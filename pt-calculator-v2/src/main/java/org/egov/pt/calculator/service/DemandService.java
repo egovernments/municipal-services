@@ -100,7 +100,7 @@ public class DemandService {
 			PropertyDetail detail = property.getPropertyDetails().get(0);
 
 			Calculation calculation = propertyCalculationMap.get(property.getPropertyDetails().get(0).getAssessmentNumber());
-
+			
 			String assessmentNumber = detail.getAssessmentNumber();
 
 			// pt_tax for the new assessment
