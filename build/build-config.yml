@@ -1,71 +1,80 @@
-#
-# config:
-# -   name: < Name of the job, foo/bar would create job named bar inside folder foo >
-#     build:
-#     - work-dir: < Working directory of the app to be built >
-#       dockerfile: < Path to the dockerfile, optional, assumes dockerfile in working directory if not provided >
-#       image-name: < Docker image name  >
-# -
-# -
-config:
-  - name: "municipal-services/egov-user-event"
-    build:
-      - work-dir: "egov-user-event"
-        image-name: "egov-user-event"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "egov-user-event/src/main/resources/db"
-        image-name: "egov-user-event-db"
-
-  - name: "municipal-services/pt-calculator-v2"
-    build:
-      - work-dir: "pt-calculator-v2"
-        image-name: "pt-calculator-v2"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "pt-calculator-v2/src/main/resources/db"
-        image-name: "pt-calculator-v2-db"
-
-  - name: "municipal-services/pt-services-v2"
-    build:
-      - work-dir: "pt-services-v2"
-        image-name: "pt-services-v2"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "pt-services-v2/src/main/resources/db"
-        image-name: "pt-services-v2-db"
-
-  - name: "municipal-services/rainmaker-pgr"
-    build:
-      - work-dir: "rainmaker-pgr"
-        image-name: "rainmaker-pgr"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "rainmaker-pgr/src/main/resources/db"
-        image-name: "rainmaker-pgr-db"
-
-  - name: "municipal-services/tl-calculator"
-    build:
-      - work-dir: "tl-calculator"
-        image-name: "tl-calculator"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "tl-calculator/src/main/resources/db"
-        image-name: "tl-calculator-db"
-        
-  - name: "municipal-services/tl-services"
-    build:
-      - work-dir: "tl-services"
-        image-name: "tl-services"
-        dockerfile: "build/maven/Dockerfile"
-      - work-dir: "tl-services/src/main/resources/db"
-        image-name: "tl-services-db"
-
-- name: "municipal-services/firenoc-services"
-    build:
-      - work-dir: "firenoc-services"
-        image-name: "firenoc-services"
-      - work-dir: "firenoc-services/migration"
-        image-name: "firenoc-services-db"
-
-- name: "municipal-services/firenoc-calculator"
-    build:
-      - work-dir: "firenoc-calculator"
-        image-name: "firenoc-calculator"
-      - work-dir: "firenoc-calculator/migration"
-        image-name: "firenoc-calculator-db"
+--- 
+config: 
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: egov-user-event
+        work-dir: egov-user-event
+      - 
+        image-name: egov-user-event-db
+        work-dir: egov-user-event/src/main/resources/db
+    name: municipal-services/egov-user-event
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: pt-calculator-v2
+        work-dir: pt-calculator-v2
+      - 
+        image-name: pt-calculator-v2-db
+        work-dir: pt-calculator-v2/src/main/resources/db
+    name: municipal-services/pt-calculator-v2
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: pt-services-v2
+        work-dir: pt-services-v2
+      - 
+        image-name: pt-services-v2-db
+        work-dir: pt-services-v2/src/main/resources/db
+    name: municipal-services/pt-services-v2
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: rainmaker-pgr
+        work-dir: rainmaker-pgr
+      - 
+        image-name: rainmaker-pgr-db
+        work-dir: rainmaker-pgr/src/main/resources/db
+    name: municipal-services/rainmaker-pgr
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: tl-calculator
+        work-dir: tl-calculator
+      - 
+        image-name: tl-calculator-db
+        work-dir: tl-calculator/src/main/resources/db
+    name: municipal-services/tl-calculator
+  - 
+    build: 
+      - 
+        dockerfile: build/maven/Dockerfile
+        image-name: tl-services
+        work-dir: tl-services
+      - 
+        image-name: tl-services-db
+        work-dir: tl-services/src/main/resources/db
+    name: municipal-services/tl-services
+  - 
+    build: 
+      - 
+        image-name: firenoc-services
+        work-dir: firenoc-services
+      - 
+        image-name: firenoc-services-db
+        work-dir: firenoc-services/migration
+    name: municipal-services/firenoc-services
+  - 
+    build: 
+      - 
+        image-name: firenoc-calculator
+        work-dir: firenoc-calculator
+      - 
+        image-name: firenoc-calculator-db
+        work-dir: firenoc-calculator/migration
+    name: municipal-services/firenoc-calculator
