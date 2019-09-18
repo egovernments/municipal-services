@@ -9,7 +9,8 @@
     "build": "babel src -s -D -d dist --presets es2015,stage-0",
     "start": "cross-env NODE_ENV=production node dist",
     "prestart": "npm run -s build",
-    "test": "eslint src"
+    "test": "eslint src",
+    "prod:start": "cross-env NODE_ENV=production node dist"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",

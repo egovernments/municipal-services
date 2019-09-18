@@ -13,7 +13,8 @@
     "dev:migrate-up": "db-migrate up --config config/database.json -e dev",
     "dev:migrate-down": "db-migrate down --config config/database.json -e dev",
     "prod:migrate-up": "db-migrate up --config config/database.json -e prod",
-    "prod:migrate-down": "db-migrate down --config config/database.json -e prod"
+    "prod:migrate-down": "db-migrate down --config config/database.json -e prod",
+    "prod:start": "cross-env NODE_ENV=production node dist"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
