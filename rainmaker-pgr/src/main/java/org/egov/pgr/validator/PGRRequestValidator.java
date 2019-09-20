@@ -164,9 +164,12 @@ public class PGRRequestValidator {
 	 * @param errorMap
 	 */
 	private void validateIfArraysEqual(ServiceRequest serviceRequest, Map<String, String> errorMap) {
-		if (null != serviceRequest.getActionInfo()
-				&& serviceRequest.getServices().size() != serviceRequest.getActionInfo().size())
-			errorMap.put(ErrorConstants.UNEQUAL_REQUEST_SIZE_KEY, ErrorConstants.UNEQUAL_REQUEST_SIZE_MSG);
+		if(!CollectionUtils.isEmpty(serviceRequest.getActionInfo())) {
+			if(serviceRequest.getServices().size() != serviceRequest.getActionInfo().size()) {
+				errorMap.put(ErrorConstants.UNEQUAL_REQUEST_SIZE_KEY, ErrorConstants.UNEQUAL_REQUEST_SIZE_MSG);
+			}
+			
+		}
 	}
 
 	/**
