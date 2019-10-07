@@ -4,6 +4,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.egov.pgr.model.user.Citizen;
 import org.hibernate.validator.constraints.Email;
@@ -37,16 +38,22 @@ public class Service   {
   
   @NotNull
   @JsonProperty("tenantId")
+  @Size(min=2,max=25)
+  @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String tenantId;
 
   @NotNull
   @JsonProperty("serviceCode")
+  @Size(min=2,max=25) 
+  @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String serviceCode;
 
   @JsonProperty("serviceRequestId")
+  @Size(min=2,max=25) 
   private String serviceRequestId;
 
   @JsonProperty("description")
+  @Size(min=2,max=500) 
   private String description;
 
   @JsonProperty("lat")
@@ -59,6 +66,7 @@ public class Service   {
   private String addressId;
   
   @JsonProperty("address")
+  @Size(min=2,max=25) 
   private String address;
 
   @JsonProperty("email")
@@ -72,9 +80,13 @@ public class Service   {
   private String accountId;
 
   @JsonProperty("firstName")
+  @Size(min=2,max=50) 
+  @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String firstName;
 
   @JsonProperty("lastName")
+  @Size(min=2,max=50) 
+  @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String lastName;
 
   @JsonProperty("phone")
@@ -195,6 +207,7 @@ public class Service   {
   private AuditDetails auditDetails;
   
   @JsonProperty("landmark")
+  @Size(min=2,max=50) 
   private String landmark;
   
   }

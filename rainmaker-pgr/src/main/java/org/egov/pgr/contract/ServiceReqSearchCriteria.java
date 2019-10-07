@@ -3,6 +3,8 @@ package org.egov.pgr.contract;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,12 +26,16 @@ public class ServiceReqSearchCriteria {
 		
 	@NotNull
 	@JsonProperty("tenantId")
+    @Size(min=2,max=25) 
+	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String tenantId;
 	
 	@JsonProperty("serviceRequestId")
 	private List<String> serviceRequestId;
 	
 	@JsonProperty("assignedTo")
+	@Size(min=2,max=25)
+	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String assignedTo;
 	
 	@JsonProperty("accountId")
@@ -48,12 +54,15 @@ public class ServiceReqSearchCriteria {
 	private Long lastUpdatedSince;	
 	
 	@JsonProperty("group")
+	@Size(min=2,max=25)
+	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String group;
 	
 	@JsonProperty("serviceCodes")
 	private List<String> serviceCodes;
 	
 	@JsonProperty("phone")
+	@Pattern(regexp="(^$|[0-9]{10})")
 	private String phone;
 	
 	@JsonProperty("active")
