@@ -27,7 +27,6 @@ public class ServiceReqSearchCriteria {
 	@NotNull
 	@JsonProperty("tenantId")
     @Size(min=2,max=25) 
-	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String tenantId;
 	
 	@JsonProperty("serviceRequestId")
