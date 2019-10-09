@@ -33,7 +33,6 @@ public class ServiceReqSearchCriteria {
 	private List<String> serviceRequestId;
 	
 	@JsonProperty("assignedTo")
-	@Size(min=2,max=25)
 	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String assignedTo;
 	
@@ -53,7 +52,6 @@ public class ServiceReqSearchCriteria {
 	private Long lastUpdatedSince;	
 	
 	@JsonProperty("group")
-	@Size(min=2,max=25)
 	@Pattern(regexp="(^[a-zA-Z0-9]$)")
 	private String group;
 	

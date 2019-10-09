@@ -43,15 +43,12 @@ public class Service   {
 
   @NotNull
   @JsonProperty("serviceCode")
-  @Size(min=2,max=25) 
   private String serviceCode;
 
   @JsonProperty("serviceRequestId")
-  @Size(min=2,max=25) 
   private String serviceRequestId;
 
   @JsonProperty("description")
-  @Size(min=2,max=500) 
   private String description;
 
   @JsonProperty("lat")
@@ -78,12 +75,10 @@ public class Service   {
   private String accountId;
 
   @JsonProperty("firstName")
-  @Size(min=2,max=50) 
   @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String firstName;
 
   @JsonProperty("lastName")
-  @Size(min=2,max=50) 
   @Pattern(regexp="(^[a-zA-Z0-9]$)")
   private String lastName;
 
@@ -205,7 +200,6 @@ public class Service   {
   private AuditDetails auditDetails;
   
   @JsonProperty("landmark")
-  @Size(min=2,max=50) 
   private String landmark;
   
   }
