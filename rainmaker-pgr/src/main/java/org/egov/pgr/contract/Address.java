@@ -1,6 +1,8 @@
 package org.egov.pgr.contract;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import org.egov.pgr.model.AuditDetails;
 
@@ -21,6 +23,8 @@ public class Address {
 	public String uuid;
 
 	@JsonProperty("houseNoAndStreetName")
+	@Pattern(regexp = "^[a-zA-Z0-9!@#.,/:()]*$")
+	@Size(max=160)
 	public String houseNoAndStreetName;
 
 	@NotNull
@@ -41,6 +45,7 @@ public class Address {
 	private Double longitude;
 
 	@JsonProperty("landmark")
+	@Pattern(regexp = "^[a-zA-Z0-9!@#.,/:()]*$")
 	public String landmark;
 	
 	@JsonProperty("tenantId")

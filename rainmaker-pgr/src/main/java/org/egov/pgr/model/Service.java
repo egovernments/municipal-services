@@ -49,6 +49,8 @@ public class Service   {
   private String serviceRequestId;
 
   @JsonProperty("description")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/:()]*$")
+  @Size(max=256)
   private String description;
 
   @JsonProperty("lat")
