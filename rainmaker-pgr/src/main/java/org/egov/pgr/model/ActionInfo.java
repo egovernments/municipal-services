@@ -62,8 +62,8 @@ public class ActionInfo   {
   private List<String> media = null;
 
   @JsonProperty("comments")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
   @Size(max=256)
-  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()]*$")
   private String comment = null;
 
   public String getUuid() {
