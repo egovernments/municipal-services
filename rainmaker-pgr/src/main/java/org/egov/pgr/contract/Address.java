@@ -35,7 +35,7 @@ public class Address {
 	
 	@JsonProperty("locality")
 	@Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&'-]*$")
-	@Size(max=30)
+	@Size(max=100)
 	public String locality;
 
 	@NotNull
