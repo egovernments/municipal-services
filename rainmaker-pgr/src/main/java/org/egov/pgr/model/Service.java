@@ -46,6 +46,8 @@ public class Service   {
 
   @NotNull
   @JsonProperty("serviceCode")
+  @Size(min=2,max=50)
+  @Pattern(regexp="^[a-zA-Z0-9._]*$")
   private String serviceCode;
 
   @JsonProperty("serviceRequestId")
@@ -75,17 +77,19 @@ public class Service   {
   private String email;
 
   @JsonProperty("deviceId")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
+  @Size(max=160)
   private String deviceId;
 
   @JsonProperty("accountId")
   private String accountId;
 
   @JsonProperty("firstName")
-  @Pattern(regexp="(^[a-zA-Z ]$)")
+  @Pattern(regexp="(^[a-zA-Z. ]$)")
   private String firstName;
 
   @JsonProperty("lastName")
-  @Pattern(regexp="(^[a-zA-Z ]$)")
+  @Pattern(regexp="(^[a-zA-Z. ]$)")
   private String lastName;
 
   @JsonProperty("phone")
@@ -98,6 +102,7 @@ public class Service   {
   
   @JsonProperty("addressDetail")
   @Valid
+  @NotNull
   private Address addressDetail;
   
   @JsonProperty("active")
@@ -196,6 +201,7 @@ public class Service   {
   private Long expectedTime;
 
   @JsonProperty("feedback")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
   private String feedback;
 
   @JsonProperty("rating")
@@ -207,6 +213,7 @@ public class Service   {
   private AuditDetails auditDetails;
   
   @JsonProperty("landmark")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
   private String landmark;
   
   }

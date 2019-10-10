@@ -21,7 +21,7 @@ public class Citizen {
 	private Long id;
 	private String uuid;
 	
-	@Pattern(regexp="^[a-zA-Z.]*$")
+	@Pattern(regexp="^[a-zA-Z. ]*$")
 	@Size(max=30)
 	private String name;
 	
