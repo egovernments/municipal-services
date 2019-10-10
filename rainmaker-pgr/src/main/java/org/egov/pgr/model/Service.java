@@ -1,5 +1,6 @@
 package org.egov.pgr.model;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -49,7 +50,7 @@ public class Service   {
   private String serviceRequestId;
 
   @JsonProperty("description")
-  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/:()]*$")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()]*$")
   @Size(max=256)
   private String description;
 
@@ -93,6 +94,7 @@ public class Service   {
   private Object attributes;
   
   @JsonProperty("addressDetail")
+  @Valid
   private Address addressDetail;
   
   @JsonProperty("active")

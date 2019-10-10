@@ -61,7 +61,7 @@ public class ActionInfo   {
 
   @JsonProperty("comments")
   @Size(max=256)
-  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/:()]*$")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()]*$")
   private String comment = null;
 
   public String getUuid() {
