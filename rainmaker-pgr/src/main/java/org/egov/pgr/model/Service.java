@@ -35,6 +35,7 @@ import lombok.NoArgsConstructor;
 public class Service   {
 	
   @JsonProperty("citizen")
+  @Valid
   private Citizen citizen;
   
   @NotNull
@@ -65,6 +66,8 @@ public class Service   {
   private String addressId;
   
   @JsonProperty("address")
+  @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
+  @Size(max=160)
   private String address;
 
   @JsonProperty("email")
