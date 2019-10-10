@@ -32,6 +32,8 @@ public class ActionInfo   {
   private String uuid;
   
   @JsonProperty("tenantId")
+  @Size(min=2,max=25)
+  @Pattern(regexp="^[a-zA-Z.]*$")
   private String tenantId = null;
 
   @JsonProperty("by")

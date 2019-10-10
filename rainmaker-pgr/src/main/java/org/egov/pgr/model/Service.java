@@ -40,6 +40,7 @@ public class Service   {
   @NotNull
   @JsonProperty("tenantId")
   @Size(min=2,max=25)
+  @Pattern(regexp="^[a-zA-Z.]*$")
   private String tenantId;
 
   @NotNull
@@ -64,7 +65,6 @@ public class Service   {
   private String addressId;
   
   @JsonProperty("address")
-  @Size(min=2,max=25) 
   private String address;
 
   @JsonProperty("email")
@@ -78,11 +78,11 @@ public class Service   {
   private String accountId;
 
   @JsonProperty("firstName")
-  @Pattern(regexp="(^[a-zA-Z0-9]$)")
+  @Pattern(regexp="(^[a-zA-Z ]$)")
   private String firstName;
 
   @JsonProperty("lastName")
-  @Pattern(regexp="(^[a-zA-Z0-9]$)")
+  @Pattern(regexp="(^[a-zA-Z ]$)")
   private String lastName;
 
   @JsonProperty("phone")

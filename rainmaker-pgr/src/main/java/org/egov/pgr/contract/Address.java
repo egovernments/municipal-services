@@ -49,6 +49,8 @@ public class Address {
 	public String landmark;
 	
 	@JsonProperty("tenantId")
+	@Size(min=2,max=25)
+	@Pattern(regexp="^[a-zA-Z.]*$")
 	public String tenantId;
 	
 	@JsonProperty("auditDetails")

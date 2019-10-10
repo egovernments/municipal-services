@@ -26,17 +26,19 @@ public class ServiceReqSearchCriteria {
 		
 	@NotNull
 	@JsonProperty("tenantId")
-    @Size(min=2,max=25) 
+	@Size(min=2,max=25)
+	@Pattern(regexp="^[a-zA-Z.]*$")
 	private String tenantId;
 	
 	@JsonProperty("serviceRequestId")
 	private List<String> serviceRequestId;
 	
 	@JsonProperty("assignedTo")
-	@Pattern(regexp="(^[a-zA-Z0-9]$)")
+	@Pattern(regexp="^[a-zA-Z0-9]$")
 	private String assignedTo;
 	
 	@JsonProperty("accountId")
+	@Pattern(regexp="^[a-zA-Z0-9]$")
 	private String accountId;
 	
 	@JsonProperty("status")
@@ -52,7 +54,7 @@ public class ServiceReqSearchCriteria {
 	private Long lastUpdatedSince;	
 	
 	@JsonProperty("group")
-	@Pattern(regexp="(^[a-zA-Z0-9]$)")
+	@Pattern(regexp="^[a-zA-Z.]$")
 	private String group;
 	
 	@JsonProperty("serviceCodes")
