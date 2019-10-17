@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.egov.pt.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.pt.calculator.repository.rowmapper.BillingSlabRowMapper;
+import org.egov.pt.calculator.repository.rowmapper.MutationBillingSlabRowMapper;
 import org.egov.pt.calculator.web.models.BillingSlab;
+import org.egov.pt.calculator.web.models.MutationBillingSlab;
 import org.egov.pt.calculator.web.models.BillingSlabSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,6 +27,9 @@ public class PTCalculatorDBRepository {
 	
 	@Autowired
 	private BillingSlabRowMapper billingSlabRowMapper;
+
+	@Autowired
+	private MutationBillingSlabRowMapper mutationBillingSlabRowMapper;
 	
 	public List<BillingSlab> searchBillingSlab(BillingSlabSearchCriteria billingSlabSearcCriteria) {
 		
@@ -32,6 +37,14 @@ public class PTCalculatorDBRepository {
 		String query = billingSlabQueryBuilder.getBillingSlabSearchQuery(billingSlabSearcCriteria, preparedStmtList);
 		log.debug("Query: "+query);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), billingSlabRowMapper);
+	}
+
+	public List<MutationBillingSlab> searchMutationBillingSlab(BillingSlabSearchCriteria billingSlabSearcCriteria) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = billingSlabQueryBuilder.getBillingSlabSearchQuery(billingSlabSearcCriteria, preparedStmtList);
+		log.debug("Query: "+query);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), mutationBillingSlabRowMapper);
 	}
 
 }
