@@ -48,14 +48,14 @@ public class MutationBillingSlabService {
 
     public MutationBillingSlabRes createMutationBillingSlab(MutationBillingSlabReq mutationBillingSlabReq) {
         enrichMutationBillingSlabForCreate(mutationBillingSlabReq);
-        producer.push(configurations.getBillingSlabSavePersisterTopic(), mutationBillingSlabReq);
+        producer.push(configurations.getMutationBillingSlabSavePersisterTopic(), mutationBillingSlabReq);
         return billingSlabUtils.getMutationBillingSlabResponse(mutationBillingSlabReq);
     }
 
 
     public MutationBillingSlabRes updateMutationBillingSlab(MutationBillingSlabReq mutationBillingSlabReq) {
         enrichBillingSlabForUpdate(mutationBillingSlabReq);
-        producer.push(configurations.getBillingSlabUpdatePersisterTopic(), mutationBillingSlabReq);
+        producer.push(configurations.getMutationBillingSlabUpdatePersisterTopic(), mutationBillingSlabReq);
         return billingSlabUtils.getMutationBillingSlabResponse(mutationBillingSlabReq);
     }
 

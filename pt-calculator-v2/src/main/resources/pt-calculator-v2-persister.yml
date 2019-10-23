@@ -26,7 +26,7 @@ serviceMaps:
 
        - jsonPath: $.BillingSlab.*.usageCategorySubMinor
 
-       - jsonPath: $.BillingSlab.*.usageCategoryDetail
+       - jsonPath: $.BilligSlab.*.usageCategoryDetail
 
        - jsonPath: $.BillingSlab.*.ownerShipCategory
 
@@ -109,6 +109,79 @@ serviceMaps:
        
        - jsonPath: $.BillingSlab.*.isPropertyMultiFloored
               
+       - jsonPath: $.BillingSlab.*.auditDetails.lastmodifiedBy
+
+       - jsonPath: $.BillingSlab.*.auditDetails.lastmodifiedTime
+
+       - jsonPath: $.BillingSlab.*.tenantId
+
+       - jsonPath: $.BillingSlab.*.id
+
+
+  - version: 1.0
+    name: pt-calculator
+    description: Persists the pt-calculator for mutation related records to db
+    fromTopic: save-pt-mutation-billingslab
+    isTransaction: true
+    queryMaps:
+    - query: INSERT INTO eg_pt_mutation_billingslab_v2(id, tenantid, ownerShipType, usageType, fromCurrentMarketValue, toCurrentMarketValue, cmvPercent, fixedAmount, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, cast(? as double precision), cast(? as double precision), ?, ?, ?, ?);
+      basePath: MutationBillingSlab.*
+      jsonMaps:
+
+      - jsonPath: $.MutationBillingSlab.*.id
+
+      - jsonPath: $.MutationBillingSlab.*.tenantId
+
+      - jsonPath: $.MutationBillingSlab.*.areaType
+
+      - jsonPath: $.MutationBillingSlab.*.ownerShipType
+
+      - jsonPath: $.MutationBillingSlab.*.usageType
+
+      - jsonPath: $.MutationBillingSlab.*.fromCurrentMarketValue
+
+      - jsonPath: $.MutationBillingSlab.*.toCurrentMarketValue
+
+      - jsonPath: $.MutationBillingSlab.*.cmvPercent
+              
+      - jsonPath: $.MutationBillingSlab.*.fixedAmount
+
+      - jsonPath: $.MutationBillingSlab.*.auditDetails.createdBy
+
+      - jsonPath: $.MutationBillingSlab.*.auditDetails.createdTime
+
+      - jsonPath: $.MutationBillingSlab.*.auditDetails.lastmodifiedBy
+
+      - jsonPath: $.MutationBillingSlab.*.auditDetails.lastmodifiedTime
+
+
+
+ - version: 1.0
+     name: pt-calculator
+     description: Persists the pt-calculator mutation related records to db
+     fromTopic: update-pt-mutation-billingslab
+     isTransaction: true
+     queryMaps:
+
+     - query: UPDATE eg_pt_Billingslab_v2 SET areaType=?, ownerShipType=?, usageType=?, fromCurrentMarketValue=?, toCurrentMarketValue=?, cmvPercent=cast(? as double precision), fixedAmount=cast(? as double precision), areaType=?, createdby=?, createdtime=?, lastmodifiedby=?, lastmodifiedtime=? WHERE tenantid=? AND id=?;
+
+       basePath: BillingSlab.*
+       jsonMaps:
+
+       - jsonPath: $.BillingSlab.*.areaType
+
+       - jsonPath: $.MutationBillingSlab.*.ownerShipType
+
+       - jsonPath: $.MutationBillingSlab.*.usageType
+
+       - jsonPath: $.MutationBillingSlab.*.fromCurrentMarketValue
+
+       - jsonPath: $.MutationBillingSlab.*.toCurrentMarketValue
+
+       - jsonPath: $.MutationBillingSlab.*.cmvPercent
+
+       - jsonPath: $.MutationBillingSlab.*.fixedAmount
+
        - jsonPath: $.BillingSlab.*.auditDetails.lastmodifiedBy
 
        - jsonPath: $.BillingSlab.*.auditDetails.lastmodifiedTime

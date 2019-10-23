@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 /**
  * BillingSlab
  */
@@ -47,8 +49,12 @@ public class MutationBillingSlab   {
     private String areaType;
 
     @NotNull
-    @JsonProperty("currentMarketValue")
-    private String currentMarketValue;
+    @JsonProperty("fromCurrentMarketValue")
+    private BigDecimal fromCurrentMarketValue;
+
+    @NotNull
+    @JsonProperty("toCurrentMarketValue")
+    private BigDecimal toCurrentMarketValue;
 
     @JsonProperty("cmvPercent")
     private Double cmvPercent;
