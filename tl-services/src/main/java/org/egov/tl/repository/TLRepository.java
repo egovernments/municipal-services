@@ -7,7 +7,10 @@ import org.egov.tl.producer.Producer;
 import org.egov.tl.repository.builder.TLQueryBuilder;
 import org.egov.tl.repository.rowmapper.TLRowMapper;
 import org.egov.tl.web.models.*;
+import org.egov.tl.web.models.workflow.BusinessService;
+import org.egov.tl.web.models.workflow.State;
 import org.egov.tl.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -77,6 +80,7 @@ public class TLRepository {
      * @param tradeLicenseRequest The update requuest
      */
     public void update(TradeLicenseRequest tradeLicenseRequest,Map<String,Boolean> idToIsStateUpdatableMap) {
+    	
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
         List<TradeLicense> licenses = tradeLicenseRequest.getLicenses();
 
