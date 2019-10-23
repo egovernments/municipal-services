@@ -29,7 +29,7 @@ public class Address {
 
 	@NotNull
 	@JsonProperty("mohalla")
-	@Pattern(regexp="^[a-zA-Z0-9._]*$")
+	@Pattern(regexp="^[a-zA-Z0-9._-]*$")
 	@Size(max=30)
 	public String mohalla;
 	
@@ -51,7 +51,7 @@ public class Address {
 	private Double longitude;
 
 	@JsonProperty("landmark")
-	@Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
+	@Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&'-]*$")
 	@Size(max=160)
 	public String landmark;
 	
