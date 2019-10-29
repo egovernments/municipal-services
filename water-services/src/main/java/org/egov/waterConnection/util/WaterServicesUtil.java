@@ -78,38 +78,35 @@ public class WaterServicesUtil {
 
 	public List<Property> propertyCallForSearchCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		if (waterConnectionSearchCriteria.getTenantId() != null && !waterConnectionSearchCriteria.getTenantId().isEmpty()) {
-			propertyCriteria.setTenantId(waterConnectionSearchCriteria.getTenantId());
-			RequestInfoWrapper requestInfoWrapper = new RequestInfoWrapper();
-			requestInfoWrapper.setRequestInfo(requestInfo);
-			RequestInfoWrapper requestInfoWrapper1 = getPropertyRequestInfoWrapperSearch(requestInfoWrapper,
-					requestInfo);
-			PropertyCriteria propertyCriteria1 = getPropertyCriteriaSearch(propertyCriteria,
-					waterConnectionSearchCriteria);
-			propertyRequestObj.put("RequestInfoWrapper", requestInfoWrapper1);
-			propertyRequestObj.put("PropertyCriteria", propertyCriteria1);
-			Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
-			return getPropertyDetails(result);
+		if ((waterConnectionSearchCriteria.getTenantId() == null
+				|| waterConnectionSearchCriteria.getTenantId().isEmpty())
+				&& (waterConnectionSearchCriteria.getMobileNumber() != null
+						|| !waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
+			return Collections.emptyList();
 		}
-		if(waterConnectionSearchCriteria.getMobileNumber() != null && !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
+		HashMap<String, Object> propertyRequestObj = new HashMap<>();
+		RequestInfoWrapper requestInfoWrapper = new RequestInfoWrapper();
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (waterConnectionSearchCriteria.getTenantId() != null
+				&& !waterConnectionSearchCriteria.getTenantId().isEmpty()) {
+			propertyCriteria.setTenantId(waterConnectionSearchCriteria.getTenantId());
+		}
+		if (waterConnectionSearchCriteria.getMobileNumber() != null
+				&& !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
 			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
 		}
-		return Collections.emptyList();
+		requestInfoWrapper.setRequestInfo(requestInfo);
+		propertyRequestObj.put("RequestInfoWrapper",
+				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
+		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
+		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
+		return getPropertyDetails(result);
 	}
 
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
 		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		return requestInfoWrapper_new;
-	}
-
-	private PropertyCriteria getPropertyCriteriaSearch(PropertyCriteria propertyCriteria,
-			WaterConnectionSearchCriteria waterConnectionSearchCriteria) {
-		PropertyCriteria propertyCriteria_new = PropertyCriteria.builder()
-				.tenantId(waterConnectionSearchCriteria.getTenantId()).build();
-		return propertyCriteria_new;
 	}
 
 	private List<Property> getPropertyDetails(Object result) {
