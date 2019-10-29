@@ -92,19 +92,19 @@ public class WaterConnectionValidator {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
 		if (isUpdate && (waterConnection.getId() == null || waterConnection.getId().isEmpty())) {
-			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be updated without connection id");
+			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be update without connection id");
 		}
-		if (!isUpdate && waterConnection.getId() != null && !waterConnection.getId().isEmpty()) {
+		if (isUpdate && waterConnection.getId() != null && !waterConnection.getId().isEmpty()) {
 			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getId()));
-			if (n > 0) {
-				errorMap.put("INVALID WATER CONNECTION", "WaterConnection id is not valid");
+			if (n == 0) {
+				errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be update without connection type");
 			}
 		}
 		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
 			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be updated without connection type");
 		}
 		if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
-			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be updated without connection category");
+			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be update without connection category");
 		}
 		if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
 			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be created without water source");

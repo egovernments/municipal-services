@@ -34,7 +34,7 @@ public class WaterConsumer {
 
 
 	
-    @KafkaListener(topics = "shriya",group="${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = "RandomChecker",group="${spring.kafka.consumer.group-id}")
     public void listen(final String record, @RequestHeader(KafkaHeaders.RECEIVED_TOPIC) String topic) {
     	
     	log.info("inside kafka !!"+record);

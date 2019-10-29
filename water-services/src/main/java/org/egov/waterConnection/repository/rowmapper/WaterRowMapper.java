@@ -27,8 +27,8 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			waterConnection.setConnectionCategory(rs.getString("connectionCategory"));
 			waterConnection.setRainWaterHarvesting(rs.getBoolean("rainWaterHarvesting"));
 			waterConnection.setConnectionType(rs.getString("connectionType"));
-			waterConnection.setWaterSource("waterSource");
-			waterConnection.setMeterId("meterId");
+			waterConnection.setWaterSource(rs.getString("waterSource"));
+			waterConnection.setMeterId(rs.getString("meterId"));
 			waterConnection.setMeterInstallationDate(rs.getLong("meterInstallationDate"));
 			waterConnection.setId(rs.getString("connection_Id"));
 			waterConnection.setApplicationNo(rs.getString("applicationNo"));
@@ -41,7 +41,6 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			waterConnection.setProperty(property);
 			//Add documents id's
 			waterConnectionList.add(waterConnection);
-
 		}
 		return waterConnectionList;
 	}
