@@ -33,7 +33,7 @@ public class WCQueryBuilder {
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc"
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 
-	private final static String noOfConnectionSearchQuery = "select count(*) from water_service where";
+	private final static String noOfConnectionSearchQuery = "select count(*) from water_service_connection where";
 
 	/**
 	 * 

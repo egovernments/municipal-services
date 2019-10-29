@@ -42,6 +42,7 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		List<Property> propertyList;
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
+		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
 		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
 		}else {
