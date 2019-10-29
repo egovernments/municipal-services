@@ -3,7 +3,6 @@ package org.egov.waterConnection.controller;
 import java.util.List;
 import javax.validation.Valid;
 
-
 import org.egov.waterConnection.model.RequestInfoWrapper;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -62,8 +61,7 @@ public class WaterController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
+
 	@RequestMapping(value = "/_update", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<WaterConnectionResponse> updateWaterConnection(
 			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest) {
@@ -75,17 +73,20 @@ public class WaterController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
-	
-//	@RequestMapping(value = "/_cancel", method = RequestMethod.POST)
-//	public ResponseEntity<WaterConnectionResponse> cancel(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-//												   @Valid @ModelAttribute WaterConnectionCancelCriteria waterConnectionCancelCriteria) {
-//		List<WaterConnection> waterConnectionList = waterService.cancelWaterConnection(waterConnectionCancelCriteria,requestInfoWrapper.getRequestInfo());
-//		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnectionList)
-//				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),
-//						true))
-//				.build();
-//		return new ResponseEntity<>(response, HttpStatus.OK);
-//	}
 
+	// @RequestMapping(value = "/_cancel", method = RequestMethod.POST)
+	// public ResponseEntity<WaterConnectionResponse> cancel(@Valid @RequestBody
+	// RequestInfoWrapper requestInfoWrapper,
+	// @Valid @ModelAttribute WaterConnectionCancelCriteria
+	// waterConnectionCancelCriteria) {
+	// List<WaterConnection> waterConnectionList =
+	// waterService.cancelWaterConnection(waterConnectionCancelCriteria,requestInfoWrapper.getRequestInfo());
+	// WaterConnectionResponse response =
+	// WaterConnectionResponse.builder().waterConnection(waterConnectionList)
+	// .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),
+	// true))
+	// .build();
+	// return new ResponseEntity<>(response, HttpStatus.OK);
+	// }
 
 }

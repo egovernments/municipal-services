@@ -51,17 +51,19 @@ public class WaterServicesUtil {
 
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
 		RequestInfo requestInfo = waterConnectionRequest.getRequestInfo();
-		Set<String> propertyIds = new HashSet<>();   //localise
+		Set<String> propertyIds = new HashSet<>(); // localise
 		List<Property> propertyList = new ArrayList<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-			propertyCriteria.setIds(propertyIds);
-			propertyRequestObj.put("RequestInfoWrapper",
-					getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
-			propertyRequestObj.put("PropertyCriteria", propertyCriteria);
-			Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
-			propertyList = getPropertyDetails(result);   //?somebody sending id but that id is not present // validate property
-			return propertyList;
+		propertyCriteria.setIds(propertyIds);
+		propertyRequestObj.put("RequestInfoWrapper",
+				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
+		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
+		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
+		propertyList = getPropertyDetails(result); // somebody sending id but
+													// that id is not present //
+													// validate property
+		return propertyList;
 	}
 
 	public List<Property> createPropertyRequest(WaterConnectionRequest waterConnectionRequest) {
@@ -114,11 +116,10 @@ public class WaterServicesUtil {
 	private List<Property> getPropertyDetails(Object result) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-		PropertyResponse propertyResponse = mapper.convertValue(result, PropertyResponse.class);
-		return propertyResponse.getProperties();
-		}
-		catch(Exception ex) {
-			throw new CustomException("PARSING ERROR","The property json cannot be parsed");
+			PropertyResponse propertyResponse = mapper.convertValue(result, PropertyResponse.class);
+			return propertyResponse.getProperties();
+		} catch (Exception ex) {
+			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
 		}
 	}
 

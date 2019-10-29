@@ -37,7 +37,7 @@ public class WaterServiceImpl implements WaterService {
 
 	@Autowired
 	ValidateProperty validateProperty;
-	
+
 	@Autowired
 	EnrichmentService enrichmentService;
 
@@ -48,26 +48,21 @@ public class WaterServiceImpl implements WaterService {
 		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
 		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
-		}else {
+		} else {
 			propertyList = waterServicesUtil.createPropertyRequest(waterConnectionRequest);
 		}
-		enrichWaterConnection(waterConnectionRequest, propertyList);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, propertyList);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
-	}
-
-	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, List<Property> propertyList) {
-		if (propertyList != null && !propertyList.isEmpty())
-			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
 	}
 
 	public List<WaterConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
-		enrichmentService.enrichWaterSearch(waterConnectionList);
+		enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo);
 		return waterConnectionList;
 	}
-	
+
 	public List<WaterConnection> getWaterConnectionsList(WaterConnectionSearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);
