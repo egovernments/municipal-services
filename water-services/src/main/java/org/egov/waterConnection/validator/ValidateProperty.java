@@ -1,6 +1,5 @@
 package org.egov.waterConnection.validator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
-import org.javers.common.collections.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,14 +41,14 @@ public class ValidateProperty {
 		Property property = new Property();
 		property = waterConnectionRequest.getWaterConnection().getProperty();
 		if (property.getId() != null && !property.getId().isEmpty()) {
-			List<String> propertyIds = new ArrayList<>();
+			Set<String> propertyIds = new HashSet<>();
 			propertyIds.add(property.getId());
 			waterConnectionSearchCriteria.setIds(propertyIds);
 		}
 		if (property.getTenantId() != null && !property.getTenantId().isEmpty()) {
 			waterConnectionSearchCriteria.setTenantId(property.getTenantId());
 		}
-		List<Property> propertyList = waterServiceUtil.propertyCallForSearchCriteria(waterConnectionSearchCriteria,
+		List<Property> propertyList = waterServiceUtil.propertySearchOnCriteria(waterConnectionSearchCriteria,
 				waterConnectionRequest.getRequestInfo());
 	}
 

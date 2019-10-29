@@ -1,7 +1,9 @@
 package org.egov.waterConnection.repository.builder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.WCConfiguration;
@@ -45,9 +47,9 @@ public class WCQueryBuilder {
 		StringBuilder query = new StringBuilder(Query);
 
 		if (criteria.getTenantId() != null && !criteria.getTenantId().isEmpty()) {
-			List<String> propertyIds = new ArrayList<>();
+			Set<String> propertyIds = new HashSet<>();
 			addClauseIfRequired(preparedStatement, query);
-			List<Property> propertyList = waterServicesUtil.propertyCallForSearchCriteria(criteria, requestInfo);
+			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty())
 				query.append(" property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -79,7 +81,7 @@ public class WCQueryBuilder {
 		}
 	}
 
-	private String createQuery(List<String> ids) {
+	private String createQuery(Set<String> ids) {
 		StringBuilder builder = new StringBuilder();
 		int length = ids.size();
 		for (int i = 0; i < length; i++) {
@@ -90,7 +92,7 @@ public class WCQueryBuilder {
 		return builder.toString();
 	}
 
-	private void addToPreparedStatement(List<Object> preparedStatement, List<String> ids) {
+	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		ids.forEach(id -> {
 			preparedStatement.add(id);
 		});
@@ -110,7 +112,7 @@ public class WCQueryBuilder {
 		return query;
 	}
 
-	public String getNoOfWaterConnectionQuery(List<String> connectionIds, List<Object> preparedStatement) {
+	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, connectionIds);

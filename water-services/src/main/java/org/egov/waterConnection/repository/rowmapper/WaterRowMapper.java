@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.Connection.StatusEnum;
 import org.egov.waterConnection.model.Property;
@@ -19,19 +20,27 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 	@Override
 	public List<WaterConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		List<WaterConnection> waterConnectionList = new ArrayList<>();
-
 		WaterConnection waterConnection = new WaterConnection();
 		while (rs.next()) {
 			waterConnection = new WaterConnection();
-			waterConnection.setApplicationNo(rs.getString("applicationno"));
-			waterConnection.setConnectionNo(rs.getString("connectionno"));
-			waterConnection.setOldConnectionNo(rs.getString("oldconnectionno"));
+			Property property = new Property();
+			waterConnection.setConnectionCategory(rs.getString("connectionCategory"));
+			waterConnection.setRainWaterHarvesting(rs.getBoolean("rainWaterHarvesting"));
+			waterConnection.setConnectionType(rs.getString("connectionType"));
+			waterConnection.setWaterSource("waterSource");
+			waterConnection.setMeterId("meterId");
+			waterConnection.setMeterInstallationDate(rs.getLong("meterInstallationDate"));
+			waterConnection.setId(rs.getString("connection_Id"));
+			waterConnection.setApplicationNo(rs.getString("applicationNo"));
 			waterConnection.setApplicationStatus(ApplicationStatusEnum.valueOf(rs.getString("applicationstatus")));
 			waterConnection.setStatus(StatusEnum.valueOf(rs.getString("status")));
+			waterConnection.setConnectionNo(rs.getString("connectionNo"));
+			waterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
 			//get property id and get property object 
-			waterConnection.setProperty(new Property());
+			property.setPropertyId(rs.getString("property_id"));
+			waterConnection.setProperty(property);
+			//Add documents id's
 			waterConnectionList.add(waterConnection);
-			// waterConnection.setDocuments(rs.getString("documents_id"));
 
 		}
 		return waterConnectionList;

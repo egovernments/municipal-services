@@ -1,6 +1,7 @@
 package org.egov.waterConnection.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,7 +26,7 @@ public class WaterConnectionSearchCriteria {
 	private String status;
 
 	@JsonProperty("ids")
-	private List<String> ids;
+	private Set<String> ids;
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -42,8 +43,8 @@ public class WaterServiceImpl implements WaterService {
 		List<Property> propertyList;
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
-			propertyList = waterServicesUtil.propertyCall(waterConnectionRequest);
-		} else {
+			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
+		}else {
 			propertyList = waterServicesUtil.createPropertyRequest(waterConnectionRequest);
 		}
 		enrichWaterConnection(waterConnectionRequest, propertyList);
@@ -59,9 +60,18 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
+		enrichWaterSearch(waterConnectionList);
 		return waterConnectionList;
 	}
-
+	
+	public void enrichWaterSearch(List<WaterConnection> waterConnectionList) {
+		waterConnectionList.forEach(waterConnection -> {
+			if(waterConnection.getProperty().getId() == null || waterConnection.getProperty().getId().isEmpty()) {
+				throw new CustomException("INVALID PROPERTY ID", "NO ID FOUND FOR PROPERTY");
+			}
+			
+		});
+	}
 	public List<WaterConnection> getWaterConnectionsList(WaterConnectionSearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);

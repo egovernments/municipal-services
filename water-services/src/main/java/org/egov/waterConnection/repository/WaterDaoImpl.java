@@ -1,7 +1,9 @@
 package org.egov.waterConnection.repository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.WaterConnection;
@@ -54,8 +56,9 @@ public class WaterDaoImpl implements WaterDao {
 	@Override
 	public int isWaterConnectionExist(List<String> ids) {
 		int n = 0;
+		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(ids, preparedStatement);
+		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
 		log.info("Query: " + query);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;

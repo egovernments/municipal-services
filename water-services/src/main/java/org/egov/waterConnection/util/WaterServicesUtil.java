@@ -1,12 +1,9 @@
 package org.egov.waterConnection.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -52,13 +49,12 @@ public class WaterServicesUtil {
 
 	}
 
-	public List<Property> propertyCall(WaterConnectionRequest waterConnectionRequest) {
+	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
 		RequestInfo requestInfo = waterConnectionRequest.getRequestInfo();
 		Set<String> propertyIds = new HashSet<>();   //localise
 		List<Property> propertyList = new ArrayList<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-	
 			propertyCriteria.setIds(propertyIds);
 			propertyRequestObj.put("RequestInfoWrapper",
 					getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
@@ -76,12 +72,15 @@ public class WaterServicesUtil {
 		return getPropertyDetails(result);
 	}
 
-	public List<Property> propertyCallForSearchCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
+	public List<Property> propertySearchOnCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
 		if ((waterConnectionSearchCriteria.getTenantId() == null
-				|| waterConnectionSearchCriteria.getTenantId().isEmpty())
-				&& (waterConnectionSearchCriteria.getMobileNumber() != null
-						|| !waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
+				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
+			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESET");
+		}
+		if ((waterConnectionSearchCriteria.getMobileNumber() == null
+				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())
+				&& (waterConnectionSearchCriteria.getIds().isEmpty())) {
 			return Collections.emptyList();
 		}
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
@@ -94,6 +93,9 @@ public class WaterServicesUtil {
 		if (waterConnectionSearchCriteria.getMobileNumber() != null
 				&& !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
 			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
+		}
+		if (!waterConnectionSearchCriteria.getIds().isEmpty()) {
+			propertyCriteria.setIds(waterConnectionSearchCriteria.getIds());
 		}
 		requestInfoWrapper.setRequestInfo(requestInfo);
 		propertyRequestObj.put("RequestInfoWrapper",
@@ -116,7 +118,7 @@ public class WaterServicesUtil {
 		return propertyResponse.getProperties();
 		}
 		catch(Exception ex) {
-			throw new CustomException("Excetion Occured!", "Exception while fetching the property!");
+			throw new CustomException("PARSING ERROR","The property json cannot be parsed");
 		}
 	}
 
