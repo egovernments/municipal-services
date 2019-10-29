@@ -37,6 +37,9 @@ public class WaterServiceImpl implements WaterService {
 
 	@Autowired
 	ValidateProperty validateProperty;
+	
+	@Autowired
+	EnrichmentService enrichmentService;
 
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
@@ -61,18 +64,10 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
-		enrichWaterSearch(waterConnectionList);
+		enrichmentService.enrichWaterSearch(waterConnectionList);
 		return waterConnectionList;
 	}
 	
-	public void enrichWaterSearch(List<WaterConnection> waterConnectionList) {
-		waterConnectionList.forEach(waterConnection -> {
-			if(waterConnection.getProperty().getId() == null || waterConnection.getProperty().getId().isEmpty()) {
-				throw new CustomException("INVALID PROPERTY ID", "NO ID FOUND FOR PROPERTY");
-			}
-			
-		});
-	}
 	public List<WaterConnection> getWaterConnectionsList(WaterConnectionSearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);
