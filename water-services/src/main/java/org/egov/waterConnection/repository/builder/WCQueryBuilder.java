@@ -33,20 +33,24 @@ public class WCQueryBuilder {
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 
-	private final static String noOfConnectionSearchQuery = "select count(*) from water_service_connection where";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM water_service_connection WHERE";
 
 	/**
 	 * 
-	 * @param criteria The WaterCriteria
-	 * @param preparedStatement The Array Of Object
-	 * @param requestInfo The Request Inof
+	 * @param criteria
+	 *            The WaterCriteria
+	 * @param preparedStatement
+	 *            The Array Of Object
+	 * @param requestInfo
+	 *            The Request Inof
 	 * @return query as a string
 	 */
 	public String getSearchQueryString(WaterConnectionSearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
-		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty()) && (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
+		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
+				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
 			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
@@ -70,18 +74,18 @@ public class WCQueryBuilder {
 			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
 		}
-		if(criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
 		}
-		if(criteria.getApplicationNumber()!= null && !criteria.getApplicationNumber().isEmpty()) {
+		if (criteria.getApplicationNumber() != null && !criteria.getApplicationNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationNumber = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
 		}
 		resultantQuery = query.toString();
-		if(query.toString().indexOf("WHERE") > -1)
+		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement);
 		return resultantQuery;
 	}
@@ -110,10 +114,19 @@ public class WCQueryBuilder {
 			preparedStatement.add(id);
 		});
 	}
+	
+	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
+		ids.forEach(id -> {
+			preparedStatement.add(id);
+		});
+	}
+
 	/**
 	 * 
-	 * @param query The
-	 * @param preparedStmtList Array of object for preparedStatement list
+	 * @param query
+	 *            The
+	 * @param preparedStmtList
+	 *            Array of object for preparedStatement list
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList) {
@@ -127,8 +140,10 @@ public class WCQueryBuilder {
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
+		Set<Integer> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
-		addToPreparedStatement(preparedStatement, connectionIds);
+		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 }
