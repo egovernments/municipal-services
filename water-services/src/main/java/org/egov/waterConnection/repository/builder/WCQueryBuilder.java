@@ -30,7 +30,7 @@ public class WCQueryBuilder {
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String Query = "SELECT wc.id as water_Id, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
 			+ "wc.meterInstallationDate, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
-			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc"
+			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 
 	private final static String noOfConnectionSearchQuery = "select count(*) from water_service_connection where";
@@ -45,32 +45,45 @@ public class WCQueryBuilder {
 	public String getSearchQueryString(WaterConnectionSearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(Query);
-
-		if (criteria.getTenantId() != null && !criteria.getTenantId().isEmpty()) {
+		String resultantQuery = Query;
+		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty()) && (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
 			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty())
-				query.append(" property_id in (").append(createQuery(propertyIds)).append(" )");
+				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" id in (").append(createQuery(criteria.getIds())).append(" )");
+			query.append(" wc.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 		}
 		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" oldconnectionno = ? ");
+			query.append(" conn.oldconnectionno = ? ");
 			preparedStatement.add(criteria.getOldConnectionNumber());
 		}
 
-		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
+		if (criteria.getConnectionNumber() != null && !criteria.getConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" connectionno = ? ");
+			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
 		}
-		return addPaginationWrapper(query.toString(), preparedStatement);
+		if(criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.status = ? ");
+			preparedStatement.add(criteria.getStatus());
+		}
+		if(criteria.getApplicationNumber()!= null && !criteria.getApplicationNumber().isEmpty()) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationNumber = ? ");
+			preparedStatement.add(criteria.getApplicationNumber());
+		}
+		resultantQuery = query.toString();
+		if(query.toString().indexOf("WHERE") > -1)
+			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement);
+		return resultantQuery;
 	}
 
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
