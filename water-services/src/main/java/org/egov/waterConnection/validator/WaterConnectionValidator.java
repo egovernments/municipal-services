@@ -97,7 +97,7 @@ public class WaterConnectionValidator {
 		if (isUpdate && waterConnection.getId() != null && !waterConnection.getId().isEmpty()) {
 			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getId()));
 			if (n == 0) {
-				errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be update without connection type");
+				errorMap.put("INVALID WATER CONNECTION", "Water Id not present");
 			}
 		}
 		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
