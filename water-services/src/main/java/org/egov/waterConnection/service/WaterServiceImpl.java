@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -40,7 +39,12 @@ public class WaterServiceImpl implements WaterService {
 
 	@Autowired
 	EnrichmentService enrichmentService;
-
+	
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest contains water connection to be created
+	 * @return List of WaterConnection after create
+	 */
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		List<Property> propertyList;
@@ -55,14 +59,24 @@ public class WaterServiceImpl implements WaterService {
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
-
+	/**
+	 * 
+	 * @param criteria WaterConnectionSearchCriteria contains search criteria on water connection
+	 * @param requestInfo 
+	 * @return List of matching water connection
+	 */
 	public List<WaterConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
 		enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo);
 		return waterConnectionList;
 	}
-
+	/**
+	 * 
+	 * @param criteria WaterConnectionSearchCriteria contains search criteria on water connection
+	 * @param requestInfo 
+	 * @return List of matching water connection
+	 */
 	public List<WaterConnection> getWaterConnectionsList(WaterConnectionSearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);
@@ -70,7 +84,11 @@ public class WaterServiceImpl implements WaterService {
 			return Collections.emptyList();
 		return waterConnectionList;
 	}
-
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest contains water connection to be updated
+	 * @return List of WaterConnection after update
+	 */
 	@Override
 	public List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);

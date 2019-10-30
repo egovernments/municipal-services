@@ -43,7 +43,11 @@ public class EnrichmentService {
 			}
 		});
 	}
-
+	/**
+	 * 
+	 * @param waterConnectionRequest
+	 * @param propertyList
+	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, List<Property> propertyList) {
 		if (propertyList != null && !propertyList.isEmpty())
 			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));

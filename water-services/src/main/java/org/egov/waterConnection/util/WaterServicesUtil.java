@@ -48,7 +48,11 @@ public class WaterServicesUtil {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
-
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest containing property
+	 * @return List of Property
+	 */
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
 		Set<String> propertyIds = new HashSet<>();
 		List<Property> propertyList = new ArrayList<>();
@@ -66,7 +70,11 @@ public class WaterServicesUtil {
 		}
 		return propertyList;
 	}
-
+	/**
+	 * 
+	 * @param waterConnectionRequest 
+	 * @return Created property list
+	 */
 	public List<Property> createPropertyRequest(WaterConnectionRequest waterConnectionRequest) {
 		List<Property> propertyList = new ArrayList<>();
 		propertyList.add(waterConnectionRequest.getWaterConnection().getProperty());
@@ -74,7 +82,13 @@ public class WaterServicesUtil {
 		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
 		return getPropertyDetails(result);
 	}
-
+	
+	/**
+	 * 
+	 * @param waterConnectionSearchCriteria
+	 * @param requestInfo
+	 * @return
+	 */
 	public List<Property> propertySearchOnCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
 		if ((waterConnectionSearchCriteria.getTenantId() == null

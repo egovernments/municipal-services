@@ -1,46 +1,29 @@
 package org.egov.waterConnection.validator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.repository.WaterDao;
-import org.egov.waterConnection.util.WCConstants;
-import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class WaterConnectionValidator {
-
-	@Autowired
-	private WaterServicesUtil waterServicesUtil;
-
-	@Autowired
-	private ServiceRequestRepository serviceRequestRepository;
-
 	@Autowired
 	WaterDao waterDao;
 
-	
-
-	
-
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest is request for create or update water connection
+	 * @param isUpdate True for update and false for create
+	 */
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
