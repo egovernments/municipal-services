@@ -1,9 +1,7 @@
 package org.egov.tl.web.models.workflow;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.egov.common.contract.response.ResponseInfo;
 
 import javax.validation.Valid;
@@ -13,6 +11,8 @@ import java.util.List;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class BusinessServiceResponse {
 

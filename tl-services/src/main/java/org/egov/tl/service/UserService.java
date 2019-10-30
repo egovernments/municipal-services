@@ -49,7 +49,7 @@ public class UserService{
     public void createUser(TradeLicenseRequest request){
         List<TradeLicense> licenses = request.getLicenses();
         RequestInfo requestInfo = request.getRequestInfo();
-        Role role = getCitizenRole();
+        Role role = getCitizenRole(licenses.get(0).getTenantId());
         licenses.forEach(tradeLicense -> {
 
            /* Set<String> listOfMobileNumbers = getMobileNumbers(tradeLicense.getTradeLicenseDetail().getOwners()
@@ -191,11 +191,16 @@ public class UserService{
      * Creates citizen role
      * @return Role object for citizen
      */
-    private Role getCitizenRole(){
+    private Role getCitizenRole(String tenantId){
         Role role = new Role();
         role.setCode("CITIZEN");
         role.setName("Citizen");
+        role.setTenantId(getStateLevelTenant(tenantId));
         return role;
+    }
+
+    private String getStateLevelTenant(String tenantId){
+        return tenantId.split("\\.")[0];
     }
 
 
