@@ -1,5 +1,6 @@
 package org.egov.waterConnection.validator;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -9,9 +10,9 @@ import java.util.Map;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
-import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.util.WCConstants;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +48,12 @@ public class MDMSValidator {
 		String tenantId = request.getWaterConnection().getProperty().getTenantId();
 
 		String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
-				WCConstants.MDMS_WC_Water_Source };
+				WCConstants.MDMS_WC_Water_Source};
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
 		Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
 				WCConstants.JSONPATH_CODES, request.getRequestInfo());
 		validateMDMSData(masterNames, codes);
-		// validateCodes(request.getProperties(),codes,errorMap);
-
+		validateCodes(request.getWaterConnection(),codes,errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -82,5 +82,21 @@ public class MDMSValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-
+	
+	private static Map<String, String> validateCodes(WaterConnection waterConnection, Map<String, List<String>> codes,
+			Map<String, String> errorMap) {
+		if(!codes.get(WCConstants.MDMS_WC_Connection_Type).contains(waterConnection.getConnectionType()) && waterConnection.getConnectionType() != null) {
+			errorMap.put("INVALID WATER CONNECTION TYPE",
+					"The WaterConnection connection type '" + waterConnection.getConnectionType() + "' does not exists");
+		}
+		if(!codes.get(WCConstants.MDMS_WC_Connection_Category).contains(waterConnection.getConnectionCategory()) && waterConnection.getConnectionCategory() != null) {
+			errorMap.put("INVALID WATER CONNECTION CATEGORY",
+					"The WaterConnection connection category'" + waterConnection.getConnectionCategory() + "' does not exists");
+		}
+		if(!codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource()) && waterConnection.getWaterSource() != null) {
+			errorMap.put("INVALID WATER CONNECTION SOURCE",
+					"The WaterConnection connection source'" + waterConnection.getWaterSource() + "' does not exists");
+		}
+		return errorMap;
+	}
 }
