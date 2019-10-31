@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
@@ -19,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import com.jayway.jsonpath.JsonPath;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,19 +36,18 @@ public class MDMSValidator {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
 
-	public void validateCreateRequest(WaterConnectionRequest request) {
-		validateMasterData(request);
-	}
-
-	private void validateMasterData(WaterConnectionRequest request) {
+	public void validateMasterData(WaterConnectionRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
+
+		String jsonPath = WCConstants.JSONPATH_ROOT + WCConstants.INVALID_CONNECTION_CATEGORY
+				+ WCConstants.MDMS_WC_Connection_Type + WCConstants.MDMS_WC_Water_Source;
 		String tenantId = request.getWaterConnection().getProperty().getTenantId();
 
 		String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
 				WCConstants.MDMS_WC_Water_Source};
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
 		Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
-				WCConstants.JSONPATH_CODES, request.getRequestInfo());
+				jsonPath, request.getRequestInfo());
 		validateMDMSData(masterNames, codes);
 		validateCodes(request.getWaterConnection(),codes,errorMap);
 		if (!errorMap.isEmpty())
@@ -67,7 +63,7 @@ public class MDMSValidator {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
-			log.error("Error while fetvhing MDMS data", e);
+			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(WCConstants.INVALID_CONNECTION_CATEGORY, WCConstants.INVALID_CONNECTION_TYPE);
 		}
 	}
