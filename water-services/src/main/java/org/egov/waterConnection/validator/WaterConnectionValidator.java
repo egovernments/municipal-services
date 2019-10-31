@@ -37,10 +37,6 @@ public class WaterConnectionValidator {
 	@Autowired
 	WaterDao waterDao;
 
-	
-
-	
-
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();

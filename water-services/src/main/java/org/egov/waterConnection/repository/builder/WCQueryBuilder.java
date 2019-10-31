@@ -1,10 +1,8 @@
 package org.egov.waterConnection.repository.builder;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.WCConfiguration;
 import org.egov.waterConnection.model.Property;
@@ -114,7 +112,7 @@ public class WCQueryBuilder {
 			preparedStatement.add(id);
 		});
 	}
-	
+
 	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
 		ids.forEach(id -> {
 			preparedStatement.add(id);
