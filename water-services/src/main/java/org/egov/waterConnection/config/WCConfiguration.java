@@ -20,9 +20,9 @@ import lombok.Setter;
 public class WCConfiguration {
 
 	@Value("${egov.waterservice.pagination.default.limit}")
-	private Long defaultLimit;
+	private Integer defaultLimit;
 
 	@Value("${egov.waterservice.pagination.default.offset}")
-	private Long defaultOffset;
+	private Integer defaultOffset;
 
 }

@@ -85,9 +85,9 @@ public class WaterServicesUtil {
 	
 	/**
 	 * 
-	 * @param waterConnectionSearchCriteria
+	 * @param waterConnectionSearchCriteria WaterConnectionSearchCriteria  containing search criteria on water connection
 	 * @param requestInfo
-	 * @return
+	 * @return List of property matching on given criteria
 	 */
 	public List<Property> propertySearchOnCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
@@ -120,13 +120,18 @@ public class WaterServicesUtil {
 		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
 		return getPropertyDetails(result);
 	}
-
+	
+	
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
 		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		return requestInfoWrapper_new;
 	}
-
+	/**
+	 * 
+	 * @param result Response object from property service call
+	 * @return List of property
+	 */
 	private List<Property> getPropertyDetails(Object result) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {

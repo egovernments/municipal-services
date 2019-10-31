@@ -86,7 +86,7 @@ public class WCQueryBuilder {
 		}
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement);
+			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
 	}
 
@@ -129,10 +129,20 @@ public class WCQueryBuilder {
 	 *            Array of object for preparedStatement list
 	 * @return It's returns query
 	 */
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList) {
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList, WaterConnectionSearchCriteria criteria) {
 		query = query + Offset_Limit_String;
-		Long limit = config.getDefaultLimit();
-		Long offset = config.getDefaultOffset();
+		Integer limit = config.getDefaultLimit();
+		Integer offset = config.getDefaultOffset();
+		
+		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
+			limit = criteria.getLimit();
+
+		if (criteria.getLimit() != null && criteria.getLimit() > config.getDefaultOffset())
+			limit = config.getDefaultLimit();
+
+		if (criteria.getOffset() != null)
+			offset = criteria.getOffset();
+		
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
 		return query;

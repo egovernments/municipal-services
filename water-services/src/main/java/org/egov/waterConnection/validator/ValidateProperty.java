@@ -56,7 +56,7 @@ public class ValidateProperty {
 	/**
 	 * 
 	 * @param waterConnectionRequest  WaterConnectionRequest is request to be validated against property ID
-	 * @return
+	 * @return true if property id is present otherwise return false
 	 */
 	public boolean isPropertyIdPresent(WaterConnectionRequest waterConnectionRequest) {
 		Property property = waterConnectionRequest.getWaterConnection().getProperty();
