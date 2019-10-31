@@ -5,10 +5,17 @@ public class WCConstants {
 	private WCConstants() {
 
 	}
+	
+	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
+	
 
-	public static final String JSONPATH_CODES = "$.waterConnection.code";
+	public static final String JSONPATH_CODE_CONNECTION_CATEGORY = "connectionCategory.code";
+	
+	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
+	
+	public static final String JSONPATH_CODE_WATER_SOURCE= "waterSource.code";
 
-	public static final String MDMS_WC_MOD_NAME = "ws-masters";
+	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
 
 	public static final String MDMS_WC_Connection_Category = "connectionCategory";
 

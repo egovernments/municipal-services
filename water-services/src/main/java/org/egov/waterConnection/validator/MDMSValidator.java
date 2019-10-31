@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 import com.jayway.jsonpath.JsonPath;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -47,7 +45,7 @@ public class MDMSValidator {
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
 		Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
 				WCConstants.JSONPATH_CODES, request.getRequestInfo());
-		validateMDMSData(masterNames, codes);
+		 validateMDMSData(masterNames, codes);
 		 validateCodes(request.getWaterConnection(),codes,errorMap);
 
 		if (!errorMap.isEmpty())
