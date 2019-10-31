@@ -22,7 +22,10 @@ public class ValidateProperty {
 
 	@Autowired
 	WaterServicesUtil waterServiceUtil;
-
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest is request to be validated against property
+	 */
 	public void validatePropertyCriteria(WaterConnectionRequest waterConnectionRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 		Property property = waterConnectionRequest.getWaterConnection().getProperty();
@@ -36,7 +39,10 @@ public class ValidateProperty {
 			throw new CustomException(errorMap);
 	}
 
-	
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest is request to be validated against property
+	 */
 	public void validatePropertyCriteriaForCreate(WaterConnectionRequest waterConnectionRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 		Property property = waterConnectionRequest.getWaterConnection().getProperty();
@@ -47,7 +53,11 @@ public class ValidateProperty {
 			throw new CustomException(errorMap);
 
 	}
-
+	/**
+	 * 
+	 * @param waterConnectionRequest  WaterConnectionRequest is request to be validated against property ID
+	 * @return true if property id is present otherwise return false
+	 */
 	public boolean isPropertyIdPresent(WaterConnectionRequest waterConnectionRequest) {
 		Property property = waterConnectionRequest.getWaterConnection().getProperty();
 		if (property.getId() == null || property.getId().isEmpty()) {
