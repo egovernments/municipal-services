@@ -5,11 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.waterConnection.model.SewerageConnection;
+import org.egov.waterConnection.model.WaterConnectionResponse.WaterConnectionResponseBuilder;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -20,6 +27,12 @@ import javax.validation.constraints.*;
 @ApiModel(description = "Contains the ResponseHeader and the created/updated property")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-10-24T10:29:25.253+05:30[Asia/Kolkata]")
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Builder
 public class SewerageConnectionResponse {
 	@JsonProperty("ResponseInfo")
 	private ResponseInfo responseInfo = null;
