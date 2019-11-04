@@ -21,7 +21,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-11-04T15:55:02.864+05:30[Asia/Kolkata]")
 public class MeterReading {
 	@JsonProperty("id")
