@@ -26,3 +26,16 @@
 --      REFERENCES public.connection (id) MATCH SIMPLE
 --      ON UPDATE NO ACTION ON DELETE NO ACTION
 --);
+
+--CREATE TABLE public.meterreading
+--(
+--  id character varying(64) NOT NULL,
+--  billingPeriod character varying(64) NOT NULL,
+--  meterStatus character varying(64) NOT NULL,
+--  lastReading int NOT NULL,
+--  lastReadingDate bigint NOT NULL,
+--  currentReading int NOT NULL,
+--  currentReadingDate bigint NOT NULL,
+--  consumption int NOT NULL
+--
+--);

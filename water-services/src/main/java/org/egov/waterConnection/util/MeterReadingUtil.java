@@ -1,6 +1,5 @@
 package org.egov.waterConnection.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -15,19 +14,17 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 public class MeterReadingUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
 
-	@Value("${egov.meterReading.service.host}")
-	private String meterReadingHost;
+	@Value("${egov.billing.service.host}")
+	private String billingServiceHost;
 
-	@Value("${egov.meterReading.createendpoint}")
-	private String createMeterReadingendpoint;
+	@Value("${egov.demand.createendpoint}")
+	private String demandCreateEndPoint;
 
 	@Autowired
 	public MeterReadingUtil(ServiceRequestRepository serviceRequestRepository) {
@@ -42,7 +39,7 @@ public class MeterReadingUtil {
 	}
 
 	public StringBuilder getDemandGenerationCreateURL() {
-		return new StringBuilder().append(meterReadingHost).append(createMeterReadingendpoint);
+		return new StringBuilder().append(billingServiceHost).append(demandCreateEndPoint);
 	}
 
 	public List<MeterReading> getMeterReadingDetails(Object result) {
@@ -51,7 +48,7 @@ public class MeterReadingUtil {
 			MeterReadingResponse meterReadingResponse = mapper.convertValue(result, MeterReadingResponse.class);
 			return meterReadingResponse.getMeterReadings();
 		} catch (Exception ex) {
-			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+			throw new CustomException("PARSING ERROR", "The demand creation json cannot be parsed");
 		}
 	}
 
