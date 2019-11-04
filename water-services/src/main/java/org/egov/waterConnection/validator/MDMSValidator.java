@@ -39,8 +39,7 @@ public class MDMSValidator {
 	public void validateMasterData(WaterConnectionRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
 
-		String jsonPath = WCConstants.JSONPATH_ROOT + WCConstants.INVALID_CONNECTION_CATEGORY
-				+ WCConstants.MDMS_WC_Connection_Type + WCConstants.MDMS_WC_Water_Source;
+		String jsonPath = WCConstants.JSONPATH_ROOT;
 		String tenantId = request.getWaterConnection().getProperty().getTenantId();
 
 		String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
