@@ -57,7 +57,6 @@ public class SewarageServiceImpl implements SewarageService {
 		List<Property> propertyList;
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
-//		 mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		if (!validateProperty.isPropertyIdPresentForSewerage(sewarageConnectionRequest)) {
 			propertyList = sewerageServicesUtil.propertySearch(sewarageConnectionRequest);
 		} else {
@@ -87,8 +86,8 @@ public class SewarageServiceImpl implements SewarageService {
 	/**
 	 * 
 	 * @param criteria
-	 *            WaterConnectionSearchCriteria contains search criteria on
-	 *            water connection
+	 *            SewarageConnectionSearchCriteria contains search criteria on
+	 *            sewarage connection
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
@@ -102,8 +101,8 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest contains water connection to be updated
+	 * @param sewarageConnectionRequest
+	 *            SewarageConnectionRequest contains sewarage connection to be updated
 	 * @return List of WaterConnection after update
 	 */
 
@@ -111,7 +110,6 @@ public class SewarageServiceImpl implements SewarageService {
 	public List<SewerageConnection> updateSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
-		// mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		sewarageDao.updatSewerageConnection(sewarageConnectionRequest);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
 	}

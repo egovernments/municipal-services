@@ -9,6 +9,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.producer.SewarageConnectionProducer;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
 import org.egov.waterConnection.repository.builder.WCQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.SewerageRowMapper;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SewarageDaoImpl implements SewarageDao {
 
 	@Autowired
-	WaterConnectionProducer waterConnectionProducer;
+	SewarageConnectionProducer sewarageConnectionProducer;
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
@@ -47,7 +48,7 @@ public class SewarageDaoImpl implements SewarageDao {
 
 	@Override
 	public void saveSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		waterConnectionProducer.push(createWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(createWaterConnection, sewerageConnectionRequest);
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class SewarageDaoImpl implements SewarageDao {
 
 	@Override
 	public void updatSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		waterConnectionProducer.push(updateWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(updateWaterConnection, sewerageConnectionRequest);
 	}
 
 }
