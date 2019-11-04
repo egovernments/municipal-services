@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.egov.waterConnection.model.MeterConnectionRequest;
 import org.egov.waterConnection.model.MeterReading;
-import org.egov.waterConnection.model.PropertyRequest;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.util.MeterReadingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +26,12 @@ public class MeterServicesImpl implements MeterServices {
 
 	@Override
 	public List<MeterReading> addMeterReading(MeterConnectionRequest meterConnectionRequest) {
-
-		MeterReading meterReading = meterConnectionRequest.getMeterReading();
-		MeterConnectionRequest meterConnectionRequest_new = meterReadingUtil
-				.getMeterReadingRequest(meterConnectionRequest.getRequestInfo(), meterReading);
+		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>(1);
 		Object result = serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
-				meterConnectionRequest_new);
-		return meterReadingUtil.getMeterReadingDetails(result);
-
+				meterConnectionRequest);
+		meterReadingUtil.getMeterReadingDetails(result);
+		meterReadingsList.add(meterConnectionRequest.getMeterReading());
+		return meterReadingsList;
 	}
 
 }
