@@ -57,7 +57,7 @@ public class SewarageServiceImpl implements SewarageService {
 		List<Property> propertyList;
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
-		// mDMSValidator.validateMasterData(sewarageConnectionRequest);
+//		 mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		if (!validateProperty.isPropertyIdPresentForSewerage(sewarageConnectionRequest)) {
 			propertyList = sewerageServicesUtil.propertySearch(sewarageConnectionRequest);
 		} else {

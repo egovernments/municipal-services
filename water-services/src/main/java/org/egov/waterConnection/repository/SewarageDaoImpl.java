@@ -11,6 +11,7 @@ import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
 import org.egov.waterConnection.repository.builder.WCQueryBuilder;
+import org.egov.waterConnection.repository.rowmapper.SewerageRowMapper;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import lombok.extern.slf4j.Slf4j;
-
 
 @Slf4j
 @Repository
@@ -36,6 +36,9 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Autowired
 	WaterRowMapper waterRowMapper;
 
+	@Autowired
+	SewerageRowMapper sewarageRowMapper;
+
 	@Value("${egov.waterservice.createWaterConnection}")
 	private String createWaterConnection;
 
@@ -50,12 +53,11 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Override
 	public List<SewerageConnection> getSewerageConnectionList(WaterConnectionSearchCriteria criteria,
 			RequestInfo requestInfo) {
-		List<SewerageConnection> waterConnectionList = new ArrayList<>();
+		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
-		// waterConnectionList = jdbcTemplate.query(query,
-		// preparedStatement.toArray(), waterRowMapper);
-		return waterConnectionList;
+		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
+		return sewarageConnectionList;
 	}
 
 	@Override
