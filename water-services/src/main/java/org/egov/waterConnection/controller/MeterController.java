@@ -4,9 +4,12 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionResponse;
+import org.egov.waterConnection.model.MeterConnectionRequest;
+import org.egov.waterConnection.model.MeterReading;
+import org.egov.waterConnection.model.MeterReadingResponse;
+import org.egov.waterConnection.service.MeterServices;
+import org.egov.waterConnection.util.ResponseInfoFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,13 +28,18 @@ import lombok.Setter;
 @RequestMapping("/meterConnection")
 public class MeterController {
 
-	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity<WaterConnectionResponse> createWaterConnection(
-			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest) {
-		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest);
-		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnection)
-				.responseInfo(responseInfoFactory
-						.createResponseInfoFromRequestInfo(waterConnectionRequest.getRequestInfo(), true))
+	@Autowired
+	MeterServices meterService;
+	
+	@Autowired
+	private final ResponseInfoFactory responseInfoFactory;
+
+	@RequestMapping(value = "/_addMeterReading", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<MeterReadingResponse> addMeterReading(
+			@Valid @RequestBody MeterConnectionRequest meterConnectionRequest) {
+		List<MeterReading> meterReadings = meterService.addMeterReading(meterConnectionRequest);
+		MeterReadingResponse response = MeterReadingResponse.builder().meterReadings(meterReadings).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(meterConnectionRequest.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
