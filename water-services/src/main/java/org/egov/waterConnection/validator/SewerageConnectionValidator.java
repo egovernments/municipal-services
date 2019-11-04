@@ -12,7 +12,13 @@ import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.SewarageDao;
 import org.egov.waterConnection.repository.WaterDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Component
 public class SewerageConnectionValidator {
 	
 	@Autowired

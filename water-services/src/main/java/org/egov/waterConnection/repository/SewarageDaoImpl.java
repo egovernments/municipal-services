@@ -15,7 +15,13 @@ import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Repository
 public class SewarageDaoImpl implements SewarageDao {
 
 	@Autowired
