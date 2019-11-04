@@ -43,14 +43,17 @@ public class WaterServicesUtil {
 	@Value("${egov.property.searchendpoint}")
 	private String searchPropertyEndPoint;
 
+
 	@Autowired
 	public WaterServicesUtil(ServiceRequestRepository serviceRequestRepository) {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
+
 	/**
 	 * 
-	 * @param waterConnectionRequest WaterConnectionRequest containing property
+	 * @param waterConnectionRequest
+	 *            WaterConnectionRequest containing property
 	 * @return List of Property
 	 */
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
@@ -65,14 +68,15 @@ public class WaterServicesUtil {
 		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
 		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
 		propertyList = getPropertyDetails(result);
-		if(propertyList == null || propertyList.isEmpty()) {
-		throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATE");
+		if (propertyList == null || propertyList.isEmpty()) {
+			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATE");
 		}
 		return propertyList;
 	}
+
 	/**
 	 * 
-	 * @param waterConnectionRequest 
+	 * @param waterConnectionRequest
 	 * @return Created property list
 	 */
 	public List<Property> createPropertyRequest(WaterConnectionRequest waterConnectionRequest) {
@@ -82,10 +86,12 @@ public class WaterServicesUtil {
 		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
 		return getPropertyDetails(result);
 	}
-	
+
 	/**
 	 * 
-	 * @param waterConnectionSearchCriteria WaterConnectionSearchCriteria  containing search criteria on water connection
+	 * @param waterConnectionSearchCriteria
+	 *            WaterConnectionSearchCriteria containing search criteria on
+	 *            water connection
 	 * @param requestInfo
 	 * @return List of property matching on given criteria
 	 */
@@ -110,9 +116,9 @@ public class WaterServicesUtil {
 				&& !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
 			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
 		}
-//		if (!waterConnectionSearchCriteria.getIds().isEmpty()) {
-//			propertyCriteria.setIds(waterConnectionSearchCriteria.getIds());
-//		}
+		// if (!waterConnectionSearchCriteria.getIds().isEmpty()) {
+		// propertyCriteria.setIds(waterConnectionSearchCriteria.getIds());
+		// }
 		requestInfoWrapper.setRequestInfo(requestInfo);
 		propertyRequestObj.put("RequestInfoWrapper",
 				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
@@ -120,16 +126,17 @@ public class WaterServicesUtil {
 		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
 		return getPropertyDetails(result);
 	}
-	
-	
+
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
 		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		return requestInfoWrapper_new;
 	}
+
 	/**
 	 * 
-	 * @param result Response object from property service call
+	 * @param result
+	 *            Response object from property service call
 	 * @return List of property
 	 */
 	private List<Property> getPropertyDetails(Object result) {

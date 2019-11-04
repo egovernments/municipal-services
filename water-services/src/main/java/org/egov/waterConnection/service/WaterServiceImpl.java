@@ -12,6 +12,7 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
+import org.egov.waterConnection.util.MeterReadingUtil;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.MDMSValidator;
 import org.egov.waterConnection.validator.ValidateProperty;
@@ -31,6 +32,9 @@ public class WaterServiceImpl implements WaterService {
 
 	@Autowired
 	WaterServicesUtil waterServicesUtil;
+	
+	@Autowired
+	MeterReadingUtil meterReadingUtil;
 
 	@Autowired
 	WaterConnectionValidator waterConnectionValidator;
@@ -55,6 +59,7 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
+		meterReadingUtil.createDemandGenerationForWaterServices(waterConnectionRequest);
 		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
 		} else {
@@ -99,6 +104,7 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
+		meterReadingUtil.createDemandGenerationForWaterServices();
 		waterDao.updateWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
