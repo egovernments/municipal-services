@@ -34,9 +34,6 @@ public class WaterServiceImpl implements WaterService {
 	WaterServicesUtil waterServicesUtil;
 	
 	@Autowired
-	MeterReadingUtil meterReadingUtil;
-
-	@Autowired
 	WaterConnectionValidator waterConnectionValidator;
 
 	@Autowired
@@ -59,7 +56,6 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
-		meterReadingUtil.createDemandGenerationForWaterServices(waterConnectionRequest);
 		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
 		} else {
@@ -104,7 +100,6 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
-		meterReadingUtil.createDemandGenerationForWaterServices();
 		waterDao.updateWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}

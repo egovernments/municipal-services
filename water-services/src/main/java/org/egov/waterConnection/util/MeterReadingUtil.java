@@ -3,8 +3,11 @@ package org.egov.waterConnection.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.MeterConnectionRequest;
 import org.egov.waterConnection.model.MeterReading;
+import org.egov.waterConnection.model.MeterReadingResponse;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.PropertyRequest;
 import org.egov.waterConnection.model.PropertyResponse;
@@ -36,23 +39,21 @@ public class MeterReadingUtil {
 
 	}
 
-	public List<MeterReading> createDemandGenerationForWaterServices(WaterConnectionRequest waterConnectionRequest) {
-		List<MeterReading> meterReadingList = new ArrayList<>();
-		meterReadingList.add(waterConnectionRequest.getWaterConnection().getProperty());
-		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(), meterReadingList);
-		Object result = serviceRequestRepository.fetchResult(getDemandGenerationCreateURL(), propertyReq);
-		return getMeterReadingDetails(result);
+	public MeterConnectionRequest getMeterReadingRequest(RequestInfo requestInfo, MeterReading meterReading) {
+		MeterConnectionRequest meterConnectionRequest = MeterConnectionRequest.builder().requestInfo(requestInfo)
+				.meterReading(meterReading).build();
+		return meterConnectionRequest;
 	}
 
 	public StringBuilder getDemandGenerationCreateURL() {
 		return new StringBuilder().append(meterReadingHost).append(createMeterReadingendpoint);
 	}
 
-	private List<MeterReading> getMeterReadingDetails(Object result) {
+	public List<MeterReading> getMeterReadingDetails(Object result) {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			MeterConnectionResponse propertyResponse = mapper.convertValue(result, PropertyResponse.class);
-			return propertyResponse.getProperties();
+			MeterReadingResponse meterReadingResponse = mapper.convertValue(result, MeterReadingResponse.class);
+			return meterReadingResponse.getMeterReadings();
 		} catch (Exception ex) {
 			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
 		}
