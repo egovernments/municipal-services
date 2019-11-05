@@ -99,7 +99,7 @@ public class WaterServicesUtil {
 			RequestInfo requestInfo) {
 		if ((waterConnectionSearchCriteria.getTenantId() == null
 				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
-			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESET");
+			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
 		}
 		if ((waterConnectionSearchCriteria.getMobileNumber() == null
 				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
