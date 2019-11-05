@@ -11,7 +11,9 @@ import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.Connection.StatusEnum;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
 
 	@Override

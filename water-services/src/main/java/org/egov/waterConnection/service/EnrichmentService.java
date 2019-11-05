@@ -30,7 +30,7 @@ public class EnrichmentService {
 	 * @param requestInfo
 	 *            is RequestInfo from request
 	 */
-	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo) {
+	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,WaterConnectionSearchCriteria waterConnectionSearchCriteria ) {
 		waterConnectionList.forEach(waterConnection -> {
 			List<Property> propertyList;
 			if (waterConnection.getProperty().getId() == null || waterConnection.getProperty().getId().isEmpty()) {
@@ -40,8 +40,7 @@ public class EnrichmentService {
 			if (waterConnection.getProperty().getId() != null) {
 				Set<String> propertyIds = new HashSet<>();
 				propertyIds.add(waterConnection.getProperty().getId());
-				WaterConnectionSearchCriteria waterConnectionSearchCriteria = WaterConnectionSearchCriteria.builder()
-						.ids(propertyIds).build();
+			
 				propertyList = waterServicesUtil.propertySearchOnCriteria(waterConnectionSearchCriteria, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",

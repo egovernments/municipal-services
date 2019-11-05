@@ -55,6 +55,7 @@ public class WCQueryBuilder {
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
+			addToPreparedStatement(preparedStatement, propertyIds);
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
@@ -128,7 +129,7 @@ public class WCQueryBuilder {
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, WaterConnectionSearchCriteria criteria) {
-		query = query + Offset_Limit_String;
+		query = query + " "+Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
 		

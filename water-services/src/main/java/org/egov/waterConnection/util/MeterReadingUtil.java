@@ -22,10 +22,10 @@ public class MeterReadingUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
 
-	@Value("${egov.meterReading.service.host}")
+	@Value("${egov.billing.service.host}")
 	private String meterReadingHost;
 
-	@Value("${egov.meterReading.createendpoint}")
+	@Value("${egov.demand.createendpoint}")
 	private String createMeterReadingendpoint;
 
 	@Autowired
