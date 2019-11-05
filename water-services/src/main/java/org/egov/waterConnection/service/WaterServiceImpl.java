@@ -12,7 +12,6 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
-import org.egov.waterConnection.util.MeterReadingUtil;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.MDMSValidator;
 import org.egov.waterConnection.validator.ValidateProperty;
