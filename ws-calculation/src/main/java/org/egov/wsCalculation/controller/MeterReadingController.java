@@ -6,12 +6,15 @@ import javax.validation.Valid;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingResponse;
+import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
+import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.ResponseInfoFactory;
-import org.egov.wsCalculation.service.MeterServices;
+import org.egov.wsCalculation.service.MeterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +35,7 @@ public class MeterReadingController {
 	private final ResponseInfoFactory responseInfoFactory;
 
 	@Autowired
-	MeterServices meterService;
+	MeterService meterService;
 
 	@RequestMapping(value = "/_createMeterReading", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<MeterReadingResponse> createMeterReading(@RequestHeader HttpHeaders headers,
@@ -44,5 +47,14 @@ public class MeterReadingController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
-
+	@RequestMapping(value = "/_searchMeterReadings", method = RequestMethod.POST)
+	public ResponseEntity<MeterReadingResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute MeterReadingSearchCriteria criteria) {
+		List<MeterReading> meterReadingLists = meterService.searchMeterReadings(criteria, requestInfoWrapper.getRequestInfo());
+		MeterReadingResponse response = MeterReadingResponse.builder().meterReadings(meterReadingLists)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),
+						true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }
