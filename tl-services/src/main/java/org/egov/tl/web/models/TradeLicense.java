@@ -44,7 +44,9 @@ public class  TradeLicense   {
   public enum LicenseTypeEnum {
     TEMPORARY("TEMPORARY"),
     
-    PERMANENT("PERMANENT");
+    PERMANENT("PERMANENT"),
+
+    BPASTAKEHOLDER("BPASTAKEHOLDER");
 
     private String value;
 
@@ -110,7 +112,6 @@ public class  TradeLicense   {
         @JsonProperty("issuedDate")
         private Long issuedDate = null;
 
-        @NotNull
         @Size(max=64)
         @JsonProperty("financialYear")
         private String financialYear = null;

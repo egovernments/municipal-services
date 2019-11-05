@@ -84,9 +84,12 @@ public class TradeLicenseService {
      * @return The list of created traddeLicense
      */
     public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest){
-        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
+        Object mdmsData=null;
+        boolean isBPARequest=tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
+        if(!isBPARequest)
+            mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
-        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest,mdmsData);
+        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest,mdmsData,isBPARequest);
         tlValidator.validateCreate(tradeLicenseRequest,mdmsData);
         userService.createUser(tradeLicenseRequest);
         calculationService.addCalculation(tradeLicenseRequest);

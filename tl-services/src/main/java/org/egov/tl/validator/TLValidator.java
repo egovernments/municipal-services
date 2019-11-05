@@ -46,6 +46,31 @@ public class TLValidator {
      * @param request The input TradeLicenseRequest Object
      */
     public void validateCreate(TradeLicenseRequest request,Object mdmsData){
+        /* compulsory fields for TL application
+        tradelicense->financialYear
+
+        trdetails->structureType
+        trdetails->subOwnerShipCategory
+        trdetails->->address
+        trdetails->tradeUnits */
+
+
+
+
+
+
+        /* stake holder
+        * trdetails->tradeUnits
+        * ownerInfo(user)->gender,email, permanent address, correspondance address
+        * institution->contactNo
+        *
+        * Licensee type specific information
+        *
+        *
+        *
+        * */
+
+
         valideDates(request,mdmsData);
         validateInstitution(request);
         validateDuplicateDocuments(request);

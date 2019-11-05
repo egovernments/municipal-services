@@ -46,7 +46,7 @@ public class EnrichmentService {
      * Enriches the incoming createRequest
      * @param tradeLicenseRequest The create request for the tradeLicense
      */
-    public void enrichTLCreateRequest(TradeLicenseRequest tradeLicenseRequest,Object mdmsData) {
+    public void enrichTLCreateRequest(TradeLicenseRequest tradeLicenseRequest,Object mdmsData,boolean isBPARequest) {
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
         AuditDetails auditDetails = tradeUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
         tradeLicenseRequest.getLicenses().forEach(tradeLicense -> {
@@ -56,15 +56,18 @@ public class EnrichmentService {
             tradeLicense.getTradeLicenseDetail().setId(UUID.randomUUID().toString());
             tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
 
-            Map<String,Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense,mdmsData);
-            if(tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo()==null)
-                tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+            if(!isBPARequest)
+            {
+                Map<String,Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense,mdmsData);
+                if(tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo()==null)
+                    tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+            }
             
 
             tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
             tradeLicense.getTradeLicenseDetail().getAddress().setId(UUID.randomUUID().toString());
 
-            if(!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
+            if((!isBPARequest)&&(!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories())))
                 tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                     accessory.setTenantId(tradeLicense.getTenantId());
                     accessory.setId(UUID.randomUUID().toString());
