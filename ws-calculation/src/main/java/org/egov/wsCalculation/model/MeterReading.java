@@ -27,7 +27,7 @@ public class MeterReading {
 	private String billingPeriod = null;
 
 	@JsonProperty("meterStatus")
-	private Object meterStatus = null;
+	private String meterStatus = null;
 
 	@JsonProperty("lastReading")
 	private Integer lastReading = null;
@@ -84,7 +84,7 @@ public class MeterReading {
 		this.billingPeriod = billingPeriod;
 	}
 
-	public MeterReading meterStatus(Object meterStatus) {
+	public MeterReading meterStatus(String meterStatus) {
 		this.meterStatus = meterStatus;
 		return this;
 	}
@@ -99,7 +99,7 @@ public class MeterReading {
 		return meterStatus;
 	}
 
-	public void setMeterStatus(Object meterStatus) {
+	public void setMeterStatus(String meterStatus) {
 		this.meterStatus = meterStatus;
 	}
 

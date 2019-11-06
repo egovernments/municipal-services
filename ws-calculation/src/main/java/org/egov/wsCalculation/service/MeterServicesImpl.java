@@ -52,8 +52,7 @@ public class MeterServicesImpl implements MeterService {
 
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
-		// TODO Auto-generated method stub
-		return null;
+		List<MeterReading> meterReadings = wSCalculationDao.searchMeterReadings(criteria);
+		return meterReadings;
 	}
-
 }
