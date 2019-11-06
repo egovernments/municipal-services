@@ -8,8 +8,8 @@ import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingResponse;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
-import org.egov.wsCalculation.model.ResponseInfoFactory;
 import org.egov.wsCalculation.service.MeterService;
+import org.egov.wsCalculation.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -57,4 +57,5 @@ public class MeterReadingController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
 }

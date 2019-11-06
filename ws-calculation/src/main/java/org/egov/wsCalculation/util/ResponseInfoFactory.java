@@ -1,4 +1,4 @@
-package org.egov.wsCalculation.model;
+package org.egov.wsCalculation.util;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
