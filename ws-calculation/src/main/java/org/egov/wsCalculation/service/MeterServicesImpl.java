@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.MeterReadingUtil;
+import org.egov.wsCalculation.validator.MDMSValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,10 @@ public class MeterServicesImpl implements MeterService {
 	
 	@Autowired
 	WSCalculationDao wSCalculationDao;
+	
+	
+	@Autowired
+	MDMSValidator mDMSValidator;
 
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -34,19 +40,14 @@ public class MeterServicesImpl implements MeterService {
 
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
-		
-		
-		
-
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
+		mDMSValidator.validateMasterData(meterConnectionRequest);
 //		Object result = serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
 //				meterConnectionRequest);
 //		meterReadingUtil.getMeterReadingDetails(result);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
-
-		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
-
-		return meterReadingsList;
+        wSCalculationDao.saveWaterConnection(meterConnectionRequest);
+        return meterReadingsList;
 	}
 
 

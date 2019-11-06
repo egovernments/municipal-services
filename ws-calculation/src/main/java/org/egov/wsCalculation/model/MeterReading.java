@@ -41,9 +41,6 @@ public class MeterReading {
 	@JsonProperty("currentReadingDate")
 	private Long currentReadingDate = null;
 
-	@JsonProperty("consumption")
-	private Integer consumption = null;
-
 	public MeterReading id(String id) {
 		this.id = id;
 		return this;
@@ -179,25 +176,6 @@ public class MeterReading {
 		this.currentReadingDate = currentReadingDate;
 	}
 
-	public MeterReading consumption(Integer consumption) {
-		this.consumption = consumption;
-		return this;
-	}
-
-	/**
-	 * Meter Reading Consumption
-	 * 
-	 * @return consumption
-	 **/
-
-	public Integer getConsumption() {
-		return consumption;
-	}
-
-	public void setConsumption(Integer consumption) {
-		this.consumption = consumption;
-	}
-
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -213,14 +191,13 @@ public class MeterReading {
 				&& Objects.equals(this.lastReading, meterReading.lastReading)
 				&& Objects.equals(this.lastReadingDate, meterReading.lastReadingDate)
 				&& Objects.equals(this.currentReading, meterReading.currentReading)
-				&& Objects.equals(this.currentReadingDate, meterReading.currentReadingDate)
-				&& Objects.equals(this.consumption, meterReading.consumption);
+				&& Objects.equals(this.currentReadingDate, meterReading.currentReadingDate);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, billingPeriod, meterStatus, lastReading, lastReadingDate, currentReading,
-				currentReadingDate, consumption);
+				currentReadingDate);
 	}
 
 	@Override
@@ -235,7 +212,6 @@ public class MeterReading {
 		sb.append("    lastReadingDate: ").append(toIndentedString(lastReadingDate)).append("\n");
 		sb.append("    currentReading: ").append(toIndentedString(currentReading)).append("\n");
 		sb.append("    currentReadingDate: ").append(toIndentedString(currentReadingDate)).append("\n");
-		sb.append("    consumption: ").append(toIndentedString(consumption)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

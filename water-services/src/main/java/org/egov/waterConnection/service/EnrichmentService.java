@@ -97,6 +97,17 @@ public class EnrichmentService {
 	/**
 	 * 
 	 * @param waterConnectionRequest
+	 * @param MDMS Data
+	 */
+	public void enrichWaterConnectionWithMDMSData(WaterConnectionRequest waterConnectionRequest, List<Property> propertyList) {
+		if (propertyList != null && !propertyList.isEmpty())
+			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
+	}
+	
+	
+	/**
+	 * 
+	 * @param waterConnectionRequest
 	 * @param propertyList
 	 */
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,

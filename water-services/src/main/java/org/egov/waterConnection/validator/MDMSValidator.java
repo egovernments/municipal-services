@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
+
+import io.jaegertracing.thriftjava.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -56,16 +58,31 @@ public class MDMSValidator {
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
 			String filter, String jsonpath, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
+		String module=moduleName;
+		String master=names.get(0);
+		String tenantId_new=requestInfo.getUserInfo().getTenantId();
+		
 		MdmsCriteriaReq criteriaReq = waterServicesUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
 				requestInfo);
+		Object abc=criteriaReq.getMdmsCriteria().getModuleDetails().get(0).getMasterDetails().get(0).getClass();
+		
 		try {
-			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
+			HashMap<String, Object> params = new HashMap<>();
+			String requestInfoString="";
+			params.put("moduleName", moduleName);
+			params.put("masterName", names.get(0));
+			params.put("tenantId", requestInfo.getUserInfo().getTenantId());
+			params.put("RequestInfo", requestInfo);
+			Object result = serviceRequestRepository.fetchResult(uri, params);
+			//Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(WCConstants.INVALID_CONNECTION_CATEGORY, WCConstants.INVALID_CONNECTION_TYPE);
 		}
 	}
+	
+
 
 	private void validateMDMSData(String[] masterNames, Map<String, List<String>> codes) {
 		Map<String, String> errorMap = new HashMap<>();
