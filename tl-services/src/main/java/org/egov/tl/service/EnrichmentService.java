@@ -113,7 +113,8 @@ public class EnrichmentService {
         });
         setIdgenIds(tradeLicenseRequest);
         setStatusForCreate(tradeLicenseRequest);
-        boundaryService.getAreaType(tradeLicenseRequest,config.getHierarchyTypeCode());
+        if(!isBPARequest)
+            boundaryService.getAreaType(tradeLicenseRequest,config.getHierarchyTypeCode());
     }
 
 

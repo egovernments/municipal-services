@@ -45,7 +45,7 @@ public class TLValidator {
      *  Validate the create Requesr
      * @param request The input TradeLicenseRequest Object
      */
-    public void validateCreate(TradeLicenseRequest request,Object mdmsData){
+    public void validateCreate(TradeLicenseRequest request,Object mdmsData,boolean isBPARequest){
         /* compulsory fields for TL application
         tradelicense->financialYear
 
@@ -70,12 +70,17 @@ public class TLValidator {
         *
         * */
 
+        if(!isBPARequest) {
+            valideDates(request, mdmsData);
+            propertyValidator.validateProperty(request);
+            mdmsValidator.validateMdmsData(request,mdmsData);
 
-        valideDates(request,mdmsData);
+        }
+        else{
+            // varify mdms
+        }
         validateInstitution(request);
         validateDuplicateDocuments(request);
-        propertyValidator.validateProperty(request);
-        mdmsValidator.validateMdmsData(request,mdmsData);
     }
 
 

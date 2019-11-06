@@ -90,14 +90,15 @@ public class TradeLicenseService {
             mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest,mdmsData,isBPARequest);
-        tlValidator.validateCreate(tradeLicenseRequest,mdmsData);
+        tlValidator.validateCreate(tradeLicenseRequest,mdmsData,isBPARequest);
         userService.createUser(tradeLicenseRequest);
-        calculationService.addCalculation(tradeLicenseRequest);
+        if(!isBPARequest)
+            calculationService.addCalculation(tradeLicenseRequest);
 		
         /*
 		 * call workflow service if it's enable else uses internal workflow process
 		 */
-		if (config.getIsExternalWorkFlowEnabled())
+		if (isBPARequest || config.getIsExternalWorkFlowEnabled())
 			wfIntegrator.callWorkFlow(tradeLicenseRequest);
 		repository.save(tradeLicenseRequest);
 		return tradeLicenseRequest.getLicenses();
