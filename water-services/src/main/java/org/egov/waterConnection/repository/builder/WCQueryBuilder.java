@@ -40,7 +40,7 @@ public class WCQueryBuilder {
 	 * @param preparedStatement
 	 *            The Array Of Object
 	 * @param requestInfo
-	 *            The Request Inof
+	 *            The Request Info
 	 * @return query as a string
 	 */
 	public String getSearchQueryString(WaterConnectionSearchCriteria criteria, List<Object> preparedStatement,

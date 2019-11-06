@@ -3,8 +3,17 @@ package org.egov.wscalculation.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Component
-public class WS_Calculation_Configuration {
+public class WSCalculationConfiguration {
 	
 	@Value("${egov.ws_calculation.meterReading.default.limit}")
 	private Integer meterReadingDefaultLimit;
