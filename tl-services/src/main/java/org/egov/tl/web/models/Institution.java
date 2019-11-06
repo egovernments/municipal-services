@@ -48,10 +48,6 @@ public class Institution {
   @JsonProperty("contactNo")
   private String contactNo;
 
-  @NotNull
-  @Size(max=256)
-  @JsonProperty("authorizedName")
-  private String authorizedName;
 
   @Size(max=64)
   @JsonProperty("organisationRegistrationNo")

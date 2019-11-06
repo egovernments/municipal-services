@@ -191,7 +191,11 @@ public class TradeLicenseService {
      * @return Updated TradeLcienses
      */
     public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest){
-        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
+        Object mdmsData=null;
+        boolean isBPARequest=tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
+
+        if(isBPARequest)
+            mdmsData = util.mDMSCall(tradeLicenseRequest);
         BusinessService businessService = workflowService.getBusinessService(tradeLicenseRequest.getLicenses().get(0).getTenantId(), tradeLicenseRequest.getRequestInfo());
         List<TradeLicense> searchResult = getLicensesWithOwnerInfo(tradeLicenseRequest);
         actionValidator.validateUpdateRequest(tradeLicenseRequest,businessService);

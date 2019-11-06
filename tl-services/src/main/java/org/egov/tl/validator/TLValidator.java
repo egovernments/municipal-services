@@ -51,8 +51,7 @@ public class TLValidator {
 
         trdetails->structureType
         trdetails->subOwnerShipCategory
-        trdetails->->address
-        trdetails->tradeUnits */
+        trdetails->->address */
 
 
 
@@ -60,9 +59,9 @@ public class TLValidator {
 
 
         /* stake holder
-        * trdetails->tradeUnits
         * ownerInfo(user)->gender,email, permanent address, correspondance address
         * institution->contactNo
+        * institution->name-authorised person name
         *
         * Licensee type specific information
         *
@@ -74,16 +73,43 @@ public class TLValidator {
             valideDates(request, mdmsData);
             propertyValidator.validateProperty(request);
             mdmsValidator.validateMdmsData(request,mdmsData);
-
+//            validateTLSpecificNotNullFields(request);
         }
         else{
-            // varify mdms
+//            validateBPASpecificNotNullFields(request);
+            // verify mdms
         }
         validateInstitution(request);
         validateDuplicateDocuments(request);
     }
 
+    private void validateTLSpecificNotNullFields(TradeLicenseRequest request){
+        request.getLicenses().forEach(license -> {
+            if(license.getFinancialYear()==null)
+                throw new CustomException("NULL FINANCIALYEAR"," Financial Year cannot be null");
+            if(license.getTradeLicenseDetail().getStructureType()==null)
+                throw new CustomException("NULL STRUCTURETYPE"," Structure Type cannot be null");
+            if(license.getTradeLicenseDetail().getSubOwnerShipCategory()==null)
+                throw new CustomException("NULL SUBOWNERSHIPCATEGORY"," SubOwnership Category cannot be null");
+            if(license.getTradeLicenseDetail().getAddress()==null)
+                throw new CustomException("NULL ADDRESS"," Address cannot be null");
+        });
+    }
 
+    private void validateBPASpecificNotNullFields(TradeLicenseRequest request){
+
+        /* stake holder
+        * trdetails->tradeUnits
+        * ownerInfo(user)->gender,email, permanent address, correspondance address
+        * institution->contactNo
+        */
+        request.getLicenses().forEach(license -> {
+            if(license.getTradeLicenseDetail().getInstitution().getContactNo()==null)
+                throw new CustomException("NULL INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
+            if(license.getTradeLicenseDetail().getStructureType()==null)
+                throw new CustomException("NULL STRUCTURETYPE"," Structure Type cannot be null");
+        });
+    }
     /**
      *  Validates the fromDate and toDate of the request
      * @param request The input TradeLicenseRequest Object

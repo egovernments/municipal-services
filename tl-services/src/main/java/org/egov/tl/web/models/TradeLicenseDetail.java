@@ -122,6 +122,7 @@ public class TradeLicenseDetail   {
         @JsonProperty("address")
         private Address address = null;
 
+        @NotNull
         @JsonProperty("tradeUnits")
         @Valid
         private List<TradeUnit> tradeUnits = new ArrayList<>();
