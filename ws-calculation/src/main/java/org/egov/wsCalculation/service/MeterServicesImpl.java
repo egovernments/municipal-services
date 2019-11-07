@@ -42,7 +42,7 @@ public class MeterServicesImpl implements MeterService {
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
-		wsCalculationValidator.validateMeterReading(meterConnectionRequest, false);
+		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		mDMSValidator.validateMasterData(meterConnectionRequest);
 		// Object result =
 		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),

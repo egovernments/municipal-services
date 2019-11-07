@@ -83,14 +83,14 @@ public class WSCalculatorQueryBuilder {
 
 	public String getNoOfMeterReadingConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<Integer> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
-		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
+		Set<String> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(id));
+		query.append(" connectionid in (").append(createQuery(connectionIds)).append(" )");
 		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 
-	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
+	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		ids.forEach(id -> {
 			preparedStatement.add(id);
 		});
