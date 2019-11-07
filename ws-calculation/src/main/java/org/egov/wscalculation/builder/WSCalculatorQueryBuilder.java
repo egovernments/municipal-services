@@ -21,7 +21,6 @@ public class WSCalculatorQueryBuilder {
 
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
 
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
 
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);

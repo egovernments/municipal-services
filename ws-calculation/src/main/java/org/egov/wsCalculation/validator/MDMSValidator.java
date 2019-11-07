@@ -87,7 +87,6 @@ public class MDMSValidator {
 			errorMap.put("INVALID BILLING PERIOD",
 					"The Billing period" + meterReading.getBillingPeriod() + " does not exist");
 		}
-
 		return errorMap;
 	}
 }
