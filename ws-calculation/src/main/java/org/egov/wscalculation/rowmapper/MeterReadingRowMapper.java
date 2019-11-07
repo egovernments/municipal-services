@@ -25,7 +25,6 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 			meterReading.setLastReading(rs.getInt("lastReading"));
 			meterReading.setLastReadingDate(rs.getLong("lastReadingDate"));
 			meterReading.setMeterStatus(rs.getString("meterStatus"));
-			meterReading.setConsumption(rs.getInt("consumption"));
 			meterReadingLists.add(meterReading);
 		}
 		return meterReadingLists;

@@ -11,6 +11,8 @@ import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.MeterReadingUtil;
+import org.egov.wsCalculation.validator.MDMSValidator;
+import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +21,15 @@ public class MeterServicesImpl implements MeterService {
 
 	@Autowired
 	MeterReadingUtil meterReadingUtil;
-	
+
 	@Autowired
 	WSCalculationDao wSCalculationDao;
+
+	@Autowired
+	MDMSValidator mDMSValidator;
+
+	@Autowired
+	WSCalculationValidator wsCalculationValidator;
 
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -31,24 +39,19 @@ public class MeterServicesImpl implements MeterService {
 
 	}
 
-
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
-		
-		
-		
-
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
-//		Object result = serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
-//				meterConnectionRequest);
-//		meterReadingUtil.getMeterReadingDetails(result);
+		wsCalculationValidator.validateMeterReading(meterConnectionRequest, false);
+		mDMSValidator.validateMasterData(meterConnectionRequest);
+		// Object result =
+		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
+		// meterConnectionRequest);
+		// meterReadingUtil.getMeterReadingDetails(result);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
-
 		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
-
 		return meterReadingsList;
 	}
-
 
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
