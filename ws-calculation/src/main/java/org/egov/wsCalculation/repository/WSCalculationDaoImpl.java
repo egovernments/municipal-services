@@ -46,6 +46,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		List<MeterReading> listOfMeterReadings = new ArrayList<>();
 		String query = queryBuilder.getSearchQueryString(criteria, preparedStatement);
 		log.info("Query: " + query);
+		log.info("Prepared Statement"+ preparedStatement.toString());
 		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
 		return listOfMeterReadings;
 	}

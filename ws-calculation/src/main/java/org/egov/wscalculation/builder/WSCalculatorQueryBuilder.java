@@ -15,15 +15,15 @@ public class WSCalculatorQueryBuilder {
 	WSCalculationConfiguration config;
 
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
-	private final static String Query = "SELECT mr.connectionId as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, ms.lastReadingDate, ms.currentReading, "
-			+ "ms.currentReadingDate, ms.consumption FROM meterreading mr";
+	private final static String Query = "SELECT mr.connectionId as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, mr.lastReadingDate, mr.currentReading, "
+			+ "mr.currentReadingDate, mr.consumption FROM meterreading mr";
 
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
 		if (!criteria.getConnectionNos().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" mr.connectionId in (").append(createQuery(criteria.getConnectionNos())).append(" )");
+			query.append(" mr.connectionId IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
 		}
 		resultantQuery = query.toString();
