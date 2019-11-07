@@ -37,7 +37,11 @@ public class  TradeLicense   {
     public enum LicenseTypeEnum {
         TEMPORARY("TEMPORARY"),
 
-        PERMANENT("PERMANENT");
+        PERMANENT("PERMANENT"),
+
+        BPASTAKEHOLDER("BPASTAKEHOLDER");
+
+
 
         private String value;
 
