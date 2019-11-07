@@ -38,13 +38,11 @@ public class Institution {
   @JsonProperty("active")
   private Boolean active = null;
 
-  @NotNull
   @Size(max=256)
   @JsonProperty("instituionName")
   private String instituionName;
 
-  @NotNull
-  @Pattern(regexp = "^[0-9]{10}$", message = "MobileNumber should be 10 digit number")
+  @Size(max=64)
   @JsonProperty("contactNo")
   private String contactNo;
 
@@ -53,7 +51,6 @@ public class Institution {
   @JsonProperty("organisationRegistrationNo")
   private String organisationRegistrationNo;
 
-  @NotNull
   @Size(max=512)
   @JsonProperty("address")
   private String address;
