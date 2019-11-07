@@ -45,13 +45,12 @@ public class MDMSValidator {
 		String jsonPath = MRConstants.JSONPATH_ROOT;
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 
-		// String[] masterNames = {MRConstants.MDMS_WC_Connection_Type};
-		// List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-		// Map<String, List<String>> codes = getAttributeValues(tenantId,
-		// MRConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
-		// jsonPath, request.getRequestInfo());
-		// validateMDMSData(masterNames, codes);
-		// validateCodes(request.getMeterReading(),codes,errorMap);
+		String[] masterNames = { MRConstants.MDMS_MS_BILLING_PERIOD };
+		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+		Map<String, List<String>> codes = getAttributeValues(tenantId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
+				jsonPath, request.getRequestInfo());
+		validateMDMSData(masterNames, codes);
+		validateCodes(request.getMeterReading(), codes, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -66,7 +65,7 @@ public class MDMSValidator {
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
-			throw new CustomException(MRConstants.INVALID_CONNECTION_CATEGORY, MRConstants.INVALID_CONNECTION_TYPE);
+			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
 		}
 	}
 
@@ -83,12 +82,11 @@ public class MDMSValidator {
 
 	private static Map<String, String> validateCodes(MeterReading meterReading, Map<String, List<String>> codes,
 			Map<String, String> errorMap) {
-		// if(!codes.get(MRConstants.MDMS_WC_Connection_Type).contains(meterReading.getBillingPeriod())
-		// && meterReading.getBillingPeriod() != null) {
-		// errorMap.put("INVALID BILLING PERIOD",
-		// "The Billing period" + meterReading.getBillingPeriod() + "' does not
-		// exists");
-		// }
+		if (!codes.get(MRConstants.MDMS_MS_BILLING_PERIOD).contains(meterReading.getBillingPeriod())
+				&& meterReading.getBillingPeriod() != null) {
+			errorMap.put("INVALID BILLING PERIOD",
+					"The Billing period" + meterReading.getBillingPeriod() + " does not exist");
+		}
 
 		return errorMap;
 	}

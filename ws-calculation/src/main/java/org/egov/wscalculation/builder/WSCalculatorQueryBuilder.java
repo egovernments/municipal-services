@@ -1,5 +1,6 @@
 package org.egov.wscalculation.builder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,8 @@ public class WSCalculatorQueryBuilder {
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String Query = "SELECT mr.connectionId as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, ms.lastReadingDate, ms.currentReading, "
 			+ "ms.currentReadingDate, ms.consumption FROM meterreading mr";
+
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
 
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
@@ -75,5 +78,20 @@ public class WSCalculatorQueryBuilder {
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
 		return query;
+	}
+
+	public String getNoOfMeterReadingConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
+		Set<Integer> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
+		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
+		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
+		return query.toString();
+	}
+
+	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
+		ids.forEach(id -> {
+			preparedStatement.add(id);
+		});
 	}
 }

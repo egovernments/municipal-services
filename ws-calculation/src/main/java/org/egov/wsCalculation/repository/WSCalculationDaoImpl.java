@@ -1,7 +1,9 @@
 package org.egov.wsCalculation.repository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
@@ -48,5 +50,16 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		log.info("Query: " + query);
 		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
 		return listOfMeterReadings;
+	}
+
+	@Override
+	public int isMeterReadingConnectionExist(List<String> ids) {
+		int n = 0;
+		Set<String> connectionIds = new HashSet<>(ids);
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getNoOfMeterReadingConnectionQuery(connectionIds, preparedStatement);
+		log.info("Query: " + query);
+		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
+		return n;
 	}
 }

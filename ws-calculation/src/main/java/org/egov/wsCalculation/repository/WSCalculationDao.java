@@ -11,5 +11,8 @@ public interface WSCalculationDao {
 	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest);
 	
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria);
+	
+	
+	public int isMeterReadingConnectionExist(List<String> ids);
 
 }

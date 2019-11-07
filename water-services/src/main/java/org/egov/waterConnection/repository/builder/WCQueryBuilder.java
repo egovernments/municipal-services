@@ -128,11 +128,12 @@ public class WCQueryBuilder {
 	 *            Array of object for preparedStatement list
 	 * @return It's returns query
 	 */
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList, WaterConnectionSearchCriteria criteria) {
-		query = query + " "+Offset_Limit_String;
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+			WaterConnectionSearchCriteria criteria) {
+		query = query + " " + Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
-		
+
 		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
 			limit = criteria.getLimit();
 
@@ -141,7 +142,7 @@ public class WCQueryBuilder {
 
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
-		
+
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
 		return query;
