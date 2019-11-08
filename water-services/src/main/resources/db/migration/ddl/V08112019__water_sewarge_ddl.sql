@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS connection;
 DROP TABLE IF EXISTS water_service_connection;
 DROP TABLE IF EXISTS sewarage_service_connection;
+DROP TABLE IF EXISTS connection;
 
 CREATE TABLE connection
 (
