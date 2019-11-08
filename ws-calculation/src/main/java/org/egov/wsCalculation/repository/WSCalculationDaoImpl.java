@@ -49,7 +49,11 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest) {
 		wSCalculationProducer.push(createMeterConnection, meterConnectionRequest);
 	}
-
+	/**
+	 * 
+	 * @param criteria would be meter reading criteria
+	 * @return List of meter readings based on criteria
+	 */
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria) {
 		List<Object> preparedStatement = new ArrayList<>();

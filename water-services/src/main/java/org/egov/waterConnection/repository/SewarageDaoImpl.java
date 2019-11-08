@@ -8,7 +8,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.producer.SewarageConnectionProducer;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
 import org.egov.waterConnection.repository.builder.SCQueryBuilder;
@@ -33,7 +33,7 @@ public class SewarageDaoImpl implements SewarageDao {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	SCQueryBuilder sCQueryBuilder;
+	WCQueryBuilder wCQueryBuilder;
 
 	@Autowired
 	WaterRowMapper waterRowMapper;
@@ -53,11 +53,12 @@ public class SewarageDaoImpl implements SewarageDao {
 	}
 
 	@Override
-	public List<SewerageConnection> getSewerageConnectionList(WaterConnectionSearchCriteria criteria,
+	public List<SewerageConnection> getSewerageConnectionList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = sCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
+		
+		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo, false);
 		//sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 		return sewarageConnectionList;
 	}
@@ -67,7 +68,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = sCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
+		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}

@@ -6,7 +6,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.WCConfiguration;
 import org.egov.waterConnection.model.Property;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,12 +26,15 @@ public class WCQueryBuilder {
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
-	private final static String Query = "SELECT wc.id as water_Id, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
+	private final static String WATER_SEARCH_Query = "SELECT wc.id as water_Id, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
 			+ "wc.meterInstallationDate, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM water_service_connection WHERE";
+	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.id as sewarage_Id, sc.connectionExecutionDate,"
+			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewerage_service_connection sc "
+			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
 
 	/**
 	 * 
@@ -43,10 +46,10 @@ public class WCQueryBuilder {
 	 *            The Request Info
 	 * @return query as a string
 	 */
-	public String getSearchQueryString(WaterConnectionSearchCriteria criteria, List<Object> preparedStatement,
-			RequestInfo requestInfo) {
-		StringBuilder query = new StringBuilder(Query);
-		String resultantQuery = Query;
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo,
+			boolean searchForWaterConnection) {
+		StringBuilder query = new StringBuilder(getQueryForSearch(searchForWaterConnection));
+		String resultantQuery = query.toString();
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -59,7 +62,7 @@ public class WCQueryBuilder {
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" wc.id in (").append(createQuery(criteria.getIds())).append(" )");
+			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 		}
 		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
@@ -87,6 +90,12 @@ public class WCQueryBuilder {
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
+	}
+
+	private String getQueryForSearch(boolean searchForWaterConnection) {
+		if (searchForWaterConnection)
+			return WATER_SEARCH_Query;
+		return SEWERAGE_SEARCH_QUERY;
 	}
 
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
@@ -128,8 +137,7 @@ public class WCQueryBuilder {
 	 *            Array of object for preparedStatement list
 	 * @return It's returns query
 	 */
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
-			WaterConnectionSearchCriteria criteria) {
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
 		query = query + " " + Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
+import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,16 @@ public class WSCalculationValidator {
 			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be updated without billing period");
 		}
 
+		if (!errorMap.isEmpty()) {
+			throw new CustomException(errorMap);
+		}
+	}
+	
+	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
+		Map<String, String> errorMap = new HashMap<>();
+		if(criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
+			errorMap.put("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
+		}
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
 		}

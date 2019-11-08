@@ -58,9 +58,11 @@ public class MeterServicesImpl implements MeterService {
 		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
 		return meterReadingsList;
 	}
+	
 
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
+		wsCalculationValidator.validateMeterReadingSearchCriteria(criteria);
 		List<MeterReading> meterReadings = wSCalculationDao.searchMeterReadings(criteria);
 		return meterReadings;
 	}

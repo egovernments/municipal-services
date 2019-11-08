@@ -10,7 +10,7 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

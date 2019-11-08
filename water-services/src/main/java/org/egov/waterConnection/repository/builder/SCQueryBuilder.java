@@ -8,7 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.SCConfiguration;
 import org.egov.waterConnection.config.WCConfiguration;
 import org.egov.waterConnection.model.Property;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -45,7 +45,7 @@ public class SCQueryBuilder {
 	 *            The Request Inof
 	 * @return query as a string
 	 */
-	public String getSearchQueryString(WaterConnectionSearchCriteria criteria, List<Object> preparedStatement,
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
@@ -130,7 +130,7 @@ public class SCQueryBuilder {
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
-			WaterConnectionSearchCriteria criteria) {
+			SearchCriteria criteria) {
 		query = query + Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();

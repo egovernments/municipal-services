@@ -7,7 +7,7 @@ import org.egov.waterConnection.model.RequestInfoWrapper;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.SewerageConnectionResponse;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.service.SewarageService;
 import org.egov.waterConnection.service.WaterService;
 import org.egov.waterConnection.util.ResponseInfoFactory;
@@ -53,7 +53,7 @@ public class SewarageController {
 
 	@RequestMapping(value = "/_search", method = RequestMethod.POST)
 	public ResponseEntity<SewerageConnectionResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-			@Valid @ModelAttribute WaterConnectionSearchCriteria criteria) {
+			@Valid @ModelAttribute SearchCriteria criteria) {
 		List<SewerageConnection> waterConnectionList = sewarageService.search(criteria,
 				requestInfoWrapper.getRequestInfo());
 
