@@ -44,7 +44,7 @@ public class SewarageServiceImpl implements SewarageService {
 	SewarageDao sewarageDao;
 
 	/**
-	 * @param waterConnectionRequest WaterConnectionRequest contains water connection to be created
+	 * @param sewarageConnectionRequest SewarageConnectionRequest contains sewarage connection to be created
 	 * @return List of WaterConnection after create
 	 */
 
@@ -66,9 +66,9 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param criteria WaterConnectionSearchCriteria contains search criteria on water connection
+	 * @param criteria SewarageConnectionSearchCriteria contains search criteria on sewarage connection
 	 * @param requestInfo
-	 * @return List of matching water connection
+	 * @return List of matching sewarage connection
 	 */
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList;
@@ -94,7 +94,7 @@ public class SewarageServiceImpl implements SewarageService {
 	/**
 	 * 
 	 * @param sewarageConnectionRequest SewarageConnectionRequest contains sewarage connection to be updated
-	 * @return List of WaterConnection after update
+	 * @return List of SewarageConnection after update
 	 */
 
 	@Override
