@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

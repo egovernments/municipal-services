@@ -1,7 +1,6 @@
 package org.egov.waterConnection.repository;
 
 import java.util.List;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;

@@ -5,8 +5,6 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
 
 public interface SewarageService {
