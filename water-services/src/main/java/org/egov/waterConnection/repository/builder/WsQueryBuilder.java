@@ -33,7 +33,7 @@ public class WsQueryBuilder {
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.connectionExecutionDate,"
-			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewerage_service_connection sc "
+			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
 			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
 
 	/**
@@ -83,7 +83,7 @@ public class WsQueryBuilder {
 		}
 		if (criteria.getApplicationNumber() != null && !criteria.getApplicationNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.applicationNumber = ? ");
+			query.append(" conn.applicationno = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
 		}
 		resultantQuery = query.toString();
