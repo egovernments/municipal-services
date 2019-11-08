@@ -11,6 +11,7 @@ import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.producer.SewarageConnectionProducer;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
+import org.egov.waterConnection.repository.builder.SCQueryBuilder;
 import org.egov.waterConnection.repository.builder.WCQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.SewerageRowMapper;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
@@ -40,15 +41,15 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
 
-	@Value("${egov.waterservice.createWaterConnection}")
-	private String createWaterConnection;
+	@Value("${egov.sewarageservice.createSewarageConnection}")
+	private String createSewarageConnection;
 
-	@Value("${egov.waterservice.updateWaterConnection}")
-	private String updateWaterConnection;
+	@Value("${egov.sewarageservice.updateSewarageConnection}")
+	private String updateSewarageConnection;
 
 	@Override
 	public void saveSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		sewarageConnectionProducer.push(createWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(createSewarageConnection, sewerageConnectionRequest);
 	}
 
 	@Override
@@ -56,6 +57,7 @@ public class SewarageDaoImpl implements SewarageDao {
 			RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
+		
 		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo, false);
 		log.info("Sewarage Search Query: " +query);
 		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
@@ -74,7 +76,7 @@ public class SewarageDaoImpl implements SewarageDao {
 
 	@Override
 	public void updatSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		sewarageConnectionProducer.push(updateWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
 	}
 
 }

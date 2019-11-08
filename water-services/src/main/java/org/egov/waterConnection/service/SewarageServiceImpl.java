@@ -11,11 +11,9 @@ import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.SewarageDao;
 import org.egov.waterConnection.util.SewerageServicesUtil;
-import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.MDMSValidator;
 import org.egov.waterConnection.validator.SewerageConnectionValidator;
 import org.egov.waterConnection.validator.ValidateProperty;
-import org.egov.waterConnection.validator.WaterConnectionValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,6 @@ public class SewarageServiceImpl implements SewarageService {
 	SewarageDao sewarageDao;
 
 	/**
-	 * 
 	 * @param waterConnectionRequest WaterConnectionRequest contains water connection to be created
 	 * @return List of WaterConnection after create
 	 */

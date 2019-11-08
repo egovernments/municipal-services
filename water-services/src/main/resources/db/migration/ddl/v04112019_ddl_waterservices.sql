@@ -26,3 +26,13 @@
 --      REFERENCES public.connection (id) MATCH SIMPLE
 --      ON UPDATE NO ACTION ON DELETE NO ACTION
 --);
+
+--CREATE TABLE sewarage_service_connection
+--(
+--  connection_id character varying(64) NOT NULL,
+--  connectionExecutionDate bigint NOT NULL,
+--  CONSTRAINT sewarage_service_connection_pkey PRIMARY KEY (connection_id),
+--  CONSTRAINT sewarage_service_connection_connection_id_fkey FOREIGN KEY (connection_id)
+--      REFERENCES public.connection (id) MATCH SIMPLE
+--      ON UPDATE NO ACTION ON DELETE NO ACTION
+--);

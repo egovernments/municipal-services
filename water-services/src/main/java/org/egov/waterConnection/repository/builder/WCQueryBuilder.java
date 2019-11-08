@@ -30,11 +30,12 @@ public class WCQueryBuilder {
 			+ "wc.meterInstallationDate, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM water_service_connection WHERE";
-	
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
+
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.id as sewarage_Id, sc.connectionExecutionDate,"
 			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewerage_service_connection sc "
 			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
+
 	/**
 	 * 
 	 * @param criteria
@@ -45,8 +46,8 @@ public class WCQueryBuilder {
 	 *            The Request Info
 	 * @return query as a string
 	 */
-	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
-			RequestInfo requestInfo, boolean searchForWaterConnection) {
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo,
+			boolean searchForWaterConnection) {
 		StringBuilder query = new StringBuilder(getQueryForSearch(searchForWaterConnection));
 		String resultantQuery = query.toString();
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
@@ -90,12 +91,13 @@ public class WCQueryBuilder {
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
 	}
-	
+
 	private String getQueryForSearch(boolean searchForWaterConnection) {
 		if (searchForWaterConnection)
-				return WATER_SEARCH_Query;
+			return WATER_SEARCH_Query;
 		return SEWERAGE_SEARCH_QUERY;
 	}
+
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -135,8 +137,7 @@ public class WCQueryBuilder {
 	 *            Array of object for preparedStatement list
 	 * @return It's returns query
 	 */
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
-			SearchCriteria criteria) {
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
 		query = query + " " + Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
@@ -157,10 +158,10 @@ public class WCQueryBuilder {
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<Integer> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
+		Set<String> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(id));
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
-		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
+		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 }
