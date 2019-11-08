@@ -38,6 +38,12 @@ public class MeterServicesImpl implements MeterService {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
+	
+	/**
+	 * 
+	 * @param meterConnectionRequest MeterConnectionRequest contains meter reading connection to be created
+	 * @return List of MeterReading after create
+	 */
 
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {

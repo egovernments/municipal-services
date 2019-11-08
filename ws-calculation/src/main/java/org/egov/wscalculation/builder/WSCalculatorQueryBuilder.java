@@ -95,7 +95,7 @@ public class WSCalculatorQueryBuilder {
 		return query.toString();
 	}
 
-	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
+	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		ids.forEach(id -> {
 			preparedStatement.add(id);
 		});

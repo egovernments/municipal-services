@@ -27,7 +27,7 @@ public class WSCalculationValidator {
 	 *            meterReadingConnectionRequest is request for create or update
 	 *            meter reading connection
 	 * @param isUpdate
-	 *            True for update and false for create
+	 *            True for create
 	 */
 
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
@@ -36,10 +36,30 @@ public class WSCalculationValidator {
 		if (isUpdate && (meterReading.getId() == null || meterReading.getId().isEmpty())) {
 			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be update without meter reading id");
 		}
+
+		if (isUpdate && (meterReading.getCurrentReading() == null)) {
+			errorMap.put("INVALID METER READING CONNECTION",
+					"Current Meter Reading cannot be update without current meter reading");
+		}
+
+		if (isUpdate && (meterReading.getCurrentReadingDate() == null)) {
+			errorMap.put("INVALID METER READING DATE",
+					"Current reading Meter date cannot be updated without current meter reading date");
+		}
+
+		if (isUpdate && (meterReading.getLastReading() == null)) {
+			errorMap.put("INVALID LAST READING", "Last Meter Reading cannot be update without last meter reading");
+		}
+
+		if (isUpdate && (meterReading.getLastReadingDate() == null)) {
+			errorMap.put("INVALID LAST READING DATE",
+					"Last Meter Reading date cannot be update without meter reading id");
+		}
+
 		if (isUpdate && meterReading.getId() != null && !meterReading.getId().isEmpty()) {
 			int n = wSCalculationDao.isMeterReadingConnectionExist(Arrays.asList(meterReading.getId()));
-			if (n == 0) {
-				errorMap.put("INVALID METER READING CONNECTION", "Meter reading Id not present");
+			if (n > 0) {
+				errorMap.put("INVALID METER READING CONNECTION", "Meter reading Id already present");
 			}
 		}
 		if (meterReading.getBillingPeriod() == null || meterReading.getBillingPeriod().isEmpty()) {
