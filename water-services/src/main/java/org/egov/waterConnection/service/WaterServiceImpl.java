@@ -10,7 +10,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.MDMSValidator;
@@ -70,7 +70,7 @@ public class WaterServiceImpl implements WaterService {
 	 * @param requestInfo 
 	 * @return List of matching water connection
 	 */
-	public List<WaterConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
+	public List<WaterConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
 		enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo,criteria);
@@ -82,7 +82,7 @@ public class WaterServiceImpl implements WaterService {
 	 * @param requestInfo 
 	 * @return List of matching water connection
 	 */
-	public List<WaterConnection> getWaterConnectionsList(WaterConnectionSearchCriteria criteria,
+	public List<WaterConnection> getWaterConnectionsList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);
 		if (waterConnectionList.isEmpty())

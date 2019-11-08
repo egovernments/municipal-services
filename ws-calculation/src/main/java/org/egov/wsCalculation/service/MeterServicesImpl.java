@@ -42,7 +42,7 @@ public class MeterServicesImpl implements MeterService {
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
-		wsCalculationValidator.validateMeterReading(meterConnectionRequest, false);
+		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		mDMSValidator.validateMasterData(meterConnectionRequest);
 		// Object result =
 		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
@@ -52,9 +52,11 @@ public class MeterServicesImpl implements MeterService {
 		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
 		return meterReadingsList;
 	}
+	
 
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
+		wsCalculationValidator.validateMeterReadingSearchCriteria(criteria);
 		List<MeterReading> meterReadings = wSCalculationDao.searchMeterReadings(criteria);
 		return meterReadings;
 	}

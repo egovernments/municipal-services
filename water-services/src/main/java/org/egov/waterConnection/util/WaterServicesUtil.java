@@ -19,7 +19,7 @@ import org.egov.waterConnection.model.PropertyRequest;
 import org.egov.waterConnection.model.PropertyResponse;
 import org.egov.waterConnection.model.RequestInfoWrapper;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,7 +95,7 @@ public class WaterServicesUtil {
 	 * @param requestInfo
 	 * @return List of property matching on given criteria
 	 */
-	public List<Property> propertySearchOnCriteria(WaterConnectionSearchCriteria waterConnectionSearchCriteria,
+	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
 		if ((waterConnectionSearchCriteria.getTenantId() == null
 				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {

@@ -8,7 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.SewarageDao;
 import org.egov.waterConnection.util.SewerageServicesUtil;
 import org.egov.waterConnection.util.WaterServicesUtil;
@@ -76,7 +76,7 @@ public class SewarageServiceImpl implements SewarageService {
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
-	public List<SewerageConnection> search(WaterConnectionSearchCriteria criteria, RequestInfo requestInfo) {
+	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList;
 		sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
 		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo);
@@ -91,7 +91,7 @@ public class SewarageServiceImpl implements SewarageService {
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
-	public List<SewerageConnection> getSewerageConnectionsList(WaterConnectionSearchCriteria criteria,
+	public List<SewerageConnection> getSewerageConnectionsList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<SewerageConnection> sewerageConnectionList = sewarageDao.getSewerageConnectionList(criteria, requestInfo);
 		if (sewerageConnectionList.isEmpty())

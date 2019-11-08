@@ -11,7 +11,7 @@ import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class EnrichmentService {
 	 * @param requestInfo
 	 *            is RequestInfo from request
 	 */
-	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,WaterConnectionSearchCriteria waterConnectionSearchCriteria ) {
+	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,SearchCriteria waterConnectionSearchCriteria ) {
 		waterConnectionList.forEach(waterConnection -> {
 			List<Property> propertyList;
 			if (waterConnection.getProperty().getId() == null || waterConnection.getProperty().getId().isEmpty()) {
@@ -71,7 +71,7 @@ public class EnrichmentService {
 			if (sewerageConnection.getProperty().getId() != null) {
 				Set<String> propertyIds = new HashSet<>();
 				propertyIds.add(sewerageConnection.getProperty().getId());
-				WaterConnectionSearchCriteria waterConnectionSearchCriteria = WaterConnectionSearchCriteria.builder()
+				SearchCriteria waterConnectionSearchCriteria = SearchCriteria.builder()
 						.ids(propertyIds).build();
 				propertyList = waterServicesUtil.propertySearchOnCriteria(waterConnectionSearchCriteria, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {

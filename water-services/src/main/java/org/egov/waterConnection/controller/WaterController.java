@@ -7,7 +7,7 @@ import org.egov.waterConnection.model.RequestInfoWrapper;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionResponse;
-import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.service.WaterService;
 import org.egov.waterConnection.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +53,7 @@ public class WaterController {
 
 	@RequestMapping(value = "/_search", method = RequestMethod.POST)
 	public ResponseEntity<WaterConnectionResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-			@Valid @ModelAttribute WaterConnectionSearchCriteria criteria) {
+			@Valid @ModelAttribute SearchCriteria criteria) {
 		List<WaterConnection> waterConnectionList = waterService.search(criteria, requestInfoWrapper.getRequestInfo());
 		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnectionList)
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),

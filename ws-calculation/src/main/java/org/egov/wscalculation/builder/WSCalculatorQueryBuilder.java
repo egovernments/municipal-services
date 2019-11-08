@@ -21,7 +21,12 @@ public class WSCalculatorQueryBuilder {
 
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
 
-
+	/**
+	 * 
+	 * @param criteria would be meter reading criteria
+	 * @param preparedStatement
+	 * @return Query for given criteria
+	 */
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
@@ -83,10 +88,10 @@ public class WSCalculatorQueryBuilder {
 
 	public String getNoOfMeterReadingConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<Integer> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
+		Set<String> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(id));
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
-		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
+		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 

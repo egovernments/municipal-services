@@ -19,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WaterConnectionSearchCriteria {
+public class SearchCriteria {
 
 	@JsonProperty("tenantId")
 	private String tenantId;
