@@ -10,7 +10,7 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
-import org.egov.waterConnection.repository.builder.WCQueryBuilder;
+import org.egov.waterConnection.repository.builder.WsQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +29,7 @@ public class WaterDaoImpl implements WaterDao {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	WCQueryBuilder wCQueryBuilder;
+	WsQueryBuilder wCQueryBuilder;
 
 	@Autowired
 	WaterRowMapper waterRowMapper;

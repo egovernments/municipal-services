@@ -10,9 +10,7 @@ import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.producer.SewarageConnectionProducer;
-import org.egov.waterConnection.producer.WaterConnectionProducer;
-import org.egov.waterConnection.repository.builder.SCQueryBuilder;
-import org.egov.waterConnection.repository.builder.WCQueryBuilder;
+import org.egov.waterConnection.repository.builder.WsQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.SewerageRowMapper;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ public class SewarageDaoImpl implements SewarageDao {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	WCQueryBuilder wCQueryBuilder;
+	WsQueryBuilder wsQueryBuilder;
 
 	@Autowired
 	WaterRowMapper waterRowMapper;
@@ -58,7 +56,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		
-		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo, false);
+		String query = wsQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo, false);
 		log.info("Sewarage Search Query: " +query);
 		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 		return sewarageConnectionList;
@@ -69,7 +67,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
+		String query = wsQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}

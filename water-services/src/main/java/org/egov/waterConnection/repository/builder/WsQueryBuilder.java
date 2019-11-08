@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class WCQueryBuilder {
+public class WsQueryBuilder {
 
 	@Autowired
 	WaterServicesUtil waterServicesUtil;
