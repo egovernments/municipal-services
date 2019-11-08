@@ -11,6 +11,7 @@ import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.producer.SewarageConnectionProducer;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
+import org.egov.waterConnection.repository.builder.SCQueryBuilder;
 import org.egov.waterConnection.repository.builder.WCQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.SewerageRowMapper;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
@@ -32,7 +33,7 @@ public class SewarageDaoImpl implements SewarageDao {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	WCQueryBuilder wCQueryBuilder;
+	SCQueryBuilder sCQueryBuilder;
 
 	@Autowired
 	WaterRowMapper waterRowMapper;
@@ -40,15 +41,15 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
 
-	@Value("${egov.waterservice.createWaterConnection}")
-	private String createWaterConnection;
+	@Value("${egov.sewarageservice.createSewarageConnection}")
+	private String createSewarageConnection;
 
-	@Value("${egov.waterservice.updateWaterConnection}")
-	private String updateWaterConnection;
+	@Value("${egov.sewarageservice.updateSewarageConnection}")
+	private String updateSewarageConnection;
 
 	@Override
 	public void saveSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		sewarageConnectionProducer.push(createWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(createSewarageConnection, sewerageConnectionRequest);
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class SewarageDaoImpl implements SewarageDao {
 			RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
+		String query = sCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
 		//sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 		return sewarageConnectionList;
 	}
@@ -66,14 +67,14 @@ public class SewarageDaoImpl implements SewarageDao {
 		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
+		String query = sCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}
 
 	@Override
 	public void updatSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		sewarageConnectionProducer.push(updateWaterConnection, sewerageConnectionRequest);
+		sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
 	}
 
 }

@@ -11,8 +11,13 @@ import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnectionSearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
 public class SCQueryBuilder {
 
 	@Autowired
@@ -28,7 +33,7 @@ public class SCQueryBuilder {
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM water_service_connection WHERE";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 
 	/**
 	 * 
@@ -146,10 +151,10 @@ public class SCQueryBuilder {
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<Integer> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
+		Set<String> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(id));
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
-		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
+		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 

@@ -150,10 +150,10 @@ public class WCQueryBuilder {
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<Integer> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(Integer.parseInt(id)));
+		Set<String> listOfIds = new HashSet<>();
+		connectionIds.forEach(id -> listOfIds.add(id));
 		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
-		addIntegerListToPreparedStatement(preparedStatement, listOfIds);
+		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
 }

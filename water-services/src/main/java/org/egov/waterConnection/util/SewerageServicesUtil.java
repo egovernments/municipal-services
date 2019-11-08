@@ -48,8 +48,8 @@ public class SewerageServicesUtil {
 
 	/**
 	 * 
-	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest containing property
+	 * @param sewarageConnectionRequest
+	 *            SewarageConnectionRequest containing property
 	 * @return List of Property
 	 */
 	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
@@ -65,7 +65,7 @@ public class SewerageServicesUtil {
 		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
 		propertyList = getPropertyDetails(result);
 		if (propertyList == null || propertyList.isEmpty()) {
-			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATE");
+			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
 	}

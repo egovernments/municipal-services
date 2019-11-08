@@ -47,9 +47,9 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param waterConnectionRequest
+	 * @param sewarageConnectionRequest
 	 *            WaterConnectionRequest contains water connection to be created
-	 * @return List of WaterConnection after create
+	 * @return List of SewarageConnection after create
 	 */
 
 	@Override
