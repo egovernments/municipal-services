@@ -71,9 +71,9 @@ public class EnrichmentService {
 			if (sewerageConnection.getProperty().getId() != null) {
 				Set<String> propertyIds = new HashSet<>();
 				propertyIds.add(sewerageConnection.getProperty().getId());
-				SearchCriteria waterConnectionSearchCriteria = SearchCriteria.builder()
+				SearchCriteria searchCriteria = SearchCriteria.builder()
 						.ids(propertyIds).build();
-				propertyList = waterServicesUtil.propertySearchOnCriteria(waterConnectionSearchCriteria, requestInfo);
+				propertyList = waterServicesUtil.propertySearchOnCriteria(searchCriteria, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",
 							"NO PROPERTY FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");

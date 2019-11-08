@@ -30,6 +30,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			sewarageConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
 			sewarageConnection.setConnectionNo(rs.getString("connectionNo"));
 			sewarageConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
+			sewarageConnection.setConnectionExecutionDate(rs.getBigDecimal("connectionExecutionDate"));
 			// get property id and get property object
 			property.setPropertyId(rs.getString("property_id"));
 			sewarageConnection.setProperty(property);

@@ -47,8 +47,7 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest contains water connection to be created
+	 * @param waterConnectionRequest WaterConnectionRequest contains water connection to be created
 	 * @return List of WaterConnection after create
 	 */
 
@@ -70,9 +69,7 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param criteria
-	 *            WaterConnectionSearchCriteria contains search criteria on
-	 *            water connection
+	 * @param criteria WaterConnectionSearchCriteria contains search criteria on water connection
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
@@ -85,9 +82,7 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param criteria
-	 *            SewarageConnectionSearchCriteria contains search criteria on
-	 *            sewarage connection
+	 * @param criteria SewarageConnectionSearchCriteria contains search criteria on sewarage connection
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
@@ -101,8 +96,7 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param sewarageConnectionRequest
-	 *            SewarageConnectionRequest contains sewarage connection to be updated
+	 * @param sewarageConnectionRequest SewarageConnectionRequest contains sewarage connection to be updated
 	 * @return List of WaterConnection after update
 	 */
 
