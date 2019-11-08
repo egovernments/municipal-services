@@ -26,7 +26,7 @@ public class WSCalculationValidator {
 	 *            meterReadingConnectionRequest is request for create or update
 	 *            meter reading connection
 	 * @param isUpdate
-	 *            True for update and false for create
+	 *            True for create
 	 */
 
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {

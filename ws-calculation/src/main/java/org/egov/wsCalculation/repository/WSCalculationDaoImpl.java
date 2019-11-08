@@ -37,6 +37,14 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	@Value("${egov.meterReadingService.createMeterConnection}")
 	private String createMeterConnection;
 
+	/**
+	 * 
+	 * @param meterConnectionRequest
+	 *            MeterConnectionRequest contains meter reading connection to be
+	 *            created
+	 * @return List of MeterReading to be pushed to kafka queue after create and
+	 *         returning list of water connection
+	 */
 	@Override
 	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest) {
 		wSCalculationProducer.push(createMeterConnection, meterConnectionRequest);
@@ -48,10 +56,18 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		List<MeterReading> listOfMeterReadings = new ArrayList<>();
 		String query = queryBuilder.getSearchQueryString(criteria, preparedStatement);
 		log.info("Query: " + query);
-		log.info("Prepared Statement"+ preparedStatement.toString());
+		log.info("Prepared Statement" + preparedStatement.toString());
 		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
 		return listOfMeterReadings;
 	}
+
+	/**
+	 * 
+	 * @param List
+	 *            of string of connection ids on which search is performed
+	 * @return total number of meter reading objects if present in the table for
+	 *         that particular connection ids
+	 */
 
 	@Override
 	public int isMeterReadingConnectionExist(List<String> ids) {

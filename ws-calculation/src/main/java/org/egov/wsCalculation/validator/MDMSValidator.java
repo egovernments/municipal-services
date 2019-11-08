@@ -47,8 +47,8 @@ public class MDMSValidator {
 
 		String[] masterNames = { MRConstants.MDMS_MS_BILLING_PERIOD };
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-		Map<String, List<String>> codes = getAttributeValues(tenantId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.billingCycle",
-				jsonPath, request.getRequestInfo());
+		Map<String, List<String>> codes = getAttributeValues(tenantId, MRConstants.MDMS_WC_MOD_NAME, names,
+				"$.*.billingCycle", jsonPath, request.getRequestInfo());
 		validateMDMSData(masterNames, codes);
 		validateCodes(request.getMeterReading(), codes, errorMap);
 		if (!errorMap.isEmpty())
