@@ -36,7 +36,7 @@ public class MeterReadingController {
 	@Autowired
 	MeterService meterService;
 
-	@RequestMapping(value = "/_createMeterReading", method = RequestMethod.POST, produces = "application/json")
+	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<MeterReadingResponse> createMeterReading(
 			@Valid @RequestBody MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadings = meterService.createMeterReading(meterConnectionRequest);
@@ -47,7 +47,7 @@ public class MeterReadingController {
 
 	}
 	
-	@RequestMapping(value = "/_searchMeterReadings", method = RequestMethod.POST)
+	@RequestMapping(value = "/_search", method = RequestMethod.POST)
 	public ResponseEntity<MeterReadingResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute MeterReadingSearchCriteria criteria) {
 		List<MeterReading> meterReadingLists = meterService.searchMeterReadings(criteria, requestInfoWrapper.getRequestInfo());
