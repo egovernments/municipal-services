@@ -20,5 +20,12 @@ public class WSCalculationConfiguration {
 
 	@Value("${egov.ws_calculation.meterReading.default.offset}")
 	private Integer meterReadingDefaultOffset;
+	
+	  //Idgen Config
+    @Value("${egov.idgen.host}")
+    private String idGenHost;
+
+    @Value("${egov.idgen.path}")
+    private String idGenPath;
 
 }
