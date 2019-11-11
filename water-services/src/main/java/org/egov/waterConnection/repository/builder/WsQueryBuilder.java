@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.waterConnection.config.WCConfiguration;
+import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
@@ -20,7 +20,7 @@ public class WsQueryBuilder {
 	WaterServicesUtil waterServicesUtil;
 
 	@Autowired
-	WCConfiguration config;
+	WSConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";

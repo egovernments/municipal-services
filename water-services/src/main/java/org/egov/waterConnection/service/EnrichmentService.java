@@ -3,6 +3,7 @@ package org.egov.waterConnection.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -11,16 +12,22 @@ import org.egov.waterConnection.model.SewerageConnection;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
+import org.egov.waterConnection.model.Idgen.IdResponse;
+import org.egov.waterConnection.repository.IdGenRepository;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class EnrichmentService {
 
 	@Autowired
 	WaterServicesUtil waterServicesUtil;
+	
+	@Autowired
+	IdGenRepository idGenRepository;
 
 	/**
 	 * 
@@ -114,5 +121,15 @@ public class EnrichmentService {
 			List<Property> propertyList) {
 		if (propertyList != null && !propertyList.isEmpty())
 			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
+	}
+	
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
+				.getIdResponses();
+
+		if (CollectionUtils.isEmpty(idResponses))
+			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+
+		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
 }

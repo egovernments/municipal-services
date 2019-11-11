@@ -16,12 +16,33 @@ import lombok.Setter;
 @Builder
 
 @Component
-public class SCConfiguration {
+
+public class WSConfiguration {
 
 	@Value("${egov.waterservice.pagination.default.limit}")
 	private Integer defaultLimit;
 
 	@Value("${egov.waterservice.pagination.default.offset}")
 	private Integer defaultOffset;
+	
+	 //IDGEN
+    @Value("${egov.idgen.wcid.name}")
+    private String waterConnectionIdGenName;
+
+    @Value("${egov.idgen.wcid.format}")
+    private String waterConnectionIdGenFormat;
+    
+    @Value("${egov.idgen.scid.name}")
+    private String sewerageIdGenName;
+
+    @Value("${egov.idgen.scid.format}")
+    private String sewerageIdGenFormat;
+    
+    //Idgen Config
+    @Value("${egov.idgen.host}")
+    private String idGenHost;
+
+    @Value("${egov.idgen.path}")
+    private String idGenPath;
 
 }
