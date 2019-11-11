@@ -51,16 +51,10 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		List<Property> propertyList;
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
-		if (!validateProperty.isPropertyIdPresent(waterConnectionRequest)) {
-			propertyList = waterServicesUtil.propertySearch(waterConnectionRequest);
-		} else {
-			propertyList = waterServicesUtil.createPropertyRequest(waterConnectionRequest);
-		}
-		enrichmentService.enrichWaterConnection(waterConnectionRequest, propertyList);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, true);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
@@ -99,6 +93,7 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, false);
 		waterDao.updateWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}

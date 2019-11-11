@@ -11,6 +11,8 @@ import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.SearchCriteria;
+import org.egov.waterConnection.model.SewerageConnection;
+import org.egov.waterConnection.util.SewerageServicesUtil;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,10 @@ public class ValidateProperty {
 
 	@Autowired
 	WaterServicesUtil waterServiceUtil;
+	
+	@Autowired
+	SewerageServicesUtil sewerageServiceUtil;
+	
 	/**
 	 * 
 	 * @param waterConnectionRequest WaterConnectionRequest is request to be validated against property
@@ -97,5 +103,27 @@ public class ValidateProperty {
 			return false;
 		}
 		return true;
+	}
+	
+	public void enrichPropertyForWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		List<Property> propertyList;
+		if (!isPropertyIdPresent(waterConnectionRequest)) {
+			propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
+		} else {
+			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);
+		}
+		if (propertyList != null && !propertyList.isEmpty())
+			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
+	}
+	
+	public void enrichPropertyForSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
+		List<Property> propertyList;
+		if (!isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
+			propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
+		} else {
+			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);
+		}
+		if (propertyList != null && !propertyList.isEmpty())
+			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
 	}
 }
