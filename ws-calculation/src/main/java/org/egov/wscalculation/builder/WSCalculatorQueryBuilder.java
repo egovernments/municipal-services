@@ -90,7 +90,7 @@ public class WSCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		Set<String> listOfIds = new HashSet<>();
 		connectionIds.forEach(id -> listOfIds.add(id));
-		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
+		query.append(" connectionid in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
