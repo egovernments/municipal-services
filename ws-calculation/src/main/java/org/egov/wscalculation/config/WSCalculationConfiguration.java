@@ -28,16 +28,10 @@ public class WSCalculationConfiguration {
 	@Value("${egov.idgen.path}")
 	private String idGenPath;
 
-	@Value("${egov.idgen.tl.applicationNum.name}")
+	@Value("${egov.idgen.mr.applicationNum.name}")
 	private String applicationNumberIdgenName;
 
-	@Value("${egov.idgen.tl.applicationNum.format}")
+	@Value("${egov.idgen.mr.applicationNum.format}")
 	private String applicationNumberIdgenFormat;
-
-	@Value("${egov.idgen.tl.licensenumber.name}")
-	private String licenseNumberIdgenName;
-
-	@Value("${egov.idgen.tl.licensenumber.format}")
-	private String licenseNumberIdgenFormat;
 
 }

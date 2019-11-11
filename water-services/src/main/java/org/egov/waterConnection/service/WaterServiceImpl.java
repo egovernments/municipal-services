@@ -67,7 +67,7 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
-		//enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo,criteria);
+		enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo,criteria);
 		return waterConnectionList;
 	}
 	/**

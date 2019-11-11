@@ -51,7 +51,7 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
-		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
+		//validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest, true);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
@@ -93,7 +93,7 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> updateSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
-		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
+		//validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest, false);
 		sewarageDao.updatSewerageConnection(sewarageConnectionRequest);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
