@@ -119,6 +119,7 @@ public class EnrichmentService {
 	 */
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,
 			List<Property> propertyList) {
+		
 		if (propertyList != null && !propertyList.isEmpty())
 			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
 	}

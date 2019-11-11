@@ -1,7 +1,6 @@
 package org.egov.wsCalculation.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -33,15 +32,19 @@ public class MeterServicesImpl implements MeterService {
 
 	private ServiceRequestRepository serviceRequestRepository;
 
-	@Autowired
-	public MeterServicesImpl(ServiceRequestRepository serviceRequestRepository) {
-		this.serviceRequestRepository = serviceRequestRepository;
+	private EnrichmentService enrichmentService;
 
+	@Autowired
+	public MeterServicesImpl(ServiceRequestRepository serviceRequestRepository, EnrichmentService enrichmentService) {
+		this.serviceRequestRepository = serviceRequestRepository;
+		this.enrichmentService = enrichmentService;
 	}
-	
+
 	/**
 	 * 
-	 * @param meterConnectionRequest MeterConnectionRequest contains meter reading connection to be created
+	 * @param meterConnectionRequest
+	 *            MeterConnectionRequest contains meter reading connection to be
+	 *            created
 	 * @return List of MeterReading after create
 	 */
 
@@ -49,7 +52,8 @@ public class MeterServicesImpl implements MeterService {
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
-		mDMSValidator.validateMasterData(meterConnectionRequest);
+		//mDMSValidator.validateMasterData(meterConnectionRequest);
+		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		// Object result =
 		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
 		// meterConnectionRequest);
@@ -59,6 +63,15 @@ public class MeterServicesImpl implements MeterService {
 		return meterReadingsList;
 	}
 	
+	/**
+	 * 
+	 * @param meterConnectionSearchCriteria
+	 *            MeterConnectionSearchCriteria contains meter reading
+	 *            connection criterias to be searched for in the meter
+	 *            connection table
+	 * @return List of MeterReading after search
+	 */
+
 
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
