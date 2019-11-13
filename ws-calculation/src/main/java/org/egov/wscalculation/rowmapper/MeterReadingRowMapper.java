@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.wsCalculation.model.MeterReading;
+import org.egov.wsCalculation.model.MeterReading.MeterStatusEnum;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 			meterReading.setCurrentReadingDate(rs.getLong("currentReadingDate"));
 			meterReading.setLastReading(rs.getInt("lastReading"));
 			meterReading.setLastReadingDate(rs.getLong("lastReadingDate"));
-			meterReading.setMeterStatus(rs.getString("meterStatus"));
+			meterReading.setMeterStatus(MeterStatusEnum.fromValue(rs.getString("meterStatus")));
 			meterReadingLists.add(meterReading);
 		}
 		return meterReadingLists;
