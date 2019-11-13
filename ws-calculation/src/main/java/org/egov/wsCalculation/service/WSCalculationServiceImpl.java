@@ -1,14 +1,5 @@
 package org.egov.wsCalculation.service;
 
-import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR;
-import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE;
-import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIALYEAR_MASTER_KEY;
-import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE;
-import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE;
-import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADVANCE_CARRYFORWARD;
-import static org.egov.pt.calculator.util.CalculatorConstants.PT_TAX;
-import static org.egov.pt.calculator.util.CalculatorConstants.TAXHEADMASTER_MASTER_KEY;
-
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -17,15 +8,12 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.pt.calculator.web.models.TaxHeadEstimate;
-import org.egov.pt.calculator.web.models.demand.Category;
-import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
-import org.egov.pt.calculator.web.models.property.Property;
-import org.egov.pt.calculator.web.models.property.PropertyDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
+import org.egov.wsCalculation.model.Category;
+import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,13 +68,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
     private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
 									   Map<String,List> estimatesAndBillingSlabs,Map<String,Object> masterMap) {
 
-		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
+		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 
-        Property property = criteria.getProperty();
-        PropertyDetail detail = property.getPropertyDetails().get(0);
-        String assessmentYear = detail.getFinancialYear();
-        String assessmentNumber = null != detail.getAssessmentNumber() ? detail.getAssessmentNumber() : criteria.getAssesmentNumber();
+        WaterConnection property = criteria.getWaterConnection();
+        
+     //   String assessmentNumber = null != detail.getAssessmentNumber() ? detail.getAssessmentNumber() : criteria.getAssesmentNumber();
         String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		Map<String,Map<String, Object>> financialYearMaster = (Map<String,Map<String, Object>>)masterMap.get(FINANCIALYEAR_MASTER_KEY);
@@ -163,8 +150,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				.fromDate(fromDate)
 				.toDate(toDate)
 				.tenantId(tenantId)
-				.serviceNumber(assessmentNumber)
-				.taxHeadEstimates(estimates)
+			    .taxHeadEstimates(estimates)
 				.billingSlabIds(billingSlabIds)
 				.build();
 	}
