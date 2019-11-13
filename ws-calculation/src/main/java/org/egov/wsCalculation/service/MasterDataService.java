@@ -1,5 +1,6 @@
 package org.egov.wsCalculation.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import org.egov.wsCalculation.model.TaxPeriod;
 import org.egov.wsCalculation.model.TaxPeriodResponse;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,19 +113,46 @@ public class MasterDataService {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
 				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
-		Map<String, JSONArray> res = response.getMdmsRes().get(CalculatorConstants.PROPERTY_TAX_MODULE);
+		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConfiguration.WS_TAX_MODULE);
 		for (Entry<String, JSONArray> entry : res.entrySet()) {
 
 			String masterName = entry.getKey();
 
 			/* Masters which need to be parsed will be contained in the list */
-			if (CalculatorConstants.PROPERTY_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
+			if (WSCalculationConfiguration.WS_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
 				propertyBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
 
 			/* Master not contained in list will be stored as it is */
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
 		}
 	}
+	
+	/**
+	 * Parses the master which has an exemption in them
+	 * @param entry
+	 * @return
+	 */
+	private Map<String, List<Object>> getParsedMaster(Entry<String, JSONArray> entry) {
+
+		JSONArray values = entry.getValue();
+		Map<String, List<Object>> codeValueListMap = new HashMap<>();
+		for (Object object : values) {
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> objectMap = (Map<String, Object>) object;
+			String code = (String) objectMap.get(WSCalculationConfiguration.CODE_FIELD_NAME);
+			if (null == codeValueListMap.get(code)) {
+
+				List<Object> valuesList = new ArrayList<>();
+				valuesList.add(objectMap);
+				codeValueListMap.put(code, valuesList);
+			} else {
+				codeValueListMap.get(code).add(objectMap);
+			}
+		}
+		return codeValueListMap;
+	}
+	
 	/**
 	 * Fetches Financial Year from Mdms Api
 	 *

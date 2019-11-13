@@ -1,5 +1,9 @@
 package org.egov.wscalculation.config;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -64,6 +68,9 @@ public class WSCalculationConfiguration {
 	@Value("${egov.mdms.host}")
 	private String mdmsHost;
 	
+	@Value("${egov.mdms.search.endpoint}")
+	private String mdmsEndPoint;
+	
 	public static final String WS_TAX_MODULE = "ws-services-calcution";
 	
 	public static final String WC_REBATE_MASTER = "Rebate";
@@ -73,5 +80,13 @@ public class WSCalculationConfiguration {
 	public static final String WC_WATER_CESS_MASTER = "WaterCess";
 
 	public static final String WC_INTEREST_MASTER = "Interest";
+	
+	public static final String CODE_FIELD_NAME = "code";
+	
+	public static final String USAGE_MAJOR_MASTER = "UsageCategoryMajor";
+	
+	public static final List<String> WS_BASED_EXEMPTION_MASTERS = Collections.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
+	
+	
 
 }

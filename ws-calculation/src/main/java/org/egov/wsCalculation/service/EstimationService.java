@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ import net.minidev.json.JSONArray;
 @Slf4j
 public class EstimationService {
 
+	@Autowired
+	MasterDataService mDataService;
 	
 	/**
 	 * Generates a List of Tax head estimates with tax head code,
@@ -35,7 +39,7 @@ public class EstimationService {
      * @param requestInfo request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	private Map<String,List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	private Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal usageExemption = BigDecimal.ZERO;
@@ -43,12 +47,11 @@ public class EstimationService {
 		String assessmentYear = "2019-20";
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 
-		List<BillingSlab> filteredBillingSlabs = getSlabsFiltered(property, requestInfo);
+		List<BillingSlab> filteredBillingSlabs = getSlabsFiltered(waterConnection, requestInfo);
 
 		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		mDataService.setPropertyMasterValues(requestInfo, tenantId, propertyBasedExemptionMasterMap,
-				timeBasedExemptionMasterMap);
+		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, propertyBasedExemptionMasterMap, timeBasedExemptionMasterMap);
 
 		List<String> billingSlabIds = new LinkedList<>();
 		HashMap<Unit, BillingSlab> unitSlabMapping = new HashMap<>();
@@ -58,8 +61,9 @@ public class EstimationService {
 		 * by default land should get only one slab from database per tenantId
 		 */
 		if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType()) && filteredBillingSlabs.size() != 1)
-			throw new CustomException(PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT,PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG
-					.replace("{count}",String.valueOf(filteredBillingSlabs.size())));
+			throw new CustomException(PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT,
+					PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG.replace("{count}",
+							String.valueOf(filteredBillingSlabs.size())));
 
 		else if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType())) {
 			taxAmt = taxAmt.add(BigDecimal.valueOf(filteredBillingSlabs.get(0).getUnitRate() * detail.getLandArea()));
@@ -74,7 +78,7 @@ public class EstimationService {
 
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
-				billingSlabIds.add(slab.getId()+"|"+i);
+				billingSlabIds.add(slab.getId() + "|" + i);
 				unitSlabMapping.put(unit, slab);
 				/*
 				 * counting the number of units & total area in ground floor for unbuilt area
@@ -84,8 +88,8 @@ public class EstimationService {
 					groundUnitsCount += 1;
 					groundUnitsArea += unit.getUnitArea();
 					groundFloorUnits.add(unit);
-//					if (null != slab.getUnBuiltUnitRate())
-//						unBuiltRate += slab.getUnBuiltUnitRate();
+					// if (null != slab.getUnBuiltUnitRate())
+					// unBuiltRate += slab.getUnBuiltUnitRate();
 				}
 				taxAmt = taxAmt.add(currentUnitTax);
 				usageExemption = usageExemption
@@ -93,8 +97,8 @@ public class EstimationService {
 				i++;
 			}
 
-
-			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
+			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits,
+					groundUnitsArea);
 
 			/*
 			 * making call to get unbuilt area tax estimate
@@ -104,22 +108,24 @@ public class EstimationService {
 			/*
 			 * special case to handle property with one unit
 			 */
-//			if (detail.getUnits().size() == 1)
-//				usageExemption = getExemption(detail.getUnits().get(0), taxAmt, assessmentYear,
-//						propertyBasedExemptionMasterMap);
+			// if (detail.getUnits().size() == 1)
+			// usageExemption = getExemption(detail.getUnits().get(0), taxAmt,
+			// assessmentYear,
+			// propertyBasedExemptionMasterMap);
 
-			for (Map.Entry<Unit,BigDecimal> e: unBuiltRateCalc.entrySet()) {
+			for (Map.Entry<Unit, BigDecimal> e : unBuiltRateCalc.entrySet()) {
 				BigDecimal ue = getExemption(e.getKey(), e.getValue(), assessmentYear, propertyBasedExemptionMasterMap);
 				usageExemption = usageExemption.add(ue);
 			}
 
 		}
-		List<TaxHeadEstimate> taxHeadEstimates =  getEstimatesForTax(assessmentYear, taxAmt, usageExemption, property, propertyBasedExemptionMasterMap,
-				timeBasedExemptionMasterMap, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt, usageExemption, property,
+				propertyBasedExemptionMasterMap, timeBasedExemptionMasterMap,
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
-		Map<String,List> estimatesAndBillingSlabs = new HashMap<>();
-		estimatesAndBillingSlabs.put("estimates",taxHeadEstimates);
-		estimatesAndBillingSlabs.put("billingSlabIds",new ArrayList<>());
+		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
+		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
+		estimatesAndBillingSlabs.put("billingSlabIds", new ArrayList<>());
 		return estimatesAndBillingSlabs;
 	}
 	
@@ -218,61 +224,24 @@ public class EstimationService {
 	 * method to do a first level filtering on the slabs based on the values present in Property detail
 	 */
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, RequestInfo requestInfo) {
-		PropertyDetail detail = property.getPropertyDetails().get(0);
+		Property property = waterConnection.getProperty();
 		String tenantId = property.getTenantId();
-		BillingSlabSearchCriteria slabSearchCriteria = BillingSlabSearchCriteria.builder().tenantId(tenantId).build();
-		List<BillingSlab> billingSlabs = billingSlabService.searchBillingSlabs(requestInfo, slabSearchCriteria)
-				.getBillingSlab();
+		// get billing Slab
+		List<BillingSlab> billingSlabs = new ArrayList<>();
 
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String all = configs.getSlabValueAll();
-
-		Double plotSize = null != detail.getLandArea() ? detail.getLandArea() : detail.getBuildUpArea();
-
-		final String dtlPtType = detail.getPropertyType();
-		final String dtlPtSubType = detail.getPropertySubType();
-		final String dtlOwnerShipCat = detail.getOwnershipCategory();
-		final String dtlSubOwnerShipCat = detail.getSubOwnershipCategory();
-		final String dtlAreaType = property.getAddress().getLocality().getArea();
-		final Boolean dtlIsMultiFloored = detail.getNoOfFloors() > 1;
+		final String propertyType = property.getPropertyType();
+		final String connectionType = waterConnection.getConnectionType();
+		final String calculationAttribute = "Water consumption";
+		final String unitOfMeasurement = "kL";
 
 		return billingSlabs.stream().filter(slab -> {
-
-			Boolean slabMultiFloored = slab.getIsPropertyMultiFloored();
-			String slabAreaType = slab.getAreaType();
-			String slabPropertyType = slab.getPropertyType();
-			String slabPropertySubType = slab.getPropertySubType();
-			String slabOwnerShipCat = slab.getOwnerShipCategory();
-			String slabSubOwnerShipCat = slab.getSubOwnerShipCategory();
-			Double slabAreaFrom = slab.getFromPlotSize();
-			Double slabAreaTo = slab.getToPlotSize();
-
-			boolean isPropertyMultiFloored = slabMultiFloored.equals(dtlIsMultiFloored);
-
-			boolean isAreaMatching = slabAreaType.equalsIgnoreCase(dtlAreaType)
-					|| all.equalsIgnoreCase(slab.getAreaType());
-
-			boolean isPtTypeMatching = slabPropertyType.equalsIgnoreCase(dtlPtType);
-
-			boolean isPtSubTypeMatching = slabPropertySubType.equalsIgnoreCase(dtlPtSubType)
-					|| all.equalsIgnoreCase(slabPropertySubType);
-
-			boolean isOwnerShipMatching = slabOwnerShipCat.equalsIgnoreCase(dtlOwnerShipCat)
-					|| all.equalsIgnoreCase(slabOwnerShipCat);
-
-			boolean isSubOwnerShipMatching = slabSubOwnerShipCat.equalsIgnoreCase(dtlSubOwnerShipCat)
-					|| all.equalsIgnoreCase(slabSubOwnerShipCat);
-
-			boolean isPlotMatching = false;
-
-			if (plotSize == 0.0)
-				isPlotMatching = slabAreaFrom <= plotSize && slabAreaTo >= plotSize;
-			else
-				isPlotMatching = slabAreaFrom < plotSize && slabAreaTo >= plotSize;
-
-			return isPtTypeMatching && isPtSubTypeMatching && isOwnerShipMatching && isSubOwnerShipMatching
-					&& isPlotMatching && isAreaMatching && isPropertyMultiFloored;
-
+			boolean isPropertyTypeMatching = slab.BuildingType.equals(propertyType);
+			boolean isConnectionTypeMatching = slab.ConnectionType.equals(connectionType);
+			boolean isCalculationAttributeMatching = slab.CalculationAttribute.equals(calculationAttribute);
+			boolean isUnitOfMeasurementMatcing = slab.UOM.equals(unitOfMeasurement);
+			return isPropertyTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
+					&& isUnitOfMeasurementMatcing;
 		}).collect(Collectors.toList());
 	}
 }

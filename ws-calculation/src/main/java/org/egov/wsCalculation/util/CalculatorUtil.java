@@ -10,6 +10,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import lombok.Getter;
@@ -18,6 +19,8 @@ import lombok.Getter;
 @Getter
 public class CalculatorUtil {
 
+	@Autowired
+	WSCalculationConfiguration calculationConfig;
 	/**
 	 * Methods provides all the usage category master for Water Service module
 	 */
@@ -40,7 +43,7 @@ public class CalculatorUtil {
 	 * @return
 	 */
 	public StringBuilder getMdmsSearchUrl() {
-		return new StringBuilder().append(WSCalculationConfiguration.getMdmsHost()).append(WSCalculationConfiguration.getMdmsEndpoint());
+		return new StringBuilder().append(calculationConfig.getMdmsHost()).append(calculationConfig.getMdmsEndPoint());
 	}
 
 }
