@@ -3,7 +3,6 @@ package org.egov.wsCalculation.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.pt.calculator.web.models.property.AuditDetails;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
