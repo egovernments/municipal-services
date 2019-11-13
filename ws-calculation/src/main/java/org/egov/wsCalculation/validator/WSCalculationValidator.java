@@ -3,14 +3,15 @@ package org.egov.wsCalculation.validator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,10 +71,39 @@ public class WSCalculationValidator {
 			throw new CustomException(errorMap);
 		}
 	}
-	
+
+	/**
+	 * validates for the required information needed to do the
+	 * calculation/estimation
+	 * 
+	 * @param detail
+	 *            property detail
+	 */
+	public void validateWaterConnectionForCalculation(WaterConnection waterConnection) {
+
+		Map<String, String> error = new HashMap<>();
+
+		// boolean isVacantLand =
+		// PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType());
+		//
+		// if(null == detail.getLandArea() && null == detail.getBuildUpArea())
+		// error.put(PT_ESTIMATE_AREA_NULL, PT_ESTIMATE_AREA_NULL_MSG);
+		//
+		// if (isVacantLand && null == detail.getLandArea())
+		// error.put(PT_ESTIMATE_VACANT_LAND_NULL,
+		// PT_ESTIMATE_VACANT_LAND_NULL_MSG);
+		//
+		// if (!isVacantLand && CollectionUtils.isEmpty(detail.getUnits()))
+		// error.put(PT_ESTIMATE_NON_VACANT_LAND_UNITS,
+		// PT_ESTIMATE_NON_VACANT_LAND_UNITS_MSG);
+
+		if (!CollectionUtils.isEmpty(error))
+			throw new CustomException(error);
+	}
+
 	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
 		Map<String, String> errorMap = new HashMap<>();
-		if(criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
+		if (criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
 			errorMap.put("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
 		}
 		if (!errorMap.isEmpty()) {
