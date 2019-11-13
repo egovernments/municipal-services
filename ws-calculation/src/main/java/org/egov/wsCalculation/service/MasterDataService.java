@@ -3,8 +3,10 @@ package org.egov.wsCalculation.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MdmsResponse;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
@@ -14,10 +16,13 @@ import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxHeadMasterResponse;
 import org.egov.wsCalculation.model.TaxPeriod;
 import org.egov.wsCalculation.model.TaxPeriodResponse;
+import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.minidev.json.JSONArray;
 
 @Service
 public class MasterDataService {
@@ -33,6 +38,9 @@ public class MasterDataService {
 
 	@Autowired
 	private WSConfiguration config;
+	
+	@Autowired
+	CalculatorUtil calculatorUtils;
 
 	/**
 	 * Fetches and creates map of all required masters
@@ -90,6 +98,32 @@ public class MasterDataService {
 		return res.getTaxHeadMasters();
 	}
 
+	
+	/**
+	 * Method to enrich the Water Connection data Map
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	public void setWaterConnectionMasterValues(RequestInfo requestInfo, String tenantId,
+			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
+			Map<String, JSONArray> timeBasedExemptionMasterMap) {
+
+		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(CalculatorConstants.PROPERTY_TAX_MODULE);
+		for (Entry<String, JSONArray> entry : res.entrySet()) {
+
+			String masterName = entry.getKey();
+
+			/* Masters which need to be parsed will be contained in the list */
+			if (CalculatorConstants.PROPERTY_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
+				propertyBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
+
+			/* Master not contained in list will be stored as it is */
+			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
+		}
+	}
 	/**
 	 * Fetches Financial Year from Mdms Api
 	 *

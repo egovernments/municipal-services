@@ -2,8 +2,6 @@ package org.egov.wsCalculation.model;
 
 import java.math.BigDecimal;
 
-import org.egov.pt.calculator.web.models.demand.Category;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

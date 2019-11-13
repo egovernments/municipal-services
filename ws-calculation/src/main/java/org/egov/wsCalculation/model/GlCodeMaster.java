@@ -9,29 +9,22 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaxPeriod {
+public class GlCodeMaster {
 
 	private String id;
 
 	@NotNull
 	private String tenantId;
-
+	@NotNull
+	private String taxHead;
+	@NotNull
+	private String service;
+	@NotNull
+	private String glCode;
 	@NotNull
 	private Long fromDate;
-
 	@NotNull
 	private Long toDate;
 	
-	@NotNull
-	private PeriodCycle periodCycle;
-
-	@NotNull
-	private String service;
-	
-	@NotNull
-	private String code;
-
-	private String financialYear;
-
-	private AuditDetails auditDetail;
+	private AuditDetails auditDetails;
 }

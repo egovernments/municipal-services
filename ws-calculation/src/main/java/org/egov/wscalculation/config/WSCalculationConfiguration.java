@@ -63,8 +63,15 @@ public class WSCalculationConfiguration {
 	// MDMS
 	@Value("${egov.mdms.host}")
 	private String mdmsHost;
+	
+	public static final String WS_TAX_MODULE = "ws-services-calcution";
+	
+	public static final String WC_REBATE_MASTER = "Rebate";
 
-	@Value("${egov.mdms.search.endpoint}")
-	private String mdmsEndpoint;
+	public static final String WC_PENANLTY_MASTER = "Penalty";
+
+	public static final String WC_WATER_CESS_MASTER = "WaterCess";
+
+	public static final String WC_INTEREST_MASTER = "Interest";
 
 }
