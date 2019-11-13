@@ -1,11 +1,15 @@
 package org.egov.wsCalculation.service;
 
-import java.awt.List;
+
 
 import org.egov.wsCalculation.model.CalculationReq;
 
+import java.util.List;
+
+import org.egov.wsCalculation.model.Calculation;
+
 public interface WSCalculationService {
 	
-	public List<> getTaxCalculation(CalculationReq calculationReq);
+	public List<Calculation> getTaxCalculation(CalculationReq calculationReq);
 
 }
