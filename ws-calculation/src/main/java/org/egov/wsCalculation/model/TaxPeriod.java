@@ -41,7 +41,6 @@ package org.egov.wsCalculation.model;
 
 import javax.validation.constraints.NotNull;
 
-import org.egov.pt.calculator.web.models.property.AuditDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -78,7 +78,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @return Calculation object constructed based on the resulting tax amount and other applicables(rebate/penalty)
 	 */
     private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
-									   Map<String,List> estimatesAndBillingSlabs,Map<String,Object> masterMap) {
+									   Map<String,List> estimatesAndBillingSlabs, Map<String,Object> masterMap) {
 
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
