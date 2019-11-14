@@ -71,6 +71,20 @@ public class WSCalculationConfiguration {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
 	
+	public static final String Water_Charge = "Water_Charge";
+	
+	public static final String Assesment_Year = "assessmentYear";
+	
+	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
+	
+	public static final String FINANCIAL_YEAR_STARTING_DATE = "01-Apr-2019";
+	
+	public static final String FINANCIAL_YEAR_ENDING_DATE = "01-Apr-2020";
+	
+	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
+	
+	public static final String WS_Round_Off="WS_Round_Off";
+	
 	public static final String WS_TAX_MODULE = "ws-services-calcution";
 	
 	public static final String WC_REBATE_MASTER = "Rebate";

@@ -18,6 +18,7 @@ import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,87 +41,19 @@ public class EstimationService {
 	 * @return Map<String, Double>
 	 */
 	private Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
-
 		BigDecimal taxAmt = BigDecimal.ZERO;
-		BigDecimal usageExemption = BigDecimal.ZERO;
 		WaterConnection waterConnection = criteria.getWaterConnection();
 		String assessmentYear = "2019-20";
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 
-		List<BillingSlab> filteredBillingSlabs = getSlabsFiltered(waterConnection, requestInfo);
+		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, requestInfo);
 
-		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
+		Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, propertyBasedExemptionMasterMap, timeBasedExemptionMasterMap);
-
-		List<String> billingSlabIds = new LinkedList<>();
-		HashMap<Unit, BillingSlab> unitSlabMapping = new HashMap<>();
-		List<Unit> groundFloorUnits = new LinkedList<>();
-
-		/*
-		 * by default land should get only one slab from database per tenantId
-		 */
-		if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType()) && filteredBillingSlabs.size() != 1)
-			throw new CustomException(PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT,
-					PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG.replace("{count}",
-							String.valueOf(filteredBillingSlabs.size())));
-
-		else if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType())) {
-			taxAmt = taxAmt.add(BigDecimal.valueOf(filteredBillingSlabs.get(0).getUnitRate() * detail.getLandArea()));
-		} else {
-
-			double unBuiltRate = 0.0;
-			int groundUnitsCount = 0;
-			Double groundUnitsArea = 0.0;
-			int i = 0;
-
-			for (Unit unit : detail.getUnits()) {
-
-				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
-				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
-				billingSlabIds.add(slab.getId() + "|" + i);
-				unitSlabMapping.put(unit, slab);
-				/*
-				 * counting the number of units & total area in ground floor for unbuilt area
-				 * tax calculation
-				 */
-				if (unit.getFloorNo().equalsIgnoreCase("0")) {
-					groundUnitsCount += 1;
-					groundUnitsArea += unit.getUnitArea();
-					groundFloorUnits.add(unit);
-					// if (null != slab.getUnBuiltUnitRate())
-					// unBuiltRate += slab.getUnBuiltUnitRate();
-				}
-				taxAmt = taxAmt.add(currentUnitTax);
-				usageExemption = usageExemption
-						.add(getExemption(unit, currentUnitTax, assessmentYear, propertyBasedExemptionMasterMap));
-				i++;
-			}
-
-			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits,
-					groundUnitsArea);
-
-			/*
-			 * making call to get unbuilt area tax estimate
-			 */
-			taxAmt = taxAmt.add(unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
-
-			/*
-			 * special case to handle property with one unit
-			 */
-			// if (detail.getUnits().size() == 1)
-			// usageExemption = getExemption(detail.getUnits().get(0), taxAmt,
-			// assessmentYear,
-			// propertyBasedExemptionMasterMap);
-
-			for (Map.Entry<Unit, BigDecimal> e : unBuiltRateCalc.entrySet()) {
-				BigDecimal ue = getExemption(e.getKey(), e.getValue(), assessmentYear, propertyBasedExemptionMasterMap);
-				usageExemption = usageExemption.add(ue);
-			}
-
-		}
-		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt, usageExemption, property,
-				propertyBasedExemptionMasterMap, timeBasedExemptionMasterMap,
+		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, waterBasedExemptionMasterMap,
+				timeBasedExemptionMasterMap);
+		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt, criteria.getWaterConnection(),
+				waterBasedExemptionMasterMap, timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
@@ -140,17 +73,16 @@ public class EstimationService {
 	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
 	 * @param build
 	 */
-	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt, BigDecimal usageExemption, Property property,
-													 Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
+	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt, WaterConnection connection,
+													 Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap,
 													 Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
-
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt;
-		List<TaxHeadEstimate> estimates = new ArrayList<>();
 
 		// taxes
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TAX).estimateAmount(taxAmt.setScale(2, 2)).build());
-
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Charge).estimateAmount(taxAmt.setScale(2, 2)).build());
+		
 		// usage exemption
 		 usageExemption = usageExemption.setScale(2, 2).negate();
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_UNIT_USAGE_EXEMPTION).estimateAmount(
@@ -204,19 +136,6 @@ public class EstimationService {
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_PENALTY).estimateAmount(penalty).build());
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_INTEREST).estimateAmount(interest).build());
 			payableTax = payableTax.add(rebate).add(penalty).add(interest);
-		}
-
-		// AdHoc Values (additional rebate or penalty manually entered by the employee)
-		if (null != detail.getAdhocPenalty())
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_ADHOC_PENALTY)
-					.estimateAmount(detail.getAdhocPenalty()).build());
-
-		if (null != detail.getAdhocExemption() && detail.getAdhocExemption().compareTo(payableTax.add(fireCess)) <= 0) {
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_ADHOC_REBATE)
-					.estimateAmount(detail.getAdhocExemption().negate()).build());
-		}
-		else if (null != detail.getAdhocExemption()) {
-			throw new CustomException(PT_ADHOC_REBATE_INVALID_AMOUNT, PT_ADHOC_REBATE_INVALID_AMOUNT_MSG + taxAmt);
 		}
 		return estimates;
 	}
