@@ -53,15 +53,15 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @param request incoming calculation request containing the criteria.
 	 * @return list of calculation object containing all the tax for the given criteria.
 	 */
-    public List<Calculation> getTaxCalculation(CalculationReq request) {
+	public List<Calculation> getTaxCalculation(CalculationReq request) {
 
-        CalculationCriteria criteria = request.getCalculationCriteria().get(0);
-        WaterConnection waterConnection = criteria.getWaterConnection();
-      //  wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
-        Map<String,Object> masterMap = mDataService.getMasterMap(request);
-        return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(), criteria,
-                getEstimationMap(criteria, request.getRequestInfo()),masterMap)));
-    }
+		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
+		WaterConnection waterConnection = criteria.getWaterConnection();
+		// wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
+		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
+				criteria, getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
+	}
     
     
 	/**
@@ -74,7 +74,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @return Calculation object constructed based on the resulting tax amount and other applicables(rebate/penalty)
 	 */
     private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
-									   Map<String,List> estimatesAndBillingSlabs,Map<String,Object> masterMap) {
+									   Map<String,List> estimatesAndBillingSlabs, Map<String,Object> masterMap) {
 
 		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
