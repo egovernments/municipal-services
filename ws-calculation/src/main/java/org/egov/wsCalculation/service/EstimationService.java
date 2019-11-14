@@ -220,9 +220,41 @@ public class EstimationService {
 		}
 		return estimates;
 	}
+	
 	/**
-	 * method to do a first level filtering on the slabs based on the values present in Property detail
+	 * method to do a first level filtering on the slabs based on the values present in the Water Details
 	 */
+	
+	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, RequestInfo requestInfo) {
+		BigDecimal waterCharege = BigDecimal.ZERO;
+		Double waterChargeToCompare = 45.0;
+		List<Double> waterCharges = new ArrayList<>();
+		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, requestInfo);
+		if (billingSlabs == null || billingSlabs.isEmpty())
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
+		if (billingSlabs.size() > 1)
+			throw new CustomException("MOre than one Billing Slab are found on criteria ",
+					"More than one billing slab found");
+		log.info(billingSlabs.get(0).toString());
+		if (isRangeCalculation("connectionAttribute")) {
+			billingSlabs.forEach(billingSlab -> {
+				billingSlab.slabs.forEach(range -> {
+					if (waterChargeToCompare > range.from && waterChargeToCompare < range.to) {
+						waterCharges.add((waterChargeToCompare * range.charge) + range.minimumCharge);
+					}
+				});
+			});
+		} else {
+			billingSlabs.forEach(billingSlab -> {
+				billingSlab.slabs.forEach(range -> {
+					waterCharges.add(range.charge + range.minimumCharge);
+				});
+			});
+		}
+		if (!waterCharges.isEmpty())
+			waterCharege = BigDecimal.valueOf(waterCharges.get(0));
+		return waterCharege;
+	}
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, RequestInfo requestInfo) {
 		Property property = waterConnection.getProperty();
 		String tenantId = property.getTenantId();
@@ -243,5 +275,11 @@ public class EstimationService {
 			return isPropertyTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
 					&& isUnitOfMeasurementMatcing;
 		}).collect(Collectors.toList());
+	}
+
+	private boolean isRangeCalculation(String type) {
+		if (type.equalsIgnoreCase("Flat"))
+			return false;
+		return true;
 	}
 }
