@@ -1,13 +1,12 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
-
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 
 public class PayService {
-	
+
 	/**
 	 * Decimal is ceiled for all the tax heads
 	 * 
@@ -36,6 +35,29 @@ public class PayService {
 		else if (roundOffNeg.doubleValue() < 0)
 			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg)
 					.taxHeadCode(WSCalculationConfiguration.WS_Round_Off).build();
+		else
+			return null;
+	}
+
+	public TaxHeadEstimate roundOfDecimals(BigDecimal amount) {
+
+		BigDecimal roundOffPos = BigDecimal.ZERO;
+		BigDecimal roundOffNeg = BigDecimal.ZERO;
+
+		BigDecimal roundOffAmount = amount.setScale(2, 2);
+		BigDecimal reminder = roundOffAmount.remainder(BigDecimal.ONE);
+
+		if (reminder.doubleValue() >= 0.5)
+			roundOffPos = roundOffPos.add(BigDecimal.ONE.subtract(reminder));
+		else if (reminder.doubleValue() < 0.5)
+			roundOffNeg = roundOffNeg.add(reminder).negate();
+
+		if (roundOffPos.doubleValue() > 0)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffPos).taxHeadCode(WSCalculationConstant.WS_ROUNDOFF)
+					.build();
+		else if (roundOffNeg.doubleValue() < 0)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg).taxHeadCode(WSCalculationConstant.WS_ROUNDOFF)
+					.build();
 		else
 			return null;
 	}

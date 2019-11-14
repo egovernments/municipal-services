@@ -14,7 +14,9 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.BillingSlab;
+import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
+import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -30,6 +32,38 @@ public class EstimationService {
 
 	@Autowired
 	MasterDataService mDataService;
+	
+	@Autowired
+	WSCalculationService wSCalculationService;
+	
+	
+	/**
+	 * Generates a map with assessment-number of property as key and estimation
+	 * map(taxhead code as key, amount to be paid as value) as value will be
+	 * called by calculate api
+	 *
+	 * @param request
+	 *            incoming calculation request containing the criteria.
+	 * @return Map<String, Calculation> key of assessment number and value of
+	 *         calculation object.
+	 */
+	public Map<String, Calculation> getEstimationWaterMap(CalculationReq request) {
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();
+		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		Map<String, Calculation> calculationWaterMap = new HashMap<>();
+		for (CalculationCriteria criteria : criteriaList) {
+			WaterConnection waterConnection = criteria.getWaterConnection();
+
+			String assessmentNumber = waterConnection.getConnectionNo();
+			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
+					getEstimationMap(criteria, requestInfo), masterMap);
+			calculation.setServiceNumber(assessmentNumber);
+			calculationWaterMap.put(assessmentNumber, calculation);
+		}
+		return calculationWaterMap;
+	}
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head
@@ -41,7 +75,7 @@ public class EstimationService {
 	 *            request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	private Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		WaterConnection waterConnection = criteria.getWaterConnection();
 		String assessmentYear = "2019-20";

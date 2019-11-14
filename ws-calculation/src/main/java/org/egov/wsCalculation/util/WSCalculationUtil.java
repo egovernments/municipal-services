@@ -12,16 +12,12 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.pt.calculator.service.ReceiptService;
-import org.egov.pt.calculator.util.Configurations;
-import org.egov.waterConnection.config.WSConfiguration;
-import org.egov.waterConnection.model.AuditDetails;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
+import org.egov.wsCalculation.model.AuditDetails;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandDetail;
 import org.egov.wsCalculation.model.GetBillCriteria;
-import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,9 +33,6 @@ public class WSCalculationUtil {
 	@Autowired
 	private WSCalculationConfiguration configurations;
 
-	@Autowired
-	private WSCalculationConstant wSCalculationConstant;
-	
 	@Value("${customization.allowdepreciationonnoreceipts:false}")
 	Boolean allowDepreciationsOnNoReceipts;
 
@@ -53,10 +46,10 @@ public class WSCalculationUtil {
 	public StringBuilder getTaxPeriodSearchUrl(String tenantId) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getTaxPeriodSearchEndpoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
-				.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
-				.append(wSCalculationConstant.SEPARATER).append(wSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(wSCalculationConstant.SERVICE_FIELD_VALUE_PT);
+				.append(configurations.getTaxPeriodSearchEndpoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
+				.append(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 	}
 
 	/**
@@ -69,10 +62,10 @@ public class WSCalculationUtil {
 	public StringBuilder getTaxHeadSearchUrl(String tenantId) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getTaxheadsSearchEndpoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
-				.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
-				.append(wSCalculationConstant.SEPARATER).append(wSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(wSCalculationConstant.SERVICE_FIELD_VALUE_PT);
+				.append(configurations.getTaxheadsSearchEndpoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
+				.append(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 	}
 
 	/**
@@ -86,11 +79,11 @@ public class WSCalculationUtil {
 			String tenantId) {
 
 		String assessmentYearStr = StringUtils.join(assesmentYears, ",");
-		MasterDetail mstrDetail = MasterDetail.builder().name(wSCalculationConstant.FINANCIAL_YEAR_MASTER)
-				.filter("[?(@." + wSCalculationConstant.FINANCIAL_YEAR_RANGE_FEILD_NAME + " IN [" + assessmentYearStr
-						+ "]" + " && @.module== '" + SERVICE_FIELD_VALUE_PT + "')]")
+		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.FINANCIAL_YEAR_MASTER)
+				.filter("[?(@." + WSCalculationConstant.FINANCIAL_YEAR_RANGE_FEILD_NAME + " IN [" + assessmentYearStr
+						+ "]" + " && @.module== '" + WSCalculationConstant.SERVICE_FIELD_VALUE_WS + "')]")
 				.build();
-		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(wSCalculationConstant.FINANCIAL_MODULE)
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.FINANCIAL_MODULE)
 				.masterDetails(Arrays.asList(mstrDetail)).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 				.build();
@@ -103,7 +96,7 @@ public class WSCalculationUtil {
 	 * @return
 	 */
 	public StringBuilder getMdmsSearchUrl() {
-		return new StringBuilder().append(configurations.getMdmsHost()).append(configurations.getMdmsEndpoint());
+		return new StringBuilder().append(configurations.getMdmsHost()).append(configurations.getMdmsEndPoint());
 	}
 
 	/**
@@ -148,7 +141,7 @@ public class WSCalculationUtil {
 	 * @return
 	 */
 	public String getAssessmentInsertQuery() {
-		return wSCalculationConstant.QUERY_ASSESSMENT_INSERT;
+		return WSCalculationConstant.QUERY_ASSESSMENT_INSERT;
 	}
 
 	/**
@@ -164,12 +157,12 @@ public class WSCalculationUtil {
 		for (DemandDetail detail : demand.getDemandDetails()) {
 
 			carryForward = carryForward.add(detail.getCollectionAmount());
-			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_ADVANCE_CARRYFORWARD))
+			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_ADVANCE_CARRYFORWARD))
 				carryForward = carryForward.add(detail.getTaxAmount());
 		}
 		return carryForward;
 	}
-	
+
 	/**
 	 * method to create demandsearch url with demand criteria
 	 *
@@ -178,54 +171,66 @@ public class WSCalculationUtil {
 	 */
 	public StringBuilder getDemandSearchUrl(GetBillCriteria getBillCriteria) {
 
-		if(CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
+		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
 			return new StringBuilder().append(configurations.getBillingServiceHost())
-					.append(configurations.getDemandSearchEndPoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
-					.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
-					.append(wSCalculationConstant.SEPARATER)
-					.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(getBillCriteria.getPropertyId()+ CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR +getBillCriteria.getAssessmentNumber());
+					.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+					.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(WSCalculationConstant.SEPARATER)
+					.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(getBillCriteria.getPropertyId() + WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
+							+ getBillCriteria.getAssessmentNumber());
 
-		else return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getDemandSearchEndPoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
-				.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
-				.append(wSCalculationConstant.SEPARATER)
-				.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(StringUtils.join(getBillCriteria.getConsumerCodes(),","));
-
+		else
+			return new StringBuilder().append(configurations.getBillingServiceHost())
+					.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+					.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(WSCalculationConstant.SEPARATER)
+					.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
 
 	}
-	
+
 	/**
 	 * Returns url for demand update Api
 	 *
 	 * @return
 	 */
 	public StringBuilder getUpdateDemandUrl() {
-		return new StringBuilder().append(configurations.getBillingServiceHost()).append(configurations.getDemandUpdateEndPoint());
+		return new StringBuilder().append(configurations.getBillingServiceHost())
+				.append(configurations.getDemandUpdateEndPoint());
 	}
-	
+
 	/**
-	 * Check if Depreciation is allowed for this Property.
-	 * In case there is no receipt the depreciation will be allowed
-	 * @param assessmentYear The year for which existing receipts needs to be checked
-	 * @param tenantId The tenantid of the property
-	 * @param propertyId The property id
-	 * @param requestInfoWrapper The incoming requestInfo
+	 * Check if Depreciation is allowed for this Water Connection. In case there
+	 * is no receipt the depreciation will be allowed
+	 * 
+	 * @param assessmentYear
+	 *            The year for which existing receipts needs to be checked
+	 * @param tenantId
+	 *            The tenantid of the property
+	 * @param propertyId
+	 *            The property id
+	 * @param requestInfoWrapper
+	 *            The incoming requestInfo
 	 */
 
-	public Boolean isAssessmentDepreciationAllowed(String assessmentYear, String tenantId, String propertyId,
-					RequestInfoWrapper requestInfoWrapper) {
-		boolean isDepreciationAllowed = false;
-		if (allowDepreciationsOnNoReceipts) {
-			List<Receipt> receipts = rcptService.getReceiptsFromPropertyAndFY(assessmentYear,tenantId, propertyId,
-					requestInfoWrapper);
+	// public Boolean isAssessmentDepreciationAllowed(String assessmentYear,
+	// String tenantId, String propertyId,
+	// RequestInfoWrapper requestInfoWrapper) {
+	// boolean isDepreciationAllowed = false;
+	// if (allowDepreciationsOnNoReceipts) {
+	// List<Receipt> receipts =
+	// rcptService.getReceiptsFromPropertyAndFY(assessmentYear,tenantId,
+	// propertyId,
+	// requestInfoWrapper);
+	//
+	// if (receipts.size() == 0)
+	// isDepreciationAllowed = true;
+	// }
+	//
+	// return isDepreciationAllowed;
+	// }
 
-			if (receipts.size() == 0)
-				isDepreciationAllowed = true;
-		}
-
-		return isDepreciationAllowed;
-	}
-	
 	/**
 	 * method to create demandsearch url with demand criteria
 	 *
@@ -235,12 +240,13 @@ public class WSCalculationUtil {
 	public StringBuilder getDemandSearchUrl(Assessment assessment) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getDemandSearchEndPoint()).append(CalculatorConstants.URL_PARAMS_SEPARATER)
-				.append(CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL).append(assessment.getTenantId())
-				.append(CalculatorConstants.SEPARATER)
-				.append(CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME).append(assessment.getConnectionId()+ CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR +assessment.getAssessmentNumber());
+				.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(assessment.getTenantId())
+				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+				.append(assessment.getConnectionId() + WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
+						+ assessment.getAssessmentNumber());
 	}
-	
+
 	public AuditDetails getAuditDetails(String by, boolean isCreate) {
 		Long time = new Date().getTime();
 
@@ -250,5 +256,25 @@ public class WSCalculationUtil {
 		else
 			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
+	
+	/**
+	 * Returns url for Bill Gen Api
+	 *
+	 * @param tenantId
+	 * @param demandId
+	 * @return
+	 */
+	public StringBuilder getBillGenUrl(String tenantId, String demandId, String consumerCode) {
+		return new StringBuilder().append(configurations.getBillingServiceHost())
+				.append(configurations.getBillGenEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.DEMAND_ID_SEARCH_FIELD_NAME)
+				.append(demandId).append(WSCalculationConstant.SEPARATER)
+				.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
+				.append(WSCalculationConstant.WATER_TAX_SERVICE_CODE).append(WSCalculationConstant.SEPARATER)
+				.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(consumerCode);
+	}
+	
+
 
 }
