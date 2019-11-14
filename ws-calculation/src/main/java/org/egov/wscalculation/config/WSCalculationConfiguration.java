@@ -67,4 +67,15 @@ public class WSCalculationConfiguration {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
 
+	// property demand configs
+
+	@Value("${pt.module.code}")
+	private String ptModuleCode;
+
+	@Value("${pt.module.minpayable.amount}")
+	private Integer ptMinAmountPayable;
+
+	@Value("${pt.financialyear.start.month}")
+	private String financialYearStartMonth;
+
 }

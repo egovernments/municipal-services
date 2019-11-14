@@ -29,6 +29,9 @@ public class MeterServicesImpl implements MeterService {
 
 	@Autowired
 	WSCalculationValidator wsCalculationValidator;
+	
+	@Autowired
+	WSCalculationService wSCalculationService;
 
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -54,6 +57,8 @@ public class MeterServicesImpl implements MeterService {
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		//mDMSValidator.validateMasterData(meterConnectionRequest);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
+		
+		
 		// Object result =
 		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
 		// meterConnectionRequest);
