@@ -39,6 +39,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 	@Autowired
 	EstimationService estimationService;
+	
+	private DemandService demandService;
+
 
 	/**
 	 * 
@@ -63,17 +66,19 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @param masterMap
 	 * @return
 	 */
-	private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
+	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
 			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
 
 		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 
 		WaterConnection waterConnection = criteria.getWaterConnection();
+		String assessmentYear = "2019-20";
 
+		// String assessmentNumber = null != detail.getAssessmentNumber() ?
+		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
 		String tenantId = null != waterConnection.getProperty().getTenantId()
-				? waterConnection.getProperty().getTenantId()
-				: criteria.getTenantId();
+				? waterConnection.getProperty().getTenantId() : criteria.getTenantId();
 
 		Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
 				.get(WSCalculationConfiguration.FINANCIALYEAR_MASTER_KEY);

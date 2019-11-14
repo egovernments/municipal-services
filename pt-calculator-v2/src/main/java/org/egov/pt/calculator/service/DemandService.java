@@ -158,7 +158,7 @@ public class DemandService {
 
 		/**
 		 * Loop through the demands and call generateBill for each demand.
-		 * Group the Bills and return the bill responsew
+		 * Group the Bills and return the bill response
 		 */
 		List<Bill> bills = new LinkedList<>();
 		BillResponse billResponse;

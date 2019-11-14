@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
+import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
@@ -23,6 +27,7 @@ import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import net.minidev.json.JSONArray;
 
@@ -62,8 +67,8 @@ public class MasterDataService {
 
 		masterMap.put(WSCalculationConstant.TAXPERIOD_MASTER_KEY, taxPeriods);
 		masterMap.put(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY, taxHeadMasters);
-		// masterMap.put(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY,
-		// financialYearMaster);
+//		 masterMap.put(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY,
+//		 financialYearMaster);
 
 		return masterMap;
 	}
@@ -159,6 +164,37 @@ public class MasterDataService {
 	 * @param req
 	 * @return
 	 */
+//	@SuppressWarnings("unchecked")
+//	public Map<String,Map<String, Object>> getFinancialYear(CalculationReq req) {
+//		String financialYear= "2019-20";
+//		String tenantId = req.getCalculationCriteria().get(0).getTenantId();
+//		RequestInfo requestInfo = req.getRequestInfo();
+//		Set<String> assessmentYears = req.getCalculationCriteria().stream().map(cal -> financialYear)
+//				.collect(Collectors.toSet());
+//		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getFinancialYearRequest(requestInfo, assessmentYears, tenantId);
+//		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
+//		Object res = repository.fetchResult(url, mdmsCriteriaReq);
+//		Map<String,Map<String, Object>> financialYearMap = new HashMap<>();
+//		for(String assessmentYear : assessmentYears){
+//			String jsonPath = MDMS_FINACIALYEAR_PATH.replace("{}",assessmentYear);
+//			try {
+//				List<Map<String,Object>> jsonOutput =  JsonPath.read(res, jsonPath);
+//				Map<String,Object> financialYearProperties = jsonOutput.get(0);
+//				financialYearMap.put(assessmentYear,financialYearProperties);
+//			}
+//			catch (IndexOutOfBoundsException e){
+//				throw new CustomException(CalculatorConstants.EG_PT_FINANCIAL_MASTER_NOT_FOUND, CalculatorConstants.EG_PT_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
+//			}
+//		}
+//		return financialYearMap;
+//	}
+	
+	/**
+	 * Fetches Financial Year from Mdms Api
+	 *
+	 * @param req
+	 * @return
+	 */
 	// @SuppressWarnings("unchecked")
 	// public Map<String, Map<String, Object>> getFinancialYear(CalculationReq
 	// req) {
@@ -189,5 +225,31 @@ public class MasterDataService {
 	// }
 	// return financialYearMap;
 	// }
+	
+	
+	/**
+	 * Method to enrich the water connection Master data Map
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	public void setPropertyMasterValues(RequestInfo requestInfo, String tenantId,
+			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap, Map<String, JSONArray> timeBasedExemptionMasterMap) {
+
+		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WATER_TAX_MODULE);
+		for (Entry<String, JSONArray> entry : res.entrySet()) {
+
+			String masterName = entry.getKey();
+			
+			/* Masters which need to be parsed will be contained in the list */
+			if (WSCalculationConstant.PROPERTY_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
+				propertyBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
+			
+			/* Master not contained in list will be stored as it is  */
+			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
+		}
+	}
 
 }

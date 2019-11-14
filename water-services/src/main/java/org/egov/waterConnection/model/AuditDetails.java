@@ -12,8 +12,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import org.egov.pt.calculator.web.models.property.AuditDetails;
-import org.egov.pt.calculator.web.models.property.AuditDetails.AuditDetailsBuilder;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;

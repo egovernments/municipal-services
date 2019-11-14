@@ -1,11 +1,8 @@
 package org.egov.wsCalculation.service;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,9 +11,10 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionCancelCriteria;
 import org.egov.wsCalculation.model.BillingSlab;
+import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
+import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.util.WaterCessUtil;
@@ -40,12 +38,45 @@ public class EstimationService {
 	@Autowired
 	PayService payService;
 	
+	WSCalculationService wSCalculationService;
+	
+	
 	/**
-	 * Generates a List of Tax head estimates with tax head code,
-	 * tax head category and the amount to be collected for the key.
-     *
-     * @param criteria criteria based on which calculation will be done.
-     * @param requestInfo request info from incoming request.
+	 * Generates a map with assessment-number of property as key and estimation
+	 * map(taxhead code as key, amount to be paid as value) as value will be
+	 * called by calculate api
+	 *
+	 * @param request
+	 *            incoming calculation request containing the criteria.
+	 * @return Map<String, Calculation> key of assessment number and value of
+	 *         calculation object.
+	 */
+	public Map<String, Calculation> getEstimationWaterMap(CalculationReq request) {
+
+		RequestInfo requestInfo = request.getRequestInfo();
+		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();
+		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		Map<String, Calculation> calculationWaterMap = new HashMap<>();
+		for (CalculationCriteria criteria : criteriaList) {
+			WaterConnection waterConnection = criteria.getWaterConnection();
+
+			String assessmentNumber = waterConnection.getConnectionNo();
+			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
+					getEstimationMap(criteria, requestInfo), masterMap);
+			calculation.setServiceNumber(assessmentNumber);
+			calculationWaterMap.put(assessmentNumber, calculation);
+		}
+		return calculationWaterMap;
+	}
+
+	/**
+	 * Generates a List of Tax head estimates with tax head code, tax head
+	 * category and the amount to be collected for the key.
+	 *
+	 * @param criteria
+	 *            criteria based on which calculation will be done.
+	 * @param requestInfo
+	 *            request info from incoming request.
 	 * @return Map<String, Double>
 	 */
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
@@ -60,8 +91,8 @@ public class EstimationService {
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, waterBasedExemptionMasterMap,
 				timeBasedExemptionMasterMap);
-		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt, criteria.getWaterConnection(),
-				waterBasedExemptionMasterMap, timeBasedExemptionMasterMap,
+		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
+				criteria.getWaterConnection(), waterBasedExemptionMasterMap, timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
@@ -69,16 +100,24 @@ public class EstimationService {
 		estimatesAndBillingSlabs.put("billingSlabIds", new ArrayList<>());
 		return estimatesAndBillingSlabs;
 	}
-	
+
 	/**
-	 * Return an Estimate list containing all the required tax heads
-	 * mapped with respective amt to be paid.
-	 * @param detail proeprty detail object
-	 * @param assessmentYear year for which calculation is being done
-	 * @param taxAmt tax amount for which rebate & penalty will be applied
-	 * @param usageExemption  total exemption value given for all unit usages
-	 * @param propertyBasedExemptionMasterMap property masters which contains exemption values associated with them
-	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
+	 * Return an Estimate list containing all the required tax heads mapped with
+	 * respective amt to be paid.
+	 * 
+	 * @param detail
+	 *            proeprty detail object
+	 * @param assessmentYear
+	 *            year for which calculation is being done
+	 * @param taxAmt
+	 *            tax amount for which rebate & penalty will be applied
+	 * @param usageExemption
+	 *            total exemption value given for all unit usages
+	 * @param propertyBasedExemptionMasterMap
+	 *            property masters which contains exemption values associated
+	 *            with them
+	 * @param timeBasedExemeptionMasterMap
+	 *            masters with period based exemption values
 	 * @param build
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
@@ -100,7 +139,6 @@ public class EstimationService {
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 				assessmentYear, timeBasedExemeptionMasterMap);
-
 		if (null != rebatePenaltyMap) {
 			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_Rebate);
 			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_PENALTY);
@@ -115,11 +153,12 @@ public class EstimationService {
 		}
 		return estimates;
 	}
-	
+
 	/**
-	 * method to do a first level filtering on the slabs based on the values present in the Water Details
+	 * method to do a first level filtering on the slabs based on the values
+	 * present in the Water Details
 	 */
-	
+
 	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, RequestInfo requestInfo) {
 		BigDecimal waterCharege = BigDecimal.ZERO;
 		Double waterChargeToCompare = 45.0;
@@ -150,6 +189,7 @@ public class EstimationService {
 			waterCharege = BigDecimal.valueOf(waterCharges.get(0));
 		return waterCharege;
 	}
+
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, RequestInfo requestInfo) {
 		Property property = waterConnection.getProperty();
 		String tenantId = property.getTenantId();
