@@ -14,10 +14,12 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.WaterConnectionCancelCriteria;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.egov.wsCalculation.util.WaterCessUtil;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,12 @@ public class EstimationService {
 	@Autowired
 	MasterDataService mDataService;
 	
+	@Autowired
+	WaterCessUtil waterCessUtil;
+	
+	@Autowired
+	PayService payService;
+	
 	/**
 	 * Generates a List of Tax head estimates with tax head code,
 	 * tax head category and the amount to be collected for the key.
@@ -40,7 +48,7 @@ public class EstimationService {
      * @param requestInfo request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	private Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		WaterConnection waterConnection = criteria.getWaterConnection();
 		String assessmentYear = "2019-20";
@@ -73,68 +81,36 @@ public class EstimationService {
 	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
 	 * @param build
 	 */
-	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt, WaterConnection connection,
-													 Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap,
-													 Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
+	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
+			WaterConnection connection, Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap,
+			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
-		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt;
+		String assesmentYear = WSCalculationConfiguration.Assesment_Year;
+		// water_charge
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Charge)
+				.estimateAmount(taxAmt.setScale(2, 2)).build());
 
-		// taxes
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Charge).estimateAmount(taxAmt.setScale(2, 2)).build());
-		
-		// usage exemption
-		 usageExemption = usageExemption.setScale(2, 2).negate();
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_UNIT_USAGE_EXEMPTION).estimateAmount(
-		        usageExemption).build());
-		payableTax = payableTax.add(usageExemption);
-
-		// owner exemption
-		BigDecimal userExemption = getExemption(detail.getOwners(), payableTax, assessmentYear,
-				propertyBasedExemptionMasterMap).setScale(2, 2).negate();
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_OWNER_EXEMPTION).estimateAmount(userExemption).build());
-		payableTax = payableTax.add(userExemption);
-
-		// Fire cess
-		List<Object> fireCessMasterList = timeBasedExemeptionMasterMap.get(CalculatorConstants.FIRE_CESS_MASTER);
-		BigDecimal fireCess;
-
-		if (usePBFirecessLogic) {
-			fireCess = firecessUtils.getPBFireCess(payableTax, assessmentYear, fireCessMasterList, detail);
-			estimates.add(
-					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
-		} else {
-			fireCess = mDataService.getCess(payableTax, assessmentYear, fireCessMasterList);
-			estimates.add(
-					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
-
-		}
-
-		// Cancer cess
-		List<Object> cancerCessMasterList = timeBasedExemeptionMasterMap.get(CalculatorConstants.CANCER_CESS_MASTER);
-		BigDecimal cancerCess = mDataService.getCess(payableTax, assessmentYear, cancerCessMasterList);
-		estimates.add(
-				TaxHeadEstimate.builder().taxHeadCode(PT_CANCER_CESS).estimateAmount(cancerCess.setScale(2, 2)).build());
-
-
-		List<Receipt> receipts = Collections.emptyList();
-
-		if (property.getPropertyId() != null) {
-			rcptService.getReceiptsFromPropertyAndFY(assessmentYear, property.getTenantId(), property.getPropertyId(), requestInfoWrapper);
-		}
+		// Water_cess
+		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
+				.get(WSCalculationConfiguration.WC_WATER_CESS_MASTER);
+		BigDecimal waterCess;
+		waterCess = waterCessUtil.getWaterCess(payableTax, assesmentYear, waterCessMasterList, connection);
 
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
-				 assessmentYear, timeBasedExemeptionMasterMap,receipts);
+				assessmentYear, timeBasedExemeptionMasterMap);
 
 		if (null != rebatePenaltyMap) {
-
-			BigDecimal rebate = rebatePenaltyMap.get(PT_TIME_REBATE);
-			BigDecimal penalty = rebatePenaltyMap.get(PT_TIME_PENALTY);
-			BigDecimal interest = rebatePenaltyMap.get(PT_TIME_INTEREST);
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_REBATE).estimateAmount(rebate).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_PENALTY).estimateAmount(penalty).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_INTEREST).estimateAmount(interest).build());
+			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_Rebate);
+			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_PENALTY);
+			BigDecimal interest = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_INTEREST);
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_Rebate)
+					.estimateAmount(rebate).build());
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_PENALTY)
+					.estimateAmount(penalty).build());
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_INTEREST)
+					.estimateAmount(interest).build());
 			payableTax = payableTax.add(rebate).add(penalty).add(interest);
 		}
 		return estimates;

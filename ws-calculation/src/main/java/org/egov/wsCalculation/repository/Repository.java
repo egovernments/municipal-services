@@ -5,7 +5,6 @@ import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;

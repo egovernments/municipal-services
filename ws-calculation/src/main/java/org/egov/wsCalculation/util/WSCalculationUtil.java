@@ -12,8 +12,6 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.pt.calculator.service.ReceiptService;
-import org.egov.pt.calculator.util.Configurations;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.AuditDetails;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
@@ -39,13 +37,13 @@ public class WSCalculationUtil {
 
 	@Autowired
 	private WSCalculationConstant wSCalculationConstant;
-	
+
 	@Value("${customization.allowdepreciationonnoreceipts:false}")
 	Boolean allowDepreciationsOnNoReceipts;
 
 	/**
-	 * Returns the tax head search Url with tenantId and PropertyTax service
-	 * name parameters
+	 * Returns the tax head search Url with tenantId and PropertyTax service name
+	 * parameters
 	 *
 	 * @param tenantId
 	 * @return
@@ -60,8 +58,8 @@ public class WSCalculationUtil {
 	}
 
 	/**
-	 * Returns the tax head search Url with tenantId and PropertyTax service
-	 * name parameters
+	 * Returns the tax head search Url with tenantId and PropertyTax service name
+	 * parameters
 	 *
 	 * @param tenantId
 	 * @return
@@ -152,8 +150,8 @@ public class WSCalculationUtil {
 	}
 
 	/**
-	 * Adds up the collection amount from the given demand and the previous
-	 * advance carry forward together as new advance carry forward
+	 * Adds up the collection amount from the given demand and the previous advance
+	 * carry forward together as new advance carry forward
 	 *
 	 * @param demand
 	 * @return carryForward
@@ -169,7 +167,7 @@ public class WSCalculationUtil {
 		}
 		return carryForward;
 	}
-	
+
 	/**
 	 * method to create demandsearch url with demand criteria
 	 *
@@ -178,45 +176,54 @@ public class WSCalculationUtil {
 	 */
 	public StringBuilder getDemandSearchUrl(GetBillCriteria getBillCriteria) {
 
-		if(CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
+		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
 			return new StringBuilder().append(configurations.getBillingServiceHost())
 					.append(configurations.getDemandSearchEndPoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
 					.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(wSCalculationConstant.SEPARATER)
-					.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(getBillCriteria.getPropertyId()+ CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR +getBillCriteria.getAssessmentNumber());
+					.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(getBillCriteria.getPropertyId() + CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR
+							+ getBillCriteria.getAssessmentNumber());
 
-		else return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getDemandSearchEndPoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
-				.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
-				.append(wSCalculationConstant.SEPARATER)
-				.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(StringUtils.join(getBillCriteria.getConsumerCodes(),","));
-
+		else
+			return new StringBuilder().append(configurations.getBillingServiceHost())
+					.append(configurations.getDemandSearchEndPoint()).append(wSCalculationConstant.URL_PARAMS_SEPARATER)
+					.append(wSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(wSCalculationConstant.SEPARATER)
+					.append(wSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
 
 	}
-	
+
 	/**
 	 * Returns url for demand update Api
 	 *
 	 * @return
 	 */
 	public StringBuilder getUpdateDemandUrl() {
-		return new StringBuilder().append(configurations.getBillingServiceHost()).append(configurations.getDemandUpdateEndPoint());
+		return new StringBuilder().append(configurations.getBillingServiceHost())
+				.append(configurations.getDemandUpdateEndPoint());
 	}
-	
+
 	/**
-	 * Check if Depreciation is allowed for this Property.
-	 * In case there is no receipt the depreciation will be allowed
-	 * @param assessmentYear The year for which existing receipts needs to be checked
-	 * @param tenantId The tenantid of the property
-	 * @param propertyId The property id
-	 * @param requestInfoWrapper The incoming requestInfo
+	 * Check if Depreciation is allowed for this Property. In case there is no
+	 * receipt the depreciation will be allowed
+	 * 
+	 * @param assessmentYear
+	 *            The year for which existing receipts needs to be checked
+	 * @param tenantId
+	 *            The tenantid of the property
+	 * @param propertyId
+	 *            The property id
+	 * @param requestInfoWrapper
+	 *            The incoming requestInfo
 	 */
 
 	public Boolean isAssessmentDepreciationAllowed(String assessmentYear, String tenantId, String propertyId,
-					RequestInfoWrapper requestInfoWrapper) {
+			RequestInfoWrapper requestInfoWrapper) {
 		boolean isDepreciationAllowed = false;
 		if (allowDepreciationsOnNoReceipts) {
-			List<Receipt> receipts = rcptService.getReceiptsFromPropertyAndFY(assessmentYear,tenantId, propertyId,
+			List<Receipt> receipts = rcptService.getReceiptsFromPropertyAndFY(assessmentYear, tenantId, propertyId,
 					requestInfoWrapper);
 
 			if (receipts.size() == 0)
@@ -225,7 +232,7 @@ public class WSCalculationUtil {
 
 		return isDepreciationAllowed;
 	}
-	
+
 	/**
 	 * method to create demandsearch url with demand criteria
 	 *
@@ -237,10 +244,11 @@ public class WSCalculationUtil {
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getDemandSearchEndPoint()).append(CalculatorConstants.URL_PARAMS_SEPARATER)
 				.append(CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL).append(assessment.getTenantId())
-				.append(CalculatorConstants.SEPARATER)
-				.append(CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME).append(assessment.getConnectionId()+ CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR +assessment.getAssessmentNumber());
+				.append(CalculatorConstants.SEPARATER).append(CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME)
+				.append(assessment.getConnectionId() + CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR
+						+ assessment.getAssessmentNumber());
 	}
-	
+
 	public AuditDetails getAuditDetails(String by, boolean isCreate) {
 		Long time = new Date().getTime();
 

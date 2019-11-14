@@ -8,10 +8,10 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
+import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
@@ -24,50 +24,46 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.egov.wsCalculation.model.Calculation;
 
-
 @Service
 @Slf4j
 public class WSCalculationServiceImpl implements WSCalculationService {
-	
-	
+
 	@Autowired
 	WSCalculationValidator wSCalculationValidator;
-	
-	
 
 	@Autowired
 	private MasterDataService mDataService;
-	
+
 	@Autowired
 	private PayService payService;
-	
+
 	@Autowired
-	private DemandService demandService;
-	
-	
+	EstimationService estimationService;
 
 	/**
 	 * 
 	 */
-	public List<Calculation> getTaxCalculation(CalculationReq request) {
+	public CalculationRes getTaxCalculation(CalculationReq request) {
 
 		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
 		WaterConnection waterConnection = criteria.getWaterConnection();
 		// wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
-				criteria, getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
+				criteria, estimationService.getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
 	}
-    
-   /**
-    * 
-    * @param requestInfo
-    * @param criteria Calculation criteria on metercharge
-    * @param estimatesAndBillingSlabs Billing Slabs
-    * @param masterMap
-    * @return
-    */
-    private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
+
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param criteria
+	 *            Calculation criteria on metercharge
+	 * @param estimatesAndBillingSlabs
+	 *            Billing Slabs
+	 * @param masterMap
+	 * @return
+	 */
+	private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
 			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
 
 		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
@@ -101,10 +97,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			estimate.setCategory(category);
 
 			switch (category) {
-			 
+
 			case CHARGES:
 				meterServiceCharge = meterServiceCharge.add(estimate.getEstimateAmount());
-			
+
 			case PENALTY:
 				penalty = penalty.add(estimate.getEstimateAmount());
 				break;
@@ -122,7 +118,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				break;
 			}
 		}
-		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(meterServiceCharge), rebate.add(exemption));
+		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(meterServiceCharge),
+				rebate.add(exemption));
 		if (null != decimalEstimate) {
 			decimalEstimate.setCategory(taxHeadCategoryMap.get(decimalEstimate.getTaxHeadCode()));
 			estimates.add(decimalEstimate);
@@ -133,21 +130,22 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		}
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(meterServiceCharge);
-//		// false in the argument represents that the demand shouldn't be updated from
-//		// this call
-//		BigDecimal collectedAmtForOldDemand = demandService.getCarryForwardAndCancelOldDemand(ptTax, criteria,
-//				requestInfo, false);
+		// // false in the argument represents that the demand shouldn't be updated from
+		// // this call
+		// BigDecimal collectedAmtForOldDemand =
+		// demandService.getCarryForwardAndCancelOldDemand(ptTax, criteria,
+		// requestInfo, false);
 
-//		if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) > 0)
-//			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_ADVANCE_CARRYFORWARD)
-//					.estimateAmount(collectedAmtForOldDemand).build());
-//		else if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) < 0)
-//			throw new CustomException(EG_PT_DEPRECIATING_ASSESSMENT_ERROR,
-//					EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
+		// if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) > 0)
+		// estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_ADVANCE_CARRYFORWARD)
+		// .estimateAmount(collectedAmtForOldDemand).build());
+		// else if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) < 0)
+		// throw new CustomException(EG_PT_DEPRECIATING_ASSESSMENT_ERROR,
+		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
 
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt)
-				.penalty(penalty).exemption(exemption).rebate(rebate).fromDate(fromDate).toDate(toDate)
-				.tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).build();
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+				.rebate(rebate).fromDate(fromDate).toDate(toDate).tenantId(tenantId).taxHeadEstimates(estimates)
+				.billingSlabIds(billingSlabIds).build();
 	}
 
 }

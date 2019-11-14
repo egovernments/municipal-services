@@ -1,10 +1,15 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+
+import net.minidev.json.JSONArray;
 
 public class PayService {
 	
@@ -38,6 +43,22 @@ public class PayService {
 					.taxHeadCode(WSCalculationConfiguration.WS_Round_Off).build();
 		else
 			return null;
+	}
+	
+	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedPtTax,
+			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap) {
+
+		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
+			return null;
+		Map<String, BigDecimal> estimates = new HashMap<>();
+		// estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2,
+		// 2).negate());
+		// estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
+		// estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
+		estimates.put(WSCalculationConfiguration.Water_Time_Rebate, BigDecimal.ZERO);
+		estimates.put(WSCalculationConfiguration.Water_Time_PENALTY, BigDecimal.ZERO);
+		estimates.put(WSCalculationConfiguration.Water_Time_INTEREST, BigDecimal.ZERO);
+		return estimates;
 	}
 
 }
