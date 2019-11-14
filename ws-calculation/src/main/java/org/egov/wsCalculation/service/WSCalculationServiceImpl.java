@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.pt.calculator.service.PayService;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
+import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
@@ -43,7 +43,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private DemandService demandService;
-	
+
+	@Autowired
+	private EstimationService estimationService;
 	
 
 	/**
@@ -53,14 +55,14 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @param request incoming calculation request containing the criteria.
 	 * @return list of calculation object containing all the tax for the given criteria.
 	 */
-	public List<Calculation> getTaxCalculation(CalculationReq request) {
+	public CalculationRes getTaxCalculation(CalculationReq request) {
 
 		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
 		WaterConnection waterConnection = criteria.getWaterConnection();
 		// wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
-				criteria, getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
+				criteria, estimationService.getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
 	}
     
     

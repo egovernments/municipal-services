@@ -39,7 +39,7 @@ public class EstimationService {
      * @param requestInfo request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	private Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal usageExemption = BigDecimal.ZERO;
@@ -57,13 +57,6 @@ public class EstimationService {
 		HashMap<Unit, BillingSlab> unitSlabMapping = new HashMap<>();
 		List<Unit> groundFloorUnits = new LinkedList<>();
 
-		/*
-		 * by default land should get only one slab from database per tenantId
-		 */
-		if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType()) && filteredBillingSlabs.size() != 1)
-			throw new CustomException(PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT,
-					PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG.replace("{count}",
-							String.valueOf(filteredBillingSlabs.size())));
 
 		else if (PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType())) {
 			taxAmt = taxAmt.add(BigDecimal.valueOf(filteredBillingSlabs.get(0).getUnitRate() * detail.getLandArea()));

@@ -74,6 +74,9 @@ public class DemandService {
 	@Autowired
 	private RestTemplate restTemplate;
 	
+	@Autowired
+	private EstimationService estimationService;
+	
 	
 	/* Generates and persists the demand to billing service for the given property
 	 * 
@@ -91,7 +94,7 @@ public class DemandService {
 		List<String> lesserAssessments = new ArrayList<>();
 		Map<String, String> consumerCodeFinYearMap = new HashMap<>();
 		
-		Map<String, Calculation> waterCalculationMap = wSCalculationService.getEstimationPropertyMap(request);
+		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationMap(request);
 		for (CalculationCriteria criteria : criterias) {
 
 			//WaterConnection waterConnection = criteria.getWaterConnection().getPropertyDetails().get(0);
