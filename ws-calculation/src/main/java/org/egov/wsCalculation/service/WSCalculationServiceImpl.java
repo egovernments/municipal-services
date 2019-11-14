@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pt.calculator.service.PayService;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 	@Autowired
 	private MasterDataService mDataService;
+	
+	@Autowired
+	private PayService payService;
+	
+	@Autowired
+	private DemandService demandService;
 	
 	
 
@@ -71,10 +79,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 
-        WaterConnection property = criteria.getWaterConnection();
+        WaterConnection waterConnection = criteria.getWaterConnection();
         
      //   String assessmentNumber = null != detail.getAssessmentNumber() ? detail.getAssessmentNumber() : criteria.getAssesmentNumber();
-        String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
+        String tenantId = null != waterConnection.getProperty().getTenantId() ? waterConnection.getProperty().getTenantId() : criteria.getTenantId();
 
 		Map<String,Map<String, Object>> financialYearMaster = (Map<String,Map<String, Object>>)masterMap.get(FINANCIALYEAR_MASTER_KEY);
 
