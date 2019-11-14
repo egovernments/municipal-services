@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 
 public class PayService {
 	
@@ -31,10 +32,10 @@ public class PayService {
 
 		if (roundOffPos.doubleValue() > 0)
 			return TaxHeadEstimate.builder().estimateAmount(roundOffPos)
-					.taxHeadCode(WSCalculationConstant.PT_ROUNDOFF).build();
+					.taxHeadCode(WSCalculationConfiguration.WS_Round_Off).build();
 		else if (roundOffNeg.doubleValue() < 0)
 			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg)
-					.taxHeadCode(WSCalculationConstant.PT_ROUNDOFF).build();
+					.taxHeadCode(WSCalculationConfiguration.WS_Round_Off).build();
 		else
 			return null;
 	}
