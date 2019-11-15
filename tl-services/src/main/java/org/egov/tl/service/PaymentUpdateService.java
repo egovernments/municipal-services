@@ -88,7 +88,7 @@ public class PaymentUpdateService {
 			Map<String, Object> info = documentContext.read("$.RequestInfo");
 			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 
-			if (valMap.get(businessService).equalsIgnoreCase(config.getBusinessService())) {
+			if (valMap.get(businessService)!=null && valMap.get(businessService).equalsIgnoreCase(config.getBusinessService())) {
 				TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
 				searchCriteria.setTenantId(valMap.get(tenantId));
 				searchCriteria.setApplicationNumber(valMap.get(consumerCode));
@@ -142,12 +142,12 @@ public class PaymentUpdateService {
 	private Map<String, String> enrichValMap(DocumentContext context) {
 		Map<String, String> valMap = new HashMap<>();
 		try {
-			valMap.put(businessService, context.read("$.Receipt[0].Bill[0].billDetails[0].businessService"));
-			valMap.put(consumerCode, context.read("$.Receipt[0].Bill[0].billDetails[0].consumerCode"));
-			valMap.put(tenantId, context.read("$.Receipt[0].tenantId"));
+			valMap.put(businessService, context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
+			valMap.put(consumerCode, context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
+			valMap.put(tenantId, context.read("$.Payments[0].tenantId"));
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new CustomException("RECEIPT ERROR", "Unable to fetch values from receipt");
+			throw new CustomException("PAYMENT ERROR", "Unable to fetch values from payment");
 		}
 		return valMap;
 	}
