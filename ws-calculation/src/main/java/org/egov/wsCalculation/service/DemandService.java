@@ -269,7 +269,7 @@ public class DemandService {
 
 		details = getAdjustedDemandDetails(tenantId, calculation, demand);
 
-		return Demand.builder().tenantId(tenantId).businessService(configs.getPtModuleCode()).consumerType(propertyType)
+		return Demand.builder().tenantId(tenantId).businessService(configs.getWsModuleCode()).consumerType(propertyType)
 				.consumerCode(consumerCode).payer(requestInfo.getUserInfo()).taxPeriodFrom(calculation.getFromDate())
 				.taxPeriodTo(calculation.getToDate()).status(Demand.StatusEnum.ACTIVE)
 				.minimumAmountPayable(BigDecimal.valueOf(configs.getPtMinAmountPayable())).demandDetails(details)
