@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.client.HttpClientErrorException;
@@ -45,7 +46,7 @@ public class Repository {
 		} catch (ResourceAccessException e) {
 			
 			Map<String, String> map = new HashMap<>();
-			map.put(CalculatorConstants.CONNECT_EXCEPTION_KEY, e.getMessage());
+			map.put(WSCalculationConstant.CONNECT_EXCEPTION_KEY, e.getMessage());
 			throw new CustomException(map);
 		}  catch (HttpClientErrorException e) {
 

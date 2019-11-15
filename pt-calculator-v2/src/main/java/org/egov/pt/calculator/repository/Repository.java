@@ -1,7 +1,4 @@
 package org.egov.pt.calculator.repository;
-
-import java.io.IOException;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +21,11 @@ public class Repository {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
+
 	@Autowired
 	@Qualifier("secondaryMapper")
 	private ObjectMapper mapper;
-		
+
 	/**
 	 * Fetches results from external services through rest call.
 	 * 
@@ -37,22 +34,22 @@ public class Repository {
 	 * @return Object
 	 */
 	public Object fetchResult(StringBuilder uri, Object request) {
-		
+
 		Object response = null;
 		log.info("URI: " + uri.toString());
 		try {
 			log.info(mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (ResourceAccessException e) {
-			
+
 			Map<String, String> map = new HashMap<>();
 			map.put(CalculatorConstants.CONNECT_EXCEPTION_KEY, e.getMessage());
 			throw new CustomException(map);
-		}  catch (HttpClientErrorException e) {
+		} catch (HttpClientErrorException e) {
 
 			log.info("the error is : " + e.getResponseBodyAsString());
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch (Exception e) {
+		} catch (Exception e) {
 
 			log.error("Exception while fetching from searcher: ", e);
 		}
