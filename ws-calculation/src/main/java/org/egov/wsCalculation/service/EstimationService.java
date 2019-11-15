@@ -86,7 +86,7 @@ public class EstimationService {
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 
 		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, requestInfo);
-
+		taxAmt = waterCharge;
 		Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, waterBasedExemptionMasterMap,
