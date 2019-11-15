@@ -54,6 +54,12 @@ public class WSCalculationConstant {
 	public static final String DEMAND_ID_SEARCH_FIELD_NAME = "demandId=";
 
 	public static final String DEMAND_CANCELLED_STATUS = DemandStatus.CANCELLED.toString();
+	
+	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+	
+	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND = "EG_WS_FINANCIAL_MASTER_NOT_FOUND";
+	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
+	
 
 	/*
 	 * queries
