@@ -175,17 +175,17 @@ public class MasterDataService {
 		Object res = repository.fetchResult(url, mdmsCriteriaReq);
 		Map<String, Map<String, Object>> financialYearMap = new HashMap<>();
 		for (String assessmentYear : assessmentYears) {
-			String jsonPath = MDMS_FINACIALYEAR_PATH.replace("{}", assessmentYear);
+			String jsonPath = WSCalculationConstant.MDMS_FINACIALYEAR_PATH.replace("{}", assessmentYear);
 			try {
 				List<Map<String, Object>> jsonOutput = JsonPath.read(res, jsonPath);
 				Map<String, Object> financialYearProperties = jsonOutput.get(0);
 				financialYearMap.put(assessmentYear, financialYearProperties);
 			} catch (IndexOutOfBoundsException e) {
-				throw new CustomException(CalculatorConstants.EG_PT_FINANCIAL_MASTER_NOT_FOUND,
-						CalculatorConstants.EG_PT_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
+				throw new CustomException(WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND,
+						WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
 			}
 		}
-		return financialYearMap;
+		return null;
 	}
 
 	/**
