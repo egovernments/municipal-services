@@ -45,7 +45,7 @@ public class Repository {
 		} catch (ResourceAccessException e) {
 			
 			Map<String, String> map = new HashMap<>();
-			map.put(CalculatorConstants.CONNECT_EXCEPTION_KEY, e.getMessage());
+			map.put("Exception Occured", e.getMessage());
 			throw new CustomException(map);
 		}  catch (HttpClientErrorException e) {
 
