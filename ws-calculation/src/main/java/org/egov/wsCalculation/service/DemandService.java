@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
@@ -216,7 +215,7 @@ public class DemandService {
 
 	/**
 	 * @param requestInfo
-	 * @param property
+	 * @param water connection
 	 * @return
 	 */
 	public Demand getLatestDemandForCurrentFinancialYear(RequestInfo requestInfo, WaterConnection waterConnection) {

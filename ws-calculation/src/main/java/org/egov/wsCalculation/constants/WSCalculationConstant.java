@@ -64,18 +64,16 @@ public class WSCalculationConstant {
 			+ " propertyid, tenantid, createdby, createdtime, lastmodifiedby, lastmodifiedtime)"
 
 			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	
-	
+
 	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
 	public static final String WATER_TAX_SERVICE_CODE = "WS";
-	
+
 	public static final String EMPTY_DEMAND_ERROR_CODE = "EMPTY_DEMANDS";
-	
+
 	public static final String EMPTY_DEMAND_ERROR_MESSAGE = "No demands found for the given bill generate criteria";
- 
-	
+
 	public static final String WATER_TAX_MODULE = "WaterTax";
-	
+
 	/*
 	 * Master names
 	 */
@@ -88,15 +86,18 @@ public class WSCalculationConstant {
 
 	public static final String USAGE_DETAIL_MASTER = "UsageCategoryDetail";
 
-
 	public static final String OWNER_TYPE_MASTER = "OwnerType";
-	
+
 	public static final List<String> PROPERTY_BASED_EXEMPTION_MASTERS = Collections.unmodifiableList(Arrays.asList(
 			USAGE_MAJOR_MASTER, USAGE_MINOR_MASTER, USAGE_SUB_MINOR_MASTER, USAGE_DETAIL_MASTER, OWNER_TYPE_MASTER));
-	
+
 	public static final String WS_ROUNDOFF = "WS_ROUNDOFF";
-	
-	
+
+	/*
+	 * exceptions
+	 */
+	public static final String CONNECT_EXCEPTION_KEY = "CONNECTION_FAILED";
+
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 }
