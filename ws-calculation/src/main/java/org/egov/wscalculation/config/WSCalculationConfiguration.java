@@ -112,8 +112,8 @@ public class WSCalculationConfiguration {
 
 	// property demand configs
 
-	@Value("${pt.module.code}")
-	private String ptModuleCode;
+	@Value("${ws.module.code}")
+	private String wsModuleCode;
 
 	@Value("${pt.module.minpayable.amount}")
 	private Integer ptMinAmountPayable;
