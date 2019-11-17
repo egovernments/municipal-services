@@ -1,6 +1,10 @@
 package org.egov.wsCalculation.service;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +16,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.constants.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
@@ -22,7 +27,6 @@ import org.egov.wsCalculation.model.TaxPeriodResponse;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -114,13 +118,13 @@ public class MasterDataService {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
 				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
-		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConfiguration.WS_TAX_MODULE);
+		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
 		for (Entry<String, JSONArray> entry : res.entrySet()) {
 
 			String masterName = entry.getKey();
 
 			/* Masters which need to be parsed will be contained in the list */
-			if (WSCalculationConfiguration.WS_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
+			if (WSCalculationConstant.WS_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
 				waterBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
 
 			/* Master not contained in list will be stored as it is */
@@ -142,7 +146,7 @@ public class MasterDataService {
 
 			@SuppressWarnings("unchecked")
 			Map<String, Object> objectMap = (Map<String, Object>) object;
-			String code = (String) objectMap.get(WSCalculationConfiguration.CODE_FIELD_NAME);
+			String code = (String) objectMap.get(WSCalculationConstant.CODE_FIELD_NAME);
 			if (null == codeValueListMap.get(code)) {
 
 				List<Object> valuesList = new ArrayList<>();
@@ -211,6 +215,123 @@ public class MasterDataService {
 			/* Master not contained in list will be stored as it is */
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
 		}
+	}
+	
+	/**
+	 * Returns the 'APPLICABLE' master object from the list of inputs
+	 *
+	 * filters the Input based on their effective financial year and starting day
+	 *
+	 * If an object is found with effective year same as assessment year that master entity will be returned
+	 *
+	 * If exact match is not found then the entity with latest effective financial year which should be lesser than the assessment year
+	 *
+	 * NOTE : applicable points to single object  out of all the entries for a given master which fits the period of the property being assessed
+	 *
+	 * @param assessmentYear
+	 * @param masterList
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getApplicableMaster(String assessmentYear, List<Object> masterList) {
+
+		Map<String, Object> objToBeReturned = null;
+		String maxYearFromTheList = "0";
+		Long maxStartTime = 0l;
+
+		for (Object object : masterList) {
+
+			Map<String, Object> objMap = (Map<String, Object>) object;
+			String objFinYear = ((String) objMap.get(WSCalculationConstant.FROMFY_FIELD_NAME)).split("-")[0];
+			if(!objMap.containsKey(WSCalculationConstant.STARTING_DATE_APPLICABLES)){
+				if (objFinYear.compareTo(assessmentYear.split("-")[0]) == 0)
+					return  objMap;
+
+				else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+					maxYearFromTheList = objFinYear;
+					objToBeReturned = objMap;
+				}
+			}
+			else{
+				String objStartDay = ((String) objMap.get(WSCalculationConstant.STARTING_DATE_APPLICABLES));
+				if (assessmentYear.split("-")[0].compareTo(objFinYear) >= 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+					maxYearFromTheList = objFinYear;
+					Long startTime = getStartDayInMillis(objStartDay);
+					Long currentTime = System.currentTimeMillis();
+					if(startTime < currentTime && maxStartTime < startTime){
+						objToBeReturned = objMap;
+						maxStartTime = startTime;
+					}
+				}
+			}
+		}
+		return objToBeReturned;
+	}
+	
+	/**
+	 * Converts startDay to epoch
+	 * @param startDay StartDay of applicable
+	 * @return
+	 */
+	private Long getStartDayInMillis(String startDay){
+
+		Long startTime = null;
+		try{
+			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			Date date = df.parse(startDay);
+			startTime = date.getTime();
+		}
+		catch (ParseException e) {
+			throw new CustomException("INVALID STARTDAY","The startDate of the penalty cannot be parsed");
+		}
+
+		return startTime;
+	}
+	
+
+	/**
+	 * Method to calculate exmeption based on the Amount and exemption map
+	 * 
+	 * @param applicableAmount
+	 * @param config
+	 * @return
+	 */
+	public BigDecimal calculateApplicables(BigDecimal applicableAmount, Object config) {
+
+		BigDecimal currentApplicable = BigDecimal.ZERO;
+
+		if (null == config)
+			return currentApplicable;
+
+		@SuppressWarnings("unchecked")
+		Map<String, Object> configMap = (Map<String, Object>) config;
+
+		BigDecimal rate = null != configMap.get(WSCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal maxAmt = null != configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal minAmt = null != configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				: BigDecimal.ZERO;
+
+		if (null == rate)
+			currentApplicable = flatAmt.compareTo(applicableAmount) > 0 ? applicableAmount : flatAmt;
+		else {
+			currentApplicable = applicableAmount.multiply(rate.divide(WSCalculationConstant.HUNDRED));
+
+			if (null != maxAmt && BigDecimal.ZERO.compareTo(maxAmt) < 0 && currentApplicable.compareTo(maxAmt) > 0)
+				currentApplicable = maxAmt;
+			else if (null != minAmt && currentApplicable.compareTo(minAmt) < 0)
+				currentApplicable = minAmt;
+		}
+		return currentApplicable;
 	}
 
 }

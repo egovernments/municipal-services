@@ -16,7 +16,6 @@ import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,13 +81,13 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				? waterConnection.getProperty().getTenantId() : criteria.getTenantId();
 
 		Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
-				.get(WSCalculationConfiguration.FINANCIALYEAR_MASTER_KEY);
+				.get(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY);
 
 		Map<String, Object> finYearMap = financialYearMaster.get(WSCalculationConstant.Assesment_Year);
-		Long fromDate = (Long) finYearMap.get(WSCalculationConfiguration.FINANCIAL_YEAR_STARTING_DATE);
-		Long toDate = (Long) finYearMap.get(WSCalculationConfiguration.FINANCIAL_YEAR_ENDING_DATE);
+		Long fromDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_STARTING_DATE);
+		Long toDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
-				.get(WSCalculationConfiguration.TAXHEADMASTER_MASTER_KEY)).stream()
+				.get(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
 						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory));
 
 		BigDecimal taxAmt = BigDecimal.ZERO;

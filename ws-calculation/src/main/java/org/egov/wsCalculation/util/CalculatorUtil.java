@@ -12,8 +12,8 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.egov.wsCalculation.constants.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +30,12 @@ public class CalculatorUtil {
 	 */
 	public MdmsCriteriaReq getPropertyModuleRequest(RequestInfo requestInfo, String tenantId) {
 		List<MasterDetail> details = new ArrayList<>();
-		details.add(MasterDetail.builder().name(WSCalculationConfiguration.WC_REBATE_MASTER).build());
-		details.add(MasterDetail.builder().name(WSCalculationConfiguration.WC_WATER_CESS_MASTER).build());
-		details.add(MasterDetail.builder().name(WSCalculationConfiguration.WC_PENANLTY_MASTER).build());
-		details.add(MasterDetail.builder().name(WSCalculationConfiguration.WC_INTEREST_MASTER).build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_REBATE_MASTER).build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_WATER_CESS_MASTER).build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_PENANLTY_MASTER).build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_INTEREST_MASTER).build());
 		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
-				.moduleName(WSCalculationConfiguration.WS_TAX_MODULE).build();
+				.moduleName(WSCalculationConstant.WS_TAX_MODULE).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();

@@ -19,7 +19,6 @@ import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.util.WaterCessUtil;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -133,10 +132,11 @@ public class EstimationService {
 
 		// Water_cess
 		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
-				.get(WSCalculationConfiguration.WC_WATER_CESS_MASTER);
+				.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
 		BigDecimal waterCess;
 		waterCess = waterCessUtil.getWaterCess(payableTax, assesmentYear, waterCessMasterList, connection);
-
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
+				.estimateAmount(waterCess).build());
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 				assessmentYear, timeBasedExemeptionMasterMap);
