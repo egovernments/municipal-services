@@ -56,9 +56,9 @@ public class PayService {
 		// 2).negate());
 		// estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
 		// estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
-		estimates.put(WSCalculationConfiguration.Water_Time_Rebate, BigDecimal.ZERO);
-		estimates.put(WSCalculationConfiguration.Water_Time_PENALTY, BigDecimal.ZERO);
-		estimates.put(WSCalculationConfiguration.Water_Time_INTEREST, BigDecimal.ZERO);
+		estimates.put(WSCalculationConstant.WS_TIME_REBATE, BigDecimal.ZERO);
+		estimates.put(WSCalculationConstant.WS_TIME_PENALTY, BigDecimal.ZERO);
+		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, BigDecimal.ZERO);
 		return estimates;
 	}
 

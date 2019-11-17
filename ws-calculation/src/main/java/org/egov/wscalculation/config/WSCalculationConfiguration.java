@@ -71,17 +71,6 @@ public class WSCalculationConfiguration {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
 
-	public static final String Water_Time_Rebate = "Water_Time_Rebate";
-
-	public static final String Water_Time_PENALTY = "Water_Time_PENALTY";
-
-	public static final String Water_Time_INTEREST = "Water_Time_INTEREST";
-
-	public static final String Water_Charge = "Water_Charge";
-
-	public static final String Assesment_Year = "assessmentYear";
-
-	public static final String Water_Cess = "Water_Cess";
 
 	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
 

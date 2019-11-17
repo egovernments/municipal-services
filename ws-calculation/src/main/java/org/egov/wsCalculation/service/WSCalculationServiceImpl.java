@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Calculation;
 
 @Service
@@ -83,7 +84,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
 				.get(WSCalculationConfiguration.FINANCIALYEAR_MASTER_KEY);
 
-		Map<String, Object> finYearMap = financialYearMaster.get(WSCalculationConfiguration.Assesment_Year);
+		Map<String, Object> finYearMap = financialYearMaster.get(WSCalculationConstant.Assesment_Year);
 		Long fromDate = (Long) finYearMap.get(WSCalculationConfiguration.FINANCIAL_YEAR_STARTING_DATE);
 		Long toDate = (Long) finYearMap.get(WSCalculationConfiguration.FINANCIAL_YEAR_ENDING_DATE);
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap

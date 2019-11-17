@@ -107,14 +107,19 @@ public class WSCalculationConstant {
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
+	public static final String Assesment_Year = "assessmentYear";
+	
+	
 	/**
 	 * Time Taxes Config
 	 */
-	public static final String WS_TIME_REBATE = "WATER_CONNECTION_REBATE";
+	public static final String WS_TIME_REBATE = "WS_TIME_REBATE";
 
 	public static final String WS_TIME_INTEREST = "WS_TIME_INTEREST";
 
 	public static final String WS_TIME_PENALTY = "WS_TIME_PENALTY";
 	
-	public static final String WS_FIRE_CESS = "WS_FIRE_CESS";
+	public static final String WS_WATER_CESS = "WS_WATER_CESS";
+	
+	public static final String WS_CHARGE = "WS_CHARGE";
 }
