@@ -33,8 +33,7 @@ public class WSCalculationUtil {
 	@Autowired
 	private WSCalculationConfiguration configurations;
 
-	@Autowired
-	private WSCalculationConstant wSCalculationConstant;
+
 
 	@Value("${customization.allowdepreciationonnoreceipts:false}")
 	Boolean allowDepreciationsOnNoReceipts;

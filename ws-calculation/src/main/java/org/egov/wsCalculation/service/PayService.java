@@ -7,9 +7,11 @@ import java.util.Map;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.springframework.stereotype.Service;
 
 import net.minidev.json.JSONArray;
 
+@Service
 public class PayService {
 
 	/**

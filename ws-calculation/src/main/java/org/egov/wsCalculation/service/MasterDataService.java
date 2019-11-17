@@ -12,8 +12,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.config.WSConfiguration;
-import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
@@ -21,6 +19,7 @@ import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxHeadMasterResponse;
 import org.egov.wsCalculation.model.TaxPeriod;
 import org.egov.wsCalculation.model.TaxPeriodResponse;
+import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -44,7 +43,7 @@ public class MasterDataService {
 	private WSCalculationUtil wSCalculationUtil;
 
 	@Autowired
-	private WSConfiguration config;
+	private WSCalculationConfiguration config;
 
 	@Autowired
 	CalculatorUtil calculatorUtils;

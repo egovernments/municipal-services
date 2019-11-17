@@ -13,10 +13,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @org.springframework.stereotype.Repository
 @Slf4j
@@ -26,7 +27,6 @@ public class Repository {
 	private RestTemplate restTemplate;
 	
 	@Autowired
-	@Qualifier("secondaryMapper")
 	private ObjectMapper mapper;
 		
 	/**

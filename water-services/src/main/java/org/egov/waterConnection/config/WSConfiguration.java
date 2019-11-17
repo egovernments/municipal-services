@@ -16,7 +16,6 @@ import lombok.Setter;
 @Builder
 
 @Component
-
 public class WSConfiguration {
 
 	@Value("${egov.waterservice.pagination.default.limit}")

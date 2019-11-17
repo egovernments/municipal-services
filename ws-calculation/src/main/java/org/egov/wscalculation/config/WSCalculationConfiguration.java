@@ -115,10 +115,10 @@ public class WSCalculationConfiguration {
 	@Value("${ws.module.code}")
 	private String wsModuleCode;
 
-	@Value("${pt.module.minpayable.amount}")
+	@Value("${ws.module.minpayable.amount}")
 	private Integer ptMinAmountPayable;
 
-	@Value("${pt.financialyear.start.month}")
+	@Value("${ws.financialyear.start.month}")
 	private String financialYearStartMonth;
 
 }
