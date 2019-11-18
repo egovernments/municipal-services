@@ -153,7 +153,7 @@ public class DemandService {
 			throw new ServiceCallException(e.getResponseBodyAsString());
 		}
 		log.info(" The demand Response is : " + res);
-		assessmentService.saveAssessments(res.getDemands(), consumerCodeFinYearMap, request.getRequestInfo());
+		//assessmentService.saveAssessments(res.getDemands(), consumerCodeFinYearMap, request.getRequestInfo());
 		return waterCalculationMap;
 	}
 
@@ -269,7 +269,7 @@ public class DemandService {
 
 		details = getAdjustedDemandDetails(tenantId, calculation, demand);
 
-		return Demand.builder().tenantId(tenantId).businessService(configs.getWsModuleCode()).consumerType(propertyType)
+		return Demand.builder().tenantId("pb").businessService(configs.getWsModuleCode()).consumerType(propertyType)
 				.consumerCode(consumerCode).payer(requestInfo.getUserInfo()).taxPeriodFrom(calculation.getFromDate())
 				.taxPeriodTo(calculation.getToDate()).status(Demand.StatusEnum.ACTIVE)
 				.minimumAmountPayable(BigDecimal.valueOf(configs.getPtMinAmountPayable())).demandDetails(details)

@@ -109,7 +109,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 			case CHARGES:
 				meterServiceCharge = meterServiceCharge.add(estimate.getEstimateAmount());
-
+                break;
+				
 			case PENALTY:
 				penalty = penalty.add(estimate.getEstimateAmount());
 				break;
