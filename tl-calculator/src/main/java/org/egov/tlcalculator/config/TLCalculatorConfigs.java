@@ -37,8 +37,8 @@ public class TLCalculatorConfigs {
     @Value("${egov.demand.minimum.payable.amount}")
     private BigDecimal minimumPayableAmount;
 
-    @Value("${egov.demand.businessservice}")
-    private String businessService;
+    @Value("${egov.demand.businessserviceTL}")
+    private String businessServiceTL;
 
 
     @Value("${egov.demand.businessserviceBPA}")

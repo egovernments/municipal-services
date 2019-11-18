@@ -75,7 +75,7 @@ public class DemandService {
             //Collect required parameters for demand search
             String tenantId = calculations.get(0).getTenantId();
             Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
-            List<Demand> demands = searchDemand(tenantId,applicationNumbers,requestInfo);
+            List<Demand> demands = searchDemand(tenantId,applicationNumbers,requestInfo,bpaRequest);
             Set<String> applicationNumbersFromDemands = new HashSet<>();
             if(!CollectionUtils.isEmpty(demands))
                 applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
@@ -93,7 +93,7 @@ public class DemandService {
             createDemand(requestInfo,createCalculations,mdmsData,bpaRequest);
 
         if(!CollectionUtils.isEmpty(updateCalculations))
-            updateDemand(requestInfo,updateCalculations);
+            updateDemand(requestInfo,updateCalculations,bpaRequest);
     }
 
 
@@ -195,7 +195,7 @@ public class DemandService {
                     .taxPeriodFrom(taxPeriodFrom)
                     .taxPeriodTo(taxPeriodTo)
                     .consumerType("tradelicense")
-                    .businessService(config.getBusinessService())
+                    .businessService(config.getBusinessServiceTL())
                     .build();
             if(bpaRequest)
             {
@@ -216,12 +216,12 @@ public class DemandService {
      * @param calculations List of calculation object
      * @return Demands that are updated
      */
-    private List<Demand> updateDemand(RequestInfo requestInfo,List<Calculation> calculations){
+    private List<Demand> updateDemand(RequestInfo requestInfo,List<Calculation> calculations,boolean bpaRequest){
         List<Demand> demands = new LinkedList<>();
         for(Calculation calculation : calculations) {
 
             List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getTradeLicense().getApplicationNumber())
-                    , requestInfo);
+                    , requestInfo,bpaRequest);
 
             if(CollectionUtils.isEmpty(searchResult))
                 throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getTradeLicense().getApplicationNumber());
@@ -243,10 +243,13 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the incoming request
      * @return Lis to demands for the given consumerCode
      */
-    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo){
+    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo, boolean bpaRequest){
         String uri = utils.getDemandSearchURL();
         uri = uri.replace("{1}",tenantId);
-        uri = uri.replace("{2}",config.getBusinessService());
+        if(bpaRequest)
+            uri = uri.replace("{2}",config.getBusinessServiceBPA());
+        else
+            uri = uri.replace("{2}",config.getBusinessServiceTL());
         uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
 
         Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
@@ -279,7 +282,8 @@ public class DemandService {
         String consumerCode = billCriteria.getConsumerCode();
         String tenantId = billCriteria.getTenantId();
 
-        List<Demand> demands = searchDemand(tenantId,Collections.singleton(consumerCode),requestInfo);
+        boolean bpaRequest=billCriteria.getBusinessService().equalsIgnoreCase(config.getBusinessServiceBPA());
+        List<Demand> demands = searchDemand(tenantId,Collections.singleton(consumerCode),requestInfo,bpaRequest);
 
         if(CollectionUtils.isEmpty(demands))
             throw new CustomException("INVALID CONSUMERCODE","Bill cannot be generated.No demand exists for the given consumerCode");

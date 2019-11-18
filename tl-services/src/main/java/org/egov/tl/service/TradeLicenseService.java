@@ -193,7 +193,7 @@ public class TradeLicenseService {
         Object mdmsData=null;
         String businessServiceName=null;
         boolean isBPARequest=tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
-        if(isBPARequest)
+        if(!isBPARequest)
             mdmsData = util.mDMSCall(tradeLicenseRequest);
 
         if(isBPARequest)
