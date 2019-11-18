@@ -11,6 +11,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
@@ -18,7 +19,6 @@ import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.util.WaterCessUtil;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -125,29 +125,30 @@ public class EstimationService {
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		BigDecimal payableTax = taxAmt;
-		String assesmentYear = WSCalculationConfiguration.Assesment_Year;
+		String assesmentYear = WSCalculationConstant.Assesment_Year;
 		// water_charge
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Charge)
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CHARGE)
 				.estimateAmount(taxAmt.setScale(2, 2)).build());
 
 		// Water_cess
 		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
-				.get(WSCalculationConfiguration.WC_WATER_CESS_MASTER);
+				.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
 		BigDecimal waterCess;
 		waterCess = waterCessUtil.getWaterCess(payableTax, assesmentYear, waterCessMasterList, connection);
-
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
+				.estimateAmount(waterCess).build());
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 				assessmentYear, timeBasedExemeptionMasterMap);
 		if (null != rebatePenaltyMap) {
-			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_Rebate);
-			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_PENALTY);
-			BigDecimal interest = rebatePenaltyMap.get(WSCalculationConfiguration.Water_Time_INTEREST);
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_Rebate)
+			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_REBATE);
+			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_PENALTY);
+			BigDecimal interest = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_INTEREST);
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_REBATE)
 					.estimateAmount(rebate).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_PENALTY)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_PENALTY)
 					.estimateAmount(penalty).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConfiguration.Water_Time_INTEREST)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_INTEREST)
 					.estimateAmount(interest).build());
 			payableTax = payableTax.add(rebate).add(penalty).add(interest);
 		}

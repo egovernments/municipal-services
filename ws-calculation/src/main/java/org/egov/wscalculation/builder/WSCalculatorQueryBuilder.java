@@ -23,7 +23,8 @@ public class WSCalculatorQueryBuilder {
 
 	/**
 	 * 
-	 * @param criteria would be meter reading criteria
+	 * @param criteria
+	 *            would be meter reading criteria
 	 * @param preparedStatement
 	 * @return Query for given criteria
 	 */

@@ -1,5 +1,6 @@
 package org.egov.wsCalculation.constants;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -8,11 +9,8 @@ import org.egov.wsCalculation.model.DemandStatus;
 
 public class WSCalculationConstant {
 
-	public static final String FINANCIALYEAR_MASTER_KEY = "FINANCIALYEAR";
 
 	public static final String TAXPERIOD_MASTER_KEY = "TAXPERIOD";
-
-	public static final String TAXHEADMASTER_MASTER_KEY = "TAXHEADMASTER";
 
 	public static final String URL_PARAMS_SEPARATER = "?";
 
@@ -107,14 +105,70 @@ public class WSCalculationConstant {
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
+	public static final String Assesment_Year = "assessmentYear";
+	
+	
 	/**
 	 * Time Taxes Config
 	 */
-	public static final String WS_TIME_REBATE = "WATER_CONNECTION_REBATE";
+	public static final String WS_TIME_REBATE = "WS_TIME_REBATE";
 
 	public static final String WS_TIME_INTEREST = "WS_TIME_INTEREST";
 
 	public static final String WS_TIME_PENALTY = "WS_TIME_PENALTY";
 	
-	public static final String WS_FIRE_CESS = "WS_FIRE_CESS";
+	public static final String WS_WATER_CESS = "WS_WATER_CESS";
+	
+	public static final String WS_CHARGE = "WS_CHARGE";
+	
+	/**
+	 * data fields
+	 */
+	public static final String FROMFY_FIELD_NAME = "fromFY";
+
+	public static final String ENDING_DATE_APPLICABLES = "endingDay";
+
+	public static final String STARTING_DATE_APPLICABLES = "startingDay";
+	
+	public static final String MAX_AMOUNT_FIELD_NAME = "maxAmount";
+
+	public static final String MIN_AMOUNT_FIELD_NAME = "minAmount";
+
+	public static final String FLAT_AMOUNT_FIELD_NAME = "flatAmount";
+
+	public static final String RATE_FIELD_NAME = "rate";
+	
+	/*
+	 * bigdecimal values
+	 */
+
+	public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+
+	public static final String WC_REBATE_MASTER = "Rebate";
+
+	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
+
+	public static final String FINANCIAL_YEAR_STARTING_DATE = "01-Apr-2019";
+
+	public static final String FINANCIAL_YEAR_ENDING_DATE = "01-Apr-2020";
+
+	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
+
+	public static final String WS_Round_Off = "WS_Round_Off";
+
+	public static final String WS_TAX_MODULE = "ws-services-calcution";
+
+	public static final String WC_PENANLTY_MASTER = "Penalty";
+
+	public static final String WC_WATER_CESS_MASTER = "WaterCess";
+
+	public static final String WC_INTEREST_MASTER = "Interest";
+
+	public static final String CODE_FIELD_NAME = "code";
+
+	public static final List<String> WS_BASED_EXEMPTION_MASTERS = Collections
+	.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
+	
+    public static final Long TIMEZONE_OFFSET = 19800000l;
+
 }

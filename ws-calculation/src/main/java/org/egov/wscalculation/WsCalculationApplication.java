@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ComponentScan(basePackages = { "org.egov.wscalculation", "org.egov.wsCalculation.controller",
 		"org.egov.wscalculation.config", "org.egov.wsCalculation.repository", "org.egov.wsCalculation.service",
 		"org.egov.wsCalculation.util", "org.egov.wsCalculation.producer", "org.egov.wsCalculation.consumer",
-		"org.egov.wsCalculation.validator" })
+		"org.egov.wsCalculation.validator"})
 public class WsCalculationApplication {
 	@Value("${app.timezone}")
 	private String timeZone;
