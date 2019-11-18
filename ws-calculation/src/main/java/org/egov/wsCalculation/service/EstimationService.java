@@ -1,5 +1,6 @@
 package org.egov.wsCalculation.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.util.WCConstants;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.Calculation;
@@ -21,6 +23,8 @@ import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -85,14 +89,14 @@ public class EstimationService {
 		String assessmentYear = "2019-20";
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 
-		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, requestInfo);
-		taxAmt = waterCharge;
-		Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap = new HashMap<>();
+		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, waterBasedExemptionMasterMap,
+		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 				timeBasedExemptionMasterMap);
+		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection,billingSlabMaster, requestInfo);
+		taxAmt = waterCharge;
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
-				criteria.getWaterConnection(), waterBasedExemptionMasterMap, timeBasedExemptionMasterMap,
+				criteria.getWaterConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
@@ -121,7 +125,7 @@ public class EstimationService {
 	 * @param build
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
-			WaterConnection connection, Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap,
+			WaterConnection connection, Map<String, JSONArray> waterBasedExemptionMasterMap,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		BigDecimal payableTax = taxAmt;
@@ -160,11 +164,25 @@ public class EstimationService {
 	 * present in the Water Details
 	 */
 
-	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, RequestInfo requestInfo) {
+	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection,
+			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal waterCharege = BigDecimal.ZERO;
 		Double waterChargeToCompare = 45.0;
+		if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
+		ObjectMapper mapper = new ObjectMapper();
+		List<BillingSlab> mappingBillingSlab;
+		try {
+			String str = billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER).toJSONString();
+			log.info(str);
+			mappingBillingSlab = mapper.readValue(
+					str,
+					mapper.getTypeFactory().constructCollectionType(List.class, BillingSlab.class));
+		} catch (IOException e) {
+			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
+		}
 		List<Double> waterCharges = new ArrayList<>();
-		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, requestInfo);
+		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
 		if (billingSlabs.size() > 1)
@@ -191,11 +209,10 @@ public class EstimationService {
 		return waterCharege;
 	}
 
-	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, RequestInfo requestInfo) {
+	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs, RequestInfo requestInfo) {
 		Property property = waterConnection.getProperty();
 		String tenantId = property.getTenantId();
 		// get billing Slab
-		List<BillingSlab> billingSlabs = new ArrayList<>();
 
 		log.debug(" the slabs count : " + billingSlabs.size());
 		final String propertyType = property.getPropertyType();

@@ -148,26 +148,31 @@ public class WSCalculationConstant {
 
 	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
 
-	public static final String FINANCIAL_YEAR_STARTING_DATE = "01-Apr-2019";
+	public static final String FINANCIAL_YEAR_STARTING_DATE = "startingDate";
 
-	public static final String FINANCIAL_YEAR_ENDING_DATE = "01-Apr-2020";
+	public static final String FINANCIAL_YEAR_ENDING_DATE = "endingDate";
 
 	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
 
 	public static final String WS_Round_Off = "WS_Round_Off";
 
-	public static final String WS_TAX_MODULE = "ws-services-calcution";
+	public static final String WS_TAX_MODULE = "ws-services-calculation";
 
 	public static final String WC_PENANLTY_MASTER = "Penalty";
 
 	public static final String WC_WATER_CESS_MASTER = "WaterCess";
 
 	public static final String WC_INTEREST_MASTER = "Interest";
+	
+	public static final String WC_BILLING_SLAB_MASTER = "WCBillingSlab";
 
 	public static final String CODE_FIELD_NAME = "code";
 
 	public static final List<String> WS_BASED_EXEMPTION_MASTERS = Collections
 	.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
+	
+	public static final List<String> WS_BILLING_SLAB_MASTERS = Collections
+			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
 	
     public static final Long TIMEZONE_OFFSET = 19800000l;
 

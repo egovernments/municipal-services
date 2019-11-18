@@ -113,7 +113,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 */
 	public void setWaterConnectionMasterValues(RequestInfo requestInfo, String tenantId,
-			Map<String, Map<String, List<Object>>> waterBasedExemptionMasterMap,
+			Map<String, JSONArray> billingSlabMaster,
 			Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
@@ -124,8 +124,8 @@ public class MasterDataService {
 			String masterName = entry.getKey();
 
 			/* Masters which need to be parsed will be contained in the list */
-			if (WSCalculationConstant.WS_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
-				waterBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
+			if (WSCalculationConstant.WS_BILLING_SLAB_MASTERS.contains(entry.getKey()))
+				billingSlabMaster.put(masterName, entry.getValue());
 
 			/* Master not contained in list will be stored as it is */
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
@@ -167,7 +167,6 @@ public class MasterDataService {
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Map<String, Object>> getFinancialYear(CalculationReq req) {
-		String financialYear = "2019-20";
 		String tenantId = req.getCalculationCriteria().get(0).getTenantId();
 		RequestInfo requestInfo = req.getRequestInfo();
 		Set<String> assessmentYears = req.getCalculationCriteria().stream().map(cal -> cal.getAssessmentYear())
@@ -188,7 +187,7 @@ public class MasterDataService {
 						WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
 			}
 		}
-		return null;
+		return financialYearMap;
 	}
 
 	/**
