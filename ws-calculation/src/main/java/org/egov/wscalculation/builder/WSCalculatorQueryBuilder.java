@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.egov.wsCalculation.constants.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,8 @@ public class WSCalculatorQueryBuilder {
 
 	/**
 	 * 
-	 * @param criteria would be meter reading criteria
+	 * @param criteria
+	 *            would be meter reading criteria
 	 * @param preparedStatement
 	 * @return Query for given criteria
 	 */
