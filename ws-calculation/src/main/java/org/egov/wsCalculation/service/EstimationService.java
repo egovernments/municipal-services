@@ -42,6 +42,7 @@ public class EstimationService {
 	@Autowired
 	PayService payService;
 	
+	@Autowired
 	WSCalculationService wSCalculationService;
 	
 	
@@ -65,8 +66,10 @@ public class EstimationService {
 			WaterConnection waterConnection = criteria.getWaterConnection();
 
 			String assessmentNumber = waterConnection.getConnectionNo();
+			Map<String, List> estimatesAndBillingSlabs = null;
+			estimatesAndBillingSlabs = getEstimationMap(criteria, requestInfo);
 			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
-					getEstimationMap(criteria, requestInfo), masterMap);
+					estimatesAndBillingSlabs , masterMap);
 			calculation.setServiceNumber(assessmentNumber);
 			calculationWaterMap.put(assessmentNumber, calculation);
 		}

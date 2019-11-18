@@ -5,14 +5,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
@@ -104,58 +107,157 @@ public class DemandService {
 		Map<String, String> consumerCodeFinYearMap = new HashMap<>();
 
 		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
-		for (CalculationCriteria criteria : criterias) {
-
-			WaterConnection waterConnection = criteria.getWaterConnection();
-
-			String assessmentNumber = waterConnection.getConnectionNo();
-
-			// ws_tax for the new assessment
-			BigDecimal newTax = BigDecimal.ZERO;
-			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = waterCalculationMap.get(assessmentNumber)
-					.getTaxHeadEstimates().stream()
-					.filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(WSCalculationConstant.WS_TAX))
-					.findAny();
-			if (advanceCarryforwardEstimate.isPresent())
-				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
-
-			// true represents that the demand should be updated from this call
-			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
-					request.getRequestInfo(), true);
-
-			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
-
-				Demand demand = prepareDemand(waterConnection,
-						waterCalculationMap.get(waterConnection.getConnectionNo()), request.getRequestInfo());
-
-				demands.add(demand);
-				consumerCodeFinYearMap.put(demand.getConsumerCode(), "2019-20");
-
-			} else {
-				lesserAssessments.add(assessmentNumber);
-			}
-		}
-
-		if (!CollectionUtils.isEmpty(lesserAssessments)) {
-			throw new CustomException(WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR,
-					WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG + lesserAssessments);
-		}
-
-		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
-		String url = new StringBuilder().append(configs.getBillingServiceHost())
-				.append(configs.getDemandCreateEndPoint()).toString();
-		DemandResponse res = new DemandResponse();
-
-		try {
-			res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
-
-		} catch (HttpClientErrorException e) {
-			throw new ServiceCallException(e.getResponseBodyAsString());
-		}
+		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
+		generateDemand(request.getRequestInfo(), calculationList, null);
+//		for (CalculationCriteria criteria : criterias) {
+//
+//			WaterConnection waterConnection = criteria.getWaterConnection();
+//
+//			String assessmentNumber = waterConnection.getConnectionNo();
+//
+//			// ws_tax for the new assessment
+//			BigDecimal newTax = BigDecimal.ZERO;
+//			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = waterCalculationMap.get(assessmentNumber)
+//					.getTaxHeadEstimates().stream()
+//					.filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(WSCalculationConstant.WS_TAX))
+//					.findAny();
+//			if (advanceCarryforwardEstimate.isPresent())
+//				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
+//
+//			// true represents that the demand should be updated from this call
+//			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
+//					request.getRequestInfo(), true);
+//
+//			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
+//
+//				Demand demand = prepareDemand(waterConnection,
+//						waterCalculationMap.get(waterConnection.getConnectionNo()), request.getRequestInfo());
+//
+//				demands.add(demand);
+//				consumerCodeFinYearMap.put(demand.getConsumerCode(), "2019-20");
+//
+//			} else {
+//				lesserAssessments.add(assessmentNumber);
+//			}
+//		}
+//
+//		if (!CollectionUtils.isEmpty(lesserAssessments)) {
+//			throw new CustomException(WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR,
+//					WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG + lesserAssessments);
+//		}
+//
+//		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
+//		String url = new StringBuilder().append(configs.getBillingServiceHost())
+//				.append(configs.getDemandCreateEndPoint()).toString();
+//		DemandResponse res = new DemandResponse();
+//
+//		try {
+//			res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
+//
+//		} catch (HttpClientErrorException e) {
+//			throw new ServiceCallException(e.getResponseBodyAsString());
+//		}
 		log.info(" The demand Response is : " + res);
 		//assessmentService.saveAssessments(res.getDemands(), consumerCodeFinYearMap, request.getRequestInfo());
 		return waterCalculationMap;
 	}
+	
+	
+	  /**
+     * Creates or updates Demand
+     * @param requestInfo The RequestInfo of the calculation request
+     * @param calculations The Calculation Objects for which demand has to be generated or updated
+     */
+    public Map<String, Calculation> generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    	
+    
+
+        //List that will contain Calculation for new demands
+        List<Calculation> createCalculations = new LinkedList<>();
+
+        //List that will contain Calculation for old demands
+        List<Calculation> updateCalculations = new LinkedList<>();
+
+        if(!CollectionUtils.isEmpty(calculations)){
+
+            //Collect required parameters for demand search
+            String tenantId = calculations.get(0).getTenantId();
+            Set<String> serviceNumbers = calculations.stream().map(calculation -> calculation.getServiceNumber()).collect(Collectors.toSet());
+//            Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
+            List<Demand> demands = searchDemand(tenantId,serviceNumbers,requestInfo);
+            Set<String> applicationNumbersFromDemands = new HashSet<>();
+            if(!CollectionUtils.isEmpty(demands))
+                applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
+
+            //If demand already exists add it updateCalculations else createCalculations
+            for(Calculation calculation : calculations)
+            {      if(!applicationNumbersFromDemands.contains(calculation.getServiceNumber()))
+                        createCalculations.add(calculation);
+                    else
+                        updateCalculations.add(calculation);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(createCalculations))
+            createDemand(requestInfo,createCalculations,mdmsData);
+
+        if(!CollectionUtils.isEmpty(updateCalculations))
+            updateDemand(requestInfo,updateCalculations);
+    }
+    
+    
+    
+    
+
+    /**
+     * Searches demand for the given consumerCode and tenantIDd
+     * @param tenantId The tenantId of the tradeLicense
+     * @param consumerCodes The set of consumerCode of the demands
+     * @param requestInfo The RequestInfo of the incoming request
+     * @return Lis to demands for the given consumerCode
+     */
+    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo){
+        String uri = getDemandSearchURL();
+        uri = uri.replace("{1}",tenantId);
+        uri = uri.replace("{2}",configs.getBusinessService());
+        uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
+
+        Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
+                                                      .requestInfo(requestInfo).build());
+
+        DemandResponse response;
+        try {
+             response = mapper.convertValue(result,DemandResponse.class);
+        }
+        catch (IllegalArgumentException e){
+            throw new CustomException("PARSING ERROR","Failed to parse response from Demand Search");
+        }
+
+        if(CollectionUtils.isEmpty(response.getDemands()))
+            return null;
+
+        else return response.getDemands();
+
+    }
+    
+    /**
+     * Creates demand Search url based on tenanatId,businessService and ConsumerCode
+     * @return demand search url
+     */
+    public String getDemandSearchURL(){
+        StringBuilder url = new StringBuilder(config.getBillingHost());
+        url.append(config.getDemandSearchEndpoint());
+        url.append("?");
+        url.append("tenantId=");
+        url.append("{1}");
+        url.append("&");
+        url.append("businessService=");
+        url.append("{2}");
+        url.append("&");
+        url.append("consumerCode=");
+        url.append("{3}");
+        return url.toString();
+    }
 
 	/**
 	 * if any previous assessments and demands associated with it exists for the

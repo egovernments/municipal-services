@@ -80,5 +80,11 @@ public class WSCalculationConfiguration {
 
 	@Value("${ws.financialyear.start.month}")
 	private String financialYearStartMonth;
+	
+	
+	  @Value("${egov.demand.businessservice}")
+	    private String businessService;
+	  
+	  
 
 }
