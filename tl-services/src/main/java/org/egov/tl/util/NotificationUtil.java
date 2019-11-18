@@ -356,13 +356,13 @@ public class NotificationUtil {
 	private StringBuilder getBillUri(TradeLicense license,boolean isBPARequest) {
 		StringBuilder builder = new StringBuilder();
 
+
+		builder.append(config.getCalculatorHost());
 		if(!isBPARequest)
 		{
-			builder.append(config.getCalculatorHostTL());
 			builder.append(config.getGetBillEndpointTL());
 		}
 		else {
-			builder.append(config.getCalculatorHostBPA());
 			builder.append(config.getGetBillEndpointBPA());
 		}
 		builder.append("?tenantId=");

@@ -65,13 +65,12 @@ public class TradeUtil {
      */
     public StringBuilder getCalculationURI(boolean isBPARequest){
         StringBuilder uri = new StringBuilder();
+        uri.append(config.getCalculatorHost());
         if(isBPARequest)
         {
-            uri.append(config.getCalculatorHostBPA());
             uri.append(config.getCalculateEndpointBPA());
         }
         else {
-            uri.append(config.getCalculatorHostTL());
             uri.append(config.getCalculateEndpointTL());
         }
         return uri;

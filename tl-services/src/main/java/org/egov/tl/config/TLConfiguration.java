@@ -122,16 +122,13 @@ public class TLConfiguration {
 
     // tradelicense Calculator
     @Value("${egov.tl.calculator.host}")
-    private String calculatorHostTL;
+    private String calculatorHost;
 
     @Value("${egov.tl.calculator.calculate.endpoint}")
     private String calculateEndpointTL;
 
     @Value("${egov.tl.calculator.getBill.endpoint}")
     private String getBillEndpointTL;
-
-    @Value("${egov.bpa.calculator.host}")
-    private String calculatorHostBPA;
 
     @Value("${egov.bpa.calculator.calculate.endpoint}")
     private String calculateEndpointBPA;
