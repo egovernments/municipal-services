@@ -6,6 +6,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.ServiceRequestRepository;
+import org.egov.tl.util.TradeUtil;
+import org.egov.tl.validator.TLValidator;
 import org.egov.tl.web.models.*;
 import org.egov.tl.web.models.user.CreateUserRequest;
 import org.egov.tl.web.models.user.UserDetailResponse;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import static org.egov.tl.util.TLConstants.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,11 +35,14 @@ public class UserService{
     private TLConfiguration config;
 
 
+    private TradeUtil tradeUtil;
+
     @Autowired
-    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config) {
+    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config,TradeUtil tradeUtil) {
         this.mapper = mapper;
         this.serviceRequestRepository = serviceRequestRepository;
         this.config = config;
+        this.tradeUtil=tradeUtil;
     }
 
 
@@ -46,7 +52,7 @@ public class UserService{
      * @param request TradeLciense create or update request
      */
 
-    public void createUser(TradeLicenseRequest request){
+    public void createUser(TradeLicenseRequest request,boolean isBPARequest){
         List<TradeLicense> licenses = request.getLicenses();
         RequestInfo requestInfo = request.getRequestInfo();
         Role role = getCitizenRole();
@@ -71,7 +77,7 @@ public class UserService{
                                 throw new CustomException("INVALID USER RESPONSE","The user created has uuid as null");
                             }
                             log.info("owner created --> "+userDetailResponse.getUser().get(0).getUuid());
-                        setOwnerFields(owner,userDetailResponse,requestInfo);
+                        setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
                     }
                  else {
                     UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
@@ -82,8 +88,12 @@ public class UserService{
                     OwnerInfo user = new OwnerInfo();
                     user.addUserWithoutAuditDetail(owner);
                     addNonUpdatableFields(user,userDetailResponse.getUser().get(0));
+                    if(isBPARequest && (tradeLicense.getStatus()!=null) &&tradeLicense.getStatus().equals(STATUS_APPROVED)){
+                        String licenseeTyperRole=tradeUtil.getusernewRoleFromMDMS(tradeLicense,requestInfo);
+                        user.addRolesItem(Role.builder().code(licenseeTyperRole).name(licenseeTyperRole).build());
+                    }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
-                    setOwnerFields(owner,userDetailResponse,requestInfo);
+                    setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
                 }
             });
         });
@@ -161,13 +171,16 @@ public class UserService{
      * @param userDetailResponse The response from user search
      * @param requestInfo The requestInfo of the request
      */
-    private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
+    private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo,boolean isBPARequest){
         owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
         owner.setId(userDetailResponse.getUser().get(0).getId());
         owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
-        owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+//        if(!isBPARequest)
+//        {
+            owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+            owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+//        }
         owner.setCreatedDate(System.currentTimeMillis());
-        owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
         owner.setLastModifiedDate(System.currentTimeMillis());
         owner.setActive(userDetailResponse.getUser().get(0).getActive());
     }
@@ -316,8 +329,11 @@ public class UserService{
      */
     public void updateUser(TradeLicenseRequest request){
         List<TradeLicense> licenses = request.getLicenses();
+
         RequestInfo requestInfo = request.getRequestInfo();
         licenses.forEach(license -> {
+
+                boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
                 license.getTradeLicenseDetail().getOwners().forEach(owner -> {
                     UserDetailResponse userDetailResponse = isUserUpdatable(owner,requestInfo);
                     OwnerInfo user = new OwnerInfo();
@@ -333,7 +349,7 @@ public class UserService{
                         user.addUserWithoutAuditDetail(owner);
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
-                    setOwnerFields(owner,userDetailResponse,requestInfo);
+                    setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
                 });
             });
     }
