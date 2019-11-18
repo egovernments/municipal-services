@@ -41,6 +41,9 @@ public class TLCalculatorConfigs {
     private String businessService;
 
 
+    @Value("${egov.demand.businessserviceBPA}")
+    private String businessServiceBPA;
+
     //tradelicense Registry
     @Value("${egov.tradelicense.host}")
     private String tradeLicenseHost;
@@ -61,6 +64,10 @@ public class TLCalculatorConfigs {
     //TaxHeads
     @Value("${egov.taxhead.basetax}")
     private String baseTaxHead;
+
+    //TaxHeads
+    @Value("${egov.taxhead.BPAbasetax}")
+    private String bpabaseTaxHead;
 
     @Value("${egov.taxhead.adhoc.penalty}")
     private String adhocPenaltyTaxHead;

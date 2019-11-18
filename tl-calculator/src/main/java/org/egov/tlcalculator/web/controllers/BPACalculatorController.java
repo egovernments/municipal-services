@@ -4,6 +4,8 @@ package org.egov.tlcalculator.web.controllers;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import org.egov.tlcalculator.service.BPACalculationService;
 import org.egov.tlcalculator.service.CalculationService;
 import org.egov.tlcalculator.service.DemandService;
 import org.egov.tlcalculator.web.models.*;
@@ -27,16 +29,16 @@ public class BPACalculatorController {
 
     private HttpServletRequest request;
 
-    private CalculationService calculationService;
+    private BPACalculationService bpaCalculationService;
 
     private DemandService demandService;
 
     @Autowired
     public BPACalculatorController(ObjectMapper objectMapper, HttpServletRequest request,
-                                CalculationService calculationService,DemandService demandService) {
+                                   BPACalculationService bpaCalculationService,DemandService demandService) {
         this.objectMapper = objectMapper;
         this.request = request;
-        this.calculationService=calculationService;
+        this.bpaCalculationService=bpaCalculationService;
         this.demandService=demandService;
     }
 
@@ -45,10 +47,10 @@ public class BPACalculatorController {
      * @param calculationReq The calculation Request
      * @return Calculation Response
      */
-    @RequestMapping(value = "/_calculate", method = RequestMethod.POST)
+    @RequestMapping(value = "/_bpacalculate", method = RequestMethod.POST)
     public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
 
-        List<Calculation> calculations = calculationService.calculate(calculationReq);
+        List<Calculation> calculations = bpaCalculationService.calculate(calculationReq);
         CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
         return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
     }
@@ -60,7 +62,7 @@ public class BPACalculatorController {
      * @param generateBillCriteria The criteria to generate bill
      * @return The response of generate bill
      */
-    @RequestMapping(value = "/_getbill", method = RequestMethod.POST)
+    @RequestMapping(value = "/_bpagetbill", method = RequestMethod.POST)
     public ResponseEntity<BillAndCalculations> getBill(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                        @ModelAttribute @Valid GenerateBillCriteria generateBillCriteria) {
         BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(),generateBillCriteria);

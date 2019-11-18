@@ -45,7 +45,7 @@ public class MDMSValidator {
      *
      * @param licenseRequest
      */
-    public void validateMdmsData(TradeLicenseRequest licenseRequest,Object mdmsData) {
+    public void validateMdmsDataForTL(TradeLicenseRequest licenseRequest,Object mdmsData) {
 
         Map<String, String> errorMap = new HashMap<>();
 

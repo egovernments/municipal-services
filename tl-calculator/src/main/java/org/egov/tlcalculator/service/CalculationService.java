@@ -66,7 +66,7 @@ public class CalculationService {
        Object mdmsData = mdmsService.mDMSCall(calculationReq.getRequestInfo(),tenantId);
        List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),
                calculationReq.getCalulationCriteria(),mdmsData);
-       demandService.generateDemand(calculationReq.getRequestInfo(),calculations,mdmsData);
+       demandService.generateDemand(calculationReq.getRequestInfo(),calculations,mdmsData,false);
        CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
        producer.push(config.getSaveTopic(),calculationRes);
        return calculations;
@@ -89,6 +89,9 @@ public class CalculationService {
           }
 
           EstimatesAndSlabs estimatesAndSlabs = getTaxHeadEstimates(criteria,requestInfo,mdmsData);
+
+
+
           List<TaxHeadEstimate> taxHeadEstimates = estimatesAndSlabs.getEstimates();
           FeeAndBillingSlabIds tradeTypeFeeAndBillingSlabIds = estimatesAndSlabs.getTradeTypeFeeAndBillingSlabIds();
           FeeAndBillingSlabIds accessoryFeeAndBillingSlabIds = null;

@@ -1,13 +1,18 @@
 package org.egov.tl.validator;
 
+import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.TradeLicenseService;
+import org.egov.tl.service.UserService;
+import org.egov.tl.util.BPAConstants;
 import org.egov.tl.util.TLConstants;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.web.models.*;
+import org.egov.tl.web.models.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,15 +34,17 @@ public class TLValidator {
 
     private TradeUtil tradeUtil;
 
+    private UserService userService;
 
     @Autowired
     public TLValidator(TLRepository tlRepository, TLConfiguration config, PropertyValidator propertyValidator,
-                       MDMSValidator mdmsValidator, TradeUtil tradeUtil) {
+                       MDMSValidator mdmsValidator, TradeUtil tradeUtil,UserService userService) {
         this.tlRepository = tlRepository;
         this.config = config;
         this.propertyValidator = propertyValidator;
         this.mdmsValidator = mdmsValidator;
         this.tradeUtil = tradeUtil;
+        this.userService=userService;
     }
 
 
@@ -72,16 +79,39 @@ public class TLValidator {
         if(!isBPARequest) {
             valideDates(request, mdmsData);
             propertyValidator.validateProperty(request);
-            mdmsValidator.validateMdmsData(request,mdmsData);
-//            validateTLSpecificNotNullFields(request);
+            mdmsValidator.validateMdmsDataForTL(request,mdmsData);
+            validateTLSpecificNotNullFields(request);
         }
         else{
-//            validateBPASpecificNotNullFields(request);
+            validateBPAIfUniqueRegRequest(request);
+            validateBPASpecificNotNullFields(request);
             // verify mdms
         }
         validateInstitution(request);
         validateDuplicateDocuments(request);
     }
+
+    private  void validateBPAIfUniqueRegRequest(TradeLicenseRequest request){
+
+        for(TradeLicense license:request.getLicenses())
+        {
+            String mobno=license.getTradeLicenseDetail().getOwners().get(0).getMobileNumber();
+            String tenantId=license.getTenantId();
+            String usernewrole=tradeUtil.getusernewRoleFromMDMS(license,request.getRequestInfo());
+
+            UserDetailResponse userDetailResponse=userService.getUser(TradeLicenseSearchCriteria.builder().tenantId(tenantId).mobileNumber(mobno).build(),request.getRequestInfo());
+            for(OwnerInfo ownerInfo:userDetailResponse.getUser()){
+                for(Role role:ownerInfo.getRoles())
+                {
+                    if(role.getCode().equalsIgnoreCase(usernewrole))
+                    {
+                        throw new CustomException("ROLE ALREADYEXISTS"," User has already "+usernewrole+" role");
+                    }
+                }
+            }
+        }
+    }
+
 
     private void validateTLSpecificNotNullFields(TradeLicenseRequest request){
         request.getLicenses().forEach(license -> {
@@ -98,16 +128,35 @@ public class TLValidator {
 
     private void validateBPASpecificNotNullFields(TradeLicenseRequest request){
 
-        /* stake holder
-        * trdetails->tradeUnits
-        * ownerInfo(user)->gender,email, permanent address, correspondance address
-        * institution->contactNo
-        */
         request.getLicenses().forEach(license -> {
-            if(license.getTradeLicenseDetail().getInstitution().getContactNo()==null)
-                throw new CustomException("NULL INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
-            if(license.getTradeLicenseDetail().getStructureType()==null)
-                throw new CustomException("NULL STRUCTURETYPE"," Structure Type cannot be null");
+            if(license.getTradeLicenseDetail().getSubOwnerShipCategory().contains("INSTITUTION")){
+                if(license.getTradeLicenseDetail().getInstitution().getContactNo()==null)
+                    throw new CustomException("NULL INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
+                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
+                    throw new CustomException("NULL AUTHORISEDPERSONNAME"," Authorised person name can not be null");
+                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
+                    throw new CustomException("NULL INSTITUTIONNAME"," Institute name can not be null");
+                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
+                    throw new CustomException("NULL ADDRESS"," Institute address can not be null");
+            }
+        });
+
+        request.getLicenses().forEach(license -> {
+            license.getTradeLicenseDetail().getOwners().forEach(
+                    owner->{
+                        if(owner.getGender()==null)
+                            throw new CustomException("NULL USERGENDER"," User gender cannot be null");
+
+                        if(owner.getEmailId()==null)
+                            throw new CustomException("NULL USEREMAIL"," User EmailId cannot be null");
+
+                        if(owner.getPermanentAddress()==null)
+                            throw new CustomException("NULL PERMANENTADDRESS"," User Permanent Address cannot be null");
+
+                        if(owner.getCorrespondenceAddress()==null)
+                            throw new CustomException("NULL CORRESPONDANCEADDRESS"," User Correspondance address cannot be null");
+                    }
+            );
         });
     }
     /**
@@ -173,16 +222,28 @@ public class TLValidator {
      *  Validates the update request
      * @param request The input TradeLicenseRequest Object
      */
-    public void validateUpdate(TradeLicenseRequest request,List<TradeLicense> searchResult,Object mdmsData){
+    public void validateUpdate(TradeLicenseRequest request,List<TradeLicense> searchResult,Object mdmsData,boolean isBPARequest){
       List<TradeLicense> licenses = request.getLicenses();
 
       if(searchResult.size()!=licenses.size())
           throw new CustomException("INVALID UPDATE","The license to be updated is not in database");
 
-      validateAllIds(searchResult,licenses);
-      mdmsValidator.validateMdmsData(request,mdmsData);
+
+
+        validateAllIds(searchResult,licenses);
+
+        if(!isBPARequest) {
+            valideDates(request, mdmsData);
+            propertyValidator.validateProperty(request);
+            mdmsValidator.validateMdmsDataForTL(request,mdmsData);
+            validateTLSpecificNotNullFields(request);
+        }
+        else{
+            validateBPAIfUniqueRegRequest(request);
+            validateBPASpecificNotNullFields(request);
+        }
+
       validateTradeUnits(request);
-      valideDates(request,mdmsData);
       validateDuplicateDocuments(request);
       setFieldsFromSearch(request,searchResult,mdmsData);
       validateOwnerActiveStatus(request);

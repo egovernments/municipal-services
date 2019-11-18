@@ -44,14 +44,14 @@ public class CalculationService {
      * @param request The input create or update request
      * @return request with calculation object added
      */
-    public List<TradeLicense> addCalculation(TradeLicenseRequest request){
+    public List<TradeLicense> addCalculation(TradeLicenseRequest request,boolean isBPARequest){
         RequestInfo requestInfo = request.getRequestInfo();
         List<TradeLicense> licenses = request.getLicenses();
 
         if(CollectionUtils.isEmpty(licenses))
             throw new CustomException("INVALID REQUEST","The request for calculation cannot be empty or null");
 
-        CalculationRes response = getCalculation(requestInfo,licenses);
+        CalculationRes response = getCalculation(requestInfo,licenses,isBPARequest);
         List<Calculation> calculations = response.getCalculations();
         Map<String,Calculation> applicationNumberToCalculation = new HashMap<>();
         calculations.forEach(calculation -> {
@@ -72,8 +72,8 @@ public class CalculationService {
      * @param licenses The tradeLicense to whom the calculation object has to be added
      * @return CalculationRes from the tl-calculator
      */
-    private CalculationRes getCalculation(RequestInfo requestInfo,List<TradeLicense> licenses){
-        StringBuilder uri = utils.getCalculationURI();
+    private CalculationRes getCalculation(RequestInfo requestInfo,List<TradeLicense> licenses,boolean isBPARequest){
+        StringBuilder uri = utils.getCalculationURI(isBPARequest);
         List<CalulationCriteria> criterias = new LinkedList<>();
 
         licenses.forEach(license -> {

@@ -63,9 +63,17 @@ public class TradeUtil {
      * Creates url for tl-calculator service
      * @return url for tl-calculator service
      */
-    public StringBuilder getCalculationURI(){
-        StringBuilder uri = new StringBuilder(config.getCalculatorHost());
-        uri.append(config.getCalculateEndpoint());
+    public StringBuilder getCalculationURI(boolean isBPARequest){
+        StringBuilder uri = new StringBuilder();
+        if(isBPARequest)
+        {
+            uri.append(config.getCalculatorHostBPA());
+            uri.append(config.getCalculateEndpointBPA());
+        }
+        else {
+            uri.append(config.getCalculatorHostTL());
+            uri.append(config.getCalculateEndpointTL());
+        }
         return uri;
     }
 
@@ -226,7 +234,12 @@ public class TradeUtil {
         return mdmsCriteriaReq;
     }
 
-
+    public String getusernewRoleFromMDMS(TradeLicense license,RequestInfo requestInfo){
+        String tradetype=license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+        Object mdmsData=mDMSCallForBPA(requestInfo,license.getTenantId(),tradetype);
+        List<String>res=JsonPath.read(mdmsData, BPAConstants.MDMS_BPAROLEPATH);
+        return  res.get(0);
+    }
 
     public Object mDMSCall(TradeLicenseRequest tradeLicenseRequest){
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
@@ -235,6 +248,35 @@ public class TradeUtil {
         Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
         return result;
     }
+
+
+
+
+    public Object mDMSCallForBPA(RequestInfo requestInfo,String tenantId,String tradetype){
+
+
+        List<MasterDetail> masterDetails = new ArrayList<>();
+
+
+        final String filterCodeForLicenseetypes = "$.[?(@.tradeType =='"+tradetype+"')]";
+
+        masterDetails.add(MasterDetail.builder().name(BPAConstants.TRADETYPE_TO_ROLEMAPPING).filter(filterCodeForLicenseetypes).build());
+
+        ModuleDetail moduleDetail = ModuleDetail.builder().masterDetails(masterDetails)
+                .moduleName(BPAConstants.MDMS_MODULE_BPAREGISTRATION).build();
+
+
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Collections.singletonList(moduleDetail)).tenantId(tenantId)
+                .build();
+
+
+        MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria)
+                .requestInfo(requestInfo).build();
+        Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+        return result;
+    }
+
+
 
 
     /**
@@ -246,7 +288,15 @@ public class TradeUtil {
     public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,List<TradeLicense> searchresult){
         Map<String ,Boolean> idToIsStateUpdatableMap = new HashMap<>();
         searchresult.forEach(result -> {
-            idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
+
+            boolean isBPARequest=result.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            if(isBPARequest && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED)))
+            {
+
+                idToIsStateUpdatableMap.put(result.getId(),true);
+            }
+            else
+                idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
         });
         return idToIsStateUpdatableMap;
     }

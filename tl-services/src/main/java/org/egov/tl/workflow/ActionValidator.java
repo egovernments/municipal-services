@@ -43,18 +43,30 @@ public class ActionValidator {
         Map<String,String> errorMap = new HashMap<>();
 
         request.getLicenses().forEach(license -> {
-            if(ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
-                if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
-                    errorMap.put("INVALID ACTION","Action should be APPLY when application document are provided");
+
+            boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
+
+            if(isBPARequest)
+            {
+                if(!TRIGGER_NOWORKFLOW.equalsIgnoreCase(license.getAction())){
+                        errorMap.put("INVALID ACTION","Action should be NOWORKFLOW during create");
+                }
             }
-            if(ACTION_APPLY.equalsIgnoreCase(license.getAction())){
-                if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
-                    errorMap.put("INVALID ACTION","Action cannot be changed to APPLY. Application document are not provided");
+            else{
+                if(ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
+                    if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
+                        errorMap.put("INVALID ACTION","Action should be APPLY when application document are provided");
+                }
+                if(ACTION_APPLY.equalsIgnoreCase(license.getAction())){
+                    if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
+                        errorMap.put("INVALID ACTION","Action cannot be changed to APPLY. Application document are not provided");
+                }
+                if(!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
+                        !ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
+                    errorMap.put("INVALID ACTION","Action can only be APPLY or INITIATE during create");
+                }
             }
-            if(!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
-                    !ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
-                errorMap.put("INVALID ACTION","Action can only be APPLY or INITIATE during create");
-            }
+
         });
     //    validateRole(request);
 
@@ -150,38 +162,43 @@ public class ActionValidator {
     private void validateIds(TradeLicenseRequest request,BusinessService businessService){
         Map<String,String> errorMap = new HashMap<>();
         request.getLicenses().forEach(license -> {
-            if( !workflowService.isStateUpdatable(license.getStatus(), businessService)) {
-                if (license.getId() == null)
-                    errorMap.put("INVALID UPDATE", "Id of tradeLicense cannot be null");
-                if(license.getTradeLicenseDetail().getId()==null)
-                    errorMap.put("INVALID UPDATE", "Id of tradeLicenseDetail cannot be null");
-                if(license.getTradeLicenseDetail().getAddress()==null)
-                    errorMap.put("INVALID UPDATE", "Id of address cannot be null");
-                license.getTradeLicenseDetail().getOwners().forEach(owner -> {
-                    if(owner.getUuid()==null)
-                        errorMap.put("INVALID UPDATE", "Id of owner cannot be null");
-                    if(!CollectionUtils.isEmpty(owner.getDocuments())){
-                        owner.getDocuments().forEach(document -> {
-                            if(document.getId()==null)
-                                errorMap.put("INVALID UPDATE", "Id of owner document cannot be null");
+
+            boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            if((!isBPARequest) || (isBPARequest && (!license.getStatus().equalsIgnoreCase(STATUS_INITIATED))))
+            {
+                if(!workflowService.isStateUpdatable(license.getStatus(), businessService)) {
+                    if (license.getId() == null)
+                        errorMap.put("INVALID UPDATE", "Id of tradeLicense cannot be null");
+                    if(license.getTradeLicenseDetail().getId()==null)
+                        errorMap.put("INVALID UPDATE", "Id of tradeLicenseDetail cannot be null");
+                    if(license.getTradeLicenseDetail().getAddress()==null)
+                        errorMap.put("INVALID UPDATE", "Id of address cannot be null");
+                    license.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                        if(owner.getUuid()==null)
+                            errorMap.put("INVALID UPDATE", "Id of owner cannot be null");
+                        if(!CollectionUtils.isEmpty(owner.getDocuments())){
+                            owner.getDocuments().forEach(document -> {
+                                if(document.getId()==null)
+                                    errorMap.put("INVALID UPDATE", "Id of owner document cannot be null");
+                            });
+                          }
                         });
-                      }
+                    license.getTradeLicenseDetail().getTradeUnits().forEach(tradeUnit -> {
+                        if(tradeUnit.getId()==null)
+                            errorMap.put("INVALID UPDATE", "Id of tradeUnit cannot be null");
                     });
-                license.getTradeLicenseDetail().getTradeUnits().forEach(tradeUnit -> {
-                    if(tradeUnit.getId()==null)
-                        errorMap.put("INVALID UPDATE", "Id of tradeUnit cannot be null");
-                });
-                if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories())){
-                    license.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
-                        if(accessory.getId()==null)
-                            errorMap.put("INVALID UPDATE", "Id of accessory cannot be null");
-                    });
-                }
-                if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getApplicationDocuments())){
-                    license.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
-                        if(document.getId()==null)
-                            errorMap.put("INVALID UPDATE", "Id of applicationDocument cannot be null");
-                    });
+                    if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories())){
+                        license.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
+                            if(accessory.getId()==null)
+                                errorMap.put("INVALID UPDATE", "Id of accessory cannot be null");
+                        });
+                    }
+                    if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getApplicationDocuments())){
+                        license.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
+                            if(document.getId()==null)
+                                errorMap.put("INVALID UPDATE", "Id of applicationDocument cannot be null");
+                        });
+                    }
                 }
             }
         });

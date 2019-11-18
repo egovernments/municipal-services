@@ -122,24 +122,34 @@ public class TLConfiguration {
 
     // tradelicense Calculator
     @Value("${egov.tl.calculator.host}")
-    private String calculatorHost;
+    private String calculatorHostTL;
 
     @Value("${egov.tl.calculator.calculate.endpoint}")
-    private String calculateEndpoint;
+    private String calculateEndpointTL;
 
     @Value("${egov.tl.calculator.getBill.endpoint}")
-    private String getBillEndpoint;
+    private String getBillEndpointTL;
 
+    @Value("${egov.bpa.calculator.host}")
+    private String calculatorHostBPA;
 
+    @Value("${egov.bpa.calculator.calculate.endpoint}")
+    private String calculateEndpointBPA;
+
+    @Value("${egov.bpa.calculator.getBill.endpoint}")
+    private String getBillEndpointBPA;
 
     //Institutional key word
     @Value("${egov.ownershipcategory.institutional}")
     private String institutional;
 
 
-    @Value("${egov.receipt.businessservice}")
-    private String businessService;
+    @Value("${egov.receipt.businessserviceTL}")
+    private String businessServiceTL;
 
+
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
 
     //Property Service
     @Value("${egov.property.service.host}")
@@ -202,7 +212,7 @@ public class TLConfiguration {
 
     // Workflow
     @Value("${create.tl.workflow.name}")
-    private String businessServiceValue;
+    private String tlBusinessServiceValue;
 
     @Value("${workflow.context.path}")
     private String wfHost;
@@ -230,8 +240,11 @@ public class TLConfiguration {
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
 	
-	@Value("${egov.user.event.notification.enabled}")
-	private Boolean isUserEventsNotificationEnabled;
+	@Value("${egov.user.event.notification.enabledForTL}")
+	private Boolean isUserEventsNotificationEnabledForTL;
+
+    @Value("${egov.user.event.notification.enabledForBPA}")
+    private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;

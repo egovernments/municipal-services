@@ -91,15 +91,14 @@ public class TradeLicenseService {
         actionValidator.validateCreateRequest(tradeLicenseRequest);
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest,mdmsData,isBPARequest);
         tlValidator.validateCreate(tradeLicenseRequest,mdmsData,isBPARequest);
-        userService.createUser(tradeLicenseRequest);
-        if(!isBPARequest)
-            calculationService.addCalculation(tradeLicenseRequest);
-		
+        userService.createUser(tradeLicenseRequest,isBPARequest);
+        calculationService.addCalculation(tradeLicenseRequest,isBPARequest);
+
         /*
 		 * call workflow service if it's enable else uses internal workflow process
 		 */
-		if (isBPARequest || config.getIsExternalWorkFlowEnabled())
-			wfIntegrator.callWorkFlow(tradeLicenseRequest);
+		if (!isBPARequest && config.getIsExternalWorkFlowEnabled())
+			wfIntegrator.callWorkFlow(tradeLicenseRequest,isBPARequest);
 		repository.save(tradeLicenseRequest);
 		return tradeLicenseRequest.getLicenses();
 	}
@@ -192,29 +191,38 @@ public class TradeLicenseService {
      */
     public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest){
         Object mdmsData=null;
+        String businessServiceName=null;
         boolean isBPARequest=tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
-
         if(isBPARequest)
             mdmsData = util.mDMSCall(tradeLicenseRequest);
-        BusinessService businessService = workflowService.getBusinessService(tradeLicenseRequest.getLicenses().get(0).getTenantId(), tradeLicenseRequest.getRequestInfo());
+
+        if(isBPARequest)
+        {
+            String licenseeType=tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+            businessServiceName=licenseeType;
+        }
+        else
+            businessServiceName=config.getTlBusinessServiceValue();
+
+        BusinessService businessService = workflowService.getBusinessService(tradeLicenseRequest.getLicenses().get(0).getTenantId(), tradeLicenseRequest.getRequestInfo(),businessServiceName);
         List<TradeLicense> searchResult = getLicensesWithOwnerInfo(tradeLicenseRequest);
         actionValidator.validateUpdateRequest(tradeLicenseRequest,businessService);
-        enrichmentService.enrichTLUpdateRequest(tradeLicenseRequest,businessService);
-        tlValidator.validateUpdate(tradeLicenseRequest,searchResult,mdmsData);
+        enrichmentService.enrichTLUpdateRequest(tradeLicenseRequest,businessService);//
+        tlValidator.validateUpdate(tradeLicenseRequest,searchResult,mdmsData,isBPARequest);
         Map<String,Difference> diffMap = diffService.getDifference(tradeLicenseRequest,searchResult);
         Map<String,Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,searchResult);
 
         /*
 	 * call workflow service if it's enable else uses internal workflow process
 	 */
-		if (config.getIsExternalWorkFlowEnabled())
-			wfIntegrator.callWorkFlow(tradeLicenseRequest);
+		if (isBPARequest || config.getIsExternalWorkFlowEnabled())
+			wfIntegrator.callWorkFlow(tradeLicenseRequest,isBPARequest);
 		else
 			TLWorkflowService.updateStatus(tradeLicenseRequest);
 
 		enrichmentService.postStatusEnrichment(tradeLicenseRequest);
-        userService.createUser(tradeLicenseRequest);
-        calculationService.addCalculation(tradeLicenseRequest);
+        userService.createUser(tradeLicenseRequest,isBPARequest);
+        calculationService.addCalculation(tradeLicenseRequest,isBPARequest);
         editNotificationService.sendEditNotification(tradeLicenseRequest,diffMap);
         repository.update(tradeLicenseRequest,idToIsStateUpdatableMap);
         return tradeLicenseRequest.getLicenses();

@@ -94,7 +94,6 @@ public class TLConstants {
 
     public static final String MDMS_ENDDATE  = "endingDate";
 
-
     // error constants
 
     public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
@@ -112,6 +111,8 @@ public class TLConstants {
     public static final String ACTION_APPROVE  = "APPROVE";
 
     public static final String ACTION_REJECT  = "REJECT";
+
+    public static final String TRIGGER_NOWORKFLOW  = "NOWORKFLOW";
 
     public static final String ACTION_CANCEL  = "CANCEL";
 

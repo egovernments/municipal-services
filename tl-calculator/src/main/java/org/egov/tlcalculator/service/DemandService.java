@@ -62,7 +62,7 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the calculation request
      * @param calculations The Calculation Objects for which demand has to be generated or updated
      */
-    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData,boolean bpaRequest){
 
         //List that will contain Calculation for new demands
         List<Calculation> createCalculations = new LinkedList<>();
@@ -90,7 +90,7 @@ public class DemandService {
         }
 
         if(!CollectionUtils.isEmpty(createCalculations))
-            createDemand(requestInfo,createCalculations,mdmsData);
+            createDemand(requestInfo,createCalculations,mdmsData,bpaRequest);
 
         if(!CollectionUtils.isEmpty(updateCalculations))
             updateDemand(requestInfo,updateCalculations);
@@ -135,7 +135,7 @@ public class DemandService {
      * @param calculations List of calculation object
      * @return Demands that are created
      */
-    private List<Demand> createDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    private List<Demand> createDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData,boolean bpaRequest){
         List<Demand> demands = new LinkedList<>();
         for(Calculation calculation : calculations) {
             TradeLicense license = null;
@@ -167,21 +167,43 @@ public class DemandService {
                         .build());
             });
 
-             Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
+
+
+            Long taxPeriodFrom ;
+            Long taxPeriodTo ;
+            if(bpaRequest)
+            {
+                taxPeriodFrom = System.currentTimeMillis();
+                taxPeriodTo = System.currentTimeMillis();
+            }
+            else {
+                Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
+                taxPeriodFrom=taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE);
+                taxPeriodTo=taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE);
+            }
+
 
              addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
 
-             demands.add(Demand.builder()
+
+            Demand singleDemand=Demand.builder()
                     .consumerCode(consumerCode)
                     .demandDetails(demandDetails)
                     .payer(owner)
                     .minimumAmountPayable(config.getMinimumPayableAmount())
                     .tenantId(tenantId)
-                    .taxPeriodFrom(taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE))
-                    .taxPeriodTo(taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE))
+                    .taxPeriodFrom(taxPeriodFrom)
+                    .taxPeriodTo(taxPeriodTo)
                     .consumerType("tradelicense")
                     .businessService(config.getBusinessService())
-                    .build());
+                    .build();
+            if(bpaRequest)
+            {
+                 singleDemand.setConsumerType("bpaStakeHolderReg");
+                 singleDemand.setBusinessService(config.getBusinessServiceBPA());
+            }
+            demands.add(singleDemand);
+
         }
         return demandRepository.saveDemand(requestInfo,demands);
     }

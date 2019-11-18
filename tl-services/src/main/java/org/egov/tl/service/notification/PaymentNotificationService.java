@@ -76,7 +76,7 @@ public class PaymentNotificationService {
             RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 //            RequestInfo requestInfo = new RequestInfo();
 
-            if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessService())){
+            if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceTL())||valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceBPA())){
                 TradeLicense license = getTradeLicenseFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
                                                                        requestInfo);
                 String localizationMessages = util.getLocalizationMessages(license.getTenantId(),requestInfo);

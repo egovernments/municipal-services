@@ -126,7 +126,7 @@ public class TLRowMapper  implements ResultSetExtractor<List<TradeLicense>> {
             { institution = Institution.builder()
                     .id(rs.getString("instiid"))
                     .tenantId(rs.getString("institenantId"))
-                    .name(rs.getString("authorisedpersonname"))
+                    .name(rs.getString("name"))
                     .type(rs.getString("institutionType"))
                     .designation(rs.getString("designation"))
                     .active(rs.getBoolean("instiactive"))

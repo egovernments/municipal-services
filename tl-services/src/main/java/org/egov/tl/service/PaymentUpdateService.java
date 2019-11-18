@@ -88,13 +88,24 @@ public class PaymentUpdateService {
 			Map<String, Object> info = documentContext.read("$.RequestInfo");
 			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 
-			if (valMap.get(businessService).equalsIgnoreCase(config.getBusinessService())) {
+			if (valMap.get(businessService).equalsIgnoreCase(config.getBusinessServiceTL())||valMap.get(businessService).equalsIgnoreCase(config.getBusinessServiceBPA())) {
 				TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
 				searchCriteria.setTenantId(valMap.get(tenantId));
 				searchCriteria.setApplicationNumber(valMap.get(consumerCode));
 				List<TradeLicense> licenses = tradeLicenseService.getLicensesWithOwnerInfo(searchCriteria, requestInfo);
 
-				BusinessService businessService = workflowService.getBusinessService(licenses.get(0).getTenantId(), requestInfo);
+
+				boolean isBPARequest=licenses.get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
+				String businessServiceName=null;
+				if(isBPARequest)
+				{
+					String licenseeType=licenses.get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+					businessServiceName=licenseeType;
+				}
+				else
+					businessServiceName=config.getTlBusinessServiceValue();
+
+				BusinessService businessService = workflowService.getBusinessService(licenses.get(0).getTenantId(), requestInfo,businessServiceName);
 
 
 				if (CollectionUtils.isEmpty(licenses))
@@ -115,7 +126,7 @@ public class PaymentUpdateService {
 				/*
 				 * calling workflow to update status
 				 */
-				wfIntegrator.callWorkFlow(updateRequest);
+				wfIntegrator.callWorkFlow(updateRequest,isBPARequest);
 
 				updateRequest.getLicenses()
 						.forEach(obj -> log.info(" the status of the application is : " + obj.getStatus()));

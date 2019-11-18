@@ -40,21 +40,31 @@ public class TLNotificationService {
      * @param request The tradeLicenseRequest listenend on the kafka topic
      */
     public void process(TradeLicenseRequest request){
+
+		boolean isBPARequest=request.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
         List<SMSRequest> smsRequests = new LinkedList<>();
         if(null != config.getIsSMSEnabled()) {
         	if(config.getIsSMSEnabled()) {
-                enrichSMSRequest(request,smsRequests);
+                enrichSMSRequest(request,smsRequests,isBPARequest);
                 if(!CollectionUtils.isEmpty(smsRequests))
                 	util.sendSMS(smsRequests);
         	}
         }
-        if(null != config.getIsUserEventsNotificationEnabled()) {
-        	if(config.getIsUserEventsNotificationEnabled()) {
+        if(isBPARequest && (null != config.getIsUserEventsNotificationEnabledForBPA())) {
+        	if(config.getIsUserEventsNotificationEnabledForBPA()) {
         		EventRequest eventRequest = getEvents(request);
         		if(null != eventRequest)
         			util.sendEventNotification(eventRequest);
         	}
         }
+
+		if(!isBPARequest && (null != config.getIsUserEventsNotificationEnabledForTL())) {
+			if(config.getIsUserEventsNotificationEnabledForTL()) {
+				EventRequest eventRequest = getEvents(request);
+				if(null != eventRequest)
+					util.sendEventNotification(eventRequest);
+			}
+		}
     }
 
 
@@ -63,11 +73,11 @@ public class TLNotificationService {
      * @param request The tradeLicenseRequest from kafka topic
      * @param smsRequests List of SMSRequets
      */
-    private void enrichSMSRequest(TradeLicenseRequest request,List<SMSRequest> smsRequests){
+    private void enrichSMSRequest(TradeLicenseRequest request,List<SMSRequest> smsRequests,boolean isBPARequest){
         String tenantId = request.getLicenses().get(0).getTenantId();
         String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
         for(TradeLicense license : request.getLicenses()){
-            String message = util.getCustomizedMsg(request.getRequestInfo(),license,localizationMessages);
+            String message = util.getCustomizedMsg(request.getRequestInfo(),license,localizationMessages,isBPARequest);
             if(message==null) continue;
 
             Map<String,String > mobileNumberToOwner = new HashMap<>();
@@ -93,7 +103,9 @@ public class TLNotificationService {
         String tenantId = request.getLicenses().get(0).getTenantId();
         String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
         for(TradeLicense license : request.getLicenses()){
-            String message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+
+			boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            String message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages,isBPARequest);
             if(message == null) continue;
             Map<String,String > mobileNumberToOwner = new HashMap<>();
             license.getTradeLicenseDetail().getOwners().forEach(owner -> {

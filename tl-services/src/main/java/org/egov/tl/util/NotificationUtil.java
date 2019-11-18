@@ -50,7 +50,7 @@ public class NotificationUtil {
 	 *            The messages from localization
 	 * @return customized message based on tradelicense
 	 */
-	public String getCustomizedMsg(RequestInfo requestInfo, TradeLicense license, String localizationMessage) {
+	public String getCustomizedMsg(RequestInfo requestInfo, TradeLicense license, String localizationMessage,boolean isBPARequest) {
 		String message = null, messageTemplate;
 		String ACTION_STATUS = license.getAction() + "_" + license.getStatus();
 		switch (ACTION_STATUS) {
@@ -72,7 +72,7 @@ public class NotificationUtil {
 		 */
 
 		case ACTION_STATUS_APPROVED:
-			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
+			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license, isBPARequest);
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPROVED, localizationMessage);
 			message = getApprovedMsg(license, amountToBePaid, messageTemplate);
 			break;
@@ -329,9 +329,9 @@ public class NotificationUtil {
 	 *            The TradeLicense object for which
 	 * @return
 	 */
-	private BigDecimal getAmountToBePaid(RequestInfo requestInfo, TradeLicense license) {
+	private BigDecimal getAmountToBePaid(RequestInfo requestInfo, TradeLicense license, boolean isBPARequest) {
 
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getBillUri(license),
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getBillUri(license,isBPARequest),
 				new RequestInfoWrapper(requestInfo));
 		String jsonString = new JSONObject(responseMap).toString();
 
@@ -353,9 +353,18 @@ public class NotificationUtil {
 	 *            The TradeLicense for which getBill has to be called
 	 * @return The uri for the getBill
 	 */
-	private StringBuilder getBillUri(TradeLicense license) {
-		StringBuilder builder = new StringBuilder(config.getCalculatorHost());
-		builder.append(config.getGetBillEndpoint());
+	private StringBuilder getBillUri(TradeLicense license,boolean isBPARequest) {
+		StringBuilder builder = new StringBuilder();
+
+		if(!isBPARequest)
+		{
+			builder.append(config.getCalculatorHostTL());
+			builder.append(config.getGetBillEndpointTL());
+		}
+		else {
+			builder.append(config.getCalculatorHostBPA());
+			builder.append(config.getGetBillEndpointBPA());
+		}
 		builder.append("?tenantId=");
 		builder.append(license.getTenantId());
 		builder.append("&consumerCode=");
