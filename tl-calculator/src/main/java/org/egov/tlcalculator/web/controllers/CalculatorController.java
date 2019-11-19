@@ -4,6 +4,8 @@ package org.egov.tlcalculator.web.controllers;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import org.egov.tlcalculator.service.BPACalculationService;
 import org.egov.tlcalculator.service.CalculationService;
 import org.egov.tlcalculator.service.DemandService;
 import org.egov.tlcalculator.web.models.*;
@@ -31,13 +33,16 @@ public class CalculatorController {
 
 	private DemandService demandService;
 
+	private BPACalculationService bpaCalculationService;
+
 	@Autowired
 	public CalculatorController(ObjectMapper objectMapper, HttpServletRequest request,
-								CalculationService calculationService,DemandService demandService) {
+								CalculationService calculationService,DemandService demandService,BPACalculationService bpaCalculationService) {
 		this.objectMapper = objectMapper;
 		this.request = request;
 		this.calculationService=calculationService;
 		this.demandService=demandService;
+		this.bpaCalculationService=bpaCalculationService;
 	}
 
 	/**
@@ -48,7 +53,12 @@ public class CalculatorController {
 	@RequestMapping(value = "/_calculate", method = RequestMethod.POST)
 	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
 
-		 List<Calculation> calculations = calculationService.calculate(calculationReq);
+		 boolean isBPARequest = calculationReq.getCalulationCriteria().get(0).getTradelicense().getLicenseType().toString().equals("BPASTAKEHOLDER");
+		List<Calculation> calculations=null;
+		 if(!isBPARequest)
+		 	calculations = calculationService.calculate(calculationReq);
+		 else
+			 calculations = bpaCalculationService.calculate(calculationReq);
 		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
 	}

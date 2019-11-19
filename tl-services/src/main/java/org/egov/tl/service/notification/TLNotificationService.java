@@ -45,7 +45,7 @@ public class TLNotificationService {
         List<SMSRequest> smsRequests = new LinkedList<>();
         if(null != config.getIsSMSEnabled()) {
         	if(config.getIsSMSEnabled()) {
-                enrichSMSRequest(request,smsRequests,isBPARequest);
+                enrichSMSRequest(request,smsRequests);
                 if(!CollectionUtils.isEmpty(smsRequests))
                 	util.sendSMS(smsRequests);
         	}
@@ -73,11 +73,11 @@ public class TLNotificationService {
      * @param request The tradeLicenseRequest from kafka topic
      * @param smsRequests List of SMSRequets
      */
-    private void enrichSMSRequest(TradeLicenseRequest request,List<SMSRequest> smsRequests,boolean isBPARequest){
+    private void enrichSMSRequest(TradeLicenseRequest request,List<SMSRequest> smsRequests){
         String tenantId = request.getLicenses().get(0).getTenantId();
         String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
         for(TradeLicense license : request.getLicenses()){
-            String message = util.getCustomizedMsg(request.getRequestInfo(),license,localizationMessages,isBPARequest);
+            String message = util.getCustomizedMsg(request.getRequestInfo(),license,localizationMessages);
             if(message==null) continue;
 
             Map<String,String > mobileNumberToOwner = new HashMap<>();
@@ -104,8 +104,7 @@ public class TLNotificationService {
         String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
         for(TradeLicense license : request.getLicenses()){
 
-			boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
-            String message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages,isBPARequest);
+            String message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
             if(message == null) continue;
             Map<String,String > mobileNumberToOwner = new HashMap<>();
             license.getTradeLicenseDetail().getOwners().forEach(owner -> {

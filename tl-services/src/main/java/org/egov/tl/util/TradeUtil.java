@@ -63,16 +63,10 @@ public class TradeUtil {
      * Creates url for tl-calculator service
      * @return url for tl-calculator service
      */
-    public StringBuilder getCalculationURI(boolean isBPARequest){
+    public StringBuilder getCalculationURI(){
         StringBuilder uri = new StringBuilder();
         uri.append(config.getCalculatorHost());
-        if(isBPARequest)
-        {
-            uri.append(config.getCalculateEndpointBPA());
-        }
-        else {
-            uri.append(config.getCalculateEndpointTL());
-        }
+        uri.append(config.getCalculateEndpoint());
         return uri;
     }
 

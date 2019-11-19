@@ -92,7 +92,7 @@ public class TradeLicenseService {
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest,mdmsData,isBPARequest);
         tlValidator.validateCreate(tradeLicenseRequest,mdmsData,isBPARequest);
         userService.createUser(tradeLicenseRequest,isBPARequest);
-        calculationService.addCalculation(tradeLicenseRequest,isBPARequest);
+        calculationService.addCalculation(tradeLicenseRequest);
 
         /*
 		 * call workflow service if it's enable else uses internal workflow process
@@ -222,7 +222,7 @@ public class TradeLicenseService {
 
 		enrichmentService.postStatusEnrichment(tradeLicenseRequest);
         userService.createUser(tradeLicenseRequest,isBPARequest);
-        calculationService.addCalculation(tradeLicenseRequest,isBPARequest);
+        calculationService.addCalculation(tradeLicenseRequest);
         editNotificationService.sendEditNotification(tradeLicenseRequest,diffMap);
         repository.update(tradeLicenseRequest,idToIsStateUpdatableMap);
         return tradeLicenseRequest.getLicenses();

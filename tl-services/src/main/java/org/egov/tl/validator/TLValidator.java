@@ -105,7 +105,7 @@ public class TLValidator {
                 {
                     if(role.getCode().equalsIgnoreCase(usernewrole))
                     {
-                        throw new CustomException("ROLE ALREADYEXISTS"," User has already "+usernewrole+" role");
+                        throw new CustomException("ROLE_ALREADYEXISTS"," User has already "+usernewrole+" role");
                     }
                 }
             }
@@ -116,13 +116,13 @@ public class TLValidator {
     private void validateTLSpecificNotNullFields(TradeLicenseRequest request){
         request.getLicenses().forEach(license -> {
             if(license.getFinancialYear()==null)
-                throw new CustomException("NULL FINANCIALYEAR"," Financial Year cannot be null");
+                throw new CustomException("NULL_FINANCIALYEAR"," Financial Year cannot be null");
             if(license.getTradeLicenseDetail().getStructureType()==null)
-                throw new CustomException("NULL STRUCTURETYPE"," Structure Type cannot be null");
+                throw new CustomException("NULL_STRUCTURETYPE"," Structure Type cannot be null");
             if(license.getTradeLicenseDetail().getSubOwnerShipCategory()==null)
-                throw new CustomException("NULL SUBOWNERSHIPCATEGORY"," SubOwnership Category cannot be null");
+                throw new CustomException("NULL_SUBOWNERSHIPCATEGORY"," SubOwnership Category cannot be null");
             if(license.getTradeLicenseDetail().getAddress()==null)
-                throw new CustomException("NULL ADDRESS"," Address cannot be null");
+                throw new CustomException("NULL_ADDRESS"," Address cannot be null");
         });
     }
 
@@ -131,13 +131,13 @@ public class TLValidator {
         request.getLicenses().forEach(license -> {
             if(license.getTradeLicenseDetail().getSubOwnerShipCategory().contains("INSTITUTION")){
                 if(license.getTradeLicenseDetail().getInstitution().getContactNo()==null)
-                    throw new CustomException("NULL INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
+                    throw new CustomException("NULL_INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
                 if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL AUTHORISEDPERSONNAME"," Authorised person name can not be null");
+                    throw new CustomException("NULL_AUTHORISEDPERSONNAME"," Authorised person name can not be null");
                 if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL INSTITUTIONNAME"," Institute name can not be null");
+                    throw new CustomException("NULL_INSTITUTIONNAME"," Institute name can not be null");
                 if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL ADDRESS"," Institute address can not be null");
+                    throw new CustomException("NULL_ADDRESS"," Institute address can not be null");
             }
         });
 
@@ -145,16 +145,16 @@ public class TLValidator {
             license.getTradeLicenseDetail().getOwners().forEach(
                     owner->{
                         if(owner.getGender()==null)
-                            throw new CustomException("NULL USERGENDER"," User gender cannot be null");
+                            throw new CustomException("NULL_USERGENDER"," User gender cannot be null");
 
                         if(owner.getEmailId()==null)
-                            throw new CustomException("NULL USEREMAIL"," User EmailId cannot be null");
+                            throw new CustomException("NULL_USEREMAIL"," User EmailId cannot be null");
 
                         if(owner.getPermanentAddress()==null)
-                            throw new CustomException("NULL PERMANENTADDRESS"," User Permanent Address cannot be null");
+                            throw new CustomException("NULL_PERMANENTADDRESS"," User Permanent Address cannot be null");
 
                         if(owner.getCorrespondenceAddress()==null)
-                            throw new CustomException("NULL CORRESPONDANCEADDRESS"," User Correspondance address cannot be null");
+                            throw new CustomException("NULL_CORRESPONDANCEADDRESS"," User Correspondance address cannot be null");
                     }
             );
         });
