@@ -42,6 +42,10 @@ public class WSCalculationConstant {
 	
 	 public static final String MDMS_ROUNDOFF_TAXHEAD= "WS_ROUNDOFF";
 
+	 
+	 public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
+	 
+	 
 	/*
 	 * Module names
 	 */

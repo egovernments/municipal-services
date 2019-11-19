@@ -13,8 +13,11 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.CalculationReq;
@@ -113,8 +116,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 */
 	public void setWaterConnectionMasterValues(RequestInfo requestInfo, String tenantId,
-			Map<String, JSONArray> billingSlabMaster,
-			Map<String, JSONArray> timeBasedExemptionMasterMap) {
+			Map<String, JSONArray> billingSlabMaster, Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
 				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
@@ -215,17 +217,21 @@ public class MasterDataService {
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
 		}
 	}
-	
+
 	/**
 	 * Returns the 'APPLICABLE' master object from the list of inputs
 	 *
-	 * filters the Input based on their effective financial year and starting day
+	 * filters the Input based on their effective financial year and starting
+	 * day
 	 *
-	 * If an object is found with effective year same as assessment year that master entity will be returned
+	 * If an object is found with effective year same as assessment year that
+	 * master entity will be returned
 	 *
-	 * If exact match is not found then the entity with latest effective financial year which should be lesser than the assessment year
+	 * If exact match is not found then the entity with latest effective
+	 * financial year which should be lesser than the assessment year
 	 *
-	 * NOTE : applicable points to single object  out of all the entries for a given master which fits the period of the property being assessed
+	 * NOTE : applicable points to single object out of all the entries for a
+	 * given master which fits the period of the property being assessed
 	 *
 	 * @param assessmentYear
 	 * @param masterList
@@ -241,22 +247,23 @@ public class MasterDataService {
 
 			Map<String, Object> objMap = (Map<String, Object>) object;
 			String objFinYear = ((String) objMap.get(WSCalculationConstant.FROMFY_FIELD_NAME)).split("-")[0];
-			if(!objMap.containsKey(WSCalculationConstant.STARTING_DATE_APPLICABLES)){
+			if (!objMap.containsKey(WSCalculationConstant.STARTING_DATE_APPLICABLES)) {
 				if (objFinYear.compareTo(assessmentYear.split("-")[0]) == 0)
-					return  objMap;
+					return objMap;
 
-				else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+				else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0
+						&& maxYearFromTheList.compareTo(objFinYear) <= 0) {
 					maxYearFromTheList = objFinYear;
 					objToBeReturned = objMap;
 				}
-			}
-			else{
+			} else {
 				String objStartDay = ((String) objMap.get(WSCalculationConstant.STARTING_DATE_APPLICABLES));
-				if (assessmentYear.split("-")[0].compareTo(objFinYear) >= 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+				if (assessmentYear.split("-")[0].compareTo(objFinYear) >= 0
+						&& maxYearFromTheList.compareTo(objFinYear) <= 0) {
 					maxYearFromTheList = objFinYear;
 					Long startTime = getStartDayInMillis(objStartDay);
 					Long currentTime = System.currentTimeMillis();
-					if(startTime < currentTime && maxStartTime < startTime){
+					if (startTime < currentTime && maxStartTime < startTime) {
 						objToBeReturned = objMap;
 						maxStartTime = startTime;
 					}
@@ -265,27 +272,27 @@ public class MasterDataService {
 		}
 		return objToBeReturned;
 	}
-	
+
 	/**
 	 * Converts startDay to epoch
-	 * @param startDay StartDay of applicable
+	 * 
+	 * @param startDay
+	 *            StartDay of applicable
 	 * @return
 	 */
-	private Long getStartDayInMillis(String startDay){
+	private Long getStartDayInMillis(String startDay) {
 
 		Long startTime = null;
-		try{
+		try {
 			SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 			Date date = df.parse(startDay);
 			startTime = date.getTime();
-		}
-		catch (ParseException e) {
-			throw new CustomException("INVALID STARTDAY","The startDate of the penalty cannot be parsed");
+		} catch (ParseException e) {
+			throw new CustomException("INVALID STARTDAY", "The startDate of the penalty cannot be parsed");
 		}
 
 		return startTime;
 	}
-	
 
 	/**
 	 * Method to calculate exmeption based on the Amount and exemption map
@@ -308,16 +315,15 @@ public class MasterDataService {
 				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
 				: null;
 
-		BigDecimal maxAmt = null != configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME)).doubleValue())
-				: null;
+		BigDecimal maxAmt = null != configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME) ? BigDecimal
+				.valueOf(((Number) configMap.get(WSCalculationConstant.MAX_AMOUNT_FIELD_NAME)).doubleValue()) : null;
 
-		BigDecimal minAmt = null != configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME)).doubleValue())
-				: null;
+		BigDecimal minAmt = null != configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME) ? BigDecimal
+				.valueOf(((Number) configMap.get(WSCalculationConstant.MIN_AMOUNT_FIELD_NAME)).doubleValue()) : null;
 
 		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				? BigDecimal
+						.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
 				: BigDecimal.ZERO;
 
 		if (null == rate)
@@ -333,30 +339,84 @@ public class MasterDataService {
 		return currentApplicable;
 	}
 
-	
-	
+	/**
+	 * Gets the startDate and the endDate of the financialYear
+	 * 
+	 * @param requestInfo
+	 *            The RequestInfo of the calculationRequest
+	 * @param license
+	 *            The water connection for which calculation is done
+	 * @return Map containing the startDate and endDate
+	 */
+	public Map<String, Long> getTaxPeriods(RequestInfo requestInfo, Object mdmsData) {
+		Map<String, Long> taxPeriods = new HashMap<>();
+		try {
+			String jsonPath = WSCalculationConstant.MDMS_FINACIALYEAR_PATH.replace("{}", "2019-20");
+			List<Map<String, Object>> jsonOutput = JsonPath.read(mdmsData, jsonPath);
+			Map<String, Object> financialYearProperties = jsonOutput.get(0);
+			Object startDate = financialYearProperties.get(WSCalculationConstant.MDMS_STARTDATE);
+			Object endDate = financialYearProperties.get(WSCalculationConstant.MDMS_ENDDATE);
+			taxPeriods.put(WSCalculationConstant.MDMS_STARTDATE, (Long) startDate);
+			taxPeriods.put(WSCalculationConstant.MDMS_ENDDATE, (Long) endDate);
 
-    /**
-     * Gets the startDate and the endDate of the financialYear
-     * @param requestInfo The RequestInfo of the calculationRequest
-     * @param license The water connection for which calculation is done
-     * @return Map containing the startDate and endDate
-     */
-    public Map<String,Long> getTaxPeriods(RequestInfo requestInfo,Object mdmsData){
-        Map<String,Long> taxPeriods = new HashMap<>();
-        try {
-            String jsonPath = WSCalculationConstant.MDMS_FINACIALYEAR_PATH.replace("{}","2019-20");
-            List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
-            Map<String,Object> financialYearProperties = jsonOutput.get(0);
-            Object startDate = financialYearProperties.get(WSCalculationConstant.MDMS_STARTDATE);
-            Object endDate = financialYearProperties.get(WSCalculationConstant.MDMS_ENDDATE);
-            taxPeriods.put(WSCalculationConstant.MDMS_STARTDATE,(Long) startDate);
-            taxPeriods.put(WSCalculationConstant.MDMS_ENDDATE,(Long) endDate);
+		} catch (Exception e) {
 
-        } catch (Exception e) {
-           
-            throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+"2019-20");
-        }
-        return taxPeriods;
-    }
+			throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: " + "2019-20");
+		}
+		return taxPeriods;
+	}
+
+	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
+		StringBuilder url = getMdmsSearchUrl();
+		Object result = repository.fetchResult(url, mdmsCriteriaReq);
+		return result;
+	}
+
+	/**
+	 * Creates MDMS request
+	 * 
+	 * @param requestInfo
+	 *            The RequestInfo of the calculationRequest
+	 * @param tenantId
+	 *            The tenantId of the tradeLicense
+	 * @return MDMSCriteria Request
+	 */
+	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
+
+		// master details for TL module
+		List<MasterDetail> fyMasterDetails = new ArrayList<>();
+		// filter to only get code field from master data
+
+		final String filterCodeForUom = "$.[?(@.active==true)]";
+
+		fyMasterDetails.add(
+				MasterDetail.builder().name(WSCalculationConstant.MDMS_FINANCIALYEAR).filter(filterCodeForUom).build());
+
+//		ModuleDetail fyModuleDtls = ModuleDetail.builder().masterDetails(fyMasterDetails)
+//				.moduleName(WSCalculationConstant.MDMS_EGF_MASTER).build();
+//
+//		List<MasterDetail> tlMasterDetails = new ArrayList<>();
+//		tlMasterDetails.add(MasterDetail.builder().name(WSCalculationConstant.MDMS_CALCULATIONTYPE)
+//				.filter(filterCodeForUom).build());
+//		ModuleDetail tlModuleDtls = ModuleDetail.builder().masterDetails(tlMasterDetails)
+//				.moduleName(WSCalculationConstant.MDMS_TRADELICENSE).build();
+
+		List<ModuleDetail> moduleDetails = new ArrayList<>();
+//		moduleDetails.add(fyModuleDtls);
+//		moduleDetails.add(tlModuleDtls);
+
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId).build();
+
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+
+	/**
+	 * Creates and returns the url for mdms search endpoint
+	 *
+	 * @return MDMS Search URL
+	 */
+	private StringBuilder getMdmsSearchUrl() {
+		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
+	}
 }
