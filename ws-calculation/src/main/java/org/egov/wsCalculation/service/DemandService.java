@@ -1,6 +1,5 @@
 package org.egov.wsCalculation.service;
 
-import static org.egov.tlcalculator.utils.TLCalculatorConstants.MDMS_ROUNDOFF_TAXHEAD;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,8 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.tlcalculator.utils.TLCalculatorConstants;
-import org.egov.tlcalculator.web.models.tradelicense.TradeLicense;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.waterConnection.model.OwnerInfo;
@@ -223,55 +220,47 @@ public class DemandService {
      * @param calculations List of calculation object
      * @return Demands that are created
      */
-    private List<Demand> createDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
-        List<Demand> demands = new LinkedList<>();
-        for(Calculation calculation : calculations) {
-            TradeLicense license = null;
+	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations, Object mdmsData) {
+		List<Demand> demands = new LinkedList<>();
+		for (Calculation calculation : calculations) {
+			WaterConnection connection = null;
 
-            if(calculation.getTradeLicense()!=null)
-                license = calculation.getTradeLicense();
+			if (calculation.getWaterConnection() != null)
+				connection = calculation.getWaterConnection();
 
-            else if(calculation.getApplicationNumber()!=null)
-                license = utils.getTradeLicense(requestInfo, calculation.getApplicationNumber()
-                        , calculation.getTenantId());
+			else if (calculation != null)
+				license = utils.getTradeLicense(requestInfo, calculation.getApplicationNumber(),
+						calculation.getTenantId());
 
+			if (license == null)
+				throw new CustomException("INVALID APPLICATIONNUMBER",
+						"Demand cannot be generated for applicationNumber " + calculation.getServiceNumber()
+								+ " TradeLicense with this number does not exist ");
 
-            if (license == null)
-                throw new CustomException("INVALID APPLICATIONNUMBER", "Demand cannot be generated for applicationNumber " +
-                        calculation.getServiceNumber() + " TradeLicense with this number does not exist ");
+			String tenantId = calculation.getTenantId();
+			String consumerCode = calculation.getServiceNumber();
+			User owner = license.getTradeLicenseDetail().getOwners().get(0).toCommonUser();
 
-            String tenantId = calculation.getTenantId();
-            String consumerCode = calculation.getServiceNumber();
-            User owner = license.getTradeLicenseDetail().getOwners().get(0).toCommonUser();
+			List<DemandDetail> demandDetails = new LinkedList<>();
 
-            List<DemandDetail> demandDetails = new LinkedList<>();
+			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
+				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
+						.tenantId(tenantId).build());
+			});
 
-            calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
-                demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
-                        .taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode())
-                        .collectionAmount(BigDecimal.ZERO)
-                        .tenantId(tenantId)
-                        .build());
-            });
+			Map<String, Long> taxPeriods = mstrDataService.getTaxPeriods(requestInfo, mdmsData);
 
-             Map<String,Long> taxPeriods = mstrDataService.getTaxPeriods(requestInfo,mdmsData);
+			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 
-             addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
-
-             demands.add(Demand.builder()
-                    .consumerCode(consumerCode)
-                    .demandDetails(demandDetails)
-                    .payer(owner)
-                    .minimumAmountPayable(configs.getMinimumPayableAmount())
-                    .tenantId(tenantId)
-                    .taxPeriodFrom(taxPeriods.get(WSCalculationConstant.MDMS_STARTDATE))
-                    .taxPeriodTo(taxPeriods.get(WSCalculationConstant.MDMS_ENDDATE))
-                    .consumerType("water connection")
-                    .businessService(configs.getBusinessService())
-                    .build());
-        }
-        return demandRepository.saveDemand(requestInfo,demands);
-    }
+			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
+					.minimumAmountPayable(configs.getMinimumPayableAmount()).tenantId(tenantId)
+					.taxPeriodFrom(taxPeriods.get(WSCalculationConstant.MDMS_STARTDATE))
+					.taxPeriodTo(taxPeriods.get(WSCalculationConstant.MDMS_ENDDATE)).consumerType("water connection")
+					.businessService(configs.getBusinessService()).build());
+		}
+		return demandRepository.saveDemand(requestInfo, demands);
+	}
     
     
     

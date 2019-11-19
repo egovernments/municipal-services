@@ -155,7 +155,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
 				.rebate(rebate).fromDate(fromDate).toDate(toDate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).build();
+				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection()).build();
 	}
 
 }
