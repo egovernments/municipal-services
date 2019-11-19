@@ -173,10 +173,8 @@ public class EstimationService {
 		ObjectMapper mapper = new ObjectMapper();
 		List<BillingSlab> mappingBillingSlab;
 		try {
-			String str = billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER).toJSONString();
-			log.info(str);
 			mappingBillingSlab = mapper.readValue(
-					str,
+					billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER).toJSONString(),
 					mapper.getTypeFactory().constructCollectionType(List.class, BillingSlab.class));
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
@@ -186,7 +184,7 @@ public class EstimationService {
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
 		if (billingSlabs.size() > 1)
-			throw new CustomException("MOre than one Billing Slab are found on criteria ",
+			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
 		log.info(billingSlabs.get(0).toString());
 		if (isRangeCalculation("connectionAttribute")) {
