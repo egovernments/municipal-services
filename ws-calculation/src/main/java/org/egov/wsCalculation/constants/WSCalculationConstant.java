@@ -9,7 +9,6 @@ import org.egov.wsCalculation.model.DemandStatus;
 
 public class WSCalculationConstant {
 
-
 	public static final String TAXPERIOD_MASTER_KEY = "TAXPERIOD";
 
 	public static final String URL_PARAMS_SEPARATER = "?";
@@ -37,6 +36,12 @@ public class WSCalculationConstant {
 
 	public static final String FINANCIAL_YEAR_RANGE_FEILD_NAME = "finYearRange";
 
+	public static final String MDMS_STARTDATE = "startingDate";
+
+	public static final String MDMS_ENDDATE = "endingDate";
+	
+	 public static final String MDMS_ROUNDOFF_TAXHEAD= "WS_ROUNDOFF";
+
 	/*
 	 * Module names
 	 */
@@ -52,12 +57,11 @@ public class WSCalculationConstant {
 	public static final String DEMAND_ID_SEARCH_FIELD_NAME = "demandId=";
 
 	public static final String DEMAND_CANCELLED_STATUS = DemandStatus.CANCELLED.toString();
-	
+
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
-	
+
 	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND = "EG_WS_FINANCIAL_MASTER_NOT_FOUND";
 	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
-	
 
 	/*
 	 * queries
@@ -104,10 +108,9 @@ public class WSCalculationConstant {
 
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
-	
+
 	public static final String Assesment_Year = "assessmentYear";
-	
-	
+
 	/**
 	 * Time Taxes Config
 	 */
@@ -116,11 +119,11 @@ public class WSCalculationConstant {
 	public static final String WS_TIME_INTEREST = "WS_TIME_INTEREST";
 
 	public static final String WS_TIME_PENALTY = "WS_TIME_PENALTY";
-	
+
 	public static final String WS_WATER_CESS = "WS_WATER_CESS";
-	
+
 	public static final String WS_CHARGE = "WS_CHARGE";
-	
+
 	/**
 	 * data fields
 	 */
@@ -129,7 +132,7 @@ public class WSCalculationConstant {
 	public static final String ENDING_DATE_APPLICABLES = "endingDay";
 
 	public static final String STARTING_DATE_APPLICABLES = "startingDay";
-	
+
 	public static final String MAX_AMOUNT_FIELD_NAME = "maxAmount";
 
 	public static final String MIN_AMOUNT_FIELD_NAME = "minAmount";
@@ -137,7 +140,7 @@ public class WSCalculationConstant {
 	public static final String FLAT_AMOUNT_FIELD_NAME = "flatAmount";
 
 	public static final String RATE_FIELD_NAME = "rate";
-	
+
 	/*
 	 * bigdecimal values
 	 */
@@ -163,17 +166,17 @@ public class WSCalculationConstant {
 	public static final String WC_WATER_CESS_MASTER = "WaterCess";
 
 	public static final String WC_INTEREST_MASTER = "Interest";
-	
+
 	public static final String WC_BILLING_SLAB_MASTER = "WCBillingSlab";
 
 	public static final String CODE_FIELD_NAME = "code";
 
 	public static final List<String> WS_BASED_EXEMPTION_MASTERS = Collections
-	.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
-	
+			.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
+
 	public static final List<String> WS_BILLING_SLAB_MASTERS = Collections
 			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
-	
-    public static final Long TIMEZONE_OFFSET = 19800000l;
+
+	public static final Long TIMEZONE_OFFSET = 19800000l;
 
 }

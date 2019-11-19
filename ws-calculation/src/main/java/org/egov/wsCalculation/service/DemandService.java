@@ -43,6 +43,7 @@ import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxPeriod;
+import org.egov.wsCalculation.repository.DemandRepository;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -93,6 +94,9 @@ public class DemandService {
 	
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
+    
+	@Autowired
+	private DemandRepository demandRepository;
 
 	/*
 	 * Generates and persists the demand to billing service for the given water
@@ -176,7 +180,7 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the calculation request
      * @param calculations The Calculation Objects for which demand has to be generated or updated
      */
-    public Map<String, Calculation> generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
     	
     
 
@@ -237,7 +241,7 @@ public class DemandService {
                         calculation.getServiceNumber() + " TradeLicense with this number does not exist ");
 
             String tenantId = calculation.getTenantId();
-            String consumerCode = calculation.getServiceNumber()
+            String consumerCode = calculation.getServiceNumber();
             User owner = license.getTradeLicenseDetail().getOwners().get(0).toCommonUser();
 
             List<DemandDetail> demandDetails = new LinkedList<>();
@@ -250,7 +254,7 @@ public class DemandService {
                         .build());
             });
 
-             Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
+             Map<String,Long> taxPeriods = mstrDataService.getTaxPeriods(requestInfo,mdmsData);
 
              addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
 
@@ -260,9 +264,9 @@ public class DemandService {
                     .payer(owner)
                     .minimumAmountPayable(configs.getMinimumPayableAmount())
                     .tenantId(tenantId)
-                    .taxPeriodFrom(taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE))
-                    .taxPeriodTo(taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE))
-                    .consumerType("tradelicense")
+                    .taxPeriodFrom(taxPeriods.get(WSCalculationConstant.MDMS_STARTDATE))
+                    .taxPeriodTo(taxPeriods.get(WSCalculationConstant.MDMS_ENDDATE))
+                    .consumerType("water connection")
                     .businessService(configs.getBusinessService())
                     .build());
         }
@@ -365,7 +369,7 @@ public class DemandService {
         * Sum all taxHeads except RoundOff as new roundOff will be calculated
         * */
         for (DemandDetail demandDetail : demandDetails){
-            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(MDMS_ROUNDOFF_TAXHEAD))
+            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD))
                 totalTax = totalTax.add(demandDetail.getTaxAmount());
             else prevRoundOffDemandDetail = demandDetail;
         }
@@ -404,7 +408,7 @@ public class DemandService {
         if(roundOff.compareTo(BigDecimal.ZERO)!=0){
                  DemandDetail roundOffDemandDetail = DemandDetail.builder()
                     .taxAmount(roundOff)
-                    .taxHeadMasterCode(MDMS_ROUNDOFF_TAXHEAD)
+                    .taxHeadMasterCode(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD)
                     .tenantId(tenantId)
                     .collectionAmount(BigDecimal.ZERO)
                     .build();

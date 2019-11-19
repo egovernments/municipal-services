@@ -1,5 +1,7 @@
 package org.egov.wscalculation.config;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -70,7 +72,7 @@ public class WSCalculationConfiguration {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
 
-	// property demand configs
+	// water demand configs
 
 	@Value("${ws.module.code}")
 	private String wsModuleCode;
@@ -84,6 +86,9 @@ public class WSCalculationConfiguration {
 	
 	  @Value("${egov.demand.businessservice}")
 	    private String businessService;
+	  
+	  @Value("${egov.demand.minimum.payable.amount}")
+	    private BigDecimal minimumPayableAmount;
 	  
 	  
 
