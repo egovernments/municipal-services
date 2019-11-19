@@ -65,13 +65,13 @@ public class EstimationService {
 		for (CalculationCriteria criteria : criteriaList) {
 			WaterConnection waterConnection = criteria.getWaterConnection();
 
-			String assessmentNumber = waterConnection.getConnectionNo();
+			String applicationNo = waterConnection.getApplicationNo();
 			Map<String, List> estimatesAndBillingSlabs = null;
 			estimatesAndBillingSlabs = getEstimationMap(criteria, requestInfo);
 			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
 					estimatesAndBillingSlabs , masterMap);
-			calculation.setServiceNumber(assessmentNumber);
-			calculationWaterMap.put(assessmentNumber, calculation);
+			calculation.setApplicationNO(applicationNo);
+			calculationWaterMap.put(applicationNo, calculation);
 		}
 		return calculationWaterMap;
 	}

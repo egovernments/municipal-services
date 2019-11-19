@@ -10,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,7 +19,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
@@ -28,7 +26,6 @@ import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.Bill;
 import org.egov.wsCalculation.model.BillResponse;
 import org.egov.wsCalculation.model.Calculation;
-import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandDetail;
@@ -46,7 +43,6 @@ import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,8 +54,6 @@ import net.minidev.json.JSONArray;
 @Slf4j
 public class DemandService {
 
-	@Autowired
-	private WSCalculationService wSCalculationService;
 
 	@Autowired
 	private ServiceRequestRepository repository;
@@ -81,9 +75,6 @@ public class DemandService {
 
 	@Autowired
 	private WSCalculationConfiguration configs;
-
-	@Autowired
-	private RestTemplate restTemplate;
 
 	@Autowired
 	private EstimationService estimationService;
@@ -137,12 +128,12 @@ public class DemandService {
 
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
-			Set<String> serviceNumbers = calculations.stream().map(calculation -> calculation.getServiceNumber())
+			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getApplicationNO())
 					.collect(Collectors.toSet());
 			// Set<String> applicationNumbers =
 			// calculations.stream().map(calculation ->
 			// calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
-			List<Demand> demands = searchDemand(tenantId, serviceNumbers, requestInfo);
+			List<Demand> demands = searchDemand(tenantId, consumerCodes, requestInfo);
 			Set<String> applicationNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -151,7 +142,7 @@ public class DemandService {
 			// If demand already exists add it updateCalculations else
 			// createCalculations
 			for (Calculation calculation : calculations) {
-				if (!applicationNumbersFromDemands.contains(calculation.getServiceNumber()))
+				if (!applicationNumbersFromDemands.contains(calculation.getApplicationNO()))
 					createCalculations.add(calculation);
 				else
 					updateCalculations.add(calculation);
@@ -177,8 +168,8 @@ public class DemandService {
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
 		List<Demand> demands = new LinkedList<>();
-
 		String assessmentYear = "2019-20";
+
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = null;
 
@@ -197,7 +188,7 @@ public class DemandService {
 								+ " Water Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
-			String consumerCode = calculation.getServiceNumber();
+			String consumerCode = calculation.getApplicationNO();
 			User owner = requestInfo.getUserInfo();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();

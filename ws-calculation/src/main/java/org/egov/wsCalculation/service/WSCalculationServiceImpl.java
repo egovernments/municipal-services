@@ -70,7 +70,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
 
 		@SuppressWarnings("unchecked")
-		List<org.egov.wsCalculation.model.TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
+		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 
@@ -95,7 +95,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory));
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
-		BigDecimal meterServiceCharge = BigDecimal.ZERO;
+		BigDecimal waterCharge = BigDecimal.ZERO;
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal exemption = BigDecimal.ZERO;
 		BigDecimal rebate = BigDecimal.ZERO;
@@ -108,7 +108,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			switch (category) {
 
 			case CHARGES:
-				meterServiceCharge = meterServiceCharge.add(estimate.getEstimateAmount());
+				waterCharge = waterCharge.add(estimate.getEstimateAmount());
                 break;
 				
 			case PENALTY:
@@ -128,7 +128,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				break;
 			}
 		}
-		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(meterServiceCharge),
+		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(waterCharge),
 				rebate.add(exemption));
 		if (null != decimalEstimate) {
 			decimalEstimate.setCategory(taxHeadCategoryMap.get(decimalEstimate.getTaxHeadCode()));
@@ -139,7 +139,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				rebate = rebate.add(decimalEstimate.getEstimateAmount());
 		}
 
-		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(meterServiceCharge);
+		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(waterCharge);
 		// // false in the argument represents that the demand shouldn't be updated from
 		// // this call
 		// BigDecimal collectedAmtForOldDemand =
@@ -155,7 +155,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
 				.rebate(rebate).fromDate(fromDate).toDate(toDate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection()).build();
+				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection()).applicationNO(criteria.getWaterConnection().getApplicationNo()).build();
 	}
 
 }
