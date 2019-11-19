@@ -1,20 +1,28 @@
 package org.egov.wsCalculation.service;
 
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.MDMS_ROUNDOFF_TAXHEAD;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.tlcalculator.utils.TLCalculatorConstants;
+import org.egov.tlcalculator.web.models.tradelicense.TradeLicense;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.waterConnection.model.OwnerInfo;
@@ -35,6 +43,7 @@ import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxPeriod;
+import org.egov.wsCalculation.repository.DemandRepository;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -82,6 +91,12 @@ public class DemandService {
 
 	@Autowired
 	private EstimationService estimationService;
+	
+    @Autowired
+    private ServiceRequestRepository serviceRequestRepository;
+    
+	@Autowired
+	private DemandRepository demandRepository;
 
 	/*
 	 * Generates and persists the demand to billing service for the given water
@@ -104,58 +119,357 @@ public class DemandService {
 		Map<String, String> consumerCodeFinYearMap = new HashMap<>();
 
 		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
-		for (CalculationCriteria criteria : criterias) {
-
-			WaterConnection waterConnection = criteria.getWaterConnection();
-
-			String assessmentNumber = waterConnection.getConnectionNo();
-
-			// ws_tax for the new assessment
-			BigDecimal newTax = BigDecimal.ZERO;
-			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = waterCalculationMap.get(assessmentNumber)
-					.getTaxHeadEstimates().stream()
-					.filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(WSCalculationConstant.WS_TAX))
-					.findAny();
-			if (advanceCarryforwardEstimate.isPresent())
-				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
-
-			// true represents that the demand should be updated from this call
-			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
-					request.getRequestInfo(), true);
-
-			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
-
-				Demand demand = prepareDemand(waterConnection,
-						waterCalculationMap.get(waterConnection.getConnectionNo()), request.getRequestInfo());
-
-				demands.add(demand);
-				consumerCodeFinYearMap.put(demand.getConsumerCode(), "2019-20");
-
-			} else {
-				lesserAssessments.add(assessmentNumber);
-			}
-		}
-
-		if (!CollectionUtils.isEmpty(lesserAssessments)) {
-			throw new CustomException(WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR,
-					WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG + lesserAssessments);
-		}
-
-		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
-		String url = new StringBuilder().append(configs.getBillingServiceHost())
-				.append(configs.getDemandCreateEndPoint()).toString();
-		DemandResponse res = new DemandResponse();
-
-		try {
-			res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
-
-		} catch (HttpClientErrorException e) {
-			throw new ServiceCallException(e.getResponseBodyAsString());
-		}
-		log.info(" The demand Response is : " + res);
+		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
+		generateDemand(request.getRequestInfo(), calculationList, null);
+//		for (CalculationCriteria criteria : criterias) {
+//
+//			WaterConnection waterConnection = criteria.getWaterConnection();
+//
+//			String assessmentNumber = waterConnection.getConnectionNo();
+//
+//			// ws_tax for the new assessment
+//			BigDecimal newTax = BigDecimal.ZERO;
+//			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = waterCalculationMap.get(assessmentNumber)
+//					.getTaxHeadEstimates().stream()
+//					.filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(WSCalculationConstant.WS_TAX))
+//					.findAny();
+//			if (advanceCarryforwardEstimate.isPresent())
+//				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
+//
+//			// true represents that the demand should be updated from this call
+//			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
+//					request.getRequestInfo(), true);
+//
+//			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
+//
+//				Demand demand = prepareDemand(waterConnection,
+//						waterCalculationMap.get(waterConnection.getConnectionNo()), request.getRequestInfo());
+//
+//				demands.add(demand);
+//				consumerCodeFinYearMap.put(demand.getConsumerCode(), "2019-20");
+//
+//			} else {
+//				lesserAssessments.add(assessmentNumber);
+//			}
+//		}
+//
+//		if (!CollectionUtils.isEmpty(lesserAssessments)) {
+//			throw new CustomException(WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR,
+//					WSCalculationConstant.EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG + lesserAssessments);
+//		}
+//
+//		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
+//		String url = new StringBuilder().append(configs.getBillingServiceHost())
+//				.append(configs.getDemandCreateEndPoint()).toString();
+//		DemandResponse res = new DemandResponse();
+//
+//		try {
+//			res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
+//
+//		} catch (HttpClientErrorException e) {
+//			throw new ServiceCallException(e.getResponseBodyAsString());
+//		}
+		//log.info(" The demand Response is : " + res);
 		//assessmentService.saveAssessments(res.getDemands(), consumerCodeFinYearMap, request.getRequestInfo());
 		return waterCalculationMap;
 	}
+	
+	
+	  /**
+     * Creates or updates Demand
+     * @param requestInfo The RequestInfo of the calculation request
+     * @param calculations The Calculation Objects for which demand has to be generated or updated
+     */
+    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    	
+    
+
+        //List that will contain Calculation for new demands
+        List<Calculation> createCalculations = new LinkedList<>();
+
+        //List that will contain Calculation for old demands
+        List<Calculation> updateCalculations = new LinkedList<>();
+
+        if(!CollectionUtils.isEmpty(calculations)){
+
+            //Collect required parameters for demand search
+            String tenantId = calculations.get(0).getTenantId();
+            Set<String> serviceNumbers = calculations.stream().map(calculation -> calculation.getServiceNumber()).collect(Collectors.toSet());
+//            Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
+            List<Demand> demands = searchDemand(tenantId,serviceNumbers,requestInfo);
+            Set<String> applicationNumbersFromDemands = new HashSet<>();
+            if(!CollectionUtils.isEmpty(demands))
+                applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
+
+            //If demand already exists add it updateCalculations else createCalculations
+            for(Calculation calculation : calculations)
+            {      if(!applicationNumbersFromDemands.contains(calculation.getServiceNumber()))
+                        createCalculations.add(calculation);
+                    else
+                        updateCalculations.add(calculation);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(createCalculations))
+            createDemand(requestInfo,createCalculations,mdmsData);
+
+        if(!CollectionUtils.isEmpty(updateCalculations))
+            updateDemand(requestInfo,updateCalculations);
+    }
+    
+    /**
+     * Creates demand for the given list of calculations
+     * @param requestInfo The RequestInfo of the calculation request
+     * @param calculations List of calculation object
+     * @return Demands that are created
+     */
+    private List<Demand> createDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+        List<Demand> demands = new LinkedList<>();
+        for(Calculation calculation : calculations) {
+            TradeLicense license = null;
+
+            if(calculation.getTradeLicense()!=null)
+                license = calculation.getTradeLicense();
+
+            else if(calculation.getApplicationNumber()!=null)
+                license = utils.getTradeLicense(requestInfo, calculation.getApplicationNumber()
+                        , calculation.getTenantId());
+
+
+            if (license == null)
+                throw new CustomException("INVALID APPLICATIONNUMBER", "Demand cannot be generated for applicationNumber " +
+                        calculation.getServiceNumber() + " TradeLicense with this number does not exist ");
+
+            String tenantId = calculation.getTenantId();
+            String consumerCode = calculation.getServiceNumber();
+            User owner = license.getTradeLicenseDetail().getOwners().get(0).toCommonUser();
+
+            List<DemandDetail> demandDetails = new LinkedList<>();
+
+            calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
+                demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+                        .taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode())
+                        .collectionAmount(BigDecimal.ZERO)
+                        .tenantId(tenantId)
+                        .build());
+            });
+
+             Map<String,Long> taxPeriods = mstrDataService.getTaxPeriods(requestInfo,mdmsData);
+
+             addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
+
+             demands.add(Demand.builder()
+                    .consumerCode(consumerCode)
+                    .demandDetails(demandDetails)
+                    .payer(owner)
+                    .minimumAmountPayable(configs.getMinimumPayableAmount())
+                    .tenantId(tenantId)
+                    .taxPeriodFrom(taxPeriods.get(WSCalculationConstant.MDMS_STARTDATE))
+                    .taxPeriodTo(taxPeriods.get(WSCalculationConstant.MDMS_ENDDATE))
+                    .consumerType("water connection")
+                    .businessService(configs.getBusinessService())
+                    .build());
+        }
+        return demandRepository.saveDemand(requestInfo,demands);
+    }
+    
+    
+    
+    /**
+     * Updates demand for the given list of calculations
+     * @param requestInfo The RequestInfo of the calculation request
+     * @param calculations List of calculation object
+     * @return Demands that are updated
+     */
+    private List<Demand> updateDemand(RequestInfo requestInfo,List<Calculation> calculations){
+        List<Demand> demands = new LinkedList<>();
+        for(Calculation calculation : calculations) {
+
+            List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getTradeLicense().getApplicationNumber())
+                    , requestInfo);
+
+            if(CollectionUtils.isEmpty(searchResult))
+                throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getTradeLicense().getApplicationNumber());
+
+            Demand demand = searchResult.get(0);
+            List<DemandDetail> demandDetails = demand.getDemandDetails();
+            List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation,demandDetails);
+            demand.setDemandDetails(updatedDemandDetails);
+            demands.add(demand);
+        }
+         return demandRepository.updateDemand(requestInfo,demands);
+    }
+    
+    /**
+     * Returns the list of new DemandDetail to be added for updating the demand
+     * @param calculation The calculation object for the update tequest
+     * @param demandDetails The list of demandDetails from the existing demand
+     * @return The list of new DemandDetails
+     */
+    private List<DemandDetail> getUpdatedDemandDetails(Calculation calculation, List<DemandDetail> demandDetails){
+
+        List<DemandDetail> newDemandDetails = new ArrayList<>();
+        Map<String, List<DemandDetail>> taxHeadToDemandDetail = new HashMap<>();
+
+        demandDetails.forEach(demandDetail -> {
+            if(!taxHeadToDemandDetail.containsKey(demandDetail.getTaxHeadMasterCode())){
+                List<DemandDetail> demandDetailList = new LinkedList<>();
+                demandDetailList.add(demandDetail);
+                taxHeadToDemandDetail.put(demandDetail.getTaxHeadMasterCode(),demandDetailList);
+            }
+            else
+              taxHeadToDemandDetail.get(demandDetail.getTaxHeadMasterCode()).add(demandDetail);
+        });
+
+        BigDecimal diffInTaxAmount;
+        List<DemandDetail> demandDetailList;
+        BigDecimal total;
+
+        for(TaxHeadEstimate taxHeadEstimate : calculation.getTaxHeadEstimates()){
+            if(!taxHeadToDemandDetail.containsKey(taxHeadEstimate.getTaxHeadCode()))
+                newDemandDetails.add(
+                        DemandDetail.builder()
+                                .taxAmount(taxHeadEstimate.getEstimateAmount())
+                                .taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode())
+                                .tenantId(calculation.getTenantId())
+                                .collectionAmount(BigDecimal.ZERO)
+                                .build());
+            else {
+                 demandDetailList = taxHeadToDemandDetail.get(taxHeadEstimate.getTaxHeadCode());
+                 total = demandDetailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                 diffInTaxAmount = taxHeadEstimate.getEstimateAmount().subtract(total);
+                 if(diffInTaxAmount.compareTo(BigDecimal.ZERO)!=0) {
+                     newDemandDetails.add(
+                             DemandDetail.builder()
+                                     .taxAmount(diffInTaxAmount)
+                                     .taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode())
+                                     .tenantId(calculation.getTenantId())
+                                     .collectionAmount(BigDecimal.ZERO)
+                                     .build());
+                 }
+            }
+        }
+        List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
+        combinedBillDetials.addAll(newDemandDetails);
+        addRoundOffTaxHead(calculation.getTenantId(),combinedBillDetials);
+        return combinedBillDetials;
+    }
+    
+    /**
+     * Adds roundOff taxHead if decimal values exists
+     * @param tenantId The tenantId of the demand
+     * @param demandDetails The list of demandDetail
+     */
+    private void addRoundOffTaxHead(String tenantId,List<DemandDetail> demandDetails){
+        BigDecimal totalTax = BigDecimal.ZERO;
+
+        DemandDetail prevRoundOffDemandDetail = null;
+
+        /*
+        * Sum all taxHeads except RoundOff as new roundOff will be calculated
+        * */
+        for (DemandDetail demandDetail : demandDetails){
+            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD))
+                totalTax = totalTax.add(demandDetail.getTaxAmount());
+            else prevRoundOffDemandDetail = demandDetail;
+        }
+
+        BigDecimal decimalValue = totalTax.remainder(BigDecimal.ONE);
+        BigDecimal midVal = new BigDecimal(0.5);
+        BigDecimal roundOff = BigDecimal.ZERO;
+
+        /*
+        * If the decimal amount is greater than 0.5 we subtract it from 1 and put it as roundOff taxHead
+        * so as to nullify the decimal eg: If the tax is 12.64 we will add extra tax roundOff taxHead
+        * of 0.36 so that the total becomes 13
+        * */
+        if(decimalValue.compareTo(midVal) > 0)
+            roundOff = BigDecimal.ONE.subtract(decimalValue);
+
+
+        /*
+         * If the decimal amount is less than 0.5 we put negative of it as roundOff taxHead
+         * so as to nullify the decimal eg: If the tax is 12.36 we will add extra tax roundOff taxHead
+         * of -0.36 so that the total becomes 12
+         * */
+        if(decimalValue.compareTo(midVal) < 0)
+            roundOff = decimalValue.negate();
+
+        /*
+        * If roundOff already exists in previous demand create a new roundOff taxHead with roundOff amount
+        * equal to difference between them so that it will be balanced when bill is generated. eg: If the
+        * previous roundOff amount was of -0.36 and the new roundOff excluding the previous roundOff is
+        * 0.2 then the new roundOff will be created with 0.2 so that the net roundOff will be 0.2 -(-0.36)
+        * */
+        if(prevRoundOffDemandDetail!=null){
+            roundOff = roundOff.subtract(prevRoundOffDemandDetail.getTaxAmount());
+        }
+
+        if(roundOff.compareTo(BigDecimal.ZERO)!=0){
+                 DemandDetail roundOffDemandDetail = DemandDetail.builder()
+                    .taxAmount(roundOff)
+                    .taxHeadMasterCode(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD)
+                    .tenantId(tenantId)
+                    .collectionAmount(BigDecimal.ZERO)
+                    .build();
+
+            demandDetails.add(roundOffDemandDetail);
+        }
+    }
+    
+    
+    
+    
+
+    /**
+     * Searches demand for the given consumerCode and tenantIDd
+     * @param tenantId The tenantId of the tradeLicense
+     * @param consumerCodes The set of consumerCode of the demands
+     * @param requestInfo The RequestInfo of the incoming request
+     * @return Lis to demands for the given consumerCode
+     */
+    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo){
+        String uri = getDemandSearchURL();
+        uri = uri.replace("{1}",tenantId);
+        uri = uri.replace("{2}",configs.getBusinessService());
+        uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
+
+        Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
+                                                      .requestInfo(requestInfo).build());
+
+        DemandResponse response;
+        try {
+             response = mapper.convertValue(result,DemandResponse.class);
+        }
+        catch (IllegalArgumentException e){
+            throw new CustomException("PARSING ERROR","Failed to parse response from Demand Search");
+        }
+
+        if(CollectionUtils.isEmpty(response.getDemands()))
+            return null;
+
+        else return response.getDemands();
+
+    }
+    
+    /**
+     * Creates demand Search url based on tenanatId,businessService and ConsumerCode
+     * @return demand search url
+     */
+    public String getDemandSearchURL(){
+        StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
+        url.append(configs.getDemandSearchEndPoint());
+        url.append("?");
+        url.append("tenantId=");
+        url.append("{1}");
+        url.append("&");
+        url.append("businessService=");
+        url.append("{2}");
+        url.append("&");
+        url.append("consumerCode=");
+        url.append("{3}");
+        return url.toString();
+    }
 
 	/**
 	 * if any previous assessments and demands associated with it exists for the

@@ -333,4 +333,30 @@ public class MasterDataService {
 		return currentApplicable;
 	}
 
+	
+	
+
+    /**
+     * Gets the startDate and the endDate of the financialYear
+     * @param requestInfo The RequestInfo of the calculationRequest
+     * @param license The water connection for which calculation is done
+     * @return Map containing the startDate and endDate
+     */
+    public Map<String,Long> getTaxPeriods(RequestInfo requestInfo,Object mdmsData){
+        Map<String,Long> taxPeriods = new HashMap<>();
+        try {
+            String jsonPath = WSCalculationConstant.MDMS_FINACIALYEAR_PATH.replace("{}","2019-20");
+            List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
+            Map<String,Object> financialYearProperties = jsonOutput.get(0);
+            Object startDate = financialYearProperties.get(WSCalculationConstant.MDMS_STARTDATE);
+            Object endDate = financialYearProperties.get(WSCalculationConstant.MDMS_ENDDATE);
+            taxPeriods.put(WSCalculationConstant.MDMS_STARTDATE,(Long) startDate);
+            taxPeriods.put(WSCalculationConstant.MDMS_ENDDATE,(Long) endDate);
+
+        } catch (Exception e) {
+           
+            throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+"2019-20");
+        }
+        return taxPeriods;
+    }
 }
