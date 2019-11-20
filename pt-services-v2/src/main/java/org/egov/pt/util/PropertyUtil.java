@@ -1,5 +1,12 @@
 package org.egov.pt.util;
 
+import static org.egov.pt.util.PTConstants.NOTIFICATION_LOCALE;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -7,15 +14,10 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.web.models.AuditDetails;
-import org.egov.pt.web.models.Property;
+import org.egov.pt.models.AuditDetails;
+import org.egov.pt.models.Property;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.util.*;
-
-import static org.egov.pt.util.PTConstants.NOTIFICATION_LOCALE;
 
 @Component
 public class PropertyUtil {
@@ -34,6 +36,7 @@ public class PropertyUtil {
      * @return AuditDetails
      */
     public AuditDetails getAuditDetails(String by, Boolean isCreate) {
+    	
         Long time = System.currentTimeMillis();
         if(isCreate)
             return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time).build();
@@ -44,7 +47,6 @@ public class PropertyUtil {
     public MdmsCriteriaReq prepareMdMsRequest(String tenantId,String moduleName, List<String> names, String filter, RequestInfo requestInfo) {
 
         List<MasterDetail> masterDetails = new ArrayList<>();
-        MasterDetail masterDetail;
 
         names.forEach(name -> {
             masterDetails.add(MasterDetail.builder().name(name).filter(filter).build());
@@ -59,15 +61,13 @@ public class PropertyUtil {
     }
 
 
-    public void addAddressIds(List<Property> responseProperties,List<Property> requestProperties){
-        Map<String,String > propertyIdToAddressId = new HashMap<>();
-        responseProperties.forEach(property -> {
-            propertyIdToAddressId.put(property.getPropertyId(),property.getAddress().getId());
-        });
-        requestProperties.forEach(property -> {
-            property.getAddress().setId(propertyIdToAddressId.get(property.getPropertyId()));
-        });
-    }
+	public void addAddressIds(List<Property> responseProperties, Property requestProperty) {
+
+		Map<String, String> propIdToAddrId = responseProperties.stream()
+				.collect(Collectors.toMap(Property::getId, prop -> prop.getAddress().getAddressId()));
+
+		requestProperty.getAddress().setAddressId(propIdToAddrId.get(requestProperty.getPropertyId()));
+	}
 
 
     /**

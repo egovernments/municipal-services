@@ -1,10 +1,11 @@
 package org.egov.pt.repository.builder;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.web.models.PropertyCriteria;
+import org.egov.pt.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -17,6 +18,8 @@ public class PropertyQueryBuilder {
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String LEFT_OUTER_JOIN_STRING = "LEFT OUTER JOIN";
+	
+	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where id IN ";
 
 	private static final String QUERY = "SELECT pt.*,ptdl.*,address.*,owner.*,doc.*,unit.*,insti.*,"
 			+ " pt.propertyid as propertyid,ptdl.assessmentnumber as propertydetailid,doc.id as documentid,unit.id as unitid,"
@@ -39,7 +42,7 @@ public class PropertyQueryBuilder {
 			+ LEFT_OUTER_JOIN_STRING + " eg_pt_institution_v2 insti ON ptdl.assessmentnumber=insti.propertydetail "
 			+ " WHERE ";
 
-	private static final String LIKE_QUERY = "SELECT pt.*,ptdl.*,address.*,owner.*,doc.*,unit.*,insti.*,"
+	private static final String  LIKE_QUERY = "SELECT pt.*,ptdl.*,address.*,owner.*,doc.*,unit.*,insti.*,"
 			+ " pt.propertyid as propid,ptdl.assessmentnumber as propertydetailid,doc.id as documentid,unit.id as unitid,"
 			+ "address.id as addresskeyid,insti.id as instiid,pt.additionalDetails as pt_additionalDetails,"
 			+ "ownerdoc.id as ownerdocid,ownerdoc.documenttype as ownerdocType,ownerdoc.filestore as ownerfileStore,"
@@ -109,31 +112,14 @@ public class PropertyQueryBuilder {
 
 		StringBuilder builder = new StringBuilder(QUERY);
 
-		Set<String> statuses = new HashSet<>();
-		criteria.getStatuses().forEach(statusEnum -> {
-			statuses.add(statusEnum.toString());
-		});
-		if (!CollectionUtils.isEmpty(statuses)) {
-			builder.append(" pt.status IN (").append(createQuery(statuses)).append(")");
-			addToPreparedStatement(preparedStmtList, statuses);
-		}
-
-		if (criteria.getAccountId() != null) {
-			builder.append(" and ptdl.accountid = ? ");
-			preparedStmtList.add(criteria.getAccountId());
-			return builder.toString();
-		}
-		
-		if (criteria.getPropertyDetailStatus() != null) {
-			builder.append(" and ptdl.status = ? ");
-			preparedStmtList.add(criteria.getPropertyDetailStatus());
-			return builder.toString();
-		}else {
-			builder.append(" and ptdl.status = 'ACTIVE' ");
-		}
-
 		builder.append(" and pt.tenantid=? ");
 		preparedStmtList.add(criteria.getTenantId());
+		
+		if (null != criteria.getStatus()) {
+			
+			builder.append(" pt.status = ?");
+			preparedStmtList.add(criteria.getStatus());
+		}
 
 		Set<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
@@ -149,59 +135,18 @@ public class PropertyQueryBuilder {
 			addToPreparedStatement(preparedStmtList, oldpropertyids);
 		}
 
-		Set<String> propertyDetailids = criteria.getPropertyDetailids();
-		if (!CollectionUtils.isEmpty(propertyDetailids)) {
-
-			builder.append("and ptdl.assessmentnumber IN (").append(createQuery(propertyDetailids)).append(")");
-			addToPreparedStatement(preparedStmtList, propertyDetailids);
-		}
-
-		Set<String> addressids = criteria.getAddressids();
-		if (!CollectionUtils.isEmpty(addressids)) {
-
-			builder.append("and address.id IN (").append(createQuery(addressids)).append(")");
-			addToPreparedStatement(preparedStmtList, addressids);
-		}
-
-		Set<String> ownerids = criteria.getOwnerids();
-		if (!CollectionUtils.isEmpty(ownerids)) {
-
-			builder.append("and owner.userid IN (").append(createQuery(ownerids)).append(")");
-			addToPreparedStatement(preparedStmtList, ownerids);
-		}
-
-		Set<String> unitids = criteria.getUnitids();
-		if (!CollectionUtils.isEmpty(unitids)) {
-
-			builder.append("and unit.id IN (").append(createQuery(unitids)).append(")");
-			addToPreparedStatement(preparedStmtList, unitids);
-		}
-
-		Set<String> documentids = criteria.getDocumentids();
-		if (!CollectionUtils.isEmpty(documentids)) {
-
-			builder.append("and doc.id IN (").append(createQuery(documentids)).append(")");
-			addToPreparedStatement(preparedStmtList, documentids);
-		}
-
-		if (criteria.getDoorNo() != null && criteria.getLocality() != null) {
-			builder.append(" and address.doorno = ? ").append(" and address.locality = ? ");
-			preparedStmtList.add(criteria.getDoorNo());
-			preparedStmtList.add(criteria.getLocality());
-		}
-
 		return builder.toString();
 	}
 
-	/*
-	 * private String createQuery(Set<String> ids) {
-	 * 
-	 * final String quotes = "'"; final String comma = ","; StringBuilder builder =
-	 * new StringBuilder(); Iterator<String> iterator = ids.iterator();
-	 * while(iterator.hasNext()) {
-	 * builder.append(quotes).append(iterator.next()).append(quotes);
-	 * if(iterator.hasNext()) builder.append(comma); } return builder.toString(); }
-	 */
+	public String getPropertyIdsQuery(Set<String> ownerIds, List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder(PROEPRTY_ID_QUERY);
+		query.append("(");
+		createQuery(ownerIds);
+		addToPreparedStatement(preparedStmtList, ownerIds);
+		query.append(")");
+		return query.toString();
+	}
 
 	private String createQuery(Set<String> ids) {
 		StringBuilder builder = new StringBuilder();

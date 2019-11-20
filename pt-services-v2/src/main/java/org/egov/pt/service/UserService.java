@@ -1,21 +1,35 @@
 package org.egov.pt.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
+import org.egov.common.contract.request.Role;
+import org.egov.pt.models.OwnerInfo;
+import org.egov.pt.models.Property;
+import org.egov.pt.models.user.CreateUserRequest;
+import org.egov.pt.models.user.UserDetailResponse;
+import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.repository.ServiceRequestRepository;
-import org.egov.pt.web.models.*;
+import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -47,48 +61,55 @@ public class UserService {
      * @param request PropertyRequest received for creating properties
      */
     public void createUser(PropertyRequest request){
-        List<Property> properties = request.getProperties();
-        RequestInfo requestInfo = request.getRequestInfo();
-        Role role = getCitizenRole();
-        properties.forEach(property -> {
-            property.getPropertyDetails().forEach(propertyDetail -> {
-                // Fetches the unique mobileNumbers from all the owners
-                Set<String> listOfMobileNumbers = getMobileNumbers(propertyDetail,requestInfo,property.getTenantId());
-                propertyDetail.getOwners().forEach(owner -> {
-                        addUserDefaultFields(property.getTenantId(),role,owner);
-                        // Checks if the user is already present based on name of the owner and mobileNumber
-                        UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
-                        // If user not present new user is created
-                        if(CollectionUtils.isEmpty(userDetailResponse.getUser()))
-                        {   /* Sets userName equal to mobileNumber if mobileNumber already assigned as username
-                          random number is assigned as username */
-                            StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
-                            setUserName(owner,listOfMobileNumbers);
+    	
+        Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+		Role role = getCitizenRole();
+		Set<String> listOfMobileNumbers = getMobileNumbers(property, requestInfo, property.getTenantId());
 
-                            userDetailResponse = userCall(new CreateUserRequest(requestInfo,owner),uri);
-                            if(userDetailResponse.getUser().get(0).getUuid()==null){
-                                throw new CustomException("INVALID USER RESPONSE","The user created has uuid as null");
-                            }
-                        }
-                        else
-                        {
-                          owner.setId(userDetailResponse.getUser().get(0).getId());
-                          owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-                          addUserDefaultFields(property.getTenantId(),role,owner);
+		property.getOwners().forEach(owner -> {
 
-                          StringBuilder uri = new StringBuilder(userHost).append(userContextPath)
-                                              .append(userUpdateEndpoint);
-                          userDetailResponse = userCall( new CreateUserRequest(requestInfo,owner),uri);
-                            if(userDetailResponse.getUser().get(0).getUuid()==null){
-                                throw new CustomException("INVALID USER RESPONSE","The user updated has uuid as null");
-                            }
-                        }
-                        // Assigns value of fields from user got from userDetailResponse to owner object
-                        setOwnerFields(owner,userDetailResponse,requestInfo);
-                });
-            });
-        });
-    }
+			addUserDefaultFields(property.getTenantId(), role, owner);
+			UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
+
+			if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
+				
+				/*
+				 * Sets userName equal to mobileNumber if mobileNumber already
+				 * assigned as user-name random number is assigned as user-name
+				 */
+				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
+				setUserName(owner, listOfMobileNumbers);
+
+				CreateUserRequest userRequest = CreateUserRequest.builder()
+						.requestInfo(requestInfo)
+						.user(owner)
+						.build();
+
+				userDetailResponse = userCall(userRequest, uri);
+				
+				if (ObjectUtils.isEmpty(userDetailResponse)) {
+
+					throw new CustomException("INVALID USER RESPONSE",
+							"The user create has failed for the mobileNumber : " + owner.getUserName());
+				}
+				
+			} else {
+
+				owner.setId(userDetailResponse.getUser().get(0).getId());
+				owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
+				addUserDefaultFields(property.getTenantId(), role, owner);
+
+				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
+				userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+				if (userDetailResponse.getUser().get(0).getUuid() == null) {
+					throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
+				}
+			}
+			// Assigns value of fields from user got from userDetailResponse to owner object
+			setOwnerFields(owner, userDetailResponse, requestInfo);
+		});
+	}
 
 
     /**
@@ -97,7 +118,8 @@ public class UserService {
      * @param role The role of the user set in this case to CITIZEN
      * @param owner The user whose fields are to be set
      */
-    private void addUserDefaultFields(String tenantId,Role role,OwnerInfo owner){
+    private void addUserDefaultFields(String tenantId,Role role, OwnerInfo owner){
+    	
         owner.setActive(true);
         owner.setTenantId(tenantId);
         owner.setRoles(Collections.singletonList(role));
@@ -108,12 +130,13 @@ public class UserService {
         owner.setLastModifiedBy(null );
     }
 
-    private Role getCitizenRole(){
-        Role role = new Role();
-        role.setCode("CITIZEN");
-        role.setName("Citizen");
-        return role;
-    }
+    private Role getCitizenRole() {
+    	
+		return Role.builder()
+				.code("CITIZEN")
+				.name("Citizen")
+				.build();
+	}
 
     /**
      * Searches if the owner is already created. Search is based on name of owner, uuid and mobileNumber
@@ -121,16 +144,13 @@ public class UserService {
      * @param requestInfo RequestInfo from the propertyRequest
      * @return UserDetailResponse containing the user if present and the responseInfo
      */
-    private UserDetailResponse userExists(OwnerInfo owner,RequestInfo requestInfo){
-        UserSearchRequest userSearchRequest =new UserSearchRequest();
-        userSearchRequest.setTenantId(owner.getTenantId());
-        userSearchRequest.setMobileNumber(owner.getMobileNumber());
-        userSearchRequest.setName(owner.getName());
-        userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setActive(true);
-        userSearchRequest.setUserType(owner.getType());
-        /*if(owner.getUuid()!=null)
-            userSearchRequest.setUuid(Collections.singletonList(owner.getUuid()));*/
+	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
+
+		UserSearchRequest userSearchRequest = getBaseUserSearchRequest(owner.getTenantId(), requestInfo);
+		userSearchRequest.setMobileNumber(owner.getMobileNumber());
+		userSearchRequest.setUserType(owner.getType());
+		userSearchRequest.setName(owner.getName());
+		
         StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
         return userCall(userSearchRequest,uri);
     }
@@ -142,6 +162,7 @@ public class UserService {
      * @param listOfMobileNumber list of unique mobileNumbers in the propertyRequest
      */
     private void setUserName(OwnerInfo owner,Set<String> listOfMobileNumber){
+    	
         if(listOfMobileNumber.contains(owner.getMobileNumber())){
             owner.setUserName(owner.getMobileNumber());
             // Once mobileNumber is set as userName it is removed from the list
@@ -155,21 +176,26 @@ public class UserService {
 
     /**
      * Fetches all the unique mobileNumbers from a propertyDetail
-     * @param propertyDetail whose unique mobileNumbers are needed to be fetched
+     * @param property whose unique mobileNumbers are needed to be fetched
      * @return list of all unique mobileNumbers in the given propertyDetail
      */
-     private Set<String> getMobileNumbers(PropertyDetail propertyDetail,RequestInfo requestInfo,String tenantId){
-        Set<String> listOfMobileNumbers = new HashSet<>();
-        propertyDetail.getOwners().forEach(owner -> {listOfMobileNumbers.add(owner.getMobileNumber());});
+     private Set<String> getMobileNumbers(Property property,RequestInfo requestInfo,String tenantId){
+    	 
+		Set<String> listOfMobileNumbers = property.getOwners().stream().map(OwnerInfo::getMobileNumber)
+				.collect(Collectors.toSet());
         StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
-        UserSearchRequest userSearchRequest = new UserSearchRequest();
-        userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setTenantId(tenantId);
-        // Should this be hardcoded?
-        userSearchRequest.setUserType("CITIZEN");
+        
+        UserSearchRequest userSearchRequest = UserSearchRequest.builder()
+        		.requestInfo(requestInfo)
+        		.userType("CITIZEN")
+				.tenantId(tenantId)
+				.build();
+        
+        
         Set<String> availableMobileNumbers = new HashSet<>();
 
         listOfMobileNumbers.forEach(mobilenumber -> {
+        	
             userSearchRequest.setUserName(mobilenumber);
             UserDetailResponse userDetailResponse =  userCall(userSearchRequest,uri);
             if(CollectionUtils.isEmpty(userDetailResponse.getUser()))
@@ -184,12 +210,12 @@ public class UserService {
      * @param requestInfo
      * @return serDetailResponse containing the user if present and the responseInfo
      */
-    public UserDetailResponse getUser(PropertyCriteria criteria,RequestInfo requestInfo){
-        UserSearchRequest userSearchRequest = getUserSearchRequest(criteria,requestInfo);
-        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
-        UserDetailResponse userDetailResponse = userCall(userSearchRequest,uri);
-        return userDetailResponse;
-    }
+	public UserDetailResponse getUser(UserSearchRequest userSearchRequest) {
+
+		StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
+		return userDetailResponse;
+	}
 
     /**
      * Returns UserDetailResponse by calling user service with given uri and object
@@ -198,6 +224,7 @@ public class UserService {
      * @return Response from user service as parsed as userDetailResponse
      */
     private UserDetailResponse userCall(Object userRequest, StringBuilder uri) {
+    	
         String dobFormat = null;
         if(uri.toString().contains(userSearchEndpoint) || uri.toString().contains(userUpdateEndpoint))
             dobFormat="yyyy-MM-dd";
@@ -262,6 +289,7 @@ public class UserService {
      * @param userDetailResponse userDetailResponse from the user Service corresponding to the given owner
      */
     private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
+    	
         owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
         owner.setId(userDetailResponse.getUser().get(0).getId());
         owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
@@ -272,111 +300,47 @@ public class UserService {
         owner.setActive(userDetailResponse.getUser().get(0).getActive());
     }
 
-    /**
-     * Creates and Returns UserSearchRequest from the propertyCriteria(Creates UserSearchRequest from values related to owner(i.e mobileNumber and name) from propertyCriteria )
-     * @param criteria PropertyCriteria from which UserSearchRequest is to be created
-     * @param requestInfo RequestInfo of the propertyRequest
-     * @return UserSearchRequest created from propertyCriteria
-     */
-    private UserSearchRequest getUserSearchRequest(PropertyCriteria criteria,RequestInfo requestInfo){
-        UserSearchRequest userSearchRequest = new UserSearchRequest();
-        Set<String> userIds = criteria.getOwnerids();
-        if(!CollectionUtils.isEmpty(userIds))
-            userSearchRequest.setUuid( new ArrayList(userIds));
-        userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setTenantId(criteria.getTenantId());
-        userSearchRequest.setMobileNumber(criteria.getMobileNumber());
-        userSearchRequest.setName(criteria.getName());
-        userSearchRequest.setActive(true);
-        userSearchRequest.setUserType("CITIZEN");
-        return userSearchRequest;
-    }
-
 
     /**
      * Updates user if present else creates new user
      * @param request PropertyRequest received from update
      */
-    public void updateUser(PropertyRequest request){
-        List<Property> properties = request.getProperties();
-        RequestInfo requestInfo = request.getRequestInfo();
-        properties.forEach(property -> {
-            property.getPropertyDetails().forEach(propertyDetail -> {
-                propertyDetail.getOwners().forEach(owner -> {
-                    UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
-                    StringBuilder uri  = new StringBuilder(userHost);
-                    if(CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-                        uri = uri.append(userContextPath).append(userCreateEndpoint);
-                    }
-                    else
-                    { owner.setId(userDetailResponse.getUser().get(0).getId());
-                        uri=uri.append(userContextPath).append(owner.getId()).append(userUpdateEndpoint);
-                    }
-                    userDetailResponse = userCall( new CreateUserRequest(requestInfo,owner),uri);
-                    setOwnerFields(owner,userDetailResponse,requestInfo);
-                });
-            });
-        });
-    }
+    public void updateUser(PropertyRequest request) {
+
+		Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+
+		property.getOwners().forEach(owner -> {
+
+			UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
+			StringBuilder uri = new StringBuilder(userHost);
+			
+			if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
+				uri = uri.append(userContextPath).append(userCreateEndpoint);
+			} else {
+				owner.setId(userDetailResponse.getUser().get(0).getId());
+				uri = uri.append(userContextPath).append(owner.getId()).append(userUpdateEndpoint);
+			}
+			userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+			setOwnerFields(owner, userDetailResponse, requestInfo);
+		});
+	}
 
     /**
-     * Creates citizenInfo if employee is creating assessment in case of user the citizenInfo object is pointed to userinfo from requestInfo
-     * @param request PropertyRequest for the assessment
+     * provides a user search request with basic mandatory parameters
+     * 
+     * @param tenantId
+     * @param requestInfo
+     * @return
      */
-    public void createCitizen(PropertyRequest request){
-        StringBuilder uriCreate = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
-        RequestInfo requestInfo = request.getRequestInfo();
-
-        Role role = getCitizenRole();
-        // If user is creating assessment, userInfo object from requestInfo is assigned as citizenInfo
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-        {   request.getProperties().forEach(property -> {
-            property.getPropertyDetails().forEach(propertyDetail -> {
-                propertyDetail.setCitizenInfo(new OwnerInfo(requestInfo.getUserInfo()));
-                log.debug("userInfo---> "+requestInfo.getUserInfo().toString());
-            });
-        });
-        }
-        else{
-            // In case of employee login it checks if the citizenInfo object is present else it creates it
-            request.getProperties().forEach(property -> {
-                property.getPropertyDetails().forEach(propertyDetail -> {
-                    addUserDefaultFields(property.getTenantId(),role,propertyDetail.getCitizenInfo());
-                    // Send MobileNumber as the userName in search
-                    String userName = null;
-                    if(!StringUtils.isEmpty(propertyDetail.getCitizenInfo().getMobileNumber()))
-                        userName = propertyDetail.getCitizenInfo().getMobileNumber();
-                    else if(propertyDetail.getCitizenInfo().getUserName()!=null &&
-                               propertyDetail.getOwnershipCategory().contains("INSTITUTIONAL"))
-                        userName = propertyDetail.getCitizenInfo().getUserName();
-                    else throw new CustomException("INVALID CITIZENINFO","Both mobileNumber and altContactNumber cannot be null");
-
-                    UserDetailResponse userDetailResponse = searchByUserName(userName,propertyDetail.getCitizenInfo().getTenantId());
-                    // If user not present new user is created
-                    if(CollectionUtils.isEmpty(userDetailResponse.getUser()))
-                    {
-                        propertyDetail.getCitizenInfo().setUserName(propertyDetail.getCitizenInfo().getMobileNumber());
-                        userDetailResponse = userCall(new CreateUserRequest(requestInfo,propertyDetail.getCitizenInfo()),uriCreate);
-                        log.info("citizen created --> "+userDetailResponse.getUser().get(0).getUuid());
-                    }
-                    propertyDetail.setCitizenInfo(userDetailResponse.getUser().get(0));
-                    if(userDetailResponse.getUser().get(0).getUuid()==null){
-                        throw new CustomException("INVALID CITIZENINFO","CitizenInfo cannot have uuid equal to null");
-                    }
-                });
-            });
-        }
-
-    }
-
-    private UserDetailResponse searchByUserName(String userName,String tenantId){
-        UserSearchRequest userSearchRequest = new UserSearchRequest();
-        userSearchRequest.setUserType("CITIZEN");
-        userSearchRequest.setUserName(userName);
-        userSearchRequest.setTenantId(tenantId);
-        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
-        return userCall(userSearchRequest,uri);
-
+    public UserSearchRequest getBaseUserSearchRequest(String tenantId, RequestInfo requestInfo) {
+    	
+		return UserSearchRequest.builder()
+				.requestInfo(requestInfo)
+				.userType("CITIZEN")
+				.tenantId(tenantId)
+				.active(true)
+				.build();
     }
 
 

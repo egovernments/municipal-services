@@ -1,20 +1,26 @@
 package org.egov.pt.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.egov.pt.models.Boundary;
+import org.egov.pt.models.Property;
 import org.egov.pt.repository.ServiceRequestRepository;
-import org.egov.pt.web.models.Boundary;
-import org.egov.pt.web.models.PropertyRequest;
+import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -42,34 +48,27 @@ public class BoundaryService {
      * @param request PropertyRequest for create
      * @param hierarchyTypeCode HierarchyTypeCode of the boundaries
      */
-    public void getAreaType(PropertyRequest request,String hierarchyTypeCode){
-        if(CollectionUtils.isEmpty(request.getProperties()))
-            return;
+	public void getAreaType(PropertyRequest request, String hierarchyTypeCode) {
 
-        String tenantId = request.getProperties().get(0).getTenantId();
+		Property property = request.getProperty();
+		if (ObjectUtils.isEmpty(property))
+			return;
 
-        LinkedList<String> localities = new LinkedList<>();
-        request.getProperties().forEach(property -> {
-            if(property.getAddress()==null || property.getAddress().getLocality()==null)
-                throw new CustomException("INVALID ADDRESS","The address or locality cannot be null");
-            localities.add(property.getAddress().getLocality().getCode());
-        });
+		String tenantId = request.getProperty().getTenantId();
 
+		if (property.getAddress() == null || property.getAddress().getLocality() == null)
+			throw new CustomException("INVALID ADDRESS", "The address or locality cannot be null");
+
+		
         StringBuilder uri = new StringBuilder(locationHost);
         uri.append(locationContextPath).append(locationEndpoint);
         uri.append("?").append("tenantId=").append(tenantId);
-        if(hierarchyTypeCode!=null)
-            uri.append("&").append("hierarchyTypeCode=").append(hierarchyTypeCode);
-        uri.append("&").append("boundaryType=").append("Locality");
-
-        if(!CollectionUtils.isEmpty(localities)) {
-            uri.append("&").append("codes=");
-            for (int i = 0; i < localities.size(); i++) {
-                uri.append(localities.get(i));
-                if(i!=localities.size()-1)
-                    uri.append(",");
-            }
-        }
+		if (hierarchyTypeCode != null)
+			uri.append("&").append("hierarchyTypeCode=").append(hierarchyTypeCode);
+		
+		uri.append("&").append("boundaryType=").append("Locality").append("&").append("codes=")
+				.append(property.getAddress().getLocality().getCode());
+	
         LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
         if(CollectionUtils.isEmpty(responseMap))
             throw new CustomException("BOUNDARY ERROR","The response from location service is empty or null");
@@ -79,7 +78,7 @@ public class BoundaryService {
 
         DocumentContext context = JsonPath.parse(jsonString);
 
-        request.getProperties().forEach(property -> {
+        	
             Object boundaryObject = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
             if(!(boundaryObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList)boundaryObject))
                 throw new CustomException("BOUNDARY MDMS DATA ERROR","The boundary data was not found");
@@ -90,7 +89,6 @@ public class BoundaryService {
                 throw new CustomException("INVALID BOUNDARY DATA","The boundary data for the code "+property.getAddress().getLocality().getCode()+ " is not available");
             property.getAddress().setLocality(boundary);
 
-        });
 
         //$..boundary[?(@.code=="JLC476")].area
 
@@ -103,23 +101,12 @@ public class BoundaryService {
      * @return Map of propertyId to jsonPath with properties locality code
      */
     private Map<String,String> getJsonpath(PropertyRequest request){
+    	
+    	Property property = request.getProperty();
         Map<String,String> propertyIdToJsonPath = new LinkedHashMap<>();
         String jsonpath = "$..boundary[?(@.code==\"{}\")]";
-        request.getProperties().forEach(property -> {
-            propertyIdToJsonPath.put(property.getPropertyId(),jsonpath.replace("{}",property.getAddress().getLocality().getCode()
-            ));
-        });
-
+        propertyIdToJsonPath.put(property.getPropertyId(), jsonpath.replace("{}",property.getAddress().getLocality().getCode()));
         return  propertyIdToJsonPath;
     }
-
-
-
-
-
-
-
-
-
 
 }
