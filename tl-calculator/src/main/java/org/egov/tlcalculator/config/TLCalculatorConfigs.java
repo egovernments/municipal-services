@@ -40,7 +40,6 @@ public class TLCalculatorConfigs {
     @Value("${egov.demand.businessserviceTL}")
     private String businessServiceTL;
 
-
     @Value("${egov.demand.businessserviceBPA}")
     private String businessServiceBPA;
 

@@ -25,10 +25,10 @@ import java.util.Collections;
 @Controller
 @RequestMapping("/billingslab")
 public class BillingslabController {
-	
+
 	@Autowired
 	private BillingslabValidator billingslabValidator;
-	
+
 	@Autowired
 	private BillingslabService service;
 
@@ -48,7 +48,7 @@ public class BillingslabController {
 		BillingSlabRes response = service.createSlabs(billingSlabReq);
 		return new ResponseEntity<BillingSlabRes>(response, HttpStatus.OK);
 	}
-	
+
 	/**
 	 * Updates Billing Slabs of TradeLicense
 	 * @param billingSlabReq
@@ -67,24 +67,20 @@ public class BillingslabController {
 	 * @param requestInfo
 	 * @return
 	 */
-	@RequestMapping(value = "/_search", method = RequestMethod.POST)
-	public ResponseEntity<BillingSlabRes> billingslabSearchPost(@ModelAttribute @Valid BillingSlabSearchCriteria billingSlabSearchCriteria,
-			@Valid @RequestBody RequestInfo requestInfo) {
+    @RequestMapping(value = "/_search", method = RequestMethod.POST)
+    public ResponseEntity<BillingSlabRes> billingslabSearchPost(@ModelAttribute @Valid BillingSlabSearchCriteria billingSlabSearchCriteria,
+                                                                @Valid @RequestBody RequestInfo requestInfo) {
 
-		String licensetype=billingSlabSearchCriteria.getLicenseType();
-		BillingSlabRes response=null;
-		if(!licensetype.equalsIgnoreCase("BPASTAKEHOLDER"))
-		{
-			response = service.searchSlabs(billingSlabSearchCriteria, requestInfo);
-		}
-		else
-		{
-			BillingSlab billingSlab=bpaBillingSlabService.search(billingSlabSearchCriteria, requestInfo);
-			response = BillingSlabRes.builder().responseInfo(factory.createResponseInfoFromRequestInfo(requestInfo, true))
-					.billingSlab(Collections.singletonList(billingSlab)).build();
-		}
-
-		return new ResponseEntity<BillingSlabRes>(response, HttpStatus.OK);
-	}
+        String licensetype = billingSlabSearchCriteria.getLicenseType();
+        BillingSlabRes response = null;
+        if (!licensetype.equalsIgnoreCase("BPASTAKEHOLDER")) {
+            response = service.searchSlabs(billingSlabSearchCriteria, requestInfo);
+        } else {
+            BillingSlab billingSlab = bpaBillingSlabService.search(billingSlabSearchCriteria, requestInfo);
+            response = BillingSlabRes.builder().responseInfo(factory.createResponseInfoFromRequestInfo(requestInfo, true))
+                    .billingSlab(Collections.singletonList(billingSlab)).build();
+        }
+        return new ResponseEntity<BillingSlabRes>(response, HttpStatus.OK);
+    }
 
 }

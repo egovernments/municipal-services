@@ -10,7 +10,6 @@ public class BillingslabConstants {
 	public static final String TL_MDMS_MODULE_NAME = "TradeLicense";
 	public static final String BPA_MDMS_MODULE_NAME = "StakeholderRegistraition";
 	public static final String BPA_MDMS_TRADETYPETOROLEMAPPING = "TradeTypetoRoleMapping";
-
 	public static final String COMMON_MASTERS_MDMS_MODULE_NAME = "common-masters";
 	public static final String TL_MDMS_TRADETYPE = "TradeType";
 	public static final String TL_MDMS_ACCESSORIESCATEGORY = "AccessoriesCategory";

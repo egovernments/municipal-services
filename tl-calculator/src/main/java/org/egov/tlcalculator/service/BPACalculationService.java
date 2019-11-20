@@ -57,19 +57,21 @@ public class BPACalculationService {
 
     @Autowired
     private BPABillingSlabService bpaBillingSlabService;
+
     /**
      * Calculates tax estimates and creates demand
+     *
      * @param calculationReq The calculationCriteria request
      * @return List of calculations for all applicationNumbers or tradeLicenses in calculationReq
      */
-    public List<Calculation> calculate(CalculationReq calculationReq){
+    public List<Calculation> calculate(CalculationReq calculationReq) {
         String tenantId = calculationReq.getCalulationCriteria().get(0).getTenantId();
-        Object mdmsData = mdmsService.mDMSCall(calculationReq.getRequestInfo(),tenantId);
+        Object mdmsData = mdmsService.mDMSCall(calculationReq.getRequestInfo(), tenantId);
         List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),
-                calculationReq.getCalulationCriteria(),mdmsData);
-        demandService.generateDemand(calculationReq.getRequestInfo(),calculations,mdmsData,true);
+                calculationReq.getCalulationCriteria(), mdmsData);
+        demandService.generateDemand(calculationReq.getRequestInfo(), calculations, mdmsData, true);
         CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
-        producer.push(config.getSaveTopic(),calculationRes);
+        producer.push(config.getSaveTopic(), calculationRes);
         return calculations;
     }
 
@@ -78,19 +80,18 @@ public class BPACalculationService {
      * Calculates tax estimates
      * @param requestInfo The requestInfo of the calculation request
      * @param criterias list of CalculationCriteria containing the tradeLicense or applicationNumber
-     * @return  List of calculations for all applicationNumbers or tradeLicenses in criterias
+     * @return List of calculations for all applicationNumbers or tradeLicenses in criterias
      */
-    public List<Calculation> getCalculation(RequestInfo requestInfo, List<CalulationCriteria> criterias,Object mdmsData){
+    public List<Calculation> getCalculation(RequestInfo requestInfo, List<CalulationCriteria> criterias, Object mdmsData) {
         List<Calculation> calculations = new LinkedList<>();
-        for(CalulationCriteria criteria : criterias) {
+        for (CalulationCriteria criteria : criterias) {
             TradeLicense license;
-            if (criteria.getTradelicense()==null && criteria.getApplicationNumber() != null) {
+            if (criteria.getTradelicense() == null && criteria.getApplicationNumber() != null) {
                 license = utils.getTradeLicense(requestInfo, criteria.getApplicationNumber(), criteria.getTenantId());
                 criteria.setTradelicense(license);
             }
 
-            EstimatesAndSlabs estimatesAndSlabs = getTaxHeadEstimates(criteria,requestInfo,mdmsData);
-
+            EstimatesAndSlabs estimatesAndSlabs = getTaxHeadEstimates(criteria, requestInfo, mdmsData);
 
 
             List<TaxHeadEstimate> taxHeadEstimates = estimatesAndSlabs.getEstimates();
@@ -110,13 +111,14 @@ public class BPACalculationService {
 
     /**
      * Creates TacHeadEstimates
+     *
      * @param calulationCriteria CalculationCriteria containing the tradeLicense or applicationNumber
-     * @param requestInfo The requestInfo of the calculation request
+     * @param requestInfo        The requestInfo of the calculation request
      * @return TaxHeadEstimates and the billingSlabs used to calculate it
      */
-    private EstimatesAndSlabs getTaxHeadEstimates(CalulationCriteria calulationCriteria, RequestInfo requestInfo,Object mdmsData){
+    private EstimatesAndSlabs getTaxHeadEstimates(CalulationCriteria calulationCriteria, RequestInfo requestInfo, Object mdmsData) {
         List<TaxHeadEstimate> estimates = new LinkedList<>();
-        EstimatesAndSlabs  estimatesAndSlabs = getBaseTax(calulationCriteria,requestInfo,mdmsData);
+        EstimatesAndSlabs estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
 
         estimates.addAll(estimatesAndSlabs.getEstimates());
 
@@ -128,34 +130,29 @@ public class BPACalculationService {
 
     /**
      * Calculates base tax and cretaes its taxHeadEstimate
+     *
      * @param calulationCriteria CalculationCriteria containing the tradeLicense or applicationNumber
-     * @param requestInfo The requestInfo of the calculation request
+     * @param requestInfo        The requestInfo of the calculation request
      * @return BaseTax taxHeadEstimate and billingSlabs used to calculate it
      */
-    private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria, RequestInfo requestInfo,Object mdmsData) {
+    private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria, RequestInfo requestInfo, Object mdmsData) {
         TradeLicense license = calulationCriteria.getTradelicense();
         EstimatesAndSlabs estimatesAndSlabs = new EstimatesAndSlabs();
 
-        String tradetype=license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+        String tradetype = license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
         BillingSlabSearchCriteria searchCriteria = new BillingSlabSearchCriteria();
         searchCriteria.setTenantId(license.getTenantId());
         searchCriteria.setTradeType(tradetype);
+        BillingSlab billingSlab = bpaBillingSlabService.search(searchCriteria, requestInfo);
+        if (billingSlab == null) {
 
-        BillingSlab billingSlab=bpaBillingSlabService.search(searchCriteria,requestInfo);
-
-        if(billingSlab==null)
-        {
-
-            throw new CustomException("NO BILLINGSLABFOUND","No Billing Slab found for "+tradetype);
+            throw new CustomException("NO BILLINGSLABFOUND", "No Billing Slab found for " + tradetype);
         }
-
         TaxHeadEstimate estimate = new TaxHeadEstimate();
         estimate.setEstimateAmount(billingSlab.getRate());
         estimate.setCategory(Category.FEE);
         estimate.setTaxHeadCode(config.getBpabaseTaxHead());
-
         estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));
-
         return estimatesAndSlabs;
     }
 }

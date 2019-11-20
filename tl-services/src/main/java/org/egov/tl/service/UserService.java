@@ -77,7 +77,7 @@ public class UserService{
                                 throw new CustomException("INVALID USER RESPONSE","The user created has uuid as null");
                             }
                             log.info("owner created --> "+userDetailResponse.getUser().get(0).getUuid());
-                        setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
+                        setOwnerFields(owner,userDetailResponse,requestInfo);
                     }
                  else {
                     UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
@@ -93,12 +93,11 @@ public class UserService{
                         user.addRolesItem(Role.builder().code(licenseeTyperRole).name(licenseeTyperRole).build());
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
-                    setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
+                    setOwnerFields(owner,userDetailResponse,requestInfo);
                 }
             });
         });
     }
-
 
     /**
      * Sets the immutable fields from search to update request
@@ -171,15 +170,12 @@ public class UserService{
      * @param userDetailResponse The response from user search
      * @param requestInfo The requestInfo of the request
      */
-    private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo,boolean isBPARequest){
+    private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
         owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
         owner.setId(userDetailResponse.getUser().get(0).getId());
         owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
-//        if(!isBPARequest)
-//        {
-            owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
-            owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
-//        }
+        owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+        owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
         owner.setCreatedDate(System.currentTimeMillis());
         owner.setLastModifiedDate(System.currentTimeMillis());
         owner.setActive(userDetailResponse.getUser().get(0).getActive());
@@ -353,7 +349,7 @@ public class UserService{
                         user.addUserWithoutAuditDetail(owner);
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
-                    setOwnerFields(owner,userDetailResponse,requestInfo,isBPARequest);
+                    setOwnerFields(owner,userDetailResponse,requestInfo);
                 });
             });
     }

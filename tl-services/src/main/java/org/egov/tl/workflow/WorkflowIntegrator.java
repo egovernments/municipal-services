@@ -48,7 +48,7 @@ public class WorkflowIntegrator {
 
 	private static final String TLMODULENAMEVALUE = "TL";
 
-	private static final String BPAMODULENAMEVALUE = "BPA";
+	private static final String BPAMODULENAMEVALUE = "BPAREG";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
 

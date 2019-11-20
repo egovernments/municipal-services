@@ -4,7 +4,6 @@ package org.egov.tlcalculator.web.controllers;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import org.egov.tlcalculator.service.BPACalculationService;
 import org.egov.tlcalculator.service.CalculationService;
 import org.egov.tlcalculator.service.DemandService;
@@ -37,12 +36,12 @@ public class CalculatorController {
 
 	@Autowired
 	public CalculatorController(ObjectMapper objectMapper, HttpServletRequest request,
-								CalculationService calculationService,DemandService demandService,BPACalculationService bpaCalculationService) {
+								CalculationService calculationService, DemandService demandService, BPACalculationService bpaCalculationService) {
 		this.objectMapper = objectMapper;
 		this.request = request;
-		this.calculationService=calculationService;
-		this.demandService=demandService;
-		this.bpaCalculationService=bpaCalculationService;
+		this.calculationService = calculationService;
+		this.demandService = demandService;
+		this.bpaCalculationService = bpaCalculationService;
 	}
 
 	/**
@@ -53,28 +52,29 @@ public class CalculatorController {
 	@RequestMapping(value = "/_calculate", method = RequestMethod.POST)
 	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
 
-		 boolean isBPARequest = calculationReq.getCalulationCriteria().get(0).getTradelicense().getLicenseType().toString().equals("BPASTAKEHOLDER");
-		List<Calculation> calculations=null;
-		 if(!isBPARequest)
-		 	calculations = calculationService.calculate(calculationReq);
-		 else
-			 calculations = bpaCalculationService.calculate(calculationReq);
-		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
-		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
+		boolean isBPARequest = calculationReq.getCalulationCriteria().get(0).getTradelicense().getLicenseType().toString().equals("BPASTAKEHOLDER");
+		List<Calculation> calculations = null;
+		if (!isBPARequest)
+			calculations = calculationService.calculate(calculationReq);
+		else
+			calculations = bpaCalculationService.calculate(calculationReq);
+		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
+		return new ResponseEntity<CalculationRes>(calculationRes, HttpStatus.OK);
 	}
 
 
 	/**
 	 * Generates Bill for the given criteria
-	 * @param requestInfoWrapper Wrapper containg the requestInfo
+	 *
+	 * @param requestInfoWrapper   Wrapper containg the requestInfo
 	 * @param generateBillCriteria The criteria to generate bill
 	 * @return The response of generate bill
 	 */
 	@RequestMapping(value = "/_getbill", method = RequestMethod.POST)
 	public ResponseEntity<BillAndCalculations> getBill(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-										@ModelAttribute @Valid GenerateBillCriteria generateBillCriteria) {
-		BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(),generateBillCriteria);
-		return new ResponseEntity<BillAndCalculations>(response,HttpStatus.OK);
+													   @ModelAttribute @Valid GenerateBillCriteria generateBillCriteria) {
+		BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(), generateBillCriteria);
+		return new ResponseEntity<BillAndCalculations>(response, HttpStatus.OK);
 	}
 
 }

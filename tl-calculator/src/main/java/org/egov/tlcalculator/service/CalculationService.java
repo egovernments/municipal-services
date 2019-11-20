@@ -87,18 +87,12 @@ public class CalculationService {
               license = utils.getTradeLicense(requestInfo, criteria.getApplicationNumber(), criteria.getTenantId());
               criteria.setTradelicense(license);
           }
-
           EstimatesAndSlabs estimatesAndSlabs = getTaxHeadEstimates(criteria,requestInfo,mdmsData);
-
-
-
           List<TaxHeadEstimate> taxHeadEstimates = estimatesAndSlabs.getEstimates();
           FeeAndBillingSlabIds tradeTypeFeeAndBillingSlabIds = estimatesAndSlabs.getTradeTypeFeeAndBillingSlabIds();
           FeeAndBillingSlabIds accessoryFeeAndBillingSlabIds = null;
           if(estimatesAndSlabs.getAccessoryFeeAndBillingSlabIds()!=null)
               accessoryFeeAndBillingSlabIds = estimatesAndSlabs.getAccessoryFeeAndBillingSlabIds();
-
-
           Calculation calculation = new Calculation();
           calculation.setTradeLicense(criteria.getTradelicense());
           calculation.setTenantId(criteria.getTenantId());

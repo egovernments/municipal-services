@@ -31,9 +31,9 @@ public class BPABillingSlabService {
     @Autowired
     private ResponseInfoFactory factory;
 
-    public BillingSlab search(BillingSlabSearchCriteria billingSlabSearchCriteria, RequestInfo requestInfo){
-        StringBuilder uri=new StringBuilder();
-        MdmsCriteriaReq request = billingslabUtils.prepareMDMSSearchReq(uri, billingSlabSearchCriteria.getTenantId(), BillingslabConstants.BPA_MDMS_MODULE_NAME, BillingslabConstants.BPA_MDMS_TRADETYPETOROLEMAPPING, "[?(@.tradeType=='"+billingSlabSearchCriteria.getTradeType()+"')]", requestInfo);
+    public BillingSlab search(BillingSlabSearchCriteria billingSlabSearchCriteria, RequestInfo requestInfo) {
+        StringBuilder uri = new StringBuilder();
+        MdmsCriteriaReq request = billingslabUtils.prepareMDMSSearchReq(uri, billingSlabSearchCriteria.getTenantId(), BillingslabConstants.BPA_MDMS_MODULE_NAME, BillingslabConstants.BPA_MDMS_TRADETYPETOROLEMAPPING, "[?(@.tradeType=='" + billingSlabSearchCriteria.getTradeType() + "')]", requestInfo);
         try {
             Object response = restTemplate.postForObject(uri.toString(), request, Map.class);
             if (null != response) {
@@ -42,14 +42,13 @@ public class BPABillingSlabService {
                 List<Map<String, Object>> jsonOutput = JsonPath.read(response, jsonPath);
                 Map<String, Object> billingProperties = jsonOutput.get(0);
                 return BillingSlab.builder().id(String.valueOf(billingProperties.get("id"))).tradeType((String) billingProperties.get("tradeType")).rate(BigDecimal.valueOf((Integer) billingProperties.get("applicationFee"))).build();
+            } else {
+                throw new CustomException("BILLINGSEARCH_NULLRESPONSE", " Found empty response on billingslab search for BPA");
             }
-            else{
-                throw new CustomException("BILLINGSEARCH_NULLRESPONSE"," Found empty response on billingslab search for BPA");
-            }
-        }catch(Exception e) {
-            log.error("Couldn't fetch master: "+BillingslabConstants.BPA_MDMS_TRADETYPETOROLEMAPPING);
-            log.error("Exception: "+e);
-            throw new CustomException("BILLINGSEARCH_ERROR"," Error occured while searching billing slab for BPA");
+        } catch (Exception e) {
+            log.error("Couldn't fetch master: " + BillingslabConstants.BPA_MDMS_TRADETYPETOROLEMAPPING);
+            log.error("Exception: " + e);
+            throw new CustomException("BILLINGSEARCH_ERROR", " Error occured while searching billing slab for BPA");
         }
     }
 }

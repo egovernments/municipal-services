@@ -127,7 +127,7 @@ public class PaymentUpdateService {
 
 				 /* calling workflow to update status
 				 */
-				wfIntegrator.callWorkFlow(updateRequest,isBPARequest);
+					wfIntegrator.callWorkFlow(updateRequest,isBPARequest);
 
 					updateRequest.getLicenses()
 							.forEach(obj -> log.info(" the status of the application is : " + obj.getStatus()));
