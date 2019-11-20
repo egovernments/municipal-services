@@ -95,12 +95,10 @@ public class WorkflowIntegrator {
 					String licenseeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
 					obj.put(BUSINESSSERVICEKEY, licenseeType);
 					obj.put(MODULENAMEKEY, BPAMODULENAMEVALUE);
-				} else
-				{
+				} else {
 					obj.put(BUSINESSSERVICEKEY, config.getTlBusinessServiceValue());
 					obj.put(MODULENAMEKEY, TLMODULENAMEVALUE);
 				}
-
 				obj.put(ACTIONKEY, license.getAction());
 				obj.put(COMMENTKEY, license.getComment());
 				if (!StringUtils.isEmpty(license.getAssignee()))

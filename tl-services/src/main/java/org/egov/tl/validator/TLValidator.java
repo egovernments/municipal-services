@@ -52,109 +52,80 @@ public class TLValidator {
      *  Validate the create Requesr
      * @param request The input TradeLicenseRequest Object
      */
-    public void validateCreate(TradeLicenseRequest request,Object mdmsData,boolean isBPARequest){
-        /* compulsory fields for TL application
-        tradelicense->financialYear
-
-        trdetails->structureType
-        trdetails->subOwnerShipCategory
-        trdetails->->address */
-
-
-
-
-
-
-        /* stake holder
-        * ownerInfo(user)->gender,email, permanent address, correspondance address
-        * institution->contactNo
-        * institution->name-authorised person name
-        *
-        * Licensee type specific information
-        *
-        *
-        *
-        * */
-
-        if(!isBPARequest) {
+    public void validateCreate(TradeLicenseRequest request, Object mdmsData, boolean isBPARequest) {
+        if (!isBPARequest) {
             valideDates(request, mdmsData);
             propertyValidator.validateProperty(request);
-            mdmsValidator.validateMdmsDataForTL(request,mdmsData);
+            mdmsValidator.validateMdmsDataForTL(request, mdmsData);
             validateTLSpecificNotNullFields(request);
-        }
-        else{
+        } else {
             validateBPAIfUniqueRegRequest(request);
             validateBPASpecificNotNullFields(request);
-            // verify mdms
         }
         validateInstitution(request);
         validateDuplicateDocuments(request);
     }
 
-    private  void validateBPAIfUniqueRegRequest(TradeLicenseRequest request){
+    private void validateBPAIfUniqueRegRequest(TradeLicenseRequest request) {
 
-        for(TradeLicense license:request.getLicenses())
-        {
-            String mobno=license.getTradeLicenseDetail().getOwners().get(0).getMobileNumber();
-            String tenantId=license.getTenantId();
-            String usernewrole=tradeUtil.getusernewRoleFromMDMS(license,request.getRequestInfo());
+        for (TradeLicense license : request.getLicenses()) {
+            String mobno = license.getTradeLicenseDetail().getOwners().get(0).getMobileNumber();
+            String tenantId = license.getTenantId();
+            String usernewrole = tradeUtil.getusernewRoleFromMDMS(license, request.getRequestInfo());
 
-            UserDetailResponse userDetailResponse=userService.getUser(TradeLicenseSearchCriteria.builder().tenantId(tenantId).mobileNumber(mobno).build(),request.getRequestInfo());
-            for(OwnerInfo ownerInfo:userDetailResponse.getUser()){
-                for(Role role:ownerInfo.getRoles())
-                {
-                    if(role.getCode().equalsIgnoreCase(usernewrole))
-                    {
-                        throw new CustomException("ROLE_ALREADYEXISTS"," User has already "+usernewrole+" role");
+            UserDetailResponse userDetailResponse = userService.getUser(TradeLicenseSearchCriteria.builder().tenantId(tenantId).mobileNumber(mobno).build(), request.getRequestInfo());
+            for (OwnerInfo ownerInfo : userDetailResponse.getUser()) {
+                for (Role role : ownerInfo.getRoles()) {
+                    if (role.getCode().equalsIgnoreCase(usernewrole)) {
+                        throw new CustomException("ROLE_ALREADYEXISTS", " User has already " + usernewrole + " role");
                     }
                 }
             }
         }
     }
 
-
-    private void validateTLSpecificNotNullFields(TradeLicenseRequest request){
+    private void validateTLSpecificNotNullFields(TradeLicenseRequest request) {
         request.getLicenses().forEach(license -> {
-            if(license.getFinancialYear()==null)
-                throw new CustomException("NULL_FINANCIALYEAR"," Financial Year cannot be null");
-            if(license.getTradeLicenseDetail().getStructureType()==null)
-                throw new CustomException("NULL_STRUCTURETYPE"," Structure Type cannot be null");
-            if(license.getTradeLicenseDetail().getSubOwnerShipCategory()==null)
-                throw new CustomException("NULL_SUBOWNERSHIPCATEGORY"," SubOwnership Category cannot be null");
-            if(license.getTradeLicenseDetail().getAddress()==null)
-                throw new CustomException("NULL_ADDRESS"," Address cannot be null");
+            if (license.getFinancialYear() == null)
+                throw new CustomException("NULL_FINANCIALYEAR", " Financial Year cannot be null");
+            if (license.getTradeLicenseDetail().getStructureType() == null)
+                throw new CustomException("NULL_STRUCTURETYPE", " Structure Type cannot be null");
+            if (license.getTradeLicenseDetail().getSubOwnerShipCategory() == null)
+                throw new CustomException("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
+            if (license.getTradeLicenseDetail().getAddress() == null)
+                throw new CustomException("NULL_ADDRESS", " Address cannot be null");
         });
     }
 
-    private void validateBPASpecificNotNullFields(TradeLicenseRequest request){
+    private void validateBPASpecificNotNullFields(TradeLicenseRequest request) {
 
         request.getLicenses().forEach(license -> {
-            if(license.getTradeLicenseDetail().getSubOwnerShipCategory().contains("INSTITUTION")){
-                if(license.getTradeLicenseDetail().getInstitution().getContactNo()==null)
-                    throw new CustomException("NULL_INSTITUTIONCONTACTNO"," Institution Contact No cannot be null");
-                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL_AUTHORISEDPERSONNAME"," Authorised person name can not be null");
-                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL_INSTITUTIONNAME"," Institute name can not be null");
-                if(license.getTradeLicenseDetail().getInstitution().getName()==null)
-                    throw new CustomException("NULL_ADDRESS"," Institute address can not be null");
+            if (license.getTradeLicenseDetail().getSubOwnerShipCategory().contains("INSTITUTION")) {
+                if (license.getTradeLicenseDetail().getInstitution().getContactNo() == null)
+                    throw new CustomException("NULL_INSTITUTIONCONTACTNO", " Institution Contact No cannot be null");
+                if (license.getTradeLicenseDetail().getInstitution().getName() == null)
+                    throw new CustomException("NULL_AUTHORISEDPERSONNAME", " Authorised person name can not be null");
+                if (license.getTradeLicenseDetail().getInstitution().getName() == null)
+                    throw new CustomException("NULL_INSTITUTIONNAME", " Institute name can not be null");
+                if (license.getTradeLicenseDetail().getInstitution().getName() == null)
+                    throw new CustomException("NULL_ADDRESS", " Institute address can not be null");
             }
         });
 
         request.getLicenses().forEach(license -> {
             license.getTradeLicenseDetail().getOwners().forEach(
-                    owner->{
-                        if(owner.getGender()==null)
-                            throw new CustomException("NULL_USERGENDER"," User gender cannot be null");
+                    owner -> {
+                        if (owner.getGender() == null)
+                            throw new CustomException("NULL_USERGENDER", " User gender cannot be null");
 
-                        if(owner.getEmailId()==null)
-                            throw new CustomException("NULL_USEREMAIL"," User EmailId cannot be null");
+                        if (owner.getEmailId() == null)
+                            throw new CustomException("NULL_USEREMAIL", " User EmailId cannot be null");
 
-                        if(owner.getPermanentAddress()==null)
-                            throw new CustomException("NULL_PERMANENTADDRESS"," User Permanent Address cannot be null");
+                        if (owner.getPermanentAddress() == null)
+                            throw new CustomException("NULL_PERMANENTADDRESS", " User Permanent Address cannot be null");
 
-                        if(owner.getCorrespondenceAddress()==null)
-                            throw new CustomException("NULL_CORRESPONDANCEADDRESS"," User Correspondance address cannot be null");
+                        if (owner.getCorrespondenceAddress() == null)
+                            throw new CustomException("NULL_CORRESPONDANCEADDRESS", " User Correspondance address cannot be null");
                     }
             );
         });
@@ -222,32 +193,25 @@ public class TLValidator {
      *  Validates the update request
      * @param request The input TradeLicenseRequest Object
      */
-    public void validateUpdate(TradeLicenseRequest request,List<TradeLicense> searchResult,Object mdmsData,boolean isBPARequest){
-      List<TradeLicense> licenses = request.getLicenses();
-
-      if(searchResult.size()!=licenses.size())
-          throw new CustomException("INVALID UPDATE","The license to be updated is not in database");
-
-
-
-        validateAllIds(searchResult,licenses);
-
-        if(!isBPARequest) {
+    public void validateUpdate(TradeLicenseRequest request, List<TradeLicense> searchResult, Object mdmsData, boolean isBPARequest) {
+        List<TradeLicense> licenses = request.getLicenses();
+        if (searchResult.size() != licenses.size())
+            throw new CustomException("INVALID UPDATE", "The license to be updated is not in database");
+        validateAllIds(searchResult, licenses);
+        if (!isBPARequest) {
             valideDates(request, mdmsData);
             propertyValidator.validateProperty(request);
-            mdmsValidator.validateMdmsDataForTL(request,mdmsData);
+            mdmsValidator.validateMdmsDataForTL(request, mdmsData);
             validateTLSpecificNotNullFields(request);
-        }
-        else{
+        } else {
             validateBPAIfUniqueRegRequest(request);
             validateBPASpecificNotNullFields(request);
         }
-
-      validateTradeUnits(request);
-      validateDuplicateDocuments(request);
-      setFieldsFromSearch(request,searchResult,mdmsData);
-      validateOwnerActiveStatus(request);
-   }
+        validateTradeUnits(request);
+        validateDuplicateDocuments(request);
+        setFieldsFromSearch(request, searchResult, mdmsData);
+        validateOwnerActiveStatus(request);
+    }
 
 
     /**

@@ -88,8 +88,8 @@ public class UserService{
                     OwnerInfo user = new OwnerInfo();
                     user.addUserWithoutAuditDetail(owner);
                     addNonUpdatableFields(user,userDetailResponse.getUser().get(0));
-                    if(isBPARequest && (tradeLicense.getStatus()!=null) &&tradeLicense.getStatus().equals(STATUS_APPROVED)){
-                        String licenseeTyperRole=tradeUtil.getusernewRoleFromMDMS(tradeLicense,requestInfo);
+                    if (isBPARequest && (tradeLicense.getStatus() != null) && tradeLicense.getStatus().equals(STATUS_APPROVED)) {
+                        String licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
                         user.addRolesItem(Role.builder().code(licenseeTyperRole).name(licenseeTyperRole).build());
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);

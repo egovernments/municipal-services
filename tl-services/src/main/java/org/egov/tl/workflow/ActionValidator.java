@@ -40,37 +40,35 @@ public class ActionValidator {
      * @param request The tradeLicense Create request
      */
 	public void validateCreateRequest(TradeLicenseRequest request){
-        Map<String,String> errorMap = new HashMap<>();
+        Map<String, String> errorMap = new HashMap<>();
 
         request.getLicenses().forEach(license -> {
 
-            boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            boolean isBPARequest = license.getLicenseType().toString().equals("BPASTAKEHOLDER");
 
-            if(isBPARequest)
-            {
-                if(!TRIGGER_NOWORKFLOW.equalsIgnoreCase(license.getAction())){
-                        errorMap.put("INVALID ACTION","Action should be NOWORKFLOW during create");
+            if (isBPARequest) {
+                if (!TRIGGER_NOWORKFLOW.equalsIgnoreCase(license.getAction())) {
+                    errorMap.put("INVALID ACTION", "Action should be NOWORKFLOW during create");
                 }
-            }
-            else{
-                if(ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
-                    if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
-                        errorMap.put("INVALID ACTION","Action should be APPLY when application document are provided");
+            } else {
+                if (ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
+                    if (license.getTradeLicenseDetail().getApplicationDocuments() != null)
+                        errorMap.put("INVALID ACTION", "Action should be APPLY when application document are provided");
                 }
-                if(ACTION_APPLY.equalsIgnoreCase(license.getAction())){
-                    if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
-                        errorMap.put("INVALID ACTION","Action cannot be changed to APPLY. Application document are not provided");
+                if (ACTION_APPLY.equalsIgnoreCase(license.getAction())) {
+                    if (license.getTradeLicenseDetail().getApplicationDocuments() == null)
+                        errorMap.put("INVALID ACTION", "Action cannot be changed to APPLY. Application document are not provided");
                 }
-                if(!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
-                        !ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
-                    errorMap.put("INVALID ACTION","Action can only be APPLY or INITIATE during create");
+                if (!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
+                        !ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
+                    errorMap.put("INVALID ACTION", "Action can only be APPLY or INITIATE during create");
                 }
             }
 
         });
-    //    validateRole(request);
+        //    validateRole(request);
 
-        if(!errorMap.isEmpty())
+        if (!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }
 

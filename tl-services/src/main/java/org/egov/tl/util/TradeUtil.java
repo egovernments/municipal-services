@@ -278,24 +278,15 @@ public class TradeUtil {
      * @param businessService The businessService configuration
      * @return Map of is to isStateUpdatable
      */
-    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,List<TradeLicense> searchresult){
-        Map<String ,Boolean> idToIsStateUpdatableMap = new HashMap<>();
+    public Map<String, Boolean> getIdToIsStateUpdatableMap(BusinessService businessService, List<TradeLicense> searchresult) {
+        Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
         searchresult.forEach(result -> {
-
-            boolean isBPARequest=result.getLicenseType().toString().equals("BPASTAKEHOLDER");
-            if(isBPARequest && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED)))
-            {
-
-                idToIsStateUpdatableMap.put(result.getId(),true);
-            }
-            else
-                idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
+            boolean isBPARequest = result.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            if (isBPARequest && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED))) {
+                idToIsStateUpdatableMap.put(result.getId(), true);
+            } else
+                idToIsStateUpdatableMap.put(result.getId(), workflowService.isStateUpdatable(result.getStatus(), businessService));
         });
         return idToIsStateUpdatableMap;
     }
-
-
-
-
-
 }
