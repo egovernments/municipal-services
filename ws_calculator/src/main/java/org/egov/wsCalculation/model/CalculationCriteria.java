@@ -32,8 +32,8 @@ public class CalculationCriteria   {
         @JsonProperty("waterConnection")
         private WaterConnection waterConnection;
 
-        @JsonProperty("applicationNO")
-        private String applicationNO;
+        @JsonProperty("connectionNo")
+        private String connectionNo;
 
         @JsonProperty("assessmentYear")
         private String assessmentYear;

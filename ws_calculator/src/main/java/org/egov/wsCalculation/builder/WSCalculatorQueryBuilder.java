@@ -1,11 +1,11 @@
-package org.egov.wscalculation.builder;
+package org.egov.wsCalculation.builder;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

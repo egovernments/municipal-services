@@ -12,7 +12,7 @@ import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.Idgen.IdResponse;
 import org.egov.wsCalculation.repository.IdGenRepository;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

@@ -1,4 +1,4 @@
-package org.egov.wscalculation.rowmapper;
+package org.egov.wsCalculation.rowmapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

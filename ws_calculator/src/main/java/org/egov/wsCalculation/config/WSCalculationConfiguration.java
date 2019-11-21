@@ -1,4 +1,4 @@
-package org.egov.wscalculation.config;
+package org.egov.wsCalculation.config;
 
 import java.math.BigDecimal;
 
@@ -71,6 +71,9 @@ public class WSCalculationConfiguration {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
+	
+    @Value("${egov.bill.gen.endpoint}")
+    private String billGenerateEndpoint;
 
 	// water demand configs
 

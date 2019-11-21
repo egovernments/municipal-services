@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.egov</groupId>
-	<artifactId>ws_service_calculation</artifactId>
+	<artifactId>ws_calculator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ws-calculation</name>
 	<description>Demo project for Spring Boot</description>
