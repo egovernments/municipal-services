@@ -1,0 +1,28 @@
+
+--DROP TABLE IF EXISTS sewarage_service_connection;
+--DROP TABLE IF EXISTS connection;
+--
+--CREATE TABLE connection
+--(
+--  id character varying(64) NOT NULL,
+--  property_id character varying(64) NOT NULL,
+--  applicationno character varying(64) NOT NULL,
+--  applicationstatus character varying(256) NOT NULL,
+--  status character varying(64) NOT NULL,
+--  connectionno character varying(256) NOT NULL,
+--  oldconnectionno character varying(64) NOT NULL,
+--  documents_id character varying(256) NOT NULL,
+--  CONSTRAINT connection_pkey PRIMARY KEY (id)
+--);
+--
+--
+--
+--CREATE TABLE sewarage_service_connection
+--(
+--  connection_id character varying(64) NOT NULL,
+--  connectionExecutionDate bigint NOT NULL,
+--  CONSTRAINT sewarage_service_connection_connection_id_fkey FOREIGN KEY (connection_id)
+--  REFERENCES connection (id)
+--  ON UPDATE CASCADE
+--  ON DELETE CASCADE
+--);
