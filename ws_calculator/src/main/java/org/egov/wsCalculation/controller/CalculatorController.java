@@ -30,8 +30,8 @@ import lombok.Setter;
 @Setter
 @Builder
 @RestController
-@RequestMapping("/waterCalculation")
-public class WSCalculationController {
+@RequestMapping("/waterCalculator")
+public class CalculatorController {
 	
 	
 	@Autowired
@@ -44,17 +44,19 @@ public class WSCalculationController {
 	private final ResponseInfoFactory responseInfoFactory;
 	
 	
-	@PostMapping("/_estimate")
+	@PostMapping("/_calculate")
 	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
 		return new ResponseEntity<>(wSCalculationService.getTaxCalculation(calculationReq), HttpStatus.OK);
 	}
 
-	@PostMapping("/_calculate")
-	public ResponseEntity<Map<String, Calculation>> generateDemands(@RequestBody @Valid CalculationReq calculationReq) {
-		return new ResponseEntity<>(demandService.generateDemands(calculationReq), HttpStatus.OK);
+	@PostMapping("/_createDemand")
+	public ResponseEntity<DemandResponse> generateDemands(@RequestBody @Valid CalculationReq calculationReq) {
+		List<Demand> demandList = demandService.generateDemands(calculationReq);
+		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping("/_update")
+	@PostMapping("/_updateDemand")
 	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid CalculationReq calculationReq) {
 		List<Demand> demandList = demandService.updateDemands(calculationReq);
 		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();

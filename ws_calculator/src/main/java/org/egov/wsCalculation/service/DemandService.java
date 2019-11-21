@@ -98,13 +98,13 @@ public class DemandService {
 	 * 
 	 * @return
 	 */
-	public Map<String, Calculation> generateDemands(CalculationReq request) {
-
+	public List<Demand> generateDemands(CalculationReq request) {
+		List<Demand> createdDemand = new ArrayList<>();
 		Map<String, Object> masterMap = mstrDataService.getMasterMap(request);
 		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
 		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
-		generateDemand(request.getRequestInfo(), calculationList, masterMap);
-		return waterCalculationMap;
+		createdDemand = generateDemand(request.getRequestInfo(), calculationList, masterMap);
+		return createdDemand;
 	}
 
 	/**
@@ -116,8 +116,8 @@ public class DemandService {
 	 *            The Calculation Objects for which demand has to be generated
 	 *            or updated
 	 */
-	public void generateDemand(RequestInfo requestInfo, List<Calculation> calculations, Map<String, Object> masterMap) {
-
+	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations, Map<String, Object> masterMap) {
+		List<Demand> createdDemands = new ArrayList<>();
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
 
@@ -150,10 +150,11 @@ public class DemandService {
 		}
 
 		if (!CollectionUtils.isEmpty(createCalculations))
-			createDemand(requestInfo, createCalculations, masterMap);
+			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			updateDemand(requestInfo, updateCalculations);
+			createdDemands =  updateDemandForCalculation(requestInfo, updateCalculations);
+	return createdDemands;
 	}
 
 	/**
@@ -215,35 +216,6 @@ public class DemandService {
 					.build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
-	}
-
-	/**
-	 * Updates demand for the given list of calculations
-	 * 
-	 * @param requestInfo
-	 *            The RequestInfo of the calculation request
-	 * @param calculations
-	 *            List of calculation object
-	 * @return Demands that are updated
-	 */
-	private List<Demand> updateDemand(RequestInfo requestInfo, List<Calculation> calculations) {
-		List<Demand> demands = new LinkedList<>();
-		for (Calculation calculation : calculations) {
-
-			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
-					Collections.singleton(calculation.getWaterConnection().getApplicationNo()), requestInfo);
-
-			if (CollectionUtils.isEmpty(searchResult))
-				throw new CustomException("INVALID UPDATE", "No demand exists for applicationNumber: "
-						+ calculation.getWaterConnection().getApplicationNo());
-
-			Demand demand = searchResult.get(0);
-			List<DemandDetail> demandDetails = demand.getDemandDetails();
-			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation, demandDetails);
-			demand.setDemandDetails(updatedDemandDetails);
-			demands.add(demand);
-		}
-		return demandRepository.updateDemand(requestInfo, demands);
 	}
 
 	/**
@@ -510,108 +482,6 @@ public class DemandService {
 		return res.getDemands().get(0);
 	}
 
-	/**
-	 * Prepares Demand object based on the incoming calculation object and
-	 * property
-	 * 
-	 * @param property
-	 * @param calculation
-	 * @return
-	 */
-	private Demand prepareDemand(WaterConnection waterConnection, Calculation calculation, RequestInfo requestInfo) {
-
-		String tenantId = waterConnection.getProperty().getTenantId();
-		String propertyType = waterConnection.getProperty().getPropertyType();
-		String consumerCode = waterConnection.getProperty().getPropertyId()
-				+ WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR + waterConnection.getConnectionNo();
-		OwnerInfo owner = null;
-		Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, waterConnection);
-
-		List<DemandDetail> details = new ArrayList<>();
-
-		details = getAdjustedDemandDetails(tenantId, calculation, demand);
-
-		return Demand.builder().tenantId("pb").businessService(configs.getWsModuleCode()).consumerType(propertyType)
-				.consumerCode(consumerCode).payer(requestInfo.getUserInfo()).taxPeriodFrom(calculation.getFromDate())
-				.taxPeriodTo(calculation.getToDate()).status(Demand.StatusEnum.ACTIVE)
-				.minimumAmountPayable(BigDecimal.valueOf(configs.getPtMinAmountPayable())).demandDetails(details)
-				.build();
-	}
-
-	/**
-	 * Creates demandDetails for the new demand by adding all old demandDetails
-	 * and then adding demandDetails using the difference between the new and
-	 * old tax amounts for each taxHead
-	 * 
-	 * @param tenantId
-	 *            The tenantId of the property
-	 * @param calculation
-	 *            The calculation object for the property
-	 * @param oldDemand
-	 *            The oldDemand against the property
-	 * @return List of DemanDetails for the new demand
-	 */
-	private List<DemandDetail> getAdjustedDemandDetails(String tenantId, Calculation calculation, Demand oldDemand) {
-
-		List<DemandDetail> details = new ArrayList<>();
-
-		/* Create map of taxHead to list of DemandDetail */
-
-		Map<String, List<DemandDetail>> taxHeadCodeDetailMap = new LinkedHashMap<>();
-		if (oldDemand != null) {
-			for (DemandDetail detail : oldDemand.getDemandDetails()) {
-				if (taxHeadCodeDetailMap.containsKey(detail.getTaxHeadMasterCode()))
-					taxHeadCodeDetailMap.get(detail.getTaxHeadMasterCode()).add(detail);
-				else {
-					List<DemandDetail> detailList = new LinkedList<>();
-					detailList.add(detail);
-					taxHeadCodeDetailMap.put(detail.getTaxHeadMasterCode(), detailList);
-				}
-			}
-		}
-
-		for (TaxHeadEstimate estimate : calculation.getTaxHeadEstimates()) {
-
-			List<DemandDetail> detailList = taxHeadCodeDetailMap.get(estimate.getTaxHeadCode());
-			taxHeadCodeDetailMap.remove(estimate.getTaxHeadCode());
-
-			if (estimate.getTaxHeadCode().equalsIgnoreCase(WSCalculationConstant.WS_ADVANCE_CARRYFORWARD))
-				continue;
-
-			if (!CollectionUtils.isEmpty(detailList)) {
-				details.addAll(detailList);
-				BigDecimal amount = detailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO,
-						BigDecimal::add);
-
-				details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
-						.taxAmount(estimate.getEstimateAmount().subtract(amount)).collectionAmount(BigDecimal.ZERO)
-						.tenantId(tenantId).build());
-			} else {
-				details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
-						.taxAmount(estimate.getEstimateAmount()).collectionAmount(BigDecimal.ZERO).tenantId(tenantId)
-						.build());
-			}
-		}
-
-		/*
-		 * If some taxHeads are in old demand but not in new one a new
-		 * demandetail is added for each taxhead to balance it out during
-		 * apportioning
-		 */
-
-		for (Map.Entry<String, List<DemandDetail>> entry : taxHeadCodeDetailMap.entrySet()) {
-			List<DemandDetail> demandDetails = entry.getValue();
-			BigDecimal taxAmount = demandDetails.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO,
-					BigDecimal::add);
-			BigDecimal collectionAmount = demandDetails.stream().map(DemandDetail::getCollectionAmount)
-					.reduce(BigDecimal.ZERO, BigDecimal::add);
-			BigDecimal netAmount = collectionAmount.subtract(taxAmount);
-			details.add(DemandDetail.builder().taxHeadMasterCode(entry.getKey()).taxAmount(netAmount)
-					.collectionAmount(BigDecimal.ZERO).tenantId(tenantId).build());
-		}
-
-		return details;
-	}
 
 	/**
 	 * Generates and returns bill from billing service
