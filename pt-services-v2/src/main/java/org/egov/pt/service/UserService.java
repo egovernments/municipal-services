@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -231,10 +232,15 @@ public class UserService {
         else if(uri.toString().contains(userCreateEndpoint))
             dobFormat = "dd/MM/yyyy";
         try{
-            LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository.fetchResult(uri, userRequest);
-            parseResponse(responseMap,dobFormat);
-            UserDetailResponse userDetailResponse = mapper.convertValue(responseMap,UserDetailResponse.class);
-            return userDetailResponse;
+        	Optional<Object> response = serviceRequestRepository.fetchResult(uri, userRequest);
+        	if(response.isPresent()) {
+        		LinkedHashMap responseMap = (LinkedHashMap)response.get();
+                parseResponse(responseMap,dobFormat);
+                UserDetailResponse userDetailResponse = mapper.convertValue(responseMap,UserDetailResponse.class);
+                return userDetailResponse;
+        	}else {
+        		return new UserDetailResponse();
+        	}
         }
         // Which Exception to throw?
         catch(IllegalArgumentException  e)

@@ -1,5 +1,8 @@
 package org.egov.pt.web.contracts;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Assessment;
 
@@ -17,9 +20,13 @@ import lombok.NoArgsConstructor;
 public class AssessmentRequest {
 
 	@JsonProperty("RequestInfo")
+	@Valid
+	@NotNull
 	private RequestInfo requestInfo;
 	
-	@JsonProperty("Assessments")
-	private Assessment assessments;
+	@JsonProperty("Assessment")
+	@Valid
+	@NotNull
+	private Assessment assessment;
 
 }

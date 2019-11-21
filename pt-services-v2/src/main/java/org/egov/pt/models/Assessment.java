@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.egov.pt.models.enums.Channel;
 import org.egov.pt.models.enums.Status;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 public class Assessment {
 	
         @JsonProperty("financialYear")
+        @NotNull
         private String financialYear ;
 
         @JsonProperty("assessmentNumber")
@@ -31,14 +33,20 @@ public class Assessment {
 
         @JsonProperty("id")
         private String id ;
+        
+        @JsonProperty("propertyID")
+        @NotNull
+        private String propertyID;
 
         @JsonProperty("assessmentDate")
+        @NotNull
         private Long assessmentDate ;
 
         @JsonProperty("status")
         private Status status ;
 
         @JsonProperty("usageCategory")
+        @NotNull
         private String usageCategory ;
 
         @JsonProperty("source")
@@ -52,10 +60,12 @@ public class Assessment {
 
         @JsonProperty("units")
         @Valid
+        @NotNull
         private List<Unit> units ;
 
         @JsonProperty("documents")
         @Valid
+        @NotNull
         private List<Document> documents ;
 
         @JsonProperty("additionalDetails")
@@ -92,8 +102,6 @@ public class Assessment {
         	    return null;
         	  }
         	}
-
-
 
         public Assessment addUnitsItem(Unit unitsItem) {
             if (this.units == null) {

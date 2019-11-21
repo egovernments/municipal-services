@@ -150,6 +150,15 @@ public class PropertyConfiguration {
 	
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
+	
+	
+	//Assessments V2
+	@Value("${egov.pt.assessment.create.topic}")
+	private String createAssessmentTopic;
+	
+	@Value("${egov.pt.assessment.update.topic}")
+	private String updateAssessmentTopic;
+	
 
 
 }
