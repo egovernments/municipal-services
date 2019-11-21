@@ -12,8 +12,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.Property;
-import org.egov.waterConnection.model.SewerageConnection;
-import org.egov.waterConnection.model.SewerageConnectionRequest;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.Idgen.IdResponse;
@@ -69,37 +67,7 @@ public class EnrichmentService {
 		});
 	}
 
-	/**
-	 * 
-	 * @param waterConnectionList
-	 *            List of water connection for enriching the water connection
-	 *            with property.
-	 * @param requestInfo
-	 *            is RequestInfo from request
-	 */
-
-	public void enrichSewerageSearch(List<SewerageConnection> sewerageConnectionList, RequestInfo requestInfo) {
-		sewerageConnectionList.forEach(sewerageConnection -> {
-			List<Property> propertyList;
-			if (sewerageConnection.getProperty().getId() == null
-					|| sewerageConnection.getProperty().getId().isEmpty()) {
-				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
-			}
-			if (sewerageConnection.getProperty().getId() != null) {
-				Set<String> propertyIds = new HashSet<>();
-				propertyIds.add(sewerageConnection.getProperty().getId());
-				SearchCriteria searchCriteria = SearchCriteria.builder()
-						.ids(propertyIds).build();
-				propertyList = waterServicesUtil.propertySearchOnCriteria(searchCriteria, requestInfo);
-				if (propertyList == null || propertyList.isEmpty()) {
-					throw new CustomException("INVALID SEARCH",
-							"NO PROPERTY FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
-				}
-				sewerageConnection.setProperty(propertyList.get(0));
-			}
-		});
-	}
+	
 
 	/**
 	 * 
@@ -123,17 +91,6 @@ public class EnrichmentService {
 	}
 	
 	
-	/**
-	 * 
-	 * @param waterConnectionRequest
-	 * @param propertyList
-	 */
-
-	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isCreate) {
-		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		if (isCreate)
-			setSewarageConnectionIdgenIds(sewerageConnectionRequest);
-	}
 	
 	/**
 	 * Sets the WaterConnectionId for given WaterConnectionRequest
@@ -160,30 +117,7 @@ public class EnrichmentService {
 		waterConnection.setId(itr.next());
 	}
 
-	/**
-	 * Sets the SewarageConnectionId for given SewerageConnectionRequest
-	 *
-	 * @param request SewerageConnectionRequest which is to be created
-	 */
-	private void setSewarageConnectionIdgenIds(SewerageConnectionRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		SewerageConnection waterConnection = request.getSewerageConnection();
 
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getSewerageIdGenName(),
-				config.getSewerageIdGenFormat(), 1);
-		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != 1) {
-			errorMap.put("IDGEN ERROR ",
-					"The Id of SewerageConnection returned by idgen is not equal to number of SewerageConnection");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		waterConnection.setId(itr.next());
-	}
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
 		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
