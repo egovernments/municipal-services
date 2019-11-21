@@ -5,10 +5,12 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.egov.waterConnection.util.ResponseInfoFactory;
 import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Demand;
+import org.egov.wsCalculation.model.DemandResponse;
 import org.egov.wsCalculation.service.DemandService;
 import org.egov.wsCalculation.service.WSCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,8 @@ public class WSCalculationController {
 	@Autowired
 	private WSCalculationService wSCalculationService;
 	
+	@Autowired
+	private final ResponseInfoFactory responseInfoFactory;
 	
 	
 	@PostMapping("/_estimate")
@@ -51,8 +55,10 @@ public class WSCalculationController {
 	}
 	
 	@PostMapping("/_update")
-	public ResponseEntity<List<Demand>> updateDemands(@RequestBody @Valid CalculationReq calculationReq) {
-		return new ResponseEntity<>(demandService.updateDemands(calculationReq), HttpStatus.OK);
+	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid CalculationReq calculationReq) {
+		List<Demand> demandList = demandService.updateDemands(calculationReq);
+		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 }

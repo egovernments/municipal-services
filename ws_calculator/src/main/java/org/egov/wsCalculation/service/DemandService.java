@@ -134,15 +134,15 @@ public class DemandService {
 			// calculations.stream().map(calculation ->
 			// calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
 			List<Demand> demands = searchDemand(tenantId, consumerCodes, requestInfo);
-			Set<String> applicationNumbersFromDemands = new HashSet<>();
+			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
-				applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
+				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
 						.collect(Collectors.toSet());
 
 			// If demand already exists add it updateCalculations else
 			// createCalculations
 			for (Calculation calculation : calculations) {
-				if (!applicationNumbersFromDemands.contains(calculation.getConnectionNo()))
+				if (!connectionNumbersFromDemands.contains(calculation.getConnectionNo()))
 					createCalculations.add(calculation);
 				else
 					updateCalculations.add(calculation);
@@ -250,7 +250,7 @@ public class DemandService {
 	 * Returns the list of new DemandDetail to be added for updating the demand
 	 * 
 	 * @param calculation
-	 *            The calculation object for the update tequest
+	 *            The calculation object for the update request
 	 * @param demandDetails
 	 *            The list of demandDetails from the existing demand
 	 * @return The list of new DemandDetails
