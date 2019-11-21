@@ -766,5 +766,45 @@ public class DemandService {
 		}
 
 	}
+	
+	/**
+	 * update demand for the given list of calculations
+	 * 
+	 * @param calculations Request that contain request info and calculation list
+	 * @return Demands that are updated
+	 */
+	public List<Demand> updateDemands(CalculationReq request) {
+		List<Demand> demands = new LinkedList<>();
+		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
+		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
+		demands = updateDemandForCalculation(request.getRequestInfo(), calculationList);
+		return demands;
+	}
+	
+
+    /**
+     * Updates demand for the given list of calculations
+     * @param requestInfo The RequestInfo of the calculation request
+     * @param calculations List of calculation object
+     * @return Demands that are updated
+     */
+    private List<Demand> updateDemandForCalculation(RequestInfo requestInfo,List<Calculation> calculations){
+        List<Demand> demands = new LinkedList<>();
+        for(Calculation calculation : calculations) {
+
+            List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getWaterConnection().getConnectionNo())
+                    , requestInfo);
+
+            if(CollectionUtils.isEmpty(searchResult))
+                throw new CustomException("INVALID UPDATE","No demand exists for connection Number: "+calculation.getWaterConnection().getConnectionNo());
+
+            Demand demand = searchResult.get(0);
+            List<DemandDetail> demandDetails = demand.getDemandDetails();
+            List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation,demandDetails);
+            demand.setDemandDetails(updatedDemandDetails);
+            demands.add(demand);
+        }
+         return demandRepository.updateDemand(requestInfo,demands);
+    }
 
 }
