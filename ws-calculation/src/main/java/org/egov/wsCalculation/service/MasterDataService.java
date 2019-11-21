@@ -119,7 +119,7 @@ public class MasterDataService {
 			Map<String, JSONArray> billingSlabMaster, Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+				calculatorUtils.getWaterConnectionModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
 		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
 		for (Entry<String, JSONArray> entry : res.entrySet()) {
 
@@ -203,7 +203,7 @@ public class MasterDataService {
 			Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
 		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+				calculatorUtils.getWaterConnectionModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
 		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WATER_TAX_MODULE);
 		for (Entry<String, JSONArray> entry : res.entrySet()) {
 

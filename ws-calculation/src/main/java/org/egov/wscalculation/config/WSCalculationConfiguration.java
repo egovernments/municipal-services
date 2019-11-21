@@ -84,12 +84,18 @@ public class WSCalculationConfiguration {
 	private String financialYearStartMonth;
 	
 	
-	  @Value("${egov.demand.businessservice}")
-	    private String businessService;
+	@Value("${egov.demand.businessservice}")
+	private String businessService;
 	  
-	  @Value("${egov.demand.minimum.payable.amount}")
-	    private BigDecimal minimumPayableAmount;
+	@Value("${egov.demand.minimum.payable.amount}")
+	 private BigDecimal minimumPayableAmount;
 	  
+	 //water&Sewarge Registry
+	 @Value("${egov.ws.host}")
+	 private String waterConnectionHost;
+
+	 @Value("${egov.wc.search.endpoint}")
+	 private String waterConnectionSearchEndPoint;
 	  
 
 }

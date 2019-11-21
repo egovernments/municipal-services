@@ -12,10 +12,18 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.WaterConnectionResponse;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.RequestInfoWrapper;
+import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 
@@ -25,10 +33,13 @@ public class CalculatorUtil {
 
 	@Autowired
 	WSCalculationConfiguration calculationConfig;
+	
+	@Autowired
+	ServiceRequestRepository serviceRequestRepository;
 	/**
 	 * Methods provides all the usage category master for Water Service module
 	 */
-	public MdmsCriteriaReq getPropertyModuleRequest(RequestInfo requestInfo, String tenantId) {
+	public MdmsCriteriaReq getWaterConnectionModuleRequest(RequestInfo requestInfo, String tenantId) {
 		List<MasterDetail> details = new ArrayList<>();
 		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_REBATE_MASTER).build());
 		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_WATER_CESS_MASTER).build());
@@ -70,6 +81,50 @@ public class CalculatorUtil {
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+	 /**
+     * Call WS-services to get waterConnection for the given applicationNumber and tenantID
+     * @param requestInfo The RequestInfo of the incoming request
+     * @param applicationNumber The applicationNumber whose waterconnection has to be fetched
+     * @param tenantId The tenantId of the waterconnection
+     * @return The waterconnection fo the particular applicationNumber
+     */
+    public WaterConnection getWaterConnection(RequestInfo requestInfo, String applicationNumber, String tenantId){
+        ObjectMapper mapper = new ObjectMapper();
+    	String url = getWaterSearchURL();
+        url = url.replace("{1}",tenantId).replace("{2}",applicationNumber);
+        Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
+                requestInfo(requestInfo).build());
+
+        WaterConnectionResponse response =null;
+        try {
+                response = mapper.convertValue(result, WaterConnectionResponse.class);
+        }
+        catch (IllegalArgumentException e){
+            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
+        }
+
+        if(response==null || CollectionUtils.isEmpty(response.getWaterConnection()))
+            return null;
+
+        return response.getWaterConnection().get(0);
+    }
+    
+    
+    /**
+     * Creates tradeLicense search url based on tenantId and applicationNumber
+     * @return water search url
+     */
+	private String getWaterSearchURL() {
+		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
+		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("connectionNumber=");
+		url.append("{2}");
+		return url.toString();
 	}
 
 }

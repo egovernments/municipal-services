@@ -49,7 +49,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	public CalculationRes getTaxCalculation(CalculationReq request) {
 
 		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
-		WaterConnection waterConnection = criteria.getWaterConnection();
 		// wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
@@ -80,7 +79,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		// String assessmentNumber = null != detail.getAssessmentNumber() ?
 		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
 		String tenantId = null != waterConnection.getProperty().getTenantId()
-				? waterConnection.getProperty().getTenantId() : criteria.getTenantId();
+				? waterConnection.getProperty().getTenantId()
+				: criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
 		Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
@@ -109,8 +109,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 			case CHARGES:
 				waterCharge = waterCharge.add(estimate.getEstimateAmount());
-                break;
-				
+				break;
+
 			case PENALTY:
 				penalty = penalty.add(estimate.getEstimateAmount());
 				break;
@@ -155,7 +155,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
 				.rebate(rebate).fromDate(fromDate).toDate(toDate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection()).applicationNO(criteria.getWaterConnection().getApplicationNo()).build();
+				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection())
+				.applicationNO(criteria.getWaterConnection().getApplicationNo()).build();
 	}
 
 }
