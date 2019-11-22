@@ -2,6 +2,7 @@ package org.egov.wsCalculation.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
+import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,9 @@ public class EstimationService {
 	
 	@Autowired
 	WSCalculationService wSCalculationService;
+	
+	@Autowired
+	CalculatorUtil calculatorUtil;
 	
 	
 	/**
@@ -88,10 +93,12 @@ public class EstimationService {
 	 */
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
-		WaterConnection waterConnection = criteria.getWaterConnection();
-		String assessmentYear = "2019-20";
+		WaterConnection waterConnection = null;
+		String assessmentYear = getAssessmentYear();
 		String tenantId = requestInfo.getUserInfo().getTenantId();
-
+		if(criteria.getWaterConnection() == null && !criteria.getConnectionNo().isEmpty()) {
+			waterConnection = calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), tenantId);
+		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
@@ -185,11 +192,12 @@ public class EstimationService {
 		List<Double> waterCharges = new ArrayList<>();
 		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
-			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
 		if (billingSlabs.size() > 1)
 			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
-		log.info(billingSlabs.get(0).toString());
+		//print billing slab id's
+		//log.info(billingSlabs.get(0).toString());
 		if (isRangeCalculation("connectionAttribute")) {
 			billingSlabs.forEach(billingSlab -> {
 				billingSlab.slabs.forEach(range -> {
@@ -212,21 +220,19 @@ public class EstimationService {
 
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs, RequestInfo requestInfo) {
 		Property property = waterConnection.getProperty();
-		String tenantId = property.getTenantId();
 		// get billing Slab
-
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String propertyType = property.getPropertyType();
+		final String buildingType = property.getPropertyType();
 		final String connectionType = waterConnection.getConnectionType();
 		final String calculationAttribute = "Water consumption";
 		final String unitOfMeasurement = "kL";
 
 		return billingSlabs.stream().filter(slab -> {
-			boolean isPropertyTypeMatching = slab.BuildingType.equals(propertyType);
+			boolean isBuildingTypeMatching = slab.BuildingType.equals(buildingType);
 			boolean isConnectionTypeMatching = slab.ConnectionType.equals(connectionType);
 			boolean isCalculationAttributeMatching = slab.CalculationAttribute.equals(calculationAttribute);
 			boolean isUnitOfMeasurementMatcing = slab.UOM.equals(unitOfMeasurement);
-			return isPropertyTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
+			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
 					&& isUnitOfMeasurementMatcing;
 		}).collect(Collectors.toList());
 	}
@@ -235,5 +241,10 @@ public class EstimationService {
 		if (type.equalsIgnoreCase("Flat"))
 			return false;
 		return true;
+	}
+	
+	private String getAssessmentYear() {
+		return Integer.toString(YearMonth.now().getYear()) + "-"
+				+ (Integer.toString(YearMonth.now().getYear() + 1).substring(0, 2));
 	}
 }
