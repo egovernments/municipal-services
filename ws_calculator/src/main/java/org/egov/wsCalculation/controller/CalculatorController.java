@@ -1,12 +1,10 @@
 package org.egov.wsCalculation.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.egov.wsCalculation.model.BillAndCalculations;
-import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Demand;

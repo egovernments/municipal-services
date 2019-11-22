@@ -1,6 +1,5 @@
 package org.egov.wsCalculation.model;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.egov.waterConnection.model.WaterConnection;
 import org.springframework.validation.annotation.Validated;
@@ -27,11 +26,10 @@ import lombok.ToString;
 @ToString
 public class CalculationCriteria   {
 	
-		@Valid
-		@NotNull
         @JsonProperty("waterConnection")
         private WaterConnection waterConnection;
-
+        
+        @NotNull
         @JsonProperty("connectionNo")
         private String connectionNo;
 
@@ -41,7 +39,15 @@ public class CalculationCriteria   {
         @NotNull
         @JsonProperty("tenantId")
         private String tenantId;
+        
+        @JsonProperty("meterStatus")
+        private Integer meterStatus = null;
+        
+        @JsonProperty("lastReading")
+        private Integer lastReading = null;
 
-
+        @JsonProperty("currentReading")
+        private Integer currentReading = null;
+        
 }
 
