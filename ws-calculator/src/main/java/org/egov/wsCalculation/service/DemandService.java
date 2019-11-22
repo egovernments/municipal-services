@@ -194,7 +194,7 @@ public class DemandService {
 
 			String tenantId = calculation.getTenantId();
 			String consumerCode = calculation.getConnectionNo();
-			User owner = requestInfo.getUserInfo() ;
+			User owner = requestInfo.getUserInfo();
 
 			List<DemandDetail> demandDetails = new LinkedList<>();
 
@@ -216,8 +216,8 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getMinimumPayableAmount()).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService()).status(StatusEnum.valueOf("ACTIVE"))
-					.build());
+					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
+					.status(StatusEnum.valueOf("ACTIVE")).build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
 	}
