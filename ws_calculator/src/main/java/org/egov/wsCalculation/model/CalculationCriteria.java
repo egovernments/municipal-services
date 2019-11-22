@@ -27,21 +27,28 @@ import lombok.ToString;
 @ToString
 public class CalculationCriteria   {
 	
-		@Valid
-		@NotNull
         @JsonProperty("waterConnection")
         private WaterConnection waterConnection;
-
-        @JsonProperty("applicationNO")
-        private String applicationNO;
-
-        @JsonProperty("assessmentYear")
-        private String assessmentYear;
+        
+        @NotNull
+        @JsonProperty("connectionNo")
+        private String connectionNo;
 
         @NotNull
         @JsonProperty("tenantId")
         private String tenantId;
+        
+        @JsonProperty("meterStatus")
+        private Integer meterStatus = null;
+        
+        @JsonProperty("lastReading")
+        private Integer lastReading = null;
 
-
+        @JsonProperty("currentReading")
+        private Integer currentReading = null;
+        
+        @JsonProperty("assessmentYear")
+        private String assessmentYear;
+        
 }
 
