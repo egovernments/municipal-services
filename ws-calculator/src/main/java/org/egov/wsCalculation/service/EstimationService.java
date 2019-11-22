@@ -103,7 +103,7 @@ public class EstimationService {
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 				timeBasedExemptionMasterMap);
-		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection,billingSlabMaster, requestInfo);
+		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, requestInfo);
 		taxAmt = waterCharge;
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
 				criteria.getWaterConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
@@ -174,10 +174,10 @@ public class EstimationService {
 	 * present in the Water Details
 	 */
 
-	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection,
+	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, CalculationCriteria criteria, 
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal waterCharege = BigDecimal.ZERO;
-		Double waterChargeToCompare = 45.0;
+		Double waterChargeToCompare =  (criteria.getCurrentReading() - criteria.getLastReading());
 		if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
 		ObjectMapper mapper = new ObjectMapper();
@@ -214,7 +214,7 @@ public class EstimationService {
 			});
 		}
 		if (!waterCharges.isEmpty())
-			waterCharege = BigDecimal.valueOf(waterCharges.get(0));
+			 waterCharege = BigDecimal.valueOf(waterCharges.get(0));
 		return waterCharege;
 	}
 

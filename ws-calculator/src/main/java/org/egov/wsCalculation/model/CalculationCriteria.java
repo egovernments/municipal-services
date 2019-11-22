@@ -44,10 +44,10 @@ public class CalculationCriteria   {
         private Integer meterStatus = null;
         
         @JsonProperty("lastReading")
-        private Integer lastReading = null;
+        private Double lastReading = null;
 
         @JsonProperty("currentReading")
-        private Integer currentReading = null;
+        private Double currentReading = null;
         
 }
 
