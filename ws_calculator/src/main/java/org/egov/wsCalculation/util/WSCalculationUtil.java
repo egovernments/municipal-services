@@ -18,7 +18,7 @@ import org.egov.wsCalculation.model.AuditDetails;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandDetail;
 import org.egov.wsCalculation.model.GetBillCriteria;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -275,6 +275,27 @@ public class WSCalculationUtil {
 				.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
 				.append(WSCalculationConstant.WATER_TAX_SERVICE_CODE).append(WSCalculationConstant.SEPARATER)
 				.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME).append(consumerCode);
+	}
+	
+	/**
+	 * Creates generate bill url using tenantId,consumerCode and businessService
+	 * 
+	 * @return Bill Generate url
+	 */
+	public String getBillGenerateURI() {
+		StringBuilder url = new StringBuilder(configurations.getBillingServiceHost());
+		url.append(configurations.getBillGenerateEndpoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("consumerCode=");
+		url.append("{2}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{3}");
+
+		return url.toString();
 	}
 	
 

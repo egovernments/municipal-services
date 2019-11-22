@@ -1,6 +1,5 @@
 package org.egov.wsCalculation.model;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.egov.waterConnection.model.WaterConnection;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +33,9 @@ public class CalculationCriteria   {
         @JsonProperty("connectionNo")
         private String connectionNo;
 
+        @JsonProperty("assessmentYear")
+        private String assessmentYear;
+
         @NotNull
         @JsonProperty("tenantId")
         private String tenantId;
@@ -46,9 +48,6 @@ public class CalculationCriteria   {
 
         @JsonProperty("currentReading")
         private Integer currentReading = null;
-        
-        @JsonProperty("assessmentYear")
-        private String assessmentYear;
         
 }
 

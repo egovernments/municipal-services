@@ -25,8 +25,8 @@ import lombok.Setter;
 @JsonPropertyOrder({ "tenantId", "totalAmount", "taxAmount", "exemption", "rebate", "exemption", "penalty" })
 public class Calculation {
 
-	@JsonProperty("connectionNo")
-	private String connectionNo;
+	@JsonProperty("applicationNo")
+	private String applicationNO;
 
 	@JsonProperty("fromDate")
 	private Long fromDate;
@@ -60,4 +60,6 @@ public class Calculation {
 	@JsonProperty("waterConnection")
 	private WaterConnection waterConnection = null;
 	
+	@JsonProperty("connectionNo")
+	private String connectionNo;
 }

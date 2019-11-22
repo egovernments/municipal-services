@@ -1,4 +1,4 @@
-package org.egov.wscalculation;
+package org.egov.wsCalculation;
 
 import java.util.TimeZone;
 

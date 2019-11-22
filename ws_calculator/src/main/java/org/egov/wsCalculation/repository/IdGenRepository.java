@@ -7,7 +7,7 @@ import org.egov.tracer.model.ServiceCallException;
 import org.egov.wsCalculation.model.Idgen.IdGenerationRequest;
 import org.egov.wsCalculation.model.Idgen.IdGenerationResponse;
 import org.egov.wsCalculation.model.Idgen.IdRequest;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;

@@ -8,7 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.AuditDetails;
 import org.egov.wsCalculation.util.WSCalculationUtil;
-import org.egov.wscalculation.rowmapper.AssessmentRowMapper;
+import org.egov.wsCalculation.rowmapper.AssessmentRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;

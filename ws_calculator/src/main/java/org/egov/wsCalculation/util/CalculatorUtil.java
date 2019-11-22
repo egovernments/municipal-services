@@ -18,7 +18,7 @@ import org.egov.waterConnection.model.WaterConnectionResponse;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

@@ -6,7 +6,7 @@ import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandRequest;
 import org.egov.wsCalculation.model.DemandResponse;
-import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
