@@ -85,14 +85,14 @@ public class CalculatorUtil {
 	 /**
      * Call WS-services to get waterConnection for the given applicationNumber and tenantID
      * @param requestInfo The RequestInfo of the incoming request
-     * @param applicationNumber The applicationNumber whose waterconnection has to be fetched
-     * @param tenantId The tenantId of the waterconnection
-     * @return The waterconnection fo the particular applicationNumber
+     * @param applicationNumber The applicationNumber whose water connection has to be fetched
+     * @param tenantId The tenantId of the water connection
+     * @return The water connection fo the particular applicationNumber
      */
-    public WaterConnection getWaterConnection(RequestInfo requestInfo, String applicationNumber, String tenantId){
+    public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
         ObjectMapper mapper = new ObjectMapper();
     	String url = getWaterSearchURL();
-        url = url.replace("{1}",tenantId).replace("{2}",applicationNumber);
+        url = url.replace("{1}",tenantId).replace("{2}",connectionNo);
         Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
                 requestInfo(requestInfo).build());
 
