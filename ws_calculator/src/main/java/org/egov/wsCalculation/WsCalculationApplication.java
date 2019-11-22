@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.egov.wscalculation", "org.egov.wsCalculation.controller",
-		"org.egov.wscalculation.config", "org.egov.wsCalculation.repository", "org.egov.wsCalculation.service",
+@ComponentScan(basePackages = { "org.egov.wsCalculation", "org.egov.wsCalculation.controller",
+		"org.egov.wsCalculation.config", "org.egov.wsCalculation.repository", "org.egov.wsCalculation.service",
 		"org.egov.wsCalculation.util", "org.egov.wsCalculation.producer", "org.egov.wsCalculation.consumer",
 		"org.egov.wsCalculation.validator"})
 public class WsCalculationApplication {

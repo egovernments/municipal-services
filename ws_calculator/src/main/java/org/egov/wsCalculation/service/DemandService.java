@@ -30,6 +30,7 @@ import org.egov.wsCalculation.model.BillingSlabIds;
 import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Demand;
+import org.egov.wsCalculation.model.Demand.StatusEnum;
 import org.egov.wsCalculation.model.DemandDetail;
 import org.egov.wsCalculation.model.DemandRequest;
 import org.egov.wsCalculation.model.DemandResponse;
@@ -215,7 +216,7 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getMinimumPayableAmount()).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
+					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService()).status(StatusEnum.valueOf("ACTIVE"))
 					.build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
