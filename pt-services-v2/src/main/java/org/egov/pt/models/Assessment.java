@@ -34,6 +34,10 @@ public class Assessment {
         @JsonProperty("id")
         private String id ;
         
+        @JsonProperty("tenantId")
+        @NotNull
+        private String tenantId ;
+        
         @JsonProperty("propertyID")
         @NotNull
         private String propertyID;
@@ -44,10 +48,6 @@ public class Assessment {
 
         @JsonProperty("status")
         private Status status ;
-
-        @JsonProperty("usageCategory")
-        @NotNull
-        private String usageCategory ;
 
         @JsonProperty("source")
         private Source source ;
@@ -60,12 +60,10 @@ public class Assessment {
 
         @JsonProperty("units")
         @Valid
-        @NotNull
         private List<Unit> units ;
 
         @JsonProperty("documents")
         @Valid
-        @NotNull
         private List<Document> documents ;
 
         @JsonProperty("additionalDetails")

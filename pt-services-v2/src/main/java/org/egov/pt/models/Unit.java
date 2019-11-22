@@ -32,7 +32,6 @@ public class Unit   {
         private String tenantId;
 
         @JsonProperty("floorNo")
-        @NotNull
         private String floorNo;
 
         @JsonProperty("unitArea")

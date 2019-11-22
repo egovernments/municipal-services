@@ -20,6 +20,10 @@ public class Document {
         @JsonProperty("id")
         private String id ;
         
+        @JsonProperty("tenantId")
+        @NotNull
+        private String tenantId ;
+        
         @JsonProperty("entityId")
         private String entityId;
 
@@ -28,11 +32,15 @@ public class Document {
         private String documentType ;
         
         @JsonProperty("documentBelongsTo")
+        @NotNull
         private DocumentBelongsTo documentBelongsTo ;
 
         @JsonProperty("fileStore")
         @NotNull
         private String fileStore ;
+        
+        @JsonProperty("active")
+        private Boolean active;
 
         @JsonProperty("documentUid")
         @NotNull

@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Assessment;
@@ -18,6 +17,8 @@ import org.egov.pt.producer.Producer;
 import org.egov.pt.validator.AssessmentValidator;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 public class AssessmentService {
 	
@@ -44,7 +45,7 @@ public class AssessmentService {
 		enrichAssessmentUpdate(request);
 		producer.push(props.getUpdateAssessmentTopic(), request);
 
-		return null;
+		return request.getAssessment();
 	}
 	
 	private void enrichAssessmentCreate(AssessmentRequest request) {
@@ -52,17 +53,19 @@ public class AssessmentService {
 		assessment.setId(String.valueOf(UUID.randomUUID()));
 		assessment.setAssessmentNumber("");
 		assessment.setStatus(Status.ACTIVE);
-		
-		for(Unit unit: assessment.getUnits()) {
-			unit.setId(String.valueOf(UUID.randomUUID()));
-			unit.setAssessmentId(assessment.getId());
-			unit.setActive(true);
-		}
-		
-		for(Document doc: assessment.getDocuments()) {
-			doc.setId(String.valueOf(UUID.randomUUID()));
-			doc.setEntityId(assessment.getId());
-			doc.setDocumentBelongsTo(DocumentBelongsTo.ASSESSMENT);
+		if(!CollectionUtils.isEmpty(assessment.getUnits())) {
+			for(Unit unit: assessment.getUnits()) {
+				unit.setId(String.valueOf(UUID.randomUUID()));
+				unit.setAssessmentId(assessment.getId());
+				unit.setActive(true);
+			}
+		}		
+		if(!CollectionUtils.isEmpty(assessment.getDocuments())) {
+			for(Document doc: assessment.getDocuments()) {
+				doc.setId(String.valueOf(UUID.randomUUID()));
+				doc.setEntityId(assessment.getId());
+				doc.setDocumentBelongsTo(DocumentBelongsTo.ASSESSMENT);
+			}
 		}
 		
 		AuditDetails auditDetails = AuditDetails.builder()
@@ -76,7 +79,30 @@ public class AssessmentService {
 		
 	}
 	
+	
 	private void enrichAssessmentUpdate(AssessmentRequest request) {
+		Assessment assessment = request.getAssessment();
+		if(!CollectionUtils.isEmpty(assessment.getUnits())) {
+			for(Unit unit: assessment.getUnits()) {
+				if(StringUtils.isEmpty(unit.getId())) {
+					unit.setId(String.valueOf(UUID.randomUUID()));
+					unit.setAssessmentId(assessment.getId());
+					unit.setActive(true);			
+				}
+			}
+		}
+		if(!CollectionUtils.isEmpty(assessment.getDocuments())) {
+			for(Document doc: assessment.getDocuments()) {
+				if(StringUtils.isEmpty(doc.getId())) {
+					doc.setId(String.valueOf(UUID.randomUUID()));
+					doc.setEntityId(assessment.getId());
+					doc.setDocumentBelongsTo(DocumentBelongsTo.ASSESSMENT);
+				}
+			}
+		}
+		assessment.getAuditDetails().setLastModifiedBy(request.getRequestInfo().getUserInfo().getUuid());
+		assessment.getAuditDetails().setLastModifiedTime(new Date().getTime());
+		
 		
 	}
 	
