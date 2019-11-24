@@ -85,7 +85,7 @@ public class WorkflowIntegrator {
 	public void callWorkFlow(TradeLicenseRequest tradeLicenseRequest) {
 
 		String wfTenantId = tradeLicenseRequest.getLicenses().get(0).getTenantId();
-		String businessServiceFromMDMS = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+		String businessServiceFromMDMS = tradeLicenseRequest.getLicenses().isEmpty()?null:tradeLicenseRequest.getLicenses().get(0).getBusinessService();
 		if (businessServiceFromMDMS == null)
 			businessServiceFromMDMS = businessService_TL;
 		JSONArray array = new JSONArray();

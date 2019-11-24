@@ -63,7 +63,7 @@ public class TLValidator {
      * @param request The input TradeLicenseRequest Object
      */
     public void validateCreate(TradeLicenseRequest request, Object mdmsData) {
-        String businessService = request.getLicenses().get(0).getBusinessService();
+        String businessService = request.getLicenses().isEmpty()?null:request.getLicenses().get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
         switch (businessService) {
@@ -228,7 +228,7 @@ public class TLValidator {
         if (searchResult.size() != licenses.size())
             throw new CustomException("INVALID UPDATE", "The license to be updated is not in database");
         validateAllIds(searchResult, licenses);
-        String businessService = request.getLicenses().get(0).getBusinessService();
+        String businessService = request.getLicenses().isEmpty()?null:request.getLicenses().get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
         switch (businessService) {

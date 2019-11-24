@@ -34,7 +34,7 @@ public class EditNotificationService {
 
     public void sendEditNotification(TradeLicenseRequest request, Map<String, Difference> diffMap) {
         List<SMSRequest> smsRequests = enrichSMSRequest(request, diffMap);
-        String businessService = request.getLicenses().get(0).getBusinessService();
+        String businessService = request.getLicenses().isEmpty()?null:request.getLicenses().get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
         switch(businessService)

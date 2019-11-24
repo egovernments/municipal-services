@@ -111,7 +111,7 @@ public class EnrichmentService {
         });
         setIdgenIds(tradeLicenseRequest);
         setStatusForCreate(tradeLicenseRequest);
-        String businessService = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+        String businessService = tradeLicenseRequest.getLicenses().isEmpty()?null:tradeLicenseRequest.getLicenses().get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
         switch (businessService) {
@@ -299,7 +299,7 @@ public class EnrichmentService {
      */
     private void setStatusForCreate(TradeLicenseRequest tradeLicenseRequest) {
         tradeLicenseRequest.getLicenses().forEach(license -> {
-            String businessService = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+            String businessService = tradeLicenseRequest.getLicenses().isEmpty()?null:tradeLicenseRequest.getLicenses().get(0).getBusinessService();
             if (businessService == null)
                 businessService = businessService_TL;
             switch (businessService) {
@@ -453,7 +453,7 @@ public class EnrichmentService {
      */
     public List<TradeLicense> enrichTradeLicenseSearch(List<TradeLicense> licenses, TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
 
-        String businessService = licenses.get(0).getBusinessService();
+        String businessService = licenses.isEmpty()?null:licenses.get(0).getBusinessService();
         if (businessService == null)
             businessService = businessService_TL;
         TradeLicenseSearchCriteria searchCriteria = enrichTLSearchCriteriaWithOwnerids(criteria,licenses);
