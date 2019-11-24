@@ -73,7 +73,7 @@ public class BillingslabController {
 
         String licensetype = billingSlabSearchCriteria.getLicenseType();
         BillingSlabRes response = null;
-        if (!licensetype.equalsIgnoreCase("BPASTAKEHOLDER")) {
+        if ((licensetype==null)||!licensetype.equalsIgnoreCase("BPASTAKEHOLDER")) {
             response = service.searchSlabs(billingSlabSearchCriteria, requestInfo);
         } else {
             BillingSlab billingSlab = bpaBillingSlabService.search(billingSlabSearchCriteria, requestInfo);
