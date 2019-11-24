@@ -64,6 +64,8 @@ public class WorkflowIntegrator {
 
 	private TLConfiguration config;
 
+	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
+	private Boolean wfFallbackEnabled;
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, TLConfiguration config) {
@@ -80,24 +82,34 @@ public class WorkflowIntegrator {
 	 *
 	 * @param tradeLicenseRequest
 	 */
-	public void callWorkFlow(TradeLicenseRequest tradeLicenseRequest,boolean isBPARequest) {
+	public void callWorkFlow(TradeLicenseRequest tradeLicenseRequest) {
 
 		String wfTenantId = tradeLicenseRequest.getLicenses().get(0).getTenantId();
+		String businessServiceFromMDMS = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
 		JSONArray array = new JSONArray();
 		for (TradeLicense license : tradeLicenseRequest.getLicenses()) {
-			if((!isBPARequest)||(!license.getAction().equalsIgnoreCase(TRIGGER_NOWORKFLOW))) {
+			if((businessServiceFromMDMS.equals(businessService_TL))||(!license.getAction().equalsIgnoreCase(TRIGGER_NOWORKFLOW))) {
 				JSONObject obj = new JSONObject();
 				Map<String, String> uuidmap = new HashMap<>();
 				uuidmap.put(UUIDKEY, license.getAssignee());
 				obj.put(BUSINESSIDKEY, license.getApplicationNumber());
 				obj.put(TENANTIDKEY, wfTenantId);
-				if (isBPARequest) {
-					String licenseeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-					obj.put(BUSINESSSERVICEKEY, licenseeType);
-					obj.put(MODULENAMEKEY, BPAMODULENAMEVALUE);
-				} else {
-					obj.put(BUSINESSSERVICEKEY, config.getTlBusinessServiceValue());
-					obj.put(MODULENAMEKEY, TLMODULENAMEVALUE);
+				switch(businessServiceFromMDMS)
+				{
+					case businessService_TL:
+						obj.put(BUSINESSSERVICEKEY, config.getTlBusinessServiceValue());
+						obj.put(MODULENAMEKEY, TLMODULENAMEVALUE);
+						break;
+
+					case businessService_BPA:
+						String tradeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+						if(wfFallbackEnabled)
+						{
+							tradeType=tradeType.split("\\.")[0];
+						}
+						obj.put(BUSINESSSERVICEKEY, tradeType);
+						obj.put(MODULENAMEKEY, BPAMODULENAMEVALUE);
+						break;
 				}
 				obj.put(ACTIONKEY, license.getAction());
 				obj.put(COMMENTKEY, license.getComment());

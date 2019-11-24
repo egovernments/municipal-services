@@ -63,10 +63,18 @@ public class TradeUtil {
      * Creates url for tl-calculator service
      * @return url for tl-calculator service
      */
-    public StringBuilder getCalculationURI(){
+    public StringBuilder getCalculationURI(String businessService) {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getCalculatorHost());
-        uri.append(config.getCalculateEndpoint());
+        switch (businessService) {
+            case businessService_TL:
+                uri.append(config.getCalculateEndpointTL());
+                break;
+
+            case businessService_BPA:
+                uri.append(config.getCalculateEndpointBPA());
+                break;
+        }
         return uri;
     }
 
@@ -233,7 +241,6 @@ public class TradeUtil {
         List<String>res=JsonPath.read(mdmsData, BPAConstants.MDMS_BPAROLEPATH);
         return  res.get(0);
     }
-
     public Object mDMSCall(TradeLicenseRequest tradeLicenseRequest){
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
         String tenantId = tradeLicenseRequest.getLicenses().get(0).getTenantId();
@@ -281,8 +288,8 @@ public class TradeUtil {
     public Map<String, Boolean> getIdToIsStateUpdatableMap(BusinessService businessService, List<TradeLicense> searchresult) {
         Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
         searchresult.forEach(result -> {
-            boolean isBPARequest = result.getLicenseType().toString().equals("BPASTAKEHOLDER");
-            if (isBPARequest && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED))) {
+            String nameofBusinessService = result.getBusinessService();
+            if (nameofBusinessService.equals(businessService_BPA) && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED))) {
                 idToIsStateUpdatableMap.put(result.getId(), true);
             } else
                 idToIsStateUpdatableMap.put(result.getId(), workflowService.isStateUpdatable(result.getStatus(), businessService));

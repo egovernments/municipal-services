@@ -117,7 +117,7 @@ public class TradeLicenseDetail   {
         @JsonProperty("channel")
         private ChannelEnum channel = null;
 
-
+        @NotNull
         @Valid
         @JsonProperty("address")
         private Address address = null;

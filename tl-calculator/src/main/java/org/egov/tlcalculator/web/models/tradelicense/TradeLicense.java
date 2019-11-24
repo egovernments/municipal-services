@@ -37,9 +37,7 @@ public class  TradeLicense   {
     public enum LicenseTypeEnum {
         TEMPORARY("TEMPORARY"),
 
-        PERMANENT("PERMANENT"),
-
-        BPASTAKEHOLDER("BPASTAKEHOLDER");
+        PERMANENT("PERMANENT");
 
 
 
@@ -74,6 +72,9 @@ public class  TradeLicense   {
 
     @JsonProperty("applicationNumber")
     private String applicationNumber;
+
+    @JsonProperty("businessService")
+    private String businessService = "TL";
 
     @JsonProperty("oldLicenseNumber")
     private String oldLicenseNumber = null;

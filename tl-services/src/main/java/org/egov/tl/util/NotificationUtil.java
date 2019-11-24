@@ -309,8 +309,8 @@ public class NotificationUtil {
 	 * @param smsRequestList
 	 *            The list of SMSRequest to be sent
 	 */
-	public void sendSMS(List<SMSRequest> smsRequestList) {
-		if (config.getIsSMSEnabled()) {
+	public void sendSMS(List<SMSRequest> smsRequestList, boolean isSMSEnabled) {
+		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {

@@ -8,6 +8,7 @@ import org.egov.tl.web.models.*;
 import org.egov.tracer.model.CustomException;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +32,12 @@ public class TLQueryBuilder {
     private static final String INNER_JOIN_STRING = " INNER JOIN ";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
+    @Value("${egov.receipt.businessserviceTL}")
+    private String businessServiceTL;
+
+
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
 
     private static final String QUERY = "SELECT tl.*,tld.*,tlunit.*,tlacc.*,tlowner.*," +
             "tladdress.*,tlapldoc.*,tlverdoc.*,tlownerdoc.*,tlinsti.*,tl.id as tl_id,tl.tenantid as tl_tenantId,tl.lastModifiedTime as " +
@@ -102,6 +109,15 @@ public class TLQueryBuilder {
             preparedStmtList.add(criteria.getTenantId());
         }
 
+        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
+            preparedStmtList.add(businessServiceTL);
+        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" tl.businessservice=? ");
+            preparedStmtList.add(businessServiceBPA);
+        }
 
         List<String> ids = criteria.getIds();
         if(!CollectionUtils.isEmpty(ids)) {

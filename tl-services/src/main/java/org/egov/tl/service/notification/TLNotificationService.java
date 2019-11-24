@@ -15,6 +15,9 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.egov.tl.util.TLConstants.businessService_BPA;
+import static org.egov.tl.util.TLConstants.businessService_TL;
+
 
 @Slf4j
 @Service
@@ -41,29 +44,44 @@ public class TLNotificationService {
      */
     public void process(TradeLicenseRequest request){
 
-		boolean isBPARequest=request.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
-        List<SMSRequest> smsRequests = new LinkedList<>();
-        if(null != config.getIsSMSEnabled()) {
-        	if(config.getIsSMSEnabled()) {
-                enrichSMSRequest(request,smsRequests);
-                if(!CollectionUtils.isEmpty(smsRequests))
-                	util.sendSMS(smsRequests);
-        	}
-        }
-        if(isBPARequest && (null != config.getIsUserEventsNotificationEnabledForBPA())) {
-        	if(config.getIsUserEventsNotificationEnabledForBPA()) {
-        		EventRequest eventRequest = getEvents(request);
-        		if(null != eventRequest)
-        			util.sendEventNotification(eventRequest);
-        	}
-        }
+        String businessService = request.getLicenses().get(0).getBusinessService();
+		switch(businessService)
+		{
+			case businessService_TL:
+				List<SMSRequest> smsRequestsTL = new LinkedList<>();
+				if(null != config.getIsTLSMSEnabled()) {
+					if(config.getIsTLSMSEnabled()) {
+						enrichSMSRequest(request,smsRequestsTL);
+						if(!CollectionUtils.isEmpty(smsRequestsTL))
+							util.sendSMS(smsRequestsTL,true);
+					}
+				}
+				if(null != config.getIsUserEventsNotificationEnabledForTL()) {
+					if(config.getIsUserEventsNotificationEnabledForTL()) {
+						EventRequest eventRequest = getEvents(request);
+						if(null != eventRequest)
+							util.sendEventNotification(eventRequest);
+					}
+				}
+				break;
 
-		if(!isBPARequest && (null != config.getIsUserEventsNotificationEnabledForTL())) {
-			if(config.getIsUserEventsNotificationEnabledForTL()) {
-				EventRequest eventRequest = getEvents(request);
-				if(null != eventRequest)
-					util.sendEventNotification(eventRequest);
-			}
+			case businessService_BPA:
+				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
+				if(null != config.getIsBPASMSEnabled()) {
+					if(config.getIsBPASMSEnabled()) {
+						enrichSMSRequest(request,smsRequestsBPA);
+						if(!CollectionUtils.isEmpty(smsRequestsBPA))
+							util.sendSMS(smsRequestsBPA,true);
+					}
+				}
+				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
+					if(config.getIsUserEventsNotificationEnabledForBPA()) {
+						EventRequest eventRequest = getEvents(request);
+						if(null != eventRequest)
+							util.sendEventNotification(eventRequest);
+					}
+				}
+				break;
 		}
     }
 

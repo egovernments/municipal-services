@@ -44,27 +44,30 @@ public class ActionValidator {
 
         request.getLicenses().forEach(license -> {
 
-            boolean isBPARequest = license.getLicenseType().toString().equals("BPASTAKEHOLDER");
+            String businessService = license.getBusinessService();
+            switch(businessService)
+            {
+                case businessService_TL:
+                    if (ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
+                        if (license.getTradeLicenseDetail().getApplicationDocuments() != null)
+                            errorMap.put("INVALID ACTION", "Action should be APPLY when application document are provided");
+                    }
+                    if (ACTION_APPLY.equalsIgnoreCase(license.getAction())) {
+                        if (license.getTradeLicenseDetail().getApplicationDocuments() == null)
+                            errorMap.put("INVALID ACTION", "Action cannot be changed to APPLY. Application document are not provided");
+                    }
+                    if (!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
+                            !ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
+                        errorMap.put("INVALID ACTION", "Action can only be APPLY or INITIATE during create");
+                    }
+                    break;
 
-            if (isBPARequest) {
-                if (!TRIGGER_NOWORKFLOW.equalsIgnoreCase(license.getAction())) {
-                    errorMap.put("INVALID ACTION", "Action should be NOWORKFLOW during create");
-                }
-            } else {
-                if (ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
-                    if (license.getTradeLicenseDetail().getApplicationDocuments() != null)
-                        errorMap.put("INVALID ACTION", "Action should be APPLY when application document are provided");
-                }
-                if (ACTION_APPLY.equalsIgnoreCase(license.getAction())) {
-                    if (license.getTradeLicenseDetail().getApplicationDocuments() == null)
-                        errorMap.put("INVALID ACTION", "Action cannot be changed to APPLY. Application document are not provided");
-                }
-                if (!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
-                        !ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
-                    errorMap.put("INVALID ACTION", "Action can only be APPLY or INITIATE during create");
-                }
+                case businessService_BPA:
+                    if (!TRIGGER_NOWORKFLOW.equalsIgnoreCase(license.getAction())) {
+                        errorMap.put("INVALID ACTION", "Action should be NOWORKFLOW during create");
+                    }
+                    break;
             }
-
         });
         //    validateRole(request);
 
@@ -161,8 +164,8 @@ public class ActionValidator {
         Map<String,String> errorMap = new HashMap<>();
         request.getLicenses().forEach(license -> {
 
-            boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
-            if((!isBPARequest) || (isBPARequest && (!license.getStatus().equalsIgnoreCase(STATUS_INITIATED))))
+            String namefBusinessService=license.getBusinessService();
+            if((namefBusinessService.equals(businessService_TL)) || (namefBusinessService.equals(businessService_BPA) && (!license.getStatus().equalsIgnoreCase(STATUS_INITIATED))))
             {
                 if(!workflowService.isStateUpdatable(license.getStatus(), businessService)) {
                     if (license.getId() == null)

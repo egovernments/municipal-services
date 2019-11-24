@@ -125,7 +125,10 @@ public class TLConfiguration {
     private String calculatorHost;
 
     @Value("${egov.tl.calculator.calculate.endpoint}")
-    private String calculateEndpoint;
+    private String calculateEndpointTL;
+
+    @Value("${egov.bpa.calculator.calculate.endpoint}")
+    private String calculateEndpointBPA;
 
     @Value("${egov.tl.calculator.getBill.endpoint}")
     private String getBillEndpoint;
@@ -157,10 +160,11 @@ public class TLConfiguration {
     @Value("${kafka.topics.notification.sms}")
     private String smsNotifTopic;
 
-    @Value("${notification.sms.enabled}")
-    private Boolean isSMSEnabled;
+    @Value("${notification.sms.enabled.forTL}")
+    private Boolean isTLSMSEnabled;
 
-
+    @Value("${notification.sms.enabled.forBPA}")
+    private Boolean isBPASMSEnabled;
 
     //Localization
     @Value("${egov.localization.host}")

@@ -22,7 +22,10 @@ import org.egov.tl.workflow.TLWorkflowService;
 import org.egov.tl.workflow.WorkflowIntegrator;
 import org.egov.tl.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import static org.egov.tl.util.TLConstants.*;
 
 @Service
 public class TradeLicenseService {
@@ -52,6 +55,9 @@ public class TradeLicenseService {
     private WorkflowService workflowService;
 
     private EditNotificationService  editNotificationService;
+
+    @Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
+    private Boolean wfFallbackEnabled;
 
     @Autowired
     public TradeLicenseService(WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService,
@@ -83,22 +89,33 @@ public class TradeLicenseService {
      * @param tradeLicenseRequest The TradeLicense Create Request
      * @return The list of created traddeLicense
      */
-    public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest){
+    public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest,String businessServicefromPath){
+        if(businessServicefromPath==null)
+             businessServicefromPath = businessService_TL;
+        tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
         Object mdmsData = null;
-        boolean isBPARequest = tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
-        if (!isBPARequest)
-            mdmsData = util.mDMSCall(tradeLicenseRequest);
+        switch(businessServicefromPath)
+        {
+            case businessService_TL:
+                mdmsData = util.mDMSCall(tradeLicenseRequest);
+                break;
+        }
         actionValidator.validateCreateRequest(tradeLicenseRequest);
-        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData, isBPARequest);
-        tlValidator.validateCreate(tradeLicenseRequest, mdmsData, isBPARequest);
-        userService.createUser(tradeLicenseRequest, isBPARequest);
+        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
+        tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
+        userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
 
         /*
          * call workflow service if it's enable else uses internal workflow process
          */
-        if (!isBPARequest && config.getIsExternalWorkFlowEnabled())
-            wfIntegrator.callWorkFlow(tradeLicenseRequest, isBPARequest);
+        switch(businessServicefromPath)
+        {
+            case businessService_TL:
+                if (config.getIsExternalWorkFlowEnabled())
+                    wfIntegrator.callWorkFlow(tradeLicenseRequest);
+                break;
+        }
         repository.save(tradeLicenseRequest);
         return tradeLicenseRequest.getLicenses();
 	}
@@ -111,9 +128,10 @@ public class TradeLicenseService {
      * @param requestInfo The search request's requestInfo
      * @return List of tradeLicense for the given criteria
      */
-    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath){
         List<TradeLicense> licenses;
-        tlValidator.validateSearch(requestInfo,criteria);
+        tlValidator.validateSearch(requestInfo,criteria,serviceFromPath);
+        criteria.setBusinessService(serviceFromPath);
         enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
          if(criteria.getMobileNumber()!=null){
              licenses = getLicensesFromMobileNumber(criteria,requestInfo);
@@ -125,7 +143,7 @@ public class TradeLicenseService {
     }
 
 
-    private List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+    public List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
         List<TradeLicense> licenses = new LinkedList<>();
         UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
         // If user not found with given user fields return empty list
@@ -174,6 +192,7 @@ public class TradeLicenseService {
 
         criteria.setTenantId(request.getLicenses().get(0).getTenantId());
         criteria.setIds(ids);
+        criteria.setBusinessService(request.getLicenses().get(0).getBusinessService());
 
         List<TradeLicense> licenses = repository.getLicenses(criteria);
 
@@ -189,37 +208,51 @@ public class TradeLicenseService {
      * @param tradeLicenseRequest The update Request
      * @return Updated TradeLcienses
      */
-    public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest){
+    public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath){
+        if (businessServicefromPath == null)
+            businessServicefromPath = businessService_TL;
+        tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
         Object mdmsData = null;
         String businessServiceName = null;
-        boolean isBPARequest = tradeLicenseRequest.getLicenses().get(0).getLicenseType().toString().equals("BPASTAKEHOLDER");
-        if (!isBPARequest)
-            mdmsData = util.mDMSCall(tradeLicenseRequest);
+        switch (businessServicefromPath) {
+            case businessService_TL:
+                mdmsData = util.mDMSCall(tradeLicenseRequest);
+                businessServiceName = config.getTlBusinessServiceValue();
+                break;
 
-        if (isBPARequest) {
-            String licenseeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-            businessServiceName = licenseeType;
-        } else
-            businessServiceName = config.getTlBusinessServiceValue();
-
+            case businessService_BPA:
+                String tradeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+                if (wfFallbackEnabled)
+                    tradeType = tradeType.split("\\.")[0];
+                businessServiceName = tradeType;
+                break;
+        }
         BusinessService businessService = workflowService.getBusinessService(tradeLicenseRequest.getLicenses().get(0).getTenantId(), tradeLicenseRequest.getRequestInfo(), businessServiceName);
         List<TradeLicense> searchResult = getLicensesWithOwnerInfo(tradeLicenseRequest);
         actionValidator.validateUpdateRequest(tradeLicenseRequest, businessService);
         enrichmentService.enrichTLUpdateRequest(tradeLicenseRequest, businessService);//
-        tlValidator.validateUpdate(tradeLicenseRequest, searchResult, mdmsData, isBPARequest);
+        tlValidator.validateUpdate(tradeLicenseRequest, searchResult, mdmsData);
         Map<String, Difference> diffMap = diffService.getDifference(tradeLicenseRequest, searchResult);
         Map<String, Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService, searchResult);
 
         /*
          * call workflow service if it's enable else uses internal workflow process
          */
-        if (isBPARequest || config.getIsExternalWorkFlowEnabled())
-            wfIntegrator.callWorkFlow(tradeLicenseRequest, isBPARequest);
-        else
-            TLWorkflowService.updateStatus(tradeLicenseRequest);
+        switch (businessServicefromPath) {
+            case businessService_TL:
+                if (config.getIsExternalWorkFlowEnabled()) {
+                    wfIntegrator.callWorkFlow(tradeLicenseRequest);
+                } else {
+                    TLWorkflowService.updateStatus(tradeLicenseRequest);
+                }
+                break;
 
+            case businessService_BPA:
+                wfIntegrator.callWorkFlow(tradeLicenseRequest);
+                break;
+        }
         enrichmentService.postStatusEnrichment(tradeLicenseRequest);
-        userService.createUser(tradeLicenseRequest, isBPARequest);
+        userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
         editNotificationService.sendEditNotification(tradeLicenseRequest, diffMap);
         repository.update(tradeLicenseRequest, idToIsStateUpdatableMap);

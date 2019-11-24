@@ -52,7 +52,7 @@ public class UserService{
      * @param request TradeLciense create or update request
      */
 
-    public void createUser(TradeLicenseRequest request,boolean isBPARequest){
+    public void createUser(TradeLicenseRequest request,boolean isBPARoleAddRequired){
         List<TradeLicense> licenses = request.getLicenses();
         RequestInfo requestInfo = request.getRequestInfo();
         Role role = getCitizenRole(licenses.get(0).getTenantId());
@@ -88,7 +88,8 @@ public class UserService{
                     OwnerInfo user = new OwnerInfo();
                     user.addUserWithoutAuditDetail(owner);
                     addNonUpdatableFields(user,userDetailResponse.getUser().get(0));
-                    if (isBPARequest && (tradeLicense.getStatus() != null) && tradeLicense.getStatus().equals(STATUS_APPROVED)) {
+                    if(isBPARoleAddRequired)
+                    {
                         String licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
                         user.addRolesItem(Role.builder().code(licenseeTyperRole).name(licenseeTyperRole).build());
                     }
@@ -332,8 +333,6 @@ public class UserService{
 
         RequestInfo requestInfo = request.getRequestInfo();
         licenses.forEach(license -> {
-
-                boolean isBPARequest=license.getLicenseType().toString().equals("BPASTAKEHOLDER");
                 license.getTradeLicenseDetail().getOwners().forEach(owner -> {
                     UserDetailResponse userDetailResponse = isUserUpdatable(owner,requestInfo);
                     OwnerInfo user = new OwnerInfo();
@@ -366,9 +365,4 @@ public class UserService{
         StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
         return userCall(userSearchRequest,uri);
     }
-
-
-
-
-
 }

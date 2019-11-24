@@ -25,6 +25,8 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_BPA;
+
 
 @Service
 @Slf4j
@@ -69,7 +71,7 @@ public class BPACalculationService {
         Object mdmsData = mdmsService.mDMSCall(calculationReq.getRequestInfo(), tenantId);
         List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),
                 calculationReq.getCalulationCriteria(), mdmsData);
-        demandService.generateDemand(calculationReq.getRequestInfo(), calculations, mdmsData, true);
+        demandService.generateDemand(calculationReq.getRequestInfo(), calculations, mdmsData, businessService_BPA);
         CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
         producer.push(config.getSaveTopic(), calculationRes);
         return calculations;
@@ -90,20 +92,13 @@ public class BPACalculationService {
                 license = utils.getTradeLicense(requestInfo, criteria.getApplicationNumber(), criteria.getTenantId());
                 criteria.setTradelicense(license);
             }
-
             EstimatesAndSlabs estimatesAndSlabs = getTaxHeadEstimates(criteria, requestInfo, mdmsData);
-
-
             List<TaxHeadEstimate> taxHeadEstimates = estimatesAndSlabs.getEstimates();
-
-
             Calculation calculation = new Calculation();
             calculation.setTradeLicense(criteria.getTradelicense());
             calculation.setTenantId(criteria.getTenantId());
             calculation.setTaxHeadEstimates(taxHeadEstimates);
-
             calculations.add(calculation);
-
         }
         return calculations;
     }

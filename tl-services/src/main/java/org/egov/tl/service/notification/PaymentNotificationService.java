@@ -21,6 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.egov.tl.util.TLConstants.businessService_BPA;
+import static org.egov.tl.util.TLConstants.businessService_TL;
+
 
 @Service
 public class PaymentNotificationService {
@@ -80,7 +83,16 @@ public class PaymentNotificationService {
                                                                        requestInfo);
                 String localizationMessages = util.getLocalizationMessages(license.getTenantId(),requestInfo);
                 List<SMSRequest> smsRequests = getSMSRequests(license,valMap,localizationMessages);
-                util.sendSMS(smsRequests);
+                switch(valMap.get(businessServiceKey))
+                {
+                    case businessService_TL:
+                        util.sendSMS(smsRequests,config.getIsTLSMSEnabled());
+                        break;
+
+                    case businessService_BPA:
+                        util.sendSMS(smsRequests,config.getIsBPASMSEnabled());
+                        break;
+                }
             }
         }
         catch (Exception e){

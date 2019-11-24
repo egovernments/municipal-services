@@ -10,12 +10,16 @@ import org.egov.tlcalculator.service.DemandService;
 import org.egov.tlcalculator.web.models.*;
 import org.egov.tlcalculator.web.models.demand.BillResponse;
 import org.egov.tlcalculator.web.models.demand.GenerateBillCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_BPA;
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_TL;
 
 
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-27T14:56:03.454+05:30")
@@ -49,15 +53,24 @@ public class CalculatorController {
 	 * @param calculationReq The calculation Request
 	 * @return Calculation Response
 	 */
-	@RequestMapping(value = "/_calculate", method = RequestMethod.POST)
-	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
+	@RequestMapping(value = {"/{servicename}/_calculate","/_calculate"}, method = RequestMethod.POST)
+	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq,@PathVariable(required = false) String servicename) {
 
-		boolean isBPARequest = calculationReq.getCalulationCriteria().get(0).getTradelicense().getLicenseType().toString().equals("BPASTAKEHOLDER");
+		if(servicename==null)
+			servicename = businessService_TL;
 		List<Calculation> calculations = null;
-		if (!isBPARequest)
-			calculations = calculationService.calculate(calculationReq);
-		else
-			calculations = bpaCalculationService.calculate(calculationReq);
+		switch(servicename)
+		{
+			case businessService_TL:
+				calculations = calculationService.calculate(calculationReq);
+				break;
+
+			case businessService_BPA:
+				calculations = bpaCalculationService.calculate(calculationReq);
+				break;
+			default:
+				throw new CustomException("UNKNOWN_BUSINESSSERVICE", " Business Service not supported");
+		}
 		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		return new ResponseEntity<CalculationRes>(calculationRes, HttpStatus.OK);
 	}
@@ -70,10 +83,13 @@ public class CalculatorController {
 	 * @param generateBillCriteria The criteria to generate bill
 	 * @return The response of generate bill
 	 */
-	@RequestMapping(value = "/_getbill", method = RequestMethod.POST)
+	@RequestMapping(value = {"/{servicename}/_getbill","/_getbill"}, method = RequestMethod.POST)
 	public ResponseEntity<BillAndCalculations> getBill(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-													   @ModelAttribute @Valid GenerateBillCriteria generateBillCriteria) {
-		BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(), generateBillCriteria);
+													   @ModelAttribute @Valid GenerateBillCriteria generateBillCriteria,
+													   @PathVariable(required = false) String servicename) {
+		if(servicename==null)
+			servicename = businessService_TL;
+		BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(), generateBillCriteria, servicename);
 		return new ResponseEntity<BillAndCalculations>(response, HttpStatus.OK);
 	}
 
