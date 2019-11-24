@@ -63,7 +63,10 @@ public class TLValidator {
      * @param request The input TradeLicenseRequest Object
      */
     public void validateCreate(TradeLicenseRequest request, Object mdmsData) {
-        switch (request.getLicenses().get(0).getBusinessService()) {
+        String businessService = request.getLicenses().get(0).getBusinessService();
+        if (businessService == null)
+            businessService = businessService_TL;
+        switch (businessService) {
             case businessService_TL:
                 valideDates(request, mdmsData);
                 propertyValidator.validateProperty(request);
@@ -226,6 +229,8 @@ public class TLValidator {
             throw new CustomException("INVALID UPDATE", "The license to be updated is not in database");
         validateAllIds(searchResult, licenses);
         String businessService = request.getLicenses().get(0).getBusinessService();
+        if (businessService == null)
+            businessService = businessService_TL;
         switch (businessService) {
             case businessService_TL:
                 valideDates(request, mdmsData);
@@ -387,7 +392,10 @@ public class TLValidator {
             license.getAuditDetails().setCreatedTime(idToTradeLicenseFromSearch.get(license.getId()).getAuditDetails().getCreatedTime());
             license.setStatus(idToTradeLicenseFromSearch.get(license.getId()).getStatus());
             license.setLicenseNumber(idToTradeLicenseFromSearch.get(license.getId()).getLicenseNumber());
-            switch (license.getBusinessService()) {
+            String businessService = license.getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
+            switch (businessService) {
                 case businessService_TL:
                     if (!idToTradeLicenseFromSearch.get(license.getId()).getFinancialYear().equalsIgnoreCase(license.getFinancialYear())
                             && license.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT)) {

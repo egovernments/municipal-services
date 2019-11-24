@@ -173,7 +173,10 @@ public class DemandService {
 
             Long taxPeriodFrom = System.currentTimeMillis();;
             Long taxPeriodTo = System.currentTimeMillis(); ;
-            switch(license.getBusinessService())
+            String businessService = license.getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
+            switch(businessService)
             {
                 case businessService_TL:
                     Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
@@ -193,7 +196,7 @@ public class DemandService {
                     .consumerType("tradelicense")
                     .businessService(config.getBusinessServiceTL())
                     .build();
-            switch(license.getBusinessService())
+            switch(businessService)
             {
                 case businessService_BPA:
                     singleDemand.setConsumerType("bpaStakeHolderReg");

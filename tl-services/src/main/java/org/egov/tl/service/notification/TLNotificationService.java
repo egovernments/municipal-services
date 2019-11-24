@@ -45,6 +45,8 @@ public class TLNotificationService {
     public void process(TradeLicenseRequest request){
 
         String businessService = request.getLicenses().get(0).getBusinessService();
+		if (businessService == null)
+			businessService = businessService_TL;
 		switch(businessService)
 		{
 			case businessService_TL:

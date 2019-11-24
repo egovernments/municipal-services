@@ -56,7 +56,10 @@ public class EnrichmentService {
             tradeLicense.setApplicationDate(auditDetails.getCreatedTime());
             tradeLicense.getTradeLicenseDetail().setId(UUID.randomUUID().toString());
             tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
-            switch (tradeLicense.getBusinessService()) {
+            String businessService = tradeLicense.getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
+            switch (businessService) {
                 case businessService_TL:
                     Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
                     if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
@@ -108,7 +111,10 @@ public class EnrichmentService {
         });
         setIdgenIds(tradeLicenseRequest);
         setStatusForCreate(tradeLicenseRequest);
-        switch (tradeLicenseRequest.getLicenses().get(0).getBusinessService()) {
+        String businessService = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+        if (businessService == null)
+            businessService = businessService_TL;
+        switch (businessService) {
             case businessService_TL:
                 boundaryService.getAreaType(tradeLicenseRequest, config.getHierarchyTypeCode());
                 break;
@@ -225,7 +231,7 @@ public class EnrichmentService {
     public void enrichBoundary(TradeLicenseRequest tradeLicenseRequest){
         List<TradeLicenseRequest> requests = getRequestByTenantId(tradeLicenseRequest);
         requests.forEach(tenantWiseRequest -> {
-            boundaryService.getAreaType(tenantWiseRequest,config.getHierarchyTypeCode());
+           boundaryService.getAreaType(tenantWiseRequest,config.getHierarchyTypeCode());
         });
     }
 
@@ -294,6 +300,8 @@ public class EnrichmentService {
     private void setStatusForCreate(TradeLicenseRequest tradeLicenseRequest) {
         tradeLicenseRequest.getLicenses().forEach(license -> {
             String businessService = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
             switch (businessService) {
                 case businessService_TL:
                     if (license.getAction().equalsIgnoreCase(ACTION_INITIATE))
@@ -446,7 +454,8 @@ public class EnrichmentService {
     public List<TradeLicense> enrichTradeLicenseSearch(List<TradeLicense> licenses, TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
 
         String businessService = licenses.get(0).getBusinessService();
-
+        if (businessService == null)
+            businessService = businessService_TL;
         TradeLicenseSearchCriteria searchCriteria = enrichTLSearchCriteriaWithOwnerids(criteria,licenses);
         switch (businessService) {
             case businessService_TL:

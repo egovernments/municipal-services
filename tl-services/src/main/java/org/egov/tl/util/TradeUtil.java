@@ -66,6 +66,8 @@ public class TradeUtil {
     public StringBuilder getCalculationURI(String businessService) {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getCalculatorHost());
+        if (businessService == null)
+            businessService = businessService_TL;
         switch (businessService) {
             case businessService_TL:
                 uri.append(config.getCalculateEndpointTL());

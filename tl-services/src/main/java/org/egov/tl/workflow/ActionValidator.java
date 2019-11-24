@@ -45,6 +45,8 @@ public class ActionValidator {
         request.getLicenses().forEach(license -> {
 
             String businessService = license.getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
             switch(businessService)
             {
                 case businessService_TL:
