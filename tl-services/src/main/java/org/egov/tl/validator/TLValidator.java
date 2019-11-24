@@ -75,7 +75,6 @@ public class TLValidator {
                 break;
 
             case businessService_BPA:
-//                validateBPAIfUniqueRegRequest(request);
                 validateBPASpecificNotNullFields(request);
                 break;
         }
@@ -92,24 +91,6 @@ public class TLValidator {
             String licenseBusinessService = license.getBusinessService();
             if (!StringUtils.equals(businessServiceFromPath, licenseBusinessService)) {
                 throw new CustomException("BUSINESSSERVICE_NOTMATCHING", " The business service inside license not matching with the one sent in path variable");
-            }
-        }
-    }
-
-    private void validateBPAIfUniqueRegRequest(TradeLicenseRequest request) {
-
-        for (TradeLicense license : request.getLicenses()) {
-            String mobno = license.getTradeLicenseDetail().getOwners().get(0).getMobileNumber();
-            String tenantId = license.getTenantId();
-            String usernewrole = tradeUtil.getusernewRoleFromMDMS(license, request.getRequestInfo());
-
-            UserDetailResponse userDetailResponse = userService.getUser(TradeLicenseSearchCriteria.builder().tenantId(tenantId).mobileNumber(mobno).build(), request.getRequestInfo());
-            for (OwnerInfo ownerInfo : userDetailResponse.getUser()) {
-                for (Role role : ownerInfo.getRoles()) {
-                    if (role.getCode().equalsIgnoreCase(usernewrole)) {
-                        throw new CustomException("ROLE_ALREADYEXISTS", " User has already " + usernewrole + " role");
-                    }
-                }
             }
         }
     }
@@ -240,7 +221,6 @@ public class TLValidator {
                 break;
 
             case businessService_BPA:
-//                validateBPAIfUniqueRegRequest(request);
                 validateBPASpecificNotNullFields(request);
                 break;
         }

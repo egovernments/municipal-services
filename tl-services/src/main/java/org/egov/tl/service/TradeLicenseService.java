@@ -253,6 +253,11 @@ public class TradeLicenseService {
         }
         enrichmentService.postStatusEnrichment(tradeLicenseRequest);
         userService.createUser(tradeLicenseRequest, false);
+        switch (businessServicefromPath) {
+            case businessService_BPA:
+                userService.addUserRolesAsynchronously(tradeLicenseRequest);
+                break;
+        }
         calculationService.addCalculation(tradeLicenseRequest);
         editNotificationService.sendEditNotification(tradeLicenseRequest, diffMap);
         repository.update(tradeLicenseRequest, idToIsStateUpdatableMap);

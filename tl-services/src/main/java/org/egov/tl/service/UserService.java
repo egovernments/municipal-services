@@ -6,6 +6,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.ServiceRequestRepository;
+import org.egov.tl.repository.TLRepository;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.validator.TLValidator;
 import org.egov.tl.web.models.*;
@@ -37,12 +38,15 @@ public class UserService{
 
     private TradeUtil tradeUtil;
 
+    private TLRepository repository;
+
     @Autowired
-    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config,TradeUtil tradeUtil) {
+    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config,TradeUtil tradeUtil,TLRepository repository) {
         this.mapper = mapper;
         this.serviceRequestRepository = serviceRequestRepository;
         this.config = config;
         this.tradeUtil=tradeUtil;
+        this.repository=repository;
     }
 
 
@@ -51,6 +55,17 @@ public class UserService{
      * in the request then the user is updated
      * @param request TradeLciense create or update request
      */
+
+    public void addUserRolesAsynchronously(TradeLicenseRequest request){
+        List<TradeLicense> licenses = request.getLicenses();
+        for(TradeLicense license : licenses){
+            if((license.getStatus()!=null) && license.getStatus().equalsIgnoreCase(STATUS_APPROVED))
+            {
+                TradeLicenseRequest tradeLicenseRequestForUserUpdate =TradeLicenseRequest.builder().licenses(Collections.singletonList(license)).requestInfo(request.getRequestInfo()).build();
+                repository.addUserRole(tradeLicenseRequestForUserUpdate);
+            }
+        }
+    }
 
     public void createUser(TradeLicenseRequest request,boolean isBPARoleAddRequired){
         List<TradeLicense> licenses = request.getLicenses();
@@ -88,10 +103,11 @@ public class UserService{
                     OwnerInfo user = new OwnerInfo();
                     user.addUserWithoutAuditDetail(owner);
                     addNonUpdatableFields(user,userDetailResponse.getUser().get(0));
-                    if(isBPARoleAddRequired)
-                    {
-                        String licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
-                        user.addRolesItem(Role.builder().code(licenseeTyperRole).name(licenseeTyperRole).build());
+                    if (isBPARoleAddRequired) {
+                        List<String> licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
+                        for (String rolename : licenseeTyperRole) {
+                            user.addRolesItem(Role.builder().code(rolename).name(rolename).build());
+                        }
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
                     setOwnerFields(owner,userDetailResponse,requestInfo);

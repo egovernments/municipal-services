@@ -237,10 +237,10 @@ public class TradeUtil {
         return mdmsCriteriaReq;
     }
 
-    public String getusernewRoleFromMDMS(TradeLicense license,RequestInfo requestInfo){
+    public List<String> getusernewRoleFromMDMS(TradeLicense license,RequestInfo requestInfo){
         String tradetype=license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
         Object mdmsData=mDMSCallForBPA(requestInfo,license.getTenantId(),tradetype);
-        List<String>res=JsonPath.read(mdmsData, BPAConstants.MDMS_BPAROLEPATH);
+        List<List<String>>res=JsonPath.read(mdmsData, BPAConstants.MDMS_BPAROLEPATH);
         return  res.get(0);
     }
     public Object mDMSCall(TradeLicenseRequest tradeLicenseRequest){
