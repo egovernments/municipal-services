@@ -59,7 +59,7 @@ public class TLValidator {
             mdmsValidator.validateMdmsDataForTL(request, mdmsData);
             validateTLSpecificNotNullFields(request);
         } else {
-            validateBPAIfUniqueRegRequest(request);
+//            validateBPAIfUniqueRegRequest(request);
             validateBPASpecificNotNullFields(request);
         }
         validateInstitution(request);
