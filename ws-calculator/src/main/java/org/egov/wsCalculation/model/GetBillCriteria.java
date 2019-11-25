@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetBillCriteria {
 	
+public class GetBillCriteria {
 	private String assessmentNumber;
 	
 	@Default

@@ -3,13 +3,13 @@ package org.egov.wsCalculation.controller;
 import java.util.List;
 
 import javax.validation.Valid;
-
 import org.egov.wsCalculation.model.BillAndCalculations;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandResponse;
 import org.egov.wsCalculation.model.GenerateBillCriteria;
+import org.egov.wsCalculation.model.GetBillCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.service.DemandService;
 import org.egov.wsCalculation.service.WSCalculationService;
@@ -81,6 +81,12 @@ public class CalculatorController {
 			@ModelAttribute @Valid GenerateBillCriteria generateBillCriteria) {
 		BillAndCalculations response = demandService.getBill(requestInfoWrapper.getRequestInfo(), generateBillCriteria);
 		return new ResponseEntity<BillAndCalculations>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/_viewbill")
+	public ResponseEntity<DemandResponse> viewBill(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
+			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
+		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
 	}
 
 }
