@@ -37,7 +37,4 @@ public class TradeLicenseConsumer {
         log.info("TradeLicense Received: "+tradeLicenseRequest.getLicenses().get(0).getApplicationNumber());
         notificationService.process(tradeLicenseRequest);
     }
-
-
-
 }

@@ -3,6 +3,7 @@ package org.egov.tl.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
@@ -117,23 +118,22 @@ public class TradeLicenseService {
 	}
 
     public void validateMobileNumberUniqueness(TradeLicenseRequest request) {
-        for(TradeLicense license:request.getLicenses())
-        {
-            String tradetypeOfNewLicense = license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-            List<String> mobileNumbers = license.getTradeLicenseDetail().getOwners().stream().map(OwnerInfo:: getMobileNumber).collect(Collectors.toList());
-            for(String mobno:mobileNumbers)
-            {
-                TradeLicenseSearchCriteria tradeLicenseSearchCriteria = TradeLicenseSearchCriteria.builder().tenantId(license.getTenantId()).businessService(license.getBusinessService()).mobileNumber(mobno).build();
-                List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
-
-                List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
-                for(TradeLicense result: licensesFromSearch)
-                {
-                    tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
-                }
-                if(tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense))
-                {
-                    throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype");
+        for (TradeLicense license : request.getLicenses()) {
+            for (TradeUnit tradeUnit : license.getTradeLicenseDetail().getTradeUnits()) {
+                String tradetypeOfNewLicense = tradeUnit.getTradeType();
+                List<String> mobileNumbers = license.getTradeLicenseDetail().getOwners().stream().map(OwnerInfo::getMobileNumber).collect(Collectors.toList());
+                for (String mobno : mobileNumbers) {
+                    TradeLicenseSearchCriteria tradeLicenseSearchCriteria = TradeLicenseSearchCriteria.builder().tenantId(license.getTenantId()).businessService(license.getBusinessService()).mobileNumber(mobno).build();
+                    List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
+                    List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
+                    for (TradeLicense result : licensesFromSearch) {
+                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber())) {
+                            tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
+                        }
+                    }
+                    if (tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense)) {
+                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype");
+                    }
                 }
             }
         }

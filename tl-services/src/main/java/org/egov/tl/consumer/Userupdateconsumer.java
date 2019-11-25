@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 @Slf4j
 @Component
-public class UserCreateConsumer {
+public class Userupdateconsumer {
 
     @Autowired
     UserService userService;
@@ -28,6 +28,5 @@ public class UserCreateConsumer {
         } catch (final Exception e) {
             log.error("Error occurred while adding roles for BPA user " + e);
         }
-
     }
 }
