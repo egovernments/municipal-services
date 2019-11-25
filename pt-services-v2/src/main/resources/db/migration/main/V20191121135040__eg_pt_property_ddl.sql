@@ -31,7 +31,7 @@ CREATE TABLE eg_pt_property (
    additionaldetails    JSONB,
 
 CONSTRAINT pk_eg_pt_property_id PRIMARY KEY(id),
-CONSTRAINT uk_eg_pt_property_propertyId UNIQUE (propertyId)
+CONSTRAINT uk_eg_pt_property_propertyId UNIQUE (propertyId, tenantid)
 );
 
 CREATE INDEX IF NOT EXISTS index_eg_pt_property_parentproperties ON eg_pt_property (parentproperties);
@@ -54,8 +54,10 @@ CREATE TABLE eg_pt_institution (
   lastmodifiedtime bigint,
 
   CONSTRAINT pk_eg_pt_institution PRIMARY KEY (id),
-  CONSTRAINT fk_eg_pt_institution FOREIGN KEY (propertyid) REFERENCES eg_pt_property (propertyid)
+  CONSTRAINT fk_eg_pt_institution FOREIGN KEY (propertyid) REFERENCES eg_pt_property (id)
 );
+
+CREATE INDEX IF NOT EXISTS index_eg_pt_institution_tenantid ON eg_pt_property (tenantid);
 
 --> Owner 
 
@@ -76,16 +78,17 @@ CREATE TABLE eg_pt_owner (
   lastmodifiedtime    BIGINT,
 
   CONSTRAINT pk_eg_pt_owner PRIMARY KEY (userid, propertyid),
-  CONSTRAINT fk_eg_pt_owner FOREIGN KEY (propertyid) REFERENCES eg_pt_property (propertyid)
+  CONSTRAINT fk_eg_pt_owner FOREIGN KEY (propertyid) REFERENCES eg_pt_property (id)
   );
 
-  CREATE INDEX IF NOT EXISTS index_eg_pt_owner_tenantid ON eg_pt_owner (tenantid);
+  CREATE INDEX IF NOT EXISTS index_eg_pt_owner_tenantid   ON eg_pt_owner (tenantid);
 
   --> document table
 
 CREATE TABLE eg_pt_document (
 
   id               CHARACTER VARYING (128) NOT NULL,
+  tenantId         CHARACTER VARYING (256) NOT NULL,
   entityid         CHARACTER VARYING (128) NOT NULL,
   documentType     CHARACTER VARYING (128) NOT NULL,
   fileStore        CHARACTER VARYING (128) NOT NULL,
@@ -100,6 +103,7 @@ CONSTRAINT uk_eg_pt_document_documentUid UNIQUE (documentUid)
 );
 
 CREATE INDEX IF NOT EXISTS index_eg_pt_document_entityid ON eg_pt_document (entityid);
+CREATE INDEX IF NOT EXISTS index_eg_pt_document_tenantid ON eg_pt_document (tenantid);
 
 --> address
 
@@ -129,8 +133,7 @@ CREATE TABLE eg_pt_address (
   lastmodifiedtime BIGINT,
 
   CONSTRAINT pk_eg_pt_address PRIMARY KEY (id),
-  CONSTRAINT fk_eg_pt_address FOREIGN KEY (propertyid) REFERENCES eg_pt_property (propertyId)
+  CONSTRAINT fk_eg_pt_address FOREIGN KEY (propertyid) REFERENCES eg_pt_property (id)
 );
 
-CREATE INDEX IF NOT EXISTS index_eg_pt_address_propertyid ON eg_pt_address (propertyid);
 CREATE INDEX IF NOT EXISTS index_eg_pt_address_tenantid   ON eg_pt_address (tenantid);
