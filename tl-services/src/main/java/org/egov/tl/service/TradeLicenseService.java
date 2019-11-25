@@ -97,7 +97,7 @@ public class TradeLicenseService {
         switch(businessServicefromPath)
         {
             case businessService_BPA:
-                validateMobileNumberUniqueness(tradeLicenseRequest);
+//                validateMobileNumberUniqueness(tradeLicenseRequest);
                 break;
         }
         userService.createUser(tradeLicenseRequest, false);
@@ -251,7 +251,7 @@ public class TradeLicenseService {
         switch(businessServicefromPath)
         {
             case businessService_BPA:
-                validateMobileNumberUniqueness(tradeLicenseRequest);
+//                validateMobileNumberUniqueness(tradeLicenseRequest);
                 break;
         }
         Map<String, Difference> diffMap = diffService.getDifference(tradeLicenseRequest, searchResult);
