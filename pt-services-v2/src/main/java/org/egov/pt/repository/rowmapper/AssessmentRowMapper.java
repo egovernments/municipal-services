@@ -11,8 +11,10 @@ import java.util.Map;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Document;
 import org.egov.pt.models.Unit;
-import org.egov.pt.models.enums.DocumentBelongsTo;
+import org.egov.pt.models.Assessment.Source;
+import org.egov.pt.models.AuditDetails;
 import org.egov.pt.models.enums.OccupancyType;
+import org.egov.pt.models.enums.Status;
 import org.egov.tracer.model.CustomException;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,16 +44,18 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				assessment = Assessment.builder()
 						.id(rs.getString("ass_assessmentid"))
 						.assessmentNumber(rs.getString("ass_assessmentnumber"))
-						.tenantId(rs.getString("ass_tenantId"))
+						.status(Status.valueOf(rs.getString("ass_status")))
+						.tenantId(rs.getString("ass_tenantid"))
 						.assessmentDate(rs.getLong("ass_assessmentdate"))
 						.buildUpArea(rs.getDouble("ass_builduparea"))
 						.financialYear(rs.getString("ass_financialyear"))
 						.propertyID(rs.getString("ass_propertyid"))
+						.source(Source.valueOf(rs.getString("ass_source")))
 						.units(new ArrayList<>())
 						.documents(new ArrayList<>()).build();
 				
 				try {
-					PGobject obj = (PGobject) rs.getObject("pt_additionalDetails");
+					PGobject obj = (PGobject) rs.getObject("ass_additionaldetails");
 					if (obj != null) {
 						JsonNode propertyAdditionalDetails = mapper.readTree(obj.getValue());
 						assessment.setAdditionalDetails(propertyAdditionalDetails);
@@ -61,6 +65,11 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				}
 				assessment.getUnits().add(getUnit(rs));
 				assessment.getDocuments().add(getDocument(rs));
+				
+				AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("ass_createdby"))
+						.createdTime(rs.getLong("ass_createdtime")).lastModifiedBy(rs.getString("ass_lastmodifiedby"))
+						.lastModifiedTime(rs.getLong("ass_lastmodifiedtime")).build();
+				assessment.setAuditDetails(auditDetails);
 				
 				assessmentMap.put(assessment.getId(), assessment);
 			}else {
@@ -75,10 +84,15 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 	
 	
 	private Unit getUnit(ResultSet rs) throws SQLException {
-		if(null == rs.getString("unit_unitid"))
+		if(null == rs.getString("unit_id"))
 			return null;
 		
-		return Unit.builder().id(rs.getString("unit_unitid"))
+		AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("unit_createdby"))
+				.createdTime(rs.getLong("unit_createdtime")).lastModifiedBy(rs.getString("unit_lastmodifiedby"))
+				.lastModifiedTime(rs.getLong("unit_lastmodifiedtime")).build();
+				
+		
+		return Unit.builder().id(rs.getString("unit_id"))
 				.active(rs.getBoolean("unit_active"))
 				.arv(rs.getDouble("unit_arv"))
 				.assessmentId(rs.getString("unit_assessmentid"))
@@ -89,23 +103,29 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				.tenantId(rs.getString("unit_tenantid"))
 				.usageCategory(rs.getString("unit_usagecategory"))
 				.unitArea(rs.getDouble("unit_unitarea"))
+				.auditDetails(auditDetails)
 				.build();
 	}
 	
 	
 	
 	private Document getDocument(ResultSet rs) throws SQLException {
-		if(null == rs.getString("doc_docid"))
+		if(null == rs.getString("doc_id"))
 			return null;
 		
-		return Document.builder().id(rs.getString("doc_docid"))
+		AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("doc_createdby"))
+				.createdTime(rs.getLong("doc_createdtime")).lastModifiedBy(rs.getString("doc_lastmodifiedby"))
+				.lastModifiedTime(rs.getLong("doc_lastmodifiedtime")).build();
+		
+		return Document.builder().id(rs.getString("doc_id"))
 				.active(rs.getBoolean("doc_active"))
-				.documentBelongsTo(DocumentBelongsTo.valueOf(rs.getString("doc_docbelongsto")))
-				.documentType(rs.getString("doc_doctype"))
-				.documentUid(rs.getString("doc_docUid"))
+				.documentType(rs.getString("doc_documenttype"))
+				.documentUid(rs.getString("doc_documentuid"))
 				.entityId(rs.getString("doc_entityid"))
 				.fileStore(rs.getString("doc_filestore"))
+				.active(rs.getBoolean("doc_active"))
 				.tenantId(rs.getString("doc_tenantid"))
+				.auditDetails(auditDetails)
 				.build();
 	}
 	

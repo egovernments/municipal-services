@@ -1,6 +1,7 @@
 CREATE TABLE eg_pt_assessments (
 
   id character varying(256) NOT NULL,
+  financialyear character varying(256) NOT NULL,
   tenantId character varying(256) NOT NULL,
   assessmentNumber character varying(64) NOT NULL,
   status character varying(64) NOT NULL,
@@ -14,8 +15,9 @@ CREATE TABLE eg_pt_assessments (
   lastmodifiedby character varying(64) NOT NULL,
   lastmodifiedtime bigint NOT NULL,
 
-  CONSTRAINT pk_eg_pt_assessments PRIMARY KEY (assessmentNumber),
-  CONSTRAINT fk_eg_pt_assessments FOREIGN KEY (propertyId) REFERENCES eg_pt_property (propertyId)
+  CONSTRAINT pk_eg_pt_assessments PRIMARY KEY (id),
+  CONSTRAINT uk_eg_pt_assessments UNIQUE (assessmentNumber, tenantId),
+  CONSTRAINT fk_eg_pt_assessments FOREIGN KEY (propertyId) REFERENCES eg_pt_property (id)
 );
 
 
@@ -39,6 +41,7 @@ CREATE TABLE eg_pt_unit (
 
   CONSTRAINT pk_eg_pt_unit PRIMARY KEY (id),
   CONSTRAINT fk_eg_pt_unit FOREIGN KEY (assessmentId) REFERENCES eg_pt_assessments (id)
+  
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );

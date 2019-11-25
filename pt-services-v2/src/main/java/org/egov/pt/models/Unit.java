@@ -59,6 +59,9 @@ public class Unit   {
 
         @JsonProperty("arv")
         private Double arv;
+        
+        @JsonProperty("auditDetails")
+        private AuditDetails auditDetails;
 
 
 }

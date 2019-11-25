@@ -30,10 +30,6 @@ public class Document {
         @JsonProperty("documentType")
         @NotNull
         private String documentType ;
-        
-        @JsonProperty("documentBelongsTo")
-        @NotNull
-        private DocumentBelongsTo documentBelongsTo ;
 
         @JsonProperty("fileStore")
         @NotNull
@@ -45,5 +41,8 @@ public class Document {
         @JsonProperty("documentUid")
         @NotNull
         private String documentUid ;
+        
+        @JsonProperty("auditDetails")
+        private AuditDetails auditDetails;
 }
 

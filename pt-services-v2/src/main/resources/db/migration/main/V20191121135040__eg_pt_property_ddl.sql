@@ -93,6 +93,7 @@ CREATE TABLE eg_pt_document (
   documentType     CHARACTER VARYING (128) NOT NULL,
   fileStore        CHARACTER VARYING (128) NOT NULL,
   documentuid      CHARACTER VARYING (128) NOT NULL,
+  active           BOOLEAN,
   createdBy        CHARACTER VARYING (128) NOT NULL,
   lastModifiedBy   CHARACTER VARYING (128),
   createdTime      BIGINT NOT NULL,

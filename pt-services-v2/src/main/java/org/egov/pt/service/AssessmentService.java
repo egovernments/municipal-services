@@ -53,27 +53,27 @@ public class AssessmentService {
 		assessment.setId(String.valueOf(UUID.randomUUID()));
 		assessment.setAssessmentNumber("");
 		assessment.setStatus(Status.ACTIVE);
+		AuditDetails auditDetails = AuditDetails.builder()
+				.createdBy(request.getRequestInfo().getUserInfo().getUuid())
+				.createdTime(new Date().getTime())
+				.lastModifiedBy(request.getRequestInfo().getUserInfo().getUuid())
+				.lastModifiedTime(new Date().getTime()).build();
+		
 		if(!CollectionUtils.isEmpty(assessment.getUnits())) {
 			for(Unit unit: assessment.getUnits()) {
 				unit.setId(String.valueOf(UUID.randomUUID()));
 				unit.setAssessmentId(assessment.getId());
 				unit.setActive(true);
+				unit.setAuditDetails(auditDetails);
 			}
 		}		
 		if(!CollectionUtils.isEmpty(assessment.getDocuments())) {
 			for(Document doc: assessment.getDocuments()) {
 				doc.setId(String.valueOf(UUID.randomUUID()));
 				doc.setEntityId(assessment.getId());
-				doc.setDocumentBelongsTo(DocumentBelongsTo.ASSESSMENT);
+				doc.setAuditDetails(auditDetails);
 			}
-		}
-		
-		AuditDetails auditDetails = AuditDetails.builder()
-				.createdBy(request.getRequestInfo().getUserInfo().getUuid())
-				.createdTime(new Date().getTime())
-				.lastModifiedBy(request.getRequestInfo().getUserInfo().getUuid())
-				.lastModifiedTime(new Date().getTime()).build();
-				
+		}		
 		
 		assessment.setAuditDetails(auditDetails);
 		
@@ -82,12 +82,20 @@ public class AssessmentService {
 	
 	private void enrichAssessmentUpdate(AssessmentRequest request) {
 		Assessment assessment = request.getAssessment();
+		
+		AuditDetails auditDetails = AuditDetails.builder()
+				.createdBy(request.getRequestInfo().getUserInfo().getUuid())
+				.createdTime(new Date().getTime())
+				.lastModifiedBy(request.getRequestInfo().getUserInfo().getUuid())
+				.lastModifiedTime(new Date().getTime()).build();
+		
 		if(!CollectionUtils.isEmpty(assessment.getUnits())) {
 			for(Unit unit: assessment.getUnits()) {
 				if(StringUtils.isEmpty(unit.getId())) {
 					unit.setId(String.valueOf(UUID.randomUUID()));
 					unit.setAssessmentId(assessment.getId());
-					unit.setActive(true);			
+					unit.setActive(true);
+					unit.setAuditDetails(auditDetails);
 				}
 			}
 		}
@@ -96,12 +104,13 @@ public class AssessmentService {
 				if(StringUtils.isEmpty(doc.getId())) {
 					doc.setId(String.valueOf(UUID.randomUUID()));
 					doc.setEntityId(assessment.getId());
-					doc.setDocumentBelongsTo(DocumentBelongsTo.ASSESSMENT);
+					doc.setAuditDetails(auditDetails);
 				}
 			}
 		}
-		assessment.getAuditDetails().setLastModifiedBy(request.getRequestInfo().getUserInfo().getUuid());
-		assessment.getAuditDetails().setLastModifiedTime(new Date().getTime());
+		
+		assessment.getAuditDetails().setLastModifiedBy(auditDetails.getLastModifiedBy());
+		assessment.getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
 		
 		
 	}
