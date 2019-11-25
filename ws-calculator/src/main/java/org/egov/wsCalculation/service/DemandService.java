@@ -32,6 +32,7 @@ import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.Demand.StatusEnum;
 import org.egov.wsCalculation.model.DemandDetail;
+import org.egov.wsCalculation.model.DemandDetailAndCollection;
 import org.egov.wsCalculation.model.DemandRequest;
 import org.egov.wsCalculation.model.DemandResponse;
 import org.egov.wsCalculation.model.GenerateBillCriteria;
@@ -722,19 +723,18 @@ public class DemandService {
 //				requestInfoWrapper);
 
 		BigDecimal taxAmtForApplicableGeneration = utils.getTaxAmtFromDemandForApplicablesGeneration(demand);
-		BigDecimal totalCollectedAmount = BigDecimal.ZERO;
 		BigDecimal oldInterest = BigDecimal.ZERO;
 		BigDecimal oldRebate = BigDecimal.ZERO;
 		
-//		demand.getDemandDetails().forEach(details -> {
-//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
-//				oldInterest = oldInterest.add(details.getTaxAmount());
-//			}
-//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-//				oldRebate = oldRebate.add(details.getTaxAmount());
-//			}
-//		});
-		boolean isRebateUpdated = false;
+		demand.getDemandDetails().forEach(details -> {
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+				oldInterest.add(details.getTaxAmount());
+			}
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+				oldRebate.add(details.getTaxAmount());
+			}
+		});
+		
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;
 		
@@ -749,30 +749,30 @@ public class DemandService {
 		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
-//		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
-//
-//		if(rebate.compareTo(oldRebate)!=0){
-//				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-//						.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-//						.build());
-//		}
-//
-//
-//		if(interest.compareTo(BigDecimal.ZERO)!=0){
-//			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
-//			if(latestInterestDemandDetail!=null){
-//				updateTaxAmount(interest,latestInterestDemandDetail);
-//				isInterestUpdated = true;
-//			}
-//		}
-//
-//		if(penalty.compareTo(BigDecimal.ZERO)!=0){
-//			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
-//			if(latestPenaltyDemandDetail!=null){
-//				updateTaxAmount(penalty,latestPenaltyDemandDetail);
-//				isPenaltyUpdated = true;
-//			}
-//		}
+		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
+
+		if(rebate.compareTo(oldRebate)!=0){
+				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+						.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+						.build());
+		}
+
+
+		if(interest.compareTo(BigDecimal.ZERO)!=0){
+			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
+			if(latestInterestDemandDetail!=null){
+				updateTaxAmount(interest,latestInterestDemandDetail);
+				isInterestUpdated = true;
+			}
+		}
+
+		if(penalty.compareTo(BigDecimal.ZERO)!=0){
+			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
+			if(latestPenaltyDemandDetail!=null){
+				updateTaxAmount(penalty,latestPenaltyDemandDetail);
+				isPenaltyUpdated = true;
+			}
+		}
 
 		
 		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
@@ -784,6 +784,18 @@ public class DemandService {
 							.demandId(demandId).tenantId(tenantId).build());
 		
 		return isCurrentDemand;
+	}
+	
+	/**
+	 * Updates the amount in the latest demandDetail by adding the diff between
+	 * new and old amounts to it
+	 * @param newAmount The new tax amount for the taxHead
+	 * @param latestDetailInfo The latest demandDetail for the particular taxHead
+	 */
+	private void updateTaxAmount(BigDecimal newAmount,DemandDetailAndCollection latestDetailInfo){
+		BigDecimal diff = newAmount.subtract(latestDetailInfo.getTaxAmountForTaxHead());
+		BigDecimal newTaxAmountForLatestDemandDetail = latestDetailInfo.getLatestDemandDetail().getTaxAmount().add(diff);
+		latestDetailInfo.getLatestDemandDetail().setTaxAmount(newTaxAmountForLatestDemandDetail);
 	}
 
 }

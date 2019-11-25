@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -17,6 +18,7 @@ import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.AuditDetails;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandDetail;
+import org.egov.wsCalculation.model.DemandDetailAndCollection;
 import org.egov.wsCalculation.model.GetBillCriteria;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -313,4 +315,33 @@ public class WSCalculationUtil {
 		return taxAmount;
 	}
 
+	
+	public DemandDetailAndCollection getLatestDemandDetailByTaxHead(String taxHeadCode,
+			List<DemandDetail> demandDetails) {
+		List<DemandDetail> details = demandDetails.stream()
+				.filter(demandDetail -> demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(taxHeadCode))
+				.collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(details))
+			return null;
+
+		BigDecimal taxAmountForTaxHead = BigDecimal.ZERO;
+		BigDecimal collectionAmountForTaxHead = BigDecimal.ZERO;
+		DemandDetail latestDemandDetail = null;
+		long maxCreatedTime = 0l;
+
+		for (DemandDetail detail : details) {
+			taxAmountForTaxHead = taxAmountForTaxHead.add(detail.getTaxAmount());
+			collectionAmountForTaxHead = collectionAmountForTaxHead.add(detail.getCollectionAmount());
+			if (detail.getAuditDetails().getCreatedTime() > maxCreatedTime) {
+				maxCreatedTime = detail.getAuditDetails().getCreatedTime();
+				latestDemandDetail = detail;
+			}
+		}
+
+		return DemandDetailAndCollection.builder().taxHeadCode(taxHeadCode).latestDemandDetail(latestDemandDetail)
+				.taxAmountForTaxHead(taxAmountForTaxHead).collectionAmountForTaxHead(collectionAmountForTaxHead)
+				.build();
+
+	}
+	
 }
