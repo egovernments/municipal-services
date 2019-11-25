@@ -179,8 +179,8 @@ public class WSCalculationUtil {
 					.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(WSCalculationConstant.SEPARATER)
 					.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
-					.append(getBillCriteria.getPropertyId() + WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
-							+ getBillCriteria.getAssessmentNumber());
+					.append(getBillCriteria.getConnectionId() + WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
+							+ getBillCriteria.getConnectionNumber());
 
 		else
 			return new StringBuilder().append(configurations.getBillingServiceHost())
@@ -209,9 +209,9 @@ public class WSCalculationUtil {
 	 * @param assessmentYear
 	 *            The year for which existing receipts needs to be checked
 	 * @param tenantId
-	 *            The tenantid of the property
-	 * @param propertyId
-	 *            The property id
+	 *            The tenant id of the property
+	 * @param connectionId
+	 *            The connection id
 	 * @param requestInfoWrapper
 	 *            The incoming requestInfo
 	 */
@@ -234,7 +234,7 @@ public class WSCalculationUtil {
 	// }
 
 	/**
-	 * method to create demandsearch url with demand criteria
+	 * method to create demand search url with demand criteria
 	 *
 	 * @param assessment
 	 * @return

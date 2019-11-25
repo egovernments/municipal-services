@@ -534,14 +534,14 @@ public class DemandService {
 		if (getBillCriteria.getAmountExpected() == null)
 			getBillCriteria.setAmountExpected(BigDecimal.ZERO);
 		RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();
-		Map<String, JSONArray> billingSlabMaster =  new HashMap<>();
-		
+		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
+
 		Map<String, JSONArray> timeBasedExmeptionMasterMap = new HashMap<>();
-		mstrDataService.setWaterConnectionMasterValues(requestInfo, getBillCriteria.getTenantId(), billingSlabMaster, timeBasedExmeptionMasterMap);
+		mstrDataService.setWaterConnectionMasterValues(requestInfo, getBillCriteria.getTenantId(), billingSlabMaster,
+				timeBasedExmeptionMasterMap);
 
 		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
-			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getPropertyId()
-					+ WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR + getBillCriteria.getAssessmentNumber()));
+			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getConnectionNumber()));
 
 		DemandResponse res = mapper.convertValue(
 				repository.fetchResult(utils.getDemandSearchUrl(getBillCriteria), requestInfoWrapper),
@@ -624,7 +624,7 @@ public class DemandService {
 		}
 
 		/*
-		 * An estimate object will be returned incase if there is a decimal
+		 * An estimate object will be returned in case if there is a decimal
 		 * value
 		 * 
 		 * If no decimal value found null object will be returned
