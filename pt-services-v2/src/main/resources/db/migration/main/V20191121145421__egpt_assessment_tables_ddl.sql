@@ -1,4 +1,4 @@
-CREATE TABLE eg_pt_assessment_v2(
+CREATE TABLE eg_pt_assessments (
 
   id character varying(256) NOT NULL,
   tenantId character varying(256) NOT NULL,
@@ -14,13 +14,14 @@ CREATE TABLE eg_pt_assessment_v2(
   lastmodifiedby character varying(64) NOT NULL,
   lastmodifiedtime bigint NOT NULL,
 
-  CONSTRAINT pk_eg_pt_assessment_v2 PRIMARY KEY (assessmentNumber),
-  CONSTRAINT fk_eg_pt_assessment_v2 FOREIGN KEY (propertyId) REFERENCES eg_pt_property_v2 (propertyId)
+  CONSTRAINT pk_eg_pt_assessments PRIMARY KEY (assessmentNumber),
+  CONSTRAINT fk_eg_pt_assessments FOREIGN KEY (propertyId) REFERENCES eg_pt_property (propertyId)
 );
 
 
 
-CREATE TABLE eg_pt_assessment_unit_v2 (
+CREATE TABLE eg_pt_unit (
+
   tenantId character varying(256) NOT NULL,
   id character varying(256) NOT NULL,
   assessmentId character varying(256) NOT NULL,
@@ -36,8 +37,8 @@ CREATE TABLE eg_pt_assessment_unit_v2 (
   lastmodifiedby character varying(64) NOT NULL,
   lastmodifiedtime bigint NOT NULL,
 
-  CONSTRAINT pk_eg_pt_assessment_unit_v2 PRIMARY KEY (id),
-  CONSTRAINT fk_eg_pt_assessment_unit_v2 FOREIGN KEY (assessmentId) REFERENCES eg_pt_assessment_v2 (id)
+  CONSTRAINT pk_eg_pt_unit PRIMARY KEY (id),
+  CONSTRAINT fk_eg_pt_unit FOREIGN KEY (assessmentId) REFERENCES eg_pt_assessments (id)
   ON UPDATE CASCADE
   ON DELETE CASCADE
 );
