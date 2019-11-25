@@ -1,12 +1,12 @@
 package org.egov.wsCalculation.service;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
@@ -533,14 +534,14 @@ public class DemandService {
 		if (getBillCriteria.getAmountExpected() == null)
 			getBillCriteria.setAmountExpected(BigDecimal.ZERO);
 		RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();
-		Map<String, JSONArray> billingSlabMaster =  new HashMap<>();
-		
+		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
+
 		Map<String, JSONArray> timeBasedExmeptionMasterMap = new HashMap<>();
-		mstrDataService.setWaterConnectionMasterValues(requestInfo, getBillCriteria.getTenantId(), billingSlabMaster, timeBasedExmeptionMasterMap);
+		mstrDataService.setWaterConnectionMasterValues(requestInfo, getBillCriteria.getTenantId(), billingSlabMaster,
+				timeBasedExmeptionMasterMap);
 
 		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
-			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getPropertyId()
-					+ WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR + getBillCriteria.getAssessmentNumber()));
+			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getConnectionNumber()));
 
 		DemandResponse res = mapper.convertValue(
 				repository.fetchResult(utils.getDemandSearchUrl(getBillCriteria), requestInfoWrapper),
@@ -576,7 +577,7 @@ public class DemandService {
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
 						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
 			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
-			addRoundOffTaxHead(getBillCriteria.getTenantId(), demand.getDemandDetails());
+			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 		}
 
@@ -725,14 +726,14 @@ public class DemandService {
 		BigDecimal oldInterest = BigDecimal.ZERO;
 		BigDecimal oldRebate = BigDecimal.ZERO;
 		
-		demand.getDemandDetails().forEach(details -> {
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
-				oldInterest = oldInterest.add(details.getTaxAmount());
-			}
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-				oldRebate = oldRebate.add(details.getTaxAmount());
-			}
-		});
+//		demand.getDemandDetails().forEach(details -> {
+//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+//				oldInterest = oldInterest.add(details.getTaxAmount());
+//			}
+//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+//				oldRebate = oldRebate.add(details.getTaxAmount());
+//			}
+//		});
 		boolean isRebateUpdated = false;
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;
@@ -748,30 +749,30 @@ public class DemandService {
 		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
-		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
-
-		if(rebate.compareTo(oldRebate)!=0){
-				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-						.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-						.build());
-		}
-
-
-		if(interest.compareTo(BigDecimal.ZERO)!=0){
-			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
-			if(latestInterestDemandDetail!=null){
-				updateTaxAmount(interest,latestInterestDemandDetail);
-				isInterestUpdated = true;
-			}
-		}
-
-		if(penalty.compareTo(BigDecimal.ZERO)!=0){
-			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
-			if(latestPenaltyDemandDetail!=null){
-				updateTaxAmount(penalty,latestPenaltyDemandDetail);
-				isPenaltyUpdated = true;
-			}
-		}
+//		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
+//
+//		if(rebate.compareTo(oldRebate)!=0){
+//				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+//						.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+//						.build());
+//		}
+//
+//
+//		if(interest.compareTo(BigDecimal.ZERO)!=0){
+//			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
+//			if(latestInterestDemandDetail!=null){
+//				updateTaxAmount(interest,latestInterestDemandDetail);
+//				isInterestUpdated = true;
+//			}
+//		}
+//
+//		if(penalty.compareTo(BigDecimal.ZERO)!=0){
+//			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
+//			if(latestPenaltyDemandDetail!=null){
+//				updateTaxAmount(penalty,latestPenaltyDemandDetail);
+//				isPenaltyUpdated = true;
+//			}
+//		}
 
 		
 		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
