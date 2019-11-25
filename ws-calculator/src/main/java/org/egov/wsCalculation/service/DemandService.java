@@ -534,10 +534,10 @@ public class DemandService {
 		if (getBillCriteria.getAmountExpected() == null)
 			getBillCriteria.setAmountExpected(BigDecimal.ZERO);
 		RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();
-		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
+		Map<String, JSONArray> billingSlabMaster =  new HashMap<>();
+		
 		Map<String, JSONArray> timeBasedExmeptionMasterMap = new HashMap<>();
-		mstrDataService.setPropertyMasterValues(requestInfo, getBillCriteria.getTenantId(),
-				propertyBasedExemptionMasterMap, timeBasedExmeptionMasterMap);
+		mstrDataService.setWaterConnectionMasterValues(requestInfo, getBillCriteria.getTenantId(), billingSlabMaster, timeBasedExmeptionMasterMap);
 
 		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
 			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getPropertyId()
