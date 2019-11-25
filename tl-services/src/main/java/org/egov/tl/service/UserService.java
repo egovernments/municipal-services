@@ -78,19 +78,24 @@ public class UserService{
 
             tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner ->
             {
-                String businessService = tradeLicense.getBusinessService();
-                if (businessService == null)
-                    businessService = businessService_TL;
-                switch (businessService) {
-                    case businessService_BPA:
-                        if (owner.getUuid() == null) {
-                            UserDetailResponse userDetailResponse = getUser(TradeLicenseSearchCriteria.builder().mobileNumber(owner.getMobileNumber()).tenantId(tradeLicense.getTenantId()).build(), request.getRequestInfo());
-                            if (!userDetailResponse.getUser().isEmpty()) {
-                                owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-                            }
-                        }
-                        break;
-                }
+//                String businessService = tradeLicense.getBusinessService();
+//                if (businessService == null)
+//                    businessService = businessService_TL;
+//                switch (businessService) {
+//                    case businessService_BPA:
+//                        if (owner.getUuid() == null) {
+//                            UserDetailResponse userDetailResponse = getUser(TradeLicenseSearchCriteria.builder().mobileNumber(owner.getMobileNumber()).tenantId(tradeLicense.getTenantId()).build(), request.getRequestInfo());
+//                            if (!userDetailResponse.getUser().isEmpty()) {
+//                                User user=userDetailResponse.getUser().get(0);
+//                                owner.setUuid(user.getUuid());
+//                                for(Role userrole:user.getRoles())
+//                                {
+//                                    owner.addRolesItem(userrole);
+//                                }
+//                            }
+//                        }
+//                        break;
+//                }
                 if(owner.getUuid()==null)
                     {
                         addUserDefaultFields(tradeLicense.getTenantId(),role,owner);
