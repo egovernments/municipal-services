@@ -182,5 +182,7 @@ public class WSCalculationConstant {
 			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
 
 	public static final Long TIMEZONE_OFFSET = 19800000l;
+	
+	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(TAXHEADMASTER_MASTER_KEY));
 
 }
