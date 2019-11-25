@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
@@ -70,7 +71,6 @@ public class TLValidator {
             case businessService_TL:
                 valideDates(request, mdmsData);
                 propertyValidator.validateProperty(request);
-                mdmsValidator.validateMdmsDataForTL(request, mdmsData);
                 validateTLSpecificNotNullFields(request);
                 break;
 
@@ -78,6 +78,7 @@ public class TLValidator {
                 validateBPASpecificNotNullFields(request);
                 break;
         }
+        mdmsValidator.validateMdmsData(request, mdmsData);
         validateInstitution(request);
         validateDuplicateDocuments(request);
     }
@@ -216,7 +217,6 @@ public class TLValidator {
             case businessService_TL:
                 valideDates(request, mdmsData);
                 propertyValidator.validateProperty(request);
-                mdmsValidator.validateMdmsDataForTL(request, mdmsData);
                 validateTLSpecificNotNullFields(request);
                 break;
 
@@ -224,6 +224,7 @@ public class TLValidator {
                 validateBPASpecificNotNullFields(request);
                 break;
         }
+        mdmsValidator.validateMdmsData(request, mdmsData);
         validateTradeUnits(request);
         validateDuplicateDocuments(request);
         setFieldsFromSearch(request, searchResult, mdmsData);

@@ -1,9 +1,7 @@
 package org.egov.tl.service;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
@@ -11,16 +9,14 @@ import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.notification.EditNotificationService;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.validator.TLValidator;
-import org.egov.tl.web.models.Difference;
-import org.egov.tl.web.models.TradeLicense;
-import org.egov.tl.web.models.TradeLicenseRequest;
-import org.egov.tl.web.models.TradeLicenseSearchCriteria;
+import org.egov.tl.web.models.*;
 import org.egov.tl.web.models.user.UserDetailResponse;
 import org.egov.tl.web.models.workflow.BusinessService;
 import org.egov.tl.workflow.ActionValidator;
 import org.egov.tl.workflow.TLWorkflowService;
 import org.egov.tl.workflow.WorkflowIntegrator;
 import org.egov.tl.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -93,16 +89,11 @@ public class TradeLicenseService {
         if(businessServicefromPath==null)
              businessServicefromPath = businessService_TL;
         tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
-        Object mdmsData = null;
-        switch(businessServicefromPath)
-        {
-            case businessService_TL:
-                mdmsData = util.mDMSCall(tradeLicenseRequest);
-                break;
-        }
+        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
         tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
+        validateMobileNumberUniqueness(tradeLicenseRequest);
         userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
 
@@ -120,7 +111,28 @@ public class TradeLicenseService {
         return tradeLicenseRequest.getLicenses();
 	}
 
+    public void validateMobileNumberUniqueness(TradeLicenseRequest request) {
+        for(TradeLicense license:request.getLicenses())
+        {
+            String tradetypeOfNewLicense = license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+            List<String> mobileNumbers = license.getTradeLicenseDetail().getOwners().stream().map(OwnerInfo:: getMobileNumber).collect(Collectors.toList());
+            for(String mobno:mobileNumbers)
+            {
+                TradeLicenseSearchCriteria tradeLicenseSearchCriteria = TradeLicenseSearchCriteria.builder().tenantId(license.getTenantId()).businessService(license.getBusinessService()).mobileNumber(mobno).build();
+                List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
 
+                List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
+                for(TradeLicense result: licensesFromSearch)
+                {
+                    tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
+                }
+                if(tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense))
+                {
+                    throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype");
+                }
+            }
+        }
+    }
     /**
      *  Searches the tradeLicense for the given criteria if search is on owner paramter then first user service
      *  is called followed by query to db
@@ -212,11 +224,10 @@ public class TradeLicenseService {
         if (businessServicefromPath == null)
             businessServicefromPath = businessService_TL;
         tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
-        Object mdmsData = null;
+        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         String businessServiceName = null;
         switch (businessServicefromPath) {
             case businessService_TL:
-                mdmsData = util.mDMSCall(tradeLicenseRequest);
                 businessServiceName = config.getTlBusinessServiceValue();
                 break;
 
