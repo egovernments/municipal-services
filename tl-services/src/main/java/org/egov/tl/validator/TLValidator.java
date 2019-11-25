@@ -104,8 +104,8 @@ public class TLValidator {
                 throw new CustomException("NULL_STRUCTURETYPE", " Structure Type cannot be null");
             if (license.getTradeLicenseDetail().getSubOwnerShipCategory() == null)
                 throw new CustomException("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
-            if (license.getTradeLicenseDetail().getAddress() == null)
-                throw new CustomException("NULL_ADDRESS", " Address cannot be null");
+            if ((license.getTradeLicenseDetail().getAddress().getLocality() == null)||(license.getTradeLicenseDetail().getAddress().getLocality().getCode() == null))
+                throw new CustomException("NULL_LOCALITY", " Locality cannot be null");
         });
     }
 
