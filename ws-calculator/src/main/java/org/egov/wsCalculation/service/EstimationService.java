@@ -234,7 +234,7 @@ public class EstimationService {
 		return true;
 	}
 	
-	private String getAssessmentYear() {
+	public String getAssessmentYear() {
 		return Integer.toString(YearMonth.now().getYear()) + "-"
 				+ (Integer.toString(YearMonth.now().getYear() + 1).substring(0, 2));
 	}

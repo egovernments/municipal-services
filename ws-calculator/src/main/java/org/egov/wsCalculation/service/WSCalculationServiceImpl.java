@@ -72,9 +72,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
-
 		WaterConnection waterConnection = criteria.getWaterConnection();
-		String assessmentYear = "2019-20";
+
+		String assessmentYear = estimationService.getAssessmentYear();
 
 		// String assessmentNumber = null != detail.getAssessmentNumber() ?
 		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
