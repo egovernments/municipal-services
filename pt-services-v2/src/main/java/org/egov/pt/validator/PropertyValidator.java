@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,7 +49,7 @@ public class PropertyValidator {
 
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
-
+    
     @Value("${egov.mdms.host}")
     private String mdmsHost;
 
@@ -120,8 +121,12 @@ public class PropertyValidator {
 
         validateInstitution(property, errorMap);
         Map<String,List<String>> codes = getAttributeValues(tenantId,PTConstants.MDMS_PT_MOD_NAME,names,"$.*.code",PTConstants.JSONPATH_CODES,request.getRequestInfo());
-        validateMDMSData(masterNames,codes);
-        validateCodes(property,codes,errorMap);
+        if(null != codes) {
+            validateMDMSData(masterNames,codes);
+            validateCodes(property,codes,errorMap);
+        }else {
+        	errorMap.put("MASTER_FETCH_FAILED", "Couldn't fetch master data for validation");
+        }
 
         if (!errorMap.isEmpty())
             throw new CustomException(errorMap);
@@ -136,17 +141,21 @@ public class PropertyValidator {
      * @return Map of MasterData name to the list of code in the MasterData
      *
      */
-    private Map<String,List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names, String filter,String jsonpath, RequestInfo requestInfo){
+    public Map<String,List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names, String filter,String jsonpath, RequestInfo requestInfo){
         StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
         MdmsCriteriaReq criteriaReq = propertyUtil.prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
+        Optional<Object> response = serviceRequestRepository.fetchResult(uri, criteriaReq);
         try {
-            Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
-            return JsonPath.read(result,jsonpath);
+        	if(response.isPresent()) {
+                return JsonPath.read(response.get(),jsonpath);
+        	}
         } catch (Exception e) {
             log.error("Error while fetvhing MDMS data",e);
             throw new CustomException(ErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
                     ErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
         }
+        
+        return null;
     }
 
     /**
