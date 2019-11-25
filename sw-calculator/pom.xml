@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.example</groupId>
-	<artifactId>sw_service_calculation</artifactId>
+	<artifactId>sw-calculator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sw_service_calculation</name>
 	<description>Demo project for Spring Boot</description>
@@ -107,7 +107,7 @@
 
 		<dependency>
 			<groupId>org.egov</groupId>
-			<artifactId>ws_service</artifactId>
+			<artifactId>ws-services</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
