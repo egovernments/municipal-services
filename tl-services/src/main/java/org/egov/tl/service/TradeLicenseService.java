@@ -93,7 +93,12 @@ public class TradeLicenseService {
         actionValidator.validateCreateRequest(tradeLicenseRequest);
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
         tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
-        validateMobileNumberUniqueness(tradeLicenseRequest);
+        switch(businessServicefromPath)
+        {
+            case businessService_BPA:
+                validateMobileNumberUniqueness(tradeLicenseRequest);
+                break;
+        }
         userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
 
@@ -243,6 +248,12 @@ public class TradeLicenseService {
         actionValidator.validateUpdateRequest(tradeLicenseRequest, businessService);
         enrichmentService.enrichTLUpdateRequest(tradeLicenseRequest, businessService);//
         tlValidator.validateUpdate(tradeLicenseRequest, searchResult, mdmsData);
+        switch(businessServicefromPath)
+        {
+            case businessService_BPA:
+                validateMobileNumberUniqueness(tradeLicenseRequest);
+                break;
+        }
         Map<String, Difference> diffMap = diffService.getDifference(tradeLicenseRequest, searchResult);
         Map<String, Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService, searchResult);
 
