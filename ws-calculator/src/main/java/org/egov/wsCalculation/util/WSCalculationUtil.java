@@ -298,6 +298,19 @@ public class WSCalculationUtil {
 		return url.toString();
 	}
 	
-
+	/**
+	 * 
+	 * @param demand
+	 * @return The Applicable tax amount for demand
+	 */
+	public BigDecimal getTaxAmtFromDemandForApplicablesGeneration(Demand demand) {
+		BigDecimal taxAmount = BigDecimal.ZERO;
+		demand.getDemandDetails().forEach(details -> {
+			if (WSCalculationConstant.TAX_APPLICABLE.contains(details.getTaxHeadMasterCode())) {
+				taxAmount.add(details.getTaxAmount());
+			}
+		});
+		return taxAmount;
+	}
 
 }

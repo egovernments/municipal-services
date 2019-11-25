@@ -53,7 +53,7 @@ public class PayService {
 			return null;
 	}
 
-	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedPtTax,
+	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedWSTax,
 			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap) {
 
 		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)

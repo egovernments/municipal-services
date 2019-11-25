@@ -1,12 +1,12 @@
 package org.egov.wsCalculation.service;
 
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
@@ -576,7 +575,7 @@ public class DemandService {
 					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
 						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
-
+			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
 			roundOffDecimalForDemand(demand, requestInfoWrapper);
 
 			demandsToBeUpdated.add(demand);
@@ -738,6 +737,101 @@ public class DemandService {
 		return response;
 	}
 	
+	/**
+	 * Applies Penalty/Rebate/Interest to the incoming demands
+	 * 
+	 * If applied already then the demand details will be updated
+	 * 
+	 * @param demand
+	 * @param requestInfoWrapper
+	 * @param timeBasedExmeptionMasterMap
+	 * @param taxPeriods
+	 * @return
+	 */
 	
+	private boolean applytimeBasedApplicables(Demand demand,RequestInfoWrapper requestInfoWrapper,
+			Map<String, JSONArray> timeBasedExmeptionMasterMap,List<TaxPeriod> taxPeriods) {
+
+		boolean isCurrentDemand = false;
+		String tenantId = demand.getTenantId();
+		String demandId = demand.getId();
+		
+		TaxPeriod taxPeriod = taxPeriods.stream()
+				.filter(t -> demand.getTaxPeriodFrom().compareTo(t.getFromDate()) >= 0
+				&& demand.getTaxPeriodTo().compareTo(t.getToDate()) <= 0)
+		.findAny().orElse(null);
+		
+		if(!(taxPeriod.getFromDate()<= System.currentTimeMillis() && taxPeriod.getToDate() >= System.currentTimeMillis()))
+			isCurrentDemand = true;
+		/*
+		 * method to get the latest collected time from the receipt service
+		 */
+//		List<Receipt> receipts = rcptService.getReceiptsFromConsumerCode(taxPeriod.getFinancialYear(), demand,
+//				requestInfoWrapper);
+
+		BigDecimal taxAmtForApplicableGeneration = utils.getTaxAmtFromDemandForApplicablesGeneration(demand);
+		BigDecimal totalCollectedAmount = BigDecimal.ZERO;
+		BigDecimal oldInterest = BigDecimal.ZERO;
+		BigDecimal oldRebate = BigDecimal.ZERO;
+		
+		demand.getDemandDetails().forEach(details -> {
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+				oldInterest = oldInterest.add(details.getTaxAmount());
+			}
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+				oldRebate = oldRebate.add(details.getTaxAmount());
+			}
+		});
+		boolean isRebateUpdated = false;
+		boolean isPenaltyUpdated = false;
+		boolean isInterestUpdated = false;
+		
+		List<DemandDetail> details = demand.getDemandDetails();
+		
+		Map<String, BigDecimal> rebatePenaltyEstimates = payService.applyPenaltyRebateAndInterest(taxAmtForApplicableGeneration,
+				taxAmtForApplicableGeneration, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap);
+		
+		if(null == rebatePenaltyEstimates) return isCurrentDemand;
+		
+		BigDecimal rebate = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_REBATE);
+		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
+		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
+
+		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
+
+		if(rebate.compareTo(oldRebate)!=0){
+				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+						.taxHeadMasterCode(PT_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+						.build());
+		}
+
+
+		if(interest.compareTo(BigDecimal.ZERO)!=0){
+			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_INTEREST,details);
+			if(latestInterestDemandDetail!=null){
+				updateTaxAmount(interest,latestInterestDemandDetail);
+				isInterestUpdated = true;
+			}
+		}
+
+		if(penalty.compareTo(BigDecimal.ZERO)!=0){
+			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_PENALTY,details);
+			if(latestPenaltyDemandDetail!=null){
+				updateTaxAmount(penalty,latestPenaltyDemandDetail);
+				isPenaltyUpdated = true;
+			}
+		}
+
+		
+		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
+			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(CalculatorConstants.PT_TIME_PENALTY)
+					.demandId(demandId).tenantId(tenantId).build());
+		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
+			details.add(
+					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(CalculatorConstants.PT_TIME_INTEREST)
+							.demandId(demandId).tenantId(tenantId).build());
+		
+		return isCurrentDemand;
+	}
 
 }
