@@ -725,14 +725,14 @@ public class DemandService {
 		BigDecimal oldInterest = BigDecimal.ZERO;
 		BigDecimal oldRebate = BigDecimal.ZERO;
 		
-//		demand.getDemandDetails().forEach(details -> {
-//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
-//				oldInterest = oldInterest.add(details.getTaxAmount());
-//			}
-//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-//				oldRebate = oldRebate.add(details.getTaxAmount());
-//			}
-//		});
+		demand.getDemandDetails().forEach(details -> {
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+				oldInterest = oldInterest.add(details.getTaxAmount());
+			}
+			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+				oldRebate = oldRebate.add(details.getTaxAmount());
+			}
+		});
 		boolean isRebateUpdated = false;
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;
@@ -748,39 +748,39 @@ public class DemandService {
 		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
-//		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
-//
-//		if(rebate.compareTo(oldRebate)!=0){
-//				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-//						.taxHeadMasterCode(PT_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-//						.build());
-//		}
-//
-//
-//		if(interest.compareTo(BigDecimal.ZERO)!=0){
-//			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_INTEREST,details);
-//			if(latestInterestDemandDetail!=null){
-//				updateTaxAmount(interest,latestInterestDemandDetail);
-//				isInterestUpdated = true;
-//			}
-//		}
-//
-//		if(penalty.compareTo(BigDecimal.ZERO)!=0){
-//			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_PENALTY,details);
-//			if(latestPenaltyDemandDetail!=null){
-//				updateTaxAmount(penalty,latestPenaltyDemandDetail);
-//				isPenaltyUpdated = true;
-//			}
-//		}
-//
-//		
-//		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
-//			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(CalculatorConstants.PT_TIME_PENALTY)
-//					.demandId(demandId).tenantId(tenantId).build());
-//		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
-//			details.add(
-//					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(CalculatorConstants.PT_TIME_INTEREST)
-//							.demandId(demandId).tenantId(tenantId).build());
+		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
+
+		if(rebate.compareTo(oldRebate)!=0){
+				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+						.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+						.build());
+		}
+
+
+		if(interest.compareTo(BigDecimal.ZERO)!=0){
+			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
+			if(latestInterestDemandDetail!=null){
+				updateTaxAmount(interest,latestInterestDemandDetail);
+				isInterestUpdated = true;
+			}
+		}
+
+		if(penalty.compareTo(BigDecimal.ZERO)!=0){
+			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
+			if(latestPenaltyDemandDetail!=null){
+				updateTaxAmount(penalty,latestPenaltyDemandDetail);
+				isPenaltyUpdated = true;
+			}
+		}
+
+		
+		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
+			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+					.demandId(demandId).tenantId(tenantId).build());
+		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
+			details.add(
+					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+							.demandId(demandId).tenantId(tenantId).build());
 		
 		return isCurrentDemand;
 	}
