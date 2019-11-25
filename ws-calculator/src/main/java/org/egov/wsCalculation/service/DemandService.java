@@ -722,18 +722,22 @@ public class DemandService {
 //		List<Receipt> receipts = rcptService.getReceiptsFromConsumerCode(taxPeriod.getFinancialYear(), demand,
 //				requestInfoWrapper);
 
-		BigDecimal taxAmtForApplicableGeneration = utils.getTaxAmtFromDemandForApplicablesGeneration(demand);
+		BigDecimal taxAmtForApplicableGeneration = BigDecimal.ZERO;
 		BigDecimal oldInterest = BigDecimal.ZERO;
 		BigDecimal oldRebate = BigDecimal.ZERO;
 		
-		demand.getDemandDetails().forEach(details -> {
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
-				oldInterest.add(details.getTaxAmount());
+		for(DemandDetail detail : demand.getDemandDetails()) {
+			if (WSCalculationConstant.TAX_APPLICABLE.contains(detail.getTaxHeadMasterCode())) {
+				taxAmtForApplicableGeneration = taxAmtForApplicableGeneration.add(detail.getTaxAmount());
 			}
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-				oldRebate.add(details.getTaxAmount());
+			if(detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+				oldInterest = oldInterest.add(detail.getTaxAmount());
 			}
-		});
+			if(detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+				oldRebate = oldRebate.add(detail.getTaxAmount());
+			}
+			
+		}
 		
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;

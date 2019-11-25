@@ -307,11 +307,11 @@ public class WSCalculationUtil {
 	 */
 	public BigDecimal getTaxAmtFromDemandForApplicablesGeneration(Demand demand) {
 		BigDecimal taxAmount = BigDecimal.ZERO;
-		demand.getDemandDetails().forEach(details -> {
-			if (WSCalculationConstant.TAX_APPLICABLE.contains(details.getTaxHeadMasterCode())) {
-				taxAmount.add(details.getTaxAmount());
+		for(DemandDetail detail : demand.getDemandDetails()) {
+			if (WSCalculationConstant.TAX_APPLICABLE.contains(detail.getTaxHeadMasterCode())) {
+				taxAmount = taxAmount.add(detail.getTaxAmount());
 			}
-		});
+		}
 		return taxAmount;
 	}
 
