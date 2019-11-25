@@ -115,25 +115,16 @@ public class EstimationService {
 		return estimatesAndBillingSlabs;
 	}
 
-	/**
-	 * Return an Estimate list containing all the required tax heads mapped with
-	 * respective amt to be paid.
-	 * 
-	 * @param detail
-	 *            proeprty detail object
-	 * @param assessmentYear
-	 *            year for which calculation is being done
-	 * @param taxAmt
-	 *            tax amount for which rebate & penalty will be applied
-	 * @param usageExemption
-	 *            total exemption value given for all unit usages
-	 * @param propertyBasedExemptionMasterMap
-	 *            property masters which contains exemption values associated
-	 *            with them
-	 * @param timeBasedExemeptionMasterMap
-	 *            masters with period based exemption values
-	 * @param build
-	 */
+ /**
+  * 
+  * @param assessmentYear Assessment year
+  * @param taxAmt taxable amount
+  * @param connection
+  * @param waterBasedExemptionMasterMap
+  * @param timeBasedExemeptionMasterMap
+  * @param requestInfoWrapper
+  * @return
+  */
 	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
 			WaterConnection connection, Map<String, JSONArray> waterBasedExemptionMasterMap,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {

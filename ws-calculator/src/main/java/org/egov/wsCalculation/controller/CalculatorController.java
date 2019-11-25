@@ -59,12 +59,12 @@ public class CalculatorController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping("/_updateDemand")
-	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid CalculationReq calculationReq) {
-		List<Demand> demandList = demandService.updateDemands(calculationReq);
-		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
+//	@PostMapping("/_updateDemand")
+//	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid CalculationReq calculationReq) {
+//		List<Demand> demandList = demandService.updateDemands(calculationReq);
+//		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
+//		return new ResponseEntity<>(response, HttpStatus.OK);
+//	}
 	
 	/**
 	 * Generates Bill for the given criteria
@@ -83,8 +83,8 @@ public class CalculatorController {
 		return new ResponseEntity<BillAndCalculations>(response, HttpStatus.OK);
 	}
 	
-	@PostMapping("/_viewbill")
-	public ResponseEntity<DemandResponse> viewBill(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
+	@PostMapping("/_updateDemand")
+	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
 		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
 	}
