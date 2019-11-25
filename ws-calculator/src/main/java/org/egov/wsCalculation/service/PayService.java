@@ -76,28 +76,6 @@ public class PayService {
 		return estimates;
 	}
 
-	public TaxHeadEstimate roundOfDecimals(BigDecimal amount) {
-
-		BigDecimal roundOffPos = BigDecimal.ZERO;
-		BigDecimal roundOffNeg = BigDecimal.ZERO;
-
-		BigDecimal roundOffAmount = amount.setScale(2, 2);
-		BigDecimal reminder = roundOffAmount.remainder(BigDecimal.ONE);
-
-		if (reminder.doubleValue() >= 0.5)
-			roundOffPos = roundOffPos.add(BigDecimal.ONE.subtract(reminder));
-		else if (reminder.doubleValue() < 0.5)
-			roundOffNeg = roundOffNeg.add(reminder).negate();
-
-		if (roundOffPos.doubleValue() > 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOffPos).taxHeadCode(WSCalculationConstant.WS_ROUNDOFF)
-					.build();
-		else if (roundOffNeg.doubleValue() < 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg).taxHeadCode(WSCalculationConstant.WS_ROUNDOFF)
-					.build();
-		else
-			return null;
-	}
 
 	/**
 	 * Returns the Amount of Rebate that can be applied on the given tax amount for

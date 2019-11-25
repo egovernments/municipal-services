@@ -576,10 +576,8 @@ public class DemandService {
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
 						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
 			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
-			roundOffDecimalForDemand(demand, requestInfoWrapper);
-
+			addRoundOffTaxHead(getBillCriteria.getTenantId(), demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
-
 		}
 
 		/**
@@ -592,53 +590,6 @@ public class DemandService {
 
 	}
 
-	/**
-	 * 
-	 * Balances the decimal values in the newly updated demand by performing a
-	 * roundoff
-	 * 
-	 * @param demand
-	 * @param requestInfoWrapper
-	 */
-	public void roundOffDecimalForDemand(Demand demand, RequestInfoWrapper requestInfoWrapper) {
-
-		List<DemandDetail> details = demand.getDemandDetails();
-		String tenantId = demand.getTenantId();
-		String demandId = demand.getId();
-
-		BigDecimal taxAmount = BigDecimal.ZERO;
-
-		// Collecting the taxHead master codes with the isDebit field in a Map
-		Map<String, Boolean> isTaxHeadDebitMap = mstrDataService
-				.getTaxHeadMasterMap(requestInfoWrapper.getRequestInfo(), tenantId).stream()
-				.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getIsDebit));
-
-		/*
-		 * Summing the credit amount and Debit amount in to separate
-		 * variables(based on the taxhead:isdebit map) to send to
-		 * roundoffDecimal method
-		 */
-		for (DemandDetail detail : demand.getDemandDetails()) {
-			taxAmount = taxAmount.add(detail.getTaxAmount());
-		}
-
-		/*
-		 * An estimate object will be returned incase if there is a decimal
-		 * value
-		 * 
-		 * If no decimal value found null object will be returned
-		 */
-		TaxHeadEstimate roundOffEstimate = payService.roundOfDecimals(taxAmount);
-
-		BigDecimal decimalRoundOff = null != roundOffEstimate ? roundOffEstimate.getEstimateAmount() : BigDecimal.ZERO;
-
-		if (decimalRoundOff.compareTo(BigDecimal.ZERO) != 0) {
-			details.add(DemandDetail.builder().taxAmount(roundOffEstimate.getEstimateAmount())
-					.taxHeadMasterCode(roundOffEstimate.getTaxHeadCode()).demandId(demandId).tenantId(tenantId)
-					.build());
-		}
-
-	}
 	
 	/**
 	 * update demand for the given list of calculations
@@ -774,14 +725,14 @@ public class DemandService {
 		BigDecimal oldInterest = BigDecimal.ZERO;
 		BigDecimal oldRebate = BigDecimal.ZERO;
 		
-		demand.getDemandDetails().forEach(details -> {
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
-				oldInterest = oldInterest.add(details.getTaxAmount());
-			}
-			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-				oldRebate = oldRebate.add(details.getTaxAmount());
-			}
-		});
+//		demand.getDemandDetails().forEach(details -> {
+//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
+//				oldInterest = oldInterest.add(details.getTaxAmount());
+//			}
+//			if(details.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
+//				oldRebate = oldRebate.add(details.getTaxAmount());
+//			}
+//		});
 		boolean isRebateUpdated = false;
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;
@@ -797,39 +748,39 @@ public class DemandService {
 		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
-		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
-
-		if(rebate.compareTo(oldRebate)!=0){
-				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-						.taxHeadMasterCode(PT_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-						.build());
-		}
-
-
-		if(interest.compareTo(BigDecimal.ZERO)!=0){
-			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_INTEREST,details);
-			if(latestInterestDemandDetail!=null){
-				updateTaxAmount(interest,latestInterestDemandDetail);
-				isInterestUpdated = true;
-			}
-		}
-
-		if(penalty.compareTo(BigDecimal.ZERO)!=0){
-			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_PENALTY,details);
-			if(latestPenaltyDemandDetail!=null){
-				updateTaxAmount(penalty,latestPenaltyDemandDetail);
-				isPenaltyUpdated = true;
-			}
-		}
-
-		
-		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
-			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(CalculatorConstants.PT_TIME_PENALTY)
-					.demandId(demandId).tenantId(tenantId).build());
-		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
-			details.add(
-					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(CalculatorConstants.PT_TIME_INTEREST)
-							.demandId(demandId).tenantId(tenantId).build());
+//		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
+//
+//		if(rebate.compareTo(oldRebate)!=0){
+//				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+//						.taxHeadMasterCode(PT_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+//						.build());
+//		}
+//
+//
+//		if(interest.compareTo(BigDecimal.ZERO)!=0){
+//			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_INTEREST,details);
+//			if(latestInterestDemandDetail!=null){
+//				updateTaxAmount(interest,latestInterestDemandDetail);
+//				isInterestUpdated = true;
+//			}
+//		}
+//
+//		if(penalty.compareTo(BigDecimal.ZERO)!=0){
+//			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(PT_TIME_PENALTY,details);
+//			if(latestPenaltyDemandDetail!=null){
+//				updateTaxAmount(penalty,latestPenaltyDemandDetail);
+//				isPenaltyUpdated = true;
+//			}
+//		}
+//
+//		
+//		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
+//			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(CalculatorConstants.PT_TIME_PENALTY)
+//					.demandId(demandId).tenantId(tenantId).build());
+//		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
+//			details.add(
+//					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(CalculatorConstants.PT_TIME_INTEREST)
+//							.demandId(demandId).tenantId(tenantId).build());
 		
 		return isCurrentDemand;
 	}
