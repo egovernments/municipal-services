@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Builder
 @Component
-public class BpaConfiguration {
+public class BPAConfiguration {
 
 
     @Value("${app.timezone}")

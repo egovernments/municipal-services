@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/s1")
-public class BpaController {
+public class BPAController {
 
 	@Autowired
 	private BPAService bpaService;
