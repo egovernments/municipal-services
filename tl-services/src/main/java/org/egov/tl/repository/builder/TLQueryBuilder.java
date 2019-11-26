@@ -86,7 +86,15 @@ public class TLQueryBuilder {
     public String getTLSearchQuery(TradeLicenseSearchCriteria criteria, List<Object> preparedStmtList) {
 
         StringBuilder builder = new StringBuilder(QUERY);
-
+        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
+            preparedStmtList.add(businessServiceTL);
+        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" tl.businessservice=? ");
+            preparedStmtList.add(businessServiceBPA);
+        }
         if(criteria.getAccountId()!=null){
             addClauseIfRequired(preparedStmtList,builder);
             builder.append(" tl.accountid = ? ");
@@ -108,17 +116,6 @@ public class TLQueryBuilder {
             builder.append(" tl.tenantid=? ");
             preparedStmtList.add(criteria.getTenantId());
         }
-
-        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
-            preparedStmtList.add(businessServiceTL);
-        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" tl.businessservice=? ");
-            preparedStmtList.add(businessServiceBPA);
-        }
-
         List<String> ids = criteria.getIds();
         if(!CollectionUtils.isEmpty(ids)) {
             addClauseIfRequired(preparedStmtList,builder);

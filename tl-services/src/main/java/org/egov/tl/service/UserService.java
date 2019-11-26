@@ -124,7 +124,7 @@ public class UserService{
                     if (isBPARoleAddRequired) {
                         List<String> licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
                         for (String rolename : licenseeTyperRole) {
-                            user.addRolesItem(Role.builder().code(rolename).name(rolename).build());
+                            user.addRolesItem(Role.builder().code(rolename).name(rolename).tenantId(tradeLicense.getTenantId()).build());
                         }
                     }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
