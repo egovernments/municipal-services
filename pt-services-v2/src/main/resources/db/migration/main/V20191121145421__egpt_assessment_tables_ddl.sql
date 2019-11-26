@@ -34,6 +34,7 @@ CREATE TABLE eg_pt_unit (
   occupancyDate bigint,
   constructionType character varying(64) NOT NULL,
   arv numeric(12,2),
+  active BOOLEAN,
   createdby character varying(64) NOT NULL,
   createdtime bigint NOT NULL,
   lastmodifiedby character varying(64) NOT NULL,

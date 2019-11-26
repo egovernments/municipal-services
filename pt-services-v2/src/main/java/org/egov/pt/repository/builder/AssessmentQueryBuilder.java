@@ -18,10 +18,10 @@ public class AssessmentQueryBuilder {
 			+ "ass.additionalDetails as ass_additionaldetails, ass.createdby as ass_createdby, ass.createdtime as ass_createdtime, ass.lastmodifiedby as ass_lastmodifiedby, "
 			+ "ass.lastmodifiedtime as ass_lastmodifiedtime, unit.tenantId as unit_tenantid, unit.id as unit_id, unit.assessmentId as unit_assessmentid, "
 			+ "unit.floorNo as unit_floorno, unit.unitArea as unit_unitarea, unit.usageCategory as unit_usagecategory, unit.occupancyType as unit_occupancytype, "
-			+ "unit.occupancyDate as unit_occupancydate, unit.constructionType as unit_constructionType, unit.arv as unit_arv, unit.createdby as unit_createdby, "
+			+ "unit.occupancyDate as unit_occupancydate, unit.constructionType as unit_constructionType, unit.arv as unit_arv, unit.active as unit_active, unit.createdby as unit_createdby, "
 			+ "unit.createdtime as unit_createdtime, unit.lastmodifiedby as unit_lastmodifiedby, unit.lastmodifiedtime as unit_lastmodifiedtime, "
 			+ "doc.id as doc_id, doc.entityid as doc_entityid, doc.documentType as doc_documenttype, doc.fileStore as doc_filestore, doc.documentuid as doc_documentuid, "
-			+ "doc.active as doc_active, doc.createdBy as doc_createdby, doc.lastModifiedBy as doc_lastModifiedby, doc.createdTime as doc_createdtime, doc.lastModifiedTime as doc_lastModifiedtime, "
+			+ "doc.status as doc_status, doc.createdBy as doc_createdby, doc.lastModifiedBy as doc_lastModifiedby, doc.createdTime as doc_createdtime, doc.lastModifiedTime as doc_lastModifiedtime, "
 			+ "doc.createdby as doc_createdby, doc.createdtime as doc_createdtime, doc.lastmodifiedby as doc_lastmodifiedby, doc.lastmodifiedtime as doc_lastmodifiedtime " 
 			+ "FROM eg_pt_assessments ass INNER JOIN eg_pt_unit unit ON ass.id = unit.assessmentId INNER JOIN eg_pt_document doc ON ass.id = doc.entityid ";
 	

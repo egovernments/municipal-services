@@ -35,9 +35,6 @@ public class Document {
         @NotNull
         private String fileStore ;
         
-        @JsonProperty("active")
-        private Boolean active;
-
         @JsonProperty("documentUid")
         @NotNull
         private String documentUid ;

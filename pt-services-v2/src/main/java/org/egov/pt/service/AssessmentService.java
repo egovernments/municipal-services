@@ -94,6 +94,7 @@ public class AssessmentService {
 				doc.setId(String.valueOf(UUID.randomUUID()));
 				doc.setEntityId(assessment.getId());
 				doc.setAuditDetails(auditDetails);
+				doc.setStatus(Status.ACTIVE);
 			}
 		}		
 		assessment.setAuditDetails(auditDetails);
@@ -130,6 +131,7 @@ public class AssessmentService {
 					doc.setId(String.valueOf(UUID.randomUUID()));
 					doc.setEntityId(assessment.getId());
 					doc.setAuditDetails(auditDetails);
+					doc.setStatus(Status.ACTIVE);
 				}
 			}
 		}

@@ -15,8 +15,11 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.AssessmentSearchCriteria;
 import org.egov.pt.models.Document;
+import org.egov.pt.models.Property;
+import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.Unit;
 import org.egov.pt.service.AssessmentService;
+import org.egov.pt.service.PropertyService;
 import org.egov.pt.util.ErrorConstants;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.AssessmentRequest;
@@ -29,13 +32,16 @@ public class AssessmentValidator {
 	@Autowired
 	private AssessmentService assessmentService;
 	
+	@Autowired
+	private PropertyService propertyService;
+	
     @Autowired
     private PropertyValidator propertyValidator;
 
 	public void validateAssessmentCreate(AssessmentRequest assessmentRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 		validateRI(assessmentRequest.getRequestInfo(), errorMap);
-		commonValidations(assessmentRequest.getAssessment(), errorMap, false);
+		commonValidations(assessmentRequest, errorMap, false);
 		validateMDMSData(assessmentRequest.getRequestInfo(), assessmentRequest.getAssessment(), errorMap);
 	}
 
@@ -43,7 +49,7 @@ public class AssessmentValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		validateRI(assessmentRequest.getRequestInfo(), errorMap);
 		validateUpdateRequest(assessmentRequest, errorMap);
-		commonValidations(assessmentRequest.getAssessment(), errorMap, true);
+		commonValidations(assessmentRequest, errorMap, true);
 		validateMDMSData(assessmentRequest.getRequestInfo(), assessmentRequest.getAssessment(), errorMap);
 	}
 
@@ -118,7 +124,6 @@ public class AssessmentValidator {
 					}
 				}
 			}
-
 		}
 
 		if (!CollectionUtils.isEmpty(errorMap.keySet())) {
@@ -126,10 +131,11 @@ public class AssessmentValidator {
 		}
 	}
 
-	private void commonValidations(Assessment assessment, Map<String, String> errorMap, Boolean isUpdate) {
-
-		// search property on id and check if the property exists.
-
+	private void commonValidations(AssessmentRequest assessmentReq, Map<String, String> errorMap, boolean isUpdate) {
+		Assessment assessment = assessmentReq.getAssessment();
+		if(!checkIfPropertyExists(assessmentReq.getRequestInfo(), assessment.getPropertyID(), assessment.getTenantId())) {
+			throw new CustomException("PROPERTY_NOT_FOUND", "You're trying to assess a non-existing property.");
+		}
 		if (assessment.getAssessmentDate() > new Date().getTime()) {
 			errorMap.put(ErrorConstants.ASSMENT_DATE_FUTURE_ERROR_CODE, ErrorConstants.ASSMENT_DATE_FUTURE_ERROR_MSG);
 		}
@@ -148,6 +154,17 @@ public class AssessmentValidator {
 			throw new CustomException(errorMap);
 		}
 
+	}
+	
+	private Boolean checkIfPropertyExists(RequestInfo requestInfo, String propertyId, String tenantId) {
+		Boolean propertyExists = false;
+		Set<String> propertyIds = new HashSet<>(); propertyIds.add(propertyId);
+		PropertyCriteria criteria = PropertyCriteria.builder().ids(propertyIds).tenantId(tenantId).build();
+		List<Property> properties = propertyService.searchProperty(criteria, requestInfo);
+		if(!CollectionUtils.isEmpty(properties))
+			propertyExists = true;
+		
+		return propertyExists;
 	}
 
 	private void validateMDMSData(RequestInfo requestInfo, Assessment assessment, Map<String, String> errorMap) {

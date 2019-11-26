@@ -38,4 +38,12 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
+/*	public List<Property> getPropertiesPlainSearch(PropertyCriteria criteria) {
+		
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getPropertyLikeQuery(criteria, preparedStmtList);
+		log.info("Query: " + query);
+		log.info("PS: " + preparedStmtList);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+	}*/
 }

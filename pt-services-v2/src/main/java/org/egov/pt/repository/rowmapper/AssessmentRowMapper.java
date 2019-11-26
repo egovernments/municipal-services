@@ -118,12 +118,11 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				.lastModifiedTime(rs.getLong("doc_lastmodifiedtime")).build();
 		
 		return Document.builder().id(rs.getString("doc_id"))
-				.active(rs.getBoolean("doc_active"))
+				.status(Status.valueOf(rs.getString("doc_status")))
 				.documentType(rs.getString("doc_documenttype"))
 				.documentUid(rs.getString("doc_documentuid"))
 				.entityId(rs.getString("doc_entityid"))
 				.fileStore(rs.getString("doc_filestore"))
-				.active(rs.getBoolean("doc_active"))
 				.tenantId(rs.getString("doc_tenantid"))
 				.auditDetails(auditDetails)
 				.build();
