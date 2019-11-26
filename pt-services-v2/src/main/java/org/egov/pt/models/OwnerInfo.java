@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.Role;
 import org.egov.pt.models.enums.Relationship;
+import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -54,6 +55,9 @@ public class OwnerInfo extends User {
 
 	@JsonProperty("institutionId")
 	private String institutionId;
+	
+	@JsonProperty("status")
+	private Status status;
 
 	@JsonProperty("documents")
 	@Valid

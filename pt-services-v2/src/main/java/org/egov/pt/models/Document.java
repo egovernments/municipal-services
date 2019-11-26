@@ -2,7 +2,7 @@ package org.egov.pt.models;
 
 import javax.validation.constraints.NotNull;
 
-import org.egov.pt.models.enums.DocumentBelongsTo;
+import org.egov.pt.models.enums.Status;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -44,5 +44,8 @@ public class Document {
         
         @JsonProperty("auditDetails")
         private AuditDetails auditDetails;
+
+        @JsonProperty("status")
+    	private Status status;
 }
 
