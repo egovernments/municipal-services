@@ -174,7 +174,7 @@ public class DemandService {
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
 		List<Demand> demands = new LinkedList<>();
-		String assessmentYear = "2019-20";
+		String assessmentYear = estimationService.getAssessmentYear();
 
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = null;
