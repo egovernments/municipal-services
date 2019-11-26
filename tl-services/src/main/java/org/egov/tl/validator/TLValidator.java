@@ -117,9 +117,9 @@ public class TLValidator {
                     throw new CustomException("NULL_INSTITUTIONCONTACTNO", " Institution Contact No cannot be null");
                 if (license.getTradeLicenseDetail().getInstitution().getName() == null)
                     throw new CustomException("NULL_AUTHORISEDPERSONNAME", " Authorised person name can not be null");
-                if (license.getTradeLicenseDetail().getInstitution().getName() == null)
+                if (license.getTradeLicenseDetail().getInstitution().getInstituionName() == null)
                     throw new CustomException("NULL_INSTITUTIONNAME", " Institute name can not be null");
-                if (license.getTradeLicenseDetail().getInstitution().getName() == null)
+                if (license.getTradeLicenseDetail().getInstitution().getAddress() == null)
                     throw new CustomException("NULL_ADDRESS", " Institute address can not be null");
             }
         });
@@ -135,9 +135,9 @@ public class TLValidator {
 
                         if (owner.getPermanentAddress() == null)
                             throw new CustomException("NULL_PERMANENTADDRESS", " User Permanent Address cannot be null");
-
-                        if (owner.getCorrespondenceAddress() == null)
-                            throw new CustomException("NULL_CORRESPONDANCEADDRESS", " User Correspondance address cannot be null");
+//
+//                        if (owner.getCorrespondenceAddress() == null)
+//                            throw new CustomException("NULL_CORRESPONDANCEADDRESS", " User Correspondance address cannot be null");
                     }
             );
         });
