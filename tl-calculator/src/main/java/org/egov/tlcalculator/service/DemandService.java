@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.egov.tlcalculator.utils.TLCalculatorConstants.MDMS_ROUNDOFF_TAXHEAD;
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_BPA;
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_TL;
 
 
 @Service
@@ -62,7 +64,7 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the calculation request
      * @param calculations The Calculation Objects for which demand has to be generated or updated
      */
-    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData){
+    public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,Object mdmsData,String businessService){
 
         //List that will contain Calculation for new demands
         List<Calculation> createCalculations = new LinkedList<>();
@@ -75,7 +77,7 @@ public class DemandService {
             //Collect required parameters for demand search
             String tenantId = calculations.get(0).getTenantId();
             Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
-            List<Demand> demands = searchDemand(tenantId,applicationNumbers,requestInfo);
+            List<Demand> demands = searchDemand(tenantId,applicationNumbers,requestInfo,businessService);
             Set<String> applicationNumbersFromDemands = new HashSet<>();
             if(!CollectionUtils.isEmpty(demands))
                 applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
@@ -93,7 +95,7 @@ public class DemandService {
             createDemand(requestInfo,createCalculations,mdmsData);
 
         if(!CollectionUtils.isEmpty(updateCalculations))
-            updateDemand(requestInfo,updateCalculations);
+            updateDemand(requestInfo,updateCalculations,businessService);
     }
 
 
@@ -103,8 +105,8 @@ public class DemandService {
      * @param billCriteria The criteria for bill generation
      * @return The generate bill response along with ids of slab used for calculation
      */
-    public BillAndCalculations getBill(RequestInfo requestInfo, GenerateBillCriteria billCriteria){
-        BillResponse billResponse = generateBill(requestInfo,billCriteria);
+    public BillAndCalculations getBill(RequestInfo requestInfo, GenerateBillCriteria billCriteria, String serviceFromPath){
+        BillResponse billResponse = generateBill(requestInfo,billCriteria,serviceFromPath);
         BillingSlabIds billingSlabIds = getBillingSlabIds(billCriteria);
         BillAndCalculations getBillResponse = new BillAndCalculations();
         getBillResponse.setBillingSlabIds(billingSlabIds);
@@ -167,21 +169,42 @@ public class DemandService {
                         .build());
             });
 
-             Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
 
-             addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
 
-             demands.add(Demand.builder()
+            Long taxPeriodFrom = System.currentTimeMillis();;
+            Long taxPeriodTo = System.currentTimeMillis(); ;
+            String businessService = license.getBusinessService();
+            if (businessService == null)
+                businessService = businessService_TL;
+            switch(businessService)
+            {
+                case businessService_TL:
+                    Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
+                    taxPeriodFrom=taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE);
+                    taxPeriodTo=taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE);
+                    break;
+            }
+            addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
+            Demand singleDemand=Demand.builder()
                     .consumerCode(consumerCode)
                     .demandDetails(demandDetails)
                     .payer(owner)
                     .minimumAmountPayable(config.getMinimumPayableAmount())
                     .tenantId(tenantId)
-                    .taxPeriodFrom(taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE))
-                    .taxPeriodTo(taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE))
+                    .taxPeriodFrom(taxPeriodFrom)
+                    .taxPeriodTo(taxPeriodTo)
                     .consumerType("tradelicense")
-                    .businessService(config.getBusinessService())
-                    .build());
+                    .businessService(config.getBusinessServiceTL())
+                    .build();
+            switch(businessService)
+            {
+                case businessService_BPA:
+                    singleDemand.setConsumerType("bpaStakeHolderReg");
+                    singleDemand.setBusinessService(config.getBusinessServiceBPA());
+                    break;
+            }
+            demands.add(singleDemand);
+
         }
         return demandRepository.saveDemand(requestInfo,demands);
     }
@@ -194,12 +217,12 @@ public class DemandService {
      * @param calculations List of calculation object
      * @return Demands that are updated
      */
-    private List<Demand> updateDemand(RequestInfo requestInfo,List<Calculation> calculations){
+    private List<Demand> updateDemand(RequestInfo requestInfo,List<Calculation> calculations,String businessService){
         List<Demand> demands = new LinkedList<>();
         for(Calculation calculation : calculations) {
 
             List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getTradeLicense().getApplicationNumber())
-                    , requestInfo);
+                    , requestInfo,businessService);
 
             if(CollectionUtils.isEmpty(searchResult))
                 throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getTradeLicense().getApplicationNumber());
@@ -221,10 +244,10 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the incoming request
      * @return Lis to demands for the given consumerCode
      */
-    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo){
+    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo, String businessService){
         String uri = utils.getDemandSearchURL();
         uri = uri.replace("{1}",tenantId);
-        uri = uri.replace("{2}",config.getBusinessService());
+        uri = uri.replace("{2}",businessService);
         uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
 
         Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
@@ -252,12 +275,15 @@ public class DemandService {
      * @param billCriteria The criteria for bill generation
      * @return The response of the bill generate
      */
-    private BillResponse generateBill(RequestInfo requestInfo,GenerateBillCriteria billCriteria){
+    private BillResponse generateBill(RequestInfo requestInfo,GenerateBillCriteria billCriteria,String businessServiceFromPath){
 
         String consumerCode = billCriteria.getConsumerCode();
         String tenantId = billCriteria.getTenantId();
 
-        List<Demand> demands = searchDemand(tenantId,Collections.singleton(consumerCode),requestInfo);
+        List<Demand> demands = searchDemand(tenantId,Collections.singleton(consumerCode),requestInfo,billCriteria.getBusinessService());
+
+        if(!StringUtils.equals(businessServiceFromPath,billCriteria.getBusinessService()))
+            throw new CustomException("BUSINESSSERVICE_MISMATCH","Business Service in Path variable and bill criteria are different");
 
         if(CollectionUtils.isEmpty(demands))
             throw new CustomException("INVALID CONSUMERCODE","Bill cannot be generated.No demand exists for the given consumerCode");

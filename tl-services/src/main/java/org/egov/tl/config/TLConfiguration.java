@@ -79,8 +79,8 @@ public class TLConfiguration {
     @Value("${egov.idgen.tl.licensenumber.format}")
     private String licenseNumberIdgenFormat;
 
-
-
+    @Value("${kafka.topics.user.update}")
+    private String userUpdateTopic;
 
     //Persister Config
     @Value("${persister.save.tradelicense.topic}")
@@ -125,21 +125,25 @@ public class TLConfiguration {
     private String calculatorHost;
 
     @Value("${egov.tl.calculator.calculate.endpoint}")
-    private String calculateEndpoint;
+    private String calculateEndpointTL;
+
+    @Value("${egov.bpa.calculator.calculate.endpoint}")
+    private String calculateEndpointBPA;
 
     @Value("${egov.tl.calculator.getBill.endpoint}")
     private String getBillEndpoint;
-
-
 
     //Institutional key word
     @Value("${egov.ownershipcategory.institutional}")
     private String institutional;
 
 
-    @Value("${egov.receipt.businessservice}")
-    private String businessService;
+    @Value("${egov.receipt.businessserviceTL}")
+    private String businessServiceTL;
 
+
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
 
     //Property Service
     @Value("${egov.property.service.host}")
@@ -156,10 +160,11 @@ public class TLConfiguration {
     @Value("${kafka.topics.notification.sms}")
     private String smsNotifTopic;
 
-    @Value("${notification.sms.enabled}")
-    private Boolean isSMSEnabled;
+    @Value("${notification.sms.enabled.forTL}")
+    private Boolean isTLSMSEnabled;
 
-
+    @Value("${notification.sms.enabled.forBPA}")
+    private Boolean isBPASMSEnabled;
 
     //Localization
     @Value("${egov.localization.host}")
@@ -202,7 +207,7 @@ public class TLConfiguration {
 
     // Workflow
     @Value("${create.tl.workflow.name}")
-    private String businessServiceValue;
+    private String tlBusinessServiceValue;
 
     @Value("${workflow.context.path}")
     private String wfHost;
@@ -230,8 +235,11 @@ public class TLConfiguration {
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
 	
-	@Value("${egov.user.event.notification.enabled}")
-	private Boolean isUserEventsNotificationEnabled;
+	@Value("${egov.user.event.notification.enabledForTL}")
+	private Boolean isUserEventsNotificationEnabledForTL;
+
+    @Value("${egov.user.event.notification.enabledForBPA}")
+    private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;

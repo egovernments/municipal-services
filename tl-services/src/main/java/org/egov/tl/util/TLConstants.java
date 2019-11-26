@@ -1,5 +1,6 @@
 package org.egov.tl.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -9,6 +10,10 @@ import java.util.List;
 @Component
 public class TLConstants {
 
+
+    public static  final String businessService_TL = "TL";
+
+    public static  final String businessService_BPA = "BPAREG";
 
     public static final String PROPERTY_JSONPATH = "$.Properties[0].propertyId";
 
@@ -94,7 +99,6 @@ public class TLConstants {
 
     public static final String MDMS_ENDDATE  = "endingDate";
 
-
     // error constants
 
     public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
@@ -112,6 +116,8 @@ public class TLConstants {
     public static final String ACTION_APPROVE  = "APPROVE";
 
     public static final String ACTION_REJECT  = "REJECT";
+
+    public static final String TRIGGER_NOWORKFLOW  = "NOWORKFLOW";
 
     public static final String ACTION_CANCEL  = "CANCEL";
 

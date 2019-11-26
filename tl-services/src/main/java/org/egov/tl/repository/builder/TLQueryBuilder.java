@@ -8,6 +8,7 @@ import org.egov.tl.web.models.*;
 import org.egov.tracer.model.CustomException;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +32,13 @@ public class TLQueryBuilder {
     private static final String INNER_JOIN_STRING = " INNER JOIN ";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
+    @Value("${egov.receipt.businessserviceTL}")
+    private String businessServiceTL;
+
+
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
+
     private static final String QUERY = "SELECT tl.*,tld.*,tlunit.*,tlacc.*,tlowner.*," +
             "tladdress.*,tlapldoc.*,tlverdoc.*,tlownerdoc.*,tlinsti.*,tl.id as tl_id,tl.tenantid as tl_tenantId,tl.lastModifiedTime as " +
             "tl_lastModifiedTime,tl.createdBy as tl_createdBy,tl.lastModifiedBy as tl_lastModifiedBy,tl.createdTime as " +
@@ -43,8 +51,8 @@ public class TLQueryBuilder {
             "tlverdoc.id as tl_ver_doc_id,tlverdoc.documenttype as tl_ver_doc_documenttype,tlverdoc.filestoreid as tl_ver_doc_filestoreid,tlverdoc.active as tl_ver_doc_active," +
             "tlownerdoc.userid as docuserid,tlownerdoc.tradeLicenseDetailId as doctradelicensedetailid,tlownerdoc.id as ownerdocid,"+
             "tlownerdoc.documenttype as ownerdocType,tlownerdoc.filestoreid as ownerfileStoreId,tlownerdoc.documentuid as ownerdocuid,tlownerdoc.active as ownerdocactive," +
-            " tlinsti.id as instiid,tlinsti.name as institutionname,tlinsti.type as institutiontype,tlinsti.tenantid as institenantId,tlinsti.active as instiactive "+
-            " FROM eg_tl_tradelicense tl"
+            " tlinsti.id as instiid,tlinsti.name as authorisedpersonname,tlinsti.type as institutiontype,tlinsti.tenantid as institenantId,tlinsti.active as instiactive, "+
+            " tlinsti.instituionname as instiinstituionname, tlinsti.contactno as insticontactno, tlinsti.organisationregistrationno as instiorganisationregistrationno, tlinsti.address as instiaddress FROM eg_tl_tradelicense tl"
             +INNER_JOIN_STRING
             +"eg_tl_tradelicensedetail tld ON tld.tradelicenseid = tl.id"
             +INNER_JOIN_STRING
@@ -101,6 +109,15 @@ public class TLQueryBuilder {
             preparedStmtList.add(criteria.getTenantId());
         }
 
+        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
+            preparedStmtList.add(businessServiceTL);
+        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" tl.businessservice=? ");
+            preparedStmtList.add(businessServiceBPA);
+        }
 
         List<String> ids = criteria.getIds();
         if(!CollectionUtils.isEmpty(ids)) {

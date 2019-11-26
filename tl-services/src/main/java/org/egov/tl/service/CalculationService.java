@@ -73,7 +73,7 @@ public class CalculationService {
      * @return CalculationRes from the tl-calculator
      */
     private CalculationRes getCalculation(RequestInfo requestInfo,List<TradeLicense> licenses){
-        StringBuilder uri = utils.getCalculationURI();
+        StringBuilder uri = utils.getCalculationURI(licenses.get(0).getBusinessService());
         List<CalulationCriteria> criterias = new LinkedList<>();
 
         licenses.forEach(license -> {

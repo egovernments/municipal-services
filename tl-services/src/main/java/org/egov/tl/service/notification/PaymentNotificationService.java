@@ -21,6 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static org.egov.tl.util.TLConstants.businessService_BPA;
+import static org.egov.tl.util.TLConstants.businessService_TL;
+
 
 @Service
 public class PaymentNotificationService {
@@ -74,14 +77,22 @@ public class PaymentNotificationService {
             Map<String,String> valMap = enrichValMap(documentContext);
             Map<String, Object> info = documentContext.read("$.RequestInfo");
             RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-//            RequestInfo requestInfo = new RequestInfo();
 
-            if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessService())){
+            if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceTL())||valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceBPA())){
                 TradeLicense license = getTradeLicenseFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
                                                                        requestInfo);
                 String localizationMessages = util.getLocalizationMessages(license.getTenantId(),requestInfo);
                 List<SMSRequest> smsRequests = getSMSRequests(license,valMap,localizationMessages);
-                util.sendSMS(smsRequests);
+                switch(valMap.get(businessServiceKey))
+                {
+                    case businessService_TL:
+                        util.sendSMS(smsRequests,config.getIsTLSMSEnabled());
+                        break;
+
+                    case businessService_BPA:
+                        util.sendSMS(smsRequests,config.getIsBPASMSEnabled());
+                        break;
+                }
             }
         }
         catch (Exception e){
@@ -157,14 +168,14 @@ public class PaymentNotificationService {
     private Map<String,String> enrichValMap(DocumentContext context){
         Map<String,String> valMap = new HashMap<>();
         try{
-            valMap.put(businessServiceKey,context.read("$.Receipt[0].Bill[0].billDetails[0].businessService"));
-            valMap.put(consumerCodeKey,context.read("$.Receipt[0].Bill[0].billDetails[0].consumerCode"));
-            valMap.put(tenantIdKey,context.read("$.Receipt[0].tenantId"));
-            valMap.put(payerMobileNumberKey,context.read("$.Receipt[0].Bill[0].mobileNumber"));
-            valMap.put(paidByKey,context.read("$.Receipt[0].Bill[0].paidBy"));
-            Integer amountPaid = context.read("$.Receipt[0].instrument.amount");
+            valMap.put(businessServiceKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
+            valMap.put(consumerCodeKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
+            valMap.put(tenantIdKey,context.read("$.Payments[0].tenantId"));
+            valMap.put(payerMobileNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber"));
+            valMap.put(paidByKey,context.read("$.Payments[0].paidBy"));
+            Integer amountPaid = context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.amountPaid");
             valMap.put(amountPaidKey,amountPaid.toString());
-            valMap.put(receiptNumberKey,context.read("$.Receipt[0].Bill[0].billDetails[0].receiptNumber"));
+            valMap.put(receiptNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].receiptNumber"));
 
         }
         catch (Exception e){

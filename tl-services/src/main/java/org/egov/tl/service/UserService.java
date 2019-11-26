@@ -6,6 +6,9 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.ServiceRequestRepository;
+import org.egov.tl.repository.TLRepository;
+import org.egov.tl.util.TradeUtil;
+import org.egov.tl.validator.TLValidator;
 import org.egov.tl.web.models.*;
 import org.egov.tl.web.models.user.CreateUserRequest;
 import org.egov.tl.web.models.user.UserDetailResponse;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import static org.egov.tl.util.TLConstants.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -32,11 +36,17 @@ public class UserService{
     private TLConfiguration config;
 
 
+    private TradeUtil tradeUtil;
+
+    private TLRepository repository;
+
     @Autowired
-    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config) {
+    public UserService(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, TLConfiguration config,TradeUtil tradeUtil,TLRepository repository) {
         this.mapper = mapper;
         this.serviceRequestRepository = serviceRequestRepository;
         this.config = config;
+        this.tradeUtil=tradeUtil;
+        this.repository=repository;
     }
 
 
@@ -46,10 +56,21 @@ public class UserService{
      * @param request TradeLciense create or update request
      */
 
-    public void createUser(TradeLicenseRequest request){
+    public void addUserRolesAsynchronously(TradeLicenseRequest request){
+        List<TradeLicense> licenses = request.getLicenses();
+        for(TradeLicense license : licenses){
+            if((license.getStatus()!=null) && license.getStatus().equalsIgnoreCase(STATUS_APPROVED))
+            {
+                TradeLicenseRequest tradeLicenseRequestForUserUpdate =TradeLicenseRequest.builder().licenses(Collections.singletonList(license)).requestInfo(request.getRequestInfo()).build();
+                repository.addUserRole(tradeLicenseRequestForUserUpdate);
+            }
+        }
+    }
+
+    public void createUser(TradeLicenseRequest request,boolean isBPARoleAddRequired){
         List<TradeLicense> licenses = request.getLicenses();
         RequestInfo requestInfo = request.getRequestInfo();
-        Role role = getCitizenRole();
+        Role role = getCitizenRole(licenses.get(0).getTenantId());
         licenses.forEach(tradeLicense -> {
 
            /* Set<String> listOfMobileNumbers = getMobileNumbers(tradeLicense.getTradeLicenseDetail().getOwners()
@@ -57,6 +78,24 @@ public class UserService{
 
             tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner ->
             {
+//                String businessService = tradeLicense.getBusinessService();
+//                if (businessService == null)
+//                    businessService = businessService_TL;
+//                switch (businessService) {
+//                    case businessService_BPA:
+//                        if (owner.getUuid() == null) {
+//                            UserDetailResponse userDetailResponse = getUser(TradeLicenseSearchCriteria.builder().mobileNumber(owner.getMobileNumber()).tenantId(tradeLicense.getTenantId()).build(), request.getRequestInfo());
+//                            if (!userDetailResponse.getUser().isEmpty()) {
+//                                User user=userDetailResponse.getUser().get(0);
+//                                owner.setUuid(user.getUuid());
+//                                for(Role userrole:user.getRoles())
+//                                {
+//                                    owner.addRolesItem(userrole);
+//                                }
+//                            }
+//                        }
+//                        break;
+//                }
                 if(owner.getUuid()==null)
                     {
                         addUserDefaultFields(tradeLicense.getTenantId(),role,owner);
@@ -82,13 +121,18 @@ public class UserService{
                     OwnerInfo user = new OwnerInfo();
                     user.addUserWithoutAuditDetail(owner);
                     addNonUpdatableFields(user,userDetailResponse.getUser().get(0));
+                    if (isBPARoleAddRequired) {
+                        List<String> licenseeTyperRole = tradeUtil.getusernewRoleFromMDMS(tradeLicense, requestInfo);
+                        for (String rolename : licenseeTyperRole) {
+                            user.addRolesItem(Role.builder().code(rolename).name(rolename).build());
+                        }
+                    }
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
                     setOwnerFields(owner,userDetailResponse,requestInfo);
                 }
             });
         });
     }
-
 
     /**
      * Sets the immutable fields from search to update request
@@ -166,8 +210,8 @@ public class UserService{
         owner.setId(userDetailResponse.getUser().get(0).getId());
         owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
         owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
-        owner.setCreatedDate(System.currentTimeMillis());
         owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+        owner.setCreatedDate(System.currentTimeMillis());
         owner.setLastModifiedDate(System.currentTimeMillis());
         owner.setActive(userDetailResponse.getUser().get(0).getActive());
     }
@@ -191,13 +235,17 @@ public class UserService{
      * Creates citizen role
      * @return Role object for citizen
      */
-    private Role getCitizenRole(){
+    private Role getCitizenRole(String tenantId){
         Role role = new Role();
         role.setCode("CITIZEN");
         role.setName("Citizen");
+        role.setTenantId(getStateLevelTenant(tenantId));
         return role;
     }
 
+    private String getStateLevelTenant(String tenantId){
+        return tenantId.split("\\.")[0];
+    }
 
 
     /**
@@ -316,6 +364,7 @@ public class UserService{
      */
     public void updateUser(TradeLicenseRequest request){
         List<TradeLicense> licenses = request.getLicenses();
+
         RequestInfo requestInfo = request.getRequestInfo();
         licenses.forEach(license -> {
                 license.getTradeLicenseDetail().getOwners().forEach(owner -> {
@@ -350,9 +399,4 @@ public class UserService{
         StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
         return userCall(userSearchRequest,uri);
     }
-
-
-
-
-
 }
