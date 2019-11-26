@@ -25,16 +25,17 @@ public class PropertyCriteria {
 	private Set<String> ids;
 
 	private Set<String> oldpropertyids;
+	
+	private Status status;
 
 	private String mobileNumber;
 
 	private String name;
 	
-	private Status status;
-
+	private Set<String> ownerIds;
+	
 	private Long offset;
 
 	private Long limit;
 	
-	private Set<String> ownerIds;
 }

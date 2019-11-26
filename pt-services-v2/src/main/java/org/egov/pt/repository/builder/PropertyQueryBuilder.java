@@ -3,7 +3,6 @@ package org.egov.pt.repository.builder;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,79 +15,61 @@ public class PropertyQueryBuilder {
 	@Autowired
 	private PropertyConfiguration config;
 
-	private static final String INNER_JOIN_STRING = "INNER JOIN";
-	private static final String LEFT_OUTER_JOIN_STRING = "LEFT OUTER JOIN";
+	private static final String SELECT = "SELECT ";
+	private static final String INNER_JOIN = "INNER JOIN";
 	
 	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where id IN ";
 
-	private static final String QUERY = "SELECT pt.*,ptdl.*,address.*,owner.*,doc.*,unit.*,insti.*,"
-			+ " pt.propertyid as propertyid,ptdl.assessmentnumber as propertydetailid,doc.id as documentid,unit.id as unitid,"
-			+ "address.id as addresskeyid,insti.id as instiid,pt.additionalDetails as pt_additionalDetails,"
-			+ "ownerdoc.id as ownerdocid,ownerdoc.documenttype as ownerdocType,ownerdoc.filestore as ownerfileStore,"
-			+ "ownerdoc.documentuid as ownerdocuid,ptdl.additionalDetails as ptdl_additionalDetails,"
-			+ "ptdl.createdby as assesscreatedby,ptdl.lastModifiedBy as assesslastModifiedBy,ptdl.createdTime as assesscreatedTime,"
-			+ "ptdl.lastModifiedTime as assesslastModifiedTime,"
-			+ "ptdl.status as propertydetailstatus, unit.occupancyDate as unitoccupancyDate,"
-			+ "insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId,"
-			+ "ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,"
-			+ "unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor"
-			+ " FROM eg_pt_property_v2 pt " + INNER_JOIN_STRING
-			+ " eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " + INNER_JOIN_STRING
-			+ " eg_pt_owner_v2 owner ON ptdl.assessmentnumber=owner.propertydetail " + INNER_JOIN_STRING
-			+ " eg_pt_address_v2 address on address.property=pt.propertyid " + LEFT_OUTER_JOIN_STRING
-			+ " eg_pt_unit_v2 unit ON ptdl.assessmentnumber=unit.propertydetail " + LEFT_OUTER_JOIN_STRING
-			+ " eg_pt_document_propertydetail_v2 doc ON ptdl.assessmentnumber=doc.propertydetail "
-			+ LEFT_OUTER_JOIN_STRING + " eg_pt_document_owner_v2 ownerdoc ON ownerdoc.userid=owner.userid "
-			+ LEFT_OUTER_JOIN_STRING + " eg_pt_institution_v2 insti ON ptdl.assessmentnumber=insti.propertydetail "
-			+ " WHERE ";
+	 // Select query
+	
+	private static String propertySelectValues = "property.id as pid, property.propertyid, property.tenantid as ptenantid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory, creationreason, occupancydate, constructiondate, nooffloors, landarea, source, parentproperties, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, ";
 
-	private static final String  LIKE_QUERY = "SELECT pt.*,ptdl.*,address.*,owner.*,doc.*,unit.*,insti.*,"
-			+ " pt.propertyid as propid,ptdl.assessmentnumber as propertydetailid,doc.id as documentid,unit.id as unitid,"
-			+ "address.id as addresskeyid,insti.id as instiid,pt.additionalDetails as pt_additionalDetails,"
-			+ "ownerdoc.id as ownerdocid,ownerdoc.documenttype as ownerdocType,ownerdoc.filestore as ownerfileStore,"
-			+ "ownerdoc.documentuid as ownerdocuid, ptdl.additionalDetails as ptdl_additionalDetails,"
-			+ "ptdl.createdby as assesscreatedby,ptdl.lastModifiedBy as assesslastModifiedBy,ptdl.createdTime as assesscreatedTime,"
-			+ "ptdl.lastModifiedTime as assesslastModifiedTime,"
-			+ "ptdl.status as propertydetailstatus, unit.occupancyDate as unitoccupancyDate,"
-			+ "insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId,"
-			+ "ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,"
-			+ "unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor"
-			+ " FROM eg_pt_property_v2 pt " + INNER_JOIN_STRING
-			+ " eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " + INNER_JOIN_STRING
-			+ " eg_pt_owner_v2 owner ON ptdl.assessmentnumber=owner.propertydetail " + INNER_JOIN_STRING
-			+ " eg_pt_address_v2 address on address.property=pt.propertyid " + LEFT_OUTER_JOIN_STRING
-			+ " eg_pt_unit_v2 unit ON ptdl.assessmentnumber=unit.propertydetail " + LEFT_OUTER_JOIN_STRING
-			+ " eg_pt_document_propertydetail_v2 doc ON ptdl.assessmentnumber=doc.propertydetail "
-			+ LEFT_OUTER_JOIN_STRING + " eg_pt_document_owner_v2 ownerdoc ON ownerdoc.userid=owner.userid "
-			+ LEFT_OUTER_JOIN_STRING + " eg_pt_institution_v2 insti ON ptdl.assessmentnumber=insti.propertydetail "
+	private static String addressSelectValues = "address.tenantid as adresstenantid, address.id as addressuuid, address.propertyid as addresspid, latitude, longitude, addressid, addressnumber, doorno, address.type as addresstype, addressline1, addressline2, landmark, city, pincode, detail as addressdetail, buildingname, street, locality, createdby as addresscreatedby, lastmodifiedby as addresslastmodifiedby, createdtime as addresscreatedtime, lastmodifiedtime as addresslastmodifiedtime, ";
+
+	private static String institutionSelectValues = "institution.id as institutionid,institution.propertyid as institutionpid, institution.tenantid as institutiontenantid, institution.name as institutionname, institution.type as institutiontype, designation, institution.createdby as institutioncreatedby, institution.lastmodifiedby as institutionlastmodifiedby, institution.createdtime as institutioncreatedtime, institution.lastmodifiedtime as institutionlastmodifiedtime, ";
+
+	private static String propertyDocSelectValues = "pdoc.id as pdocid, pdoc.tenantid as pdoctenantid, pdoc.entityid as pdocpid, pdoc.documenttype as pdocdocumenttype, pdoc.filestore as pdocfilestore, pdoc.documentuid as pdocdocumentuid, pdoc.status as pdocstatus, ";
+
+	private static String ownerSelectValues = "owner.tenantid as owntenantid, owner.propertyid as ownpropertyid, userid, owner.status as ownstatus, isprimaryowner, ownertype, ownershippercentage, owner.institutionid as owninstitutionid, relationship, owner.createdby as owncreatedby, owner.createdtime as owncreatedtime,owner.lastmodifiedby as ownlastmodifiedby, owner.lastmodifiedtime as ownlastmodifiedtime, ";
+
+	private static String ownerDocSelectValues = "owndoc.id as owndocid, owndoc.tenantid as owndoctenantid, owndoc.entityid as owndocpid, owndoc.documenttype as owndocdocumenttype, owndoc.filestore as owndocfilestore, owndoc.documentuid as owndocdocumentuid, owndoc.status as owndocstatus, ";
+
+	private static final String QUERY = SELECT 
+			
+			+	propertySelectValues    
+			
+			+   addressSelectValues     
+			
+			+   institutionSelectValues 
+			
+			+   propertyDocSelectValues
+			
+			+   ownerSelectValues 
+			
+			+   ownerDocSelectValues    
+			
+			+   " FROM EG_PT_PROPERTY property " 
+			
+			+   INNER_JOIN +  " EG_PT_ADDRESS address         ON pid = address.addresspid " 
+			
+			+   INNER_JOIN +  " EG_PT_INSTITUTION institution ON pid = institution.institutionpid " 
+			
+			+   INNER_JOIN +  " EG_PT_DOCUMENT pdoc           ON pid = pdoc.pdocpid "
+			
+			+   INNER_JOIN +  " EG_PT_OWNER owner             ON pid = owner.ownpid " 
+			
+			+   INNER_JOIN +  " EG_PT_DOCUMENT owndoc         ON pid = owndocpid "
+			
 			+ " WHERE ";
+	
+
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY propid) offset_ FROM " + "({})" + " result) result_offset "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY pid) offset_ FROM " + "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
-	public String getPropertyLikeQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
-		StringBuilder builder = new StringBuilder(LIKE_QUERY);	
+	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
 		
-		if(!StringUtils.isEmpty(criteria.getTenantId())) {
-			if(criteria.getTenantId().equals("pb")) {
-				builder.append("pt.tenantid LIKE ? ");
-				preparedStmtList.add("pb%");
-			}else {
-				builder.append("pt.tenantid = ? ");
-				preparedStmtList.add(criteria.getTenantId());
-			}
-		}else {
-			builder.append("pt.tenantid LIKE ? ");
-			preparedStmtList.add("pb%");
-		}
-		
-        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
-
-	}
-
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
-			PropertyCriteria criteria) {
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
 		String finalQuery = paginationWrapper.replace("{}", query);
@@ -108,35 +89,49 @@ public class PropertyQueryBuilder {
 		return finalQuery;
 	}
 
+	/**
+	 * 
+	 * @param criteria
+	 * @param preparedStmtList
+	 * @return
+	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
 
-		builder.append(" and pt.tenantid=? ");
+		builder.append(" property.tenantid=? ");
 		preparedStmtList.add(criteria.getTenantId());
-		
+
 		if (null != criteria.getStatus()) {
-			
-			builder.append(" pt.status = ?");
+
+			builder.append(" property.status = ?");
 			preparedStmtList.add(criteria.getStatus());
 		}
 
 		Set<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
 
-			builder.append("and pt.propertyid IN (").append(createQuery(ids)).append(")");
+			builder.append("and property.propertyid IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
 		Set<String> oldpropertyids = criteria.getOldpropertyids();
 		if (!CollectionUtils.isEmpty(oldpropertyids)) {
 
-			builder.append("and pt.oldpropertyid IN (").append(createQuery(oldpropertyids)).append(")");
+			builder.append("and property.oldpropertyid IN (").append(createQuery(oldpropertyids)).append(")");
 			addToPreparedStatement(preparedStmtList, oldpropertyids);
 		}
 
-		return builder.toString();
+		Set<String> ownerIds = criteria.getOwnerIds();
+		if (!CollectionUtils.isEmpty(ownerIds)) {
+
+			builder.append("and owner.userid IN (").append(createQuery(ownerIds)).append(")");
+			addToPreparedStatement(preparedStmtList, ownerIds);
+		}
+
+		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
+	
 
 	public String getPropertyIdsQuery(Set<String> ownerIds, List<Object> preparedStmtList) {
 
@@ -149,6 +144,7 @@ public class PropertyQueryBuilder {
 	}
 
 	private String createQuery(Set<String> ids) {
+		
 		StringBuilder builder = new StringBuilder();
 		int length = ids.size();
 		for (int i = 0; i < length; i++) {
