@@ -18,7 +18,7 @@ public class PropertyQueryBuilder {
 	private static final String SELECT = "SELECT ";
 	private static final String INNER_JOIN = "INNER JOIN";
 	
-	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where id IN ";
+	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where userid IN ";
 
 	 // Select query
 	
@@ -120,13 +120,6 @@ public class PropertyQueryBuilder {
 
 			builder.append("and property.oldpropertyid IN (").append(createQuery(oldpropertyids)).append(")");
 			addToPreparedStatement(preparedStmtList, oldpropertyids);
-		}
-
-		Set<String> ownerIds = criteria.getOwnerIds();
-		if (!CollectionUtils.isEmpty(ownerIds)) {
-
-			builder.append("and owner.userid IN (").append(createQuery(ownerIds)).append(")");
-			addToPreparedStatement(preparedStmtList, ownerIds);
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

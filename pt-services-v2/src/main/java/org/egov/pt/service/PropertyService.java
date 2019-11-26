@@ -83,6 +83,11 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
+		Set<String> ownerIds = new HashSet<String>();
+		
+		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			ownerIds.addAll(criteria.getOwnerIds());
+		criteria.setOwnerIds(null);
 
 		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
@@ -98,7 +103,7 @@ public class PropertyService {
 				return Collections.emptyList();
 
 			// fetching property id from owner-id and enriching criteria
-			Set<String> ownerIds = userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet());
+			ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
 			criteria.setIds(new HashSet<>(repository.getPropertyIds(ownerIds)));
 
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);

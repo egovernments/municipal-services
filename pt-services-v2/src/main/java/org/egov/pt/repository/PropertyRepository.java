@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Repository
-@Slf4j
 public class PropertyRepository {
 
 	@Autowired
@@ -41,12 +38,4 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getPropertiesPlainSearch(PropertyCriteria criteria) {
-		
-		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertyLikeQuery(criteria, preparedStmtList);
-		log.info("Query: " + query);
-		log.info("PS: " + preparedStmtList);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
-	}
 }
