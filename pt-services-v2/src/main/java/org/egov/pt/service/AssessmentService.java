@@ -11,9 +11,9 @@ import org.egov.pt.models.AssessmentSearchCriteria;
 import org.egov.pt.models.AuditDetails;
 import org.egov.pt.models.Document;
 import org.egov.pt.models.Unit;
-import org.egov.pt.models.enums.DocumentBelongsTo;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.producer.Producer;
+import org.egov.pt.repository.AssessmentRepository;
 import org.egov.pt.validator.AssessmentValidator;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,16 @@ public class AssessmentService {
 	@Autowired
 	private PropertyConfiguration props;
 	
+	@Autowired
+	private AssessmentRepository repository;
 	
+	
+	/**
+	 * Method to create an assessment asynchronously.
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public Assessment createAssessment(AssessmentRequest request) {
 		validator.validateAssessmentCreate(request);
 		enrichAssessmentCreate(request);
@@ -40,6 +49,13 @@ public class AssessmentService {
 		return request.getAssessment();
 	}
 	
+	
+	/**
+	 * Method to update an assessment asynchronously.
+	 * 
+	 * @param request
+	 * @return
+	 */
 	public Assessment updateAssessment(AssessmentRequest request) {
 		validator.validateAssessmentUpdate(request);
 		enrichAssessmentUpdate(request);
@@ -48,6 +64,12 @@ public class AssessmentService {
 		return request.getAssessment();
 	}
 	
+	
+	/**
+	 * Service layer to enrich assessment object in create flow
+	 * 
+	 * @param request
+	 */
 	private void enrichAssessmentCreate(AssessmentRequest request) {
 		Assessment assessment = request.getAssessment();
 		assessment.setId(String.valueOf(UUID.randomUUID()));
@@ -74,12 +96,15 @@ public class AssessmentService {
 				doc.setAuditDetails(auditDetails);
 			}
 		}		
-		
 		assessment.setAuditDetails(auditDetails);
-		
 	}
 	
 	
+	/**
+	 * Service layer to enrich assessment object in update flow
+	 * 
+	 * @param request
+	 */
 	private void enrichAssessmentUpdate(AssessmentRequest request) {
 		Assessment assessment = request.getAssessment();
 		
@@ -108,14 +133,19 @@ public class AssessmentService {
 				}
 			}
 		}
-		
 		assessment.getAuditDetails().setLastModifiedBy(auditDetails.getLastModifiedBy());
-		assessment.getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
-		
-		
+		assessment.getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());	
 	}
 	
+	/**
+	 * Service layer to search assessments.
+	 * 
+	 * @param requestInfo
+	 * @param criteria
+	 * @return
+	 */
 	public List<Assessment> searchAssessments(RequestInfo requestInfo, AssessmentSearchCriteria criteria) {
-		return null;
+		List<Assessment> assessments = repository.getAssessments(criteria);
+		return assessments;
 	}
 }
