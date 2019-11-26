@@ -15,7 +15,8 @@ CREATE TABLE eg_bpa_BuildingPlan(
   createdTime bigint,
   lastModifiedTime bigint,
 
-  CONSTRAINT uk_eg_bpa_BuildingPlan  PRIMARY KEY (id)
+  CONSTRAINT pk_eg_bpa_Unit PRIMARY KEY (id),
+  CONSTRAINT uk_eg_bpa_BuildingPlan  UNIQUE (id)
 );
 
 
@@ -72,10 +73,8 @@ CREATE TABLE eg_bpa_Address(
     createdTime bigint,
     lastModifiedTime bigint,
 
-    CONSTRAINT uk_eg_bpa_Address PRIMARY KEY (id),
+    CONSTRAINT uk_eg_bpa_Address UNIQUE (id),
     CONSTRAINT fk_eg_bpa_Address FOREIGN KEY (buildingPlanId) REFERENCES eg_bpa_BuildingPlan (id)
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
 );
 
 
@@ -97,28 +96,9 @@ CREATE TABLE eg_bpa_owner(
   lastmodifiedby character varying(64),
   buildingPlanId character varying(64),
   lastmodifiedtime bigint,
-  CONSTRAINT pk_eg_bpa_owner PRIMARY KEY (id,tradeLicenseDetailId),
+
+  CONSTRAINT pk_eg_bpa_owner PRIMARY KEY (id),
   CONSTRAINT uk_eg_bpa_owner  UNIQUE (id),
   CONSTRAINT fk_eg_bpa_owner FOREIGN KEY (buildingPlanId) REFERENCES eg_bpa_BuildingPlan (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
 );
 
-
-CREATE TABLE eg_tl_institution (
-  tenantId character varying(256),
-  id character varying(64),
-  tradeLicenseDetailId character varying(64),
-  name character varying(64),
-  type character varying(64),
-  designation character varying(64),
-  createdby character varying(64),
-  createdtime bigint,
-  lastmodifiedby character varying(64),
-  lastmodifiedtime bigint,
-
-  CONSTRAINT pk_eg_tl_institution PRIMARY KEY (id),
-  CONSTRAINT fk_eg_tl_institution FOREIGN KEY (tradeLicenseDetailId) REFERENCES eg_tl_TradeLicenseDetail (id)
-  ON UPDATE CASCADE
-  ON DELETE CASCADE
-);
