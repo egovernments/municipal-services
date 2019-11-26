@@ -15,6 +15,7 @@ import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
+import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,21 +41,21 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	@Autowired
 	EstimationService estimationService;
 	
-	private DemandService demandService;
-
+	@Autowired
+	CalculatorUtil calculatorUtil;
 
 	/**
-	 * 
+	 * Get CalculationReq and Calculate the Tax Head on Water Charge
 	 */
 	public CalculationRes getTaxCalculation(CalculationReq request) {
 
 		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
-		// wSCalculationValidator.validateWaterConnectionForCalculation(waterConnection);
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
 				criteria, estimationService.getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
 	}
 
+	
 	/**
 	 * 
 	 * @param requestInfo
@@ -154,7 +155,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.rebate(rebate).fromDate(fromDate).toDate(toDate).tenantId(tenantId).taxHeadEstimates(estimates)
+				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
 				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection())
 				.connectionNo(criteria.getConnectionNo()).build();
 	}

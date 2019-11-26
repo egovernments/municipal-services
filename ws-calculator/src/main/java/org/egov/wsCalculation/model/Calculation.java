@@ -28,12 +28,6 @@ public class Calculation {
 	@JsonProperty("applicationNo")
 	private String applicationNO;
 
-	@JsonProperty("fromDate")
-	private Long fromDate;
-
-	@JsonProperty("toDate")
-	private Long toDate;
-
 	@JsonProperty("tenantId")
 	private String tenantId;
 

@@ -68,9 +68,7 @@ public class EstimationService {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		Map<String, Calculation> calculationWaterMap = new HashMap<>();
 		for (CalculationCriteria criteria : criteriaList) {
-			WaterConnection waterConnection = criteria.getWaterConnection();
-
-			String connectionNO = waterConnection.getConnectionNo();
+			String connectionNO = criteria.getConnectionNo();
 			Map<String, List> estimatesAndBillingSlabs = null;
 			estimatesAndBillingSlabs = getEstimationMap(criteria, requestInfo);
 			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
@@ -98,6 +96,10 @@ public class EstimationService {
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 		if(criteria.getWaterConnection() == null && !criteria.getConnectionNo().isEmpty()) {
 			waterConnection = calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), tenantId);
+			criteria.setWaterConnection(waterConnection);
+		}
+		if(criteria.getWaterConnection() == null) {
+			throw new CustomException("Water Connection not found for given criteria ", "Water Connection are not present for "+ criteria.getConnectionNo()+" connection no");
 		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
