@@ -1,5 +1,6 @@
 package org.egov.swCalculation.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -11,12 +12,15 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.swCalculation.model.Calculation;
 import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
+import org.egov.swCalculation.model.RequestInfoWrapper;
+import org.egov.swCalculation.model.TaxHeadEstimate;
+import org.egov.swCalculation.util.CalculatorUtils;
+import org.egov.swService.model.SewerageConnection;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.wsCalculation.model.RequestInfoWrapper;
-import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -27,9 +31,12 @@ public class EstimationService {
 	
 	@Autowired
 	MasterDataService mDataService;
+	
+	@Autowired
+	CalculatorUtils calculatorUtil;
 /**
  * 
- * @param Calculation request param
+ * @param Calculation request parameter
  * @return Map of Billing Slab and Calculation
  */
 	public Map<String, Calculation> getEstimationWaterMap(CalculationReq request) {
@@ -63,30 +70,41 @@ public class EstimationService {
 	 */
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
-		WaterConnection waterConnection = null;
+		SewerageConnection sewerageConnection = null;
 		String assessmentYear = getAssessmentYear();
 		String tenantId = requestInfo.getUserInfo().getTenantId();
-		if(criteria.getWaterConnection() == null && !criteria.getConnectionNo().isEmpty()) {
-			waterConnection = calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), tenantId);
-			criteria.setWaterConnection(waterConnection);
+		if(criteria.getSewerageConnection() == null && !criteria.getConnectionNo().isEmpty()) {
+			sewerageConnection = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), tenantId);
+			criteria.setSewerageConnection(sewerageConnection);
 		}
-		if(criteria.getWaterConnection() == null) {
-			throw new CustomException("Water Connection not found for given criteria ", "Water Connection are not present for "+ criteria.getConnectionNo()+" connection no");
+		if(criteria.getSewerageConnection() == null) {
+			throw new CustomException("Sewerage Connection not found for given criteria ", "Sewerage Connection are not present for "+ criteria.getConnectionNo()+" connection no");
 		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
+		mDataService.setSewerageConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 				timeBasedExemptionMasterMap);
-		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, requestInfo);
+		BigDecimal waterCharge = getSeweEstimationCharge(sewerageConnection, criteria, billingSlabMaster, requestInfo);
 		taxAmt = waterCharge;
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
-				criteria.getWaterConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
+				criteria.getSewerageConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
 		estimatesAndBillingSlabs.put("billingSlabIds", new ArrayList<>());
 		return estimatesAndBillingSlabs;
+	}
+	
+	/**
+	 * method to do a first level filtering on the slabs based on the values
+	 * present in the Sewerage Details
+	 */
+
+	public BigDecimal getSeweEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria, 
+			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
+		BigDecimal sewerageCharge = BigDecimal.ZERO;
+		return sewerageCharge;
 	}
 	
 	

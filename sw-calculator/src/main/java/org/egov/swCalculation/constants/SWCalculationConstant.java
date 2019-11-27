@@ -30,5 +30,18 @@ public class SWCalculationConstant {
 	public static final String FINANCIAL_YEAR_RANGE_FEILD_NAME = "finYearRange";
 	
 	public static final String FINANCIAL_MODULE = "egf-master";
+	
+	public static final String SW_TAX_MODULE = "sw-services-calculation";
+	
+	public static final String SW_REBATE_MASTER = "Rebate";
+	
+	public static final String SW_SEWERAGE_CESS_MASTER = "SewerageCess";
+	
+	public static final String SW_PENANLTY_MASTER = "Penalty";
+
+	public static final String SW_INTEREST_MASTER = "Interest";
+
+	public static final String SW_BILLING_SLAB_MASTER = "SCBillingSlab";
+	
 
 }

@@ -1,6 +1,8 @@
 package org.egov.swCalculation.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,10 +13,11 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
+import org.egov.swCalculation.model.RequestInfoWrapper;
+import org.egov.swCalculation.repository.ServiceRequestRepository;
+import org.egov.swService.model.SewerageConnection;
+import org.egov.swService.model.SewerageConnectionResponse;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionResponse;
-import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +33,8 @@ public class CalculatorUtils {
 	@Autowired
 	SWCalculationConfiguration configurations;
 	
+	@Autowired
+	ServiceRequestRepository serviceRequestRepository;
 	/**
 	 * Prepares and returns Mdms search request with financial master criteria
 	 *
@@ -70,25 +75,25 @@ public class CalculatorUtils {
      * @param tenantId The tenantId of the sewerage connection
      * @return The water connection fo the particular connection no
      */
-    public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
+    public SewerageConnection getSewerageConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
         ObjectMapper mapper = new ObjectMapper();
-    	String url = getWaterSearchURL();
+    	String url = getSewerageSearchURL();
         url = url.replace("{1}",tenantId).replace("{2}",connectionNo);
         Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
                 requestInfo(requestInfo).build());
 
-        WaterConnectionResponse response =null;
+        SewerageConnectionResponse response =null;
         try {
-                response = mapper.convertValue(result, WaterConnectionResponse.class);
+                response = mapper.convertValue(result, SewerageConnectionResponse.class);
         }
         catch (IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
+            throw new CustomException("PARSING ERROR","Error while parsing response of Sewerage Search");
         }
 
-        if(response==null || CollectionUtils.isEmpty(response.getWaterConnection()))
+        if(response==null || CollectionUtils.isEmpty(response.getSewerageConnections()))
             return null;
 
-        return response.getWaterConnection().get(0);
+        return response.getSewerageConnections().get(0);
     }
     
     /**
@@ -96,8 +101,8 @@ public class CalculatorUtils {
      * @return water search url
      */
 	private String getSewerageSearchURL() {
-		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
-		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
+		StringBuilder url = new StringBuilder(configurations.getSewerageConnectionHost());
+		url.append(configurations.getSewerageConnectionSearchEndPoint());
 		url.append("?");
 		url.append("tenantId=");
 		url.append("{1}");
@@ -105,5 +110,22 @@ public class CalculatorUtils {
 		url.append("connectionNumber=");
 		url.append("{2}");
 		return url.toString();
+	}
+	
+	
+	/**
+	 * Methods provides all the usage category master for Sewerage Service module
+	 */
+	public MdmsCriteriaReq getWaterConnectionModuleRequest(RequestInfo requestInfo, String tenantId) {
+		List<MasterDetail> details = new ArrayList<>();
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_REBATE_MASTER).build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_PENANLTY_MASTER).build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_INTEREST_MASTER).build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_BILLING_SLAB_MASTER).build());
+		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
+				.moduleName(SWCalculationConstant.SW_TAX_MODULE).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 }

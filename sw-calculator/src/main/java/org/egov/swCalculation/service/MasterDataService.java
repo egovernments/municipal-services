@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.MdmsResponse;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.RequestInfoWrapper;
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+
+import net.minidev.json.JSONArray;
 
 @Service
 public class MasterDataService {
@@ -124,6 +128,31 @@ public class MasterDataService {
 			}
 		}
 		return financialYearMap;
+	}
+	
+	/**
+	 * Method to enrich the Water Connection data Map
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	public void setSewerageConnectionMasterValues(RequestInfo requestInfo, String tenantId,
+			Map<String, JSONArray> billingSlabMaster, Map<String, JSONArray> timeBasedExemptionMasterMap) {
+
+		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+				calculatorUtils.getWaterConnectionModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(SWCalculationConstant.SW_TAX_MODULE);
+		for (Entry<String, JSONArray> entry : res.entrySet()) {
+
+			String masterName = entry.getKey();
+
+			/* Masters which need to be parsed will be contained in the list */
+			if (SWCalculationConstant.SW_BILLING_SLAB_MASTER.contains(entry.getKey()))
+				billingSlabMaster.put(masterName, entry.getValue());
+
+			/* Master not contained in list will be stored as it is */
+			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
+		}
 	}
 	
 }
