@@ -97,7 +97,7 @@ public class TradeLicenseService {
        switch(businessServicefromPath)
        {
            case businessService_BPA:
-               validateMobileNumberUniqueness(tradeLicenseRequest);
+//               validateMobileNumberUniqueness(tradeLicenseRequest);
                break;
        }
         userService.createUser(tradeLicenseRequest, false);
