@@ -41,7 +41,7 @@ public class WSCalculationUtil {
 	Boolean allowDepreciationsOnNoReceipts;
 
 	/**
-	 * Returns the tax head search Url with tenantId and PropertyTax service name
+	 * Returns the tax head search Url with tenantId and WS service name
 	 * parameters
 	 *
 	 * @param tenantId
@@ -57,7 +57,7 @@ public class WSCalculationUtil {
 	}
 
 	/**
-	 * Returns the tax head search Url with tenantId and PropertyTax service name
+	 * Returns the tax head search Url with tenantId and WS service name
 	 * parameters
 	 *
 	 * @param tenantId
