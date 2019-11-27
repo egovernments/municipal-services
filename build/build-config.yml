@@ -72,13 +72,6 @@ config:
 
   - name: "municipal-services/ws-services"
     build:
-      - work-dir: "firenoc-calculator"
-        image-name: "firenoc-calculator"
-      - work-dir: "firenoc-calculator/migration"
-        image-name: "firenoc-calculator-db"
-
-  - name: "municipal-services/ws-services"
-    build:
       - work-dir: "ws-services"
         image-name: "ws-services"
       - work-dir: "ws-services/src/main/resources/db"
