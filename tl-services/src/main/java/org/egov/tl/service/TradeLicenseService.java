@@ -87,32 +87,32 @@ public class TradeLicenseService {
      * @return The list of created traddeLicense
      */
     public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest,String businessServicefromPath){
-        if(businessServicefromPath==null)
-             businessServicefromPath = businessService_TL;
-        tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
-        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
-        actionValidator.validateCreateRequest(tradeLicenseRequest);
-        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
-        tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
-        switch(businessServicefromPath)
-        {
-            case businessService_BPA:
-//                validateMobileNumberUniqueness(tradeLicenseRequest);
-                break;
-        }
+       if(businessServicefromPath==null)
+            businessServicefromPath = businessService_TL;
+       tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
+       Object mdmsData = util.mDMSCall(tradeLicenseRequest);
+       actionValidator.validateCreateRequest(tradeLicenseRequest);
+       enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
+       tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
+       switch(businessServicefromPath)
+       {
+           case businessService_BPA:
+               validateMobileNumberUniqueness(tradeLicenseRequest);
+               break;
+       }
         userService.createUser(tradeLicenseRequest, false);
-        calculationService.addCalculation(tradeLicenseRequest);
+       calculationService.addCalculation(tradeLicenseRequest);
 
         /*
          * call workflow service if it's enable else uses internal workflow process
          */
-        switch(businessServicefromPath)
-        {
-            case businessService_TL:
-                if (config.getIsExternalWorkFlowEnabled())
-                    wfIntegrator.callWorkFlow(tradeLicenseRequest);
-                break;
-        }
+       switch(businessServicefromPath)
+       {
+           case businessService_TL:
+               if (config.getIsExternalWorkFlowEnabled())
+                   wfIntegrator.callWorkFlow(tradeLicenseRequest);
+               break;
+       }
         repository.save(tradeLicenseRequest);
         return tradeLicenseRequest.getLicenses();
 	}
