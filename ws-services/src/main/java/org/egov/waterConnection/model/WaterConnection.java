@@ -38,6 +38,43 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("meterInstallationDate")
 	private Long meterInstallationDate = null;
+	
+	@JsonProperty("pipeSize")
+	private Double pipeSize;
+	
+	@JsonProperty("noOfTaps")
+	private Integer noOfTaps;
+	
+	@JsonProperty("UOM")
+	private String UOM;
+	
+	@JsonProperty("waterSubSoruce")
+	private String waterSubSoruce;
+	
+
+	public Double getPipeSize() {
+		return pipeSize;
+	}
+
+	public void setPipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
+	}
+
+	public Integer getNoOfTabs() {
+		return noOfTaps;
+	}
+
+	public void setNoOfTabs(Integer noOfTabs) {
+		this.noOfTaps = noOfTabs;
+	}
+
+	public String getWaterSubSoruce() {
+		return waterSubSoruce;
+	}
+
+	public void setWaterSubSoruce(String waterSubSoruce) {
+		this.waterSubSoruce = waterSubSoruce;
+	}
 
 	public WaterConnection connectionCategory(String connectionCategory) {
 		this.connectionCategory = connectionCategory;
@@ -164,6 +201,16 @@ public class WaterConnection extends Connection {
 
 	public void setMeterInstallationDate(Long meterInstallationDate) {
 		this.meterInstallationDate = meterInstallationDate;
+	}
+	
+	
+	public String getUOM() {
+		return this.UOM;
+	}
+
+	
+	public void setUOM(String uom) {
+		this.UOM = uom;
 	}
 
 	// public WaterConnection documents(List<Document> documents) {
