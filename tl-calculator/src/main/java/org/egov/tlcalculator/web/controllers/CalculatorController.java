@@ -71,6 +71,11 @@ public class CalculatorController {
 			default:
 				throw new CustomException("UNKNOWN_BUSINESSSERVICE", " Business Service not supported");
 		}
+
+		calculations.forEach(calculation -> {
+			calculation.setTradeLicense(null);
+		});
+
 		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		return new ResponseEntity<CalculationRes>(calculationRes, HttpStatus.OK);
 	}
