@@ -2,7 +2,8 @@ package org.egov.swCalculation.model;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import org.egov.waterConnection.model.WaterConnection;
+
+import org.egov.swService.model.SewerageConnection;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,8 +30,8 @@ public class CalculationCriteria   {
 	
 		@Valid
 		@NotNull
-        @JsonProperty("waterConnection")
-        private WaterConnection waterConnection;
+        @JsonProperty("sewerageConnection")
+        private SewerageConnection sewerageConnection;
 
         @JsonProperty("connectionNo")
         private String connectionNo;

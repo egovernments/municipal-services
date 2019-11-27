@@ -167,6 +167,8 @@ public class WaterConnection extends Connection {
 	public void setMeterInstallationDate(Long meterInstallationDate) {
 		this.meterInstallationDate = meterInstallationDate;
 	}
+	
+	
 
 	// public WaterConnection documents(List<Document> documents) {
 	// this.documents = documents;
