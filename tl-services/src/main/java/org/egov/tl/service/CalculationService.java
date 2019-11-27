@@ -56,6 +56,7 @@ public class CalculationService {
         Map<String,Calculation> applicationNumberToCalculation = new HashMap<>();
         calculations.forEach(calculation -> {
             applicationNumberToCalculation.put(calculation.getTradeLicense().getApplicationNumber(),calculation);
+            calculation.setTradeLicense(null);
         });
 
         licenses.forEach(license ->{
