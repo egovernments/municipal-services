@@ -25,24 +25,32 @@ public class BPAService {
 	@Autowired
 	private BPARepository bpaRequestInfoDao;
 
+	@Autowired
 	private WorkflowIntegrator wfIntegrator;
 
+	@Autowired
     private EnrichmentService enrichmentService;
 
+	@Autowired
     private UserService userService;
 
+	@Autowired
     private BPARepository repository;
 
+    @Autowired
     private ActionValidator actionValidator;
 
+    @Autowired
     private BPAValidator bpaValidator;
 
     private BPAWorkflowService TLWorkflowService;
 
+    @Autowired
     private BPAUtil util;
 
 //    private DiffService diffService;
 
+    @Autowired
     private BPAConfiguration config;
 
     private WorkflowService workflowService;
@@ -51,9 +59,10 @@ public class BPAService {
 	public BPA create(BPARequest bpaRequest) {
 
 		   Object mdmsData = util.mDMSCall(bpaRequest);
+		    bpaValidator.validateCreate(bpaRequest,mdmsData);
 	        actionValidator.validateCreateRequest(bpaRequest);
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
-	        bpaValidator.validateCreate(bpaRequest,mdmsData);
+	       
 	        userService.createUser(bpaRequest);
 //	        calculationService.addCalculation(tradeLicenseRequest);
 			

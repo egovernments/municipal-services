@@ -34,6 +34,7 @@ public class BPAUtil {
 
 	 private BPAConfiguration config;
 
+	 @Autowired
 	    private ServiceRequestRepository serviceRequestRepository;
 
 	    private WorkflowService workflowService;

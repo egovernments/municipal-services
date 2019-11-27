@@ -17,10 +17,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class GeoLocation {
 
 	@JsonProperty("latitude")
-	 private String latitude;
+	 private Double latitude;
 	
 	@JsonProperty("longitude")
-	 private String longitude;
+	 private Double longitude;
 	 
 	 @JsonProperty("additionalDetails")
 	 private Object additionalDetails;

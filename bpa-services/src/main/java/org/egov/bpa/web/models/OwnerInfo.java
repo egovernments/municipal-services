@@ -23,6 +23,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class OwnerInfo {
 
 	@NotNull
+	@JsonProperty("id")
+	private String id;
+	
+	@NotNull
 	@JsonProperty("name")
 	private String name;
 	

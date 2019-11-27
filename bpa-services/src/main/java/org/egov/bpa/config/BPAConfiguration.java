@@ -193,7 +193,7 @@ public class BPAConfiguration {
 
 
     // Workflow
-    @Value("${create.tl.workflow.name}")
+    @Value("${create.bpa.workflow.name}")
     private String businessServiceValue;
 
     @Value("${workflow.context.path}")
