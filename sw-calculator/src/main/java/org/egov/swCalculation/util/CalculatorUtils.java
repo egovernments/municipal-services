@@ -11,8 +11,15 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
+import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.WaterConnectionResponse;
+import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 
@@ -55,4 +62,48 @@ public class CalculatorUtils {
 		return new StringBuilder().append(configurations.getMdmsHost()).append(configurations.getMdmsEndPoint());
 	}
 
+	
+	 /**
+     * Call SW-services to get sewerage for the given connectionNo and tenantID
+     * @param requestInfo The RequestInfo of the incoming request
+     * @param connectionNo The connectionNumber whose sewerage connection has to be fetched
+     * @param tenantId The tenantId of the sewerage connection
+     * @return The water connection fo the particular connection no
+     */
+    public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
+        ObjectMapper mapper = new ObjectMapper();
+    	String url = getWaterSearchURL();
+        url = url.replace("{1}",tenantId).replace("{2}",connectionNo);
+        Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
+                requestInfo(requestInfo).build());
+
+        WaterConnectionResponse response =null;
+        try {
+                response = mapper.convertValue(result, WaterConnectionResponse.class);
+        }
+        catch (IllegalArgumentException e){
+            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
+        }
+
+        if(response==null || CollectionUtils.isEmpty(response.getWaterConnection()))
+            return null;
+
+        return response.getWaterConnection().get(0);
+    }
+    
+    /**
+     * Creates tradeLicense search url based on tenantId and applicationNumber
+     * @return water search url
+     */
+	private String getSewerageSearchURL() {
+		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
+		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("connectionNumber=");
+		url.append("{2}");
+		return url.toString();
+	}
 }
