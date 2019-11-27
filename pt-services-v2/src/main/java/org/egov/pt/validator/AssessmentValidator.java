@@ -20,6 +20,7 @@ import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.Unit;
 import org.egov.pt.service.AssessmentService;
 import org.egov.pt.service.PropertyService;
+import org.egov.pt.util.AssessmentUtils;
 import org.egov.pt.util.ErrorConstants;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.AssessmentRequest;
@@ -37,6 +38,9 @@ public class AssessmentValidator {
 	
     @Autowired
     private PropertyValidator propertyValidator;
+    
+    @Autowired
+    private AssessmentUtils utils;
 
 	public void validateAssessmentCreate(AssessmentRequest assessmentRequest) {
 		Map<String, String> errorMap = new HashMap<>();
@@ -124,6 +128,9 @@ public class AssessmentValidator {
 					}
 				}
 			}
+			
+		assessment.setAdditionalDetails(utils.jsonMerge(assessmentFromDB.getAdditionalDetails(), assessment.getAdditionalDetails()));
+			
 		}
 
 		if (!CollectionUtils.isEmpty(errorMap.keySet())) {

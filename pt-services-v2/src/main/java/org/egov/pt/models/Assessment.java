@@ -12,6 +12,7 @@ import org.egov.pt.models.enums.Status;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,7 +68,7 @@ public class Assessment {
         private List<Document> documents ;
 
         @JsonProperty("additionalDetails")
-        private Object additionalDetails ;
+        private JsonNode additionalDetails ;
 
         @JsonProperty("channel")
         private Channel channel ;
