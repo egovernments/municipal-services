@@ -17,6 +17,8 @@ public class PropertyServiceImpl implements PropertyService {
 	public List<Property> createProperty(PropertyRequest propertyRequest) {
 		List<Property> propertyList = new ArrayList<>();
 		Property property = new Property();
+		
+		Address address= new Address();
 		for (int i = 0; i < 2; i++) {
 			property = new Property();
 			property.setAccountId("AccountId " + i);

@@ -38,6 +38,8 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("meterInstallationDate")
 	private Long meterInstallationDate = null;
+	
+
 
 	public WaterConnection connectionCategory(String connectionCategory) {
 		this.connectionCategory = connectionCategory;

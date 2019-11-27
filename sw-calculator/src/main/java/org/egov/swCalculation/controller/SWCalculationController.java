@@ -4,10 +4,12 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.DemandResponse;
 import org.egov.swCalculation.service.DemandService;
 import org.egov.swCalculation.service.SWCalculationService;
+import org.egov.waterConnection.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,9 @@ public class SWCalculationController {
 	
 	@Autowired
 	DemandService demandService;
+	
+	@Autowired
+	ResponseInfoFactory responseInfoFactory;
 	
 	
 	

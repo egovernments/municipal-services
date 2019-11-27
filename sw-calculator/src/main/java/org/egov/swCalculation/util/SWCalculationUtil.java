@@ -43,5 +43,26 @@ public class SWCalculationUtil {
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
 				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_WS);
 	}
+	
+	/**
+	 * Creates generate bill url using tenantId,consumerCode and businessService
+	 * 
+	 * @return Bill Generate url
+	 */
+	public String getBillGenerateURI() {
+		StringBuilder url = new StringBuilder(configurations.getBillingServiceHost());
+		url.append(configurations.getBillGenEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("consumerCode=");
+		url.append("{2}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{3}");
+
+		return url.toString();
+	}
 
 }
