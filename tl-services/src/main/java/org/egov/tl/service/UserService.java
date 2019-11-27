@@ -84,12 +84,10 @@ public class UserService{
                     businessService = businessService_TL;
                 switch (businessService) {
                     case businessService_BPA:
-                        if (owner.getUuid() == null) {
-                            UserDetailResponse userDetailResponse = searchByUserName(owner.getMobileNumber(),getStateLevelTenant(tradeLicense.getTenantId()));
-                            if (!userDetailResponse.getUser().isEmpty()) {
-                                User user=userDetailResponse.getUser().get(0);
-                                owner=addNotNullFieldsFromOwner(user,owner);
-                            }
+                        UserDetailResponse userDetailResponse = searchByUserName(owner.getMobileNumber(), getStateLevelTenant(tradeLicense.getTenantId()));
+                        if (!userDetailResponse.getUser().isEmpty()) {
+                            User user = userDetailResponse.getUser().get(0);
+                            owner = addNotNullFieldsFromOwner(user, owner);
                         }
                         break;
                 }
