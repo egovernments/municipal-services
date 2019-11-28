@@ -1,13 +1,12 @@
-FROM node:11.15.0-alpine
+FROM node:8.4-alpine
 
-RUN apk add --update  bash
-COPY package.json /opt/package.json
-COPY .babelrc /opt/.babelrc
+ARG WORK_DIR
+ENV npm_config_cache=/tmp
+WORKDIR /app
 
-COPY src /opt/src
+COPY ${WORK_DIR} .
 
-RUN cd /opt && npm install
-WORKDIR /opt
+RUN npm install
 
 # set your port
 ENV PORT 8080
@@ -15,4 +14,4 @@ ENV PORT 8080
 #EXPOSE  8080
 
 # start command as per package.json
-CMD ["npm", "start"]
+CMD ["npm", "start
