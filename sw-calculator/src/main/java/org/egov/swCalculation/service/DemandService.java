@@ -2,11 +2,9 @@ package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +15,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
-import org.egov.common.contract.response.ResponseInfo;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.Bill;
@@ -38,13 +35,11 @@ import org.egov.swCalculation.model.TaxPeriod;
 import org.egov.swCalculation.repository.DemandRepository;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -55,7 +50,6 @@ import net.minidev.json.JSONArray;
 @Slf4j
 public class DemandService {
 
-
 	@Autowired
 	private ObjectMapper mapper;
 
@@ -65,27 +59,23 @@ public class DemandService {
 	@Autowired
 	private MasterDataService mstrDataService;
 
-	
 	@Autowired
 	private DemandRepository demandRepository;
-	
+
 	@Autowired
 	private SWCalculationConfiguration configs;
 
-
-//	@Autowired
-//	private WSCalculationUtil utils;
-//
-//	@Autowired
-//	private WSCalculationConfiguration configs;
+	// @Autowired
+	// private WSCalculationUtil utils;
+	//
+	// @Autowired
+	// private WSCalculationConfiguration configs;
 
 	@Autowired
 	private EstimationService estimationService;
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
-
-	
 
 	/*
 	 * Generates and persists the demand to billing service for the given water
@@ -118,7 +108,8 @@ public class DemandService {
 	 *            The Calculation Objects for which demand has to be generated
 	 *            or updated
 	 */
-	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations, Map<String, Object> masterMap) {
+	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
+			Map<String, Object> masterMap) {
 		List<Demand> createdDemands = new ArrayList<>();
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
@@ -155,8 +146,8 @@ public class DemandService {
 			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands =  updateDemandForCalculation(requestInfo, updateCalculations);
-	return createdDemands;
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations);
+		return createdDemands;
 	}
 
 	/**
@@ -220,7 +211,6 @@ public class DemandService {
 		return demandRepository.saveDemand(requestInfo, demands);
 	}
 
-	
 	/**
 	 * Adds roundOff taxHead if decimal values exists
 	 * 
@@ -343,10 +333,6 @@ public class DemandService {
 		return url.toString();
 	}
 
-
-
-
-
 	/**
 	 * Generates and returns bill from billing service
 	 * 
@@ -356,37 +342,39 @@ public class DemandService {
 	 * @param getBillCriteria
 	 * @param requestInfoWrapper
 	 */
-//	public BillResponse getBill(GetBillCriteria getBillCriteria, RequestInfoWrapper requestInfoWrapper) {
-//
-//		DemandResponse res = updateDemands(getBillCriteria, requestInfoWrapper);
-//
-//		/**
-//		 * Loop through the demands and call generateBill for each demand. Group
-//		 * the Bills and return the bill response
-//		 */
-//		List<Bill> bills = new LinkedList<>();
-//		BillResponse billResponse;
-//		ResponseInfo responseInfo = null;
-//		StringBuilder billGenUrl;
-//
-//		for (Demand demand : res.getDemands()) {
-//			billGenUrl = utils.getBillGenUrl(getBillCriteria.getTenantId(), demand.getId(), demand.getConsumerCode());
-//			billResponse = mapper.convertValue(repository.fetchResult(billGenUrl, requestInfoWrapper),
-//					BillResponse.class);
-//			responseInfo = billResponse.getResposneInfo();
-//			bills.addAll(billResponse.getBill());
-//		}
-//
-//		return BillResponse.builder().resposneInfo(responseInfo).bill(bills).build();
-//	}
+	// public BillResponse getBill(GetBillCriteria getBillCriteria,
+	// RequestInfoWrapper requestInfoWrapper) {
+	//
+	// DemandResponse res = updateDemands(getBillCriteria, requestInfoWrapper);
+	//
+	// /**
+	// * Loop through the demands and call generateBill for each demand. Group
+	// * the Bills and return the bill response
+	// */
+	// List<Bill> bills = new LinkedList<>();
+	// BillResponse billResponse;
+	// ResponseInfo responseInfo = null;
+	// StringBuilder billGenUrl;
+	//
+	// for (Demand demand : res.getDemands()) {
+	// billGenUrl = utils.getBillGenUrl(getBillCriteria.getTenantId(),
+	// demand.getId(), demand.getConsumerCode());
+	// billResponse = mapper.convertValue(repository.fetchResult(billGenUrl,
+	// requestInfoWrapper),
+	// BillResponse.class);
+	// responseInfo = billResponse.getResposneInfo();
+	// bills.addAll(billResponse.getBill());
+	// }
+	//
+	// return
+	// BillResponse.builder().resposneInfo(responseInfo).bill(bills).build();
+	// }
 
-
-
-	
 	/**
 	 * update demand for the given list of calculations
 	 * 
-	 * @param calculations Request that contain request info and calculation list
+	 * @param calculations
+	 *            Request that contain request info and calculation list
 	 * @return Demands that are updated
 	 */
 	public List<Demand> updateDemands(CalculationReq request) {
@@ -396,34 +384,36 @@ public class DemandService {
 		demands = updateDemandForCalculation(request.getRequestInfo(), calculationList);
 		return demands;
 	}
-	
 
-    /**
-     * Updates demand for the given list of calculations
-     * @param requestInfo The RequestInfo of the calculation request
-     * @param calculations List of calculation object
-     * @return Demands that are updated
-     */
-    private List<Demand> updateDemandForCalculation(RequestInfo requestInfo,List<Calculation> calculations){
-        List<Demand> demands = new LinkedList<>();
-        for(Calculation calculation : calculations) {
+	/**
+	 * Updates demand for the given list of calculations
+	 * 
+	 * @param requestInfo
+	 *            The RequestInfo of the calculation request
+	 * @param calculations
+	 *            List of calculation object
+	 * @return Demands that are updated
+	 */
+	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations) {
+		List<Demand> demands = new LinkedList<>();
+		for (Calculation calculation : calculations) {
 
-            List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getWaterConnection().getConnectionNo())
-                    , requestInfo);
+			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
+					Collections.singleton(calculation.getWaterConnection().getConnectionNo()), requestInfo);
 
-            if(CollectionUtils.isEmpty(searchResult))
-                throw new CustomException("INVALID UPDATE","No demand exists for connection Number: "+calculation.getWaterConnection().getConnectionNo());
+			if (CollectionUtils.isEmpty(searchResult))
+				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
+						+ calculation.getWaterConnection().getConnectionNo());
 
-            Demand demand = searchResult.get(0);
-            List<DemandDetail> demandDetails = demand.getDemandDetails();
-            List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation,demandDetails);
-            demand.setDemandDetails(updatedDemandDetails);
-            demands.add(demand);
-        }
-         return demandRepository.updateDemand(requestInfo,demands);
-    }
-    
-    
+			Demand demand = searchResult.get(0);
+			List<DemandDetail> demandDetails = demand.getDemandDetails();
+			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation, demandDetails);
+			demand.setDemandDetails(updatedDemandDetails);
+			demands.add(demand);
+		}
+		return demandRepository.updateDemand(requestInfo, demands);
+	}
+
 	/**
 	 * Returns the list of new DemandDetail to be added for updating the demand
 	 * 
@@ -473,7 +463,7 @@ public class DemandService {
 		addRoundOffTaxHead(calculation.getTenantId(), combinedBillDetials);
 		return combinedBillDetials;
 	}
-	
+
 	/**
 	 * Method updates the demands based on the getBillCriteria
 	 * 
@@ -530,7 +520,7 @@ public class DemandService {
 					&& SWCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(SWCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
 						SWCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
-		
+
 			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 		}
@@ -544,8 +534,6 @@ public class DemandService {
 		return res;
 
 	}
-    
-    
 
 	/**
 	 * Generates bill
@@ -557,14 +545,15 @@ public class DemandService {
 	 * @return The generate bill response along with ids of slab used for
 	 *         calculation
 	 */
-//	public BillAndCalculations getBill(RequestInfo requestInfo, GenerateBillCriteria billCriteria) {
-//		BillResponse billResponse = generateBill(requestInfo, billCriteria);
-//		BillingSlabIds billingSlabIds = new BillingSlabIds();
-//		BillAndCalculations getBillResponse = new BillAndCalculations();
-//		getBillResponse.setBillingSlabIds(billingSlabIds);
-//		getBillResponse.setBillResponse(billResponse);
-//		return getBillResponse;
-//	}
+	// public BillAndCalculations getBill(RequestInfo requestInfo,
+	// GenerateBillCriteria billCriteria) {
+	// BillResponse billResponse = generateBill(requestInfo, billCriteria);
+	// BillingSlabIds billingSlabIds = new BillingSlabIds();
+	// BillAndCalculations getBillResponse = new BillAndCalculations();
+	// getBillResponse.setBillingSlabIds(billingSlabIds);
+	// getBillResponse.setBillResponse(billResponse);
+	// return getBillResponse;
+	// }
 
 	/**
 	 * Generates bill by calling BillingService
@@ -601,7 +590,7 @@ public class DemandService {
 		}
 		return response;
 	}
-	
+
 	/**
 	 * Applies Penalty/Rebate/Interest to the incoming demands
 	 * 
@@ -613,104 +602,126 @@ public class DemandService {
 	 * @param taxPeriods
 	 * @return
 	 */
-	
-//	private boolean applytimeBasedApplicables(Demand demand,RequestInfoWrapper requestInfoWrapper,
-//			Map<String, JSONArray> timeBasedExmeptionMasterMap,List<TaxPeriod> taxPeriods) {
-//
-//		boolean isCurrentDemand = false;
-//		String tenantId = demand.getTenantId();
-//		String demandId = demand.getId();
-//		
-//		TaxPeriod taxPeriod = taxPeriods.stream()
-//				.filter(t -> demand.getTaxPeriodFrom().compareTo(t.getFromDate()) >= 0
-//				&& demand.getTaxPeriodTo().compareTo(t.getToDate()) <= 0)
-//		.findAny().orElse(null);
-//		
-//		if(!(taxPeriod.getFromDate()<= System.currentTimeMillis() && taxPeriod.getToDate() >= System.currentTimeMillis()))
-//			isCurrentDemand = true;
-//		/*
-//		 * method to get the latest collected time from the receipt service
-//		 */
-////		List<Receipt> receipts = rcptService.getReceiptsFromConsumerCode(taxPeriod.getFinancialYear(), demand,
-////				requestInfoWrapper);
-//
-//		BigDecimal taxAmtForApplicableGeneration = BigDecimal.ZERO;
-//		BigDecimal oldInterest = BigDecimal.ZERO;
-//		BigDecimal oldRebate = BigDecimal.ZERO;
-//		
-//		for(DemandDetail detail : demand.getDemandDetails()) {
-//			if (SWCalculationConstant.TAX_APPLICABLE.contains(detail.getTaxHeadMasterCode())) {
-//				taxAmtForApplicableGeneration = taxAmtForApplicableGeneration.add(detail.getTaxAmount());
-//			}
-//			if(detail.getTaxHeadMasterCode().equalsIgnoreCase(SWCalculationConstant.WS_TIME_INTEREST)) {
-//				oldInterest = oldInterest.add(detail.getTaxAmount());
-//			}
-//			if(detail.getTaxHeadMasterCode().equalsIgnoreCase(SWCalculationConstant.WS_TIME_REBATE)) {
-//				oldRebate = oldRebate.add(detail.getTaxAmount());
-//			}
-//			
-//		}
-//		
-//		boolean isPenaltyUpdated = false;
-//		boolean isInterestUpdated = false;
-//		
-//		List<DemandDetail> details = demand.getDemandDetails();
-//		
-//		Map<String, BigDecimal> rebatePenaltyEstimates = payService.applyPenaltyRebateAndInterest(taxAmtForApplicableGeneration,
-//				taxAmtForApplicableGeneration, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap);
-//		
-//		if(null == rebatePenaltyEstimates) return isCurrentDemand;
-//		
-//		BigDecimal rebate = rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_REBATE);
-//		BigDecimal penalty = rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_PENALTY);
-//		BigDecimal interest = rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_INTEREST);
-//
-//		DemandDetailAndCollection latestPenaltyDemandDetail,latestInterestDemandDetail;
-//
-//		if(rebate.compareTo(oldRebate)!=0){
-//				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-//						.taxHeadMasterCode(SWCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-//						.build());
-//		}
-//
-//
-//		if(interest.compareTo(BigDecimal.ZERO)!=0){
-//			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
-//			if(latestInterestDemandDetail!=null){
-//				updateTaxAmount(interest,latestInterestDemandDetail);
-//				isInterestUpdated = true;
-//			}
-//		}
-//
-//		if(penalty.compareTo(BigDecimal.ZERO)!=0){
-//			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
-//			if(latestPenaltyDemandDetail!=null){
-//				updateTaxAmount(penalty,latestPenaltyDemandDetail);
-//				isPenaltyUpdated = true;
-//			}
-//		}
-//
-//		
-//		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
-//			details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
-//					.demandId(demandId).tenantId(tenantId).build());
-//		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
-//			details.add(
-//					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
-//							.demandId(demandId).tenantId(tenantId).build());
-//		
-//		return isCurrentDemand;
-//	}
-	
+
+	// private boolean applytimeBasedApplicables(Demand
+	// demand,RequestInfoWrapper requestInfoWrapper,
+	// Map<String, JSONArray> timeBasedExmeptionMasterMap,List<TaxPeriod>
+	// taxPeriods) {
+	//
+	// boolean isCurrentDemand = false;
+	// String tenantId = demand.getTenantId();
+	// String demandId = demand.getId();
+	//
+	// TaxPeriod taxPeriod = taxPeriods.stream()
+	// .filter(t -> demand.getTaxPeriodFrom().compareTo(t.getFromDate()) >= 0
+	// && demand.getTaxPeriodTo().compareTo(t.getToDate()) <= 0)
+	// .findAny().orElse(null);
+	//
+	// if(!(taxPeriod.getFromDate()<= System.currentTimeMillis() &&
+	// taxPeriod.getToDate() >= System.currentTimeMillis()))
+	// isCurrentDemand = true;
+	// /*
+	// * method to get the latest collected time from the receipt service
+	// */
+	//// List<Receipt> receipts =
+	// rcptService.getReceiptsFromConsumerCode(taxPeriod.getFinancialYear(),
+	// demand,
+	//// requestInfoWrapper);
+	//
+	// BigDecimal taxAmtForApplicableGeneration = BigDecimal.ZERO;
+	// BigDecimal oldInterest = BigDecimal.ZERO;
+	// BigDecimal oldRebate = BigDecimal.ZERO;
+	//
+	// for(DemandDetail detail : demand.getDemandDetails()) {
+	// if
+	// (SWCalculationConstant.TAX_APPLICABLE.contains(detail.getTaxHeadMasterCode()))
+	// {
+	// taxAmtForApplicableGeneration =
+	// taxAmtForApplicableGeneration.add(detail.getTaxAmount());
+	// }
+	// if(detail.getTaxHeadMasterCode().equalsIgnoreCase(SWCalculationConstant.WS_TIME_INTEREST))
+	// {
+	// oldInterest = oldInterest.add(detail.getTaxAmount());
+	// }
+	// if(detail.getTaxHeadMasterCode().equalsIgnoreCase(SWCalculationConstant.WS_TIME_REBATE))
+	// {
+	// oldRebate = oldRebate.add(detail.getTaxAmount());
+	// }
+	//
+	// }
+	//
+	// boolean isPenaltyUpdated = false;
+	// boolean isInterestUpdated = false;
+	//
+	// List<DemandDetail> details = demand.getDemandDetails();
+	//
+	// Map<String, BigDecimal> rebatePenaltyEstimates =
+	// payService.applyPenaltyRebateAndInterest(taxAmtForApplicableGeneration,
+	// taxAmtForApplicableGeneration, taxPeriod.getFinancialYear(),
+	// timeBasedExmeptionMasterMap);
+	//
+	// if(null == rebatePenaltyEstimates) return isCurrentDemand;
+	//
+	// BigDecimal rebate =
+	// rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_REBATE);
+	// BigDecimal penalty =
+	// rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_PENALTY);
+	// BigDecimal interest =
+	// rebatePenaltyEstimates.get(SWCalculationConstant.WS_TIME_INTEREST);
+	//
+	// DemandDetailAndCollection
+	// latestPenaltyDemandDetail,latestInterestDemandDetail;
+	//
+	// if(rebate.compareTo(oldRebate)!=0){
+	// details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+	// .taxHeadMasterCode(SWCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+	// .build());
+	// }
+	//
+	//
+	// if(interest.compareTo(BigDecimal.ZERO)!=0){
+	// latestInterestDemandDetail =
+	// utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,details);
+	// if(latestInterestDemandDetail!=null){
+	// updateTaxAmount(interest,latestInterestDemandDetail);
+	// isInterestUpdated = true;
+	// }
+	// }
+	//
+	// if(penalty.compareTo(BigDecimal.ZERO)!=0){
+	// latestPenaltyDemandDetail =
+	// utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_PENALTY,details);
+	// if(latestPenaltyDemandDetail!=null){
+	// updateTaxAmount(penalty,latestPenaltyDemandDetail);
+	// isPenaltyUpdated = true;
+	// }
+	// }
+	//
+	//
+	// if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
+	// details.add(DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+	// .demandId(demandId).tenantId(tenantId).build());
+	// if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
+	// details.add(
+	// DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+	// .demandId(demandId).tenantId(tenantId).build());
+	//
+	// return isCurrentDemand;
+	// }
+
 	/**
 	 * Updates the amount in the latest demandDetail by adding the diff between
 	 * new and old amounts to it
-	 * @param newAmount The new tax amount for the taxHead
-	 * @param latestDetailInfo The latest demandDetail for the particular taxHead
+	 * 
+	 * @param newAmount
+	 *            The new tax amount for the taxHead
+	 * @param latestDetailInfo
+	 *            The latest demandDetail for the particular taxHead
 	 */
-	private void updateTaxAmount(BigDecimal newAmount,DemandDetailAndCollection latestDetailInfo){
+	private void updateTaxAmount(BigDecimal newAmount, DemandDetailAndCollection latestDetailInfo) {
 		BigDecimal diff = newAmount.subtract(latestDetailInfo.getTaxAmountForTaxHead());
-		BigDecimal newTaxAmountForLatestDemandDetail = latestDetailInfo.getLatestDemandDetail().getTaxAmount().add(diff);
+		BigDecimal newTaxAmountForLatestDemandDetail = latestDetailInfo.getLatestDemandDetail().getTaxAmount()
+				.add(diff);
 		latestDetailInfo.getLatestDemandDetail().setTaxAmount(newTaxAmountForLatestDemandDetail);
 	}
 

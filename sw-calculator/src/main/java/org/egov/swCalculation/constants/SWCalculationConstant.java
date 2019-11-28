@@ -1,6 +1,10 @@
 package org.egov.swCalculation.constants;
 
+<<<<<<< HEAD
 import org.egov.swCalculation.model.DemandStatus;
+=======
+import java.math.BigDecimal;
+>>>>>>> 06a67bd080b67b9a0edc67086f2b92a8ffdb650f
 
 public class SWCalculationConstant {
 
@@ -51,6 +55,7 @@ public class SWCalculationConstant {
 
 	public static final String SW_BILLING_SLAB_MASTER = "SCBillingSlab";
 	
+<<<<<<< HEAD
 	public static final String EMPTY_DEMAND_ERROR_CODE = "EMPTY_DEMANDS";
 
 	public static final String EMPTY_DEMAND_ERROR_MESSAGE = "No demands found for the given bill generate criteria";
@@ -64,5 +69,53 @@ public class SWCalculationConstant {
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
+=======
+	/**
+	 * Time Taxes Config
+	 */
+	public static final String SW_TIME_REBATE = "SW_TIME_REBATE";
+
+	public static final String SW_TIME_INTEREST = "SW_TIME_INTEREST";
+
+	public static final String SW_TIME_PENALTY = "SW_TIME_PENALTY";
+
+	public static final String SW_WATER_CESS = "SW_WATER_CESS";
+
+	public static final String SW_CHARGE = "SW_CHARGE";
+	
+	
+	/**
+	 * data fields
+	 */
+	public static final String FROMFY_FIELD_NAME = "fromFY";
+
+	public static final String ENDING_DATE_APPLICABLES = "endingDay";
+
+	public static final String STARTING_DATE_APPLICABLES = "startingDay";
+	
+	
+	public static final String MAX_AMOUNT_FIELD_NAME = "maxAmount";
+
+	public static final String MIN_AMOUNT_FIELD_NAME = "minAmount";
+
+	public static final String FLAT_AMOUNT_FIELD_NAME = "flatAmount";
+
+	public static final String RATE_FIELD_NAME = "rate";
+	
+	public static final String FINANCIAL_YEAR_STARTING_DATE = "startingDate";
+
+	public static final String FINANCIAL_YEAR_ENDING_DATE = "endingDate";
+	
+	/*
+	 * bigdecimal values
+	 */
+
+	public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
+	
+	
+	public static final Long TIMEZONE_OFFSET = 19800000l;
+	
+	public static final String SW_Round_Off = "SW_Round_Off";
+>>>>>>> 06a67bd080b67b9a0edc67086f2b92a8ffdb650f
 
 }

@@ -25,7 +25,7 @@ public class WsQueryBuilder {
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
-			+ "wc.meterInstallationDate, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
+			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.connection_id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
@@ -48,6 +48,7 @@ public class WsQueryBuilder {
 			boolean searchForWaterConnection) {
 		StringBuilder query = new StringBuilder(getQueryForSearch(searchForWaterConnection));
 		String resultantQuery = query.toString();
+		boolean isAnyCriteriaMatch = false;
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -57,33 +58,41 @@ public class WsQueryBuilder {
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 			addToPreparedStatement(preparedStatement, propertyIds);
+			isAnyCriteriaMatch = true;
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");
 			preparedStatement.add(criteria.getOldConnectionNumber());
+			isAnyCriteriaMatch = true;
 		}
 
 		if (criteria.getConnectionNumber() != null && !criteria.getConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getApplicationNumber() != null && !criteria.getApplicationNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationno = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
+			isAnyCriteriaMatch = true;
 		}
+		if(isAnyCriteriaMatch == false)
+			return null;
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
