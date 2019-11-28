@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.MdmsCriteriaReq;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
@@ -40,7 +40,7 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		String jsonPath = WCConstants.JSONPATH_ROOT;
-		String tenantId = request.getWaterConnection().getProperty().getTenantId();
+		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 
 		String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
 				WCConstants.MDMS_WC_Water_Source};

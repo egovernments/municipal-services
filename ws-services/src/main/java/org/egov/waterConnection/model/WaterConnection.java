@@ -45,11 +45,11 @@ public class WaterConnection extends Connection {
 	@JsonProperty("noOfTaps")
 	private Integer noOfTaps;
 	
-	@JsonProperty("UOM")
-	private String UOM;
+	@JsonProperty("waterSubSource")
+	private String waterSubSource = null;
 	
-	@JsonProperty("waterSubSoruce")
-	private String waterSubSoruce;
+	@JsonProperty("uom")
+	private String uom = null;
 	
 
 	public Double getPipeSize() {
@@ -60,22 +60,47 @@ public class WaterConnection extends Connection {
 		this.pipeSize = pipeSize;
 	}
 
-	public Integer getNoOfTabs() {
+	public void setNoOfTaps(Integer noOfTaps) {
+		this.noOfTaps = noOfTaps;
+	}
+
+	public void setWaterSubSource(String waterSubSource) {
+		this.waterSubSource = waterSubSource;
+	}
+	
+	public Integer getNoOfTaps() {
 		return noOfTaps;
 	}
 
-	public void setNoOfTabs(Integer noOfTabs) {
-		this.noOfTaps = noOfTabs;
+	public String getWaterSubSource() {
+		return waterSubSource;
 	}
-
-	public String getWaterSubSoruce() {
-		return waterSubSoruce;
+	
+	public void setUom(String uom) {
+		this.uom = uom;
 	}
-
-	public void setWaterSubSoruce(String waterSubSoruce) {
-		this.waterSubSoruce = waterSubSoruce;
+	public String getUom() {
+	return uom;
 	}
-
+	
+	public WaterConnection pipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
+		return this;
+	}
+	
+	public WaterConnection noOfTaps(Integer noOfTaps) {
+		this.noOfTaps = noOfTaps;
+		return this;
+	}
+	
+	public WaterConnection waterSubSource(String waterSubSource) {
+		this.waterSubSource = waterSubSource;
+		return this;
+	}
+	public WaterConnection uOM(String uom) {
+		this.uom = uom;
+		return this;
+	}
 	public WaterConnection connectionCategory(String connectionCategory) {
 		this.connectionCategory = connectionCategory;
 		return this;
@@ -203,15 +228,6 @@ public class WaterConnection extends Connection {
 		this.meterInstallationDate = meterInstallationDate;
 	}
 	
-	
-	public String getUOM() {
-		return this.UOM;
-	}
-
-	
-	public void setUOM(String uom) {
-		this.UOM = uom;
-	}
 
 	// public WaterConnection documents(List<Document> documents) {
 	// this.documents = documents;

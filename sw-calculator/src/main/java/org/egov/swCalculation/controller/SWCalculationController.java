@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.swCalculation.model.CalculationReq;
+import org.egov.swCalculation.model.CalculationRes;
 import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.DemandResponse;
 import org.egov.swCalculation.service.DemandService;
@@ -35,6 +37,10 @@ public class SWCalculationController {
 	
 	
 	
+	@PostMapping("/_calculate")
+	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
+		return new ResponseEntity<>(sWCalculationService.getTaxCalculation(calculationReq), HttpStatus.OK);
+	}
 	
 	@PostMapping("/_createDemand")
 	public ResponseEntity<DemandResponse> generateDemands(@RequestBody @Valid CalculationReq calculationReq) {
