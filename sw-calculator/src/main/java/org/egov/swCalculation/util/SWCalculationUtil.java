@@ -1,9 +1,12 @@
 package org.egov.swCalculation.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
+import org.egov.swCalculation.model.GetBillCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import lombok.Getter;
 @Component
@@ -63,6 +66,43 @@ public class SWCalculationUtil {
 		url.append("{3}");
 
 		return url.toString();
+	}
+	
+	/**
+	 * method to create demandsearch url with demand criteria
+	 *
+	 * @param getBillCriteria
+	 * @return
+	 */
+	public StringBuilder getDemandSearchUrl(GetBillCriteria getBillCriteria) {
+
+		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
+			return new StringBuilder().append(configurations.getBillingServiceHost())
+					.append(configurations.getDemandSearchEndPoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
+					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(SWCalculationConstant.SEPARATER)
+					.append(SWCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(getBillCriteria.getConnectionId() + SWCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
+							+ getBillCriteria.getConnectionNumber());
+
+		else
+			return new StringBuilder().append(configurations.getBillingServiceHost())
+					.append(configurations.getDemandSearchEndPoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
+					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(SWCalculationConstant.SEPARATER)
+					.append(SWCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
+
+	}
+	
+	/**
+	 * Returns url for demand update Api
+	 *
+	 * @return
+	 */
+	public StringBuilder getUpdateDemandUrl() {
+		return new StringBuilder().append(configurations.getBillingServiceHost())
+				.append(configurations.getDemandUpdateEndPoint());
 	}
 
 }

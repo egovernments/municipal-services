@@ -7,12 +7,15 @@ import javax.validation.Valid;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.DemandResponse;
+import org.egov.swCalculation.model.GetBillCriteria;
+import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.service.DemandService;
 import org.egov.swCalculation.service.SWCalculationService;
 import org.egov.waterConnection.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +50,11 @@ public class SWCalculationController {
 		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
+	@PostMapping("/_updateDemand")
+	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
+			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
+		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
+	}
 
 }

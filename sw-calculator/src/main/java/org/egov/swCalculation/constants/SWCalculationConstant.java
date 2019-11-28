@@ -1,5 +1,7 @@
 package org.egov.swCalculation.constants;
 
+import org.egov.swCalculation.model.DemandStatus;
+
 public class SWCalculationConstant {
 
 	public static final String TAXPERIOD_MASTER_KEY = "TAXPERIOD";
@@ -48,6 +50,19 @@ public class SWCalculationConstant {
 	public static final String SW_INTEREST_MASTER = "Interest";
 
 	public static final String SW_BILLING_SLAB_MASTER = "SCBillingSlab";
+	
+	public static final String EMPTY_DEMAND_ERROR_CODE = "EMPTY_DEMANDS";
+
+	public static final String EMPTY_DEMAND_ERROR_MESSAGE = "No demands found for the given bill generate criteria";
+	
+	public static final String DEMAND_CANCELLED_STATUS = DemandStatus.CANCELLED.toString();
+	
+	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
+	
+	public static final String WS_CONSUMER_CODE_SEPARATOR = ":";
+	
+	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
+	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
 
 }

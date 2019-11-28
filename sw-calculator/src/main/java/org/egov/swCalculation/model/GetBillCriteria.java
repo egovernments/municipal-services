@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GetBillCriteria {
 	
-	private String assessmentNumber;
+public class GetBillCriteria {
+	private String connectionNumber;
 	
 	@Default
 	private BigDecimal amountExpected = BigDecimal.ZERO;
 	
-	private String propertyId;
+	private String connectionId;
 	
 	private String assessmentYear;
 	
