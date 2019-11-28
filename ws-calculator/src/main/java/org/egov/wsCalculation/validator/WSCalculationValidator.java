@@ -34,7 +34,7 @@ public class WSCalculationValidator {
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
-		if (isUpdate && (meterReading.getCurrentReading() <= meterReading.getLastReading())) {
+		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
