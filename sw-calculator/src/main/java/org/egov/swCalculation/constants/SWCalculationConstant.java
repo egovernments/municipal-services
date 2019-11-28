@@ -1,10 +1,10 @@
 package org.egov.swCalculation.constants;
 
-<<<<<<< HEAD
+
 import org.egov.swCalculation.model.DemandStatus;
-=======
+
 import java.math.BigDecimal;
->>>>>>> 06a67bd080b67b9a0edc67086f2b92a8ffdb650f
+
 
 public class SWCalculationConstant {
 
@@ -55,7 +55,7 @@ public class SWCalculationConstant {
 
 	public static final String SW_BILLING_SLAB_MASTER = "SCBillingSlab";
 	
-<<<<<<< HEAD
+
 	public static final String EMPTY_DEMAND_ERROR_CODE = "EMPTY_DEMANDS";
 
 	public static final String EMPTY_DEMAND_ERROR_MESSAGE = "No demands found for the given bill generate criteria";
@@ -69,7 +69,7 @@ public class SWCalculationConstant {
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
-=======
+
 	/**
 	 * Time Taxes Config
 	 */
@@ -102,9 +102,6 @@ public class SWCalculationConstant {
 
 	public static final String RATE_FIELD_NAME = "rate";
 	
-	public static final String FINANCIAL_YEAR_STARTING_DATE = "startingDate";
-
-	public static final String FINANCIAL_YEAR_ENDING_DATE = "endingDate";
 	
 	/*
 	 * bigdecimal values
@@ -116,6 +113,6 @@ public class SWCalculationConstant {
 	public static final Long TIMEZONE_OFFSET = 19800000l;
 	
 	public static final String SW_Round_Off = "SW_Round_Off";
->>>>>>> 06a67bd080b67b9a0edc67086f2b92a8ffdb650f
+
 
 }
