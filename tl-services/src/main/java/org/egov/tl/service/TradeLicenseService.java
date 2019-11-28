@@ -228,6 +228,8 @@ public class TradeLicenseService {
     public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath){
         if (businessServicefromPath == null)
             businessServicefromPath = businessService_TL;
+        else if(!businessServicefromPath.equals(businessService_TL))
+            businessServicefromPath = businessService_BPA;
         tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
         Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         String businessServiceName = null;
