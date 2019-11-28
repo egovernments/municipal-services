@@ -20,15 +20,13 @@ public class PropertyServiceImpl implements PropertyService {
 	public List<Property> createProperty(PropertyRequest propertyRequest) {
 		List<Property> propertyList = new ArrayList<>();
 		Property property = new Property();
-		for (int i = 0; i < 1; i++) {
 			property = new Property();
-			property.setAccountId("AccountId " + i);
-			property.setAcknowldgementNumber("AcknowldgementNumber " + i);
-			property.setId("PropertyId " + i);
+			property.setAccountId("AccountId ");
+			property.setAcknowldgementNumber("AcknowldgementNumber ");
+			property.setId("PropertyId ");
 			property.setAddress(new Address());
 			property.setChannel(Property.ChannelEnum.CITIZEN);
 			propertyList.add(property);
-		}
 		return propertyList;
 
 	}
