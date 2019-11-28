@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS eg_pt_property;
-DROP TABLE IF EXISTS eg_pt_address;
 DROP TABLE IF EXISTS eg_pt_document;
+DROP TABLE IF EXISTS eg_pt_address;
 DROP TABLE IF EXISTS eg_pt_owner;
 DROP TABLE IF EXISTS eg_pt_institution;
+DROP TABLE IF EXISTS eg_pt_property;
 
 --> Property table
 
@@ -138,3 +138,61 @@ CREATE TABLE eg_pt_address (
 );
 
 CREATE INDEX IF NOT EXISTS index_eg_pt_address_tenantid   ON eg_pt_address (tenantid);
+
+
+--> Audit tables 
+
+CREATE TABLE eg_pt_property_audit (
+
+   id                   CHARACTER VARYING (128) NOT NULL,
+   propertyId           CHARACTER VARYING (128) NOT NULL,
+   tenantId             CHARACTER VARYING (256) NOT NULL,
+   accountId            CHARACTER VARYING (128) NOT NULL,
+   oldPropertyId        CHARACTER VARYING (128),
+   status               CHARACTER VARYING (128) NOT NULL,
+   acknowldgementNumber CHARACTER VARYING (128) NOT NULL,
+   propertyType         CHARACTER VARYING (128) NOT NULL,
+   ownershipCategory    CHARACTER VARYING (128) NOT NULL,
+   creationReason       CHARACTER VARYING (128),
+   occupancyDate        BIGINT,
+   constructionDate     BIGINT NOT NULL,
+   noOfFloors           BIGINT, 
+   landArea             NUMERIC(102) NOT NULL,
+   source               CHARACTER VARYING (128) NOT NULL,
+   createdBy            CHARACTER VARYING (128) NOT NULL,
+   parentproperties     CHARACTER VARYING [],
+   lastModifiedBy       CHARACTER VARYING (128),
+   createdTime          BIGINT NOT NULL,
+   lastModifiedTime     BIGINT,
+   additionaldetails    JSONB,
+   auditcreatedtime	    BIGINT
+   
+   );
+   
+CREATE TABLE eg_pt_address_audit (
+
+  tenantId         CHARACTER VARYING(256) NOT NULL,
+  id               CHARACTER VARYING(128) NOT NULL,
+  propertyid       CHARACTER VARYING(128) NOT NULL,
+  latitude         NUMERIC(9,6),
+  longitude        NUMERIC(10,7),
+  addressid        CHARACTER VARYING(128) NOT NULL,
+  addressnumber    CHARACTER VARYING(128),
+  doorNo           CHARACTER VARYING(64),
+  type             CHARACTER VARYING(64) NOT NULL,
+  addressline1     CHARACTER VARYING(1024),
+  addressline2     CHARACTER VARYING(1024),
+  landmark         CHARACTER VARYING(1024),
+  city             CHARACTER VARYING(1024) NOT NULL,
+  pincode          CHARACTER VARYING(16) NOT NULL,
+  detail           CHARACTER VARYING(2048),
+  buildingName     CHARACTER VARYING(1024),
+  street           CHARACTER VARYING(1024),
+  locality         CHARACTER VARYING(128) NOT NULL,
+  createdby        CHARACTER VARYING(128) NOT NULL,
+  createdtime      BIGINT NOT NULL,
+  lastmodifiedby   CHARACTER VARYING(128),
+  lastmodifiedtime BIGINT
+
+);
+

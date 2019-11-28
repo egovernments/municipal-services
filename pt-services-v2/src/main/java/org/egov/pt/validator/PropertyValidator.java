@@ -112,21 +112,19 @@ public class PropertyValidator {
         Property property = request.getProperty();
         String tenantId = property.getTenantId();
 
-        String[] masterNames = {PTConstants.MDMS_PT_CONSTRUCTIONSUBTYPE, PTConstants.MDMS_PT_CONSTRUCTIONTYPE, PTConstants.MDMS_PT_OCCUPANCYTYPE,
-                PTConstants.MDMS_PT_PROPERTYTYPE,PTConstants.MDMS_PT_PROPERTYSUBTYPE,PTConstants.MDMS_PT_OWNERSHIP,PTConstants.MDMS_PT_SUBOWNERSHIP,
-                PTConstants.MDMS_PT_USAGEMAJOR,PTConstants.MDMS_PT_USAGEMINOR,PTConstants.MDMS_PT_USAGESUBMINOR,PTConstants.MDMS_PT_USAGEDETAIL,
-                PTConstants.MDMS_PT_OWNERTYPE};
-        
-        List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+		List<String> masterNames = new ArrayList<>(Arrays.asList(PTConstants.MDMS_PT_PROPERTYTYPE,
+				PTConstants.MDMS_PT_OWNERSHIP, PTConstants.MDMS_PT_OWNERTYPE));
 
-        validateInstitution(property, errorMap);
-        Map<String,List<String>> codes = getAttributeValues(tenantId,PTConstants.MDMS_PT_MOD_NAME,names,"$.*.code",PTConstants.JSONPATH_CODES,request.getRequestInfo());
-        if(null != codes) {
-            validateMDMSData(masterNames,codes);
-            validateCodes(property,codes,errorMap);
-        }else {
-        	errorMap.put("MASTER_FETCH_FAILED", "Couldn't fetch master data for validation");
-        }
+		validateInstitution(property, errorMap);
+		
+		Map<String, List<String>> codes = getAttributeValues(tenantId, PTConstants.MDMS_PT_MOD_NAME, 
+											masterNames, "$.*.code", PTConstants.JSONPATH_CODES, request.getRequestInfo());
+		if (null != codes) {
+			validateMDMSData(masterNames, codes);
+			validateCodes(property, codes, errorMap);
+		} else {
+			errorMap.put("MASTER_FETCH_FAILED", "Couldn't fetch master data for validation");
+		}
 
         if (!errorMap.isEmpty())
             throw new CustomException(errorMap);
@@ -174,58 +172,10 @@ public class PropertyValidator {
                     errorMap.put("Invalid PROPERTYTYPE","The PropertyType '"+property.getPropertyType()+"' does not exists");
                 }
 
-//                if(!codes.get(PTConstants.MDMS_PT_SUBOWNERSHIP).contains(property.getSubOwnershipCategory()) && property.getSubOwnershipCategory()!=null){
-//                    errorMap.put("Invalid SUBOWNERSHIPCATEGORY","The SubOwnershipCategory '"+property.getSubOwnershipCategory()+"' does not exists");
-//                }
-
                 if(!codes.get(PTConstants.MDMS_PT_OWNERSHIP).contains(property.getOwnershipCategory()) && property.getOwnershipCategory()!=null){
                     errorMap.put("Invalid OWNERSHIPCATEGORY","The OwnershipCategory '"+ property.getOwnershipCategory()+"' does not exists");
                 }
                 
-//                if(!codes.get(PTConstants.MDMS_PT_PROPERTYSUBTYPE).contains(property.getPropertySubType()) && property.getPropertySubType()!=null){
-//                    errorMap.put(ErrorConstants.INVALID_PROPERTYSUBTYPE,"The PropertySubType '"+property.getPropertySubType()+"' does not exists");
-//                }
-
-//                if(!codes.get(PTConstants.MDMS_PT_USAGEMAJOR).contains(property.getUsageCategoryMajor()) && property.getUsageCategoryMajor()!=null){
-//                    errorMap.put("INVALID USAGECATEGORYMAJOR","The UsageCategoryMajor '"+property.getUsageCategoryMajor()+"' at Property level does not exists");
-//                }
-
-//                if(!CollectionUtils.isEmpty(propertyDetail.getUnits()))
-//                    propertyDetail.getUnits().forEach(unit ->{
-//                        if(!codes.get(PTConstants.MDMS_PT_USAGEMAJOR).contains(unit.getUsageCategoryMajor()) && unit.getUsageCategoryMajor()!=null){
-//                            errorMap.put("INVALID USAGECATEGORYMAJOR","The UsageCategoryMajor '"+unit.getUsageCategoryMajor()+"' at unit level does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_USAGEMINOR).contains(unit.getUsageCategoryMinor()) && unit.getUsageCategoryMinor()!=null){
-//                            errorMap.put("INVALID USAGECATEGORYMINOR","The UsageCategoryMinor '"+unit.getUsageCategoryMinor()+"' does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_USAGESUBMINOR).contains(unit.getUsageCategorySubMinor()) && unit.getUsageCategorySubMinor()!=null){
-//                            errorMap.put("INVALID USAGECATEGORYSUBMINOR","The UsageCategorySubMinor '"+unit.getUsageCategorySubMinor()+"' does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_USAGEDETAIL).contains(unit.getUsageCategoryDetail()) && unit.getUsageCategoryDetail()!=null){
-//                            errorMap.put("INVALID USAGECATEGORYDETAIL","The UsageCategoryDetail "+unit.getUsageCategoryDetail()+" does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_CONSTRUCTIONTYPE).contains(unit.getConstructionType()) && unit.getConstructionType()!=null){
-//                            errorMap.put("INVALID CONSTRUCTIONTYPE","The ConstructionType '"+unit.getConstructionType()+"' does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_CONSTRUCTIONSUBTYPE).contains(unit.getConstructionSubType()) && unit.getConstructionSubType()!=null){
-//                            errorMap.put("INVALID CONSTRUCTIONSUBTYPE","The ConstructionSubType '"+unit.getConstructionSubType()+"' does not exists");
-//                        }
-//
-//                        if(!codes.get(PTConstants.MDMS_PT_OCCUPANCYTYPE).contains(unit.getOccupancyType()) && unit.getOccupancyType()!=null){
-//                            errorMap.put("INVALID OCCUPANCYTYPE","The OccupancyType '"+unit.getOccupancyType()+"' does not exists");
-//                        }
-//
-//                        if("RENTED".equalsIgnoreCase(unit.getOccupancyType())){
-//                            if(unit.getArv()==null || unit.getArv().compareTo(new BigDecimal(0))!=1)
-//                                errorMap.put("INVALID ARV","Total Annual Rent should be greater than zero ");
-//                        }
-//                    });
-
                 property.getOwners().forEach(owner ->{
                 	
                     if(!codes.get(PTConstants.MDMS_PT_OWNERTYPE).contains(owner.getOwnerType()) && owner.getOwnerType()!=null){
@@ -244,7 +194,7 @@ public class PropertyValidator {
      * @param masterNames
      * @param codes
      */
-    private void validateMDMSData(String[] masterNames,Map<String,List<String>> codes){
+    private void validateMDMSData(List<String> masterNames,Map<String,List<String>> codes){
     	
         Map<String,String> errorMap = new HashMap<>();
         for(String masterName:masterNames){
