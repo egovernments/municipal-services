@@ -237,12 +237,25 @@ public class TradeUtil {
         return mdmsCriteriaReq;
     }
 
+    public List<String> getBPAEndState(TradeLicenseRequest tradeLicenseRequest) {
+
+        List<String> endstates = new ArrayList<>();
+        for (TradeLicense tradeLicense : tradeLicenseRequest.getLicenses()) {
+            String tradetype = tradeLicense.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+            Object mdmsData = mDMSCallForBPA(tradeLicenseRequest.getRequestInfo(), tradeLicense.getTenantId(), tradetype);
+            List<String> res = JsonPath.read(mdmsData, BPAConstants.MDMS_ENDSTATEPATH);
+            endstates.add(res.get(0));
+        }
+        return endstates;
+    }
+
     public List<String> getusernewRoleFromMDMS(TradeLicense license,RequestInfo requestInfo){
         String tradetype=license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
         Object mdmsData=mDMSCallForBPA(requestInfo,license.getTenantId(),tradetype);
         List<List<String>>res=JsonPath.read(mdmsData, BPAConstants.MDMS_BPAROLEPATH);
         return  res.get(0);
     }
+
     public Object mDMSCall(TradeLicenseRequest tradeLicenseRequest){
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
         String tenantId = tradeLicenseRequest.getLicenses().get(0).getTenantId();

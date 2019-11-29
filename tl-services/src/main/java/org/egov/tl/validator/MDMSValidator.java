@@ -124,7 +124,7 @@ public class MDMSValidator {
                 case businessService_BPA:
                     license.getTradeLicenseDetail().getTradeUnits().forEach(unit -> {
                         if (!tradeTypeUomMap.containsKey(unit.getTradeType()))
-                            errorMap.put("INVALID TRADETYPE", "The Trade type '" + unit.getTradeType() + "' does not exists");
+                            errorMap.put("INVALID TRADETYPE", "The Trade type '" + unit.getTradeType() + "' does not exist");
                     });
                     break;
             }

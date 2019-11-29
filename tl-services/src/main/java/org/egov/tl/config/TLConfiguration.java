@@ -68,16 +68,28 @@ public class TLConfiguration {
     private String idGenPath;
 
     @Value("${egov.idgen.tl.applicationNum.name}")
-    private String applicationNumberIdgenName;
+    private String applicationNumberIdgenNameTL;
 
     @Value("${egov.idgen.tl.applicationNum.format}")
-    private String applicationNumberIdgenFormat;
+    private String applicationNumberIdgenFormatTL;
 
     @Value("${egov.idgen.tl.licensenumber.name}")
-    private String licenseNumberIdgenName;
+    private String licenseNumberIdgenNameTL;
 
     @Value("${egov.idgen.tl.licensenumber.format}")
-    private String licenseNumberIdgenFormat;
+    private String licenseNumberIdgenFormatTL;
+
+    @Value("${egov.idgen.bpa.applicationNum.name}")
+    private String applicationNumberIdgenNameBPA;
+
+    @Value("${egov.idgen.bpa.applicationNum.format}")
+    private String applicationNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.licensenumber.name}")
+    private String licenseNumberIdgenNameBPA;
+
+    @Value("${egov.idgen.bpa.licensenumber.format}")
+    private String licenseNumberIdgenFormatBPA;
 
     @Value("${kafka.topics.user.update}")
     private String userUpdateTopic;

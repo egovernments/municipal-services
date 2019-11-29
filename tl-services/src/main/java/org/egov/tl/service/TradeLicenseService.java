@@ -53,6 +53,8 @@ public class TradeLicenseService {
 
     private EditNotificationService  editNotificationService;
 
+    private  TradeUtil tradeUtil;
+
     @Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
     private Boolean wfFallbackEnabled;
 
@@ -61,7 +63,7 @@ public class TradeLicenseService {
                                UserService userService, TLRepository repository, ActionValidator actionValidator,
                                TLValidator tlValidator, TLWorkflowService TLWorkflowService,
                                CalculationService calculationService, TradeUtil util, DiffService diffService,
-                               TLConfiguration config,EditNotificationService editNotificationService,WorkflowService workflowService) {
+                               TLConfiguration config, EditNotificationService editNotificationService, WorkflowService workflowService, TradeUtil tradeUtil) {
         this.wfIntegrator = wfIntegrator;
         this.enrichmentService = enrichmentService;
         this.userService = userService;
@@ -75,6 +77,7 @@ public class TradeLicenseService {
         this.config = config;
         this.editNotificationService = editNotificationService;
         this.workflowService = workflowService;
+        this.tradeUtil = tradeUtil;
     }
 
 
@@ -97,10 +100,10 @@ public class TradeLicenseService {
        switch(businessServicefromPath)
        {
            case businessService_BPA:
-//               validateMobileNumberUniqueness(tradeLicenseRequest);
+               validateMobileNumberUniqueness(tradeLicenseRequest);
                break;
        }
-        userService.createUser(tradeLicenseRequest, false);
+       userService.createUser(tradeLicenseRequest, false);
        calculationService.addCalculation(tradeLicenseRequest);
 
         /*
@@ -120,7 +123,7 @@ public class TradeLicenseService {
     public void validateMobileNumberUniqueness(TradeLicenseRequest request) {
         for (TradeLicense license : request.getLicenses()) {
             for (TradeUnit tradeUnit : license.getTradeLicenseDetail().getTradeUnits()) {
-                String tradetypeOfNewLicense = tradeUnit.getTradeType();
+                String tradetypeOfNewLicense = tradeUnit.getTradeType().split("\\.")[0];
                 List<String> mobileNumbers = license.getTradeLicenseDetail().getOwners().stream().map(OwnerInfo::getMobileNumber).collect(Collectors.toList());
                 for (String mobno : mobileNumbers) {
                     TradeLicenseSearchCriteria tradeLicenseSearchCriteria = TradeLicenseSearchCriteria.builder().tenantId(license.getTenantId()).businessService(license.getBusinessService()).mobileNumber(mobno).build();
@@ -128,11 +131,11 @@ public class TradeLicenseService {
                     List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
                     for (TradeLicense result : licensesFromSearch) {
                         if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber())) {
-                            tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
+                            tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType().split("\\.")[0]);
                         }
                     }
                     if (tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense)) {
-                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype");
+                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype: "+tradetypeOfNewLicense);
                     }
                 }
             }
@@ -253,7 +256,7 @@ public class TradeLicenseService {
         switch(businessServicefromPath)
         {
             case businessService_BPA:
-//                validateMobileNumberUniqueness(tradeLicenseRequest);
+                validateMobileNumberUniqueness(tradeLicenseRequest);
                 break;
         }
         Map<String, Difference> diffMap = diffService.getDifference(tradeLicenseRequest, searchResult);
@@ -262,6 +265,7 @@ public class TradeLicenseService {
         /*
          * call workflow service if it's enable else uses internal workflow process
          */
+        List<String> endStates = Collections.nCopies(tradeLicenseRequest.getLicenses().size(),STATUS_APPROVED);
         switch (businessServicefromPath) {
             case businessService_TL:
                 if (config.getIsExternalWorkFlowEnabled()) {
@@ -272,14 +276,15 @@ public class TradeLicenseService {
                 break;
 
             case businessService_BPA:
+                endStates = tradeUtil.getBPAEndState(tradeLicenseRequest);
                 wfIntegrator.callWorkFlow(tradeLicenseRequest);
                 break;
         }
-        enrichmentService.postStatusEnrichment(tradeLicenseRequest);
+        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
         userService.createUser(tradeLicenseRequest, false);
         switch (businessServicefromPath) {
             case businessService_BPA:
-                userService.addUserRolesAsynchronously(tradeLicenseRequest);
+                userService.addUserRolesAsynchronously(tradeLicenseRequest,endStates);
                 break;
         }
         calculationService.addCalculation(tradeLicenseRequest);

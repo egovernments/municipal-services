@@ -56,12 +56,12 @@ public class UserService{
      * @param request TradeLciense create or update request
      */
 
-    public void addUserRolesAsynchronously(TradeLicenseRequest request){
+    public void addUserRolesAsynchronously(TradeLicenseRequest request, List<String> endStates) {
         List<TradeLicense> licenses = request.getLicenses();
-        for(TradeLicense license : licenses){
-            if((license.getStatus()!=null) && license.getStatus().equalsIgnoreCase(STATUS_APPROVED))
-            {
-                TradeLicenseRequest tradeLicenseRequestForUserUpdate =TradeLicenseRequest.builder().licenses(Collections.singletonList(license)).requestInfo(request.getRequestInfo()).build();
+        for (int i = 0; i < licenses.size(); i++) {
+            TradeLicense license = licenses.get(i);
+            if ((license.getStatus() != null) && license.getStatus().equalsIgnoreCase(endStates.get(i))) {
+                TradeLicenseRequest tradeLicenseRequestForUserUpdate = TradeLicenseRequest.builder().licenses(Collections.singletonList(license)).requestInfo(request.getRequestInfo()).build();
                 repository.addUserRole(tradeLicenseRequestForUserUpdate);
             }
         }

@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +137,13 @@ public class PaymentUpdateService {
 					updateRequest.getLicenses()
 							.forEach(obj -> log.info(" the status of the application is : " + obj.getStatus()));
 
-					enrichmentService.postStatusEnrichment(updateRequest);
+					List<String> endStates = Collections.nCopies(updateRequest.getLicenses().size(), STATUS_APPROVED);
+					switch (paymentDetail.getBusinessService()) {
+						case businessService_BPA:
+							endStates = util.getBPAEndState(updateRequest);
+							break;
+					}
+					enrichmentService.postStatusEnrichment(updateRequest,endStates);
 
 					/*
 					 * calling repository to update the object in TL tables
