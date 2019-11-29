@@ -19,7 +19,8 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 		List<MeterReading> meterReadingLists = new ArrayList<>();
 		MeterReading meterReading = new MeterReading();
 		while (rs.next()) {
-			meterReading.setId(rs.getString("connectionNo"));
+			meterReading.setId(rs.getString("id"));
+			meterReading.setConnectionNo(rs.getString("connectionId"));
 			meterReading.setBillingPeriod(rs.getString("billingPeriod"));
 			meterReading.setCurrentReading(rs.getInt("currentReading"));
 			meterReading.setCurrentReadingDate(rs.getLong("currentReadingDate"));

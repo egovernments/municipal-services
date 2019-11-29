@@ -38,9 +38,9 @@ public class WSCalculationValidator {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
-		if (isUpdate && (meterReading.getId() == null || meterReading.getId().isEmpty())) {
-			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be update without meter reading id");
-		}
+//		if (isUpdate && (meterReading.getId() == null || meterReading.getId().isEmpty())) {
+//			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be update without meter reading id");
+//		}
 
 		if (isUpdate && (meterReading.getCurrentReading() == null)) {
 			errorMap.put("INVALID METER READING CONNECTION",
