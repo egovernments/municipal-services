@@ -51,6 +51,9 @@ public class WaterConnection extends Connection {
 	@JsonProperty("uom")
 	private String uom = null;
 	
+	@JsonProperty("calculationAttribute")
+	private String calculationAttribute = null;
+	
 
 	public Double getPipeSize() {
 		return pipeSize;
@@ -83,6 +86,14 @@ public class WaterConnection extends Connection {
 	return uom;
 	}
 	
+	public void setCalculationAttribute(String calculationAttribute) {
+		this.calculationAttribute = calculationAttribute;
+	}
+	
+	public String getCalculationAttribute() {
+		return calculationAttribute;
+	}
+	
 	public WaterConnection pipeSize(Double pipeSize) {
 		this.pipeSize = pipeSize;
 		return this;
@@ -105,7 +116,12 @@ public class WaterConnection extends Connection {
 		this.connectionCategory = connectionCategory;
 		return this;
 	}
-
+	
+	public WaterConnection calculationAttribute(String calculationAttribute) {
+		this.calculationAttribute = calculationAttribute;
+		return this;
+	}
+	
 	/**
 	 * It is a master data, defined in MDMS
 	 * 
