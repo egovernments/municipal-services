@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -66,15 +67,17 @@ public class EnrichmentService {
 
 	}
 	
-	 /**
-     * Enriches the incoming createRequest
-     * @param meterConnectionRequest The create request for the meter reading
-     */
-	
-	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest){
-		
+	/**
+	 * Enriches the incoming createRequest
+	 * 
+	 * @param meterConnectionRequest
+	 *            The create request for the meter reading
+	 */
+
+	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
+		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
 		setIdgenIds(meterConnectionRequest);
-		
+
 	}
 
 }

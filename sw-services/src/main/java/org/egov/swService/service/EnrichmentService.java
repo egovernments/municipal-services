@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -83,7 +84,8 @@ public class EnrichmentService {
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isCreate) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		if (isCreate)
-			setSewarageConnectionIdgenIds(sewerageConnectionRequest);
+			sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
+		setSewarageConnectionIdgenIds(sewerageConnectionRequest);
 	}
 	
 
