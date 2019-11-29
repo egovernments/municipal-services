@@ -20,6 +20,7 @@ import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
+import org.egov.wsCalculation.model.Slab;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WaterCessUtil;
@@ -170,7 +171,6 @@ public class EstimationService {
 	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, CalculationCriteria criteria, 
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal waterCharege = BigDecimal.ZERO;
-		Double waterChargeToCompare =  (criteria.getCurrentReading() - criteria.getLastReading());
 		if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
 		ObjectMapper mapper = new ObjectMapper();
@@ -182,7 +182,8 @@ public class EstimationService {
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
 		}
-		List<Double> waterCharges = new ArrayList<>();
+		
+		Double waterCharges = 0.0;
 		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
@@ -191,23 +192,33 @@ public class EstimationService {
 					"More than one billing slab found");
 		//print billing slab id's
 		//log.info(billingSlabs.get(0).toString());
-		if (isRangeCalculation("connectionAttribute")) {
-			billingSlabs.forEach(billingSlab -> {
-				billingSlab.slabs.forEach(range -> {
-					if (waterChargeToCompare > range.from && waterChargeToCompare < range.to) {
-						waterCharges.add((waterChargeToCompare * range.charge) + range.minimumCharge);
+		
+		//WaterCharge Calculation
+		 Double totalUnite = 0.0;
+		 totalUnite = getUnite(waterConnection, criteria);
+		 if(totalUnite == 0.0)
+			 return waterCharege;
+
+		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
+			for (BillingSlab billingSlab : billingSlabs) {
+				for (Slab slab : billingSlab.slabs) {
+					if (totalUnite >= slab.from && totalUnite < slab.to) {
+						waterCharges = (totalUnite * slab.charge);
+						if (slab.minimumCharge > waterCharges) {
+							waterCharges = slab.minimumCharge;
+						}
+						break;
 					}
-				});
-			});
+				}
+			}
 		} else {
-			billingSlabs.forEach(billingSlab -> {
-				billingSlab.slabs.forEach(range -> {
-					waterCharges.add(range.charge + range.minimumCharge);
-				});
-			});
+			for (BillingSlab billingSlab : billingSlabs) {
+				waterCharges = billingSlab.slabs.get(0).charge;
+				break;
+			}
 		}
-		if (!waterCharges.isEmpty())
-			 waterCharege = BigDecimal.valueOf(waterCharges.get(0));
+		
+			 waterCharege = BigDecimal.valueOf(waterCharges);
 		return waterCharege;
 	}
 
@@ -217,8 +228,8 @@ public class EstimationService {
 		log.debug(" the slabs count : " + billingSlabs.size());
 		final String buildingType = property.getPropertyType();
 		final String connectionType = waterConnection.getConnectionType();
-		final String calculationAttribute = "Water consumption";
-		final String unitOfMeasurement = "kL";
+		final String calculationAttribute = waterConnection.getCalculationAttribute();
+		final String unitOfMeasurement = waterConnection.getUom();
 
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.BuildingType.equals(buildingType);
@@ -231,7 +242,7 @@ public class EstimationService {
 	}
 
 	private boolean isRangeCalculation(String type) {
-		if (type.equalsIgnoreCase("Flat"))
+		if (type.equalsIgnoreCase(WSCalculationConstant.flatRateCalculationAttribute))
 			return false;
 		return true;
 	}
@@ -239,5 +250,20 @@ public class EstimationService {
 	public String getAssessmentYear() {
 		return Integer.toString(YearMonth.now().getYear()) + "-"
 				+ (Integer.toString(YearMonth.now().getYear() + 1).substring(0, 2));
+	}
+	
+	private Double getUnite(WaterConnection waterConnection, CalculationCriteria criteria) {
+		Double totalUnite = 0.0;
+		if (waterConnection.getConnectionType().equals(WSCalculationConstant.meteredConnectionType)) {
+			totalUnite = (criteria.getCurrentReading() - criteria.getLastReading());
+			return totalUnite;
+		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
+				&& waterConnection.getCalculationAttribute().equalsIgnoreCase(WSCalculationConstant.noOfTapsConst)) {
+			return totalUnite = new Double(waterConnection.getNoOfTaps());
+		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
+				&& waterConnection.getCalculationAttribute().equalsIgnoreCase(WSCalculationConstant.pipeSizeConst)) {
+			return totalUnite = waterConnection.getPipeSize();
+		}
+		return 0.0;
 	}
 }

@@ -28,6 +28,7 @@
 --  noOfTaps integer,
 --  UOM character varying(32),
 --  waterSubSource character varying(64),
+--  calculationAttribute character varying(64),
 --  CONSTRAINT water_service_connection_connection_id_fkey FOREIGN KEY (connection_id) REFERENCES connection (id) 
 --  ON UPDATE CASCADE
 --  ON DELETE CASCADE

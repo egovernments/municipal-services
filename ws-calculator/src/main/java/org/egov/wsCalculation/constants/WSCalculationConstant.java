@@ -184,5 +184,15 @@ public class WSCalculationConstant {
 	public static final Long TIMEZONE_OFFSET = 19800000l;
 	
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(WS_CHARGE));
+	
+	public static final String flatRateCalculationAttribute = "Flat";
+	
+	public static final String meteredConnectionType = "Metered";
+	
+	public static final String nonMeterdConnection = "Non-metered";
+	
+public static final String noOfTapsConst = "No. of taps";
+	
+	public static final String pipeSizeConst = "Pipe Size";
 
 }
