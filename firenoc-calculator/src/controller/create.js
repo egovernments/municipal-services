@@ -3,7 +3,7 @@ import { requestInfoToResponseInfo, upadteForAuditDetails } from "../utils";
 import uuid4 from "uuid/v4";
 import envVariables from "../envVariables";
 import { validateBillingSlabReq } from "../utils/modelValidation";
-import mdmsData from "../services/mdmsService";
+import { mdmsData } from "../services/mdmsService";
 import get from "lodash/get";
 import some from "lodash/some";
 import { constants } from "../config/constants";

@@ -2,7 +2,7 @@ import { requestInfoToResponseInfo, upadteForAuditDetails } from "../utils";
 import { calculateService } from "../services/calculateService";
 import { validateCalculationReq } from "../utils/modelValidation";
 import { constants } from "../config/constants";
-import mdmsData from "../services/mdmsService";
+import { mdmsData } from "../services/mdmsService";
 import get from "lodash/get";
 import some from "lodash/some";
 

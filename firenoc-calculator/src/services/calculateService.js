@@ -4,7 +4,7 @@ import { generateDemand } from "./demandService";
 import { getFireNoc } from "./firenocService";
 import isEmpty from "lodash/isEmpty";
 import envVariables from "../envVariables";
-import mdmsData from "./mdmsService";
+import { mdmsData } from "./mdmsService";
 
 export const calculateService = async (req, pool, next) => {
   let calculalteResponse = {};

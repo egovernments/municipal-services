@@ -2,11 +2,13 @@ import { generateDemandSearchURL, generateGetBillURL } from "../utils";
 import { httpRequest } from "../utils/api";
 import get from "lodash/get";
 import envVariables from "../envVariables";
+import { mdmsFiananceYear } from "./mdmsService";
 
 export const generateDemand = async (requestInfo, tenantId, calculations) => {
   let consumercodeList = calculations.map(calculation => {
     return calculation.applicationNumber;
   });
+  let mdms = await mdmsFiananceYear(requestInfo, tenantId);
 
   let createcalculations = [];
   let updatecalculations = [];
@@ -24,15 +26,22 @@ export const generateDemand = async (requestInfo, tenantId, calculations) => {
     else createcalculations.push(calculation);
   });
   if (createcalculations.length > 0) {
-    let cr = await createDemand(requestInfo, createcalculations);
+    let cr = await createDemand(requestInfo, createcalculations, mdms);
   }
   if (updatecalculations.length > 0) {
-    let ud = await updateDemand(requestInfo, updatecalculations, demandsSearch);
+    let ud = await updateDemand(
+      requestInfo,
+      updatecalculations,
+      demandsSearch,
+      mdms
+    );
   }
   return "uri";
 };
 
-const createDemand = async (requestInfo, calculations) => {
+const createDemand = async (requestInfo, calculations, mdms) => {
+  //  let financeYear = mdms.
+  let FinancialYearsData = get(mdms, "MdmsRes.egf-master.FinancialYear");
   let demands = [];
   calculations.map(calculation => {
     let tenantId = calculation.tenantId;
@@ -47,8 +56,8 @@ const createDemand = async (requestInfo, calculations) => {
       consumerType: "FIRENOC",
       payer,
       businessService: envVariables.BUSINESSSERVICE,
-      taxPeriodFrom: 1554076799000,
-      taxPeriodTo: 1585679399000,
+      taxPeriodFrom: FYData.startingDate,
+      taxPeriodTo: FYData.endingDate,
       demandDetails: []
     };
     calculation.taxHeadEstimates.map(taxHeadEstimate => {
@@ -74,7 +83,9 @@ const createDemand = async (requestInfo, calculations) => {
   });
 };
 
-const updateDemand = async (requestInfo, calculations, demandsSearch) => {
+const updateDemand = async (requestInfo, calculations, demandsSearch, mdms) => {
+  let FinancialYearsData = get(mdms, "MdmsRes.egf-master.FinancialYear");
+
   let demandMap = {};
   demandsSearch.Demands.map(demand => {
     if (get(demand, "payer") && !demand.payer.uuid) demand.payer = null; // demand search is sending payer object in case of null
@@ -84,7 +95,7 @@ const updateDemand = async (requestInfo, calculations, demandsSearch) => {
   calculations.map(calculation => {
     let tenantId = calculation.tenantId;
     let consumerCode = calculation.applicationNumber;
-    let fireNOC = calculation.fireNOC;
+    let fireNoc = calculation.fireNoc;
     let demand = demandMap[consumerCode];
     let demandDetailsMap = {};
     demand.demandDetails.map(demandDetail => {

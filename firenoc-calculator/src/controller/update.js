@@ -2,7 +2,7 @@ import producer from "../kafka/producer";
 import { requestInfoToResponseInfo, upadteForAuditDetails } from "../utils";
 import envVariables from "../envVariables";
 import { validateBillingSlabReq } from "../utils/modelValidation";
-import mdmsData from "../services/mdmsService";
+import { mdmsData } from "../services/mdmsService";
 import get from "lodash/get";
 import some from "lodash/some";
 
