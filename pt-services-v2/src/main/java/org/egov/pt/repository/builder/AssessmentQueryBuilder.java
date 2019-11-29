@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.AssessmentSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+@Repository
 public class AssessmentQueryBuilder {
 	
 	@Autowired

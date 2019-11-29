@@ -1,5 +1,6 @@
 package org.egov.pt.repository;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.egov.tracer.model.ServiceCallException;
@@ -38,7 +39,7 @@ public class ServiceRequestRepository {
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		Object response = null;
 		try {
-			response = restTemplate.postForObject(uri.toString(), request, JsonNode.class);
+			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (HttpClientErrorException e) {
 			log.error("External Service threw an Exception: ", e);
 			throw new ServiceCallException(e.getResponseBodyAsString());
