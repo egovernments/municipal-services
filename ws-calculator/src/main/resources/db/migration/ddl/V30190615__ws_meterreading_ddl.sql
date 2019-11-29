@@ -9,5 +9,5 @@
 --  lastReadingDate bigint NOT NULL,
 --  currentReading int NOT NULL,
 --  currentReadingDate bigint NOT NULL,
---  CONSTRAINT meterreading UNIQUE (id)
+--  CONSTRAINT uk_meterreading UNIQUE (id)
 --);
