@@ -87,6 +87,9 @@ public class MeterReading   {
 
   @JsonProperty("currentReadingDate")
   private Long currentReadingDate = null;
+  
+  @JsonProperty("connectionNo")
+  private String connectionNo = null;
 
   public MeterReading id(String id) {
     this.id = id;
@@ -111,7 +114,27 @@ public class MeterReading   {
     this.billingPeriod = billingPeriod;
     return this;
   }
+  
+  public MeterReading connectionNo(String connectionNo) {
+	    this.connectionNo = connectionNo;
+	    return this;
+	  }
 
+  /**
+   * Formatted billingPeriod
+   * @return billingPeriod
+  **/
+  @ApiModelProperty(required = true, readOnly = true, value = "Formatted billingPeriod")
+  @NotNull
+
+  public String getConnectionNo() {
+    return connectionNo;
+  }
+
+  public void setConnectionNo(String connectionNo) {
+    this.connectionNo = connectionNo;
+  }
+  
   /**
    * Formatted billingPeriod
    * @return billingPeriod
@@ -139,7 +162,7 @@ public class MeterReading   {
   @ApiModelProperty(required = true, readOnly = true, value = "")
   @NotNull
 
-@Size(min=1,max=64)   public MeterStatusEnum getMeterStatus() {
+  public MeterStatusEnum getMeterStatus() {
     return meterStatus;
   }
 

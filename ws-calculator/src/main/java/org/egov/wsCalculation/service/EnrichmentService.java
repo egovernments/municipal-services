@@ -76,7 +76,7 @@ public class EnrichmentService {
 
 	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
 		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
-		setIdgenIds(meterConnectionRequest);
+		//setIdgenIds(meterConnectionRequest);
 
 	}
 
