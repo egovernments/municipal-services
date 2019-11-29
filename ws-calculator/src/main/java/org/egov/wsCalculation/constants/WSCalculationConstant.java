@@ -40,9 +40,6 @@ public class WSCalculationConstant {
 
 	public static final String MDMS_ENDDATE = "endingDate";
 	
-	 public static final String MDMS_ROUNDOFF_TAXHEAD= "WS_ROUNDOFF";
-
-	 
 	 public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
 	 
 	 
@@ -103,7 +100,6 @@ public class WSCalculationConstant {
 	public static final List<String> PROPERTY_BASED_EXEMPTION_MASTERS = Collections.unmodifiableList(Arrays.asList(
 			USAGE_MAJOR_MASTER, USAGE_MINOR_MASTER, USAGE_SUB_MINOR_MASTER, USAGE_DETAIL_MASTER, OWNER_TYPE_MASTER));
 
-	public static final String WS_ROUNDOFF = "WS_ROUNDOFF";
 
 	/*
 	 * exceptions
@@ -184,5 +180,15 @@ public class WSCalculationConstant {
 	public static final Long TIMEZONE_OFFSET = 19800000l;
 	
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(WS_CHARGE));
+	
+	public static final String flatRateCalculationAttribute = "Flat";
+	
+	public static final String meteredConnectionType = "Metered";
+	
+	public static final String nonMeterdConnection = "Non-metered";
+	
+public static final String noOfTapsConst = "No. of taps";
+	
+	public static final String pipeSizeConst = "Pipe Size";
 
 }

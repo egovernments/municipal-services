@@ -93,7 +93,7 @@ public class WSCalculationConfiguration {
 	@Value("${egov.demand.minimum.payable.amount}")
 	 private BigDecimal minimumPayableAmount;
 	  
-	 //water&Sewarge Registry
+	 //water Registry
 	 @Value("${egov.ws.host}")
 	 private String waterConnectionHost;
 

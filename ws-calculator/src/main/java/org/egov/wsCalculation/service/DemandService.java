@@ -290,7 +290,7 @@ public class DemandService {
 		 * Sum all taxHeads except RoundOff as new roundOff will be calculated
 		 */
 		for (DemandDetail demandDetail : demandDetails) {
-			if (!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD))
+			if (!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_Round_Off))
 				totalTax = totalTax.add(demandDetail.getTaxAmount());
 			else
 				prevRoundOffDemandDetail = demandDetail;
@@ -332,7 +332,7 @@ public class DemandService {
 
 		if (roundOff.compareTo(BigDecimal.ZERO) != 0) {
 			DemandDetail roundOffDemandDetail = DemandDetail.builder().taxAmount(roundOff)
-					.taxHeadMasterCode(WSCalculationConstant.MDMS_ROUNDOFF_TAXHEAD).tenantId(tenantId)
+					.taxHeadMasterCode(WSCalculationConstant.WS_Round_Off).tenantId(tenantId)
 					.collectionAmount(BigDecimal.ZERO).build();
 
 			demandDetails.add(roundOffDemandDetail);

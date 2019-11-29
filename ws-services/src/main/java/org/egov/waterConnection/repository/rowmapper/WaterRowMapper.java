@@ -40,6 +40,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			waterConnection.setNoOfTaps(rs.getInt("noOfTaps"));
 			waterConnection.setUom(rs.getString("uom"));
 			waterConnection.setWaterSubSource(rs.getString("waterSubSource"));
+			waterConnection.setCalculationAttribute(rs.getString("calculationAttribute"));
 			//get property id and get property object 
 			property.setId(rs.getString("property_id"));
 			waterConnection.setProperty(property);

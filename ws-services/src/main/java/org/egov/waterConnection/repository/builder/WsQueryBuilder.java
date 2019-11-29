@@ -25,7 +25,7 @@ public class WsQueryBuilder {
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
-			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.connection_id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
+			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
