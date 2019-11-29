@@ -50,13 +50,13 @@ serviceMaps:
 
           - jsonPath: $.BPA.documents.*.documentuid
 
-          - jsonPath: $.BPA.documents.*.auditDetails.createdBy
+          - jsonPath: $.BPA.auditDetails.createdBy
 
-          - jsonPath: $.BPA.documents.*..auditDetails.lastModifiedBy
+          - jsonPath: $.BPA.auditDetails.lastModifiedBy
 
-          - jsonPath: $.BPA.documents.*.auditDetails.createdTime
+          - jsonPath: $.BPA.auditDetails.createdTime
 
-          - jsonPath: $.BPA.documents.*.auditDetails.lastModifiedTime
+          - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
 
        - query: INSERT INTO eg_bpa_address( id, tenantid, doorno, plotno, district, region, state, country, pincode, additiondetails, buildingname, locality, landmark, city, buildingplanid, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -100,12 +100,16 @@ serviceMaps:
 
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
-       - query: INSERT INTO eg_bpa_owner( id, name, mobilenumber, gender, fatherorhusbandname, correspondenceaddress, institutionid, isprimaryowner, ownertype, ownershippercentage, relationship, buildingplanid, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_bpa_owner( id, name, uuid, tenantid, mobilenumber, gender, fatherorhusbandname, correspondenceaddress, institutionid, isprimaryowner, ownertype, ownershippercentage, relationship, buildingplanid, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: BPA.owners.*
          jsonMaps:
           - jsonPath: $.BPA.owners.*.id
 
           - jsonPath: $.BPA.owners.*.name
+
+          - jsonPath: $.BPA.owners.*.uuid
+
+          - jsonPath: $.BPA.owners.*.tenantId
 
           - jsonPath: $.BPA.owners.*.mobileNumber
 
@@ -185,6 +189,21 @@ serviceMaps:
 
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
   
+
+
+       - query: INSERT INTO eg_bpa_auditdetails( createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?);
+         basePath: BPA.auditDetails
+         jsonMaps:
+
+          - jsonPath: $.BPA.auditDetails.createdBy
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.auditDetails.createdTime
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedTime
+  
+
 
 
 

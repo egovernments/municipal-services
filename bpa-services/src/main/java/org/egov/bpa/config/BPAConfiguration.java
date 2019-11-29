@@ -59,11 +59,11 @@ public class BPAConfiguration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
-    @Value("${egov.idgen.tl.applicationNum.name}")
-    private String applicationNumberIdgenName;
+    @Value("${egov.idgen.bpa.applicationNum.name}")
+    private String applicationNoIdgenName;
 
-    @Value("${egov.idgen.tl.applicationNum.format}")
-    private String applicationNumberIdgenFormat;
+    @Value("${egov.idgen.bpa.applicationNum.format}")
+    private String applicationNoIdgenFormat;
 
     @Value("${egov.idgen.tl.licensenumber.name}")
     private String licenseNumberIdgenName;

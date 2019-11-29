@@ -1,7 +1,10 @@
 package org.egov.bpa.web.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -12,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,7 +30,7 @@ public class User {
 
 	 @JsonProperty("id")
      private Long id;
-
+	 
      @Size(max=64)
      @JsonProperty("uuid")
      private String uuid;
@@ -118,9 +122,9 @@ public class User {
      @JsonProperty("accountLocked")
      private Boolean accountLocked;
 
-    /* @JsonProperty("roles")
+     @JsonProperty("roles")
      @Valid
-     private List<Role> roles;*/
+     private List<Role> roles;
 
      @Size(max=100)
      @JsonProperty("fatherOrHusbandName")
@@ -158,13 +162,13 @@ public class User {
      private String tenantId;
 
 
-/*     public User addRolesItem(Role rolesItem) {
+     public User addRolesItem(Role rolesItem) {
              if (this.roles == null) {
                      this.roles = new ArrayList<>();
              }
              this.roles.add(rolesItem);
              return this;
-     }*/
+     }
 
      @Override
      public boolean equals(Object o) {

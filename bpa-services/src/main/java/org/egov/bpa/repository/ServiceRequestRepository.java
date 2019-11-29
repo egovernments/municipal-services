@@ -28,7 +28,7 @@ public class ServiceRequestRepository {
 
 
 	public Object fetchResult(StringBuilder uri, Object request) {
-		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+//		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		Object response = null;
 		log.info("URI: "+uri.toString());
 		try {
