@@ -193,16 +193,16 @@ public class EstimationService {
 		// log.info(billingSlabs.get(0).toString());
 
 		// WaterCharge Calculation
-		Double totalUnite = 0.0;
-		totalUnite = getUnite(waterConnection, criteria);
-		if (totalUnite == 0.0)
+		Double calculation = 0.0;
+		calculation = getCalculation(waterConnection, criteria);
+		if (calculation == 0.0)
 			return waterCharge;
 
 		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
 			for (BillingSlab billingSlab : billingSlabs) {
 				for (Slab slab : billingSlab.slabs) {
-					if (totalUnite >= slab.from && totalUnite < slab.to) {
-						waterCharge = BigDecimal.valueOf((totalUnite * slab.charge));
+					if (calculation >= slab.from && calculation < slab.to) {
+						waterCharge = BigDecimal.valueOf((calculation * slab.charge));
 						if (slab.minimumCharge > waterCharge.doubleValue()) {
 							waterCharge = BigDecimal.valueOf(slab.minimumCharge);
 						}
@@ -254,7 +254,7 @@ public class EstimationService {
 				+ (Integer.toString(YearMonth.now().getYear() + 1).substring(0, 2));
 	}
 	
-	private Double getUnite(WaterConnection waterConnection, CalculationCriteria criteria) {
+	private Double getCalculation(WaterConnection waterConnection, CalculationCriteria criteria) {
 		Double totalUnite = 0.0;
 		if (waterConnection.getConnectionType().equals(WSCalculationConstant.meteredConnectionType)) {
 			totalUnite = (criteria.getCurrentReading() - criteria.getLastReading());
