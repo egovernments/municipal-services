@@ -1,7 +1,5 @@
 package org.egov.swService.config;
 
-import org.egov.waterConnection.config.WSConfiguration;
-import org.egov.waterConnection.config.WSConfiguration.WSConfigurationBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

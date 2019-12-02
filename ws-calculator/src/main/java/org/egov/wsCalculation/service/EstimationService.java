@@ -170,7 +170,7 @@ public class EstimationService {
 
 	public BigDecimal getWaterEstimationCharge(WaterConnection waterConnection, CalculationCriteria criteria, 
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
-		BigDecimal waterCharege = BigDecimal.ZERO;
+		BigDecimal waterCharge = BigDecimal.ZERO;
 		if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
 		ObjectMapper mapper = new ObjectMapper();
@@ -183,7 +183,6 @@ public class EstimationService {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
 		}
 		
-		Double waterCharges = 0.0;
 		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
@@ -197,15 +196,15 @@ public class EstimationService {
 		 Double totalUnite = 0.0;
 		 totalUnite = getUnite(waterConnection, criteria);
 		 if(totalUnite == 0.0)
-			 return waterCharege;
+			 return waterCharge;
 
 		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
 			for (BillingSlab billingSlab : billingSlabs) {
 				for (Slab slab : billingSlab.slabs) {
 					if (totalUnite >= slab.from && totalUnite < slab.to) {
-						waterCharges = (totalUnite * slab.charge);
-						if (slab.minimumCharge > waterCharges) {
-							waterCharges = slab.minimumCharge;
+						waterCharge = BigDecimal.valueOf((totalUnite * slab.charge));
+						if (slab.minimumCharge > waterCharge.doubleValue()) {
+							waterCharge = BigDecimal.valueOf(slab.minimumCharge);
 						}
 						break;
 					}
@@ -213,13 +212,11 @@ public class EstimationService {
 			}
 		} else {
 			for (BillingSlab billingSlab : billingSlabs) {
-				waterCharges = billingSlab.slabs.get(0).charge;
+				waterCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
 				break;
 			}
 		}
-		
-			 waterCharege = BigDecimal.valueOf(waterCharges);
-		return waterCharege;
+		return waterCharge;
 	}
 
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs, RequestInfo requestInfo) {

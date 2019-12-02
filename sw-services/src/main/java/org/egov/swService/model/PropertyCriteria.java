@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.egov.waterConnection.model.Connection.StatusEnum;
+import org.egov.swService.model.Connection.StatusEnum;
 import org.springframework.util.CollectionUtils;
 
 @Data

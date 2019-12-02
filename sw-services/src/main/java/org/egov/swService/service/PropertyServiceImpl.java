@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.waterConnection.model.Address;
-import org.egov.waterConnection.model.Property;
-import org.egov.waterConnection.model.PropertyCriteria;
-import org.egov.waterConnection.model.PropertyRequest;
+import org.egov.swService.model.Address;
+import org.egov.swService.model.Property;
+import org.egov.swService.model.PropertyCriteria;
+import org.egov.swService.model.PropertyRequest;
 import org.springframework.stereotype.Component;
 
 @Component

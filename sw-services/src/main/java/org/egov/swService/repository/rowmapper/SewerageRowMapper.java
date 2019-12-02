@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.swService.model.Property;
-import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
 import org.egov.swService.model.Connection.StatusEnum;
+import org.egov.swService.model.Property;
+import org.egov.swService.model.SewerageConnection;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
