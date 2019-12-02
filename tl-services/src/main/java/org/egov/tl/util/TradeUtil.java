@@ -2,6 +2,7 @@ package org.egov.tl.util;
 
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -304,7 +305,7 @@ public class TradeUtil {
         Map<String, Boolean> idToIsStateUpdatableMap = new HashMap<>();
         searchresult.forEach(result -> {
             String nameofBusinessService = result.getBusinessService();
-            if (nameofBusinessService.equals(businessService_BPA) && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED))) {
+            if (StringUtils.equals(nameofBusinessService,businessService_BPA) && (result.getStatus().equalsIgnoreCase(STATUS_INITIATED))) {
                 idToIsStateUpdatableMap.put(result.getId(), true);
             } else
                 idToIsStateUpdatableMap.put(result.getId(), workflowService.isStateUpdatable(result.getStatus(), businessService));
