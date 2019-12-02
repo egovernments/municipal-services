@@ -84,18 +84,21 @@ public class EstimationService {
 		SewerageConnection sewerageConnection = null;
 		String assessmentYear = getAssessmentYear();
 		String tenantId = requestInfo.getUserInfo().getTenantId();
-		if(criteria.getSewerageConnection() == null && !criteria.getConnectionNo().isEmpty()) {
-			sewerageConnection = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), tenantId);
+		if (criteria.getSewerageConnection() == null && !criteria.getConnectionNo().isEmpty()) {
+			sewerageConnection = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(),
+					tenantId);
 			criteria.setSewerageConnection(sewerageConnection);
 		}
-		if(criteria.getSewerageConnection() == null) {
-			throw new CustomException("Sewerage Connection not found for given criteria ", "Sewerage Connection are not present for "+ criteria.getConnectionNo()+" connection no");
+		if (criteria.getSewerageConnection() == null) {
+			throw new CustomException("Sewerage Connection not found for given criteria ",
+					"Sewerage Connection are not present for " + criteria.getConnectionNo() + " connection no");
 		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setSewerageConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 				timeBasedExemptionMasterMap);
-		BigDecimal sewarageCharge = getSeweEstimationCharge(sewerageConnection, criteria, billingSlabMaster, requestInfo);
+		BigDecimal sewarageCharge = getSewerageEstimationCharge(sewerageConnection, criteria, billingSlabMaster,
+				requestInfo);
 		taxAmt = sewarageCharge;
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
 				criteria.getSewerageConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
@@ -112,7 +115,7 @@ public class EstimationService {
 	 * present in the Sewerage Details
 	 */
 
-	public BigDecimal getSeweEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria, 
+	public BigDecimal getSewerageEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria, 
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
 		if (billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER) == null)
