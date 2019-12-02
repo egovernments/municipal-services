@@ -8,7 +8,6 @@ import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.DemandRequest;
 import org.egov.swCalculation.model.DemandResponse;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
