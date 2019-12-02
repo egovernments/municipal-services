@@ -57,7 +57,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Demand   {
+public class Demand {
 
 	@JsonProperty("id")
 	private String id;
@@ -91,6 +91,9 @@ public class Demand   {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+
+	@JsonProperty("billExpiryTime")
+	private Long billExpiryTime;
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
@@ -135,7 +138,6 @@ public class Demand   {
 
 	@JsonProperty("status")
 	private StatusEnum status;
-
 
 	public Demand addDemandDetailsItem(DemandDetail demandDetailsItem) {
 		this.demandDetails.add(demandDetailsItem);

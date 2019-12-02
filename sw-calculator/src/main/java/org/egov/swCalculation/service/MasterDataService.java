@@ -127,8 +127,8 @@ public class MasterDataService {
 				Map<String, Object> financialYearProperties = jsonOutput.get(0);
 				financialYearMap.put(assessmentYear, financialYearProperties);
 			} catch (IndexOutOfBoundsException e) {
-				throw new CustomException(SWCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND,
-						SWCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
+				throw new CustomException(SWCalculationConstant.EG_SW_FINANCIAL_MASTER_NOT_FOUND,
+						SWCalculationConstant.EG_SW_FINANCIAL_MASTER_NOT_FOUND_MSG + assessmentYear);
 			}
 		}
 		return financialYearMap;

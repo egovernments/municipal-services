@@ -28,7 +28,7 @@ public class SWCalculationUtil {
 				.append(configurations.getTaxPeriodSearchEndpoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_WS);
+				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 	}
 	
 	/**
@@ -44,7 +44,7 @@ public class SWCalculationUtil {
 				.append(configurations.getTaxheadsSearchEndpoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_WS);
+				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 	}
 	
 	/**
@@ -82,7 +82,7 @@ public class SWCalculationUtil {
 					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(SWCalculationConstant.SEPARATER)
 					.append(SWCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
-					.append(getBillCriteria.getConnectionId() + SWCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
+					.append(getBillCriteria.getConnectionId() + SWCalculationConstant.SW_CONSUMER_CODE_SEPARATOR
 							+ getBillCriteria.getConnectionNumber());
 
 		else

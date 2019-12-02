@@ -48,7 +48,7 @@ public class CalculatorUtils {
 		String assessmentYearStr = StringUtils.join(assesmentYears, ",");
 		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.FINANCIAL_YEAR_MASTER)
 				.filter("[?(@." + SWCalculationConstant.FINANCIAL_YEAR_RANGE_FEILD_NAME + " IN [" + assessmentYearStr
-						+ "]" + " && @.module== '" + SWCalculationConstant.SERVICE_FIELD_VALUE_WS + "')]")
+						+ "]" + " && @.module== '" + SWCalculationConstant.SERVICE_FIELD_VALUE_SW + "')]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.FINANCIAL_MODULE)
 				.masterDetails(Arrays.asList(mstrDetail)).build();
