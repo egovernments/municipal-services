@@ -27,12 +27,7 @@ public class SWConfiguration {
 	@Value("${egov.waterservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
-	 //IDGEN
-    @Value("${egov.idgen.wcid.name}")
-    private String waterConnectionIdGenName;
 
-    @Value("${egov.idgen.wcid.format}")
-    private String waterConnectionIdGenFormat;
     
     @Value("${egov.idgen.scid.name}")
     private String sewerageIdGenName;
