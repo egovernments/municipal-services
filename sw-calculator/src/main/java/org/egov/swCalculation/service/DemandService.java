@@ -92,7 +92,7 @@ public class DemandService {
 	public List<Demand> generateDemands(CalculationReq request) {
 		List<Demand> createdDemand = new ArrayList<>();
 		Map<String, Object> masterMap = mstrDataService.getMasterMap(request);
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
+		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationSewerageMap(request);
 		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
 		createdDemand = generateDemand(request.getRequestInfo(), calculationList, masterMap);
 		return createdDemand;
@@ -378,7 +378,7 @@ public class DemandService {
 	 */
 	public List<Demand> updateDemands(CalculationReq request) {
 		List<Demand> demands = new LinkedList<>();
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
+		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationSewerageMap(request);
 		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
 		demands = updateDemandForCalculation(request.getRequestInfo(), calculationList);
 		return demands;

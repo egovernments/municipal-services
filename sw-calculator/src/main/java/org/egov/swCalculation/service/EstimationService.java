@@ -50,7 +50,7 @@ public class EstimationService {
  * @param Calculation request parameter
  * @return Map of Billing Slab and Calculation
  */
-	public Map<String, Calculation> getEstimationWaterMap(CalculationReq request) {
+	public Map<String, Calculation> getEstimationSewerageMap(CalculationReq request) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
 		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();

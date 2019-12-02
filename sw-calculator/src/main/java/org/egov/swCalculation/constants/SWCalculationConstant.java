@@ -28,14 +28,14 @@ public class SWCalculationConstant {
 	
 	public static final String SERVICE_FIELD_FOR_SEARCH_URL = "service=";
 	
-	public static final String SERVICE_FIELD_VALUE_WS = "SW";
+	public static final String SERVICE_FIELD_VALUE_SW = "SW";
 	
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
 	
 	
-	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND = "EG_WS_FINANCIAL_MASTER_NOT_FOUND";
+	public static final String EG_SW_FINANCIAL_MASTER_NOT_FOUND = "EG_SW_FINANCIAL_MASTER_NOT_FOUND";
 	
-	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
+	public static final String EG_SW_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
 	
 	public static final String FINANCIAL_YEAR_MASTER = "FinancialYear";
 	
@@ -64,7 +64,7 @@ public class SWCalculationConstant {
 	
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
 	
-	public static final String WS_CONSUMER_CODE_SEPARATOR = ":";
+	public static final String SW_CONSUMER_CODE_SEPARATOR = ":";
 	
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
