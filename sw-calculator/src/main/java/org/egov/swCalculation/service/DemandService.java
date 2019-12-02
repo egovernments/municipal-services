@@ -122,9 +122,6 @@ public class DemandService {
 			String tenantId = calculations.get(0).getTenantId();
 			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 					.collect(Collectors.toSet());
-			// Set<String> applicationNumbers =
-			// calculations.stream().map(calculation ->
-			// calculation.getTradeLicense().getApplicationNumber()).collect(Collectors.toSet());
 			List<Demand> demands = searchDemand(tenantId, consumerCodes, requestInfo);
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
@@ -175,8 +172,8 @@ public class DemandService {
 			// calculation.getTenantId());
 
 			if (connection == null)
-				throw new CustomException("INVALID APPLICATIONNUMBER",
-						"Demand cannot be generated for applicationNumber "
+				throw new CustomException("INVALID CONNECTIONNUMBER",
+						"Demand cannot be generated for connectionNumber "
 								+ calculation.getSewerageConnection().getConnectionNo()
 								+ " Sewerage Connection with this number does not exist ");
 
@@ -204,8 +201,8 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getSwMinAmountPayable()).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("sewerageConnection").businessService(configs.getBusinessService())
-					.status(StatusEnum.valueOf("ACTIVE")).build());
+					.taxPeriodTo(toDate).consumerType("sewerageConnection")
+					.businessService(configs.getBusinessService()).status(StatusEnum.valueOf("ACTIVE")).build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
 	}
