@@ -23,11 +23,77 @@ import javax.validation.constraints.*;
 public class SewerageConnection extends Connection {
 	@JsonProperty("connectionExecutionDate")
 	private BigDecimal connectionExecutionDate = null;
-
+	
+	@JsonProperty("noOfWaterClosets")
+	private Integer noOfWaterClosets;
+	
+	@JsonProperty("noOfToilets")
+	private Integer noOfToilets;
+	
+	@JsonProperty("uom")
+	private String uom = null;
+	
+	@JsonProperty("calculationAttribute")
+	private String calculationAttribute = null;
+	
+	
+	public void setNoOfToilets(Integer noOfToilets) {
+		this.noOfToilets = noOfToilets;
+	}
+	
+	public Integer getNoOfToilets() {
+	return noOfToilets;
+	}
+	
+	public void setNoOfWaterClosets(Integer noOfWaterClosets) {
+		this.noOfWaterClosets = noOfWaterClosets;
+	}
+	
+	public Integer getNoOfWaterClosets() {
+	return noOfWaterClosets;
+	}
+	
+	public void setUom(String uom) {
+		this.uom = uom;
+	}
+	
+	public String getUom() {
+	return uom;
+	}
+	
+	public void setCalculationAttribute(String calculationAttribute) {
+		this.calculationAttribute = calculationAttribute;
+	}
+	
+	public String getCalculationAttribute() {
+		return calculationAttribute;
+	}
+	
+	public SewerageConnection noOfToilets(Integer noOfToilets) {
+		this.noOfToilets = noOfToilets;
+		return this;
+	}
+	
+	
+	public SewerageConnection noOfWaterClosets(Integer noOfWaterClosets) {
+		this.noOfWaterClosets = noOfWaterClosets;
+		return this;
+	}
+	
+	public SewerageConnection calculationAttribute(String calculationAttribute) {
+		this.calculationAttribute = calculationAttribute;
+		return this;
+	}
+	public SewerageConnection uOM(String uom) {
+		this.uom = uom;
+		return this;
+	}
+	
 	public SewerageConnection connectionExecutionDate(BigDecimal connectionExecutionDate) {
 		this.connectionExecutionDate = connectionExecutionDate;
 		return this;
 	}
+	
 
 	/**
 	 * Get connectionExecutionDate
