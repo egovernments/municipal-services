@@ -1,5 +1,6 @@
 package org.egov.swService.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -85,6 +86,7 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		if (isCreate) {
 			sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
+			sewerageConnectionRequest.getSewerageConnection().setConnectionExecutionDate(new BigDecimal(System.currentTimeMillis()));
 			setSewarageConnectionIdgenIds(sewerageConnectionRequest);
 		}
 	}
