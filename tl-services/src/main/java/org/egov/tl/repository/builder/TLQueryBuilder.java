@@ -86,15 +86,10 @@ public class TLQueryBuilder {
     public String getTLSearchQuery(TradeLicenseSearchCriteria criteria, List<Object> preparedStmtList) {
 
         StringBuilder builder = new StringBuilder(QUERY);
-        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
-            preparedStmtList.add(businessServiceTL);
-        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" tl.businessservice=? ");
-            preparedStmtList.add(businessServiceBPA);
-        }
+
+        addBusinessServiceClause(criteria,preparedStmtList,builder);
+
+
         if(criteria.getAccountId()!=null){
             addClauseIfRequired(preparedStmtList,builder);
             builder.append(" tl.accountid = ? ");
@@ -104,6 +99,7 @@ public class TLQueryBuilder {
             if(!CollectionUtils.isEmpty(ownerIds)) {
                 builder.append(" OR (tlowner.id IN (").append(createQuery(ownerIds)).append(")");
                 addToPreparedStatement(preparedStmtList,ownerIds);
+                addBusinessServiceClause(criteria,preparedStmtList,builder);
                 builder.append(" AND tlowner.active = ? )");
                 preparedStmtList.add(true);
             }
@@ -177,7 +173,17 @@ public class TLQueryBuilder {
     }
 
 
-
+    private void addBusinessServiceClause(TradeLicenseSearchCriteria criteria,List<Object> preparedStmtList,StringBuilder builder){
+        if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
+            preparedStmtList.add(businessServiceTL);
+        } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" tl.businessservice=? ");
+            preparedStmtList.add(businessServiceBPA);
+        }
+    }
 
     private String createQuery(List<String> ids) {
         StringBuilder builder = new StringBuilder();
