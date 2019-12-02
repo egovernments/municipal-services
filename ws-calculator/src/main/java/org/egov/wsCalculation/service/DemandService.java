@@ -161,16 +161,15 @@ public class DemandService {
 			createdDemands =  updateDemandForCalculation(requestInfo, updateCalculations);
 	return createdDemands;
 	}
-
+	
 	/**
-	 * Creates demand for the given list of calculations
 	 * 
 	 * @param requestInfo
-	 *            The RequestInfo of the calculation request
 	 * @param calculations
-	 *            List of calculation object
-	 * @return Demands that are created
+	 * @param masterMap
+	 * @return
 	 */
+	
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
 		List<Demand> demands = new LinkedList<>();

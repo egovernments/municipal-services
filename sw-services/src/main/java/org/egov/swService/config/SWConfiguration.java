@@ -19,10 +19,10 @@ import lombok.Setter;
 @Component
 public class SWConfiguration {
 	
-	@Value("${egov.waterservice.pagination.default.limit}")
+	@Value("${egov.sewerageservice.pagination.default.limit}")
 	private Integer defaultLimit;
 
-	@Value("${egov.waterservice.pagination.default.offset}")
+	@Value("${egov.sewerageservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
 

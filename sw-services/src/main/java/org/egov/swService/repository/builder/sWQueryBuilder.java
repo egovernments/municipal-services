@@ -7,52 +7,45 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SearchCriteria;
-import org.egov.swService.util.WaterServicesUtil;
+import org.egov.swService.util.SewerageServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 
 @Component
-public class WsQueryBuilder {
+public class sWQueryBuilder {
 
 	@Autowired
-	WaterServicesUtil waterServicesUtil;
+	SewerageServicesUtil sewerageServicesUtil;
 
 	@Autowired
 	SWConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
-	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
-			+ "wc.meterInstallationDate, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
-			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
-			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
+	
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
-
+	
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.connectionExecutionDate,"
 			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
 			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
 
 	/**
 	 * 
-	 * @param criteria
-	 *            The WaterCriteria
-	 * @param preparedStatement
-	 *            The Array Of Object
+	 * @param criteria on search criteria
+	 * @param preparedStatement preparedStatement
 	 * @param requestInfo
-	 *            The Request Info
-	 * @return query as a string
+	 * @return
 	 */
-	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo,
-			boolean searchForWaterConnection) {
-		StringBuilder query = new StringBuilder(getQueryForSearch(searchForWaterConnection));
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo) {
+		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		String resultantQuery = query.toString();
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
 			addClauseIfRequired(preparedStatement, query);
-			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
+			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -90,12 +83,6 @@ public class WsQueryBuilder {
 		return resultantQuery;
 	}
 
-	private String getQueryForSearch(boolean searchForWaterConnection) {
-		if (searchForWaterConnection)
-			return WATER_SEARCH_Query;
-		return SEWERAGE_SEARCH_QUERY;
-	}
-
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -121,11 +108,6 @@ public class WsQueryBuilder {
 		});
 	}
 
-	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
-		ids.forEach(id -> {
-			preparedStatement.add(id);
-		});
-	}
 
 	/**
 	 * 
@@ -153,7 +135,7 @@ public class WsQueryBuilder {
 		preparedStmtList.add(limit + offset);
 		return query;
 	}
-
+	
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		Set<String> listOfIds = new HashSet<>();
@@ -162,4 +144,5 @@ public class WsQueryBuilder {
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
+
 }

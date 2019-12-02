@@ -9,7 +9,7 @@ import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.producer.SewarageConnectionProducer;
-import org.egov.swService.repository.builder.WsQueryBuilder;
+import org.egov.swService.repository.builder.sWQueryBuilder;
 import org.egov.swService.repository.rowmapper.SewerageRowMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class SewarageDaoImpl implements SewarageDao {
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	WsQueryBuilder wsQueryBuilder;
+	sWQueryBuilder sWQueryBuilder;
 
 	
 
@@ -53,7 +53,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		
-		String query = wsQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo, false);
+		String query = sWQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
 		log.info("Sewarage Search Query: " +query);
 		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 		return sewarageConnectionList;
@@ -64,7 +64,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wsQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
+		String query = sWQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}

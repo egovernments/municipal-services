@@ -1,18 +1,13 @@
 package org.egov.swService.validator;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnectionRequest;
-import org.egov.swService.model.SearchCriteria;
-import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.util.SewerageServicesUtil;
-import org.egov.swService.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class ValidateProperty {
 
-	@Autowired
-	WaterServicesUtil waterServiceUtil;
 	
 	@Autowired
 	SewerageServicesUtil sewerageServiceUtil;

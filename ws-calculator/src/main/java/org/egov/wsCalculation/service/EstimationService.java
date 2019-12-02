@@ -146,20 +146,20 @@ public class EstimationService {
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
 				.estimateAmount(waterCess).build());
 		// get applicable rebate and penalty
-		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
-				assessmentYear, timeBasedExemeptionMasterMap);
-		if (null != rebatePenaltyMap) {
-			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_REBATE);
-			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_PENALTY);
-			BigDecimal interest = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_INTEREST);
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_REBATE)
-					.estimateAmount(rebate).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_PENALTY)
-					.estimateAmount(penalty).build());
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_INTEREST)
-					.estimateAmount(interest).build());
-			payableTax = payableTax.add(rebate).add(penalty).add(interest);
-		}
+//		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
+//				assessmentYear, timeBasedExemeptionMasterMap);
+//		if (null != rebatePenaltyMap) {
+//			BigDecimal rebate = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_REBATE);
+//			BigDecimal penalty = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_PENALTY);
+//			BigDecimal interest = rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_INTEREST);
+//			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_REBATE)
+//					.estimateAmount(rebate).build());
+//			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_PENALTY)
+//					.estimateAmount(penalty).build());
+//			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_INTEREST)
+//					.estimateAmount(interest).build());
+//			payableTax = payableTax.add(rebate).add(penalty).add(interest);
+//		}
 		return estimates;
 	}
 
@@ -172,7 +172,7 @@ public class EstimationService {
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal waterCharge = BigDecimal.ZERO;
 		if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
-			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
 		ObjectMapper mapper = new ObjectMapper();
 		List<BillingSlab> mappingBillingSlab;
 		try {

@@ -13,6 +13,7 @@ import org.egov.swService.model.PropertyCriteria;
 import org.egov.swService.model.PropertyRequest;
 import org.egov.swService.model.PropertyResponse;
 import org.egov.swService.model.RequestInfoWrapper;
+import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,5 +118,40 @@ public class SewerageServicesUtil {
 				.build();
 		return propertyReq;
 	}
+	
+	/**
+	 * 
+	 * @param sewerageConnectionSearchCriteria
+	 * @param requestInfo
+	 * @return
+	 */
+	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
+			RequestInfo requestInfo) {
+		if ((sewerageConnectionSearchCriteria.getTenantId() == null
+				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
+			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
+		}
+		HashMap<String, Object> propertyRequestObj = new HashMap<>();
+		RequestInfoWrapper requestInfoWrapper = new RequestInfoWrapper();
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (sewerageConnectionSearchCriteria.getTenantId() != null
+				&& !sewerageConnectionSearchCriteria.getTenantId().isEmpty()) {
+			propertyCriteria.setTenantId(sewerageConnectionSearchCriteria.getTenantId());
+		}
+		if (sewerageConnectionSearchCriteria.getMobileNumber() != null
+				&& !sewerageConnectionSearchCriteria.getMobileNumber().isEmpty()) {
+			propertyCriteria.setMobileNumber(sewerageConnectionSearchCriteria.getMobileNumber());
+		}
+		// if (!waterConnectionSearchCriteria.getIds().isEmpty()) {
+		// propertyCriteria.setIds(waterConnectionSearchCriteria.getIds());
+		// }
+		requestInfoWrapper.setRequestInfo(requestInfo);
+		propertyRequestObj.put("RequestInfoWrapper",
+				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), requestInfo));
+		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
+		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
+		return getPropertyDetails(result);
+	}
+
 
 }

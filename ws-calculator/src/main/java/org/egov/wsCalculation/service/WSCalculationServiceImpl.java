@@ -84,13 +84,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				: criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
-		Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
-				.get(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY);
-
-		Map<String, Object> finYearMap = financialYearMaster.get(assessmentYear);
-		Long fromDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_STARTING_DATE);
-		Long toDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
-		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
 						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory));
