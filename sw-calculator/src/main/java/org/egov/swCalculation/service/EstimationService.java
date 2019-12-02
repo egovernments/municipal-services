@@ -7,18 +7,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swCalculation.constants.SWCalculationConstant;
+import org.egov.swCalculation.model.BillingSlab;
 import org.egov.swCalculation.model.Calculation;
 import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.RequestInfoWrapper;
+import org.egov.swCalculation.model.Slab;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.util.CalculatorUtils;
 import org.egov.swService.model.SewerageConnection;
+import org.egov.swService.model.Property;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.WaterConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -112,6 +115,48 @@ public class EstimationService {
 	public BigDecimal getSeweEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria, 
 			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
+		if (billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER) == null)
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
+		ObjectMapper mapper = new ObjectMapper();
+		List<BillingSlab> mappingBillingSlab;
+		try {
+			mappingBillingSlab = mapper.readValue(
+					billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER).toJSONString(),
+					mapper.getTypeFactory().constructCollectionType(List.class, BillingSlab.class));
+		} catch (IOException e) {
+			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
+		}
+
+		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnection, mappingBillingSlab, requestInfo);
+		if (billingSlabs == null || billingSlabs.isEmpty())
+			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
+		if (billingSlabs.size() > 1)
+			throw new CustomException("More than one Billing Slab are found on criteria ",
+					"More than one billing slab found");
+
+		// Sewerage Charge Calculation
+		Double totalUnite = 0.0;
+		totalUnite = getUnite(sewerageConnection, criteria);
+		if (totalUnite == 0.0)
+			return sewerageCharge;
+		if (isRangeCalculation(sewerageConnection.getCalculationAttribute())) {
+			for (BillingSlab billingSlab : billingSlabs) {
+				for (Slab slab : billingSlab.slabs) {
+					if (totalUnite >= slab.from && totalUnite < slab.to) {
+						sewerageCharge = BigDecimal.valueOf((totalUnite * slab.charge));
+						if (slab.minimumCharge > sewerageCharge.doubleValue()) {
+							sewerageCharge = BigDecimal.valueOf(slab.minimumCharge);
+						}
+						break;
+					}
+				}
+			}
+		} else {
+			for (BillingSlab billingSlab : billingSlabs) {
+				sewerageCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
+				break;
+			}
+		}
 		return sewerageCharge;
 	}
 	
@@ -164,5 +209,54 @@ public class EstimationService {
 				payableTax = payableTax.add(rebate).add(penalty).add(interest);
 			}
 			return estimates;
+		}
+		/**
+		 * 
+		 * @param waterConnection
+		 * @param billingSlabs
+		 * @param requestInfo
+		 * @return
+		 */
+		private List<BillingSlab> getSlabsFiltered(SewerageConnection sewerageConnection, List<BillingSlab> billingSlabs, RequestInfo requestInfo) {
+			Property property = sewerageConnection.getProperty();
+			// get billing Slab
+			log.debug(" the slabs count : " + billingSlabs.size());
+			final String buildingType = property.getPropertyType();
+			final String connectionType = sewerageConnection.getConnectionType();
+			final String calculationAttribute = sewerageConnection.getCalculationAttribute();
+			final String unitOfMeasurement = sewerageConnection.getUom();
+
+			return billingSlabs.stream().filter(slab -> {
+				boolean isBuildingTypeMatching = slab.BuildingType.equals(buildingType);
+				boolean isConnectionTypeMatching = slab.ConnectionType.equals(connectionType);
+				boolean isCalculationAttributeMatching = slab.CalculationAttribute.equals(calculationAttribute);
+				boolean isUnitOfMeasurementMatcing = slab.UOM.equals(unitOfMeasurement);
+				return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
+						&& isUnitOfMeasurementMatcing;
+			}).collect(Collectors.toList());
+		}
+		
+		private Double getUnite(SewerageConnection sewerageConnection, CalculationCriteria criteria) {
+			Double totalUnite = 0.0;
+			if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.meteredConnectionType)) {
+				return totalUnite;
+			} else if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.nonMeterdConnection)
+					&& sewerageConnection.getCalculationAttribute().equalsIgnoreCase(SWCalculationConstant.noOfToilets)) {
+				return totalUnite = new Double(sewerageConnection.getNoOfToilets());
+			} else if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.nonMeterdConnection)
+					&& sewerageConnection.getCalculationAttribute().equalsIgnoreCase(SWCalculationConstant.noOfWaterClosets)) {
+				return totalUnite = new Double(sewerageConnection.getNoOfWaterClosets());
+			}
+			return totalUnite;
+		}
+		/**
+		 * 
+		 * @param type will be calculation Attribute
+		 * @return true if calculation Attribute is not Flat else false
+		 */
+		private boolean isRangeCalculation(String type) {
+			if (type.equalsIgnoreCase(SWCalculationConstant.flatRateCalculationAttribute))
+				return false;
+			return true;
 		}
 }

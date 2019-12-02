@@ -240,7 +240,12 @@ public class EstimationService {
 					&& isUnitOfMeasurementMatcing;
 		}).collect(Collectors.toList());
 	}
-
+	
+	/**
+	 * 
+	 * @param type will be calculation Attribute
+	 * @return true if calculation Attribute is not Flat else false
+	 */
 	private boolean isRangeCalculation(String type) {
 		if (type.equalsIgnoreCase(WSCalculationConstant.flatRateCalculationAttribute))
 			return false;

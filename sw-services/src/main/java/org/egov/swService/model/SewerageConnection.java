@@ -36,6 +36,9 @@ public class SewerageConnection extends Connection {
 	@JsonProperty("calculationAttribute")
 	private String calculationAttribute = null;
 	
+	@JsonProperty("connectionType")
+	private String connectionType = null;
+	
 	
 	public void setNoOfToilets(Integer noOfToilets) {
 		this.noOfToilets = noOfToilets;
@@ -59,6 +62,23 @@ public class SewerageConnection extends Connection {
 	
 	public String getUom() {
 	return uom;
+	}
+	
+	/**
+	 * It is a master data, defined in MDMS.
+	 * 
+	 * @return connectionType
+	 **/
+	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
+	@NotNull
+
+	@Size(min = 2, max = 32)
+	public String getConnectionType() {
+		return connectionType;
+	}
+
+	public void setConnectionType(String connectionType) {
+		this.connectionType = connectionType;
 	}
 	
 	public void setCalculationAttribute(String calculationAttribute) {
@@ -86,6 +106,11 @@ public class SewerageConnection extends Connection {
 	}
 	public SewerageConnection uOM(String uom) {
 		this.uom = uom;
+		return this;
+	}
+	
+	public SewerageConnection connectionType(String connectionType) {
+		this.connectionType = connectionType;
 		return this;
 	}
 	

@@ -113,6 +113,16 @@ public class SWCalculationConstant {
 	public static final Long TIMEZONE_OFFSET = 19800000l;
 	
 	public static final String SW_Round_Off = "SW_Round_Off";
+	
+	public static final String flatRateCalculationAttribute = "Flat";
+	
+	public static final String meteredConnectionType = "Metered";
+	
+	public static final String nonMeterdConnection = "Non Metered";
+	
+	public static final String noOfWaterClosets = "No. of water closets";
+	
+	public static final String noOfToilets = "No. of toilets";
 
 
 }
