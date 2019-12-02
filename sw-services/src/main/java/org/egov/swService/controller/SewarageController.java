@@ -43,8 +43,8 @@ public class SewarageController {
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<SewerageConnectionResponse> createWaterConnection(
 			@Valid @RequestBody SewerageConnectionRequest sewerageConnectionRequest) {
-		List<SewerageConnection> waterConnection = sewarageService.createSewarageConnection(sewerageConnectionRequest);
-		SewerageConnectionResponse response = SewerageConnectionResponse.builder().sewerageConnections(waterConnection)
+		List<SewerageConnection> sewerageConnection = sewarageService.createSewarageConnection(sewerageConnectionRequest);
+		SewerageConnectionResponse response = SewerageConnectionResponse.builder().sewerageConnections(sewerageConnection)
 				.responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(sewerageConnectionRequest.getRequestInfo(), true))
 				.build();
@@ -54,11 +54,11 @@ public class SewarageController {
 	@RequestMapping(value = "/_search", method = RequestMethod.POST)
 	public ResponseEntity<SewerageConnectionResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute SearchCriteria criteria) {
-		List<SewerageConnection> waterConnectionList = sewarageService.search(criteria,
+		List<SewerageConnection> sewerageConnectionList = sewarageService.search(criteria,
 				requestInfoWrapper.getRequestInfo());
 
 		SewerageConnectionResponse response = SewerageConnectionResponse.builder()
-				.sewerageConnections(waterConnectionList).responseInfo(responseInfoFactory
+				.sewerageConnections(sewerageConnectionList).responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -68,8 +68,8 @@ public class SewarageController {
 	@RequestMapping(value = "/_update", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<SewerageConnectionResponse> updateSewerageConnection(
 			@Valid @RequestBody SewerageConnectionRequest sewerageConnectionRequest) {
-		List<SewerageConnection> waterConnection = sewarageService.updateSewarageConnection(sewerageConnectionRequest);
-		SewerageConnectionResponse response = SewerageConnectionResponse.builder().sewerageConnections(waterConnection)
+		List<SewerageConnection> sewerageConnection = sewarageService.updateSewarageConnection(sewerageConnectionRequest);
+		SewerageConnectionResponse response = SewerageConnectionResponse.builder().sewerageConnections(sewerageConnection)
 				.responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(sewerageConnectionRequest.getRequestInfo(), true))
 				.build();

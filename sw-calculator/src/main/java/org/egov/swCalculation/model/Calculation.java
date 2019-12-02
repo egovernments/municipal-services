@@ -3,6 +3,7 @@ package org.egov.swCalculation.model;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.egov.swService.model.SewerageConnection;
 import org.egov.waterConnection.model.WaterConnection;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,12 +29,6 @@ public class Calculation {
 	@JsonProperty("applicationNo")
 	private String applicationNO;
 
-	@JsonProperty("fromDate")
-	private Long fromDate;
-
-	@JsonProperty("toDate")
-	private Long toDate;
-
 	@JsonProperty("tenantId")
 	private String tenantId;
 
@@ -57,8 +52,8 @@ public class Calculation {
 	@JsonProperty("billingSlabIds")
 	private List<String> billingSlabIds;
 	
-	@JsonProperty("waterConnection")
-	private WaterConnection waterConnection = null;
+	@JsonProperty("sewerageConnection")
+	private SewerageConnection sewerageConnection = null;
 	
 	@JsonProperty("connectionNo")
 	private String connectionNo;

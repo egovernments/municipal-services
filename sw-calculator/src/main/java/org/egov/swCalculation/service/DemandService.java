@@ -17,7 +17,6 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
-import org.egov.swCalculation.model.Bill;
 import org.egov.swCalculation.model.BillResponse;
 import org.egov.swCalculation.model.Calculation;
 import org.egov.swCalculation.model.CalculationReq;
@@ -33,10 +32,10 @@ import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxPeriod;
 import org.egov.swCalculation.repository.DemandRepository;
+import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.egov.swCalculation.util.SWCalculationUtil;
+import org.egov.swService.model.SewerageConnection;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -165,10 +164,10 @@ public class DemandService {
 		String assessmentYear = estimationService.getAssessmentYear();
 
 		for (Calculation calculation : calculations) {
-			WaterConnection connection = null;
+			SewerageConnection connection = null;
 
-			if (calculation.getWaterConnection() != null)
-				connection = calculation.getWaterConnection();
+			if (calculation.getSewerageConnection() != null)
+				connection = calculation.getSewerageConnection();
 
 			// else if (calculation != null)
 			// connection = utils.getConnection(requestInfo,
@@ -178,8 +177,8 @@ public class DemandService {
 			if (connection == null)
 				throw new CustomException("INVALID APPLICATIONNUMBER",
 						"Demand cannot be generated for applicationNumber "
-								+ calculation.getWaterConnection().getConnectionNo()
-								+ " Water Connection with this number does not exist ");
+								+ calculation.getSewerageConnection().getConnectionNo()
+								+ " Sewerage Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
 			String consumerCode = calculation.getConnectionNo();
@@ -205,7 +204,7 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getSwMinAmountPayable()).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
+					.taxPeriodTo(toDate).consumerType("sewerageConnection").businessService(configs.getBusinessService())
 					.status(StatusEnum.valueOf("ACTIVE")).build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
@@ -399,11 +398,11 @@ public class DemandService {
 		for (Calculation calculation : calculations) {
 
 			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
-					Collections.singleton(calculation.getWaterConnection().getConnectionNo()), requestInfo);
+					Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), requestInfo);
 
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
-						+ calculation.getWaterConnection().getConnectionNo());
+						+ calculation.getSewerageConnection().getConnectionNo());
 
 			Demand demand = searchResult.get(0);
 			List<DemandDetail> demandDetails = demand.getDemandDetails();
