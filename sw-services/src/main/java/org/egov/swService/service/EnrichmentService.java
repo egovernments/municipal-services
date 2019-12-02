@@ -83,9 +83,10 @@ public class EnrichmentService {
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isCreate) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		if (isCreate)
+		if (isCreate) {
 			sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
-		setSewarageConnectionIdgenIds(sewerageConnectionRequest);
+			setSewarageConnectionIdgenIds(sewerageConnectionRequest);
+		}
 	}
 	
 
@@ -98,7 +99,7 @@ public class EnrichmentService {
 	private void setSewarageConnectionIdgenIds(SewerageConnectionRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		SewerageConnection waterConnection = request.getSewerageConnection();
+		SewerageConnection sewerageConnection = request.getSewerageConnection();
 
 		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getSewerageIdGenName(),
 				config.getSewerageIdGenFormat(), 1);
@@ -112,7 +113,7 @@ public class EnrichmentService {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		waterConnection.setId(itr.next());
+		sewerageConnection.setConnectionNo(itr.next());
 	}
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
