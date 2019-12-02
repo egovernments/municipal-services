@@ -185,9 +185,9 @@ public class WSCalculationConstant {
 	
 	public static final String meteredConnectionType = "Metered";
 	
-	public static final String nonMeterdConnection = "Non-metered";
+	public static final String nonMeterdConnection = "Non Metered";
 	
-public static final String noOfTapsConst = "No. of taps";
+	public static final String noOfTapsConst = "No. of taps";
 	
 	public static final String pipeSizeConst = "Pipe Size";
 
