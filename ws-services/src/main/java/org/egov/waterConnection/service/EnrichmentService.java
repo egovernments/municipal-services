@@ -117,7 +117,8 @@ public class EnrichmentService {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		waterConnection.setId(itr.next());
+		waterConnection.setConnectionNo(itr.next());
+
 	}
 
 
