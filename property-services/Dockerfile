@@ -6,7 +6,7 @@ MAINTAINER Senthil<senthil.kalimuthu@tarento.com>
 # INSTRUCTIONS ON HOW TO BUILD JAR:
 # Move to the location where pom.xml is exist in project and build project using below command
 # "mvn clean package"
-COPY /target/pt-services-v2-0.0.1-SNAPSHOT.jar /opt/egov/pt-services-v2.jar
+COPY /target/property-services-0.0.1-SNAPSHOT.jar /opt/egov/property-services.jar
 
 COPY start.sh /usr/bin/start.sh
 
