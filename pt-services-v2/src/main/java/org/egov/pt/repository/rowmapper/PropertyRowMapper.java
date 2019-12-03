@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,92 +43,123 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 		while (rs.next()) {
 
-			String currentId = rs.getString("propertyid");
-			Property currentProperty = propertyMap.get(currentId);
-			String tenanId = rs.getString("tenantId");
+			String propertyUuId = rs.getString("pid");
+			Property currentProperty = propertyMap.get(propertyUuId);
+			String tenanId = rs.getString("ptenantid");
 
 			if (null == currentProperty) {
 
 				Address address = getAddress(rs, tenanId);
 
-				AuditDetails auditdetails = getAuditDetail(rs);
+				AuditDetails auditdetails = getAuditDetail(rs, "proeprty");
 
 				Long occupancyDate = rs.getLong("occupancyDate");
 				if (rs.wasNull()) {
 					occupancyDate = null;
 				}
-				
+
 				Double landArea = rs.getDouble("landArea");
-				if(rs.wasNull()){landArea = null;}
+				if (rs.wasNull()) {
+					landArea = null;
+				}
 
 				currentProperty = Property.builder()
 						.creationReason(CreationReason.fromValue(rs.getString("creationReason")))
 						.acknowldgementNumber(rs.getString("acknowldgementNumber"))
-						.status(Status.fromValue(rs.getString("status")))
+						.status(Status.fromValue(rs.getString("propertystatus")))
+						.ownershipCategory(rs.getString("ownershipcategory"))
 						.oldPropertyId(rs.getString("oldPropertyId"))
+						.propertyType(rs.getString("propertytype"))
+						.propertyId(rs.getString("propertyid"))
 						.occupancyDate(occupancyDate)
 						.auditDetails(auditdetails)
 						.landArea(landArea)
-						.propertyId(currentId)
-						.propertyId(currentId)
+						.tenantId(tenanId)
+						.id(propertyUuId)
 						.address(address)
 						.build();
-				
-				currentProperty.addInstitutionItem(getInstitution(rs));
-				
-				currentProperty.addOwnersItem(getOwner(rs));
-				
-				currentProperty.addDocumentsItem(getDocument(rs));
-				
-				try {
 
-					PGobject obj = (PGobject) rs.getObject("pt_additionalDetails");
-					if (obj != null) {
-						JsonNode propertyAdditionalDetails = mapper.readTree(obj.getValue());
-						currentProperty.setAdditionalDetails(propertyAdditionalDetails);
-					}
-
-					propertyMap.put(currentId, currentProperty);
-				} catch (IOException e) {
-					throw new CustomException("PARSING ERROR", "The propertyAdditionalDetail json cannot be parsed");
-				}
+				currentProperty.setAdditionalDetails(getadditionalDetail(rs, "padditionalDetails"));
+				
+				addChildrenToProperty(rs, currentProperty);
+				propertyMap.put(propertyUuId, currentProperty);
 			}
-		
-			// addChildrenToProperty(rs, currentProperty);
-			currentProperty.addInstitutionItem(getInstitution(rs));
-			
-			currentProperty.addOwnersItem(getOwner(rs));
-			
-			currentProperty.addDocumentsItem(getDocument(rs));
+
+			addChildrenToProperty(rs, currentProperty);
 		}
 
 		return new ArrayList<>(propertyMap.values());
-		
+
+	}
+
+	/**
+	 * Adding children elements to Property
+	 * 
+	 * @param rs
+	 * @param propertyUuId
+	 * @param currentProperty
+	 * @throws SQLException
+	 */
+	private void addChildrenToProperty(ResultSet rs, Property currentProperty)
+			throws SQLException {
+
+		addInstitutionToProperty(rs, currentProperty);
+		addOwnerToProperty(rs, currentProperty);
+		addDocToProperty(rs, currentProperty);
 	}
 
 
-	private Document getDocument(ResultSet rs) throws SQLException {
+	/**
+	 * Adds document to Property
+	 * 
+	 * @param rs
+	 * @param property
+	 * @throws SQLException
+	 */
+	private void addDocToProperty(ResultSet rs, Property property) throws SQLException {
+
+		String docId = rs.getString("pdocid");
+		String entityId = rs.getString("pdocentityid");
+		List<Document> docs = property.getDocuments();
 		
-	if(rs.getString("documentid") == null)
-		return null;
-	
-		return Document.builder().id(rs.getString("documentid"))
-			.documentType(rs.getString("documentType"))
-			.fileStore(rs.getString("fileStore"))
-			.documentUid(rs.getString("documentuid"))
+		if (!(docId != null && entityId.equals(property.getId())))
+			return;
+
+		if (!CollectionUtils.isEmpty(docs))
+			for (Document doc : docs) {
+				if (doc.getId().equals(docId))
+					return;
+			}
+
+		Document doc =  Document.builder()
+			.status(Status.fromValue(rs.getString("pdocstatus")))
+			.documentType(rs.getString("pdoctype"))
+			.fileStore(rs.getString("pdocfileStore"))
+			.documentUid(rs.getString("pdocuid"))
+			.id(docId)
 			.build();
+		
+		property.addDocumentsItem(doc);
 	}
 	
 	/**
+	 * Adds Owner Object to Property
+	 * 
 	 * @param rs
 	 * @return
 	 * @throws SQLException
 	 */
-	private OwnerInfo getOwner(ResultSet rs) throws SQLException {
+	private void addOwnerToProperty(ResultSet rs, Property property) throws SQLException {
 		
-		if(rs.getString("ownerid") == null)
-			return null;
-		
+		String uuid = rs.getString("userid");
+		List<OwnerInfo> owners = property.getOwners();
+
+		if (!CollectionUtils.isEmpty(owners))
+			for (OwnerInfo owner : owners) {
+				if (owner.getUuid().equals(uuid))
+					return;
+			}
+
 		Double ownerShipPercentage = rs.getDouble("ownerShipPercentage");
 		if(rs.wasNull()) {
 			ownerShipPercentage = null;
@@ -140,60 +172,99 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		
 		OwnerInfo owner = OwnerInfo.builder()
 				.relationship(Relationship.fromValue(rs.getString("relationship")))
-				.institutionId(rs.getString("institutionid"))
+				.status(Status.fromValue(rs.getString("ownstatus")))
+				.institutionId(rs.getString("owninstitutionid"))
 				.ownerShipPercentage(ownerShipPercentage)
+				.tenantId(rs.getString("owntenantid"))
 				.ownerType(rs.getString("ownerType"))
 				.isPrimaryOwner(isPrimaryOwner)
-				.uuid(rs.getString("userid"))
+				.uuid(uuid)
 				.build();
 		
-		return owner;
+		addDocToOwner(rs, owner);
+		
+		property.addOwnersItem(owner);
+	}
+	
+	/**
+	 * Method to add documents to Owner
+	 * 
+	 * @param rs
+	 * @param OwnerId
+	 * @param owner
+	 * @throws SQLException
+	 */
+	private void addDocToOwner(ResultSet rs, OwnerInfo owner) throws SQLException {
+		
+		String docId = rs.getString("owndocid");
+		String 	entityId = rs.getString("owndocentityId");
+		List<Document> docs = owner.getDocuments();
+
+		if (!(null != docId && entityId.equals(owner.getUuid())))
+			return;
+
+		if (!CollectionUtils.isEmpty(docs))
+			for (Document doc : docs) {
+				if (doc.getId().equals(docId))
+					return;
+			}
+	
+		Document doc = Document.builder()
+			.status(Status.fromValue(rs.getString("owndocstatus")))
+			.fileStore(rs.getString("owndocfileStore"))
+			.documentType(rs.getString("owndoctype"))
+			.tenantId(rs.getString("owndoctenantid"))
+			.documentUid(rs.getString("owndocuid"))
+			.id(docId)
+			.build();
+		
+		owner.addDocumentsItem(doc);
 	}
 	
 		
 	/**
+	 * Creates and add institution to Property 
 	 * @param rs
 	 * @throws SQLException
 	 */
-	private Institution getInstitution(ResultSet rs) throws SQLException {
+	private void addInstitutionToProperty(ResultSet rs, Property property) throws SQLException {
 
-		if (rs.getString("instiid") == null)
-			return null;
+		
+		String institutionId = rs.getString("institutionid");
+		List<Institution> institutions = property.getInstitution();
+		
+		if(institutionId == null)
+			return;
 
-			 return Institution.builder()
+		if (!CollectionUtils.isEmpty(institutions))
+			for (Institution institute : institutions) {
+
+				if (institute.getId().equals(institutionId))
+					return;
+			}
+
+			 Institution institute = Institution.builder()
+					.tenantId(rs.getString("institutiontenantid"))
 					.designation(rs.getString("designation"))
-					.tenantId(rs.getString("institenantId"))
 					.name(rs.getString("institutionName"))
 					.type(rs.getString("institutionType"))
-					.id(rs.getString("instiid"))
+					.id(rs.getString(institutionId))
 					.build();
+			 
+			property.addInstitutionItem(institute);
 	}
 
 	
 	/**
-	 * @param rs
-	 * @return
-	 * @throws SQLException
-	 */
-	private AuditDetails getAuditDetail(ResultSet rs) throws SQLException {
-		Long lastModifiedTime = rs.getLong("lastModifiedTime");
-		if (rs.wasNull()) {
-			lastModifiedTime = null;
-		}
-		
-		AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("createdBy"))
-				.createdTime(rs.getLong("createdTime")).lastModifiedBy(rs.getString("lastModifiedBy"))
-				.lastModifiedTime(lastModifiedTime).build();
-		return auditdetails;
-	}
-
-	/**
+	 * creates and adds the address object to property 
+	 * 
 	 * @param rs
 	 * @param tenanId
 	 * @return
 	 * @throws SQLException
 	 */
 	private Address getAddress(ResultSet rs, String tenanId) throws SQLException {
+		
 		Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
 		/*
@@ -211,18 +282,17 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		}
 
 		Address address = Address.builder()
+				.type(Type.fromValue(rs.getString("addresstype")))
 				.addressNumber(rs.getString("addressNumber"))
 				.addressLine1(rs.getString("addressLine1"))
 				.addressLine2(rs.getString("addressLine2"))
 				.buildingName(rs.getString("buildingName"))
-				.type(Type.fromValue(rs.getString("type")))
-				.addressId(rs.getString("addresskeyid"))
-				.addressId(rs.getString("addressId"))
+				.detail(rs.getString("addressdetail"))
 				.landmark(rs.getString("landmark"))
 				.pincode(rs.getString("pincode"))
 				.doorNo(rs.getString("doorno"))
 				.street(rs.getString("street"))
-				.detail(rs.getString("detail"))
+				.id(rs.getString("addressId"))
 				.city(rs.getString("city"))
 				.latitude(latitude)
 				.locality(locality)
@@ -230,5 +300,63 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				.tenantId(tenanId)
 				.build();
 		return address;
+	}
+	
+	/**
+	 * prepares and returns an audit detail object
+	 * 
+	 * depending on the source the column names of result set will vary
+	 * 
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private AuditDetails getAuditDetail(ResultSet rs, String source) throws SQLException {
+		
+		switch (source) {
+		
+		case "property":
+			
+			Long lastModifiedTime = rs.getLong("plastModifiedTime");
+			if (rs.wasNull()) {
+				lastModifiedTime = null;
+			}
+			
+			return AuditDetails.builder().createdBy(rs.getString("pcreatedBy"))
+					.createdTime(rs.getLong("pcreatedTime")).lastModifiedBy(rs.getString("plastModifiedBy"))
+					.lastModifiedTime(lastModifiedTime).build();
+			
+		default: 
+			return null;
+			
+		}
+
+	}
+	
+	/**
+	 * method parses the PGobject and returns the JSON node
+	 * 
+	 * @param rs
+	 * @param key
+	 * @return
+	 * @throws SQLException
+	 */
+	private Object getadditionalDetail(ResultSet rs, String key) throws SQLException {
+
+		JsonNode propertyAdditionalDetails = null;
+
+		try {
+
+			PGobject obj = (PGobject) rs.getObject(key);
+			if (obj != null) {
+				propertyAdditionalDetails = mapper.readTree(obj.getValue());
+			}
+
+		} catch (IOException e) {
+			throw new CustomException("PARSING ERROR", "The propertyAdditionalDetail json cannot be parsed");
+		}
+
+		return propertyAdditionalDetails;
+
 	}
 }

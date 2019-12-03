@@ -11,60 +11,58 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Address   {
-	
-        @JsonProperty("tenantId")
-        private String tenantId ;
+public class Address {
 
-        @JsonProperty("doorNo")
-        private String doorNo ;
+	@JsonProperty("id")
+	private String id;
 
-        @JsonProperty("latitude")
-        private Double latitude ;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-        @JsonProperty("longitude")
-        private Double longitude ;
+	@JsonProperty("doorNo")
+	private String doorNo;
 
-        @JsonProperty("addressId")
-        private String addressId ;
+	@JsonProperty("latitude")
+	private Double latitude;
 
-        @JsonProperty("addressNumber")
-        private String addressNumber ;
+	@JsonProperty("longitude")
+	private Double longitude;
 
-        @JsonProperty("type")
-        @Valid
-        private Type type ;
+	@JsonProperty("addressNumber")
+	private String addressNumber;
 
-        @JsonProperty("addressLine1")
-        private String addressLine1 ;
+	@JsonProperty("type")
+	@Valid
+	private Type type;
 
-        @JsonProperty("addressLine2")
-        private String addressLine2 ;
+	@JsonProperty("addressLine1")
+	private String addressLine1;
 
-        @JsonProperty("landmark")
-        private String landmark ;
+	@JsonProperty("addressLine2")
+	private String addressLine2;
 
-        @JsonProperty("city")
-        private String city ;
+	@JsonProperty("landmark")
+	private String landmark;
 
-        @JsonProperty("pincode")
-        private String pincode ;
+	@JsonProperty("city")
+	private String city;
 
-        @JsonProperty("detail")
-        private String detail ;
+	@JsonProperty("pincode")
+	private String pincode;
 
-        @JsonProperty("buildingName")
-        private String buildingName ;
+	@JsonProperty("detail")
+	private String detail;
 
-        @JsonProperty("street")
-        private String street ;
+	@JsonProperty("buildingName")
+	private String buildingName;
 
-        @JsonProperty("locality")
-        private Boundary locality ;
+	@JsonProperty("street")
+	private String street;
+
+	@JsonProperty("locality")
+	private Boundary locality;
 }
-

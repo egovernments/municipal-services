@@ -28,10 +28,6 @@ import lombok.ToString;
 public class OwnerInfo extends User {
 
 	@NotNull
-	@JsonProperty("name")
-	private String name;
-
-	@NotNull
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
 
@@ -123,16 +119,14 @@ public class OwnerInfo extends User {
 			Long dob, Long pwdExpiryDate, String locale, String type, String signature, Boolean accountLocked,
 			List<Role> roles, String fatherOrHusbandName, String bloodGroup, String identificationMark, String photo,
 			String createdBy, Long createdDate, String lastModifiedBy, Long lastModifiedDate, String otpReference,
-			String tenantId, String name2, String mobileNumber2, String gender2, String fatherOrHusbandName2,
+			String tenantId, String mobileNumber2, String gender2, String fatherOrHusbandName2,
 			String correspondenceAddress2, Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType,
-			String institutionId, List<Document> documents, Relationship relationship) {
-
+			String institutionId, Status status, List<Document> documents, Relationship relationship) {
 		super(id, uuid, userName, password, salutation, name, gender, mobileNumber, emailId, altContactNumber, pan,
 				aadhaarNumber, permanentAddress, permanentCity, permanentPincode, correspondenceCity,
 				correspondencePincode, correspondenceAddress, active, dob, pwdExpiryDate, locale, type, signature,
 				accountLocked, roles, fatherOrHusbandName, bloodGroup, identificationMark, photo, createdBy,
 				createdDate, lastModifiedBy, lastModifiedDate, otpReference, tenantId);
-		name = name2;
 		mobileNumber = mobileNumber2;
 		gender = gender2;
 		fatherOrHusbandName = fatherOrHusbandName2;
@@ -141,9 +135,9 @@ public class OwnerInfo extends User {
 		this.ownerShipPercentage = ownerShipPercentage;
 		this.ownerType = ownerType;
 		this.institutionId = institutionId;
+		this.status = status;
 		this.documents = documents;
 		this.relationship = relationship;
 	}
 	
-
 }

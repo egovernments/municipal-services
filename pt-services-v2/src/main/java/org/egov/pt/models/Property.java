@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
@@ -35,6 +37,7 @@ public class Property extends PropertyInfo {
 
 	@JsonProperty("owners")
 	@Valid
+	@NotNull
 	private List<OwnerInfo> owners;
 
 	@JsonProperty("institution")
@@ -54,6 +57,7 @@ public class Property extends PropertyInfo {
 	private Long noOfFloors;
 
 	@JsonProperty("landArea")
+	@Min(1)
 	private Double landArea;
 
 	@JsonProperty("source")
@@ -106,15 +110,18 @@ public class Property extends PropertyInfo {
 		if (this.owners == null) {
 			this.owners = new ArrayList<>();
 		}
-		this.owners.add(ownersItem);
+
+		if (null != ownersItem)
+			this.owners.add(ownersItem);
 		return this;
 	}
 
 	public Property addInstitutionItem(Institution institutionItem) {
+
 		if (this.institution == null) {
 			this.institution = new ArrayList<>();
 		}
-		
+
 		if (null != institutionItem)
 			this.institution.add(institutionItem);
 		return this;
@@ -124,19 +131,19 @@ public class Property extends PropertyInfo {
 		if (this.documents == null) {
 			this.documents = new ArrayList<>();
 		}
-		this.documents.add(documentsItem);
+
+		if (null != documentsItem)
+			this.documents.add(documentsItem);
 		return this;
 	}
 
-	
 	@Builder
 	public Property(String id, String propertyId, String tenantId, String accountId, String oldPropertyId,
-			Status status, Address address, String acknowldgementNumber, String propertyType, String ownershipCategory,
-			List<OwnerInfo> owners, List<Institution> institution, CreationReason creationReason, Long occupancyDate,
-			Long constructionDate, Long noOfFloors, Double landArea, Source source, List<Document> documents,
-			Object additionalDetails, AuditDetails auditDetails) {
-		
-		super(id, propertyId, tenantId, accountId, oldPropertyId, status, address);
+			Status status, Address address, List<String> parentProperties, String acknowldgementNumber,
+			String propertyType, String ownershipCategory, List<OwnerInfo> owners, List<Institution> institution,
+			CreationReason creationReason, Long occupancyDate, Long constructionDate, Long noOfFloors, Double landArea,
+			Source source, List<Document> documents, Object additionalDetails, AuditDetails auditDetails) {
+		super(id, propertyId, tenantId, accountId, oldPropertyId, status, address, parentProperties);
 		this.acknowldgementNumber = acknowldgementNumber;
 		this.propertyType = propertyType;
 		this.ownershipCategory = ownershipCategory;
@@ -152,5 +159,7 @@ public class Property extends PropertyInfo {
 		this.additionalDetails = additionalDetails;
 		this.auditDetails = auditDetails;
 	}
+
+	
 
 }

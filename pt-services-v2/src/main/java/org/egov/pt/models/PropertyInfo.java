@@ -1,5 +1,9 @@
 package org.egov.pt.models;
 
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+
 import org.egov.pt.models.enums.Status;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,6 +36,9 @@ public class PropertyInfo {
 	private Status status;
 
 	@JsonProperty("address")
+	@NotNull
 	private Address address;
-	
+
+	@JsonProperty("parentProperties")
+	private List<String> parentProperties;
 }

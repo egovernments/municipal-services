@@ -99,8 +99,7 @@ CREATE TABLE eg_pt_document (
   createdTime      BIGINT NOT NULL,
   lastModifiedTime BIGINT, 
 
-CONSTRAINT pk_eg_pt_document_id PRIMARY KEY(id),
-CONSTRAINT uk_eg_pt_document_documentUid UNIQUE (documentUid)
+CONSTRAINT pk_eg_pt_document_id PRIMARY KEY(id)
 );
 
 CREATE INDEX IF NOT EXISTS index_eg_pt_document_entityid ON eg_pt_document (entityid);
@@ -115,7 +114,6 @@ CREATE TABLE eg_pt_address (
   propertyid       CHARACTER VARYING(128) NOT NULL,
   latitude         NUMERIC(9,6),
   longitude        NUMERIC(10,7),
-  addressid        CHARACTER VARYING(128) NOT NULL,
   addressnumber    CHARACTER VARYING(128),
   doorNo           CHARACTER VARYING(64),
   type             CHARACTER VARYING(64) NOT NULL,

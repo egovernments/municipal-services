@@ -56,8 +56,24 @@ public class EnrichmentService {
 		AuditDetails propertyAuditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		Property property = request.getProperty();
 
-		property.getAddress().setAddressId(UUID.randomUUID().toString());
+		property.setId(UUID.randomUUID().toString());
+		property.setAccountId(requestInfo.getUserInfo().getUuid());
+		property.getDocuments().forEach(doc -> {
+			doc.setId(UUID.randomUUID().toString());
+			doc.setStatus(Status.ACTIVE);
+		});
+
 		property.getAddress().setTenantId(property.getTenantId());
+		property.getAddress().setId(UUID.randomUUID().toString());
+
+		property.getOwners().forEach(owner -> {
+
+			owner.getDocuments().forEach(doc -> {
+				doc.setId(UUID.randomUUID().toString());
+				doc.setStatus(Status.ACTIVE);
+			});
+			owner.setStatus(Status.ACTIVE);
+		});
 
 		property.setAuditDetails(propertyAuditDetails);
 		property.setStatus(Status.ACTIVE);
@@ -82,7 +98,7 @@ public class EnrichmentService {
 
             property.setAuditDetails(auditDetails);
             Property propertyFromDb = propertyIdMap.get(property.getPropertyId());
-            property.getAddress().setAddressId(propertyFromDb.getAddress().getAddressId());
+            property.getAddress().setId(propertyFromDb.getAddress().getId());
     }
 
 
@@ -163,7 +179,7 @@ public class EnrichmentService {
 		PropertyCriteria criteria = new PropertyCriteria();
 		Set<String> propertyids = new HashSet<>();
 		properties.forEach(property -> propertyids.add(property.getPropertyId()));
-		criteria.setIds(propertyids);
+		criteria.setPropertyIds(propertyids);
 		criteria.setTenantId(properties.get(0).getTenantId());
 		return criteria;
 	}

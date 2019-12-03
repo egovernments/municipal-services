@@ -87,7 +87,7 @@ serviceMaps:
 
       - jsonPath: $.Assessment.documents.*.tenantId
 
-      - jsonPath: $.Assessment.documents.*.entityId
+      - jsonPath: $.Assessment.id
 
       - jsonPath: $.Assessment.documents.*.documentType
 
@@ -205,7 +205,7 @@ serviceMaps:
 
       - jsonPath: $.Assessment.documents.*.tenantId
 
-      - jsonPath: $.Assessment.documents.*.entityId
+      - jsonPath: $.Assessment.id
 
       - jsonPath: $.Assessment.documents.*.documentType
 

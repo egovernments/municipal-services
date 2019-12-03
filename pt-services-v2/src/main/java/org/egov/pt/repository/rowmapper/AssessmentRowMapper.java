@@ -121,7 +121,6 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				.status(Status.valueOf(rs.getString("doc_status")))
 				.documentType(rs.getString("doc_documenttype"))
 				.documentUid(rs.getString("doc_documentuid"))
-				.entityId(rs.getString("doc_entityid"))
 				.fileStore(rs.getString("doc_filestore"))
 				.tenantId(rs.getString("doc_tenantid"))
 				.auditDetails(auditDetails)

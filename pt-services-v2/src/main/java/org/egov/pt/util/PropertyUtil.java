@@ -64,9 +64,8 @@ public class PropertyUtil {
 	public void addAddressIds(List<Property> responseProperties, Property requestProperty) {
 
 		Map<String, String> propIdToAddrId = responseProperties.stream()
-				.collect(Collectors.toMap(Property::getId, prop -> prop.getAddress().getAddressId()));
-
-		requestProperty.getAddress().setAddressId(propIdToAddrId.get(requestProperty.getPropertyId()));
+				.collect(Collectors.toMap(Property::getId, prop -> prop.getAddress().getId()));
+		requestProperty.getAddress().setId(propIdToAddrId.get(requestProperty.getPropertyId()));
 	}
 
 

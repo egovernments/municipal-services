@@ -17,6 +17,7 @@ public class PropertyQueryBuilder {
 
 	private static final String SELECT = "SELECT ";
 	private static final String INNER_JOIN = "INNER JOIN";
+	private static final String LEFT_JOIN  =  "LEFT OUTER JOIN";
 	
 	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where userid IN ";
 
@@ -24,15 +25,15 @@ public class PropertyQueryBuilder {
 	
 	private static String propertySelectValues = "property.id as pid, property.propertyid, property.tenantid as ptenantid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory, creationreason, occupancydate, constructiondate, nooffloors, landarea, source, parentproperties, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, ";
 
-	private static String addressSelectValues = "address.tenantid as adresstenantid, address.id as addressuuid, address.propertyid as addresspid, latitude, longitude, addressid, addressnumber, doorno, address.type as addresstype, addressline1, addressline2, landmark, city, pincode, detail as addressdetail, buildingname, street, locality, createdby as addresscreatedby, lastmodifiedby as addresslastmodifiedby, createdtime as addresscreatedtime, lastmodifiedtime as addresslastmodifiedtime, ";
+	private static String addressSelectValues = "address.tenantid as adresstenantid, address.id as addressid, address.propertyid as addresspid, latitude, longitude, addressnumber, doorno, address.type as addresstype, addressline1, addressline2, landmark, city, pincode, detail as addressdetail, buildingname, street, locality, address.createdby as addresscreatedby, address.lastmodifiedby as addresslastmodifiedby, address.createdtime as addresscreatedtime, address.lastmodifiedtime as addresslastmodifiedtime, ";
 
 	private static String institutionSelectValues = "institution.id as institutionid,institution.propertyid as institutionpid, institution.tenantid as institutiontenantid, institution.name as institutionname, institution.type as institutiontype, designation, institution.createdby as institutioncreatedby, institution.lastmodifiedby as institutionlastmodifiedby, institution.createdtime as institutioncreatedtime, institution.lastmodifiedtime as institutionlastmodifiedtime, ";
 
-	private static String propertyDocSelectValues = "pdoc.id as pdocid, pdoc.tenantid as pdoctenantid, pdoc.entityid as pdocpid, pdoc.documenttype as pdocdocumenttype, pdoc.filestore as pdocfilestore, pdoc.documentuid as pdocdocumentuid, pdoc.status as pdocstatus, ";
+	private static String propertyDocSelectValues = "pdoc.id as pdocid, pdoc.tenantid as pdoctenantid, pdoc.entityid as pdocentityid, pdoc.documenttype as pdoctype, pdoc.filestore as pdocfilestore, pdoc.documentuid as pdocuid, pdoc.status as pdocstatus, ";
 
 	private static String ownerSelectValues = "owner.tenantid as owntenantid, owner.propertyid as ownpropertyid, userid, owner.status as ownstatus, isprimaryowner, ownertype, ownershippercentage, owner.institutionid as owninstitutionid, relationship, owner.createdby as owncreatedby, owner.createdtime as owncreatedtime,owner.lastmodifiedby as ownlastmodifiedby, owner.lastmodifiedtime as ownlastmodifiedtime, ";
 
-	private static String ownerDocSelectValues = "owndoc.id as owndocid, owndoc.tenantid as owndoctenantid, owndoc.entityid as owndocpid, owndoc.documenttype as owndocdocumenttype, owndoc.filestore as owndocfilestore, owndoc.documentuid as owndocdocumentuid, owndoc.status as owndocstatus, ";
+	private static String ownerDocSelectValues = "owndoc.id as owndocid, owndoc.tenantid as owndoctenantid, owndoc.entityid as owndocentityId, owndoc.documenttype as owndoctype, owndoc.filestore as owndocfilestore, owndoc.documentuid as owndocuid, owndoc.status as owndocstatus ";
 
 	private static final String QUERY = SELECT 
 			
@@ -50,15 +51,15 @@ public class PropertyQueryBuilder {
 			
 			+   " FROM EG_PT_PROPERTY property " 
 			
-			+   INNER_JOIN +  " EG_PT_ADDRESS address         ON pid = address.addresspid " 
+			+   INNER_JOIN +  " EG_PT_ADDRESS address         ON property.id = address.propertyid " 
 			
-			+   INNER_JOIN +  " EG_PT_INSTITUTION institution ON pid = institution.institutionpid " 
+			+   LEFT_JOIN +  " EG_PT_INSTITUTION institution ON property.id = institution.propertyid " 
 			
-			+   INNER_JOIN +  " EG_PT_DOCUMENT pdoc           ON pid = pdoc.pdocpid "
+			+   LEFT_JOIN +  " EG_PT_DOCUMENT pdoc           ON property.id = pdoc.entityid "
 			
-			+   INNER_JOIN +  " EG_PT_OWNER owner             ON pid = owner.ownpid " 
+			+   INNER_JOIN +  " EG_PT_OWNER owner             ON property.id = owner.propertyid " 
 			
-			+   INNER_JOIN +  " EG_PT_DOCUMENT owndoc         ON pid = owndocpid "
+			+   LEFT_JOIN +  " EG_PT_DOCUMENT owndoc         ON owner.userid = owndoc.entityid "
 			
 			+ " WHERE ";
 	
@@ -69,6 +70,9 @@ public class PropertyQueryBuilder {
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, PropertyCriteria criteria) {
+		
+		if(criteria.getLimit() == null && criteria.getOffset() == null)
+			return query;
 		
 		Long limit = config.getDefaultLimit();
 		Long offset = config.getDefaultOffset();
@@ -108,7 +112,7 @@ public class PropertyQueryBuilder {
 			preparedStmtList.add(criteria.getStatus());
 		}
 
-		Set<String> ids = criteria.getIds();
+		Set<String> ids = criteria.getPropertyIds();
 		if (!CollectionUtils.isEmpty(ids)) {
 
 			builder.append("and property.propertyid IN (").append(createQuery(ids)).append(")");

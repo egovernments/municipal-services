@@ -9,6 +9,7 @@ import org.egov.pt.models.Boundary;
 import org.egov.pt.models.Property;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,8 @@ public class BoundaryService {
 		uri.append("&").append("boundaryType=").append("Locality").append("&").append("codes=")
 				.append(property.getAddress().getLocality().getCode());
 
-		Optional<Object> response = serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
+		Optional<Object> response = serviceRequestRepository.fetchResult(uri,
+				RequestInfoWrapper.builder().requestInfo(request.getRequestInfo()).build());
 		if (response.isPresent()) {
 			LinkedHashMap responseMap = (LinkedHashMap) response.get();
 			if (CollectionUtils.isEmpty(responseMap))

@@ -21,12 +21,8 @@ public class Document {
         private String id ;
         
         @JsonProperty("tenantId")
-        @NotNull
         private String tenantId ;
         
-        @JsonProperty("entityId")
-        private String entityId;
-
         @JsonProperty("documentType")
         @NotNull
         private String documentType ;

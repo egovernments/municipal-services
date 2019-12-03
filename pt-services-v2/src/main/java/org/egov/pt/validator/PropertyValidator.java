@@ -233,7 +233,7 @@ public class PropertyValidator {
         
         Set<String> ids = new HashSet<>();
         ids.add(property.getPropertyId());
-        propertyCriteria.setIds(ids);
+        propertyCriteria.setPropertyIds(ids);
         
 		if (!CollectionUtils.isEmpty(ids)) {
 
@@ -360,7 +360,7 @@ public class PropertyValidator {
         if(propertyCriteria.getMobileNumber()!=null && !allowedParams.contains("mobileNumber"))
             throw new CustomException("INVALID SEARCH","Search based on mobileNumber is not available");
 
-        if(!CollectionUtils.isEmpty(propertyCriteria.getIds()) && !allowedParams.contains("ids"))
+        if(!CollectionUtils.isEmpty(propertyCriteria.getPropertyIds()) && !allowedParams.contains("ids"))
             throw new CustomException("INVALID SEARCH","Search based on ids is not available");
 
         if(!CollectionUtils.isEmpty(propertyCriteria.getOldpropertyids()) && !allowedParams.contains("oldpropertyids"))
@@ -372,7 +372,7 @@ public class PropertyValidator {
 
         // Search Based only on tenantId is not allowed
 		Boolean emptySearch = (propertyCriteria.getName() == null && propertyCriteria.getMobileNumber() == null
-				&& CollectionUtils.isEmpty(propertyCriteria.getIds())
+				&& CollectionUtils.isEmpty(propertyCriteria.getPropertyIds())
 				&& CollectionUtils.isEmpty(propertyCriteria.getOldpropertyids()));
 
         if(emptySearch)
