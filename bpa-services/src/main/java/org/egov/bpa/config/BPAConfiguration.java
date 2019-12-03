@@ -112,16 +112,19 @@ public class BPAConfiguration {
 
 
 
-    // tradelicense Calculator
-    @Value("${egov.tl.calculator.host}")
-    private String calculatorHost;
 
-    @Value("${egov.tl.calculator.calculate.endpoint}")
-    private String calculateEndpoint;
 
-    @Value("${egov.tl.calculator.getBill.endpoint}")
-    private String getBillEndpoint;
+    
 
+    // EDCR Service
+    @Value("${egov.edcr.host}")
+    private String edcrHost;
+
+    @Value("${egov.edcr.authtoken.endpoint}")
+    private String edcrAuthEndPoint;
+
+    @Value("${egov.edcr.getPlan.endpoint}")
+    private String getPlanEndPoint;
 
 
     //Institutional key word

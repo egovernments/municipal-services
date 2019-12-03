@@ -16,6 +16,7 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.BPAWorkflowService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,9 @@ public class BPAService {
 
 	@Autowired
     private EnrichmentService enrichmentService;
+	
+	@Autowired
+    private EDCRService edcrService;
 
 	@Autowired
     private UserService userService;
@@ -59,6 +63,11 @@ public class BPAService {
 	public BPA create(BPARequest bpaRequest) {
 
 		   Object mdmsData = util.mDMSCall(bpaRequest);
+		   if( !edcrService.validateEdcrPlan(bpaRequest)) {
+			   throw new CustomException("INVALID EDCR NUMBER",
+						"The Scrutiny is not accepted for the EDCR Number "
+								+ bpaRequest.getBPA().getEdcrNumber() );
+		   }
 		    bpaValidator.validateCreate(bpaRequest,mdmsData);
 	        actionValidator.validateCreateRequest(bpaRequest);
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
