@@ -92,7 +92,6 @@ public class AssessmentService {
 		if(!CollectionUtils.isEmpty(assessment.getDocuments())) {
 			for(Document doc: assessment.getDocuments()) {
 				doc.setId(String.valueOf(UUID.randomUUID()));
-				doc.setEntityId(assessment.getId());
 				doc.setAuditDetails(auditDetails);
 				doc.setStatus(Status.ACTIVE);
 			}
@@ -129,7 +128,6 @@ public class AssessmentService {
 			for(Document doc: assessment.getDocuments()) {
 				if(StringUtils.isEmpty(doc.getId())) {
 					doc.setId(String.valueOf(UUID.randomUUID()));
-					doc.setEntityId(assessment.getId());
 					doc.setAuditDetails(auditDetails);
 					doc.setStatus(Status.ACTIVE);
 				}
