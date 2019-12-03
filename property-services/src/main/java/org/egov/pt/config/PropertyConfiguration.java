@@ -53,14 +53,6 @@ public class PropertyConfiguration {
     @Value("${persister.cancel.property.assessment.topic}")
     private String cancelPropertyAssessmentTopic;
 
-
-    @Value("${persister.save.drafts.topic}")
-    private String saveDraftsTopic;
-
-    @Value("${persister.update.drafts.topic}")
-    private String updateDraftsTopic;
-    
-    
     //USER
     @Value("${egov.user.host}")
     private String userHost;
