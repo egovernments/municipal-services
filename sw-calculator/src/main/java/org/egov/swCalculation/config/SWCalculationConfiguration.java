@@ -59,6 +59,12 @@ public class SWCalculationConfiguration {
 	@Value("${egov.demand.search.endpoint}")
 	private String demandSearchEndPoint;
 
+	@Value("${egov.sewerageservice.pagination.default.limit}")
+	private String limit;
+	
+	@Value("${egov.sewerageservice.pagination.default.offset}")
+	private String offset;
+	
 	@Value("${egov.bill.gen.endpoint}")
 	private String billGenEndPoint;
 

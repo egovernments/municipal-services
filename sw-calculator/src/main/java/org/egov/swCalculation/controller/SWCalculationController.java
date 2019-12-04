@@ -12,7 +12,7 @@ import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.service.DemandService;
 import org.egov.swCalculation.service.SWCalculationService;
-import org.egov.swService.util.ResponseInfoFactory;
+import org.egov.swCalculation.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
