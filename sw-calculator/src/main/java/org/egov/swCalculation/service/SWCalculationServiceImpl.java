@@ -17,8 +17,9 @@ import org.egov.swCalculation.model.Category;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxHeadMaster;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public class SWCalculationServiceImpl implements SWCalculationService {
 	
 	@Autowired
