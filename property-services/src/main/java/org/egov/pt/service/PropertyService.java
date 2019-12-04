@@ -104,7 +104,7 @@ public class PropertyService {
 
 			// fetching property id from owner-id and enriching criteria
 			ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
-			criteria.setPropertyIds(new HashSet<>(repository.getPropertyIds(ownerIds)));
+			criteria.setUuids(new HashSet<>(repository.getPropertyIds(ownerIds)));
 
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
 		} else {

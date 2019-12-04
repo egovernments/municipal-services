@@ -112,11 +112,18 @@ public class PropertyQueryBuilder {
 			preparedStmtList.add(criteria.getStatus());
 		}
 
-		Set<String> ids = criteria.getPropertyIds();
-		if (!CollectionUtils.isEmpty(ids)) {
+		Set<String> propertyIds = criteria.getPropertyIds();
+		if (!CollectionUtils.isEmpty(propertyIds)) {
 
-			builder.append("and property.propertyid IN (").append(createQuery(ids)).append(")");
-			addToPreparedStatement(preparedStmtList, ids);
+			builder.append("and property.propertyid IN (").append(createQuery(propertyIds)).append(")");
+			addToPreparedStatement(preparedStmtList, propertyIds);
+		}
+		
+		Set<String> uuids = criteria.getUuids();
+		if (!CollectionUtils.isEmpty(uuids)) {
+
+			builder.append("and property.id IN (").append(createQuery(uuids)).append(")");
+			addToPreparedStatement(preparedStmtList, uuids);
 		}
 
 		Set<String> oldpropertyids = criteria.getOldpropertyids();

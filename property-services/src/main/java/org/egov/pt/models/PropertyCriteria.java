@@ -23,6 +23,8 @@ public class PropertyCriteria {
 	private String tenantId;
 
 	private Set<String> propertyIds;
+	
+	private Set<String> uuids;
 
 	private Set<String> oldpropertyids;
 	
