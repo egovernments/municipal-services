@@ -1,6 +1,7 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,23 +49,19 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
 	 */
 	public CalculationRes getTaxCalculation(CalculationReq request) {
-
-		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
-		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
-				criteria, estimationService.getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
+		List<Calculation> calculations = getCalculations(request);
+		return new CalculationRes(new ResponseInfo(),calculations);
 	}
 
 	
 	/**
+	 * It will take calculation and return calculation with tax head code 
 	 * 
 	 * @param requestInfo
-	 * @param criteria
-	 *            Calculation criteria on metercharge
-	 * @param estimatesAndBillingSlabs
-	 *            Billing Slabs
+	 * @param criteria Calculation criteria on meter charge
+	 * @param estimatesAndBillingSlabs Billing Slabs
 	 * @param masterMap
-	 * @return
+	 * @return Calculation With Tax head
 	 */
 	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
 			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
@@ -75,10 +72,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 		WaterConnection waterConnection = criteria.getWaterConnection();
 
-		String assessmentYear = estimationService.getAssessmentYear();
-
-		// String assessmentNumber = null != detail.getAssessmentNumber() ?
-		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
 		String tenantId = null != waterConnection.getProperty().getTenantId()
 				? waterConnection.getProperty().getTenantId()
 				: criteria.getTenantId();
@@ -151,5 +144,21 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
 				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection())
 				.connectionNo(criteria.getConnectionNo()).build();
+	}
+	
+	/**
+	 * 
+	 * @param request Contains calculation request
+	 * @return List of Calculation with different tax head
+	 */
+	List<Calculation> getCalculations(CalculationReq request) {
+		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
+			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			calculations.add(calculation);
+		}
+		return calculations;
 	}
 }
