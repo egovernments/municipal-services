@@ -70,7 +70,7 @@ public class MDMSValidator {
 			return JsonPath.read(result, jsonpath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
-			throw new CustomException(WCConstants.INVALID_CONNECTION_CATEGORY, WCConstants.INVALID_CONNECTION_TYPE);
+			throw new CustomException(WCConstants.INVALID_CONNECTION_TYPE, WCConstants.INVALID_CONNECTION_TYPE);
 		}
 	}
 	
