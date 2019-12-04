@@ -19,7 +19,7 @@ public class PropertyQueryBuilder {
 	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN  =  "LEFT OUTER JOIN";
 	
-	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner_v2 where userid IN ";
+	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner where userid IN ";
 
 	 // Select query
 	
@@ -134,7 +134,7 @@ public class PropertyQueryBuilder {
 
 		StringBuilder query = new StringBuilder(PROEPRTY_ID_QUERY);
 		query.append("(");
-		createQuery(ownerIds);
+		query.append(createQuery(ownerIds));
 		addToPreparedStatement(preparedStmtList, ownerIds);
 		query.append(")");
 		return query.toString();
