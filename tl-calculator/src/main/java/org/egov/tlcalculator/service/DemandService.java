@@ -173,8 +173,14 @@ public class DemandService {
 
              addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
 
-            List<String> combinedBillingSlabs = Stream.of(calculation.getTradeTypeBillingIds().getBillingSlabIds(), calculation.getAccessoryBillingIds().getBillingSlabIds())
-                                                .flatMap(x -> x.stream()).collect(Collectors.toList());
+            List<String> combinedBillingSlabs = new LinkedList<>();
+
+            if(!CollectionUtils.isEmpty(calculation.getTradeTypeBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getTradeTypeBillingIds().getBillingSlabIds());
+
+            if(!CollectionUtils.isEmpty(calculation.getAccessoryBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getAccessoryBillingIds().getBillingSlabIds());
+
 
 
              demands.add(Demand.builder()
