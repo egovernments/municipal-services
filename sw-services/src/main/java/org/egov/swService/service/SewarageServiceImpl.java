@@ -52,6 +52,7 @@ public class SewarageServiceImpl implements SewarageService {
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
+		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest, true);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
