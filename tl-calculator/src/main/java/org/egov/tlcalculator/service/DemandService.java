@@ -175,10 +175,10 @@ public class DemandService {
 
             List<String> combinedBillingSlabs = new LinkedList<>();
 
-            if(!CollectionUtils.isEmpty(calculation.getTradeTypeBillingIds().getBillingSlabIds()))
+            if(calculation.getTradeTypeBillingIds()!=null && !CollectionUtils.isEmpty(calculation.getTradeTypeBillingIds().getBillingSlabIds()))
                 combinedBillingSlabs.addAll(calculation.getTradeTypeBillingIds().getBillingSlabIds());
 
-            if(!CollectionUtils.isEmpty(calculation.getAccessoryBillingIds().getBillingSlabIds()))
+            if(calculation.getAccessoryBillingIds()!=null  && !CollectionUtils.isEmpty(calculation.getAccessoryBillingIds().getBillingSlabIds()))
                 combinedBillingSlabs.addAll(calculation.getAccessoryBillingIds().getBillingSlabIds());
 
 
