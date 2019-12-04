@@ -268,6 +268,10 @@ public class PropertyValidator {
 		log.debug("contains check: " + property.getOwnershipCategory().contains("INSTITUTIONAL"));
 		
 		List<Institution> institutions = property.getInstitution();
+		
+		if(CollectionUtils.isEmpty(institutions))
+			return;
+		
 		Boolean isOwnerCategoryInstitution = property.getOwnershipCategory().contains("INSTITUTIONAL");
 		
 		if (!property.getOwnershipCategory().contains("INSTITUTIONAL")
