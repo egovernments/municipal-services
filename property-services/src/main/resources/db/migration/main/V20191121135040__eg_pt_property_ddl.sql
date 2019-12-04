@@ -3,23 +3,24 @@ DROP TABLE IF EXISTS eg_pt_address;
 DROP TABLE IF EXISTS eg_pt_owner;
 DROP TABLE IF EXISTS eg_pt_institution;
 DROP TABLE IF EXISTS eg_pt_property;
-
+DROP TABLE IF EXISTS eg_pt_property_audit;
+DROP TABLE IF EXISTS eg_pt_address_audit;
 --> Property table
 
 CREATE TABLE eg_pt_property (
 
    id                   CHARACTER VARYING (128) NOT NULL,
-   propertyId           CHARACTER VARYING (128) NOT NULL,
+   propertyId           CHARACTER VARYING (128),
    tenantId             CHARACTER VARYING (256) NOT NULL,
    accountId            CHARACTER VARYING (128) NOT NULL,
    oldPropertyId        CHARACTER VARYING (128),
    status               CHARACTER VARYING (128) NOT NULL,
-   acknowldgementNumber CHARACTER VARYING (128) NOT NULL,
+   acknowldgementNumber CHARACTER VARYING (128),
    propertyType         CHARACTER VARYING (128) NOT NULL,
    ownershipCategory    CHARACTER VARYING (128) NOT NULL,
    creationReason       CHARACTER VARYING (128),
    occupancyDate        BIGINT,
-   constructionDate     BIGINT NOT NULL,
+   constructionDate     BIGINT,
    noOfFloors           BIGINT, 
    landArea             NUMERIC(102) NOT NULL,
    source               CHARACTER VARYING (128) NOT NULL,
