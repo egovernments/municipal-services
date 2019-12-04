@@ -1,16 +1,28 @@
 package org.egov.swCalculation.util;
 
+import java.math.BigDecimal;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
+import org.egov.swCalculation.config.SWCalculationConfiguration.SWCalculationConfigurationBuilder;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-@Component
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Component
 public class SWCalculationUtil {
 	
 	@Autowired
