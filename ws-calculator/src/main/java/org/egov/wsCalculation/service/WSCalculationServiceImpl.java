@@ -44,12 +44,17 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	CalculatorUtil calculatorUtil;
+	
+	@Autowired
+	DemandService demandService;
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
 	 */
-	public CalculationRes getTaxCalculation(CalculationReq request) {
-		List<Calculation> calculations = getCalculations(request);
+	public CalculationRes getCalculation(CalculationReq request) {
+		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		List<Calculation> calculations = getCalculations(request, masterMap);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return new CalculationRes(new ResponseInfo(),calculations);
 	}
 
@@ -151,9 +156,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @param request Contains calculation request
 	 * @return List of Calculation with different tax head
 	 */
-	List<Calculation> getCalculations(CalculationReq request) {
+	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,16 +16,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
-import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
-import org.egov.wsCalculation.model.Bill;
-import org.egov.wsCalculation.model.BillAndCalculations;
-import org.egov.wsCalculation.model.BillResponse;
-import org.egov.wsCalculation.model.BillingSlabIds;
 import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Demand;
@@ -35,11 +28,9 @@ import org.egov.wsCalculation.model.DemandDetail;
 import org.egov.wsCalculation.model.DemandDetailAndCollection;
 import org.egov.wsCalculation.model.DemandRequest;
 import org.egov.wsCalculation.model.DemandResponse;
-import org.egov.wsCalculation.model.GenerateBillCriteria;
 import org.egov.wsCalculation.model.GetBillCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
-import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxPeriod;
 import org.egov.wsCalculation.repository.DemandRepository;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
@@ -48,7 +39,6 @@ import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -485,39 +475,6 @@ public class DemandService {
 	}
 
 	/**
-	 * Generates and returns bill from billing service
-	 * 
-	 * updates the demand with penalty and rebate if applicable before
-	 * generating bill
-	 * 
-	 * @param getBillCriteria
-	 * @param requestInfoWrapper
-	 */
-	public BillResponse getBill(GetBillCriteria getBillCriteria, RequestInfoWrapper requestInfoWrapper) {
-
-		DemandResponse res = updateDemands(getBillCriteria, requestInfoWrapper);
-
-		/**
-		 * Loop through the demands and call generateBill for each demand. Group
-		 * the Bills and return the bill response
-		 */
-		List<Bill> bills = new LinkedList<>();
-		BillResponse billResponse;
-		ResponseInfo responseInfo = null;
-		StringBuilder billGenUrl;
-
-		for (Demand demand : res.getDemands()) {
-			billGenUrl = utils.getBillGenUrl(getBillCriteria.getTenantId(), demand.getId(), demand.getConsumerCode());
-			billResponse = mapper.convertValue(repository.fetchResult(billGenUrl, requestInfoWrapper),
-					BillResponse.class);
-			responseInfo = billResponse.getResposneInfo();
-			bills.addAll(billResponse.getBill());
-		}
-
-		return BillResponse.builder().resposneInfo(responseInfo).bill(bills).build();
-	}
-
-	/**
 	 * Method updates the demands based on the getBillCriteria
 	 * 
 	 * The response will be the list of demands updated for the
@@ -632,61 +589,7 @@ public class DemandService {
 		return demandRepository.updateDemand(requestInfo, demands);
 	}
 
-	/**
-	 * Generates bill
-	 * 
-	 * @param requestInfo
-	 *            The RequestInfo of the calculation request
-	 * @param billCriteria
-	 *            The criteria for bill generation
-	 * @return The generate bill response along with ids of slab used for
-	 *         calculation
-	 */
-	public BillAndCalculations getBill(RequestInfo requestInfo, GenerateBillCriteria billCriteria) {
-		BillResponse billResponse = generateBill(requestInfo, billCriteria);
-		BillingSlabIds billingSlabIds = new BillingSlabIds();
-		BillAndCalculations getBillResponse = new BillAndCalculations();
-		getBillResponse.setBillingSlabIds(billingSlabIds);
-		getBillResponse.setBillResponse(billResponse);
-		return getBillResponse;
-	}
-
-	/**
-	 * Generates bill by calling BillingService
-	 * 
-	 * @param requestInfo
-	 *            The RequestInfo of the getBill request
-	 * @param billCriteria
-	 *            The criteria for bill generation
-	 * @return The response of the bill generate
-	 */
-	private BillResponse generateBill(RequestInfo requestInfo, GenerateBillCriteria billCriteria) {
-
-		String consumerCode = billCriteria.getConsumerCode();
-		String tenantId = billCriteria.getTenantId();
-
-		List<Demand> demands = searchDemand(tenantId, Collections.singleton(consumerCode), requestInfo);
-
-		if (CollectionUtils.isEmpty(demands))
-			throw new CustomException("INVALID CONSUMERCODE",
-					"Bill cannot be generated.No demand exists for the given consumerCode");
-
-		String uri = utils.getBillGenerateURI();
-		uri = uri.replace("{1}", billCriteria.getTenantId());
-		uri = uri.replace("{2}", billCriteria.getConsumerCode());
-		uri = uri.replace("{3}", billCriteria.getBusinessService());
-
-		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
-				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		BillResponse response;
-		try {
-			response = mapper.convertValue(result, BillResponse.class);
-		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Unable to parse response of generate bill");
-		}
-		return response;
-	}
-
+	
 	/**
 	 * Applies Penalty/Rebate/Interest to the incoming demands
 	 * 
