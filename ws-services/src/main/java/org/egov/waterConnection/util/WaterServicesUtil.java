@@ -83,7 +83,7 @@ public class WaterServicesUtil {
 		List<Property> propertyList = new ArrayList<>();
 		propertyList.add(waterConnectionRequest.getWaterConnection().getProperty());
 		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getProperty());
-		Object result = serviceRequestRepository.fetchResult(getPropertyURL(), propertyReq);
+		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
 		return getPropertyDetails(result);
 	}
 
