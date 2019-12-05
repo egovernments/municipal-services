@@ -32,6 +32,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WaterServicesUtil {
 
+	@Autowired
+	ObjectMapper objectMapper;
+
 	private ServiceRequestRepository serviceRequestRepository;
 
 	@Value("${egov.property.service.host}")
@@ -42,7 +45,6 @@ public class WaterServicesUtil {
 
 	@Value("${egov.property.searchendpoint}")
 	private String searchPropertyEndPoint;
-
 
 	@Autowired
 	public WaterServicesUtil(ServiceRequestRepository serviceRequestRepository) {
@@ -82,7 +84,8 @@ public class WaterServicesUtil {
 	public List<Property> createPropertyRequest(WaterConnectionRequest waterConnectionRequest) {
 		List<Property> propertyList = new ArrayList<>();
 		propertyList.add(waterConnectionRequest.getWaterConnection().getProperty());
-		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getProperty());
+		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(),
+				waterConnectionRequest.getWaterConnection().getProperty());
 		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
 		return getPropertyDetails(result);
 	}
@@ -129,7 +132,6 @@ public class WaterServicesUtil {
 		return requestInfoWrapper_new;
 	}
 
-	
 	/**
 	 * 
 	 * @param result
@@ -137,9 +139,9 @@ public class WaterServicesUtil {
 	 * @return List of property
 	 */
 	private List<Property> getPropertyDetails(Object result) {
-		ObjectMapper mapper = new ObjectMapper();
+
 		try {
-			PropertyResponse propertyResponse = mapper.convertValue(result, PropertyResponse.class);
+			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
 			return propertyResponse.getProperties();
 		} catch (Exception ex) {
 			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
@@ -147,8 +149,7 @@ public class WaterServicesUtil {
 	}
 
 	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
-		PropertyRequest propertyReq = PropertyRequest.builder().requestInfo(requestInfo).property(propertyList)
-				.build();
+		PropertyRequest propertyReq = PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
 		return propertyReq;
 	}
 
@@ -172,8 +173,9 @@ public class WaterServicesUtil {
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
-	
-	public MdmsCriteriaReq prepareMdMsRequest(String tenantId, String moduleName, List<String> names, String filter,MdmsCriteriaReq mdmsCriteriaReq,RequestInfo requestInfo) {
+
+	public MdmsCriteriaReq prepareMdMsRequest(String tenantId, String moduleName, List<String> names, String filter,
+			MdmsCriteriaReq mdmsCriteriaReq, RequestInfo requestInfo) {
 		List<MasterDetail> masterDetails = new ArrayList<>();
 		names.forEach(name -> {
 			masterDetails.add(MasterDetail.builder().name(name).filter(filter).build());
@@ -184,11 +186,11 @@ public class WaterServicesUtil {
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
-	
-	 /**
-	  * 
-	  * @return
-	  */
+
+	/**
+	 * 
+	 * @return
+	 */
 	private String getPropertySearchURL() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
@@ -199,9 +201,10 @@ public class WaterServicesUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-	private StringBuilder getPropURL(String tenantId, String mobileNumber){
-		 String url = getPropertySearchURL();
-		 url = url.replace("{1}",tenantId).replace("{2}",mobileNumber);
-		 return new StringBuilder(url);
+
+	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
+		String url = getPropertySearchURL();
+		url = url.replace("{1}", tenantId).replace("{2}", mobileNumber);
+		return new StringBuilder(url);
 	}
 }

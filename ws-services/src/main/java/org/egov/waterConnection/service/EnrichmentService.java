@@ -30,13 +30,13 @@ public class EnrichmentService {
 
 	@Autowired
 	WaterServicesUtil waterServicesUtil;
-	
+
 	@Autowired
 	IdGenRepository idGenRepository;
-	
+
 	@Autowired
 	WSConfiguration config;
-	
+
 	@Autowired
 	ValidateProperty validateProperty;
 
@@ -48,17 +48,19 @@ public class EnrichmentService {
 	 * @param requestInfo
 	 *            is RequestInfo from request
 	 */
-	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,SearchCriteria waterConnectionSearchCriteria ) {
+	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
+			SearchCriteria waterConnectionSearchCriteria) {
 		waterConnectionList.forEach(waterConnection -> {
 			List<Property> propertyList;
-			if (waterConnection.getProperty().getId() == null || waterConnection.getProperty().getId().isEmpty()) {
+			if (waterConnection.getProperty().getPropertyId() == null
+					|| waterConnection.getProperty().getPropertyId().isEmpty()) {
 				throw new CustomException("INVALID SEARCH",
 						"PROPERTY ID NOT FOUND FOR " + waterConnection.getId() + " WATER CONNECTION ID");
 			}
-			if (waterConnection.getProperty().getId() != null) {
+			if (waterConnection.getProperty().getPropertyId() != null) {
 				Set<String> propertyIds = new HashSet<>();
-				propertyIds.add(waterConnection.getProperty().getId());
-			
+				propertyIds.add(waterConnection.getProperty().getPropertyId());
+
 				propertyList = waterServicesUtil.propertySearchOnCriteria(waterConnectionSearchCriteria, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",
@@ -69,12 +71,11 @@ public class EnrichmentService {
 		});
 	}
 
-	
-
 	/**
 	 * 
 	 * @param waterConnectionRequest
-	 * @param true for create and false for update
+	 * @param true
+	 *            for create and false for update
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isCreate) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
@@ -83,46 +84,47 @@ public class EnrichmentService {
 			setWaterConnectionIdgenIds(waterConnectionRequest);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param waterConnectionRequest
-	 * @param MDMS Data
+	 * @param MDMS
+	 *            Data
 	 */
-	public void enrichWaterConnectionWithMDMSData(WaterConnectionRequest waterConnectionRequest, List<Property> propertyList) {
+	public void enrichWaterConnectionWithMDMSData(WaterConnectionRequest waterConnectionRequest,
+			List<Property> propertyList) {
 		if (propertyList != null && !propertyList.isEmpty())
 			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
 	}
-	
-	
-	
+
 	/**
 	 * Sets the WaterConnectionId for given WaterConnectionRequest
 	 *
-	 * @param request WaterConnectionRequest which is to be created
+	 * @param request
+	 *            WaterConnectionRequest which is to be created
 	 */
 	private void setWaterConnectionIdgenIds(WaterConnectionRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
 
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
-				config.getWaterConnectionIdGenFormat(), 1);
-		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != 1) {
-			errorMap.put("IDGEN ERROR ",
-					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		waterConnection.setConnectionNo(itr.next());
+		// List<String> applicationNumbers = getIdList(requestInfo, tenantId,
+		// config.getWaterConnectionIdGenName(),
+		// config.getWaterConnectionIdGenFormat(), 1);
+		// ListIterator<String> itr = applicationNumbers.listIterator();
+		//
+		// Map<String, String> errorMap = new HashMap<>();
+		// if (applicationNumbers.size() != 1) {
+		// errorMap.put("IDGEN ERROR ",
+		// "The Id of WaterConnection returned by idgen is not equal to number
+		// of WaterConnection");
+		// }
+		//
+		// if (!errorMap.isEmpty())
+		// throw new CustomException(errorMap);
+		waterConnection.setConnectionNo("WS-001");
 
 	}
-
-
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
 		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
