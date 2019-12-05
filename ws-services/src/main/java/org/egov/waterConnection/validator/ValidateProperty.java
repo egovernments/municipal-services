@@ -63,7 +63,7 @@ public class ValidateProperty {
 	 */
 	public boolean isPropertyIdPresent(WaterConnectionRequest waterConnectionRequest) {
 		Property property = waterConnectionRequest.getWaterConnection().getProperty();
-		if (property.getId() == null || property.getId().isEmpty()) {
+		if (property.getPropertyId() == null || property.getPropertyId().isEmpty()) {
 			return false;
 		}
 		return true;
@@ -73,7 +73,7 @@ public class ValidateProperty {
 	
 	public void enrichPropertyForWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		List<Property> propertyList;
-		if (!isPropertyIdPresent(waterConnectionRequest)) {
+		if (isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
 		} else {
 			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);

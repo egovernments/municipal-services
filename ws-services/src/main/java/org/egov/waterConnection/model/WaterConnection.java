@@ -309,7 +309,7 @@ public class WaterConnection extends Connection {
 	 * @return documents
 	 **/
 	@ApiModelProperty(value = "The documents attached by owner for exemption.")
-	@Valid
+	
 	public List<Document> getDocuments() {
 		return documents;
 	}

@@ -50,7 +50,7 @@ public class WsQueryBuilder {
 			Set<String> propertyIds = new HashSet<>();
 			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getId()));
+			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 			addToPreparedStatement(preparedStatement, propertyIds);

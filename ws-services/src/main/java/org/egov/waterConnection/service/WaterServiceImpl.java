@@ -52,8 +52,8 @@ public class WaterServiceImpl implements WaterService {
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
-		validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
-		mDMSValidator.validateMasterData(waterConnectionRequest);
+	//	validateProperty.validatePropertyCriteriaForCreate(waterConnectionRequest);
+		//mDMSValidator.validateMasterData(waterConnectionRequest);
 		enrichmentService.enrichWaterConnection(waterConnectionRequest, true);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
