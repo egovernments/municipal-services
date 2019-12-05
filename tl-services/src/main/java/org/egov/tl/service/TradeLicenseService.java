@@ -130,7 +130,7 @@ public class TradeLicenseService {
                     List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
                     List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
                     for (TradeLicense result : licensesFromSearch) {
-                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber())) {
+                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber()) && !StringUtils.equals(result.getStatus(),STATUS_REJECTED)) {
                             tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType().split("\\.")[0]);
                         }
                     }
