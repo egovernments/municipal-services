@@ -12,32 +12,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyCriteria {
-
+public class AssessmentSearchCriteria {
+	
 	@NotNull
 	private String tenantId;
 
+	private Set<String> ids;
+
+	private Set<String> assessmentNumbers;
+
+	private String financialYear;
+		
 	private Set<String> propertyIds;
 	
-	private Set<String> uuids;
-
-	private Set<String> oldpropertyids;
-	
 	private Status status;
-
-	private String mobileNumber;
-
-	private String name;
-	
-	private Set<String> ownerIds;
 	
 	private Long offset;
 
 	private Long limit;
-	
+
 }

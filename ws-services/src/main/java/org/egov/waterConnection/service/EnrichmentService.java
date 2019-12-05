@@ -1,5 +1,6 @@
 package org.egov.waterConnection.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,23 +102,23 @@ public class EnrichmentService {
 	 * @param request WaterConnectionRequest which is to be created
 	 */
 	private void setWaterConnectionIdgenIds(WaterConnectionRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+//		RequestInfo requestInfo = request.getRequestInfo();
+//		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
-
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
-				config.getWaterConnectionIdGenFormat(), 1);
-		ListIterator<String> itr = applicationNumbers.listIterator();
-
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != 1) {
-			errorMap.put("IDGEN ERROR ",
-					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
-		}
-
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		waterConnection.setConnectionNo(itr.next());
+//
+//		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
+//				config.getWaterConnectionIdGenFormat(), 1);
+//		ListIterator<String> itr = applicationNumbers.listIterator();
+//
+//		Map<String, String> errorMap = new HashMap<>();
+//		if (applicationNumbers.size() != 1) {
+//			errorMap.put("IDGEN ERROR ",
+//					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+//		}
+//
+//		if (!errorMap.isEmpty())
+//			throw new CustomException(errorMap);
+		waterConnection.setConnectionNo("WS-CON-001");
 
 	}
 
