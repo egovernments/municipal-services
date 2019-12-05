@@ -76,6 +76,8 @@ public class EnrichmentService {
 
 	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
 		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
+		meterConnectionRequest.getMeterReading().setCurrentReadingDate(System.currentTimeMillis());
+		meterConnectionRequest.getMeterReading().setLastReadingDate(System.currentTimeMillis());
 		//setIdgenIds(meterConnectionRequest);
 
 	}

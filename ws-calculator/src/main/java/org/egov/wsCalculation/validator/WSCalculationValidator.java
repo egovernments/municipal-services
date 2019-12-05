@@ -9,6 +9,7 @@ import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.repository.WSCalculationDao;
+import org.egov.wsCalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,6 +22,9 @@ public class WSCalculationValidator {
 
 	@Autowired
 	WSCalculationDao wSCalculationDao;
+	
+	@Autowired
+	CalculatorUtil calculationUtil;
 
 	/**
 	 * 
@@ -34,31 +38,25 @@ public class WSCalculationValidator {
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
+		
+		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(), meterReading.getConnectionNo(), "pb.amritsar");
+		if(connection == null) {
+			errorMap.put("INVALID METER READING CONNECTION",
+					"Invalid water connection number");
+		}
 		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
-//		if (isUpdate && (meterReading.getId() == null || meterReading.getId().isEmpty())) {
-//			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be update without meter reading id");
-//		}
-
+		
+		if (meterReading.getMeterStatus() != null) {
+			errorMap.put("INVALID METER READING CONNECTION",
+					"Meter status can not be null");
+		}
+		
 		if (isUpdate && (meterReading.getCurrentReading() == null)) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be update without current meter reading");
-		}
-
-		if (isUpdate && (meterReading.getCurrentReadingDate() == null)) {
-			errorMap.put("INVALID METER READING DATE",
-					"Current reading Meter date cannot be updated without current meter reading date");
-		}
-
-		if (isUpdate && (meterReading.getLastReading() == null)) {
-			errorMap.put("INVALID LAST READING", "Last Meter Reading cannot be update without last meter reading");
-		}
-
-		if (isUpdate && (meterReading.getLastReadingDate() == null)) {
-			errorMap.put("INVALID LAST READING DATE",
-					"Last Meter Reading date cannot be update without meter reading id");
 		}
 
 		if (isUpdate && meterReading.getId() != null && !meterReading.getId().isEmpty()) {
@@ -70,7 +68,7 @@ public class WSCalculationValidator {
 		if (meterReading.getBillingPeriod() == null || meterReading.getBillingPeriod().isEmpty()) {
 			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be updated without billing period");
 		}
-
+		
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
 		}

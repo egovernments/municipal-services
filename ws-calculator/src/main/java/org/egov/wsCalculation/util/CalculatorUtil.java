@@ -8,14 +8,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
-import org.egov.mdms.model.MdmsCriteria;
-import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionResponse;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.MasterDetail;
+import org.egov.wsCalculation.model.MdmsCriteria;
+import org.egov.wsCalculation.model.MdmsCriteriaReq;
+import org.egov.wsCalculation.model.ModuleDetail;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
@@ -82,13 +82,13 @@ public class CalculatorUtil {
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
-	 /**
-     * Call WS-services to get waterConnection for the given applicationNumber and tenantID
-     * @param requestInfo The RequestInfo of the incoming request
-     * @param applicationNumber The applicationNumber whose water connection has to be fetched
-     * @param tenantId The tenantId of the water connection
-     * @return The water connection fo the particular applicationNumber
-     */
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionNo 
+	 * @param tenantId
+	 * @return WaterConnection based on parameters
+	 */
     public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
         ObjectMapper mapper = new ObjectMapper();
     	String url = getWaterSearchURL();
@@ -101,7 +101,7 @@ public class CalculatorUtil {
                 response = mapper.convertValue(result, WaterConnectionResponse.class);
         }
         catch (IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
+            throw new CustomException("PARSING ERROR","Error while parsing response of Water Connection Search");
         }
 
         if(response==null || CollectionUtils.isEmpty(response.getWaterConnection()))
@@ -112,7 +112,7 @@ public class CalculatorUtil {
     
     
     /**
-     * Creates tradeLicense search url based on tenantId and applicationNumber
+     * Creates waterConnection search url based on tenantId and connectionNumber
      * @return water search url
      */
 	private String getWaterSearchURL() {
