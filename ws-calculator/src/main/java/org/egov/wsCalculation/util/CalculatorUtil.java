@@ -8,14 +8,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionResponse;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
-import org.egov.wsCalculation.model.MasterDetail;
-import org.egov.wsCalculation.model.MdmsCriteria;
-import org.egov.wsCalculation.model.MdmsCriteriaReq;
-import org.egov.wsCalculation.model.ModuleDetail;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
