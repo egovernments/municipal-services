@@ -30,9 +30,6 @@ public class WsQueryBuilder {
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 
-	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.connectionExecutionDate,"
-			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
-			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
 
 	/**
 	 * 
@@ -44,9 +41,8 @@ public class WsQueryBuilder {
 	 *            The Request Info
 	 * @return query as a string
 	 */
-	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo,
-			boolean searchForWaterConnection) {
-		StringBuilder query = new StringBuilder(getQueryForSearch(searchForWaterConnection));
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo) {
+		StringBuilder query = new StringBuilder(WATER_SEARCH_Query);
 		String resultantQuery = query.toString();
 		boolean isAnyCriteriaMatch = false;
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
@@ -99,12 +95,6 @@ public class WsQueryBuilder {
 		return resultantQuery;
 	}
 
-	private String getQueryForSearch(boolean searchForWaterConnection) {
-		if (searchForWaterConnection)
-			return WATER_SEARCH_Query;
-		return SEWERAGE_SEARCH_QUERY;
-	}
-
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -130,11 +120,6 @@ public class WsQueryBuilder {
 		});
 	}
 
-	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<Integer> ids) {
-		ids.forEach(id -> {
-			preparedStatement.add(id);
-		});
-	}
 
 	/**
 	 * 
