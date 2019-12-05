@@ -140,6 +140,8 @@ public class WSCalculationConstant {
 	public static final String FLAT_AMOUNT_FIELD_NAME = "flatAmount";
 
 	public static final String RATE_FIELD_NAME = "rate";
+	
+	public static final String DAYA_APPLICABLE_NAME = "applicableAfterDays";
 
 	/*
 	 * bigdecimal values
@@ -177,8 +179,8 @@ public class WSCalculationConstant {
 	public static final List<String> WS_BILLING_SLAB_MASTERS = Collections
 			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
 
-	public static final Long TIMEZONE_OFFSET = 19800000l;
 	
+	public static final Long TIMEZONE_OFFSET = 19800000l;
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(WS_CHARGE));
 	
 	public static final String flatRateCalculationAttribute = "Flat";

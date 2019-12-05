@@ -39,7 +39,8 @@ public class WSCalculationValidator {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
 		
-		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(), meterReading.getConnectionNo(), "pb.amritsar");
+		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
+				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if(connection == null) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Invalid water connection number");
@@ -49,7 +50,7 @@ public class WSCalculationValidator {
 					"Current Meter Reading cannot be less than last meter reading");
 		}
 		
-		if (meterReading.getMeterStatus() != null) {
+		if (meterReading.getMeterStatus() == null) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Meter status can not be null");
 		}

@@ -219,22 +219,10 @@ public class MasterDataService {
 	}
 
 	/**
-	 * Returns the 'APPLICABLE' master object from the list of inputs
-	 *
-	 * filters the Input based on their effective financial year and starting
-	 * day
-	 *
-	 * If an object is found with effective year same as assessment year that
-	 * master entity will be returned
-	 *
-	 * If exact match is not found then the entity with latest effective
-	 * financial year which should be lesser than the assessment year
-	 *
-	 * NOTE : applicable points to single object out of all the entries for a
-	 * given master which fits the period of the property being assessed
-	 *
-	 * @param assessmentYear
-	 * @param masterList
+	 * 
+	 * @param assessmentYear Assessment year
+	 * @param masterList master list for that applicable
+	 * @return master data for that assessment Year
 	 */
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> getApplicableMaster(String assessmentYear, List<Object> masterList) {
@@ -419,4 +407,5 @@ public class MasterDataService {
 	private StringBuilder getMdmsSearchUrl() {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
+
 }

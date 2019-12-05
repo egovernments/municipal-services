@@ -1,11 +1,17 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.egov.waterConnection.util.WCConstants;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
@@ -29,8 +35,8 @@ public class PayService {
 	 * else if decimal is lesser than 0.5 lower bound is applied
 	 * 
 	 */
-	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount) {
 
+	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount) {
 		BigDecimal roundOffPos = BigDecimal.ZERO;
 		BigDecimal roundOffNeg = BigDecimal.ZERO;
 
@@ -52,27 +58,33 @@ public class PayService {
 		else
 			return null;
 	}
+	
+	/**
+	 * 
+	 * @param waterCharge
+	 * @param assessmentYear
+	 * @param timeBasedExmeptionMasterMap
+	 * @param billingExpiryDate
+	 * @return estimation of time based exemption
+	 */
+	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal waterCharge,
+			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
 
-	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedWSTax,
-			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap) {
-
-		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
+		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
 			return null;
 		Map<String, BigDecimal> estimates = new HashMap<>();
-		BigDecimal rebate = getRebate(taxAmt, assessmentYear,
+		BigDecimal rebate = getRebate(waterCharge, assessmentYear,
 				timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_REBATE_MASTER));
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;
-
-		if (rebate.equals(BigDecimal.ZERO)) {
-			penalty = getPenalty(taxAmt, assessmentYear,
-					timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
-//			interest = getInterest(taxAmt, assessmentYear,
-//					timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER), receipts);
-		}
-		estimates.put(WSCalculationConstant.WS_TIME_REBATE, rebate.setScale(2, 2).negate());
+		long currentUTC = System.currentTimeMillis();
+		long numberOfDaysInMillies = billingExpiryDate - currentUTC;
+		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
+		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
+		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
+		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
 		estimates.put(WSCalculationConstant.WS_TIME_PENALTY, penalty.setScale(2, 2));
-		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, BigDecimal.ZERO);
+		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, interest.setScale(2, 2));
 		return estimates;
 	}
 
@@ -128,62 +140,107 @@ public class PayService {
 	 * 
 	 * @param taxAmt
 	 * @param assessmentYear
-	 * @return
+	 * @return applicable penalty for given time
 	 */
-	public BigDecimal getPenalty(BigDecimal taxAmt, String assessmentYear, JSONArray penaltyMasterList) {
+	public BigDecimal getPenalty(BigDecimal taxAmt, String assessmentYear, JSONArray penaltyMasterList, BigDecimal noOfDays) {
 
 		BigDecimal penaltyAmt = BigDecimal.ZERO;
 		Map<String, Object> penalty = mDService.getApplicableMaster(assessmentYear, penaltyMasterList);
 		if (null == penalty) return penaltyAmt;
-
-		String[] time = getStartTime(assessmentYear,penalty);
-		Calendar cal = Calendar.getInstance();
-		setDateToCalendar(time, cal);
-		Long currentIST = System.currentTimeMillis()+WSCalculationConstant.TIMEZONE_OFFSET;
-
-		if (cal.getTimeInMillis() < currentIST)
 			penaltyAmt = mDService.calculateApplicables(taxAmt, penalty);
-
 		return penaltyAmt;
 	}
 
-	/**
-	 * Fetch the fromFY and take the starting year of financialYear
-	 * calculate the difference between the start of assessment financial year and fromFY
-	 * Add the difference in year to the year in the starting day
-	 * eg: Assessment year = 2017-18 and interestMap fetched from master due to fallback have fromFY = 2015-16
-	 * and startingDay = 01/04/2016. Then diff = 2017-2015 = 2
-	 * Therefore the starting day will be modified from 01/04/2016 to 01/04/2018
-	 * @param assessmentYear Year of the assessment
-	 * @param interestMap The applicable master data
-	 * @return list of string with 0'th element as day, 1'st as month and 2'nd as year
-	 */
-	private String[] getStartTime(String assessmentYear,Map<String, Object> interestMap){
-		String financialYearOfApplicableEntry = ((String) interestMap.get(WSCalculationConstant.FROMFY_FIELD_NAME)).split("-")[0];
-		Integer diffInYear = Integer.valueOf(assessmentYear.split("-")[0]) - Integer.valueOf(financialYearOfApplicableEntry);
-		String startDay = ((String) interestMap.get(WSCalculationConstant.STARTING_DATE_APPLICABLES));
-		Integer yearOfStartDayInApplicableEntry = Integer.valueOf((startDay.split("/")[2]));
-		startDay = startDay.replace(String.valueOf(yearOfStartDayInApplicableEntry),String.valueOf(yearOfStartDayInApplicableEntry+diffInYear));
-		String[] time = startDay.split("/");
-		return time;
-	}
 
+	/**
+	 * Returns the current end of the day epoch time for the given epoch time
+	 * @param epoch The epoch time for which end of day time is required
+	 * @return End of day epoch time for the given time
+	 */
+	public static Long getEODEpoch(Long epoch){
+		LocalDate date =
+				Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get("IST"))).toLocalDate();
+		LocalDateTime endOfDay = LocalDateTime.of(date, LocalTime.MAX);
+		Long eodEpoch = endOfDay.atZone(ZoneId.of(ZoneId.SHORT_IDS.get("IST"))).toInstant().toEpochMilli();
+		return eodEpoch;
+	}
 	
 	/**
-	 * Overloaded method
-	 * Sets the date in to calendar based on the month and date value present in the time array*
-	 * @param time
-	 * @param cal
+	 * 
+	 * @param waterCharge
+	 * @param noOfDays
+	 * @param config
+	 *            master configuration
+	 * @return applicable penalty
 	 */
-	private void setDateToCalendar(String[] time, Calendar cal) {
+	public BigDecimal getApplicablePenalty(BigDecimal waterCharge, BigDecimal noOfDays, Object config) {
+		BigDecimal applicablePenalty = BigDecimal.ZERO;
+		@SuppressWarnings("unchecked")
+		Map<String, Object> configMap = (Map<String, Object>) config;
+		BigDecimal daysApplicable = null != configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+				: null;
+		if (daysApplicable == null)
+			return applicablePenalty;
+		BigDecimal daysDiff = noOfDays.subtract(daysApplicable);
+		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
+			return applicablePenalty;
+		}
+		BigDecimal rate = null != configMap.get(WSCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+				: null;
 
-		cal.clear();
-		TimeZone timeZone = TimeZone.getTimeZone("Asia/Kolkata");
-		cal.setTimeZone(timeZone);
-		Integer day = Integer.valueOf(time[0]);
-		Integer month = Integer.valueOf(time[1])-1;
-		// One is subtracted because calender reads january as 0
-		Integer year = Integer.valueOf(time[2]);
-		cal.set(year, month, day);
+		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+				? BigDecimal
+						.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				: BigDecimal.ZERO;
+
+		if (rate == null)
+			applicablePenalty = flatAmt.compareTo(waterCharge) > 0 ? BigDecimal.ZERO : flatAmt;
+		else if (rate != null) {
+			// rate of penalty
+			applicablePenalty = waterCharge.multiply(rate.divide(WSCalculationConstant.HUNDRED));
+		}
+		return applicablePenalty;
 	}
+	
+	/**
+	 * 
+	 * @param waterCharge
+	 * @param noOfDays
+	 * @param config
+	 *            master configuration
+	 * @return applicable Interest
+	 */
+	public BigDecimal getApplicableInterest(BigDecimal waterCharge, BigDecimal noOfDays, Object config) {
+		BigDecimal applicableInterest = BigDecimal.ZERO;
+		@SuppressWarnings("unchecked")
+		Map<String, Object> configMap = (Map<String, Object>) config;
+		BigDecimal daysApplicable = null != configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+				: null;
+		if (daysApplicable == null)
+			return applicableInterest;
+		BigDecimal daysDiff = noOfDays.subtract(daysApplicable);
+		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
+			return applicableInterest;
+		}
+		BigDecimal rate = null != configMap.get(WSCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+				? BigDecimal
+						.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				: BigDecimal.ZERO;
+
+		if (rate == null)
+			applicableInterest = flatAmt.compareTo(waterCharge) > 0 ? BigDecimal.ZERO : flatAmt;
+		else if (rate != null) {
+			// rate of interest
+			applicableInterest = waterCharge.multiply(rate.divide(WSCalculationConstant.HUNDRED));
+		}
+		return applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
+	}
+	
 }
