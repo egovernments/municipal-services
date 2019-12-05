@@ -475,13 +475,10 @@ public class DemandService {
 	}
 
 	/**
-	 * Method updates the demands based on the getBillCriteria
 	 * 
-	 * The response will be the list of demands updated for the
-	 * 
-	 * @param getBillCriteria
-	 * @param requestInfoWrapper
-	 * @return
+	 * @param getBillCriteria Bill Criteria
+	 * @param requestInfoWrapper contains request info wrapper
+	 * @return updated demand response
 	 */
 	public DemandResponse updateDemands(GetBillCriteria getBillCriteria, RequestInfoWrapper requestInfoWrapper) {
 
@@ -608,61 +605,52 @@ public class DemandService {
 		boolean isCurrentDemand = false;
 		String tenantId = demand.getTenantId();
 		String demandId = demand.getId();
-
+		Long expiryDate = demand.getBillExpiryTime();
 		TaxPeriod taxPeriod = taxPeriods.stream().filter(t -> demand.getTaxPeriodFrom().compareTo(t.getFromDate()) >= 0
 				&& demand.getTaxPeriodTo().compareTo(t.getToDate()) <= 0).findAny().orElse(null);
 
 		if (!(taxPeriod.getFromDate() <= System.currentTimeMillis()
 				&& taxPeriod.getToDate() >= System.currentTimeMillis()))
 			isCurrentDemand = true;
-		/*
-		 * method to get the latest collected time from the receipt service
-		 */
-		// List<Receipt> receipts =
-		// rcptService.getReceiptsFromConsumerCode(taxPeriod.getFinancialYear(),
-		// demand,
-		// requestInfoWrapper);
-
-		BigDecimal taxAmtForApplicableGeneration = BigDecimal.ZERO;
+		
+		if(expiryDate < System.currentTimeMillis()) {
+		BigDecimal waterChargeApplicable = BigDecimal.ZERO;
+		BigDecimal oldPenality = BigDecimal.ZERO;
 		BigDecimal oldInterest = BigDecimal.ZERO;
-		BigDecimal oldRebate = BigDecimal.ZERO;
+		
 
 		for (DemandDetail detail : demand.getDemandDetails()) {
 			if (WSCalculationConstant.TAX_APPLICABLE.contains(detail.getTaxHeadMasterCode())) {
-				taxAmtForApplicableGeneration = taxAmtForApplicableGeneration.add(detail.getTaxAmount());
+				waterChargeApplicable = waterChargeApplicable.add(detail.getTaxAmount());
+			}
+			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_PENALTY)) {
+				oldPenality = oldPenality.add(detail.getTaxAmount());
 			}
 			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_INTEREST)) {
 				oldInterest = oldInterest.add(detail.getTaxAmount());
 			}
-			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TIME_REBATE)) {
-				oldRebate = oldRebate.add(detail.getTaxAmount());
-			}
-
 		}
-
+		
 		boolean isPenaltyUpdated = false;
 		boolean isInterestUpdated = false;
-
+		
 		List<DemandDetail> details = demand.getDemandDetails();
 
 		Map<String, BigDecimal> rebatePenaltyEstimates = payService.applyPenaltyRebateAndInterest(
-				taxAmtForApplicableGeneration, taxAmtForApplicableGeneration, taxPeriod.getFinancialYear(),
-				timeBasedExmeptionMasterMap);
-
+				waterChargeApplicable, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap, expiryDate);
 		if (null == rebatePenaltyEstimates)
 			return isCurrentDemand;
 
-		BigDecimal rebate = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_REBATE);
 		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
 		DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
-
-		if (rebate.compareTo(oldRebate) != 0) {
-			details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-					.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-					.build());
-		}
+//
+//		if (penalty.compareTo(oldPenality) != 0) {
+//			details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
+//					.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
+//					.build());
+//		}
 
 		if (interest.compareTo(BigDecimal.ZERO) != 0) {
 			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,
@@ -690,6 +678,7 @@ public class DemandService {
 			details.add(
 					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
 							.demandId(demandId).tenantId(tenantId).build());
+		}
 
 		return isCurrentDemand;
 	}
