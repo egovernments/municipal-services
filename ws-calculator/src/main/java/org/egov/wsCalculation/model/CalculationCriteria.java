@@ -1,7 +1,6 @@
 package org.egov.wsCalculation.model;
 
 import javax.validation.constraints.NotNull;
-import org.egov.waterConnection.model.WaterConnection;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

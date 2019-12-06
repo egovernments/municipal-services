@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.Calculation;
@@ -32,6 +31,7 @@ import org.egov.wsCalculation.model.GetBillCriteria;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxPeriod;
+import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.repository.DemandRepository;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.WSCalculationUtil;
@@ -600,13 +600,13 @@ public class DemandService {
 		
 		List<DemandDetail> details = demand.getDemandDetails();
 
-		Map<String, BigDecimal> rebatePenaltyEstimates = payService.applyPenaltyRebateAndInterest(
+		Map<String, BigDecimal> interestPenaltyEstimates = payService.applyPenaltyRebateAndInterest(
 				waterChargeApplicable, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap, expiryDate);
-		if (null == rebatePenaltyEstimates)
+		if (null == interestPenaltyEstimates)
 			return isCurrentDemand;
 
-		BigDecimal penalty = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
-		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
+		BigDecimal penalty = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
+		BigDecimal interest = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
 		DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
 

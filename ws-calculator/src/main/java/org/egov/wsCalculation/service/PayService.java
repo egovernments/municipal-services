@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import org.egov.waterConnection.util.WCConstants;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +72,6 @@ public class PayService {
 		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
 			return null;
 		Map<String, BigDecimal> estimates = new HashMap<>();
-		BigDecimal rebate = getRebate(waterCharge, assessmentYear,
-				timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_REBATE_MASTER));
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;
 		long currentUTC = System.currentTimeMillis();
@@ -88,53 +85,6 @@ public class PayService {
 		return estimates;
 	}
 
-
-	/**
-	 * Returns the Amount of Rebate that can be applied on the given tax amount for
-	 * the given period
-	 * 
-	 * @param taxAmt
-	 * @param assessmentYear
-	 * @return
-	 */
-	public BigDecimal getRebate(BigDecimal taxAmt, String assessmentYear, JSONArray rebateMasterList) {
-
-		BigDecimal rebateAmt = BigDecimal.ZERO;
-		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
-
-		if (null == rebate)
-			return rebateAmt;
-
-		String[] time = ((String) rebate.get(WSCalculationConstant.ENDING_DATE_APPLICABLES)).split("/");
-		Calendar cal = Calendar.getInstance();
-		setDateToCalendar(assessmentYear, time, cal);
-
-		if (cal.getTimeInMillis() > System.currentTimeMillis())
-			rebateAmt = mDService.calculateApplicables(taxAmt, rebate);
-
-		return rebateAmt;
-	}
-
-	/**
-	 * Sets the date in to calendar based on the month and date value present in the
-	 * time array
-	 * 
-	 * @param assessmentYear
-	 * @param time
-	 * @param cal
-	 */
-	private void setDateToCalendar(String assessmentYear, String[] time, Calendar cal) {
-
-		cal.clear();
-		Integer day = Integer.valueOf(time[0]);
-		Integer month = Integer.valueOf(time[1]) - 1;
-		// One is subtracted because calender reads january as 0
-		Integer year = Integer.valueOf(assessmentYear.split("-")[0]);
-		if (month < 3)
-			year += 1;
-		cal.set(year, month, day);
-	}
-	
 	/**
 	 * Returns the Amount of penalty that has to be applied on the given tax amount for the given period
 	 * 
@@ -243,4 +193,7 @@ public class PayService {
 		return applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
 	}
 	
+	public Long convertDaysToMilliSecond(int days) {
+		return TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS); //gives 86400000
+	}
 }

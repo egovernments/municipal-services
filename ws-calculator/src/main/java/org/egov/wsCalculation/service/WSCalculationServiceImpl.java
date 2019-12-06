@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
+import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +146,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
+				.waterConnection(waterConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	
 	/**

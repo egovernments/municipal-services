@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.waterConnection.model.WaterConnection;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.service.MasterDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
