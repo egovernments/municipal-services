@@ -31,7 +31,7 @@ public class WaterConnectionValidator {
 			errorMap.put("INVALID WATER CONNECTION", "WaterConnection cannot be update without connection no");
 		}
 		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
-			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getId()));
+			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
 			if (n == 0) {
 				errorMap.put("INVALID WATER CONNECTION", "Water Id not present");
 			}
