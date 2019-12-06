@@ -20,7 +20,6 @@ import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.Calculation;
-import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.Demand.StatusEnum;
 import org.egov.wsCalculation.model.DemandDetail;

@@ -9,6 +9,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingResponse;
@@ -26,12 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MeterReadingUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
+	
+	@Autowired
+	WSCalculationConfiguration config;
 
-	@Value("${egov.meterReading.service.host}")
-	private String meterReadingHost;
-
-	@Value("${egov.meterReading.createendpoint}")
-	private String createMeterReadingendpoint;
 
 	@Autowired
 	public MeterReadingUtil(ServiceRequestRepository serviceRequestRepository) {
@@ -46,7 +45,7 @@ public class MeterReadingUtil {
 	}
 
 	public StringBuilder getDemandGenerationCreateURL() {
-		return new StringBuilder().append(meterReadingHost).append(createMeterReadingendpoint);
+		return new StringBuilder().append(config.getBillingServiceHost()).append(config.getDemandCreateEndPoint());
 	}
 
 	public List<MeterReading> getMeterReadingDetails(Object result) {
