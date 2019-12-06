@@ -126,7 +126,19 @@ public class WaterServicesUtil {
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
-
+	
+	/**
+	 * 
+	 * @param tenantId
+	 * @param propertyId
+	 * @param requestInfo
+	 * @return List of Property
+	 */
+	public List<Property> searchPropertyOnId(String tenantId, String propertyId, RequestInfo requestInfo){
+		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyId);
+		Object result = serviceRequestRepository.fetchResult(propertySearhURL,RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		return getPropertyDetails(result);
+	}
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
 		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();

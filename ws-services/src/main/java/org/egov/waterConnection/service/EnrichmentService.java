@@ -57,10 +57,8 @@ public class EnrichmentService {
 						"PROPERTY ID NOT FOUND FOR " + waterConnection.getId() + " WATER CONNECTION ID");
 			}
 			if (waterConnection.getProperty().getPropertyId() != null) {
-				Set<String> propertyIds = new HashSet<>();
-				propertyIds.add(waterConnection.getProperty().getPropertyId());
-
-				propertyList = waterServicesUtil.propertySearchOnCriteria(waterConnectionSearchCriteria, requestInfo);
+				String propertyId = waterConnection.getProperty().getPropertyId();
+				propertyList = waterServicesUtil.searchPropertyOnId(waterConnectionSearchCriteria.getTenantId(), propertyId, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",
 							"NO PROPERTY FOUND FOR " + waterConnection.getId() + " WATER CONNECTION ID");
