@@ -68,10 +68,13 @@ public class WaterServicesUtil {
 		propertyRequestObj.put("RequestInfoWrapper",
 				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), waterConnectionRequest.getRequestInfo()));
 		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
-		Object result = serviceRequestRepository.fetchResult(getPropertyURL(), propertyRequestObj);
+		Object result = serviceRequestRepository.fetchResult(
+				getPropURLForCreate(waterConnectionRequest.getWaterConnection().getProperty().getTenantId(),
+						waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()),
+				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());
 		propertyList = getPropertyDetails(result);
 		if (propertyList == null || propertyList.isEmpty()) {
-			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATE");
+			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
 	}
@@ -108,8 +111,6 @@ public class WaterServicesUtil {
 				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
 			return Collections.emptyList();
 		}
-		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		RequestInfoWrapper requestInfoWrapper = new RequestInfoWrapper();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (waterConnectionSearchCriteria.getTenantId() != null
 				&& !waterConnectionSearchCriteria.getTenantId().isEmpty()) {
@@ -189,7 +190,7 @@ public class WaterServicesUtil {
 
 	/**
 	 * 
-	 * @return
+	 * @return search url for property search
 	 */
 	private String getPropertySearchURL() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
@@ -205,6 +206,28 @@ public class WaterServicesUtil {
 	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
 		String url = getPropertySearchURL();
 		url = url.replace("{1}", tenantId).replace("{2}", mobileNumber);
+		return new StringBuilder(url);
+	}
+	
+	/**
+	 * 
+	 * @return search url for property search
+	 */
+	private String getPropertySearchURLForCreate() {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("propertyIds=");
+		url.append("{2}");
+		return url.toString();
+	}
+	
+	
+	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
+		String url = getPropertySearchURLForCreate();
+		url = url.replace("{1}", tenantId).replace("{2}", propertyIds);
 		return new StringBuilder(url);
 	}
 }
