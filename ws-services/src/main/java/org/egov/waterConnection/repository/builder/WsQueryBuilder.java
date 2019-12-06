@@ -152,7 +152,7 @@ public class WsQueryBuilder {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		Set<String> listOfIds = new HashSet<>();
 		connectionIds.forEach(id -> listOfIds.add(id));
-		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
+		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
