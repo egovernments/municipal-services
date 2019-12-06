@@ -1,240 +1,56 @@
 package org.egov.swService.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 
-/**
- * Boundary
- */
-@Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-10-24T10:29:25.253+05:30[Asia/Kolkata]")
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Boundary {
-	@JsonProperty("code")
-	private String code = null;
+	
+        @JsonProperty("code")
+        private String code ;
 
-	@JsonProperty("name")
-	private String name = null;
+        @JsonProperty("name")
+        private String name ;
 
-	@JsonProperty("label")
-	private String label = null;
+        @JsonProperty("label")
+        private String label ;
 
-	@JsonProperty("latitude")
-	private String latitude = null;
+        @JsonProperty("latitude")
+        private String latitude ;
 
-	@JsonProperty("longitude")
-	private String longitude = null;
+        @JsonProperty("longitude")
+        private String longitude ;
+        
+        @JsonProperty("area")
+        private String area;
 
-	@JsonProperty("children")
-	@Valid
-	private List<Boundary> children = null;
+        @JsonProperty("children")
+        @Valid
+        private List<Boundary> children ;
 
-	@JsonProperty("materializedPath")
-	private String materializedPath = null;
+        @JsonProperty("materializedPath")
+        private String materializedPath ;
 
-	public Boundary code(String code) {
-		this.code = code;
-		return this;
-	}
 
-	/**
-	 * code of the boundary.
-	 * 
-	 * @return code
-	 **/
-	@ApiModelProperty(required = true, value = "code of the boundary.")
-	@NotNull
+        public Boundary addChildrenItem(Boundary childrenItem) {
+            if (this.children == null) {
+            this.children = new ArrayList<>();
+            }
+        this.children.add(childrenItem);
+        return this;
+        }
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public Boundary name(String name) {
-		this.name = name;
-		return this;
-	}
-
-	/**
-	 * name of the boundary.
-	 * 
-	 * @return name
-	 **/
-	@ApiModelProperty(required = true, value = "name of the boundary.")
-	@NotNull
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Boundary label(String label) {
-		this.label = label;
-		return this;
-	}
-
-	/**
-	 * localized label for the boundry.
-	 * 
-	 * @return label
-	 **/
-	@ApiModelProperty(value = "localized label for the boundry.")
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public Boundary latitude(String latitude) {
-		this.latitude = latitude;
-		return this;
-	}
-
-	/**
-	 * latitude of the boundary.
-	 * 
-	 * @return latitude
-	 **/
-	@ApiModelProperty(value = "latitude of the boundary.")
-
-	public String getLatitude() {
-		return latitude;
-	}
-
-	public void setLatitude(String latitude) {
-		this.latitude = latitude;
-	}
-
-	public Boundary longitude(String longitude) {
-		this.longitude = longitude;
-		return this;
-	}
-
-	/**
-	 * longitude of the boundary.
-	 * 
-	 * @return longitude
-	 **/
-	@ApiModelProperty(value = "longitude of the boundary.")
-
-	public String getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(String longitude) {
-		this.longitude = longitude;
-	}
-
-	public Boundary children(List<Boundary> children) {
-		this.children = children;
-		return this;
-	}
-
-	public Boundary addChildrenItem(Boundary childrenItem) {
-		if (this.children == null) {
-			this.children = new ArrayList<Boundary>();
-		}
-		this.children.add(childrenItem);
-		return this;
-	}
-
-	/**
-	 * Get children
-	 * 
-	 * @return children
-	 **/
-	@ApiModelProperty(value = "")
-	@Valid
-	public List<Boundary> getChildren() {
-		return children;
-	}
-
-	public void setChildren(List<Boundary> children) {
-		this.children = children;
-	}
-
-	public Boundary materializedPath(String materializedPath) {
-		this.materializedPath = materializedPath;
-		return this;
-	}
-
-	/**
-	 * materialized path of the boundary - this would be of the format
-	 * tenantid.[code] from parentt till teh current boundary
-	 * 
-	 * @return materializedPath
-	 **/
-	@ApiModelProperty(readOnly = true, value = "materialized path of the boundary - this would be of the format tenantid.[code] from parentt till teh current boundary")
-
-	public String getMaterializedPath() {
-		return materializedPath;
-	}
-
-	public void setMaterializedPath(String materializedPath) {
-		this.materializedPath = materializedPath;
-	}
-
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Boundary boundary = (Boundary) o;
-		return Objects.equals(this.code, boundary.code) && Objects.equals(this.name, boundary.name)
-				&& Objects.equals(this.label, boundary.label) && Objects.equals(this.latitude, boundary.latitude)
-				&& Objects.equals(this.longitude, boundary.longitude)
-				&& Objects.equals(this.children, boundary.children)
-				&& Objects.equals(this.materializedPath, boundary.materializedPath);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(code, name, label, latitude, longitude, children, materializedPath);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Boundary {\n");
-
-		sb.append("    code: ").append(toIndentedString(code)).append("\n");
-		sb.append("    name: ").append(toIndentedString(name)).append("\n");
-		sb.append("    label: ").append(toIndentedString(label)).append("\n");
-		sb.append("    latitude: ").append(toIndentedString(latitude)).append("\n");
-		sb.append("    longitude: ").append(toIndentedString(longitude)).append("\n");
-		sb.append("    children: ").append(toIndentedString(children)).append("\n");
-		sb.append("    materializedPath: ").append(toIndentedString(materializedPath)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
 }
+

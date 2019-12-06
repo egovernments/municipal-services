@@ -12,6 +12,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+
 import org.egov.swService.model.Property;
 import org.egov.swService.model.PropertyCriteria;
 import org.egov.swService.model.PropertyRequest;
@@ -55,20 +56,24 @@ public class SewerageServicesUtil {
 	 *            SewarageConnectionRequest containing property
 	 * @return List of Property
 	 */
+	
 	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
 		Set<String> propertyIds = new HashSet<>();
 		List<Property> propertyList = new ArrayList<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		propertyIds.add(sewerageConnectionRequest.getSewerageConnection().getId());
-		propertyCriteria.setIds(propertyIds);
-		propertyRequestObj.put("RequestInfoWrapper", getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(),
-				sewerageConnectionRequest.getRequestInfo()));
+		propertyIds.add(sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId());
+		propertyCriteria.setPropertyIds(propertyIds);
+		propertyRequestObj.put("RequestInfoWrapper",
+				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), sewerageConnectionRequest.getRequestInfo()));
 		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
-		Object result = serviceRequestRepository.fetchResult(getPropertySearchURL(), propertyRequestObj);
+		Object result = serviceRequestRepository.fetchResult(
+				getPropURLForCreate(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId(),
+						sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId()),
+				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
 		propertyList = getPropertyDetails(result);
 		if (propertyList == null || propertyList.isEmpty()) {
-			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
+			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
 	}
@@ -99,17 +104,23 @@ public class SewerageServicesUtil {
 		}
 	}
 
-	/**
+	/*
+	 * @param sewerageConnectionRequest
 	 * 
-	 * @param waterConnectionRequest
 	 * @return Created property list
 	 */
 	public List<Property> createPropertyRequest(SewerageConnectionRequest sewerageConnectionRequest) {
 		List<Property> propertyList = new ArrayList<>();
 		propertyList.add(sewerageConnectionRequest.getSewerageConnection().getProperty());
-		PropertyRequest propertyReq = getPropertyRequest(sewerageConnectionRequest.getRequestInfo(), propertyList);
+		PropertyRequest propertyReq = getPropertyRequest(sewerageConnectionRequest.getRequestInfo(),
+				sewerageConnectionRequest.getSewerageConnection().getProperty());
 		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
 		return getPropertyDetails(result);
+	}
+	
+	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
+		PropertyRequest propertyReq = PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
+		return propertyReq;
 	}
 
 	public StringBuilder getPropertyCreateURL() {
@@ -167,6 +178,49 @@ public class SewerageServicesUtil {
 		moduleDetails.add(moduleDetail);
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+	
+	/**
+	 * 
+	 * @return search url for property search
+	 */
+	private String getPropertySearchURL() {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("mobileNumber=");
+		url.append("{2}");
+		return url.toString();
+	}
+
+	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
+		String url = getPropertySearchURL();
+		url = url.replace("{1}", tenantId).replace("{2}", mobileNumber);
+		return new StringBuilder(url);
+	}
+	
+	/**
+	 * 
+	 * @return search url for property search
+	 */
+	private String getPropertySearchURLForCreate() {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("propertyIds=");
+		url.append("{2}");
+		return url.toString();
+	}
+	
+	
+	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
+		String url = getPropertySearchURLForCreate();
+		url = url.replace("{1}", tenantId).replace("{2}", propertyIds);
+		return new StringBuilder(url);
 	}
 
 }
