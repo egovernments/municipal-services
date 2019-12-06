@@ -26,5 +26,7 @@ public class WCConstants {
 	public static final String INVALID_CONNECTION_CATEGORY = "Invalid Connection Category";
 
 	public static final String INVALID_CONNECTION_TYPE = "Invalid Connection Type";
+	
+	public static final String METER_STATUS = "Metered";
 
 }
