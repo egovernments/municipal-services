@@ -34,7 +34,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	@Autowired
 	MeterReadingRowMapper meterReadingRowMapper;
 
-	@Value("${egov.meterReadingService.createMeterConnection}")
+	@Value("${egov.meterreadingservice.createmeterconnectionn}")
 	private String createMeterConnection;
 
 	/**
