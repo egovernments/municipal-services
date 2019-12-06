@@ -9,24 +9,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.util.BPAUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -80,12 +78,12 @@ public class BPAUtil {
 	     */
 	    private ModuleDetail getFinancialYearRequest() {
 
-	        // master details for TL module
+	        // master details for BPA module
 	        List<MasterDetail> masterDetails = new ArrayList<>();
 
 	        // filter to only get code field from master data
 
-	        final String filterCodeForUom = "$.[?(@.active==true && @.module=='TL')]";
+	        final String filterCodeForUom = "$.[?(@.active==true && @.module=='BPA')]";
 
 	        masterDetails.add(MasterDetail.builder().name(BPAConstants.MDMS_FINANCIALYEAR).filter(filterCodeForUom).build());
 
@@ -122,12 +120,10 @@ public class BPAUtil {
 	    }
 	    
 	    private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,String tenantId){
-	        ModuleDetail financialYearRequest = getFinancialYearRequest();
-	        List<ModuleDetail> tradeModuleRequest = getBPAModuleRequest();
+	        List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
 	        List<ModuleDetail> moduleDetails = new LinkedList<>();
-	        moduleDetails.add(financialYearRequest);
-	        moduleDetails.addAll(tradeModuleRequest);
+	        moduleDetails.addAll(moduleRequest);
 
 	        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
 	                .build();
@@ -150,15 +146,13 @@ public class BPAUtil {
 
 	    /**
 	     * Creates a map of id to isStateUpdatable
-	     * @param searchresult Application from DB
+	     * @param searchResult Application from DB
 	     * @param businessService The businessService configuration
 	     * @return Map of is to isStateUpdatable
 	     */
-	    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,List<BPA> searchresult){
+	    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,BPA searchResult){
 	        Map<String ,Boolean> idToIsStateUpdatableMap = new HashMap<>();
-	        searchresult.forEach(result -> {
-	            idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
-	        });
+	            idToIsStateUpdatableMap.put(searchResult.getId(),workflowService.isStateUpdatable(searchResult.getStatus(), businessService));
 	        return idToIsStateUpdatableMap;
 	    }
 

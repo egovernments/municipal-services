@@ -1,5 +1,6 @@
 package org.egov.bpa.web.models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,53 +22,85 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BPA {
 
-	@Size(max=64)
+	@Size(max = 64)
 	@JsonProperty("id")
 	private String id;
-	
-	@Size(max=64)
+
+	@Size(max = 64)
 	@JsonProperty("applicationNo")
 	private String applicationNo;
-	 
-	@Size(max=64)
+
+	@Size(max = 64)
 	@JsonProperty("edcrNumber")
 	private String edcrNumber;
 
 	@NotNull
-	@Size(max=256)
+	@Size(max = 256)
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@Size(max=256)
+	@Size(max = 256)
 	@JsonProperty("serviceType")
 	private String serviceType;
-	
+
 	@JsonProperty("status")
-	private Status status;
-	
+	private String status;
+
 	@NotNull
 	@JsonProperty("address")
 	private Address address;
-	
+
 	@JsonProperty("ownershipCategory")
 	private String ownershipCategory;
-	
+
 	@NotNull
 	@JsonProperty("owners")
-	private Set<OwnerInfo> owners;
-	
+	private List<OwnerInfo> owners;
+
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
-	
+
 	@JsonProperty("documents")
 	private List<Document> documents;
-	
+
 	@JsonProperty("units")
 	private List<Unit> units;
-	
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
-	
+
+	public BPA addOwnersItem(OwnerInfo ownersItem) {
+		if (this.owners == null)
+			this.owners = new ArrayList<>();
+		if (!this.owners.contains(ownersItem))
+			this.owners.add(ownersItem);
+		return this;
+	}
+
+	public BPA addUnitsItem(Unit unitsItem) {
+		if (this.units == null)
+			this.units = new ArrayList<>();
+		if (!this.units.contains(unitsItem))
+			this.units.add(unitsItem);
+		return this;
+	}
+
+	public BPA addDocumentsItem(Document documentsItem) {
+		if (this.documents == null) {
+			this.documents = new ArrayList<>();
+		}
+		if (!this.documents.contains(documentsItem))
+			this.documents.add(documentsItem);
+		return this;
+	}
+
+	/*public void addAddressItem(Address addressItem) {
+		if (!((List<Address>) this.address).contains(addressItem))
+			((List<Address>) this.address).add(addressItem);
+		return;
+	}*/
+
 }

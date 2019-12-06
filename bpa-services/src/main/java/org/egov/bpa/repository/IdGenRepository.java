@@ -38,7 +38,7 @@ public class IdGenRepository {
 	 * @param requestInfo
 	 *            The rquestInfo of the request
 	 * @param tenantId
-	 *            The tenantiD of the tradeLicense
+	 *            The tenantiD of the bpa
 	 * @param name
 	 *            Name of the foramt
 	 * @param format

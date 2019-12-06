@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,17 +53,12 @@ public class UserService {
         BPA bpa = bpaRequest.getBPA();
         RequestInfo requestInfo = bpaRequest.getRequestInfo();
         Role role = getCitizenRole();
-//        licenses.forEach(tradeLicense -> {
-
-           /* Set<String> listOfMobileNumbers = getMobileNumbers(tradeLicense.getTradeLicenseDetail().getOwners()
-                    ,requestInfo,tradeLicense.getTenantId());*/
 
             bpa.getOwners().forEach(owner ->
             {
                 if(owner.getUuid()==null)
                     {
                         addUserDefaultFields(bpa.getTenantId(),role,owner);
-                      //  UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
                          StringBuilder uri = new StringBuilder(config.getUserHost())
                                     .append(config.getUserContextPath())
                                     .append(config.getUserCreateEndpoint());
@@ -91,7 +85,6 @@ public class UserService {
                     userDetailResponse = userCall( new CreateUserRequest(requestInfo,user),uri);
                     setOwnerFields(owner,userDetailResponse,requestInfo);
                 }
-//            });
         });
     }
 
@@ -111,7 +104,7 @@ public class UserService {
 
     /**
      * Checks if the user exists in the database
-     * @param owner The owner from the tradeLicense
+     * @param owner The owner from the bpa
      * @param requestInfo The requestInfo of the request
      * @return The search response from the user service
      */
@@ -135,36 +128,16 @@ public class UserService {
      * @param owner The owner to whom the username is to assigned
      */
     private void setUserName(OwnerInfo owner){
-            String username = UUID.randomUUID().toString();
+//            String username = UUID.randomUUID().toString();
+    	String username = owner.getMobileNumber();
             owner.setUserName(username);
     }
 
 
 
-    private Set<String> getMobileNumbers(List<OwnerInfo> owners,RequestInfo requestInfo,String tenantId){
-        Set<String> listOfMobileNumbers = new HashSet<>();
-        owners.forEach(owner -> {listOfMobileNumbers.add(owner.getMobileNumber());});
-        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
-        UserSearchRequest userSearchRequest = new UserSearchRequest();
-        userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setTenantId(tenantId);
-        userSearchRequest.setUserType("CITIZEN");
-        Set<String> availableMobileNumbers = new HashSet<>();
-
-        listOfMobileNumbers.forEach(mobilenumber -> {
-        	
-            userSearchRequest.setMobileNumber(mobilenumber);
-            UserDetailResponse userDetailResponse =  userCall(userSearchRequest,uri);
-            if(CollectionUtils.isEmpty(userDetailResponse.getUser()))
-                availableMobileNumbers.add(mobilenumber);
-        });
-        return availableMobileNumbers;
-    }
-
-
     /**
      * Sets ownerfields from the userResponse
-     * @param owner The owner from tradeLicense
+     * @param owner The owner from bpa
      * @param userDetailResponse The response from user search
      * @param requestInfo The requestInfo of the request
      */
@@ -287,8 +260,8 @@ public class UserService {
 
 
     /**
-     * Creates userSearchRequest from tradeLicenseSearchCriteria
-     * @param criteria The tradeLcienseSearch criteria
+     * Creates userSearchRequest from bpaSearchCriteria
+     * @param criteria The bpaSearch criteria
      * @param requestInfo The requestInfo of the request
      * @return The UserSearchRequest based on ownerIds
      */
@@ -305,38 +278,14 @@ public class UserService {
     }
 
 
-
-    private UserDetailResponse searchByUserName(String userName,String tenantId){
-        UserSearchRequest userSearchRequest = new UserSearchRequest();
-        userSearchRequest.setUserType("CITIZEN");
-        userSearchRequest.setUserName(userName);
-        userSearchRequest.setTenantId(tenantId);
-        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
-        return userCall(userSearchRequest,uri);
-
-    }
-
-
     /**
      * Updates user if present else creates new user
-     * @param request TradeLicenseRequest received from update
+     * @param request bpaRequest received from update
      */
     public void updateUser(BPARequest request){
        //TO DO update
     }
 
-
-    private UserDetailResponse isUserUpdatable(OwnerInfo owner,RequestInfo requestInfo){
-        UserSearchRequest userSearchRequest =new UserSearchRequest();
-        userSearchRequest.setTenantId(owner.getTenantId());
-        userSearchRequest.setMobileNumber(owner.getMobileNumber());
-        userSearchRequest.setUuid(Collections.singletonList(owner.getUuid()));
-        userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setActive(true);
-        userSearchRequest.setUserType(owner.getType());
-        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
-        return userCall(userSearchRequest,uri);
-    }
 
 
 }

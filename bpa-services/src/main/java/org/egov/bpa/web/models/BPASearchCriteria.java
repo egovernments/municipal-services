@@ -28,14 +28,8 @@ public class BPASearchCriteria {
 	    @JsonProperty("ids")
 	    private List<String> ids;
 
-	    @JsonProperty("applicationNumber")
-	    private String applicationNumber;
-
-	    @JsonProperty("licenseNumber")
-	    private String licenseNumber;
-
-	    @JsonProperty("oldLicenseNumber")
-	    private String oldLicenseNumber;
+	    @JsonProperty("applicationNo")
+	    private String applicationNo;
 
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;
@@ -62,15 +56,15 @@ public class BPASearchCriteria {
 
 
 	    public boolean isEmpty() {
-	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNumber == null
-	                && this.licenseNumber == null && this.oldLicenseNumber == null && this.mobileNumber == null &&
+	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
+	                && this.mobileNumber == null &&
 	                this.fromDate == null && this.toDate == null && this.ownerIds == null
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
-	        return (this.tenantId != null && this.status == null && this.ids == null && this.applicationNumber == null
-	                && this.licenseNumber == null && this.oldLicenseNumber == null && this.mobileNumber == null &&
+	        return (this.tenantId != null && this.status == null && this.ids == null && this.applicationNo == null
+	                && this.mobileNumber == null &&
 	                this.fromDate == null && this.toDate == null && this.ownerIds == null
 	        );
 	    }

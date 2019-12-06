@@ -31,7 +31,7 @@ public class BPAWorkflowService {
 
     /**
      * Validates and updates the status
-     * @param request The update tradeLicense Request
+     * @param request The update bpa Request
      */
     public void updateStatus(BPARequest request){
         actionValidator.validateUpdateRequest(request,null);
@@ -40,19 +40,11 @@ public class BPAWorkflowService {
 
 
     /**
-     * Changes the status of the tradeLicense according to action status mapping
-     * @param request The update tradeLicenseRequest
+     * Changes the status of the bpa according to action status mapping
+     * @param request The update bpaRequest
      */
     private void changeStatus(BPARequest request){
        Map<String,String> actionToStatus =  workflowConfig.getActionStatusMap();
-//       request.getLicenses().forEach(license -> {
-//             license.setStatus(actionToStatus.get(license.getAction()));
-//             if(license.getAction().equalsIgnoreCase(ACTION_APPROVE)){
-//                 Long time = System.currentTimeMillis();
-//                 license.setIssuedDate(time);
-//                 license.setValidFrom(time);
-//             }
-//       });
     }
 
 }

@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A Object holds the basic data for a Trade License
+ * A Object holds the basic data for a Building Plan
  */
-@ApiModel(description = "A Object holds the basic data for a Trade License")
+@ApiModel(description = "A Object holds the basic data for a Building Plan")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-12-04T11:26:25.532+05:30")
 

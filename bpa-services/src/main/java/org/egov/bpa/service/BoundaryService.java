@@ -43,14 +43,12 @@ public class BoundaryService {
 	 * Enriches the locality object by calling the location service
 	 * 
 	 * @param request
-	 *            TradeLicenseRequest for create
+	 *            bpaRequest for create
 	 * @param hierarchyTypeCode
 	 *            HierarchyTypeCode of the boundaries
 	 */
 	public void getAreaType(BPARequest request, String hierarchyTypeCode) {
-		/*
-		 * if (CollectionUtils.isEmpty(request.getLicenses())) return;
-		 */
+		
 
 		String tenantId = request.getBPA().getTenantId();
 
@@ -111,12 +109,12 @@ public class BoundaryService {
 	}
 
 	/**
-	 * Prepares map of tradeLicenseId to jsonpath which contains the code of the
-	 * tradeLicense
+	 * Prepares map of bpaId to jsonpath which contains the code of the
+	 * bpa
 	 * 
 	 * @param request
-	 *            TradeLicenseRequest for create
-	 * @return Map of tradeLcienseId to jsonPath with tradeLcienses locality
+	 *            bpaRequest for create
+	 * @return Map of bpaId to jsonPath with bpa locality
 	 *         code
 	 */
 	private Map<String, String> getJsonpath(BPARequest request) {

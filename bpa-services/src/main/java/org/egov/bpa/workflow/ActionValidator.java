@@ -37,24 +37,10 @@ public class ActionValidator {
 
     /**
      * Validates create request
-     * @param request The tradeLicense Create request
+     * @param request The BPA Create request
      */
 	public void validateCreateRequest(BPARequest request){
         Map<String,String> errorMap = new HashMap<>();
-
-//        BPA bpa = request.getBPA();
-//        if(ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
-//            if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
-//                errorMap.put("INVALID ACTION","Action should be APPLY when application document are provided");
-//        }
-//        if(ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
-//            if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
-//                errorMap.put("INVALID ACTION","Action cannot be changed to APPLY. Application document are not provided");
-//        }
-//        if(!ACTION_APPLY.equalsIgnoreCase(bpa.getAction()) &&
-//                !ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
-//            errorMap.put("INVALID ACTION","Action can only be APPLY or INITIATE during create");
-//        }
 
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
@@ -67,27 +53,27 @@ public class ActionValidator {
      */
     public void validateUpdateRequest(BPARequest request,BusinessService businessService){
         validateDocumentsForUpdate(request);
-       // validateRole(request);
-       // validateAction(request);
+        validateRole(request);
+        validateAction(request);
         validateIds(request,businessService);
     }
 
 
     /**
      * Validates the applicationDocument
-     * @param request The tradeLciense create or update request
+     * @param request The bpa create or update request
      */
     private void validateDocumentsForUpdate(BPARequest request){
         Map<String,String> errorMap = new HashMap<>();
         BPA bpa = request.getBPA();
-//        if(ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
-//            if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
-//                errorMap.put("INVALID STATUS","Status cannot be INITIATE when application document are provided");
-//        }
-//        if(ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
-//            if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
-//                errorMap.put("INVALID STATUS","Status cannot be APPLY when application document are not provided");
-//        }
+       /* if(ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
+            if(bpa.getDocuments()!=null)
+                errorMap.put("INVALID STATUS","Status cannot be INITIATE when application document are provided");
+        }
+        if(ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
+            if(bpa.getDocuments()==null)
+                errorMap.put("INVALID STATUS","Status cannot be APPLY when application document are not provided");
+        }*/
 
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
@@ -96,7 +82,7 @@ public class ActionValidator {
 
     /**
      * Validates if the role of the logged in user can perform the given action
-     * @param request The tradeLciense create or update request
+     * @param request The bpa create or update request
      */
     private void validateRole(BPARequest request){
        Map<String,List<String>> roleActionMap = workflowConfig.getRoleActionMap();
@@ -113,9 +99,6 @@ public class ActionValidator {
        });
 
 
-//          if(!actions.contains(bpa.getAction().toString()))
-//              errorMap.put("UNAUTHORIZED UPDATE","The action cannot be performed by this user");
-
        if(!errorMap.isEmpty())
            throw new CustomException(errorMap);
     }
@@ -123,18 +106,12 @@ public class ActionValidator {
 
     /**
      * Validate if the action can be performed on the current status
-     * @param request The tradeLciense update request
+     * @param request The bpa update request
      */
     private void validateAction(BPARequest request){
        Map<String,List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
         Map<String,String> errorMap = new HashMap<>();
         BPA bpa = request.getBPA();
-//        request.getLicenses().forEach(license -> {
-//           if(actionStatusMap.get(bpa.getStatus().toString())!=null){
-//               if(!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
-//                   errorMap.put("UNAUTHORIZED ACTION","The action "+bpa.getAction() +" cannot be applied on the status "+license.getStatus());
-//               }
-//       });
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }
@@ -142,47 +119,11 @@ public class ActionValidator {
 
     /**
      * Validates if the any new object is added in the request
-     * @param request The tradeLciense update request
+     * @param request The bpa update request
      */
     private void validateIds(BPARequest request,BusinessService businessService){
         Map<String,String> errorMap = new HashMap<>();
         BPA bpa = request.getBPA();
-//        request.getLicenses().forEach(license -> {
-//            if( !workflowService.isStateUpdatable(license.getStatus(), businessService)) {
-//                if (license.getId() == null)
-//                    errorMap.put("INVALID UPDATE", "Id of tradeLicense cannot be null");
-//                if(license.getTradeLicenseDetail().getId()==null)
-//                    errorMap.put("INVALID UPDATE", "Id of tradeLicenseDetail cannot be null");
-//                if(license.getTradeLicenseDetail().getAddress()==null)
-//                    errorMap.put("INVALID UPDATE", "Id of address cannot be null");
-//                license.getTradeLicenseDetail().getOwners().forEach(owner -> {
-//                    if(owner.getUuid()==null)
-//                        errorMap.put("INVALID UPDATE", "Id of owner cannot be null");
-//                    if(!CollectionUtils.isEmpty(owner.getDocuments())){
-//                        owner.getDocuments().forEach(document -> {
-//                            if(document.getId()==null)
-//                                errorMap.put("INVALID UPDATE", "Id of owner document cannot be null");
-//                        });
-//                      }
-//                    });
-//                license.getTradeLicenseDetail().getTradeUnits().forEach(tradeUnit -> {
-//                    if(tradeUnit.getId()==null)
-//                        errorMap.put("INVALID UPDATE", "Id of tradeUnit cannot be null");
-//                });
-//                if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories())){
-//                    license.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
-//                        if(accessory.getId()==null)
-//                            errorMap.put("INVALID UPDATE", "Id of accessory cannot be null");
-//                    });
-//                }
-//                if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getApplicationDocuments())){
-//                    license.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
-//                        if(document.getId()==null)
-//                            errorMap.put("INVALID UPDATE", "Id of applicationDocument cannot be null");
-//                    });
-//                }
-//            }
-//        });
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }

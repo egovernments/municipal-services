@@ -1,7 +1,6 @@
 package org.egov.bpa.web.models;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,15 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class GeoLocation {
+public class DocumentOwner extends Document {
 
-	@JsonProperty("latitude")
-	 private Double latitude;
+	@JsonProperty("owner")
+	private String owner;
 	
-	@JsonProperty("longitude")
-	 private Double longitude;
-	 
-	 @JsonProperty("additionalDetails")
-	 private Object additionalDetails;
 }

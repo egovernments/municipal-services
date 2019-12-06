@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-//@Import({TracerConfiguration.class})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -65,12 +64,6 @@ public class BPAConfiguration {
     @Value("${egov.idgen.bpa.applicationNum.format}")
     private String applicationNoIdgenFormat;
 
-    @Value("${egov.idgen.tl.licensenumber.name}")
-    private String licenseNumberIdgenName;
-
-    @Value("${egov.idgen.tl.licensenumber.format}")
-    private String licenseNumberIdgenFormat;
-
 
 
 
@@ -78,14 +71,14 @@ public class BPAConfiguration {
     @Value("${persister.save.buildingplan.topic}")
     private String saveTopic;
 
-/*    @Value("${persister.update.tradelicense.topic}")
+   @Value("${persister.update.buildingplan.topic}")
     private String updateTopic;
 
-    @Value("${persister.update.tradelicense.workflow.topic}")
+    @Value("${persister.update.buildingplan.workflow.topic}")
     private String updateWorkflowTopic;
 
-    @Value("${persister.update.tradelicense.adhoc.topic}")
-    private String updateAdhocTopic;*/
+    @Value("${persister.update.buildingplan.adhoc.topic}")
+    private String updateAdhocTopic;
 
 
     //Location Config
@@ -112,10 +105,6 @@ public class BPAConfiguration {
 
 
 
-
-
-    
-
     // EDCR Service
     @Value("${egov.edcr.host}")
     private String edcrHost;
@@ -125,6 +114,7 @@ public class BPAConfiguration {
 
     @Value("${egov.edcr.getPlan.endpoint}")
     private String getPlanEndPoint;
+
 
 
     //Institutional key word

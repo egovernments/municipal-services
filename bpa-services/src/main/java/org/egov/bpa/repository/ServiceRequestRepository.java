@@ -26,9 +26,7 @@ public class ServiceRequestRepository {
 		this.restTemplate = restTemplate;
 	}
 
-
 	public Object fetchResult(StringBuilder uri, Object request) {
-//		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		Object response = null;
 		log.info("URI: "+uri.toString());
 		try {

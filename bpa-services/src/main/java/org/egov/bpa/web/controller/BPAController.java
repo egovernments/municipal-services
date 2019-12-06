@@ -32,9 +32,25 @@ public class BPAController {
 		BPAResponse response = BPAResponse
 				.builder()
 				.BPA(bpa)
-				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(
 								bpaRequest.getRequestInfo(), true)).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/appl/_update")
+	public ResponseEntity<BPAResponse> update(
+			@Valid @RequestBody BPARequest bpaRequest) {
+		BPA bpa = bpaService.update(bpaRequest);
+
+		BPAResponse response = BPAResponse
+				.builder()
+				.BPA(bpa)
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(
+								bpaRequest.getRequestInfo(), true)).build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
 	}
 
 }

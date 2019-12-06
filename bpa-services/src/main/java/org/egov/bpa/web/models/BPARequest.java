@@ -16,8 +16,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
 @Setter
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @EqualsAndHashCode
 @Validated

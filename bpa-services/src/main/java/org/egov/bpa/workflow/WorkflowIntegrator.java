@@ -68,11 +68,11 @@ public class WorkflowIntegrator {
 	/**
 	 * Method to integrate with workflow
 	 *
-	 * takes the trade-license request as parameter constructs the work-flow request
+	 * takes the bpa request as parameter constructs the work-flow request
 	 *
-	 * and sets the resultant status from wf-response back to trade-license object
+	 * and sets the resultant status from wf-response back to bpa object
 	 *
-	 * @param tradeLicenseRequest
+	 * @param bpaRequest
 	 */
 	public void callWorkFlow(BPARequest bpaRequest) {
 
@@ -82,18 +82,6 @@ public class WorkflowIntegrator {
 
 			JSONObject obj = new JSONObject();
 			Map<String, String> uuidmap = new HashMap<>();
-//			uuidmap.put(UUIDKEY, license.getAssignee());
-//			obj.put(BUSINESSIDKEY, license.getApplicationNumber());
-//			obj.put(TENANTIDKEY, wfTenantId);
-//			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-//			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-//			obj.put(ACTIONKEY, license.getAction());
-//			obj.put(COMMENTKEY, license.getComment());
-//			if (!StringUtils.isEmpty(license.getAssignee()))
-//				obj.put(ASSIGNEEKEY, uuidmap);
-//			obj.put(DOCUMENTSKEY, license.getWfDocuments());
-//			array.add(obj);
-			
 
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, bpaRequest.getRequestInfo());
@@ -136,8 +124,5 @@ public class WorkflowIntegrator {
 					idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
 				});
 
-		// setting the status back to TL object from wf response
-//		bpaRequest.getBPA()
-//				.forEach(tlObj -> tlObj.setStatus(idStatusMap.get(tlObj.getApplicationNumber())));
 	}
 }

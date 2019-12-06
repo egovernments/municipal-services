@@ -1,9 +1,13 @@
 package org.egov.bpa.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -13,7 +17,12 @@ import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.models.BPASearchCriteria;
+import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.idgen.IdResponse;
+import org.egov.bpa.web.models.user.UserDetailResponse;
+import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +44,13 @@ public class EnrichmentService {
 	@Autowired
 	private BoundaryService boundaryService;
 
+	@Autowired
+	private WorkflowService workflowService;
+
+	@Autowired
+	private UserService userService;
+
 	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData) {
-		// TODO Auto-generated method stub
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo
 				.getUserInfo().getUuid(), true);
@@ -44,40 +58,42 @@ public class EnrichmentService {
 		bpaRequest.getBPA().setId(UUID.randomUUID().toString());
 
 		// address
+		bpaRequest.getBPA().getAddress().setId(UUID.randomUUID().toString());
 		bpaRequest.getBPA().getAddress()
 				.setTenantId(bpaRequest.getBPA().getTenantId());
-		bpaRequest.getBPA().getAddress().setId(UUID.randomUUID().toString());
 
 		// units
 		bpaRequest.getBPA().getUnits().forEach(unit -> {
 			unit.setTenantId(bpaRequest.getBPA().getTenantId());
 			unit.setId(UUID.randomUUID().toString());
 			unit.setAuditDetails(auditDetails);
-			// unit.setActive(true);
-			});
+		});
 
 		// owners
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
-//			owner.setId(UUID.randomUUID().toString());
-//			owner.setTenantId(bpaRequest.getBPA().getTenantId());
-			owner.setAuditDetails(auditDetails);
-			owner.setInstitutionId(UUID.randomUUID().toString());
-			if (!CollectionUtils.isEmpty(owner.getDocuments()))
-				owner.getDocuments().forEach(document -> {
-					document.setId(UUID.randomUUID().toString());
-				});
-		});
+			// owner.setUuid(UUID.randomUUID().toString());
+
+				owner.setUserActive(true);
+				/*
+				 * owner.setTenantId(bpaRequest.getBPA().getTenantId());
+				 * owner.setAuditDetails(auditDetails);
+				 * owner.setInstitutionId(UUID.randomUUID().toString());
+				 */
+				if (!CollectionUtils.isEmpty(owner.getDocuments()))
+					owner.getDocuments().forEach(document -> {
+						document.setId(UUID.randomUUID().toString());
+					});
+			});
 
 		setIdgenIds(bpaRequest);
 		setStatusForCreate(bpaRequest);
-//		boundaryService.getAreaType(bpaRequest, config.getHierarchyTypeCode());
 	}
 
 	/**
-	 * Sets the ApplicationNumber for given TradeLicenseRequest
+	 * Sets the ApplicationNumber for given bpaRequest
 	 *
 	 * @param request
-	 *            TradeLicenseRequest which is to be created
+	 *            bpaRequest which is to be created
 	 */
 	private void setIdgenIds(BPARequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -129,10 +145,137 @@ public class EnrichmentService {
 	/**
 	 * Sets status for create request
 	 * 
-	 * @param tradeLicenseRequest
+	 * @param bpaRequest
 	 *            The create request
 	 */
-	private void setStatusForCreate(BPARequest tradeLicenseRequest) {
+	private void setStatusForCreate(BPARequest bpaRequest) {
+		/*
+		 * if(bpaRequest.getBPA().getAction().equalsIgnoreCase(ACTION_INITIATE))
+		 * bpaRequest.getBPA().setStatus(STATUS_INITIATED);
+		 * if(bpaRequest.getBPA().getAction().equalsIgnoreCase(ACTION_APPLY))
+		 * bpaRequest.getBPA().setStatus(STATUS_APPLIED);
+		 */
+	}
 
+	public void enrichBPAUpdateRequest(BPARequest bpaRequest,
+			BusinessService businessService) {
+
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo
+				.getUserInfo().getUuid(), false);
+		bpaRequest.getBPA().setAuditDetails(auditDetails);
+		if (workflowService.isStateUpdatable(bpaRequest.getBPA().getStatus(),
+				businessService)) {
+			bpaRequest.getBPA().setAuditDetails(auditDetails);
+
+			bpaRequest.getBPA().getUnits().forEach(unit -> {
+				if (unit.getId() == null) {
+					unit.setTenantId(bpaRequest.getBPA().getTenantId());
+					unit.setId(UUID.randomUUID().toString());
+				}
+			});
+
+			bpaRequest.getBPA().getOwners().forEach(owner -> {
+				if (owner.getUuid() == null || owner.getUserActive() == null)
+					owner.setUserActive(true);
+				if (!CollectionUtils.isEmpty(owner.getDocuments()))
+					owner.getDocuments().forEach(document -> {
+						if (document.getId() == null) {
+							document.setId(UUID.randomUUID().toString());
+						}
+					});
+			});
+
+			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments())) {
+				bpaRequest.getBPA().getDocuments().forEach(document -> {
+					if (document.getId() == null) {
+						document.setId(UUID.randomUUID().toString());
+					}
+				});
+			}
+		}
+
+	}
+
+	public void postStatusEnrichment(BPARequest bpaRequest) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public List<BPA> enrichBPASearch(List<BPA> bpa, BPASearchCriteria criteria,
+			RequestInfo requestInfo) {
+
+		BPASearchCriteria searchCriteria = enrichBPASearchCriteriaWithOwnerids(
+				criteria, bpa);
+//		enrichBoundary(new BPARequest(requestInfo, (BPA) bpa)); // some pending
+		UserDetailResponse userDetailResponse = userService.getUser(
+				searchCriteria, requestInfo);
+		enrichOwner(userDetailResponse, bpa); // completed
+		return bpa;
+	}
+
+	private void enrichOwner(UserDetailResponse userDetailResponse,
+			List<BPA> bpas) {
+
+		List<OwnerInfo> users = userDetailResponse.getUser();
+		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
+		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
+		bpas.forEach(bpa -> {
+			bpa.getOwners().forEach(
+					owner -> {
+						if (userIdToOwnerMap.get(owner.getUuid()) == null)
+							throw new CustomException("OWNER SEARCH ERROR",
+									"The owner of the bpaCategoryDetail "
+											+ bpa.getId()
+											+ " is not coming in user search");
+						else
+							owner.addUserDetail(userIdToOwnerMap.get(owner
+									.getUuid()));
+					});
+		});
+
+	}
+
+	private BPASearchCriteria enrichBPASearchCriteriaWithOwnerids(
+			BPASearchCriteria criteria, List<BPA> bpas) {
+		BPASearchCriteria searchCriteria = new BPASearchCriteria();
+		searchCriteria.setTenantId(criteria.getTenantId());
+		Set<String> ownerids = new HashSet<>();
+		bpas.forEach(bpa -> {
+			bpa.getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
+		});
+		
+
+		searchCriteria.setOwnerIds(new ArrayList<>(ownerids));
+		return searchCriteria;
+	}
+
+	private void enrichBoundary(BPARequest bpaRequest) {
+		BPARequest request = getRequestByTenantId(bpaRequest); 
+		boundaryService.getAreaType(request, config.getHierarchyTypeCode());
+	}
+
+	private BPARequest getRequestByTenantId(BPARequest bpaRequest) {
+		BPA bpa = bpaRequest.getBPA();
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+
+		Map<String, List<BPA>> tenantIdToProperties = new HashMap<>();
+		if (bpa != null) {
+			if (tenantIdToProperties.containsKey(bpa.getTenantId()))
+				tenantIdToProperties.get(bpa.getTenantId()).add(bpa);
+			else {
+				List<BPA> list = new ArrayList<>();
+				list.add(bpa);
+				tenantIdToProperties.put(bpa.getTenantId(), list);
+			}
+		}
+		List<BPARequest> requests = new LinkedList<>();
+
+		/*
+		 * tenantIdToProperties.forEach((key,value)-> { requests.add(new
+		 * BPARequest(requestInfo,bpa)); }); return requests;
+		 */
+
+		return bpaRequest;
 	}
 }

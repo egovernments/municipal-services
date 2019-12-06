@@ -73,13 +73,13 @@ public class WorkflowService {
 
     /**
      * Returns boolean value to specifying if the state is updatable
-     * @param stateCode The stateCode of the license
+     * @param string The stateCode of the bpa
      * @param businessService The BusinessService of the application flow
      * @return State object to be fetched
      */
-    public Boolean isStateUpdatable(Status stateCode, BusinessService businessService){
+    public Boolean isStateUpdatable(String string, BusinessService businessService){
        for(State state : businessService.getStates()){
-           if(state.getApplicationStatus()!=null && state.getApplicationStatus().equalsIgnoreCase(stateCode.toString()))
+           if(state.getApplicationStatus()!=null && state.getApplicationStatus().equalsIgnoreCase(string.toString()))
                return state.getIsStateUpdatable();
        }
        return null;

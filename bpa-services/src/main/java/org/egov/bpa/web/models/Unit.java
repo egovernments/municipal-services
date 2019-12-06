@@ -3,6 +3,7 @@ package org.egov.bpa.web.models;
 import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Unit {
 
 	@JsonProperty("id")
@@ -33,4 +35,7 @@ public class Unit {
 	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("active")
+	private Boolean active;
 }

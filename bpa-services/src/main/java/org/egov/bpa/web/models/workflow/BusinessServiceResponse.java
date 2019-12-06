@@ -1,18 +1,20 @@
 package org.egov.bpa.web.models.workflow;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 import org.egov.common.contract.response.ResponseInfo;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @NoArgsConstructor
@@ -32,9 +34,10 @@ public class BusinessServiceResponse {
 
     public BusinessServiceResponse addBusinessServiceItem(BusinessService businessServiceItem) {
         if (this.businessServices == null) {
-            this.businessServices = new ArrayList<>();
+            this.businessServices = new ArrayList<BusinessService>();
         }
         this.businessServices.add(businessServiceItem);
+//        this.businessServices.add(businessServiceItem);
         return this;
     }
 
