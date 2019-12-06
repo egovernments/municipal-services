@@ -51,34 +51,6 @@ public class EstimationService {
 	@Autowired
 	CalculatorUtil calculatorUtil;
 	
-	
-	/**
-	 * Generates a map with assessment-number of property as key and estimation
-	 * map(taxhead code as key, amount to be paid as value) as value will be
-	 * called by calculate api
-	 *
-	 * @param request
-	 *            incoming calculation request containing the criteria.
-	 * @return Map<String, Calculation> key of assessment number and value of
-	 *         calculation object.
-	 */
-	public Map<String, Calculation> getEstimationWaterMap(CalculationReq request) {
-
-		RequestInfo requestInfo = request.getRequestInfo();
-		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
-		Map<String, Calculation> calculationWaterMap = new HashMap<>();
-		for (CalculationCriteria criteria : criteriaList) {
-			String connectionNO = criteria.getConnectionNo();
-			Map<String, List> estimatesAndBillingSlabs = null;
-			estimatesAndBillingSlabs = getEstimationMap(criteria, requestInfo);
-			Calculation calculation = wSCalculationService.getCalculation(requestInfo, criteria,
-					estimatesAndBillingSlabs , masterMap);
-			calculation.setConnectionNo(connectionNO);
-			calculationWaterMap.put(connectionNO, calculation);
-		}
-		return calculationWaterMap;
-	}
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head

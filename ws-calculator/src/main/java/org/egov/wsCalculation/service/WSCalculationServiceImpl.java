@@ -146,9 +146,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
 
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).waterConnection(criteria.getWaterConnection())
-				.connectionNo(criteria.getConnectionNo()).build();
+				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	
 	/**

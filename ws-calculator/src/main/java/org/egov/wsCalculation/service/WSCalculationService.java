@@ -13,7 +13,4 @@ import org.egov.wsCalculation.model.CalculationCriteria;
 public interface WSCalculationService {
 
 	public CalculationRes getCalculation(CalculationReq calculationReq);
-
-	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
-			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap);
 }

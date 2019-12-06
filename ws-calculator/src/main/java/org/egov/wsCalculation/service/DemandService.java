@@ -79,27 +79,6 @@ public class DemandService {
 	@Autowired
 	private DemandRepository demandRepository;
 
-	/*
-	 * Generates and persists the demand to billing service for the given water
-	 * connection
-	 * 
-	 * if the water connection has been assessed already for the given financial
-	 * year then
-	 * 
-	 * it carry forwards the old collection amount to the new demand as advance
-	 * 
-	 * @param request
-	 * 
-	 * @return
-	 */
-	public List<Demand> generateDemands(CalculationReq request) {
-		List<Demand> createdDemand = new ArrayList<>();
-		Map<String, Object> masterMap = mstrDataService.getMasterMap(request);
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
-		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
-		createdDemand = generateDemand(request.getRequestInfo(), calculationList, masterMap);
-		return createdDemand;
-	}
 
 	/**
 	 * Creates or updates Demand
@@ -543,21 +522,6 @@ public class DemandService {
 	}
 
 	/**
-	 * update demand for the given list of calculations
-	 * 
-	 * @param calculations
-	 *            Request that contain request info and calculation list
-	 * @return Demands that are updated
-	 */
-	public List<Demand> updateDemands(CalculationReq request) {
-		List<Demand> demands = new LinkedList<>();
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationWaterMap(request);
-		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
-		demands = updateDemandForCalculation(request.getRequestInfo(), calculationList);
-		return demands;
-	}
-
-	/**
 	 * Updates demand for the given list of calculations
 	 * 
 	 * @param requestInfo
@@ -645,12 +609,6 @@ public class DemandService {
 		BigDecimal interest = rebatePenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
 		DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
-//
-//		if (penalty.compareTo(oldPenality) != 0) {
-//			details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
-//					.taxHeadMasterCode(WSCalculationConstant.WS_TIME_REBATE).demandId(demandId).tenantId(tenantId)
-//					.build());
-//		}
 
 		if (interest.compareTo(BigDecimal.ZERO) != 0) {
 			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(WSCalculationConstant.WS_TIME_INTEREST,
