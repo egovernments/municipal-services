@@ -68,6 +68,12 @@ public class EnrichmentService {
 			unit.setId(UUID.randomUUID().toString());
 			unit.setAuditDetails(auditDetails);
 		});
+		
+		// BPA Documents
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
+			bpaRequest.getBPA().getDocuments().forEach(document -> {
+				document.setId(UUID.randomUUID().toString());
+			});
 
 		// owners
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
@@ -207,7 +213,8 @@ public class EnrichmentService {
 
 		BPASearchCriteria searchCriteria = enrichBPASearchCriteriaWithOwnerids(
 				criteria, bpa);
-//		enrichBoundary(new BPARequest(requestInfo, (BPA) bpa)); // some pending
+		// enrichBoundary(new BPARequest(requestInfo, (BPA) bpa)); // some
+		// pending
 		UserDetailResponse userDetailResponse = userService.getUser(
 				searchCriteria, requestInfo);
 		enrichOwner(userDetailResponse, bpa); // completed
@@ -244,14 +251,13 @@ public class EnrichmentService {
 		bpas.forEach(bpa -> {
 			bpa.getOwners().forEach(owner -> ownerids.add(owner.getUuid()));
 		});
-		
 
 		searchCriteria.setOwnerIds(new ArrayList<>(ownerids));
 		return searchCriteria;
 	}
 
 	private void enrichBoundary(BPARequest bpaRequest) {
-		BPARequest request = getRequestByTenantId(bpaRequest); 
+		BPARequest request = getRequestByTenantId(bpaRequest);
 		boundaryService.getAreaType(request, config.getHierarchyTypeCode());
 	}
 
@@ -271,11 +277,64 @@ public class EnrichmentService {
 		}
 		List<BPARequest> requests = new LinkedList<>();
 
-		/*
-		 * tenantIdToProperties.forEach((key,value)-> { requests.add(new
-		 * BPARequest(requestInfo,bpa)); }); return requests;
-		 */
 
 		return bpaRequest;
 	}
+
+	/**
+	 * Adds accountId of the logged in user to search criteria
+	 * 
+	 * @param requestInfo
+	 *            The requestInfo of search request
+	 * @param criteria
+	 *            The bpaSearch criteria
+	 */
+
+	public void enrichSearchCriteriaWithAccountId(RequestInfo requestInfo,
+			BPASearchCriteria criteria) {
+
+		if (criteria.isEmpty()
+				&& requestInfo.getUserInfo().getType()
+						.equalsIgnoreCase("CITIZEN")) {
+			criteria.setAccountId(requestInfo.getUserInfo().getUuid());
+			criteria.setMobileNumber(requestInfo.getUserInfo().getUserName());
+			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
+		}
+
+	}
+
+	/**
+	 * Creates search criteria from list of bpa's
+	 * 
+	 * @param bpa
+	 *            's list The bpa whose id's are added to search
+	 * @return bpaSearch criteria on basis of bpa id
+	 */
+	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa) {
+		BPASearchCriteria criteria = new BPASearchCriteria();
+		Set<String> bpaIds = new HashSet<>();
+		bpa.forEach(data -> bpaIds.add(data.getId()));
+		criteria.setIds(new LinkedList<>(bpaIds));
+		return criteria;
+	}
+
+	/**
+	 * Adds the ownerIds from userSearchReponse to search criteria
+	 * 
+	 * @param criteria
+	 *            The BPA search Criteria
+	 * @param userDetailResponse
+	 *            The response of user search
+	 */
+	public void enrichBPACriteriaWithOwnerids(BPASearchCriteria criteria,
+			UserDetailResponse userDetailResponse) {
+		if (CollectionUtils.isEmpty(criteria.getOwnerIds())) {
+			Set<String> ownerids = new HashSet<>();
+			userDetailResponse.getUser().forEach(
+					owner -> ownerids.add(owner.getUuid()));
+			criteria.setOwnerIds(new ArrayList<>(ownerids));
+		}
+
+	}
+
 }

@@ -20,21 +20,10 @@ public class BPAQueryBuilder {
 	private static final String INNER_JOIN_STRING = " INNER JOIN ";
 	private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
-	/*
-	 * private static final String QUERY =
-	 * "SELECT bpa.*,bpaunit.*,bpaacc.*,bpaowner.*,"+
-	 * "bpaaddress.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
-	 * +
-	 * "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-	 * +
-	 * "bpa_createdTime,,bpad.id as bpad_id,bpaaddress.id as bpa_ad_id,bpad.createdBy as bpad_createdBy,"
-	 * + "bpaowner.id as bpaowner_uuid,bpaowner.active as useractive,";
-	 */
-
 	private static final String QUERY = "SELECT bpa.*,bpaunit.*,bpaowner.*,"
-			+ "bpaaddress.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
+			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-			+ "bpa_createdTime,bpaaddress.id as bpa_ad_id,"
+			+ "bpa_createdTime,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
 			+ "bpaowner.id as bpaowner_uuid,bpaowner.active as useractive,"
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
 			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestore as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,bpaownerdoc.active as ownerdocactive,"
@@ -49,7 +38,9 @@ public class BPAQueryBuilder {
 			+ LEFT_OUTER_JOIN_STRING
 			+ "eg_bpa_unit bpaunit ON bpaunit.buildingplanid = bpa.id"
 			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_bpa_document bpadoc ON bpadoc.buildingplanid = bpa.id";
+			+ "eg_bpa_document bpadoc ON bpadoc.buildingplanid = bpa.id"
+			+ LEFT_OUTER_JOIN_STRING
+			+ "eg_bpa_geolocation bpageolocation ON bpageolocation.addressid = bpaaddress.id";;
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_id) offset_ FROM "
@@ -60,8 +51,6 @@ public class BPAQueryBuilder {
 			List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
-
-		
 
 		if (criteria.getTenantId() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -83,7 +72,7 @@ public class BPAQueryBuilder {
 					.append(")");
 			addToPreparedStatement(preparedStmtList, ownerIds);
 			addClauseIfRequired(preparedStmtList, builder);
-			// builder.append(" bpaowner.active = ? ) ");
+			builder.append(" bpaowner.active = ? ) ");
 			preparedStmtList.add(true);
 		}
 

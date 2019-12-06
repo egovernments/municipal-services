@@ -11,7 +11,7 @@ public class BPAConstants {
 
 	public static final String BPA_MODULE = "BPA";
 
-	public static final String BPA_MODULE_CODE = "BP";
+	public static final String BPA_MODULE_CODE = "BPA";
 
 	public static final String COMMON_MASTERS_MODULE = "common-masters";
 	
@@ -47,7 +47,7 @@ public class BPAConstants {
 	
 	// mdms path codes
 
-	public static final String BPA_JSONPATH_CODE = "$.MdmsRes";
+	public static final String BPA_JSONPATH_CODE = "$.MdmsRes.BPA";
 	
 	public static final String COMMON_MASTER_JSONPATH_CODE = "$.MdmsRes.common-masters";
 	
@@ -59,10 +59,12 @@ public class BPAConstants {
 	
 	// mdms master names
 
+    public static final String SERVICE_TYPE = "ServiceType";
 	public static final String APPLICATION_TYPE = "ApplicationType";
+	public static final String DOCUMENT_TYPE_MAPPING = "DocTypeMapping";
+	public static final String DOCUMENT_TYPE = "DocumentType";
 	public static final String OWNER_TYPE = "OwnerType";
 	public static final String OWNERSHIP_CATEGORY = "OwnerShipCategory";
-	public static final String DOCUMENT_TYPE = "DocumentType";
 
 	// FINANCIAL YEAR
 
@@ -116,4 +118,6 @@ public class BPAConstants {
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	public static final String  USREVENTS_EVENT_NAME = "Building Plan";
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPA";
+
+	
 }

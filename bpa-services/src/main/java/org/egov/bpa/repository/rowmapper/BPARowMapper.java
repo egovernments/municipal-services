@@ -54,7 +54,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.lastModifiedBy(rs.getString("bpa_lastModifiedBy"))
 						.lastModifiedTime(lastModifiedTime).build();
 				
-				/*
+				
 				Double latitude = (Double) rs.getObject("latitude");
 				Double longitude = (Double) rs.getObject("longitude");
 				
@@ -65,9 +65,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.build();
 
 				GeoLocation location2 = GeoLocation.builder().longitude(longitude)
-						.build();*/
-				Boundary locality = Boundary.builder()
-						.code(rs.getString("locality")).build();
+						.build();
+				
 				
 				Address address = Address
 						.builder()
@@ -104,7 +103,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 	}
 
-	@SuppressWarnings("unused")
 	private void addChildrenToProperty(ResultSet rs, BPA bpa)
 			throws SQLException {
 
@@ -165,12 +163,11 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			});
 		}
 
-		if (rs.getString("bpa_doc_id") != null
-				&& rs.getBoolean("bpa_doc_active")) {
+		if (rs.getString("bpa_doc_id") != null) {
 			Document document = Document.builder()
-					.documentType(rs.getString("bpa_ap_doc_documenttype"))
-					.fileStore(rs.getString("bpa_ap_doc_filestoreid"))
-					.id(rs.getString("bpa_ap_doc_id")).build();
+					.documentType(rs.getString("bpa_doc_documenttype"))
+					.fileStore(rs.getString("bpa_doc_filestore"))
+					.id(rs.getString("bpa_doc_id")).build();
 			bpa.addDocumentsItem(document);
 		}
 

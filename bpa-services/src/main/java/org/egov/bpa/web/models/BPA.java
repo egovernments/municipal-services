@@ -34,6 +34,10 @@ public class BPA {
 	private String applicationNo;
 
 	@Size(max = 64)
+	@JsonProperty("applicationType")
+	private String applicationType;
+	
+	@Size(max = 64)
 	@JsonProperty("edcrNumber")
 	private String edcrNumber;
 

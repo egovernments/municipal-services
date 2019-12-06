@@ -1,5 +1,5 @@
 ALTER TABLE eg_bpa_owner
-DROP CONSTRAINT eg_bpa_owner_pkey;
+DROP CONSTRAINT pk_eg_bpa_owner;
 
 ALTER TABLE eg_bpa_owner
 DROP COLUMN id;

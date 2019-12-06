@@ -28,7 +28,7 @@ public class WorkflowConfig {
     }
 
 
-    private String CONFIG_ROLES ="egov.workflow.tl.roles";
+    private String CONFIG_ROLES ="egov.workflow.bpa.roles";
 
 
 

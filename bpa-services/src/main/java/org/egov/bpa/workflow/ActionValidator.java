@@ -1,21 +1,19 @@
 package org.egov.bpa.workflow;
 
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.tracer.model.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.egov.bpa.util.BPAConstants.*;
+import org.egov.bpa.web.models.BPA;
+import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 @Component
@@ -53,7 +51,7 @@ public class ActionValidator {
      */
     public void validateUpdateRequest(BPARequest request,BusinessService businessService){
         validateDocumentsForUpdate(request);
-        validateRole(request);
+//        validateRole(request);
         validateAction(request);
         validateIds(request,businessService);
     }
@@ -127,8 +125,6 @@ public class ActionValidator {
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }
-
-
 
 
 

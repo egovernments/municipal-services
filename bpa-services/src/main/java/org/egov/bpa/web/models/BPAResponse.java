@@ -1,6 +1,5 @@
 package org.egov.bpa.web.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -18,7 +17,7 @@ public class BPAResponse {
 
 	@JsonProperty("Bpa")
 	@Valid
-	private Object BPA;
+	private List<BPA> BPA;
 
 	/*public BPAResponse addBuildingPlanItem(BPA bpaReq) {
 		if (this.BPA == null) {

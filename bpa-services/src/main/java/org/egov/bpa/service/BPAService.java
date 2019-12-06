@@ -13,11 +13,9 @@ import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
-import org.egov.bpa.workflow.ActionValidator;
-import org.egov.bpa.workflow.BPAWorkflowService;
+import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.workflow.WorkflowIntegrator;
-import org.egov.bpa.workflow.WorkflowService;
-import org.egov.tracer.model.CustomException;
+import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,14 +40,10 @@ public class BPAService {
 	@Autowired
     private BPARepository repository;
 
-    @Autowired
-    private ActionValidator actionValidator;
 
     @Autowired
     private BPAValidator bpaValidator;
 
-    @Autowired
-    private BPAWorkflowService BPAWorkflowService;
 
     @Autowired
     private BPAUtil util;
@@ -60,8 +54,6 @@ public class BPAService {
     @Autowired
     private BPAConfiguration config;
 
-    @Autowired
-    private WorkflowService workflowService;
     
 	public BPA create(BPARequest bpaRequest) {
 
@@ -72,7 +64,6 @@ public class BPAService {
 								+ bpaRequest.getBPA().getEdcrNumber() );
 		   }*/
 		    bpaValidator.validateCreate(bpaRequest,mdmsData);
-	        actionValidator.validateCreateRequest(bpaRequest);
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
 	       
 	        userService.createUser(bpaRequest);
@@ -87,10 +78,68 @@ public class BPAService {
 	}
 	
 
+	/**
+     *  Searches the Bpa for the given criteria if search is on owner paramter then first user service
+     *  is called followed by query to db
+     * @param criteria The object containing the paramters on which to search
+     * @param requestInfo The search request's requestInfo
+     * @return List of bpa for the given criteria
+     */
+    public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo){
+        List<BPA> bpa;
+        bpaValidator.validateSearch(requestInfo,criteria);
+        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
+         if(criteria.getMobileNumber()!=null){
+             bpa = getBPAFromMobileNumber(criteria,requestInfo);
+         }
+         else {
+             bpa = getBPAWithOwnerInfo(criteria,requestInfo);
+         }
+       return bpa;
+    }
 	
-	
-	
-	  /**
+
+    /**
+     * Returns the bpa with enrivhed owners from user servise
+     * @param criteria The object containing the paramters on which to search
+     * @param requestInfo The search request's requestInfo
+     * @return List of bpa for the given criteria
+     */
+    public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria,RequestInfo requestInfo){
+        List<BPA> bpa = repository.getBPAData(criteria);
+        if(bpa.isEmpty())
+            return Collections.emptyList();
+        bpa = enrichmentService.enrichBPASearch(bpa,criteria,requestInfo);
+        return bpa;
+    }
+   
+    
+    
+	  private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria,
+			RequestInfo requestInfo) {
+		  
+		  List<BPA> bpa = new LinkedList<>();
+	        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
+	        // If user not found with given user fields return empty list
+	        if(userDetailResponse.getUser().size()==0){
+	            return Collections.emptyList();
+	        }
+	        enrichmentService.enrichBPACriteriaWithOwnerids(criteria,userDetailResponse);
+	        bpa = repository.getBPAData(criteria);
+
+	        if(bpa.size()==0){
+	            return Collections.emptyList();
+	        }
+
+	        // Add bpaId of all bpa's owned by the user
+	        criteria=enrichmentService.getBPACriteriaFromIds(bpa);
+	        //Get all bpa with ownerInfo enriched from user service
+	        bpa = getBPAWithOwnerInfo(criteria,requestInfo);
+	        return bpa;
+	}
+
+
+	/**
      * Updates the bpa
      * @param bpaRequest The update Request
      * @return Updated bpa

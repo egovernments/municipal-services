@@ -1,7 +1,5 @@
 package org.egov.bpa.util;
 
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -109,13 +107,21 @@ public class BPAUtil {
 	        // filter to only get code field from master data
 	        final String filterCode = "$.[?(@.active==true)].code";
 
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).build());
-
+	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).filter(filterCode).build());
+	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
+	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
 	        ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
 	                .moduleName(BPAConstants.BPA_MODULE).build();
+	        
+	        // master details for common-masters module
+	        List<MasterDetail> commonMasterDetails = new ArrayList<>();
+	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNERSHIP_CATEGORY).filter(filterCode).build());
+	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNER_TYPE).filter(filterCode).build());
+	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
+	        ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
+	                .moduleName(BPAConstants.COMMON_MASTERS_MODULE).build();
 
-
-	        return Arrays.asList(bpaModuleDtls);
+	        return Arrays.asList(bpaModuleDtls,commonMasterMDtl);
 
 	    }
 	    

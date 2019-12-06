@@ -208,31 +208,31 @@ serviceMaps:
 
 
        - query: INSERT INTO eg_bpa_document_owner(id,tenantId,owner,active, buildingplanid, documenttype, fileStore,documentuid, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ? ,? ,?, ?, ?, ?, ?, ?, ?, ?);
-         basePath: bpa.owners.*.documents.*
+         basePath: BPA.owners.*.documents.*
          jsonMaps:
-           - jsonPath: $.bpa.owners.*.documents.*.id
+           - jsonPath: $.BPA.owners.*.documents.*.id
 
-           - jsonPath: $.bpa.owners.*.documents.*.tenantId
+           - jsonPath: $.BPA.owners.*.documents.*.tenantId
 
-           - jsonPath: $.bpa.owners.*.uuid
+           - jsonPath: $.BPA.owners.*.uuid
 
-           - jsonPath: $.bpa.owners.*.documents.*.active
+           - jsonPath: $.BPA.owners.*.documents.*.active
 
-           - jsonPath: $.bpa.owners.*.buildingplanId
+           - jsonPath: $.BPA.owners.*.buildingplanId
 
-           - jsonPath: $.bpa.owners.*.documents.*.documentType
+           - jsonPath: $.BPA.owners.*.documents.*.documentType
 
-           - jsonPath: $.bpa.owners.*.documents.*.fileStore
+           - jsonPath: $.BPA.owners.*.documents.*.fileStore
 
-           - jsonPath: $.bpa.owners.*.documents.*.documentUid
+           - jsonPath: $.BPA.owners.*.documents.*.documentUid
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.createdBy
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.createdBy
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.lastModifiedBy
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.lastModifiedBy
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.createdTime
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.createdTime
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.lastModifiedTime
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.lastModifiedTime
 
 
 
@@ -400,28 +400,28 @@ serviceMaps:
 
 
        - query: UPDATE eg_bpa_document_owner SET tenantId=?,owner=?,active=?, buildingplanid=?, documenttype=?, fileStore=?,documentuid=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
-         basePath: bpa.owners.*.documents.*
+         basePath: BPA.owners.*.documents.*
          jsonMaps:
 
-           - jsonPath: $.bpa.owners.*.documents.*.tenantId
+           - jsonPath: $.BPA.owners.*.documents.*.tenantId
 
-           - jsonPath: $.bpa.owners.*.uuid
+           - jsonPath: $.BPA.owners.*.uuid
 
-           - jsonPath: $.bpa.owners.*.documents.*.active
+           - jsonPath: $.BPA.owners.*.documents.*.active
 
-           - jsonPath: $.bpa.owners.*.buildingplanid
+           - jsonPath: $.BPA.owners.*.buildingplanid
 
-           - jsonPath: $.bpa.owners.*.documents.*.documentType
+           - jsonPath: $.BPA.owners.*.documents.*.documentType
 
-           - jsonPath: $.bpa.owners.*.documents.*.fileStore
+           - jsonPath: $.BPA.owners.*.documents.*.fileStore
 
-           - jsonPath: $.bpa.owners.*.documents.*.documentUid
+           - jsonPath: $.BPA.owners.*.documents.*.documentUid
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.lastModifiedBy
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.lastModifiedBy
 
-           - jsonPath: $.bpa.owners.*.documents.*.auditDetails.lastModifiedTime
+           - jsonPath: $.BPA.owners.*.documents.*.auditDetails.lastModifiedTime
 
-           - jsonPath: $.bpa.owners.*.documents.*.id
+           - jsonPath: $.BPA.owners.*.documents.*.id
 
 
 

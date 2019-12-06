@@ -21,8 +21,7 @@ public class BPAWorkflowService {
     private WorkflowConfig workflowConfig;
 
     @Autowired
-    public BPAWorkflowService(ActionValidator actionValidator, Producer producer, BPAConfiguration config,WorkflowConfig workflowConfig) {
-        this.actionValidator = actionValidator;
+    public BPAWorkflowService( Producer producer, BPAConfiguration config,WorkflowConfig workflowConfig) {
         this.producer = producer;
         this.config = config;
         this.workflowConfig = workflowConfig;
@@ -34,7 +33,7 @@ public class BPAWorkflowService {
      * @param request The update bpa Request
      */
     public void updateStatus(BPARequest request){
-        actionValidator.validateUpdateRequest(request,null);
+//        actionValidator.validateUpdateRequest(request,null);
         changeStatus(request);
     }
 
