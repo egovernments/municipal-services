@@ -34,10 +34,10 @@ public class WaterDaoImpl implements WaterDao {
 	@Autowired
 	WaterRowMapper waterRowMapper;
 
-	@Value("${egov.waterservice.createWaterConnection}")
+	@Value("${egov.waterservice.createwaterconnection}")
 	private String createWaterConnection;
 
-	@Value("${egov.waterservice.updateWaterConnection}")
+	@Value("${egov.waterservice.updatewaterconnection}")
 	private String updateWaterConnection;
 
 	@Override
