@@ -58,7 +58,6 @@ public class EstimationService {
 	 * @return Map<String, Double>
 	 */
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
-		BigDecimal taxAmt = BigDecimal.ZERO;
 		SewerageConnection sewerageConnection = null;
 		String assessmentYear = getAssessmentYear();
 		String tenantId = requestInfo.getUserInfo().getTenantId();
@@ -73,18 +72,18 @@ public class EstimationService {
 		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
+		ArrayList<String> billingSlabIds = new ArrayList<>();
 		mDataService.setSewerageConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 				timeBasedExemptionMasterMap);
 		BigDecimal sewarageCharge = getSewerageEstimationCharge(sewerageConnection, criteria, billingSlabMaster,
-				requestInfo);
-		taxAmt = sewarageCharge;
-		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
-				criteria.getSewerageConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
+				billingSlabIds, requestInfo);
+		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, sewarageCharge,
+				criteria.getSewerageConnection(), timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
-		estimatesAndBillingSlabs.put("billingSlabIds", new ArrayList<>());
+		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
 		return estimatesAndBillingSlabs;
 	}
 	
@@ -94,7 +93,7 @@ public class EstimationService {
 	 */
 
 	public BigDecimal getSewerageEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria, 
-			Map<String, JSONArray> billingSlabMaster, RequestInfo requestInfo) {
+			Map<String, JSONArray> billingSlabMaster, ArrayList<String> billingSlabIds, RequestInfo requestInfo) {
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
 		if (billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Emplty");
@@ -114,7 +113,9 @@ public class EstimationService {
 		if (billingSlabs.size() > 1)
 			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
-
+		//Add Billing Slab Ids
+		billingSlabIds.add(billingSlabs.get(0).id);
+		
 		// Sewerage Charge Calculation
 		Double totalUnite = 0.0;
 		totalUnite = getUnite(sewerageConnection, criteria);
@@ -148,49 +149,24 @@ public class EstimationService {
 	}
 	
 	
-	 /**
-	  * 
-	  * @param assessmentYear Assessment year
-	  * @param taxAmt taxable amount
-	  * @param connection
-	  * @param sewerageExemptionMasterMap
-	  * @param timeBasedExemeptionMasterMap
-	  * @param requestInfoWrapper
-	  * @return
-	  */
-		private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
-				SewerageConnection sewerageConnection, Map<String, JSONArray> sewerageBasedExemptionMasterMap,
-				Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
-			List<TaxHeadEstimate> estimates = new ArrayList<>();
-			BigDecimal payableTax = taxAmt;
-			// water_charge
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_CHARGE)
-					.estimateAmount(taxAmt.setScale(2, 2)).build());
-
-			// Water_cess
-//			List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
-//					.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
-//			BigDecimal waterCess;
-//			waterCess = waterCessUtil.getSewerageCess(payableTax, assesmentYear, waterCessMasterList, connection);
-//			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
-//					.estimateAmount(waterCess).build());
-			// get applicable rebate and penalty
-			Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
-					assessmentYear, timeBasedExemeptionMasterMap);
-			if (null != rebatePenaltyMap) {
-				BigDecimal rebate = rebatePenaltyMap.get(SWCalculationConstant.SW_TIME_REBATE);
-				BigDecimal penalty = rebatePenaltyMap.get(SWCalculationConstant.SW_TIME_REBATE);
-				BigDecimal interest = rebatePenaltyMap.get(SWCalculationConstant.SW_TIME_INTEREST);
-				estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_TIME_REBATE)
-						.estimateAmount(rebate).build());
-				estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_TIME_REBATE)
-						.estimateAmount(penalty).build());
-				estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_TIME_INTEREST)
-						.estimateAmount(interest).build());
-				payableTax = payableTax.add(rebate).add(penalty).add(interest);
-			}
-			return estimates;
-		}
+	/**
+	 * 
+	 * @param assessmentYear
+	 * @param sewarageCharge
+	 * @param sewerageConnection
+	 * @param timeBasedExemeptionMasterMap
+	 * @param requestInfoWrapper
+	 * @return
+	 */
+	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal sewarageCharge,
+			SewerageConnection sewerageConnection, Map<String, JSONArray> timeBasedExemeptionMasterMap,
+			RequestInfoWrapper requestInfoWrapper) {
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		// sewerage_charge
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_CHARGE)
+				.estimateAmount(sewarageCharge.setScale(2, 2)).build());
+		return estimates;
+	}
 		/**
 		 * 
 		 * @param waterConnection
