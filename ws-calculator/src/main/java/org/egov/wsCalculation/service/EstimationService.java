@@ -202,10 +202,10 @@ public class EstimationService {
 		final String unitOfMeasurement = waterConnection.getUom();
 
 		return billingSlabs.stream().filter(slab -> {
-			boolean isBuildingTypeMatching = slab.BuildingType.equals(buildingType);
-			boolean isConnectionTypeMatching = slab.ConnectionType.equals(connectionType);
-			boolean isCalculationAttributeMatching = slab.CalculationAttribute.equals(calculationAttribute);
-			boolean isUnitOfMeasurementMatcing = slab.UOM.equals(unitOfMeasurement);
+			boolean isBuildingTypeMatching = slab.BuildingType.equalsIgnoreCase(buildingType);
+			boolean isConnectionTypeMatching = slab.ConnectionType.equalsIgnoreCase(connectionType);
+			boolean isCalculationAttributeMatching = slab.CalculationAttribute.equalsIgnoreCase(calculationAttribute);
+			boolean isUnitOfMeasurementMatcing = slab.UOM.equalsIgnoreCase(unitOfMeasurement);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
 					&& isUnitOfMeasurementMatcing;
 		}).collect(Collectors.toList());

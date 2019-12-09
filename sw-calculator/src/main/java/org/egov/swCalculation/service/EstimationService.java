@@ -118,7 +118,7 @@ public class EstimationService {
 		
 		// Sewerage Charge Calculation
 		Double totalUnite = 0.0;
-		totalUnite = getUnite(sewerageConnection, criteria);
+		totalUnite = getCalculationUnit(sewerageConnection, criteria);
 		if (totalUnite == 0.0)
 			return sewerageCharge;
 		if (isRangeCalculation(sewerageConnection.getCalculationAttribute())) {
@@ -184,16 +184,16 @@ public class EstimationService {
 			final String unitOfMeasurement = sewerageConnection.getUom();
 
 			return billingSlabs.stream().filter(slab -> {
-				boolean isBuildingTypeMatching = slab.BuildingType.equals(buildingType);
-				boolean isConnectionTypeMatching = slab.ConnectionType.equals(connectionType);
-				boolean isCalculationAttributeMatching = slab.CalculationAttribute.equals(calculationAttribute);
-				boolean isUnitOfMeasurementMatcing = slab.UOM.equals(unitOfMeasurement);
+				boolean isBuildingTypeMatching = slab.BuildingType.equalsIgnoreCase(buildingType);
+				boolean isConnectionTypeMatching = slab.ConnectionType.equalsIgnoreCase(connectionType);
+				boolean isCalculationAttributeMatching = slab.CalculationAttribute.equalsIgnoreCase(calculationAttribute);
+				boolean isUnitOfMeasurementMatcing = slab.UOM.equalsIgnoreCase(unitOfMeasurement);
 				return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
 						&& isUnitOfMeasurementMatcing;
 			}).collect(Collectors.toList());
 		}
 		
-		private Double getUnite(SewerageConnection sewerageConnection, CalculationCriteria criteria) {
+		private Double getCalculationUnit(SewerageConnection sewerageConnection, CalculationCriteria criteria) {
 			Double totalUnite = 0.0;
 			if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.meteredConnectionType)) {
 				return totalUnite;
