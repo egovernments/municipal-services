@@ -198,7 +198,6 @@ public class DemandService {
 			Long toDate = (Long) finYearMap.get(SWCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
 
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
-
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getSwMinAmountPayable()).tenantId(tenantId).taxPeriodFrom(fromDate)
 					.taxPeriodTo(toDate).consumerType("sewerageConnection")

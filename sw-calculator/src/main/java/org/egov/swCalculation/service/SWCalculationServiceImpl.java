@@ -1,7 +1,7 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,15 +33,19 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	
 	@Autowired
 	PayService payService;
+	
+	@Autowired
+	DemandService demandService;
+	
 	/**
 	 * Get Calculation Request and return Calculated Response
 	 */
 	@Override
 	public CalculationRes getTaxCalculation(CalculationReq request) {
-		CalculationCriteria criteria = request.getCalculationCriteria().get(0);
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
-		return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(),
-				criteria, estimationService.getEstimationMap(criteria, request.getRequestInfo()), masterMap)));
+		List<Calculation> calculations = getCalculations(request, masterMap);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		return new CalculationRes(new ResponseInfo(),calculations);
 	}
 
 	
@@ -123,5 +127,19 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				.billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	
+	/**
+	 * 
+	 * @param request Contains calculation request
+	 * @return List of Calculation with different tax head
+	 */
+	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
+		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
+			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			calculations.add(calculation);
+		}
+		return calculations;
+	}
 	
 }

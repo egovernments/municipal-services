@@ -49,13 +49,6 @@ public class SWCalculationController {
 		return new ResponseEntity<>(sWCalculationService.getTaxCalculation(calculationReq), HttpStatus.OK);
 	}
 	
-	@PostMapping("/_createDemand")
-	public ResponseEntity<DemandResponse> generateDemands(@RequestBody @Valid CalculationReq calculationReq) {
-		List<Demand> demandList = demandService.generateDemands(calculationReq);
-		DemandResponse response = DemandResponse.builder().demands(demandList).responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true)).build();
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-
 	@PostMapping("/_updateDemand")
 	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {

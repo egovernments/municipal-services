@@ -98,6 +98,10 @@ public class Demand   {
 	@Builder.Default
 	@JsonProperty("minimumAmountPayable")
 	private BigDecimal minimumAmountPayable = BigDecimal.ZERO;
+	
+	
+	@JsonProperty("billExpiryTime")
+	private Long billExpiryTime;
 
 	/**
 	 * Gets or Sets status
