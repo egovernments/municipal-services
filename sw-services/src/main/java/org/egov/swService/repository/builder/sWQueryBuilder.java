@@ -46,9 +46,8 @@ public class sWQueryBuilder {
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
-			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getId()));
+			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 			addClauseIfRequired(preparedStatement, query);
@@ -86,6 +85,8 @@ public class sWQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
+		if(isAnyCriteriaMatch == false)
+			return null;
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);

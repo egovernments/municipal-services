@@ -43,9 +43,9 @@ public class MDMSValidator {
 		String jsonPath = SWConstants.JSONPATH_ROOT;
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 
-		String[] masterNames = { SWConstants.MDMS_WC_Connection_Type };
+		String[] masterNames = { SWConstants.MDMS_SW_Connection_Type };
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-		Map<String, List<String>> codes = getAttributeValues(tenantId, SWConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
+		Map<String, List<String>> codes = getAttributeValues(tenantId, SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
 				jsonPath, request.getRequestInfo());
 		validateMDMSData(masterNames, codes);
 		validateCodes(request.getSewerageConnection(), codes, errorMap);
@@ -88,7 +88,7 @@ public class MDMSValidator {
 
 	private static Map<String, String> validateCodes(SewerageConnection sewerageConnection,
 			Map<String, List<String>> codes, Map<String, String> errorMap) {
-		if (!codes.get(SWConstants.MDMS_WC_Connection_Type).contains(sewerageConnection.getConnectionType())
+		if (!codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())
 				&& sewerageConnection.getConnectionType() != null) {
 			errorMap.put("INVALID SEWERAGE CONNECTION TYPE", "The SewerageConnection connection type '"
 					+ sewerageConnection.getConnectionType() + "' does not exists");

@@ -52,6 +52,8 @@ public class SewarageDaoImpl implements SewarageDao {
 		List<Object> preparedStatement = new ArrayList<>();
 		
 		String query = sWQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
+		if(query == null)
+			return sewarageConnectionList;
 		log.info("Sewarage Search Query: " +query);
 		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 		return sewarageConnectionList;

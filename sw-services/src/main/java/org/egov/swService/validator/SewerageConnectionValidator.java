@@ -28,13 +28,10 @@ public class SewerageConnectionValidator {
 	public void validateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isUpdate) {
 		SewerageConnection sewerageConnection = sewerageConnectionRequest.getSewerageConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (isUpdate && (sewerageConnection.getId() == null || sewerageConnection.getId().isEmpty())) {
-			errorMap.put("INVALID SEWARAGE CONNECTION", "SewarageConnection cannot be updated without connection id");
-		}
-		if (isUpdate && sewerageConnection.getId() != null && !sewerageConnection.getId().isEmpty()) {
-			int n = sewarageDao.isSewerageConnectionExist(Arrays.asList(sewerageConnection.getId()));
+		if (isUpdate && sewerageConnection.getConnectionNo() != null && !sewerageConnection.getConnectionNo().isEmpty()) {
+			int n = sewarageDao.isSewerageConnectionExist(Arrays.asList(sewerageConnection.getConnectionNo()));
 			if (n == 0) {
-				errorMap.put("INVALID SEWARAGE CONNECTION", "Sewarage Id not present");
+				errorMap.put("INVALID SEWARAGE CONNECTION", "Sewarage connection id not present");
 			}
 		}
 		if (sewerageConnection.getConnectionType() == null || sewerageConnection.getConnectionType().isEmpty()) {

@@ -131,28 +131,28 @@ public class SewerageServicesUtil {
 	 * @return
 	 */
 
-	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
+	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if ((waterConnectionSearchCriteria.getTenantId() == null
-				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
+		if ((sewerageConnectionSearchCriteria.getTenantId() == null
+				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
 			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
 		}
-		if ((waterConnectionSearchCriteria.getMobileNumber() == null
-				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
+		if ((sewerageConnectionSearchCriteria.getMobileNumber() == null
+				|| sewerageConnectionSearchCriteria.getMobileNumber().isEmpty())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		if (waterConnectionSearchCriteria.getTenantId() != null
-				&& !waterConnectionSearchCriteria.getTenantId().isEmpty()) {
-			propertyCriteria.setTenantId(waterConnectionSearchCriteria.getTenantId());
+		if (sewerageConnectionSearchCriteria.getTenantId() != null
+				&& !sewerageConnectionSearchCriteria.getTenantId().isEmpty()) {
+			propertyCriteria.setTenantId(sewerageConnectionSearchCriteria.getTenantId());
 		}
-		if (waterConnectionSearchCriteria.getMobileNumber() != null
-				&& !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
-			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
+		if (sewerageConnectionSearchCriteria.getMobileNumber() != null
+				&& !sewerageConnectionSearchCriteria.getMobileNumber().isEmpty()) {
+			propertyCriteria.setMobileNumber(sewerageConnectionSearchCriteria.getMobileNumber());
 		}
 		Object result = serviceRequestRepository.fetchResult(
-				getPropURL(waterConnectionSearchCriteria.getTenantId(),
-						waterConnectionSearchCriteria.getMobileNumber()),
+				getPropURL(sewerageConnectionSearchCriteria.getTenantId(),
+						sewerageConnectionSearchCriteria.getMobileNumber()),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}

@@ -48,13 +48,15 @@ public class WsQueryBuilder {
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
-			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
-			if (!propertyIds.isEmpty())
+			if (!propertyIds.isEmpty()) {
+				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
-			addToPreparedStatement(preparedStatement, propertyIds);
-			isAnyCriteriaMatch = true;
+				addToPreparedStatement(preparedStatement, propertyIds);
+				isAnyCriteriaMatch = true;
+			}
+			
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
