@@ -25,6 +25,9 @@ public class PayService {
 
 	@Autowired
 	MasterDataService mDService;
+	
+	@Autowired
+	EstimationService estimationService;
 
 	/**
 	 * Decimal is ceiled for all the tax heads
@@ -123,12 +126,12 @@ public class PayService {
 	 *            master configuration
 	 * @return applicable penalty
 	 */
-	public BigDecimal getApplicablePenalty(BigDecimal waterCharge, BigDecimal noOfDays, Object config) {
+	public BigDecimal getApplicablePenalty(BigDecimal waterCharge, BigDecimal noOfDays, JSONArray config) {
 		BigDecimal applicablePenalty = BigDecimal.ZERO;
-		@SuppressWarnings("unchecked")
-		Map<String, Object> configMap = (Map<String, Object>) config;
-		BigDecimal daysApplicable = null != configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+		Map<String, Object> penaltyMaster = mDService.getApplicableMaster(estimationService.getAssessmentYear(), config);
+		if (null == penaltyMaster) return applicablePenalty;
+		BigDecimal daysApplicable = null != penaltyMaster.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) penaltyMaster.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
 				: null;
 		if (daysApplicable == null)
 			return applicablePenalty;
@@ -136,13 +139,13 @@ public class PayService {
 		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
 			return applicablePenalty;
 		}
-		BigDecimal rate = null != configMap.get(WSCalculationConstant.RATE_FIELD_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+		BigDecimal rate = null != penaltyMaster.get(WSCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) penaltyMaster.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
 				: null;
 
-		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+		BigDecimal flatAmt = null != penaltyMaster.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
 				? BigDecimal
-						.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+						.valueOf(((Number) penaltyMaster.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
 				: BigDecimal.ZERO;
 
 		if (rate == null)
@@ -162,12 +165,12 @@ public class PayService {
 	 *            master configuration
 	 * @return applicable Interest
 	 */
-	public BigDecimal getApplicableInterest(BigDecimal waterCharge, BigDecimal noOfDays, Object config) {
+	public BigDecimal getApplicableInterest(BigDecimal waterCharge, BigDecimal noOfDays, JSONArray config) {
 		BigDecimal applicableInterest = BigDecimal.ZERO;
-		@SuppressWarnings("unchecked")
-		Map<String, Object> configMap = (Map<String, Object>) config;
-		BigDecimal daysApplicable = null != configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+		Map<String, Object> interestMaster = mDService.getApplicableMaster(estimationService.getAssessmentYear(), config);
+		if (null == interestMaster) return applicableInterest;
+		BigDecimal daysApplicable = null != interestMaster.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) interestMaster.get(WSCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
 				: null;
 		if (daysApplicable == null)
 			return applicableInterest;
@@ -175,13 +178,13 @@ public class PayService {
 		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
 			return applicableInterest;
 		}
-		BigDecimal rate = null != configMap.get(WSCalculationConstant.RATE_FIELD_NAME)
-				? BigDecimal.valueOf(((Number) configMap.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+		BigDecimal rate = null != interestMaster.get(WSCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) interestMaster.get(WSCalculationConstant.RATE_FIELD_NAME)).doubleValue())
 				: null;
 
-		BigDecimal flatAmt = null != configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+		BigDecimal flatAmt = null != interestMaster.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
 				? BigDecimal
-						.valueOf(((Number) configMap.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+						.valueOf(((Number) interestMaster.get(WSCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
 				: BigDecimal.ZERO;
 
 		if (rate == null)
@@ -190,7 +193,8 @@ public class PayService {
 			// rate of interest
 			applicableInterest = waterCharge.multiply(rate.divide(WSCalculationConstant.HUNDRED));
 		}
-		return applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
+		//applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
+		return applicableInterest;
 	}
 	
 	public Long convertDaysToMilliSecond(int days) {

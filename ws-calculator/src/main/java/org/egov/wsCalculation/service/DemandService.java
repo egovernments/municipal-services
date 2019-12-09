@@ -61,9 +61,6 @@ public class DemandService {
 	private MasterDataService mstrDataService;
 
 	@Autowired
-	private AssessmentService assessmentService;
-
-	@Autowired
 	private WSCalculationUtil utils;
 
 	@Autowired
@@ -361,98 +358,6 @@ public class DemandService {
 	}
 
 	/**
-	 * if any previous assessments and demands associated with it exists for the
-	 * same financial year
-	 * 
-	 * Then Returns the collected amount of previous demand if the current
-	 * assessment is for the current year
-	 * 
-	 * and cancels the previous demand by updating it's status to inactive
-	 * 
-	 * @param criteria
-	 * @return
-	 */
-	protected BigDecimal getCarryForwardAndCancelOldDemand(BigDecimal newTax,
-			org.egov.wsCalculation.model.CalculationCriteria criteria, RequestInfo requestInfo, boolean cancelDemand) {
-
-		WaterConnection waterConnection = criteria.getWaterConnection();
-
-		BigDecimal carryForward = BigDecimal.ZERO;
-		BigDecimal oldTaxAmt = BigDecimal.ZERO;
-
-		if (null == waterConnection.getId())
-			return carryForward;
-
-		Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, waterConnection);
-
-		if (null == demand)
-			return carryForward;
-
-		carryForward = utils.getTotalCollectedAmountAndPreviousCarryForward(demand);
-
-		for (DemandDetail detail : demand.getDemandDetails()) {
-			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_TAX))
-				oldTaxAmt = oldTaxAmt.add(detail.getTaxAmount());
-		}
-
-		// if (oldTaxAmt.compareTo(newTax) > 0) {
-		// boolean isDepreciationAllowed =
-		// utils.isAssessmentDepreciationAllowed(criteria.getAssessmentYear(),
-		// waterConnection.getProperty().getTenantId(),
-		// waterConnection.getProperty().getPropertyId(),
-		// new RequestInfoWrapper(requestInfo));
-		// if (!isDepreciationAllowed)
-		// carryForward = BigDecimal.valueOf(-1);
-		// }
-
-		if (BigDecimal.ZERO.compareTo(carryForward) >= 0 || !cancelDemand)
-			return carryForward;
-
-		demand.setStatus(Demand.StatusEnum.CANCELLED);
-		DemandRequest request = DemandRequest.builder().demands(Arrays.asList(demand)).requestInfo(requestInfo).build();
-		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
-		repository.fetchResult(updateDemandUrl, request);
-
-		return carryForward;
-	}
-
-	/**
-	 * @param requestInfo
-	 * @param water
-	 *            connection
-	 * @return
-	 */
-	public Demand getLatestDemandForCurrentFinancialYear(RequestInfo requestInfo, WaterConnection waterConnection) {
-		String financialYear = "2019-20";
-
-		Assessment assessment = Assessment.builder().connectionId(waterConnection.getId())
-				.tenantId(waterConnection.getProperty().getTenantId()).assessmentYear(financialYear).build();
-
-		List<Assessment> assessments = assessmentService.getMaxAssessment(assessment);
-
-		if (CollectionUtils.isEmpty(assessments))
-			return null;
-
-		Assessment latestAssessment = assessments.get(0);
-
-		DemandResponse res = mapper.convertValue(
-				repository.fetchResult(utils.getDemandSearchUrl(latestAssessment), new RequestInfoWrapper(requestInfo)),
-				DemandResponse.class);
-		BigDecimal totalCollectedAmount = res.getDemands().get(0).getDemandDetails().stream()
-				.map(d -> d.getCollectionAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-		if (totalCollectedAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
-			// The total collected amount is fractional most probably because of
-			// previous
-			// round off dropping prior to BS/CS 1.1 release
-			throw new CustomException("INVALID_COLLECT_AMOUNT",
-					"The collected amount is fractional, please contact support for data correction");
-		}
-
-		return res.getDemands().get(0);
-	}
-
-	/**
 	 * 
 	 * @param getBillCriteria Bill Criteria
 	 * @param requestInfoWrapper contains request info wrapper
@@ -571,7 +476,12 @@ public class DemandService {
 		Long expiryDate = demand.getBillExpiryTime();
 		TaxPeriod taxPeriod = taxPeriods.stream().filter(t -> demand.getTaxPeriodFrom().compareTo(t.getFromDate()) >= 0
 				&& demand.getTaxPeriodTo().compareTo(t.getToDate()) <= 0).findAny().orElse(null);
-
+		
+		if (taxPeriod == null) {
+			log.info("Demand Expired!!");
+			return isCurrentDemand;
+		}
+		
 		if (!(taxPeriod.getFromDate() <= System.currentTimeMillis()
 				&& taxPeriod.getToDate() >= System.currentTimeMillis()))
 			isCurrentDemand = true;
@@ -633,7 +543,7 @@ public class DemandService {
 							.demandId(demandId).tenantId(tenantId).build());
 		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
 			details.add(
-					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_INTEREST)
 							.demandId(demandId).tenantId(tenantId).build());
 		}
 
