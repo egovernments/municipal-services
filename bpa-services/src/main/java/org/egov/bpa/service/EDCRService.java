@@ -45,7 +45,7 @@ public class EDCRService {
 	 *            BPARequest for create
 	 * 
 	 */
-	public Boolean validateEdcrPlan(BPARequest request) {
+	public void validateEdcrPlan(BPARequest request) {
 		
 		String edcrNo = request.getBPA().getEdcrNumber();
 		StringBuilder uri = new StringBuilder(config.getEdcrHost());
@@ -66,18 +66,11 @@ public class EDCRService {
 		List<String> edcrStatus = context.read("edcrDetail.*.status");
 		
 		if(CollectionUtils.isEmpty(edcrStatus) && !edcrStatus.get(0).equalsIgnoreCase("Accepted") ) {
-			return Boolean.FALSE;
-		}else {
-			return Boolean.TRUE;
+			 throw new CustomException("INVALID EDCR NUMBER",
+						"The Scrutiny is not accepted for the EDCR Number "
+								+ edcrNo );
 		}
-		
-		
-
-		
-
-		
-
-	}
+		}
 	
 	
 	

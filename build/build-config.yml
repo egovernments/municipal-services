@@ -69,3 +69,10 @@ config:
         image-name: "firenoc-calculator"
       - work-dir: "firenoc-calculator/migration"
         image-name: "firenoc-calculator-db"
+
+  - name: "municipal-services/bpa-services"
+    build:
+      - work-dir: "bpa-services"
+        image-name: "bpa-services"
+      - work-dir: "bpa-services/main/resources/db"
+        image-name: "bpa-services-db"

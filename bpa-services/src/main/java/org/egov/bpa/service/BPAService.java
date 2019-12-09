@@ -58,11 +58,7 @@ public class BPAService {
 	public BPA create(BPARequest bpaRequest) {
 
 		   Object mdmsData = util.mDMSCall(bpaRequest);
-		   /*if( !edcrService.validateEdcrPlan(bpaRequest)) {
-			   throw new CustomException("INVALID EDCR NUMBER",
-						"The Scrutiny is not accepted for the EDCR Number "
-								+ bpaRequest.getBPA().getEdcrNumber() );
-		   }*/
+		   edcrService.validateEdcrPlan(bpaRequest);
 		    bpaValidator.validateCreate(bpaRequest,mdmsData);
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
 	       
