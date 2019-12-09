@@ -64,6 +64,13 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}
+		
+		List<String> edcrNumbers = criteria.getEdcrNumber();
+		if (!CollectionUtils.isEmpty(edcrNumbers)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
+			addToPreparedStatement(preparedStmtList, edcrNumbers);
+		}
 
 		List<String> ownerIds = criteria.getOwnerIds();
 		if (!CollectionUtils.isEmpty(ownerIds)) {
@@ -76,10 +83,19 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(true);
 		}
 
-		if (criteria.getApplicationNo() != null) {
+		List<String> applicationNos = criteria.getApplicationNo();
+		if (!CollectionUtils.isEmpty(applicationNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("  bpa.applicationnumber = ? ");
-			preparedStmtList.add(criteria.getApplicationNo());
+			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos))
+			.append(")");
+			addToPreparedStatement(preparedStmtList, applicationNos);
+//			preparedStmtList.add(criteria.getApplicationNo());
+		}
+		
+		if (criteria.getMobileNumber() != null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpaowner.mobileNumber = ? ");
+			preparedStmtList.add(criteria.getMobileNumber());
 		}
 
 		if (criteria.getStatus() != null) {

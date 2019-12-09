@@ -40,6 +40,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 		while (rs.next()) {
 			String id = rs.getString("bpa_id");
+			String applicationNo = rs.getString("applicationno");
 			BPA currentbpa = buildingMap.get(id);
 			String tenantId = rs.getString("bpa_tenantId");
 			if (currentbpa == null) {
@@ -84,7 +85,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.street(rs.getString("street")).tenantId(tenantId).build();
 
 				currentbpa = BPA.builder().auditDetails(auditdetails)
-						.applicationNo(rs.getString("applicationno"))
+						.applicationNo(applicationNo)
 						.status(rs.getString("status"))
 						.tenantId(tenantId)
 						.edcrNumber("edcrnumber")

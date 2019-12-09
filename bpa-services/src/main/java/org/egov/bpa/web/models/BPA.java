@@ -34,6 +34,7 @@ public class BPA {
 	private String applicationNo;
 
 	@Size(max = 64)
+	@NotNull
 	@JsonProperty("applicationType")
 	private String applicationType;
 	
@@ -47,6 +48,7 @@ public class BPA {
 	private String tenantId;
 
 	@Size(max = 256)
+	@NotNull
 	@JsonProperty("serviceType")
 	private String serviceType;
 

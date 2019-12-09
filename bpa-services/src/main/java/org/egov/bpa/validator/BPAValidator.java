@@ -183,14 +183,14 @@ public class BPAValidator {
 			List<String> allowedParams) {
 
 		if (criteria.getApplicationNo() != null
-				&& !allowedParams.contains("applicationNumber"))
+				&& !allowedParams.contains("applicationNo"))
 			throw new CustomException("INVALID SEARCH",
-					"Search on applicationNumber is not allowed");
-
-		if (criteria.getTenantId() != null
-				&& !allowedParams.contains("tenantId"))
+					"Search on applicationNo is not allowed");
+		
+		if (criteria.getEdcrNumber() != null
+				&& !allowedParams.contains("edcrNumber"))
 			throw new CustomException("INVALID SEARCH",
-					"Search on tenantId is not allowed");
+					"Search on edcrNumber is not allowed");
 
 		if (criteria.getStatus() != null && !allowedParams.contains("status"))
 			throw new CustomException("INVALID SEARCH",

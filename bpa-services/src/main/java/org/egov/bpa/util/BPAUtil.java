@@ -88,8 +88,6 @@ public class BPAUtil {
 	        ModuleDetail masterDetail = ModuleDetail.builder().masterDetails(masterDetails)
 	                .moduleName(BPAConstants.MDMS_EGF_MASTER).build();
 
-
-
 	        return masterDetail;
 	    }
 	    
