@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.SearchCriteria;
@@ -66,7 +65,7 @@ public class SewarageServiceImpl implements SewarageService {
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList;
 		sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
-//		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo);
+		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo,criteria);
 		return sewarageConnectionList;
 	}
 

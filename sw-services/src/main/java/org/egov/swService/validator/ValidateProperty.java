@@ -21,11 +21,7 @@ public class ValidateProperty {
 	@Autowired
 	SewerageServicesUtil sewerageServiceUtil;
 	
-
-
-
-	
-	/**
+    /**
 	 * 
 	 * @param waterConnectionRequest
 	 *            WaterConnectionRequest is request to be validated against
@@ -52,13 +48,13 @@ public class ValidateProperty {
 	
 	public boolean isPropertyIdPresentForSewerage(SewerageConnectionRequest sewerageConnectionRequest) {
 		Property property = sewerageConnectionRequest.getSewerageConnection().getProperty();
-		if (property.getId() == null || property.getId().isEmpty()) {
+		if (property.getPropertyId() == null || property.getPropertyId().isEmpty()) {
 			return false;
 		}
 		return true;
 	}
 	
-	
+ 	
 	
 	public void enrichPropertyForSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		List<Property> propertyList;

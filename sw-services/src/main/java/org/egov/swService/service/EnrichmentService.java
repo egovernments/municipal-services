@@ -52,30 +52,27 @@ public class EnrichmentService {
 	 *            is RequestInfo from request
 	 */
 
-	public void enrichSewerageSearch(List<SewerageConnection> sewerageConnectionList, RequestInfo requestInfo) {
+	public void enrichSewerageSearch(List<SewerageConnection> sewerageConnectionList, RequestInfo requestInfo,SearchCriteria sewerageConnectionSearchCriteria) {
 		sewerageConnectionList.forEach(sewerageConnection -> {
 			List<Property> propertyList;
-			if (sewerageConnection.getProperty().getId() == null
-					|| sewerageConnection.getProperty().getId().isEmpty()) {
+			if (sewerageConnection.getProperty().getPropertyId() == null
+					|| sewerageConnection.getProperty().getPropertyId().isEmpty()) {
 				throw new CustomException("INVALID SEARCH",
 						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
 			}
-			if (sewerageConnection.getProperty().getId() != null) {
-				Set<String> propertyIds = new HashSet<>();
-				propertyIds.add(sewerageConnection.getProperty().getId());
-				SearchCriteria searchCriteria = SearchCriteria.builder()
-						.ids(propertyIds).build();
-				propertyList = sewerageServicesUtil.propertySearchOnCriteria(searchCriteria, requestInfo);
+			if (sewerageConnection.getProperty().getPropertyId() != null) {
+				String propertyId = sewerageConnection.getProperty().getPropertyId();
+				propertyList = sewerageServicesUtil.searchPropertyOnId(sewerageConnectionSearchCriteria.getTenantId(), propertyId, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",
-							"NO PROPERTY FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
+							"NO PROPERTY FOUND FOR " + sewerageConnection.getId() + " WATER CONNECTION ID");
 				}
 				sewerageConnection.setProperty(propertyList.get(0));
 			}
 		});
 	}
-
 	
+
 	
 	/**
 	 * 

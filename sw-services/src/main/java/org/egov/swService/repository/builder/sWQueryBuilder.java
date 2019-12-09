@@ -28,7 +28,7 @@ public class sWQueryBuilder {
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 	
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.connectionExecutionDate,"
-			+ " conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
+			+ "sc.noOfWaterClosets, sc.noOfToilets, sc.uom, sc.connectionType, sc.calculationAttribute, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
 			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
 
 	/**
@@ -38,9 +38,11 @@ public class sWQueryBuilder {
 	 * @param requestInfo
 	 * @return
 	 */
-	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo) {
+	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
+			RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		String resultantQuery = query.toString();
+		boolean isAnyCriteriaMatch = false;
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -49,33 +51,40 @@ public class sWQueryBuilder {
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
+			addClauseIfRequired(preparedStatement, query);
 			addToPreparedStatement(preparedStatement, propertyIds);
+			isAnyCriteriaMatch = true;
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");
 			preparedStatement.add(criteria.getOldConnectionNumber());
+			isAnyCriteriaMatch = true;
 		}
 
 		if (criteria.getConnectionNumber() != null && !criteria.getConnectionNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
+			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getApplicationNumber() != null && !criteria.getApplicationNumber().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationno = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
+			isAnyCriteriaMatch = true;
 		}
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
@@ -136,11 +145,11 @@ public class sWQueryBuilder {
 		return query;
 	}
 	
-	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
+	public String getNoOfSewerageConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		Set<String> listOfIds = new HashSet<>();
 		connectionIds.forEach(id -> listOfIds.add(id));
-		query.append(" id in (").append(createQuery(connectionIds)).append(" )");
+		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}

@@ -31,15 +31,13 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Autowired
 	sWQueryBuilder sWQueryBuilder;
 
-	
-
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
 
-	@Value("${egov.sewarageservice.createSewarageConnection}")
+	@Value("${egov.sewarageservice.createsewarageconnection}")
 	private String createSewarageConnection;
 
-	@Value("${egov.sewarageservice.updateSewarageConnection}")
+	@Value("${egov.sewarageservice.updatesewarageconnection}")
 	private String updateSewarageConnection;
 
 	@Override
@@ -64,7 +62,7 @@ public class SewarageDaoImpl implements SewarageDao {
 		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = sWQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
+		String query = sWQueryBuilder.getNoOfSewerageConnectionQuery(connectionIds, preparedStatement);
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}
