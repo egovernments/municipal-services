@@ -149,7 +149,7 @@ public class DemandService {
 			// calculation.getTenantId());
 
 			if (connection == null)
-				throw new CustomException("INVALID CONNECTIONNUMBER",
+				throw new CustomException("INVALID CONNECTION NUMBER",
 						"Demand cannot be generated for connectionNumber "
 								+ calculation.getWaterConnection().getConnectionNo()
 								+ " Water Connection with this number does not exist ");
@@ -182,6 +182,7 @@ public class DemandService {
 					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(billExpiryTime).build());
 		}
+		log.info("Demand Object" + demands.toString());
 		return demandRepository.saveDemand(requestInfo, demands);
 	}
 
@@ -451,6 +452,7 @@ public class DemandService {
 			demand.setDemandDetails(updatedDemandDetails);
 			demands.add(demand);
 		}
+		log.info("Updated Demand Details " +demands.toString());
 		return demandRepository.updateDemand(requestInfo, demands);
 	}
 
