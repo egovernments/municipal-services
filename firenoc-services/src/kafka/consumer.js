@@ -40,6 +40,7 @@ consumerGroup.on("message", function(message) {
   let payloads = [];
   const topic = envVariables.KAFKA_TOPICS_NOTIFICATION;
   let smsRequest = {};
+  let fireNOCRequest = {};
   let events = [];
   let { RequestInfo } = value;
 
@@ -168,6 +169,28 @@ consumerGroup.on("message", function(message) {
       sendEventNotificaiton();
     }
   };
+  const FireNOCPaymentStatus = Payments => {
+    console.log(Payments);
+    // for (let i = 0; i < Payments.length; i++) {
+    //   let applicationNumber = get(
+    //     Payments[i],
+    //     "paymentDetails.bill.consumerCode"
+    //   );
+    //   let status = get(
+    //     FireNOCs[i],
+    //     "FireNOCs[i].fireNOCDetails.status"
+    //   );
+    //   fireNOCRequest["status"]= `${status}`;
+
+    //   payloads.push({
+    //     topic,
+    //     messages: JSON.stringify(fireNOCRequest)
+    //   });
+  
+
+    // }
+  
+  };
 
   switch (message.topic) {
     case envVariables.KAFKA_TOPICS_FIRENOC_CREATE:
@@ -189,11 +212,17 @@ consumerGroup.on("message", function(message) {
       }
       break;
 
+    // case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
+    //   {
+    //     console.log("reciept hit");
+    //   }
+    //   break;
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
-      {
-        console.log("reciept hit");
-      }
-      break;
+        {
+          const { FireNOCs } = value;
+          FireNOCPaymentStatus(FireNOCs);
+        }
+       break;
   }
 
   producer.send(payloads, function(err, data) {
