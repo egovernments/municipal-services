@@ -58,7 +58,7 @@ public class ValidateProperty {
 	
 	public void enrichPropertyForSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		List<Property> propertyList;
-		if (!isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
+		if (isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
 			propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
 		} else {
 			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);

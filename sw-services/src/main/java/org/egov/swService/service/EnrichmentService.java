@@ -45,8 +45,8 @@ public class EnrichmentService {
 
 	/**
 	 * 
-	 * @param waterConnectionList
-	 *            List of water connection for enriching the water connection
+	 * @param sewerageConnectionList
+	 *            List of sewerage connection for enriching the sewerage connection
 	 *            with property.
 	 * @param requestInfo
 	 *            is RequestInfo from request
@@ -76,7 +76,7 @@ public class EnrichmentService {
 	
 	/**
 	 * 
-	 * @param waterConnectionRequest
+	 * @param sewerageConnectionRequest
 	 * @param propertyList
 	 */
 
