@@ -18,7 +18,7 @@ import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.Idgen.IdResponse;
 import org.egov.swService.repository.IdGenRepository;
-import org.egov.swService.util.WaterServicesUtil;
+import org.egov.swService.util.SewerageServicesUtil;
 import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,9 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class EnrichmentService {
 
+	
 	@Autowired
-	WaterServicesUtil waterServicesUtil;
+	SewerageServicesUtil sewerageServicesUtil;
 	
 	@Autowired
 	IdGenRepository idGenRepository;
@@ -64,7 +65,7 @@ public class EnrichmentService {
 				propertyIds.add(sewerageConnection.getProperty().getId());
 				SearchCriteria searchCriteria = SearchCriteria.builder()
 						.ids(propertyIds).build();
-				propertyList = waterServicesUtil.propertySearchOnCriteria(searchCriteria, requestInfo);
+				propertyList = sewerageServicesUtil.propertySearchOnCriteria(searchCriteria, requestInfo);
 				if (propertyList == null || propertyList.isEmpty()) {
 					throw new CustomException("INVALID SEARCH",
 							"NO PROPERTY FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
