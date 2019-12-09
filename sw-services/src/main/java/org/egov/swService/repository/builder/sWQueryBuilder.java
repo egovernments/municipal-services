@@ -48,9 +48,10 @@ public class sWQueryBuilder {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
-			if (!propertyIds.isEmpty())
+			if (!propertyIds.isEmpty()) {
+				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
-			addClauseIfRequired(preparedStatement, query);
+			}
 			addToPreparedStatement(preparedStatement, propertyIds);
 			isAnyCriteriaMatch = true;
 		}
