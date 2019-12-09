@@ -6,11 +6,11 @@ public class SWConstants {
 
 	}
 
-	public static final String JSONPATH_ROOT = "$.MdmsRes.sw-services-masters";
+	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
 
 	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
 
-	public static final String MDMS_SW_MOD_NAME = "sw-services-masters";
+	public static final String MDMS_SW_MOD_NAME = "ws-services-masters";
 
 	public static final String MDMS_SW_Connection_Type = "connectionType";
 
