@@ -26,9 +26,9 @@ public class WsQueryBuilder {
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
 			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
-			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM eg_ws_service wc "
-			+ INNER_JOIN_STRING + " eg_ws_connection conn ON wc.connection_id = conn.id";
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_ws_connection WHERE";
+			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
+			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 
 
 	/**
@@ -48,14 +48,13 @@ public class WsQueryBuilder {
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
+			addClauseIfRequired(preparedStatement, query);
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
-			if (!propertyIds.isEmpty()) {
+			if (!propertyIds.isEmpty())
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
-				addClauseIfRequired(preparedStatement, query);
-				addToPreparedStatement(preparedStatement, propertyIds);
-				isAnyCriteriaMatch = true;
-			}
+			addToPreparedStatement(preparedStatement, propertyIds);
+			isAnyCriteriaMatch = true;
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);

@@ -17,9 +17,9 @@ public class WSCalculatorQueryBuilder {
 
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String Query = "SELECT mr.id, mr.connectionNo as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, mr.lastReadingDate, mr.currentReading, "
-			+ "mr.currentReadingDate FROM eg_ws_meterreading mr";
+			+ "mr.currentReadingDate FROM meterreading mr";
 
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_ws_meterreading WHERE";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
 
 	/**
 	 * 
