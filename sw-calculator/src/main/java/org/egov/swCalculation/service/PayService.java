@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.TaxHeadEstimate;
@@ -18,6 +19,10 @@ public class PayService {
 
 	@Autowired
 	MasterDataService mDService;
+	
+	@Autowired
+	EstimationService estimationService;
+	
 	/**
 	 * 
 	 * @param taxAmt
@@ -202,5 +207,115 @@ public class PayService {
 					.build();
 		else
 			return null;
+	}
+	
+	
+	/**
+	 * 
+	 * @param waterCharge
+	 * @param assessmentYear
+	 * @param timeBasedExmeptionMasterMap
+	 * @param billingExpiryDate
+	 * @return estimation of time based exemption
+	 */
+	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal waterCharge,
+			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
+
+		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
+			return null;
+		Map<String, BigDecimal> estimates = new HashMap<>();
+		BigDecimal penalty = BigDecimal.ZERO;
+		BigDecimal interest = BigDecimal.ZERO;
+		long currentUTC = System.currentTimeMillis();
+		long numberOfDaysInMillies = billingExpiryDate - currentUTC;
+		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
+		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
+		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_PENANLTY_MASTER));
+		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_INTEREST_MASTER));
+		estimates.put(SWCalculationConstant.SW_TIME_PENALTY, penalty.setScale(2, 2));
+		estimates.put(SWCalculationConstant.SW_TIME_INTEREST, interest.setScale(2, 2));
+		return estimates;
+	}
+	
+	
+	/**
+	 * 
+	 * @param sewerageCharge
+	 * @param noOfDays
+	 * @param config
+	 * @return
+	 */
+	public BigDecimal getApplicablePenalty(BigDecimal sewerageCharge, BigDecimal noOfDays, JSONArray config) {
+		BigDecimal applicablePenalty = BigDecimal.ZERO;
+		Map<String, Object> penaltyMaster = mDService.getApplicableMaster(estimationService.getAssessmentYear(), config);
+		if (null == penaltyMaster) return applicablePenalty;
+		BigDecimal daysApplicable = null != penaltyMaster.get(SWCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) penaltyMaster.get(SWCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+				: null;
+		if (daysApplicable == null)
+			return applicablePenalty;
+		BigDecimal daysDiff = noOfDays.subtract(daysApplicable);
+		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
+			return applicablePenalty;
+		}
+		BigDecimal rate = null != penaltyMaster.get(SWCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) penaltyMaster.get(SWCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal flatAmt = null != penaltyMaster.get(SWCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+				? BigDecimal
+						.valueOf(((Number) penaltyMaster.get(SWCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				: BigDecimal.ZERO;
+
+		if (rate == null)
+			applicablePenalty = flatAmt.compareTo(sewerageCharge) > 0 ? BigDecimal.ZERO : flatAmt;
+		else if (rate != null) {
+			// rate of penalty
+			applicablePenalty = sewerageCharge.multiply(rate.divide(SWCalculationConstant.HUNDRED));
+		}
+		return applicablePenalty;
+	}
+	
+	/**
+	 * 
+	 * @param sewerageCharge
+	 * @param noOfDays
+	 * @param config
+	 * @return
+	 */
+	public BigDecimal getApplicableInterest(BigDecimal sewerageCharge, BigDecimal noOfDays, JSONArray config) {
+		BigDecimal applicableInterest = BigDecimal.ZERO;
+		Map<String, Object> interestMaster = mDService.getApplicableMaster(estimationService.getAssessmentYear(), config);
+		if (null == interestMaster) return applicableInterest;
+		BigDecimal daysApplicable = null != interestMaster.get(SWCalculationConstant.DAYA_APPLICABLE_NAME)
+				? BigDecimal.valueOf(((Number) interestMaster.get(SWCalculationConstant.DAYA_APPLICABLE_NAME)).intValue())
+				: null;
+		if (daysApplicable == null)
+			return applicableInterest;
+		BigDecimal daysDiff = noOfDays.subtract(daysApplicable);
+		if (daysDiff.compareTo(BigDecimal.ONE) < 0) {
+			return applicableInterest;
+		}
+		BigDecimal rate = null != interestMaster.get(SWCalculationConstant.RATE_FIELD_NAME)
+				? BigDecimal.valueOf(((Number) interestMaster.get(SWCalculationConstant.RATE_FIELD_NAME)).doubleValue())
+				: null;
+
+		BigDecimal flatAmt = null != interestMaster.get(SWCalculationConstant.FLAT_AMOUNT_FIELD_NAME)
+				? BigDecimal
+						.valueOf(((Number) interestMaster.get(SWCalculationConstant.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
+				: BigDecimal.ZERO;
+
+		if (rate == null)
+			applicableInterest = flatAmt.compareTo(sewerageCharge) > 0 ? BigDecimal.ZERO : flatAmt;
+		else if (rate != null) {
+			// rate of interest
+			applicableInterest = sewerageCharge.multiply(rate.divide(SWCalculationConstant.HUNDRED));
+		}
+		//applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
+		return applicableInterest;
+	}
+	
+	public Long convertDaysToMilliSecond(int days) {
+		return TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS); //gives 86400000
 	}
 }

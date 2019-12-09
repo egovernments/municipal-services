@@ -4,6 +4,9 @@ package org.egov.swCalculation.constants;
 import org.egov.swCalculation.model.DemandStatus;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class SWCalculationConstant {
@@ -123,6 +126,11 @@ public class SWCalculationConstant {
 	public static final String noOfWaterClosets = "No. of water closets";
 	
 	public static final String noOfToilets = "No. of toilets";
+	
+	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(SW_CHARGE));
+	
+	public static final String DAYA_APPLICABLE_NAME = "applicableAfterDays";
 
+	
 
 }

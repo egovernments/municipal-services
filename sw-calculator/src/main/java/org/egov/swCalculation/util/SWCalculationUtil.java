@@ -1,11 +1,14 @@
 package org.egov.swCalculation.util;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
-import org.egov.swCalculation.config.SWCalculationConfiguration.SWCalculationConfigurationBuilder;
 import org.egov.swCalculation.constants.SWCalculationConstant;
+import org.egov.swCalculation.model.DemandDetail;
+import org.egov.swCalculation.model.DemandDetailAndCollection;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -115,6 +118,34 @@ public class SWCalculationUtil {
 	public StringBuilder getUpdateDemandUrl() {
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getDemandUpdateEndPoint());
+	}
+	
+	public DemandDetailAndCollection getLatestDemandDetailByTaxHead(String taxHeadCode,
+			List<DemandDetail> demandDetails) {
+		List<DemandDetail> details = demandDetails.stream()
+				.filter(demandDetail -> demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(taxHeadCode))
+				.collect(Collectors.toList());
+		if (CollectionUtils.isEmpty(details))
+			return null;
+
+		BigDecimal taxAmountForTaxHead = BigDecimal.ZERO;
+		BigDecimal collectionAmountForTaxHead = BigDecimal.ZERO;
+		DemandDetail latestDemandDetail = null;
+		long maxCreatedTime = 0l;
+
+		for (DemandDetail detail : details) {
+			taxAmountForTaxHead = taxAmountForTaxHead.add(detail.getTaxAmount());
+			collectionAmountForTaxHead = collectionAmountForTaxHead.add(detail.getCollectionAmount());
+			if (detail.getAuditDetails().getCreatedTime() > maxCreatedTime) {
+				maxCreatedTime = detail.getAuditDetails().getCreatedTime();
+				latestDemandDetail = detail;
+			}
+		}
+
+		return DemandDetailAndCollection.builder().taxHeadCode(taxHeadCode).latestDemandDetail(latestDemandDetail)
+				.taxAmountForTaxHead(taxAmountForTaxHead).collectionAmountForTaxHead(collectionAmountForTaxHead)
+				.build();
+
 	}
 
 }
