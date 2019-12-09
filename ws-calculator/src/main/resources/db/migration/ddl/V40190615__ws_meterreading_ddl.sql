@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS meterreading;
-CREATE TABLE meterreading
+DROP TABLE IF EXISTS eg_ws_meterreading;
+CREATE TABLE eg_ws_meterreading
 (
   id character varying(64),
   connectionNo character varying(64),

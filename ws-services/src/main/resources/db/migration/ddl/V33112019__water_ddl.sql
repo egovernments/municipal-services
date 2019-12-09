@@ -1,10 +1,10 @@
-DROP TABLE IF EXISTS water_service_connection;
-DROP TABLE IF EXISTS connection;
+DROP TABLE IF EXISTS eg_ws_service;
+DROP TABLE IF EXISTS eg_ws_connection;
 
-CREATE TABLE connection
+CREATE TABLE eg_ws_connection
 (
   id character varying(64) NOT NULL,
-	tenantid character varying(250) NOT NULL,
+  tenantid character varying(250) NOT NULL,
   property_id character varying(64) NOT NULL,
   applicationno character varying(64),
   applicationstatus character varying(256),
@@ -15,7 +15,7 @@ CREATE TABLE connection
   CONSTRAINT connection_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE water_service_connection
+CREATE TABLE eg_ws_service
 (
   connection_id character varying(64) NOT NULL,
   connectioncategory character varying(32) NOT NULL,
