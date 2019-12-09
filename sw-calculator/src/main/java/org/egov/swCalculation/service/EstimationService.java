@@ -45,28 +45,6 @@ public class EstimationService {
 	
 	@Autowired
 	SWCalculationService swCalculationService;
-/**
- * 
- * @param Calculation request parameter
- * @return Map of Billing Slab and Calculation
- */
-	public Map<String, Calculation> getEstimationSewerageMap(CalculationReq request) {
-
-		RequestInfo requestInfo = request.getRequestInfo();
-		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
-		Map<String, Calculation> calculationWaterMap = new HashMap<>();
-		for (CalculationCriteria criteria : criteriaList) {
-			String connectionNO = criteria.getConnectionNo();
-			Map<String, List> estimatesAndBillingSlabs = null;
-			estimatesAndBillingSlabs = getEstimationMap(criteria, requestInfo);
-			Calculation calculation = swCalculationService.getCalculation(requestInfo, criteria,
-					estimatesAndBillingSlabs , masterMap);
-			calculation.setConnectionNo(connectionNO);
-			calculationWaterMap.put(connectionNO, calculation);
-		}
-		return calculationWaterMap;
-	}
 
 	
 	/**

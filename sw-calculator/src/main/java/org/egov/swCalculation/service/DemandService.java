@@ -76,27 +76,6 @@ public class DemandService {
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
-	/*
-	 * Generates and persists the demand to billing service for the given water
-	 * connection
-	 * 
-	 * if the water connection has been assessed already for the given financial
-	 * year then
-	 * 
-	 * it carry forwards the old collection amount to the new demand as advance
-	 * 
-	 * @param request
-	 * 
-	 * @return
-	 */
-	public List<Demand> generateDemands(CalculationReq request) {
-		List<Demand> createdDemand = new ArrayList<>();
-		Map<String, Object> masterMap = mstrDataService.getMasterMap(request);
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationSewerageMap(request);
-		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
-		createdDemand = generateDemand(request.getRequestInfo(), calculationList, masterMap);
-		return createdDemand;
-	}
 
 	/**
 	 * Creates or updates Demand
@@ -328,57 +307,7 @@ public class DemandService {
 		return url.toString();
 	}
 
-	/**
-	 * Generates and returns bill from billing service
-	 * 
-	 * updates the demand with penalty and rebate if applicable before
-	 * generating bill
-	 * 
-	 * @param getBillCriteria
-	 * @param requestInfoWrapper
-	 */
-	// public BillResponse getBill(GetBillCriteria getBillCriteria,
-	// RequestInfoWrapper requestInfoWrapper) {
-	//
-	// DemandResponse res = updateDemands(getBillCriteria, requestInfoWrapper);
-	//
-	// /**
-	// * Loop through the demands and call generateBill for each demand. Group
-	// * the Bills and return the bill response
-	// */
-	// List<Bill> bills = new LinkedList<>();
-	// BillResponse billResponse;
-	// ResponseInfo responseInfo = null;
-	// StringBuilder billGenUrl;
-	//
-	// for (Demand demand : res.getDemands()) {
-	// billGenUrl = utils.getBillGenUrl(getBillCriteria.getTenantId(),
-	// demand.getId(), demand.getConsumerCode());
-	// billResponse = mapper.convertValue(repository.fetchResult(billGenUrl,
-	// requestInfoWrapper),
-	// BillResponse.class);
-	// responseInfo = billResponse.getResposneInfo();
-	// bills.addAll(billResponse.getBill());
-	// }
-	//
-	// return
-	// BillResponse.builder().resposneInfo(responseInfo).bill(bills).build();
-	// }
 
-	/**
-	 * update demand for the given list of calculations
-	 * 
-	 * @param calculations
-	 *            Request that contain request info and calculation list
-	 * @return Demands that are updated
-	 */
-	public List<Demand> updateDemands(CalculationReq request) {
-		List<Demand> demands = new LinkedList<>();
-		Map<String, Calculation> waterCalculationMap = estimationService.getEstimationSewerageMap(request);
-		List<Calculation> calculationList = new ArrayList<>(waterCalculationMap.values());
-		demands = updateDemandForCalculation(request.getRequestInfo(), calculationList);
-		return demands;
-	}
 
 	/**
 	 * Updates demand for the given list of calculations
