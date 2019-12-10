@@ -154,7 +154,7 @@ public class AssessmentValidator {
 		}
 
 		else {
-
+			//Do something.
 		}
 
 		if (!CollectionUtils.isEmpty(errorMap.keySet())) {
