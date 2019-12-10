@@ -58,7 +58,10 @@ public class EnrichmentService {
             tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
             String businessService = tradeLicense.getBusinessService();
             if (businessService == null)
+            {
                 businessService = businessService_TL;
+                tradeLicense.setBusinessService(businessService);
+            }
             switch (businessService) {
                 case businessService_TL:
                     Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
@@ -340,6 +343,11 @@ public class EnrichmentService {
             tradeLicense.setAuditDetails(auditDetails);
 
             String nameOfBusinessService = tradeLicense.getBusinessService();
+            if(nameOfBusinessService==null)
+            {
+                nameOfBusinessService=businessService_TL;
+                tradeLicense.setBusinessService(nameOfBusinessService);
+            }
             if ((nameOfBusinessService.equals(businessService_BPA) && (tradeLicense.getStatus().equalsIgnoreCase(STATUS_INITIATED))) || workflowService.isStateUpdatable(tradeLicense.getStatus(), businessService)) {
                 tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
                 if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories())) {
