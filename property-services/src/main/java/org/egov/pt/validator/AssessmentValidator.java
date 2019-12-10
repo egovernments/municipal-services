@@ -183,7 +183,7 @@ public class AssessmentValidator {
 			if(!masters.get(PTConstants.MDMS_PT_CONSTRUCTIONTYPE).contains(unit.getConstructionType()))
 				errorMap.put("CONSTRUCTION_TYPE_INVALID", "The construction type provided is invalid");
 			
-			if(!masters.get(PTConstants.MDMS_PT_USAGEMAJOR).contains(unit.getUsageCategory()))
+			if(!masters.get(PTConstants.MDMS_PT_USAGECATEGORY).contains(unit.getUsageCategory()))
 				errorMap.put("USAGE_CATEGORY_INVALID", "The usage category provided is invalid");
 			
 			if(!masters.get(PTConstants.MDMS_PT_OCCUPANCYTYPE).contains(unit.getOccupancyType()))
