@@ -45,12 +45,12 @@ public class WSCalculationValidator {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
 		
-//		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
-//				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
-//		if(connection == null) {
-//			errorMap.put("INVALID METER READING CONNECTION",
-//					"Invalid water connection number");
-//		}
+		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
+				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		if(connection == null) {
+			errorMap.put("INVALID METER READING CONNECTION",
+					"Invalid water connection number");
+		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
 		Set<String> connectionNos= new HashSet<>();
 		connectionNos.add(meterReading.getConnectionNo());
