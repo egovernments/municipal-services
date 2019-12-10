@@ -78,6 +78,23 @@ public class WaterServicesUtil {
 		}
 		return propertyList;
 	}
+	
+	public List<Property> propertySearchForCitizen(RequestInfo requestInfo) {
+		Set<String> propertyIds = new HashSet<>();
+		List<Property> propertyList = new ArrayList<>();
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		HashMap<String, Object> propertyRequestObj = new HashMap<>();
+		propertyCriteria.setPropertyIds(propertyIds);
+//		Object result = serviceRequestRepository.fetchResult(
+//				getPropURLForCreate(waterConnectionRequest.getWaterConnection().getProperty().getTenantId(),
+//						waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()),
+//				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+//		propertyList = getPropertyDetails(result);
+		if (propertyList == null || propertyList.isEmpty()) {
+			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
+		}
+		return propertyList;
+	}
 
 	/**
 	 * 

@@ -2,7 +2,10 @@ package org.egov.wsCalculation.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
@@ -45,6 +48,17 @@ public class WSCalculationValidator {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Invalid water connection number");
 		}
+		
+		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
+		Set<String> connectionNos= new HashSet<>();
+		connectionNos.add(meterReading.getConnectionNo());
+		criteria.setConnectionNos(connectionNos);
+		Integer currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
+		if (meterReading.getCurrentReading() <= currentMeterReading) {
+			errorMap.put("INVALID METER READING CONNECTION",
+					"Current meter reading has to be greater than the past current readings in the meter reading table !");
+		}
+		
 		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
