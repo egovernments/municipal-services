@@ -23,8 +23,8 @@ public class ValidateProperty {
 	
     /**
 	 * 
-	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest is request to be validated against
+	 * @param sewerageConnectionRequest
+	 *            SewerageConnectionRequest is request to be validated against
 	 *            property
 	 */
 

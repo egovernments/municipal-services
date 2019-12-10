@@ -34,10 +34,10 @@ public class SewarageDaoImpl implements SewarageDao {
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
 
-	@Value("${egov.sewarageservice.createsewarageconnection}")
+	@Value("${egov.sewarageservice.createconnection}")
 	private String createSewarageConnection;
 
-	@Value("${egov.sewarageservice.updatesewarageconnection}")
+	@Value("${egov.sewarageservice.updateconnection}")
 	private String updateSewarageConnection;
 
 	@Override

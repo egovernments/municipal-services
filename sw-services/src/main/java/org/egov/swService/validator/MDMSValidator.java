@@ -35,7 +35,6 @@ public class MDMSValidator {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
 
-	;
 
 	public void validateMasterData(SewerageConnectionRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
