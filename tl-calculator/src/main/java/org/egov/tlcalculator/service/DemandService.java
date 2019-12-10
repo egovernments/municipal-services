@@ -22,7 +22,9 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.BILLINGSLAB_KEY;
 import static org.egov.tlcalculator.utils.TLCalculatorConstants.MDMS_ROUNDOFF_TAXHEAD;
 import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_BPA;
 import static org.egov.tlcalculator.utils.TLCalculatorConstants.businessService_TL;
@@ -168,24 +170,25 @@ public class DemandService {
                         .tenantId(tenantId)
                         .build());
             });
-
-
-
-            Long taxPeriodFrom = System.currentTimeMillis();;
-            Long taxPeriodTo = System.currentTimeMillis(); ;
+            Long taxPeriodFrom = System.currentTimeMillis();
+            Long taxPeriodTo = System.currentTimeMillis();
             String businessService = license.getBusinessService();
             if (businessService == null)
                 businessService = businessService_TL;
-            switch(businessService)
-            {
+            switch (businessService) {
                 case businessService_TL:
-                    Map<String,Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo,license,mdmsData);
-                    taxPeriodFrom=taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE);
-                    taxPeriodTo=taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE);
+                    Map<String, Long> taxPeriods = mdmsService.getTaxPeriods(requestInfo, license, mdmsData);
+                    taxPeriodFrom = taxPeriods.get(TLCalculatorConstants.MDMS_STARTDATE);
+                    taxPeriodTo = taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE);
                     break;
             }
-            addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
-            Demand singleDemand=Demand.builder()
+            addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
+            List<String> combinedBillingSlabs = new LinkedList<>();
+            if (calculation.getTradeTypeBillingIds() != null && !CollectionUtils.isEmpty(calculation.getTradeTypeBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getTradeTypeBillingIds().getBillingSlabIds());
+            if (calculation.getAccessoryBillingIds() != null && !CollectionUtils.isEmpty(calculation.getAccessoryBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getAccessoryBillingIds().getBillingSlabIds());
+            Demand singleDemand = Demand.builder()
                     .consumerCode(consumerCode)
                     .demandDetails(demandDetails)
                     .payer(owner)
@@ -195,16 +198,15 @@ public class DemandService {
                     .taxPeriodTo(taxPeriodTo)
                     .consumerType("tradelicense")
                     .businessService(config.getBusinessServiceTL())
+                    .additionalDetails(Collections.singletonMap(BILLINGSLAB_KEY, combinedBillingSlabs))
                     .build();
-            switch(businessService)
-            {
+            switch (businessService) {
                 case businessService_BPA:
                     singleDemand.setConsumerType("bpaStakeHolderReg");
                     singleDemand.setBusinessService(config.getBusinessServiceBPA());
                     break;
             }
             demands.add(singleDemand);
-
         }
         return demandRepository.saveDemand(requestInfo,demands);
     }

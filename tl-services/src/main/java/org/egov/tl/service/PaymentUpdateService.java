@@ -130,8 +130,9 @@ public class PaymentUpdateService {
 					TradeLicenseRequest updateRequest = TradeLicenseRequest.builder().requestInfo(requestInfo)
 							.licenses(licenses).build();
 
-				 /* calling workflow to update status
-				 */
+					/*
+					 * calling workflow to update status
+					 */
 					wfIntegrator.callWorkFlow(updateRequest);
 
 					updateRequest.getLicenses()
