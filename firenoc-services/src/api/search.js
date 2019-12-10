@@ -314,20 +314,40 @@ export const asd =async( request, res, db,next)=>{
     )} ORDER BY FN.uuid`;
   }
   // console.log(sqlQuery);
-  db.query(sqlQuery, async (err, dbRes) => {
-    if (err) {
-      console.log(err.stack);
-    } else {
-      // console.log(JSON.stringify(res.rows));
-      response.FireNOCs =
-        dbRes.rows && !isEmpty(dbRes.rows)
-          ? await mergeSearchResults(
-              dbRes.rows,
-              request.query,
-              request.body.RequestInfo
-            )
-          : [];
-     return (response);
-    }
-  });
+  const dbResponse=-await db.query(sqlQuery);
+  console.log(response);
+  if (dbResponse.err) {
+    console.log(err.stack);
+  } else {
+    // console.log(JSON.stringify(res.rows));
+    response.FireNOCs =
+      dbResponse.rows && !isEmpty(dbResponse.rows)
+        ? await mergeSearchResults(
+            dbResponse.rows,
+            request.query,
+            request.body.RequestInfo
+          )
+        : [];
+  }
+
+  return response;
+
+
+
+  // , async (err, dbRes) => {
+  //   if (err) {
+  //     console.log(err.stack);
+  //   } else {
+  //     // console.log(JSON.stringify(res.rows));
+  //     response.FireNOCs =
+  //       dbRes.rows && !isEmpty(dbRes.rows)
+  //         ? await mergeSearchResults(
+  //             dbRes.rows,
+  //             request.query,
+  //             request.body.RequestInfo
+  //           )
+  //         : [];
+  //    return (response);
+  //   }
+  // });
 }
