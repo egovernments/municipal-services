@@ -113,7 +113,7 @@ public class PropertyValidator {
         String tenantId = property.getTenantId();
 
 		List<String> masterNames = new ArrayList<>(Arrays.asList(PTConstants.MDMS_PT_PROPERTYTYPE,
-				PTConstants.MDMS_PT_OWNERSHIP, PTConstants.MDMS_PT_OWNERTYPE));
+				PTConstants.MDMS_PT_OWNERSHIP, PTConstants.MDMS_PT_OWNERTYPE, PTConstants.MDMS_PT_USAGECATEGORY));
 
 		validateInstitution(property, errorMap);
 		
@@ -167,27 +167,28 @@ public class PropertyValidator {
      */
     private static Map<String,String> validateCodes(Property property, Map<String,List<String>> codes, Map<String,String> errorMap){
     	
+		if (property.getPropertyType() != null && !codes.get(PTConstants.MDMS_PT_PROPERTYTYPE).contains(property.getPropertyType())) {
+			errorMap.put("Invalid PROPERTYTYPE", "The PropertyType '" + property.getPropertyType() + "' does not exists");
+		}
 
-                if(!codes.get(PTConstants.MDMS_PT_PROPERTYTYPE).contains(property.getPropertyType()) && property.getPropertyType()!=null){
-                    errorMap.put("Invalid PROPERTYTYPE","The PropertyType '"+property.getPropertyType()+"' does not exists");
-                }
+		if (property.getOwnershipCategory() != null && !codes.get(PTConstants.MDMS_PT_OWNERSHIP).contains(property.getOwnershipCategory())) {
+			errorMap.put("Invalid OWNERSHIPCATEGORY", "The OwnershipCategory '" + property.getOwnershipCategory() + "' does not exists");
+		}
 
-                if(!codes.get(PTConstants.MDMS_PT_OWNERSHIP).contains(property.getOwnershipCategory()) && property.getOwnershipCategory()!=null){
-                    errorMap.put("Invalid OWNERSHIPCATEGORY","The OwnershipCategory '"+ property.getOwnershipCategory()+"' does not exists");
-                }
-                
-                property.getOwners().forEach(owner ->{
-                	
-                    if(!codes.get(PTConstants.MDMS_PT_OWNERTYPE).contains(owner.getOwnerType()) && owner.getOwnerType()!=null){
-                    	
-                        errorMap.put("INVALID OWNERTYPE","The OwnerType '"+owner.getOwnerType()+"' does not exists");
-                    }
-                });
+		if (property.getUsageCategory() != null && !codes.get(PTConstants.MDMS_PT_USAGECATEGORY).contains(property.getUsageCategory())) {
+			errorMap.put("Invalid USageCategory", "The USageCategory '" + property.getUsageCategory() + "' does not exists");
+		}
 
-        return errorMap;
+		property.getOwners().forEach(owner -> {
 
-    }
+			if (owner.getOwnerType() != null && !codes.get(PTConstants.MDMS_PT_OWNERTYPE).contains(owner.getOwnerType())) {
+				errorMap.put("INVALID OWNERTYPE", "The OwnerType '" + owner.getOwnerType() + "' does not exists");
+			}
+		});
 
+		return errorMap;
+
+	}
 
     /**
      * Validates if MasterData is properly fetched for the given MasterData names

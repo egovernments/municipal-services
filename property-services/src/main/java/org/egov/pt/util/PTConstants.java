@@ -10,6 +10,8 @@ public class PTConstants {
     public static final String MDMS_PT_MOD_NAME = "PropertyTax";
 
     public static final String MDMS_PT_PROPERTYTYPE = "PropertyType";
+    
+    public static final String MDMS_PT_USAGECATEGORY = "UsageCategory";
 
     public static final String MDMS_PT_PROPERTYSUBTYPE = "PropertySubType";
 
