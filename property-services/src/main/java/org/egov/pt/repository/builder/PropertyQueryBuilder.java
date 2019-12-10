@@ -23,7 +23,7 @@ public class PropertyQueryBuilder {
 
 	 // Select query
 	
-	private static String propertySelectValues = "property.id as pid, property.propertyid, property.tenantid as ptenantid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory, creationreason, occupancydate, constructiondate, nooffloors, landarea, source, parentproperties, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, ";
+	private static String propertySelectValues = "property.id as pid, property.propertyid, property.tenantid as ptenantid, accountid, oldpropertyid, property.status as propertystatus, acknowldgementnumber, propertytype, ownershipcategory,property.usagecategory as pusagecategory, creationreason, occupancydate, constructiondate, nooffloors, landarea, source, parentproperties, property.createdby as pcreatedby, property.lastmodifiedby as plastmodifiedby, property.createdtime as pcreatedtime, property.lastmodifiedtime as plastmodifiedtime, property.additionaldetails as padditionaldetails, ";
 
 	private static String addressSelectValues = "address.tenantid as adresstenantid, address.id as addressid, address.propertyid as addresspid, latitude, longitude, addressnumber, doorno, address.type as addresstype, addressline1, addressline2, landmark, city, pincode, detail as addressdetail, buildingname, street, locality, address.createdby as addresscreatedby, address.lastmodifiedby as addresslastmodifiedby, address.createdtime as addresscreatedtime, address.lastmodifiedtime as addresslastmodifiedtime, ";
 

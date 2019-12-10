@@ -68,6 +68,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.acknowldgementNumber(rs.getString("acknowldgementNumber"))
 						.status(Status.fromValue(rs.getString("propertystatus")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
+						.usageCategory(rs.getString("pusagecategory"))
 						.oldPropertyId(rs.getString("oldPropertyId"))
 						.propertyType(rs.getString("propertytype"))
 						.propertyId(rs.getString("propertyid"))
