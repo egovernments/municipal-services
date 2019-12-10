@@ -3,6 +3,7 @@ package org.egov.wsCalculation.validator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +17,8 @@ import org.egov.wsCalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.jayway.jsonpath.Criteria;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,21 +45,24 @@ public class WSCalculationValidator {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
 		
-		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
-				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
-		if(connection == null) {
-			errorMap.put("INVALID METER READING CONNECTION",
-					"Invalid water connection number");
-		}
-		
+//		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
+//				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+//		if(connection == null) {
+//			errorMap.put("INVALID METER READING CONNECTION",
+//					"Invalid water connection number");
+//		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
 		Set<String> connectionNos= new HashSet<>();
 		connectionNos.add(meterReading.getConnectionNo());
 		criteria.setConnectionNos(connectionNos);
-		Integer currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
-		if (meterReading.getCurrentReading() <= currentMeterReading) {
-			errorMap.put("INVALID METER READING CONNECTION",
-					"Current meter reading has to be greater than the past current readings in the meter reading table !");
+		List<MeterReading> previousMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria);
+		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
+			Integer currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0)
+					.getCurrentReading();
+			if (meterReading.getCurrentReading() <= currentMeterReading) {
+				errorMap.put("INVALID METER READING CONNECTION",
+						"Current meter reading has to be greater than the past current readings in the meter reading table !");
+			}
 		}
 		
 		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {

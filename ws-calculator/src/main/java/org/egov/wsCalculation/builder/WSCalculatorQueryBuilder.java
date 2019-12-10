@@ -22,7 +22,8 @@ public class WSCalculatorQueryBuilder {
 
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
     
-	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading ORDER BY currentReadingDate DESC LIMIT 1";
+	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading mr";
+	
 	/**
 	 * 
 	 * @param criteria
@@ -112,12 +113,11 @@ public class WSCalculatorQueryBuilder {
 			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
 			isAnyCriteriaMatch = true;
+			query.append(" ORDER BY mr.currentReadingDate DESC LIMIT 1");
 		}
 		if (isAnyCriteriaMatch == false)
 			return null;
 		resultantQuery = query.toString();
-		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
 	}
 
