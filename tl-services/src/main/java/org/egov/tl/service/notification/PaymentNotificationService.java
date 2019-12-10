@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.Map;
 
 
 @Service
+@Slf4j
 public class PaymentNotificationService {
 
 
@@ -68,6 +71,7 @@ public class PaymentNotificationService {
      * @param record The kafka message from receipt create topic
      */
     public void process(HashMap<String, Object> record){
+        log.info("Processing the record :  " + new JSONObject(record).toString());
         try{
             String jsonString = new JSONObject(record).toString();
             DocumentContext documentContext = JsonPath.parse(jsonString);
