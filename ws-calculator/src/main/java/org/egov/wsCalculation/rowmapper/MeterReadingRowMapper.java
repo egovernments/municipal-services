@@ -17,8 +17,9 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 	@Override
 	public List<MeterReading> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		List<MeterReading> meterReadingLists = new ArrayList<>();
-		MeterReading meterReading = new MeterReading();
+		
 		while (rs.next()) {
+			MeterReading meterReading = new MeterReading();
 			meterReading.setId(rs.getString("id"));
 			meterReading.setConnectionNo(rs.getString("connectionId"));
 			meterReading.setBillingPeriod(rs.getString("billingPeriod"));

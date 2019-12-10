@@ -31,11 +31,15 @@ public class WSCalculatorQueryBuilder {
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
+		boolean isAnyCriteriaMatch = false;
 		if (!criteria.getConnectionNos().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
+			isAnyCriteriaMatch = true;
 		}
+		if(isAnyCriteriaMatch == false)
+			return null;
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
