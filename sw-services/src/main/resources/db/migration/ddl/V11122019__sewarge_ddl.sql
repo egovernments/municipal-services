@@ -1,6 +1,6 @@
-
-DROP TABLE IF EXISTS connection;
 DROP TABLE IF EXISTS sewarage_service_connection;
+DROP TABLE IF EXISTS connection;
+
 DROP TABLE IF EXISTS eg_sw_service;
 DROP TABLE IF EXISTS eg_sw_connection;
 
