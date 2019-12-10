@@ -171,6 +171,7 @@ consumerGroup.on("message", function(message) {
   };
   const FireNOCPaymentStatus = Payments => {
     console.log(Payments);
+    
     // for (let i = 0; i < Payments.length; i++) {
     //   let applicationNumber = get(
     //     Payments[i],
