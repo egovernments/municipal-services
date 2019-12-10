@@ -429,7 +429,14 @@ components:
                 Central Government etc.
               maxLength: 64
               example: VACANT
-              
+            usageCategory:
+              type: string
+              description: >-
+                This is about the usage of the property like Residential,
+                Non-residential, Mixed(Property which is getting used for
+                Residential, Non-residential purpose)
+              maxLength: 64
+              example: RESIDENTIAL              
             ownershipCategory:
               type: string
               description: The type of ownership of the property.
@@ -529,15 +536,6 @@ components:
           enum:
             - ACTIVE
             - INACTIVE
-            
-        usageCategory:
-          type: string
-          description: >-
-            This is about the usage of the property like Residential,
-            Non-residential, Mixed(Property which is getting used for
-            Residential, Non-residential purpose)
-          maxLength: 64
-          example: RESIDENTIAL
         source:
           type: string
           description: >-
