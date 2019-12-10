@@ -89,7 +89,7 @@ public class TLValidator {
             throw new CustomException("BUSINESSSERVICE_NOTALLOWED", " The business service is not allowed in this module");
         }
         for (TradeLicense license : request.getLicenses()) {
-            String licenseBusinessService = license.getBusinessService();
+            String licenseBusinessService = license.getBusinessService()==null?businessService_TL:license.getBusinessService();
             if (!StringUtils.equals(businessServiceFromPath, licenseBusinessService)) {
                 throw new CustomException("BUSINESSSERVICE_NOTMATCHING", " The business service inside license not matching with the one sent in path variable");
             }

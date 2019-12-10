@@ -67,23 +67,23 @@ public class TLNotificationService {
 				}
 				break;
 
-			case businessService_BPA:
-				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
-				if(null != config.getIsBPASMSEnabled()) {
-					if(config.getIsBPASMSEnabled()) {
-						enrichSMSRequest(request,smsRequestsBPA);
-						if(!CollectionUtils.isEmpty(smsRequestsBPA))
-							util.sendSMS(smsRequestsBPA,true);
-					}
-				}
-				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
-					if(config.getIsUserEventsNotificationEnabledForBPA()) {
-						EventRequest eventRequest = getEvents(request);
-						if(null != eventRequest)
-							util.sendEventNotification(eventRequest);
-					}
-				}
-				break;
+//			case businessService_BPA:
+//				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
+//				if(null != config.getIsBPASMSEnabled()) {
+//					if(config.getIsBPASMSEnabled()) {
+//						enrichSMSRequest(request,smsRequestsBPA);
+//						if(!CollectionUtils.isEmpty(smsRequestsBPA))
+//							util.sendSMS(smsRequestsBPA,true);
+//					}
+//				}
+//				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
+//					if(config.getIsUserEventsNotificationEnabledForBPA()) {
+//						EventRequest eventRequest = getEvents(request);
+//						if(null != eventRequest)
+//							util.sendEventNotification(eventRequest);
+//					}
+//				}
+//				break;
 		}
     }
 

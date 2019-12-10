@@ -89,9 +89,9 @@ public class PaymentNotificationService {
                         util.sendSMS(smsRequests,config.getIsTLSMSEnabled());
                         break;
 
-                    case businessService_BPA:
-                        util.sendSMS(smsRequests,config.getIsBPASMSEnabled());
-                        break;
+//                    case businessService_BPA:
+//                        util.sendSMS(smsRequests,config.getIsBPASMSEnabled());
+//                        break;
                 }
             }
         }
