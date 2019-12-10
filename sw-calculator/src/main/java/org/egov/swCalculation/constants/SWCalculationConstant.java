@@ -13,7 +13,7 @@ public class SWCalculationConstant {
 
 	public static final String TAXPERIOD_MASTER_KEY = "TAXPERIOD";
 	
-	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
+	public static final String TAXHEADMASTER_MASTER_KEY = "SW_TAX";
 	
 	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
 	
@@ -23,7 +23,7 @@ public class SWCalculationConstant {
 	
 	public static final String URL_PARAMS_SEPARATER = "?";
 	
-	public static final String MDMS_ROUNDOFF_TAXHEAD= "WS_ROUNDOFF";
+	public static final String MDMS_ROUNDOFF_TAXHEAD= "SW_ROUNDOFF";
 	
 	public static final String TENANT_ID_FIELD_FOR_SEARCH_URL = "tenantId=";
 	
