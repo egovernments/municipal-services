@@ -13,9 +13,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
-import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
-import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Property;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.Slab;
@@ -101,24 +99,23 @@ public class EstimationService {
   * @param requestInfoWrapper
   * @return
   */
-	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt,
+	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal waterCharge,
 			WaterConnection connection, Map<String, JSONArray> waterBasedExemptionMasterMap,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
-		BigDecimal payableTax = taxAmt;
 		String assesmentYear = WSCalculationConstant.Assesment_Year;
 		// water_charge
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CHARGE)
-				.estimateAmount(taxAmt.setScale(2, 2)).build());
+				.estimateAmount(waterCharge.setScale(2, 2)).build());
 
 		// Water_cess
-//		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
-//				.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
-//		BigDecimal waterCess;
-//		waterCess = waterCessUtil.getWaterCess(payableTax, assesmentYear, waterCessMasterList, connection);
-//		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
-//				.estimateAmount(waterCess).build());
-		// get applicable rebate and penalty
+		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
+				.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
+		BigDecimal waterCess;
+		waterCess = waterCessUtil.getWaterCess(waterCharge, assesmentYear, waterCessMasterList);
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
+				.estimateAmount(waterCess).build());
+//		 get applicable rebate and penalty
 //		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 //				assessmentYear, timeBasedExemeptionMasterMap);
 //		if (null != rebatePenaltyMap) {
