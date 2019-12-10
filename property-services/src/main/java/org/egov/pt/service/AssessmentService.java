@@ -17,9 +17,11 @@ import org.egov.pt.repository.AssessmentRepository;
 import org.egov.pt.validator.AssessmentValidator;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+@Service
 public class AssessmentService {
 	
 	@Autowired
