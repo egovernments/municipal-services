@@ -3,8 +3,6 @@ package org.egov.swCalculation.model;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.egov.swService.model.SewerageConnection;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 

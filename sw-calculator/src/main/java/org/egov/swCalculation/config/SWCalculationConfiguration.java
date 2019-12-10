@@ -38,10 +38,10 @@ public class SWCalculationConfiguration {
 	private String mdmsEndPoint;
 
 	// water Registry
-	@Value("${egov.ws.host}")
+	@Value("${egov.sw.host}")
 	private String sewerageConnectionHost;
 
-	@Value("${egov.wc.search.endpoint}")
+	@Value("${egov.sc.search.endpoint}")
 	private String sewerageConnectionSearchEndPoint;
 
 	@Value("${sw.module.minpayable.amount}")

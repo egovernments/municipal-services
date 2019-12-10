@@ -1,34 +1,28 @@
 package org.egov.swCalculation.model;
 
-
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString
-public class AuditDetails   {
+public class AuditDetails {
+	
         @JsonProperty("createdBy")
-        private String createdBy;
+        private String createdBy ;
 
         @JsonProperty("lastModifiedBy")
-        private String lastModifiedBy;
+        private String lastModifiedBy ;
 
         @JsonProperty("createdTime")
-        private Long createdTime;
+        private Long createdTime ;
 
         @JsonProperty("lastModifiedTime")
-        private Long lastModifiedTime;
-
-
+        private Long lastModifiedTime ;
 }
+
