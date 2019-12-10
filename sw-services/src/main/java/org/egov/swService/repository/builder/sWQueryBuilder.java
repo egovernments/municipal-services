@@ -25,11 +25,11 @@ public class sWQueryBuilder {
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_sw_connection WHERE";
 	
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT sc.connectionExecutionDate,"
-			+ "sc.noOfWaterClosets, sc.noOfToilets, sc.uom, sc.connectionType, sc.calculationAttribute, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM sewarage_service_connection sc "
-			+ INNER_JOIN_STRING + " connection conn ON sc.connection_id = conn.id";
+			+ "sc.noOfWaterClosets, sc.noOfToilets, sc.uom, sc.connectionType, sc.calculationAttribute, conn.id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.documents_id, conn.property_id FROM eg_sw_service sc "
+			+ INNER_JOIN_STRING + " eg_sw_connection conn ON sc.connection_id = conn.id";
 
 	/**
 	 * 

@@ -1,8 +1,8 @@
---DROP TABLE IF EXISTS connection;
---DROP TABLE IF EXISTS sewarage_service_connection;
+--DROP TABLE IF EXISTS eg_sw_connection;
+--DROP TABLE IF EXISTS eg_sw_service;
 --
 --
---CREATE TABLE connection
+--CREATE TABLE eg_sw_connection
 --(
 --  id character varying(64) NOT NULL,
 --  property_id character varying(64) NOT NULL,
@@ -17,7 +17,7 @@
 --
 --
 --
---CREATE TABLE sewarage_service_connection
+--CREATE TABLE eg_sw_service
 --(
 --  connection_id character varying(64) NOT NULL,
 --  connectionExecutionDate bigint NOT NULL,
