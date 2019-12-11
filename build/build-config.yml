@@ -106,3 +106,5 @@ config:
       - work-dir: "sw-calculator"
         image-name: "sw-calculator"
         dockerfile: "build/maven/Dockerfile"
+      - work-dir: "sw-calculator/src/main/resources/db"
+        image-name: "sw-calculator-db"
