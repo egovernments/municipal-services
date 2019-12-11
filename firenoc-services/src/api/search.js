@@ -187,7 +187,6 @@ export default ({ config, db }) => {
     "/_search",
     asyncHandler(async (request, res, next) => {
       let response = await searchApiResponse(request,res,db,next)
-      console.log("resoPonceAAyaKya?",response)
       res.json(response)
     })
   );
@@ -315,9 +314,7 @@ export const searchApiResponse =async( request, res, db,next)=>{
       sqlQuery.length - 3
     )} ORDER BY FN.uuid`;
   }
-   console.log(sqlQuery);
   const dbResponse=await db.query(sqlQuery);
-  console.log("319linenumber",dbResponse);
   if (dbResponse.err) {
     console.log(err.stack);
   } else {
@@ -331,7 +328,6 @@ export const searchApiResponse =async( request, res, db,next)=>{
           )
         : [];
   }
-console.log("responseGaya",response)
   return response;
 
 

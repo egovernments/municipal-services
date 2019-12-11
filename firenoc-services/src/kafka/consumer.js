@@ -170,10 +170,10 @@ consumerGroup.on("message", function(message) {
     }
   };
   const FireNOCPaymentStatus = (Payments) => {
-    console.log(Payments);
+    console.log("Payments",Payments);
     let tenantId = get(
       Payments,
-      "teneantId"
+      "tenantId"
     );
       console.log(tenantId);
     let applicationNumber = get(
@@ -232,6 +232,7 @@ consumerGroup.on("message", function(message) {
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
         {
           const { Payments } = value;
+          console.log("value",value);
           FireNOCPaymentStatus(Payments);
         }
        break;
