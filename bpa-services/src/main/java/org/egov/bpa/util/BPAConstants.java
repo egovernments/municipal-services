@@ -118,6 +118,11 @@ public class BPAConstants {
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	public static final String  USREVENTS_EVENT_NAME = "Building Plan";
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPA";
+	
+	
+	// OCCUPANCY TYPE
+	
+	public static final String RESIDENTIAL_OCCUPANCY = "A";
 
 	
 }

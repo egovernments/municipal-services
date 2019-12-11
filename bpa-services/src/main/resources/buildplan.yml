@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO eg_bpa_buildingplan(id, applicationno, edcrnumber, tenantid, servicetype, status, ownershipcategory, additionaldetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+       - query: INSERT INTO eg_bpa_buildingplan(id, applicationno, edcrnumber, tenantid, servicetype, risktype, status, ownershipcategory, additionaldetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
          basePath: BPA
          jsonMaps:
           - jsonPath: $.BPA.id
@@ -19,6 +19,8 @@ serviceMaps:
           - jsonPath: $.BPA.tenantId
 
           - jsonPath: $.BPA.serviceType
+
+          - jsonPath: $.BPA.riskType
 
           - jsonPath: $.BPA.status
 
@@ -244,7 +246,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, edcrnumber=?, tenantid=?, servicetype=?, status=?, ownershipcategory=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
+       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, edcrnumber=?, tenantid=?, servicetype=?, riskType=?, status=?, ownershipcategory=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
          basePath: BPA
          jsonMaps:
           - jsonPath: $.BPA.applicationNo
@@ -254,6 +256,8 @@ serviceMaps:
           - jsonPath: $.BPA.tenantId
 
           - jsonPath: $.BPA.serviceType
+
+          - jsonPath: $.BPA.riskType
 
           - jsonPath: $.BPA.status
 

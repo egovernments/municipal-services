@@ -2,20 +2,22 @@ package org.egov.bpa.web.models;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.egov.bpa.web.models.OwnerInfo.RelationshipEnum;
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Validated
 @Getter
@@ -37,6 +39,41 @@ public class BPA {
 	@NotNull
 	@JsonProperty("applicationType")
 	private String applicationType;
+	
+	public enum RiskTypeEnum {
+		
+		HIGH("HIGH"),
+
+		LOW("LOW"),
+		
+		MEDIUM("MEDIUM");
+
+		private String value;
+
+		RiskTypeEnum(String value) {
+			this.value = value;
+		}
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		@JsonCreator
+		public static RiskTypeEnum fromValue(String text) {
+			for (RiskTypeEnum b : RiskTypeEnum.values()) {
+				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
+	@Size(max = 64)
+	@NotNull
+	@JsonProperty("riskType")
+	private RiskTypeEnum riskType;
 	
 	@Size(max = 64)
 	@JsonProperty("edcrNumber")

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.bpa.service.BPAService;
+import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
@@ -28,6 +29,9 @@ public class BPAController {
 
 	@Autowired
 	private BPAService bpaService;
+	
+	@Autowired
+	private BPAUtil bpaUtil;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
@@ -35,6 +39,7 @@ public class BPAController {
 	@PostMapping(value = "/appl/_create")
 	public ResponseEntity<BPAResponse> create(
 			@Valid @RequestBody BPARequest bpaRequest) {
+		bpaUtil.defaultJsonPathConfig();
 		BPA bpa = bpaService.create(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
 		bpas.add(bpa);
