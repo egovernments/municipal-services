@@ -343,8 +343,12 @@ public class UserEventsService {
 		});
 		if(!CollectionUtils.isEmpty(eventsTobeUpdated)) {
 			EventRequest request = EventRequest.builder().requestInfo(requestInfo).events(eventsTobeUpdated).build();
-			log.info("Updating events...");
-			updateEvents(request);
+			try {
+				log.info("Updating events...");
+				updateEvents(request);
+			}catch(Exception e) {
+				log.error("There was an error while lazy-updating the events: ", e);
+			}
 		}
 	}
 
