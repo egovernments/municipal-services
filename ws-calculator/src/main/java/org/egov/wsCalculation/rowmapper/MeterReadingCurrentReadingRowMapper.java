@@ -12,7 +12,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReading>> {
+public class MeterReadingCurrentReadingRowMapper implements ResultSetExtractor<List<MeterReading>> {
 
 	@Override
 	public List<MeterReading> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -20,14 +20,10 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 		
 		while (rs.next()) {
 			MeterReading meterReading = new MeterReading();
-			meterReading.setId(rs.getString("id"));
-			meterReading.setConnectionNo(rs.getString("connectionId"));
-			meterReading.setBillingPeriod(rs.getString("billingPeriod"));
+			
+
 			meterReading.setCurrentReading(rs.getInt("currentReading"));
-			meterReading.setCurrentReadingDate(rs.getLong("currentReadingDate"));
-			meterReading.setLastReading(rs.getInt("lastReading"));
-			meterReading.setLastReadingDate(rs.getLong("lastReadingDate"));
-			meterReading.setMeterStatus(MeterStatusEnum.fromValue(rs.getString("meterStatus")));
+			
 			meterReadingLists.add(meterReading);
 		}
 		return meterReadingLists;

@@ -10,6 +10,7 @@ import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.builder.WSCalculatorQueryBuilder;
+import org.egov.wsCalculation.rowmapper.MeterReadingCurrentReadingRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,9 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 
 	@Autowired
 	MeterReadingRowMapper meterReadingRowMapper;
+	
+	@Autowired
+	MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
 
 	@Value("${egov.meterservice.createmeterconnection}")
 	private String createMeterConnection;
@@ -59,9 +63,24 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		List<Object> preparedStatement = new ArrayList<>();
 		List<MeterReading> listOfMeterReadings = new ArrayList<>();
 		String query = queryBuilder.getSearchQueryString(criteria, preparedStatement);
+		if(query == null)
+			return listOfMeterReadings;
 		log.info("Query: " + query);
 		log.info("Prepared Statement" + preparedStatement.toString());
 		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
+		return listOfMeterReadings;
+	}
+	
+	@Override
+	public List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria) {
+		List<Object> preparedStatement = new ArrayList<>();
+		List<MeterReading> listOfMeterReadings = new ArrayList<>();
+		String query = queryBuilder.getCurrentReadingConnectionQuery(criteria, preparedStatement);
+		if (query == null)
+			return listOfMeterReadings;
+		log.info("Query: " + query);
+		log.info("Prepared Statement" + preparedStatement.toString());
+		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), currentMeterReadingRowMapper);
 		return listOfMeterReadings;
 	}
 

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,9 @@ public class WSCalculatorQueryBuilder {
 			+ "mr.currentReadingDate FROM meterreading mr";
 
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
-
+    
+	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading mr";
+	
 	/**
 	 * 
 	 * @param criteria
@@ -31,11 +34,15 @@ public class WSCalculatorQueryBuilder {
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
 		String resultantQuery = Query;
+		boolean isAnyCriteriaMatch = false;
 		if (!criteria.getConnectionNos().isEmpty()) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
+			isAnyCriteriaMatch = true;
 		}
+		if(isAnyCriteriaMatch == false)
+			return null;
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
@@ -91,9 +98,27 @@ public class WSCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
 		Set<String> listOfIds = new HashSet<>();
 		connectionIds.forEach(id -> listOfIds.add(id));
-		query.append(" connectionid in (").append(createQuery(connectionIds)).append(" )");
+		query.append(" connectionNo in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
+	}
+	
+	public String getCurrentReadingConnectionQuery(MeterReadingSearchCriteria criteria,
+			List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(noOfConnectionSearchQueryForCurrentMeterReading);
+		String resultantQuery = noOfConnectionSearchQueryForCurrentMeterReading;
+		boolean isAnyCriteriaMatch = false;
+		if (!criteria.getConnectionNos().isEmpty()) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
+			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
+			isAnyCriteriaMatch = true;
+			query.append(" ORDER BY mr.currentReadingDate DESC LIMIT 1");
+		}
+		if (isAnyCriteriaMatch == false)
+			return null;
+		resultantQuery = query.toString();
+		return resultantQuery;
 	}
 
 	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {

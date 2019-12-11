@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.CalculationRes;
-import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.DemandResponse;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.RequestInfoWrapper;

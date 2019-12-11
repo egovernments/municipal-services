@@ -2,7 +2,11 @@ package org.egov.wsCalculation.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
@@ -13,6 +17,8 @@ import org.egov.wsCalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.jayway.jsonpath.Criteria;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +51,19 @@ public class WSCalculationValidator {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Invalid water connection number");
 		}
+		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
+		Set<String> connectionNos= new HashSet<>();
+		connectionNos.add(meterReading.getConnectionNo());
+		criteria.setConnectionNos(connectionNos);
+		List<MeterReading> previousMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria);
+		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
+			Integer currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
+			if (meterReading.getCurrentReading() <= currentMeterReading) {
+				errorMap.put("INVALID METER READING CONNECTION",
+						"Current meter reading has to be greater than the past last readings in the meter reading table !");
+			}
+		}
+		
 		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
