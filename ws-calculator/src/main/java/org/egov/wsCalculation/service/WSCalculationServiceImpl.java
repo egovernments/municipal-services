@@ -46,6 +46,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	DemandService demandService;
+	
+	@Autowired
+	MasterDataService masterDataService; 
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
@@ -155,8 +158,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
+			masterDataService.getBillingFrequencyMasterData(request.getRequestInfo(), criteria.getWaterConnection().getConnectionType(), tenantId ,masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}

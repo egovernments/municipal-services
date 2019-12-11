@@ -162,6 +162,8 @@ public class WSCalculationConstant {
 	public static final String WS_Round_Off = "WS_Round_Off";
 
 	public static final String WS_TAX_MODULE = "ws-services-calculation";
+	
+	public static final String WS_MODULE = "ws-services-masters";
 
 	public static final String WC_PENANLTY_MASTER = "Penalty";
 
@@ -192,5 +194,25 @@ public class WSCalculationConstant {
 	public static final String noOfTapsConst = "No. of taps";
 	
 	public static final String pipeSizeConst = "Pipe Size";
+	
+	public static final String BillingPeriod = "billingPeriod";
+	
+	public static final String ConnectionType = "connectionType";
+	
+	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
+	
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
+	
+	public static final String Quaterly_Billing_Period = "quaterly";
+	
+	public static final String Monthly_Billing_Period = "monthly";
+	
+	public static final String Billing_Cycle_String="billingCycle";
+	
+	public static final String Demand_End_Date_String = "demandEndDateMillis";
+	
+	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
+	
+	
 
 }

@@ -8,12 +8,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.tracer.model.CustomException;
-import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.model.WaterConnectionResponse;
@@ -82,6 +82,21 @@ public class CalculatorUtil {
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
+	
+	
+	
+	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String connectionType, String tenantId) {
+
+		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.BillingPeriod)
+				.filter("[?(@." + WSCalculationConstant.ConnectionType + " == '" + connectionType + "' && @.active== "+true+")]")
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.WS_MODULE)
+				.masterDetails(Arrays.asList(mstrDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+	
 	/**
 	 * 
 	 * @param requestInfo

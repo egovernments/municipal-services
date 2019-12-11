@@ -1,8 +1,10 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,14 +15,14 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.tracer.model.CustomException;
-import org.egov.wsCalculation.constants.WSCalculationConstant;
-import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.TaxHeadMasterResponse;
@@ -35,8 +37,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-
+@Slf4j
 @Service
 public class MasterDataService {
 
@@ -54,6 +57,9 @@ public class MasterDataService {
 
 	@Autowired
 	CalculatorUtil calculatorUtils;
+	
+	@Autowired
+	EstimationService estimationService;
 
 	/**
 	 * Fetches and creates map of all required masters
@@ -69,11 +75,9 @@ public class MasterDataService {
 		List<TaxPeriod> taxPeriods = getTaxPeriodList(requestInfo, tenantId);
 		List<TaxHeadMaster> taxHeadMasters = getTaxHeadMasterMap(requestInfo, tenantId);
 		Map<String, Map<String, Object>> financialYearMaster = getFinancialYear(request);
-
 		masterMap.put(WSCalculationConstant.TAXPERIOD_MASTER_KEY, taxPeriods);
 		masterMap.put(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY, taxHeadMasters);
 		masterMap.put(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY, financialYearMaster);
-
 		return masterMap;
 	}
 
@@ -192,6 +196,54 @@ public class MasterDataService {
 		return financialYearMap;
 	}
 
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionType
+	 * @param tenantId
+	 * @return Master For Billing Period
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getBillingFrequencyMasterData(RequestInfo requestInfo,
+			String connectionType, String tenantId, Map<String, Object> masterMap) {
+		String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
+		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
+		Object res = repository.fetchResult(url, mdmsCriteriaReq);
+		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+		if (res == null) {
+			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		getBillingPeriod(mdmsResponse, masterMap);
+		return masterMap;
+	}
+	
+	/**
+	 * 
+	 * @param master
+	 * @param billingPeriodMap
+	 * @return master map with date period
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getBillingPeriod(ArrayList<?> mdmsResponse, Map<String, Object> masterMap) {
+		log.info("Billing Frequency Map" + mdmsResponse.toString());
+		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+		Map<String, Object> billingPeriod = new HashMap<>();
+		LocalDateTime demandStartingDate = LocalDateTime.now();
+		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
+		Long demandEndDateMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
+		Long demandExpiryDateMillis = (Long) master.get(WSCalculationConstant.Demand_Expiry_Date_String);
+		billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
+				Timestamp.valueOf(demandStartingDate).getTime());
+		billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
+				Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
+		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String,
+				Timestamp.valueOf(demandStartingDate).getTime() + demandExpiryDateMillis);
+		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
+		return masterMap;
+	}
+	
 	/**
 	 * Method to enrich the water connection Master data Map
 	 * 
@@ -407,5 +459,7 @@ public class MasterDataService {
 	private StringBuilder getMdmsSearchUrl() {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
-
+	public LocalDateTime setCurrentDateValueToStartingOfDay(LocalDateTime localDateTime) {
+		return localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+	}
 }

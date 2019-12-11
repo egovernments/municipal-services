@@ -2,8 +2,11 @@ package org.egov.wsCalculation.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -238,5 +241,52 @@ public class EstimationService {
 			return totalUnite = waterConnection.getPipeSize();
 		}
 		return 0.0;
+	}
+	
+	public Map<String, Object> getQuaterStartAndEndDate(Map<String, Object> billingPeriod){
+		Date date = new Date();
+		Calendar fromDateCalendar = Calendar.getInstance();
+		fromDateCalendar.setTime(date);
+		fromDateCalendar.set(Calendar.MONTH, fromDateCalendar.get(Calendar.MONTH)/3 * 3);
+		fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
+		setTimeToBeginningOfDay(fromDateCalendar);
+		Calendar toDateCalendar = Calendar.getInstance();
+		toDateCalendar.setTime(date);
+		toDateCalendar.set(Calendar.MONTH, toDateCalendar.get(Calendar.MONTH)/3 * 3 + 2);
+		toDateCalendar.set(Calendar.DAY_OF_MONTH, toDateCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+		setTimeToEndofDay(toDateCalendar);
+		billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, fromDateCalendar.getTimeInMillis());
+		billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, toDateCalendar.getTimeInMillis());
+		return billingPeriod;
+	}
+	
+	public Map<String, Object> getMonthStartAndEndDate(Map<String, Object> billingPeriod){
+		Date date = new Date();
+		Calendar monthStartDate = Calendar.getInstance();
+		monthStartDate.setTime(date);
+		monthStartDate.set(Calendar.DAY_OF_MONTH, monthStartDate.getActualMinimum(Calendar.DAY_OF_MONTH));
+		setTimeToBeginningOfDay(monthStartDate);
+	    
+		Calendar monthEndDate = Calendar.getInstance();
+		monthEndDate.setTime(date);
+		monthEndDate.set(Calendar.DAY_OF_MONTH, monthEndDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+		setTimeToEndofDay(monthEndDate);
+		billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, monthStartDate.getTimeInMillis());
+		billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, monthEndDate.getTimeInMillis());
+		return billingPeriod;
+	}
+	
+	private static void setTimeToBeginningOfDay(Calendar calendar) {
+	    calendar.set(Calendar.HOUR_OF_DAY, 0);
+	    calendar.set(Calendar.MINUTE, 0);
+	    calendar.set(Calendar.SECOND, 0);
+	    calendar.set(Calendar.MILLISECOND, 0);
+	}
+
+	private static void setTimeToEndofDay(Calendar calendar) {
+	    calendar.set(Calendar.HOUR_OF_DAY, 23);
+	    calendar.set(Calendar.MINUTE, 59);
+	    calendar.set(Calendar.SECOND, 59);
+	    calendar.set(Calendar.MILLISECOND, 999);
 	}
 }
