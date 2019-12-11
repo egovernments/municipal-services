@@ -106,13 +106,13 @@ export default ({ config, db }) => {
   api.post(
     "/_update",
     asyncHandler(async ({ body }, res, next) => {
-      let response = await asd({ body },res,db,next)
+      let response = await updateApiResponse({ body },res,db,next)
       res.json(response)
     })
       );
        return api;
     };
-     export const asd =async( { body }, res, db,next)=>{
+     export const updateApiResponse =async( { body }, res, db,next)=>{
       let payloads = [];
       let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
       //model validator
@@ -167,11 +167,15 @@ export default ({ config, db }) => {
         });
       }
       // console.log(JSON.stringify(body));
-      producer.send(payloads, function(err, data) {
-        let response = {
-          ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
-          FireNOCs: body.FireNOCs
-        };
+      let response = {
+        ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
+        FireNOCs: body.FireNOCs
+      };
+      producer.send(payloads,function(err,data){
+        if(err)
+        console.log(err)
+      })
+       
         return response;
-      });
+
 };

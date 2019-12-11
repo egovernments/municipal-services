@@ -84,13 +84,14 @@ export default ({ config, db }) => {
   api.post(
     "/_create",
     asyncHandler(async ({ body }, res, next) => {
-      let response = await asd({ body },res,db,next)
+      let response = await createApiResponse({ body },res,db,next)
+      console.log("reponseGaya",response)
       res.json(response)
     })
       );
        return api;
     };
-     export const asd =async( { body }, res, db,next)=>{
+     export const createApiResponse =async( { body }, res, db,next)=>{
       let payloads = [];
       //getting mdms data
       let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
@@ -124,18 +125,19 @@ export default ({ config, db }) => {
       for (var i = 0; i < FireNOCs.length; i++) {
         let firenocResponse = await calculate(FireNOCs[i], RequestInfo);
       }
-
       body.FireNOCs = updateStatus(FireNOCs, workflowResponse);
-
       payloads.push({
         topic: envVariables.KAFKA_TOPICS_FIRENOC_CREATE,
         messages: JSON.stringify(body)
       });
-      producer.send(payloads, function(err, data) {
-        let response = {
-          ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
-          FireNOCs: body.FireNOCs
-        };
+      let response = {
+        ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
+        FireNOCs: body.FireNOCs
+      };
+
+      producer.send(payloads,function(err,data){
+        if(err)
+        console.log(err)
+      })
       return response;
-      });
 };

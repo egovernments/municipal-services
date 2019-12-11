@@ -1,6 +1,6 @@
 // import { Router } from "express";
 // import { requestInfoToResponseInfo } from "../utils";
-//import { mergeSearchResults, searchByMobileNumber } from "../utils/search";
+// import { mergeSearchResults, searchByMobileNumber } from "../utils/search";
 // import isEmpty from "lodash/isEmpty";
 // import get from "lodash/get";
 // import some from "lodash/some";
@@ -161,6 +161,7 @@
 //                   request.body.RequestInfo
 //                 )
 //               : [];
+//               console.log(res)
 //           res.json(response);
 //         }
 //       });
@@ -185,13 +186,14 @@ export default ({ config, db }) => {
   api.post(
     "/_search",
     asyncHandler(async (request, res, next) => {
-      let response = await asd(request,res,db,next)
+      let response = await searchApiResponse(request,res,db,next)
+      console.log("resoPonceAAyaKya?",response)
       res.json(response)
     })
   );
   return api;
 };
-export const asd =async( request, res, db,next)=>{
+export const searchApiResponse =async( request, res, db,next)=>{
   let response = {
     ResponseInfo: requestInfoToResponseInfo(request.body.RequestInfo, true),
     FireNOCs: []
@@ -226,8 +228,8 @@ export const asd =async( request, res, db,next)=>{
       "RequestInfo.userInfo.mobileNumber"
     );
     const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
-    // console.log(mobileNumber);
-    // console.log(tenantId);
+     console.log("mobileNumber",mobileNumber);
+    console.log("tenedrIDD",tenantId);
     text = `${text} where (FN.createdby = '${userUUID}' OR`;
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
@@ -313,9 +315,9 @@ export const asd =async( request, res, db,next)=>{
       sqlQuery.length - 3
     )} ORDER BY FN.uuid`;
   }
-  // console.log(sqlQuery);
-  const dbResponse=-await db.query(sqlQuery);
-  console.log(response);
+   console.log(sqlQuery);
+  const dbResponse=await db.query(sqlQuery);
+  console.log("319linenumber",dbResponse);
   if (dbResponse.err) {
     console.log(err.stack);
   } else {
@@ -329,7 +331,7 @@ export const asd =async( request, res, db,next)=>{
           )
         : [];
   }
-
+console.log("responseGaya",response)
   return response;
 
 
