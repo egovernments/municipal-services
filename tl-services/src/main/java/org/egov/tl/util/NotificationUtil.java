@@ -220,6 +220,8 @@ public class NotificationUtil {
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
+		message = message.replace("<applicationNumber>", license.getApplicationNumber());
+		message = message.replace("<tenantId>", license.getTenantId());
 		return message;
 	}
 
