@@ -9,7 +9,7 @@ status character varying(64) NOT NULL,
 connectionno character varying(256) NOT NULL,
 oldconnectionno character varying(64),
 documents_id character varying(256),
-CONSTRAINT connection_pkey PRIMARY KEY (id)
+CONSTRAINT eg_sw_connection_pkey PRIMARY KEY (id)
 );
 
 
@@ -23,7 +23,7 @@ noOfToilets integer,
 UOM character varying(32),
 connectiontype character varying(32) NOT NULL,
 calculationAttribute character varying(64),
-CONSTRAINT sewarage_service_connection_connection_id_fkey FOREIGN KEY (connection_id)
+CONSTRAINT eg_sw_service_connection_id_fkey FOREIGN KEY (connection_id)
 REFERENCES connection (id)
 ON UPDATE CASCADE
 ON DELETE CASCADE
