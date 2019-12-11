@@ -160,14 +160,14 @@ public class PaymentNotificationService {
     private Map<String,String> enrichValMap(DocumentContext context){
         Map<String,String> valMap = new HashMap<>();
         try{
-            valMap.put(businessServiceKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
-            valMap.put(consumerCodeKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
-            valMap.put(tenantIdKey,context.read("$.Payments[0].tenantId"));
-            valMap.put(payerMobileNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber"));
-            valMap.put(paidByKey,context.read("$.Payments[0].paidBy"));
-            Integer amountPaid = context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.amountPaid");
+            valMap.put(businessServiceKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].businessService")).get(0));
+            valMap.put(consumerCodeKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.consumerCode")).get(0));
+            valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
+            valMap.put(payerMobileNumberKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber")).get(0));
+            valMap.put(paidByKey,context.read("$.Payment.paidBy"));
+            Integer amountPaid = ((List<Integer>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.amountPaid")).get(0);
             valMap.put(amountPaidKey,amountPaid.toString());
-            valMap.put(receiptNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].receiptNumber"));
+            valMap.put(receiptNumberKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].receiptNumber")).get(0));
 
         }
         catch (Exception e){
