@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.CalculationRes;
@@ -15,10 +17,15 @@ import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.WaterConnection;
+import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
+import org.egov.wsCalculation.util.MRConstants;
+import org.egov.wsCalculation.validator.MDMSValidator;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,7 +55,15 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	DemandService demandService;
 	
 	@Autowired
-	MasterDataService masterDataService; 
+    MasterDataService masterDataService; 
+
+	@Autowired
+	WSCalculationDao wSCalculationDao;
+	
+	@Autowired
+	MDMSValidator mdmsValidator;
+
+
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
@@ -166,5 +181,34 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			calculations.add(calculation);
 		}
 		return calculations;
+	}
+
+
+	@Override
+	public void jobscheduler() {
+		// TODO Auto-generated method stub
+		ArrayList<String> tenentIds =	wSCalculationDao.searchTenentIds();
+	  
+	  for(String tenentId : tenentIds){
+		 Map<String, Object> billingPeriodJson = ((Map<String,Object>)mdmsValidator.validateMasterDataWithoutFilter(tenentId));
+		 List<Map<String, Object>> jsonOutput = (List<Map<String, Object>>) billingPeriodJson;
+		
+		String jsonPath = MRConstants.JSONPATH_ROOT;
+			try {
+			
+				Map<String, Object> financialYearProperties = jsonOutput.get(0);
+				log.info(financialYearProperties.toString());
+			
+			} catch (IndexOutOfBoundsException e) {
+				throw new CustomException(WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND,
+						WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG );
+			}
+		
+		
+		
+	  }
+        
+	
+
 	}
 }

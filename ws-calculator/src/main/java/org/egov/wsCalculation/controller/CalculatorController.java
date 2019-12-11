@@ -52,5 +52,10 @@ public class CalculatorController {
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
 		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
 	}
+	
+	@PostMapping("/_jobscheduler")
+	public void jobscheduler() {
+		wSCalculationService.jobscheduler();
+	}
 
 }

@@ -24,6 +24,7 @@ public class WSCalculatorQueryBuilder {
     
 	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading mr";
 	
+	private final static String tenentIdWaterConnectionSearchQuery="select DISTINCT tenantid from connection";
 	/**
 	 * 
 	 * @param criteria
@@ -125,5 +126,10 @@ public class WSCalculatorQueryBuilder {
 		ids.forEach(id -> {
 			preparedStatement.add(id);
 		});
+	}
+	
+	public String getTenentIdConnectionQuery() {
+		StringBuilder query = new StringBuilder(tenentIdWaterConnectionSearchQuery);
+		return query.toString();
 	}
 }

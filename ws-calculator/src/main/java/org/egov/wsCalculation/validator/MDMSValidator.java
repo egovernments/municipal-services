@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
@@ -22,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Slf4j
 @Component
@@ -54,6 +56,28 @@ public class MDMSValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
+	
+	public Object validateMasterDataWithoutFilter(String tenentId) {
+		Map<String, String> errorMap = new HashMap<>();
+		
+		RequestInfo requestInfo = new RequestInfo();
+		User user= new User();
+		user.setTenantId(tenentId);
+		requestInfo.setUserInfo(user);
+		String jsonPath = MRConstants.JSONPATH_ROOT;
+
+		String[] masterNames = { MRConstants.MDMS_MS_BILLING_PERIOD };
+		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+
+		
+		Object mdmsJsonForBillingPeriod = getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",jsonPath, requestInfo);
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
+		return mdmsJsonForBillingPeriod;
+	}
+	
+
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
 			String filter, String jsonpath, RequestInfo requestInfo) {
@@ -89,4 +113,20 @@ public class MDMSValidator {
 		}
 		return errorMap;
 	}
+	
+	private Object getAttributeValuesWithoutFilter(String tenantId, String moduleName, List<String> names,
+			String filter, String jsonpath, RequestInfo requestInfo) {
+		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
+		MdmsCriteriaReq criteriaReq = meterReadingUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
+				requestInfo);
+		try {
+			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
+			return JsonPath.read(result, jsonpath);
+		} catch (Exception e) {
+			log.error("Error while fetching MDMS data", e);
+			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
+		}
+	}
+	
+	
 }

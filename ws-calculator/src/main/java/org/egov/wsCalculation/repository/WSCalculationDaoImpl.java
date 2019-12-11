@@ -37,6 +37,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	
 	@Autowired
 	MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
+	
 
 	@Value("${egov.meterservice.createmeterconnection}")
 	private String createMeterConnection;
@@ -102,4 +103,16 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return n;
 	}
+	
+	@Override
+	public ArrayList<String> searchTenentIds() {
+		ArrayList<String> tenentIds = new ArrayList<>();
+		String query = queryBuilder.getTenentIdConnectionQuery();
+		if (query == null)
+			return tenentIds;
+		log.info("Query: " + query);
+		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
+		return tenentIds;
+	}
+
 }
