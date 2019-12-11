@@ -41,7 +41,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 * Get Calculation Request and return Calculated Response
 	 */
 	@Override
-	public CalculationRes getTaxCalculation(CalculationReq request) {
+	public CalculationRes getCalculation(CalculationReq request) {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
@@ -134,8 +134,10 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 */
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
+			mDataService.getBillingFrequencyMasterData(request.getRequestInfo(), criteria.getSewerageConnection().getConnectionType(), tenantId ,masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}

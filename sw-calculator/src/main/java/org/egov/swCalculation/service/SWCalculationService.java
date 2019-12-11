@@ -5,5 +5,5 @@ import org.egov.swCalculation.model.CalculationRes;
 
 public interface SWCalculationService {
 
-	public CalculationRes getTaxCalculation(CalculationReq calculationReq);
+	public CalculationRes getCalculation(CalculationReq calculationReq);
 }

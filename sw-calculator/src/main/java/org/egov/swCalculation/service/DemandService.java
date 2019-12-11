@@ -17,16 +17,13 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
-import org.egov.swCalculation.model.BillResponse;
 import org.egov.swCalculation.model.Calculation;
-import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.Demand.StatusEnum;
 import org.egov.swCalculation.model.DemandDetail;
 import org.egov.swCalculation.model.DemandDetailAndCollection;
 import org.egov.swCalculation.model.DemandRequest;
 import org.egov.swCalculation.model.DemandResponse;
-import org.egov.swCalculation.model.GenerateBillCriteria;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.model.SewerageConnection;
@@ -169,18 +166,27 @@ public class DemandService {
 						.tenantId(tenantId).build());
 			});
 
+//			@SuppressWarnings("unchecked")
+//			Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
+//					.get(SWCalculationConstant.FINANCIALYEAR_MASTER_KEY);
+//
+//			Map<String, Object> finYearMap = financialYearMaster.get(assessmentYear);
+//			Long fromDate = (Long) finYearMap.get(SWCalculationConstant.FINANCIAL_YEAR_STARTING_DATE);
+//			Long toDate = (Long) finYearMap.get(SWCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
+
+			
 			@SuppressWarnings("unchecked")
-			Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
-					.get(SWCalculationConstant.FINANCIALYEAR_MASTER_KEY);
+			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
+					.get(SWCalculationConstant.BillingPeriod);
 
-			Map<String, Object> finYearMap = financialYearMaster.get(assessmentYear);
-			Long fromDate = (Long) finYearMap.get(SWCalculationConstant.FINANCIAL_YEAR_STARTING_DATE);
-			Long toDate = (Long) finYearMap.get(SWCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
-
+			Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+			Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+			Long expiryDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+			
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(configs.getSwMinAmountPayable()).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("sewerageConnection").billExpiryTime(billExpiryTime)
+					.taxPeriodTo(toDate).consumerType("sewerageConnection").billExpiryTime(expiryDate)
 					.businessService(configs.getBusinessService()).status(StatusEnum.valueOf("ACTIVE")).build());
 		}
 		return demandRepository.saveDemand(requestInfo, demands);
@@ -440,8 +446,8 @@ public class DemandService {
 
 			if (demand.getStatus() != null
 					&& SWCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
-				throw new CustomException(SWCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
-						SWCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
+				throw new CustomException(SWCalculationConstant.EG_SW_INVALID_DEMAND_ERROR,
+						SWCalculationConstant.EG_SW_INVALID_DEMAND_ERROR_MSG);
 			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap, taxPeriods);
 			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);

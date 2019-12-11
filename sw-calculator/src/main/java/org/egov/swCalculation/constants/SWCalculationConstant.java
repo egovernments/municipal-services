@@ -13,7 +13,7 @@ public class SWCalculationConstant {
 
 	public static final String TAXPERIOD_MASTER_KEY = "TAXPERIOD";
 	
-	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
+	public static final String TAXHEADMASTER_MASTER_KEY = "SW_TAX";
 	
 	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
 	
@@ -23,7 +23,7 @@ public class SWCalculationConstant {
 	
 	public static final String URL_PARAMS_SEPARATER = "?";
 	
-	public static final String MDMS_ROUNDOFF_TAXHEAD= "WS_ROUNDOFF";
+	public static final String MDMS_ROUNDOFF_TAXHEAD= "SW_ROUNDOFF";
 	
 	public static final String TENANT_ID_FIELD_FOR_SEARCH_URL = "tenantId=";
 	
@@ -69,8 +69,8 @@ public class SWCalculationConstant {
 	
 	public static final String SW_CONSUMER_CODE_SEPARATOR = ":";
 	
-	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
-	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
+	public static final String EG_SW_INVALID_DEMAND_ERROR = "EG_SW_INVALID_DEMAND_ERROR";
+	public static final String EG_SW_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 	
 
 	/**
@@ -130,7 +130,17 @@ public class SWCalculationConstant {
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(SW_CHARGE));
 	
 	public static final String DAYA_APPLICABLE_NAME = "applicableAfterDays";
-
 	
+	public static final String Demand_End_Date_String = "demandEndDateMillis";
+	
+	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
+	
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.sw-services-calculation.billingPeriod";
+	
+	public static final String BillingPeriod = "billingPeriod";
+	
+	public static final String ConnectionType = "connectionType";
+	
+	public static final String SW_MODULE = "sw-services-calculation";
 
 }

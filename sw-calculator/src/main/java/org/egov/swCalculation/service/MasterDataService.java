@@ -1,8 +1,10 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,8 +34,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
+@Slf4j
 @Service
 public class MasterDataService {
 
@@ -281,5 +285,57 @@ public class MasterDataService {
 				currentApplicable = minAmt;
 		}
 		return currentApplicable;
+	}
+	
+	
+	/**
+	 * 
+	 * @param master
+	 * @param billingPeriodMap
+	 * @return master map with date period
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getBillingPeriod(ArrayList<?> mdmsResponse, Map<String, Object> masterMap) {
+		log.info("Billing Frequency Map" + mdmsResponse.toString());
+		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+		Map<String, Object> billingPeriod = new HashMap<>();
+		LocalDateTime demandStartingDate = LocalDateTime.now();
+		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
+		Long demandEndDateMillis = (Long) master.get(SWCalculationConstant.Demand_End_Date_String);
+		Long demandExpiryDateMillis = (Long) master.get(SWCalculationConstant.Demand_Expiry_Date_String);
+		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES,
+				Timestamp.valueOf(demandStartingDate).getTime());
+		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES,
+				Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
+		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String,
+				Timestamp.valueOf(demandStartingDate).getTime() + demandExpiryDateMillis);
+		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
+		return masterMap;
+	}
+	
+	public LocalDateTime setCurrentDateValueToStartingOfDay(LocalDateTime localDateTime) {
+		return localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionType
+	 * @param tenantId
+	 * @return Master For Billing Period
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getBillingFrequencyMasterData(RequestInfo requestInfo,
+			String connectionType, String tenantId, Map<String, Object> masterMap) {
+		String jsonPath = SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
+		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
+		Object res = repository.fetchResult(url, mdmsCriteriaReq);
+		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+		if (res == null) {
+			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		getBillingPeriod(mdmsResponse, masterMap);
+		return masterMap;
 	}
 }

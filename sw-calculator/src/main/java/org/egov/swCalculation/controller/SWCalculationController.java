@@ -45,8 +45,8 @@ public class SWCalculationController {
 	
 	
 	@PostMapping("/_calculate")
-	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
-		return new ResponseEntity<>(sWCalculationService.getTaxCalculation(calculationReq), HttpStatus.OK);
+	public ResponseEntity<CalculationRes> calculate(@RequestBody @Valid CalculationReq calculationReq) {
+		return new ResponseEntity<>(sWCalculationService.getCalculation(calculationReq), HttpStatus.OK);
 	}
 	
 	@PostMapping("/_updateDemand")
