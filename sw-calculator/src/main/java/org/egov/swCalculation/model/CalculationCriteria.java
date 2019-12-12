@@ -27,10 +27,10 @@ import lombok.ToString;
 public class CalculationCriteria   {
 	
 		@Valid
-		@NotNull
         @JsonProperty("sewerageConnection")
         private SewerageConnection sewerageConnection;
-
+		
+		@NotNull
         @JsonProperty("connectionNo")
         private String connectionNo;
 

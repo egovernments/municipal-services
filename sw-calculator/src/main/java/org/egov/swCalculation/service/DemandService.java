@@ -151,7 +151,7 @@ public class DemandService {
 			if (connection == null)
 				throw new CustomException("INVALID CONNECTIONNUMBER",
 						"Demand cannot be generated for connectionNumber "
-								+ calculation.getSewerageConnection().getConnectionNo()
+								+ calculation.getConnectionNo()
 								+ " Sewerage Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
@@ -181,7 +181,7 @@ public class DemandService {
 
 			Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
-			Long expiryDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+			Long expiryDate = (Long) financialYearMaster.get(SWCalculationConstant.Demand_Expiry_Date_String);
 			
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)

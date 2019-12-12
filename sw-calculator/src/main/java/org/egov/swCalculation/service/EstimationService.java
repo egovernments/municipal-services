@@ -58,7 +58,7 @@ public class EstimationService {
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
 		SewerageConnection sewerageConnection = null;
 		String assessmentYear = getAssessmentYear();
-		String tenantId = requestInfo.getUserInfo().getTenantId();
+		String tenantId = criteria.getTenantId();
 		if (criteria.getSewerageConnection() == null && !criteria.getConnectionNo().isEmpty()) {
 			sewerageConnection = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(),
 					tenantId);
