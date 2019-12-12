@@ -24,7 +24,7 @@ UOM character varying(32),
 connectiontype character varying(32) NOT NULL,
 calculationAttribute character varying(64),
 CONSTRAINT eg_sw_service_connection_id_fkey FOREIGN KEY (connection_id)
-REFERENCES connection (id)
+REFERENCES eg_sw_connection (id)
 ON UPDATE CASCADE
 ON DELETE CASCADE
 );
