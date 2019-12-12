@@ -169,18 +169,33 @@ consumerGroup.on("message", function(message) {
       sendEventNotificaiton();
     }
   };
-  const FireNOCPaymentStatus = (Payments) => {
-    console.log("Payments",Payments);
+  const FireNOCPaymentStatus = (Payment) => {
+    console.log("Payments..",Payment);
     let tenantId = get(
-      Payments,
+      Payment,
       "tenantId"
     );
       console.log(tenantId);
+      let businessService = get(
+        Payment,
+        "paymentDetails[0].businessService"
+      );
+      console.log(businessService)
     let applicationNumber = get(
-        Payments,
-        "paymentDetails.consumerCode"
+        Payment,
+        "paymentDetails[0].bill[0].consumerCode"
       );
       console.log(applicationNumber);
+      let applicationNumber1 = get(
+        Payment,
+        "paymentDetails[0].bill.consumerCode"
+      );
+      console.log(applicationNumber1);
+      let applicationNumber2 = get(
+        Payment,
+        "paymentDetails.bill.consumerCode"
+      );
+      console.log(applicationNumber2);
 
     
     // for (let i = 0; i < Payments.length; i++) {
@@ -231,9 +246,9 @@ consumerGroup.on("message", function(message) {
     //   break;
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
         {
-          const { Payments } = value;
+          const { Payment } = value;
           console.log("value",value);
-          FireNOCPaymentStatus(Payments);
+          FireNOCPaymentStatus(Payment);
         }
        break;
   }
