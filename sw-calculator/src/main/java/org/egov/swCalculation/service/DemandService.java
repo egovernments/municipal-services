@@ -152,7 +152,7 @@ public class DemandService {
 
 			String tenantId = calculation.getTenantId();
 			String consumerCode = calculation.getConnectionNo();
-			User owner = requestInfo.getUserInfo();
+			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
 			List<DemandDetail> demandDetails = new LinkedList<>();
 
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
