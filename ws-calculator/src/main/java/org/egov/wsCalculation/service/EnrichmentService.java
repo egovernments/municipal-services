@@ -1,5 +1,6 @@
 package org.egov.wsCalculation.service;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -42,10 +43,8 @@ public class EnrichmentService {
 
 	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
 		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
-		meterConnectionRequest.getMeterReading().setCurrentReadingDate(System.currentTimeMillis());
-		meterConnectionRequest.getMeterReading().setLastReadingDate(System.currentTimeMillis());
+		meterConnectionRequest.getMeterReading().setCurrentReadingDate(Instant.now().getEpochSecond());
 		//setIdgenIds(meterConnectionRequest);
-
 	}
 
 }

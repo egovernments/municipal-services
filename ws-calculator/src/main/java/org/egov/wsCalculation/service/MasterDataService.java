@@ -238,8 +238,7 @@ public class MasterDataService {
 				Timestamp.valueOf(demandStartingDate).getTime());
 		billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
 				Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
-		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String,
-				Timestamp.valueOf(demandStartingDate).getTime() + demandExpiryDateMillis);
+		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String,demandExpiryDateMillis);
 		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
 	}

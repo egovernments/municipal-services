@@ -45,8 +45,9 @@ public class WSCalculatorQueryBuilder {
 		if(isAnyCriteriaMatch == false)
 			return null;
 		resultantQuery = query.toString();
+		resultantQuery = addOrderBy(resultantQuery);
 		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
+			resultantQuery = addPaginationWrapper(resultantQuery, preparedStatement, criteria);
 		return resultantQuery;
 	}
 
@@ -131,5 +132,10 @@ public class WSCalculatorQueryBuilder {
 	public String getTenentIdConnectionQuery() {
 		StringBuilder query = new StringBuilder(tenentIdWaterConnectionSearchQuery);
 		return query.toString();
+	}
+	
+	private String addOrderBy(String query) {
+		query = query + " ORDER BY mr.currentReadingDate DESC";
+		return query;
 	}
 }
