@@ -66,9 +66,6 @@ public class DemandService {
 	private ServiceRequestRepository repository;
 
 	@Autowired
-	private EstimationService estimationService;
-
-	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 	
 	@Autowired
@@ -77,12 +74,8 @@ public class DemandService {
 
 	/**
 	 * Creates or updates Demand
-	 * 
-	 * @param requestInfo
-	 *            The RequestInfo of the calculation request
-	 * @param calculations
-	 *            The Calculation Objects for which demand has to be generated
-	 *            or updated
+	 * @param requestInfo The RequestInfo of the calculation request
+	 * @param calculations The Calculation Objects for which demand has to be generated or updated
 	 */
 	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
@@ -92,14 +85,18 @@ public class DemandService {
 
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
-
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap.get(SWCalculationConstant.BillingPeriod);
+		Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+		Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+		
 		if (!CollectionUtils.isEmpty(calculations)) {
-
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
 			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 					.collect(Collectors.toSet());
-			List<Demand> demands = searchDemand(tenantId, consumerCodes, requestInfo);
+			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDate, toDate, requestInfo);
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -119,7 +116,7 @@ public class DemandService {
 			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations);
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate);
 		return createdDemands;
 	}
 
@@ -135,7 +132,6 @@ public class DemandService {
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
 		List<Demand> demands = new LinkedList<>();
-		String assessmentYear = estimationService.getAssessmentYear();
 
 		for (Calculation calculation : calculations) {
 			SewerageConnection connection = null;
@@ -157,7 +153,6 @@ public class DemandService {
 			String tenantId = calculation.getTenantId();
 			String consumerCode = calculation.getConnectionNo();
 			User owner = requestInfo.getUserInfo();
-			Long billExpiryTime = System.currentTimeMillis() + configs.getDemandBillExpiry();
 			List<DemandDetail> demandDetails = new LinkedList<>();
 
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
@@ -269,12 +264,13 @@ public class DemandService {
 	 *            The RequestInfo of the incoming request
 	 * @return List of demands for the given consumerCode
 	 */
-	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes, RequestInfo requestInfo) {
+	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo, RequestInfo requestInfo) {
 		String uri = getDemandSearchURL();
 		uri = uri.replace("{1}", tenantId);
 		uri = uri.replace("{2}", configs.getBusinessService());
 		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
-
+		uri = uri.replace("{4}", taxPeriodFrom.toString());
+		uri = uri.replace("{5}", taxPeriodTo.toString());
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -325,12 +321,12 @@ public class DemandService {
 	 *            List of calculation object
 	 * @return Demands that are updated
 	 */
-	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations) {
+	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations, Long fromDate, Long toDate) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 
 			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
-					Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), requestInfo);
+					Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), fromDate, toDate, requestInfo);
 
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
@@ -574,5 +570,57 @@ public class DemandService {
 		}
 
 		return isCurrentDemand;
+	}
+	
+	/**
+	 * 
+	 * @param tenantId
+	 * @param consumerCodes
+	 * @param taxPeriodFrom
+	 * @param taxPeriodTo
+	 * @param requestInfo
+	 * @return List of Demand
+	 */
+	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCodes,RequestInfo requestInfo) {
+		String uri = getDemandSearchURLForUpdate();
+		uri = uri.replace("{1}", tenantId);
+		uri = uri.replace("{2}", configs.getBusinessService());
+		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
+		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+
+		DemandResponse response;
+		try {
+			response = mapper.convertValue(result, DemandResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
+		}
+
+		if (CollectionUtils.isEmpty(response.getDemands()))
+			return null;
+
+		else
+			return response.getDemands();
+
+	}
+	
+	/**
+	 * Creates demand Search url based on tenanatId,businessService, and
+	 * 
+	 * @return demand search url
+	 */
+	public String getDemandSearchURLForUpdate() {
+		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
+		url.append(configs.getDemandSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{2}");
+		url.append("&");
+		url.append("consumerCode=");
+		url.append("{3}");
+		return url.toString();
 	}
 }

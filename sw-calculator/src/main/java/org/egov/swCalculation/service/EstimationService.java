@@ -170,13 +170,13 @@ public class EstimationService {
 		 * @param waterConnection
 		 * @param billingSlabs
 		 * @param requestInfo
-		 * @return
+		 * @return List of billing slab based on matching criteria
 		 */
 		private List<BillingSlab> getSlabsFiltered(SewerageConnection sewerageConnection, List<BillingSlab> billingSlabs, RequestInfo requestInfo) {
 			Property property = sewerageConnection.getProperty();
 			// get billing Slab
 			log.debug(" the slabs count : " + billingSlabs.size());
-			final String buildingType = property.getPropertyType();
+			final String buildingType = "Domestic";
 			final String connectionType = sewerageConnection.getConnectionType();
 			final String calculationAttribute = sewerageConnection.getCalculationAttribute();
 			final String unitOfMeasurement = sewerageConnection.getUom();
