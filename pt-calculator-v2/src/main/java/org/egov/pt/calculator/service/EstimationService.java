@@ -47,6 +47,9 @@ public class EstimationService {
 	private PayService payService;
 
 	@Autowired
+	private ReceiptService rcptService;
+
+	@Autowired
 	private Configurations configs;
 
 	@Autowired
@@ -315,14 +318,18 @@ public class EstimationService {
 	 * @param taxAmt tax amount for which rebate & penalty will be applied
 	 * @param usageExemption  total exemption value given for all unit usages
 	 * @param property proeprty  object
+
 	 * @param propertyBasedExemptionMasterMap property masters which contains exemption values associated with them
 	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
+	 * @param build
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(RequestInfo requestInfo,BigDecimal taxAmt, BigDecimal usageExemption, Property property,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap,Map<String, Object> masterMap) {
 
 
+
+		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt;
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 
@@ -383,7 +390,6 @@ public class EstimationService {
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 				 assessmentYear, timeBasedExemeptionMasterMap,payments,taxPeriod);
-
 
 		if (null != rebatePenaltyMap) {
 
