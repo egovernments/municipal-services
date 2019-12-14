@@ -65,6 +65,7 @@ public class DemandService {
 	@Autowired
 	private ServiceRequestRepository repository;
 
+
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 	
@@ -74,6 +75,7 @@ public class DemandService {
 
 	/**
 	 * Creates or updates Demand
+	 * 
 	 * @param requestInfo The RequestInfo of the calculation request
 	 * @param calculations The Calculation Objects for which demand has to be generated or updated
 	 */
@@ -90,13 +92,14 @@ public class DemandService {
 		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap.get(SWCalculationConstant.BillingPeriod);
 		Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 		Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
-		
+
 		if (!CollectionUtils.isEmpty(calculations)) {
+
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
 			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 					.collect(Collectors.toSet());
-			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDate, toDate, requestInfo);
+			List<Demand> demands = searchDemand(tenantId, consumerCodes,fromDate, toDate, requestInfo);
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -116,7 +119,7 @@ public class DemandService {
 			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate);
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations ,fromDate, toDate);
 		return createdDemands;
 	}
 
@@ -603,7 +606,7 @@ public class DemandService {
 			return response.getDemands();
 
 	}
-	
+
 	/**
 	 * Creates demand Search url based on tenanatId,businessService, and
 	 * 
