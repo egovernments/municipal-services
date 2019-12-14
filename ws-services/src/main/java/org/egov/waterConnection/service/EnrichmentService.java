@@ -75,7 +75,6 @@ public class EnrichmentService {
 	 *            for create and false for update
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isCreate) {
-		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(System.currentTimeMillis());
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		if (isCreate) {
 			waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
@@ -102,23 +101,23 @@ public class EnrichmentService {
 	 *            WaterConnectionRequest which is to be created
 	 */
 	private void setWaterConnectionIdgenIds(WaterConnectionRequest request) {
-//		RequestInfo requestInfo = request.getRequestInfo();
-//		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
-//
-//		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
-//				config.getWaterConnectionIdGenFormat(), 1);
-//		ListIterator<String> itr = applicationNumbers.listIterator();
-//
-//		Map<String, String> errorMap = new HashMap<>();
-//		if (applicationNumbers.size() != 1) {
-//			errorMap.put("IDGEN ERROR ",
-//					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
-//		}
-//
-//		if (!errorMap.isEmpty())
-//			throw new CustomException(errorMap);
-		waterConnection.setConnectionNo("1001");
+
+		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
+				config.getWaterConnectionIdGenFormat(), 1);
+		ListIterator<String> itr = applicationNumbers.listIterator();
+
+		Map<String, String> errorMap = new HashMap<>();
+		if (applicationNumbers.size() != 1) {
+			errorMap.put("IDGEN ERROR ",
+					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		waterConnection.setConnectionNo(itr.next());
 
 	}
 

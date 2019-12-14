@@ -10,7 +10,6 @@ import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.builder.WSCalculatorQueryBuilder;
-import org.egov.wsCalculation.rowmapper.DemandSchedulerRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingCurrentReadingRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +37,6 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	
 	@Autowired
 	MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
-	
-	
-	@Autowired
-	DemandSchedulerRowMapper demandSchedulerRowMapper;
 	
 
 	@Value("${egov.meterservice.createmeterconnection}")
@@ -119,29 +114,5 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
 		return tenentIds;
 	}
-	
-	@Override
-	public ArrayList<String> searchConnectionNos(String connectionType,String tenentId) {
-		ArrayList<String> connectionNos = new ArrayList<>();
-		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberFromWaterServicesQuery(preparedStatement,connectionType,tenentId);
-		if (query == null)
-			return connectionNos;
-		log.info("Query: " + query);
-		
-		connectionNos = (ArrayList<String>)jdbcTemplate.query(query,preparedStatement.toArray(),demandSchedulerRowMapper);
-		return connectionNos;
-	}
-	
-//	@Override
-//	public ArrayList<String> searchConnectionNos() {
-//		ArrayList<String> connectionNos = new ArrayList<>();
-//		String query = queryBuilder.getTenentIdConnectionQuery();
-//		if (query == null)
-//			return connectionNos;
-//		log.info("Query: " + query);
-//		connectionNos = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
-//		return connectionNos;
-//	}
 
 }

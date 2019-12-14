@@ -141,6 +141,5 @@ public class CalculatorUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-	
 
 }
