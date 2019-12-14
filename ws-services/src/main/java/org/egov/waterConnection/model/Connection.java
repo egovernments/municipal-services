@@ -110,10 +110,26 @@ public class Connection {
 
 	@JsonProperty("documents")
 	private List<Document> documents = null;
+	
+	@JsonProperty("connectionExecutionDate")
+	private Long connectionExecutionDate = 0l;
 
 	public Connection id(String id) {
 		this.id = id;
 		return this;
+	}
+	
+	public Connection connectionExecutionDate(Long connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
+		return this;
+	}
+
+	public Long getConnectionExecutionDate() {
+		return connectionExecutionDate;
+	}
+
+	public void setConnectionExecutionDate(Long connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
 	}
 
 	/**

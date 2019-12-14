@@ -70,7 +70,7 @@ public class MDMSValidator {
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
 
 		
-		Object mdmsJsonForBillingPeriod = getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",jsonPath, requestInfo);
+		Object mdmsJsonForBillingPeriod = getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, null,jsonPath, requestInfo);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 		
