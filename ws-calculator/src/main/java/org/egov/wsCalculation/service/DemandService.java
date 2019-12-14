@@ -67,9 +67,6 @@ public class DemandService {
 	private WSCalculationConfiguration configs;
 
 	@Autowired
-	private EstimationService estimationService;
-
-	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
@@ -91,15 +88,17 @@ public class DemandService {
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
 
+		
+		@SuppressWarnings("unchecked")
+		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
+				.get(WSCalculationConstant.BillingPeriod);
+		Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+		Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+		
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
 
 		if (!CollectionUtils.isEmpty(calculations)) {
-			@SuppressWarnings("unchecked")
-			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
-					.get(WSCalculationConstant.BillingPeriod);
-			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
-			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
 			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
@@ -124,7 +123,7 @@ public class DemandService {
 			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations);
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate);
 		return createdDemands;
 	}
 	
@@ -139,8 +138,6 @@ public class DemandService {
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap) {
 		List<Demand> demands = new LinkedList<>();
-		String assessmentYear = estimationService.getAssessmentYear();
-
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = null;
 
@@ -155,7 +152,7 @@ public class DemandService {
 			if (connection == null)
 				throw new CustomException("INVALID CONNECTION NUMBER",
 						"Demand cannot be generated for connectionNumber "
-								+ calculation.getWaterConnection().getConnectionNo()
+								+ calculation.getConnectionNo()
 								+ " Water Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
@@ -520,12 +517,12 @@ public class DemandService {
 	 *            List of calculation object
 	 * @return Demands that are updated
 	 */
-	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations) {
+	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations, Long fromDate, Long toDate) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 
-			List<Demand> searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(),
-					Collections.singleton(calculation.getWaterConnection().getConnectionNo()), requestInfo);
+			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
+					Collections.singleton(calculation.getWaterConnection().getConnectionNo()), fromDate, toDate, requestInfo);
 
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
