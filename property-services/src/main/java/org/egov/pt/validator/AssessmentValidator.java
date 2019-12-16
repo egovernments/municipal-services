@@ -29,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AssessmentValidator {
 
 	@Autowired
@@ -182,14 +185,20 @@ public class AssessmentValidator {
         	throw new CustomException("MASTER_FETCH_FAILED", "Couldn't fetch master data for validation");
 		
 		for(Unit unit: assessment.getUnits()) {
-			if(!masters.get(PTConstants.MDMS_PT_CONSTRUCTIONTYPE).contains(unit.getConstructionType()))
-				errorMap.put("CONSTRUCTION_TYPE_INVALID", "The construction type provided is invalid");
+			if(!CollectionUtils.isEmpty(masters.get(PTConstants.MDMS_PT_CONSTRUCTIONTYPE))) {
+				if(!masters.get(PTConstants.MDMS_PT_CONSTRUCTIONTYPE).contains(unit.getConstructionType()))
+					errorMap.put("CONSTRUCTION_TYPE_INVALID", "The construction type provided is invalid");
+			}
+
+			if(!CollectionUtils.isEmpty(masters.get(PTConstants.MDMS_PT_USAGECATEGORY))) {
+				if(!masters.get(PTConstants.MDMS_PT_USAGECATEGORY).contains(unit.getUsageCategory()))
+					errorMap.put("USAGE_CATEGORY_INVALID", "The usage category provided is invalid");
+			}
 			
-			if(!masters.get(PTConstants.MDMS_PT_USAGECATEGORY).contains(unit.getUsageCategory()))
-				errorMap.put("USAGE_CATEGORY_INVALID", "The usage category provided is invalid");
-			
-			if(!masters.get(PTConstants.MDMS_PT_OCCUPANCYTYPE).contains(unit.getOccupancyType()))
-				errorMap.put("OCCUPANCY_TYPE_INVALID", "The occupancy type provided is invalid");
+			if(CollectionUtils.isEmpty(masters.get(PTConstants.MDMS_PT_OCCUPANCYTYPE))) {
+				if(!masters.get(PTConstants.MDMS_PT_OCCUPANCYTYPE).contains(unit.getOccupancyType().toString()))
+					errorMap.put("OCCUPANCY_TYPE_INVALID", "The occupancy type provided is invalid");
+			}
 		}
 
 		if (!CollectionUtils.isEmpty(errorMap.keySet())) {
