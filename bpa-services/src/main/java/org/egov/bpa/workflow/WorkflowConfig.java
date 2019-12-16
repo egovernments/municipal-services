@@ -45,11 +45,9 @@ public class WorkflowConfig {
 
         Map<String, String> map = new HashMap<>();
 
-//        map.put(ACTION_INITIATE, STATUS_INITIATED);
-//        map.put(ACTION_APPLY, STATUS_APPLIED);
-//        map.put(ACTION_APPROVE, STATUS_APPROVED);
-//        map.put(ACTION_REJECT, STATUS_REJECTED);
-//        map.put(ACTION_CANCEL, STATUS_CANCELLED);
+        map.put(ACTION_INITIATE, STATUS_INITIATED);
+        map.put(ACTION_APPLY, STATUS_APPLIED);
+        map.put(ACTION_APPROVE, STATUS_APPROVED);
 
         actionStatusMap = Collections.unmodifiableMap(map);
     }
@@ -84,13 +82,15 @@ public class WorkflowConfig {
 
         Map<String, List<String>> map = new HashMap<>();
 
-//        map.put(null, Arrays.asList(ACTION_APPLY,ACTION_INITIATE));
-//        map.put(STATUS_INITIATED, Arrays.asList(ACTION_APPLY,ACTION_INITIATE));
-//        map.put(STATUS_APPLIED, Arrays.asList(ACTION_APPLY)); // FIXME PUT THE ACTIONS IN PLACE
-//        map.put(STATUS_PAID, Arrays.asList(ACTION_APPROVE, ACTION_REJECT));
-//        map.put(STATUS_APPROVED, Arrays.asList(ACTION_CANCEL));
-//        map.put(STATUS_REJECTED, Arrays.asList()); // FIXME PUT THE ACTIONS IN PLACE
-//        map.put(STATUS_CANCELLED, Arrays.asList()); // FIXME PUT THE ACTIONS IN PLACE
+        map.put(null, Arrays.asList(ACTION_APPLY,ACTION_INITIATE));
+        map.put(STATUS_INITIATED, Arrays.asList(ACTION_APPLY));
+        map.put(STATUS_APPLIED, Arrays.asList(ACTION_PAY)); // FIXME PUT THE ACTIONS IN PLACE
+        map.put(STATUS_PAID, Arrays.asList(ACTION_UPDTEDOCVERIFICATION, ACTION_FORWORD));
+        map.put(STATUS_DOCUMENTVERIFICATION, Arrays.asList(ACTION_FIELDINSPECTION, ACTION_FORWORD));
+        map.put(STATUS_FIELDINSPECTION, Arrays.asList(ACTION_NOCUPDATION, ACTION_FORWORD));
+        map.put(STATUS_NOCUPDATION, Arrays.asList(ACTION_PENDINGAPPROVAL, ACTION_FORWORD));
+        map.put(STATUS_PENDINGAPPROVAL, Arrays.asList(ACTION_APPROVE, ACTION_FORWORD));
+        map.put(STATUS_APPROVED, Arrays.asList(ACTION_CANCEL));
 
         actionCurrentStatusMap = Collections.unmodifiableMap(map);
     }

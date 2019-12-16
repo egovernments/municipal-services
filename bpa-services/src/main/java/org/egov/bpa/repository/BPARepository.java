@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,6 +12,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.querybuilder.BPAQueryBuilder;
 import org.egov.bpa.repository.rowmapper.BPARowMapper;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
@@ -53,7 +55,7 @@ public class BPARepository {
 		producer.push(config.getSaveTopic(), bpaRequest);
 	}
 
-	public void update(BPARequest bpaRequest) {
+	/*public void update(BPARequest bpaRequest) {
 			 RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		        BPA bpa = bpaRequest.getBPA();
 
@@ -63,7 +65,47 @@ public class BPARepository {
 		        
 		        if (!CollectionUtils.isEmpty(bpaForUpdate))
 		            producer.push(config.getUpdateTopic(), new BPARequest(requestInfo, bpa));
-	}
+	}*/
+	
+	
+	
+	
+	public void update(BPARequest bpaRequest,Map<String,Boolean> idToIsStateUpdatableMap) {
+        RequestInfo requestInfo = bpaRequest.getRequestInfo();
+        
+
+        BPA bpaForStatusUpdate = new BPA();
+        BPA bpaForUpdate = new BPA();
+        BPA bpaForAdhocChargeUpdate = new BPA();
+
+        BPA bpa = bpaRequest.getBPA();
+
+            if (idToIsStateUpdatableMap.get("9d2f4ea3-bd58-4b41-a38e-da36f6ccd5d0")) {
+            	bpaForUpdate = bpa;
+            }
+            else if(bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC))
+                bpaForAdhocChargeUpdate = bpa;
+            else {
+                bpaForStatusUpdate = bpa;
+            }
+            
+
+        if (bpaForUpdate != null)
+            producer.push(config.getUpdateTopic(), new BPARequest(requestInfo, bpaForUpdate));
+
+        if (bpaForStatusUpdate != null)
+            producer.push(config.getUpdateWorkflowTopic(), new BPARequest(requestInfo, bpaForStatusUpdate));
+
+        if(bpaForAdhocChargeUpdate != null)
+            producer.push(config.getUpdateAdhocTopic(),new BPARequest(requestInfo,bpaForAdhocChargeUpdate));
+
+    }
+	
+	
+	
+	
+	
+	
 	
 	
 	 /**

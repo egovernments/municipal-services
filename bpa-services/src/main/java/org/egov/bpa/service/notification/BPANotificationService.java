@@ -134,9 +134,9 @@ public class BPANotificationService {
 	private void enrichSMSRequest(BPARequest bpaRequest,
 			List<SMSRequest> smsRequests) {
         String tenantId = bpaRequest.getBPA().getTenantId();
-//      String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  --Localization service changes to be done.
+//      String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  //--Localization service changes to be done.
         String localizationMessages ="Checking";
-//      String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); --Localization service changes to be done.
+//      String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); //--Localization service changes to be done.
         String message ="Application creation successfull";
             Map<String,String > mobileNumberToOwner = new HashMap<>();
 

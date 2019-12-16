@@ -14,7 +14,11 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
 import org.egov.bpa.web.models.user.UserDetailResponse;
+import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.workflow.ActionValidator;
+import org.egov.bpa.workflow.BPAWorkflowService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
+import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,8 @@ public class BPAService {
 	@Autowired
     private BPARepository repository;
 
+	@Autowired
+	private ActionValidator actionValidator;
 
     @Autowired
     private BPAValidator bpaValidator;
@@ -54,7 +60,12 @@ public class BPAService {
     @Autowired
     private BPAConfiguration config;
 
+    @Autowired
+    private WorkflowService workflowService;
     
+    
+    @Autowired
+    private BPAWorkflowService bpaWorkflowService;
 	public BPA create(BPARequest bpaRequest) {
 
 		   Object mdmsData = util.mDMSCall(bpaRequest);
@@ -142,13 +153,32 @@ public class BPAService {
      */
     public BPA update(BPARequest bpaRequest){
         Object mdmsData = util.mDMSCall(bpaRequest);
-     
+        BusinessService businessService = workflowService.getBusinessService(bpaRequest.getBPA().getTenantId(), bpaRequest.getRequestInfo());
         List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest); 
+        actionValidator.validateUpdateRequest(bpaRequest,businessService);
+        enrichmentService.enrichBPAUpdateRequest(bpaRequest,businessService);
         bpaValidator.validateUpdate(bpaRequest,searchResult,mdmsData);
         Map<String,Difference> diffMap = diffService.getDifference(bpaRequest,searchResult);
-        userService.createUser(bpaRequest);
-        repository.update(bpaRequest);
-        return bpaRequest.getBPA();
+        Map<String,Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,searchResult);
+        
+        
+        
+    	  /*call workflow service if it's enable else uses internal workflow process*/
+        
+    		/*if (config.getIsExternalWorkFlowEnabled())
+    			wfIntegrator.callWorkFlow(bpaRequest);
+    		else
+    			bpaWorkflowService.updateStatus(bpaRequest);*/
+
+    		enrichmentService.postStatusEnrichment(bpaRequest);
+    		   userService.createUser(bpaRequest);
+//            calculationService.addCalculation(bpaRequest);
+//            editNotificationService.sendEditNotification(bpaRequest,diffMap);
+
+            repository.update(bpaRequest,idToIsStateUpdatableMap);
+            return bpaRequest.getBPA();
+        
+        
     }
     
     

@@ -33,8 +33,8 @@ public class BPAWorkflowService {
      * @param request The update bpa Request
      */
     public void updateStatus(BPARequest request){
-//        actionValidator.validateUpdateRequest(request,null);
-        changeStatus(request);
+    	 actionValidator.validateUpdateRequest(request,null);
+         changeStatus(request);
     }
 
 

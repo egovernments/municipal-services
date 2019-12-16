@@ -83,14 +83,20 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(true);
 		}
 
-		List<String> applicationNos = criteria.getApplicationNo();
+		/*String applicationNos = criteria.getApplicationNo();
 		if (!CollectionUtils.isEmpty(applicationNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos))
 			.append(")");
 			addToPreparedStatement(preparedStmtList, applicationNos);
 //			preparedStmtList.add(criteria.getApplicationNo());
-		}
+		}*/
+		
+		if(criteria.getApplicationNo()!=null){
+            addClauseIfRequired(preparedStmtList,builder);
+            builder.append(" bpa.applicationNo = ? ");
+            preparedStmtList.add(criteria.getApplicationNo());
+        }
 		
 		if (criteria.getMobileNumber() != null) {
 			addClauseIfRequired(preparedStmtList, builder);

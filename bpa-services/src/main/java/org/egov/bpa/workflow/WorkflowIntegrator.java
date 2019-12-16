@@ -4,7 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +47,7 @@ public class WorkflowIntegrator {
 
 	private static final String UUIDKEY = "uuid";
 
-	private static final String MODULENAMEVALUE = "TL";
+	private static final String MODULENAMEVALUE = "BPA";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
 
@@ -79,9 +84,24 @@ public class WorkflowIntegrator {
 		String wfTenantId = bpaRequest.getBPA().getTenantId();
 
 		JSONArray array = new JSONArray();
+//		for (BPA bpa : bpaRequest.getBPA()) {
+		
+		BPA bpa = bpaRequest.getBPA();
 
 			JSONObject obj = new JSONObject();
 			Map<String, String> uuidmap = new HashMap<>();
+//			uuidmap.put(UUIDKEY, bpa.getAssignee());
+			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
+			obj.put(TENANTIDKEY, wfTenantId);
+			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+			obj.put(ACTIONKEY, bpa.getAction());
+//			obj.put(COMMENTKEY, bpa.getComment());
+			/*if (!StringUtils.isEmpty(bpa.getAssignee()))
+				obj.put(ASSIGNEEKEY, uuidmap);*/
+			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
+			array.add(obj);
+//		}
 
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, bpaRequest.getRequestInfo());
@@ -99,9 +119,9 @@ public class WorkflowIntegrator {
 			try {
 				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+				log.error("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
 						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+				throw new CustomException("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
 						" Unable to read the json path in error object : " + pnfe.getMessage());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());
@@ -111,7 +131,7 @@ public class WorkflowIntegrator {
 		}
 
 		/*
-		 * on success result from work-flow read the data and set the status back to TL
+		 * on success result from work-flow read the data and set the status back to BPA
 		 * object
 		 */
 		DocumentContext responseContext = JsonPath.parse(response);

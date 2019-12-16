@@ -163,9 +163,13 @@ public class BPAUtil {
 	     * @param businessService The businessService configuration
 	     * @return Map of is to isStateUpdatable
 	     */
-	    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,BPA searchResult){
+	    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,List<BPA> searchResult){
 	        Map<String ,Boolean> idToIsStateUpdatableMap = new HashMap<>();
-	            idToIsStateUpdatableMap.put(searchResult.getId(),workflowService.isStateUpdatable(searchResult.getStatus(), businessService));
+	        
+	        searchResult.forEach(result -> {
+	            idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
+	        });
+//	            idToIsStateUpdatableMap.put(searchResult.getId(),workflowService.isStateUpdatable(searchResult.getStatus(), businessService));
 	        return idToIsStateUpdatableMap;
 	    }
 	    

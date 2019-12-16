@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAConstants.*;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.workflow.BusinessService;
@@ -14,7 +16,6 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
 
 @Component
 public class ActionValidator {
@@ -64,14 +65,14 @@ public class ActionValidator {
     private void validateDocumentsForUpdate(BPARequest request){
         Map<String,String> errorMap = new HashMap<>();
         BPA bpa = request.getBPA();
-       /* if(ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
+        if(BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
             if(bpa.getDocuments()!=null)
                 errorMap.put("INVALID STATUS","Status cannot be INITIATE when application document are provided");
         }
-        if(ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
+        if(BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
             if(bpa.getDocuments()==null)
                 errorMap.put("INVALID STATUS","Status cannot be APPLY when application document are not provided");
-        }*/
+        }
 
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);

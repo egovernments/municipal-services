@@ -3,6 +3,7 @@ package org.egov.bpa.web.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -18,6 +19,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Validated
 @Getter
@@ -91,7 +96,11 @@ public class BPA {
 
 	@JsonProperty("status")
 	private String status;
-
+	
+	@Size(max = 64)
+	@JsonProperty("action")
+	private String action;
+	
 	@NotNull
 	@JsonProperty("address")
 	private Address address;
@@ -114,6 +123,10 @@ public class BPA {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@Valid
+	@JsonProperty("wfDocuments")
+	private List<Document> wfDocuments;
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
@@ -139,6 +152,11 @@ public class BPA {
 			this.documents.add(documentsItem);
 		return this;
 	}
+/*
+	public String SECTION_CLERKSECTION_CLERK() {
+		// TODO Auto-generated method stub
+		return "INITIATED";
+	}*/
 
 	/*public void addAddressItem(Address addressItem) {
 		if (!((List<Address>) this.address).contains(addressItem))
