@@ -51,6 +51,7 @@ public class Assessment {
         private Status status ;
 
         @JsonProperty("source")
+        @NotNull
         private Source source ;
 
         @JsonProperty("buildUpArea")
@@ -77,6 +78,10 @@ public class Assessment {
         	  
         	  MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
         	  
+        	  WEBAPP("WEBAPP"),
+
+        	  MOBILEAPP("MOBILEAPP"),
+
         	  FIELD_SURVEY("FIELD_SURVEY");
 
         	  private String value;

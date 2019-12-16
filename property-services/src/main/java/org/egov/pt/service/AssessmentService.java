@@ -78,8 +78,10 @@ public class AssessmentService {
 	private void enrichAssessmentCreate(AssessmentRequest request) {
 		Assessment assessment = request.getAssessment();
 		assessment.setId(String.valueOf(UUID.randomUUID()));
-		assessment.setAssessmentNumber("");
-		assessment.setStatus(Status.ACTIVE);
+		assessment.setAssessmentNumber("assessmentNo");
+		if(null == assessment.getStatus()) 
+			assessment.setStatus(Status.ACTIVE);
+
 		AuditDetails auditDetails = AuditDetails.builder()
 				.createdBy(request.getRequestInfo().getUserInfo().getUuid())
 				.createdTime(new Date().getTime())
