@@ -6,13 +6,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
-import org.egov.mdms.model.MdmsCriteria;
-import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.MasterDetail;
+import org.egov.waterConnection.model.MdmsCriteria;
+import org.egov.waterConnection.model.MdmsCriteriaReq;
+import org.egov.waterConnection.model.ModuleDetail;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.PropertyCriteria;
 import org.egov.waterConnection.model.PropertyRequest;
@@ -151,8 +152,8 @@ public class WaterServicesUtil {
 	 * @param requestInfo
 	 * @return List of Property
 	 */
-	public List<Property> searchPropertyOnId(String tenantId, String propertyId, RequestInfo requestInfo){
-		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyId);
+	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo){
+		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyIds);
 		Object result = serviceRequestRepository.fetchResult(propertySearhURL,RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
@@ -193,19 +194,6 @@ public class WaterServicesUtil {
 
 	public MdmsCriteriaReq prepareMdMsRequest(String tenantId, String moduleName, List<String> names, String filter,
 			RequestInfo requestInfo) {
-		List<MasterDetail> masterDetails = new ArrayList<>();
-		names.forEach(name -> {
-			masterDetails.add(MasterDetail.builder().name(name).filter(filter).build());
-		});
-		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(moduleName).masterDetails(masterDetails).build();
-		List<ModuleDetail> moduleDetails = new ArrayList<>();
-		moduleDetails.add(moduleDetail);
-		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build();
-		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
-	}
-
-	public MdmsCriteriaReq prepareMdMsRequest(String tenantId, String moduleName, List<String> names, String filter,
-			MdmsCriteriaReq mdmsCriteriaReq, RequestInfo requestInfo) {
 		List<MasterDetail> masterDetails = new ArrayList<>();
 		names.forEach(name -> {
 			masterDetails.add(MasterDetail.builder().name(name).filter(filter).build());

@@ -1,12 +1,12 @@
 package org.egov.waterConnection.service;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -41,31 +41,29 @@ public class EnrichmentService {
 
 	/**
 	 * 
-	 * @param waterConnectionList
-	 *            List of water connection for enriching the water connection
-	 *            with property.
-	 * @param requestInfo
-	 *            is RequestInfo from request
+	 * @param waterConnectionList List of water connection for enriching the water connection with property.
+	 * @param requestInfo is RequestInfo from request
 	 */
 	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
 			SearchCriteria waterConnectionSearchCriteria) {
-		waterConnectionList.forEach(waterConnection -> {
-			List<Property> propertyList;
-			if (waterConnection.getProperty().getPropertyId() == null
-					|| waterConnection.getProperty().getPropertyId().isEmpty()) {
-				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + waterConnection.getId() + " WATER CONNECTION ID");
-			}
-			if (waterConnection.getProperty().getPropertyId() != null) {
+		if(!waterConnectionList.isEmpty()) {
+			String propertyIdsString = waterConnectionList.stream()
+					.map(waterConnection -> waterConnection.getProperty().getPropertyId()).collect(Collectors.toList())
+					.stream().collect(Collectors.joining(","));
+			List<Property> propertyList = waterServicesUtil.searchPropertyOnId(waterConnectionSearchCriteria.getTenantId(),
+					propertyIdsString, requestInfo);
+			HashMap<String, Property> propertyMap = propertyList.stream().collect(Collectors.toMap(Property::getPropertyId,
+					Function.identity(), (oldValue, newValue) -> newValue, LinkedHashMap::new));
+			waterConnectionList.forEach(waterConnection -> {
 				String propertyId = waterConnection.getProperty().getPropertyId();
-				propertyList = waterServicesUtil.searchPropertyOnId(waterConnectionSearchCriteria.getTenantId(), propertyId, requestInfo);
-				if (propertyList == null || propertyList.isEmpty()) {
+				if (propertyMap.containsKey(propertyId)) {
+					waterConnection.setProperty(propertyMap.get(propertyId));
+				} else {
 					throw new CustomException("INVALID SEARCH",
-							"NO PROPERTY FOUND FOR " + waterConnection.getId() + " WATER CONNECTION ID");
+							"NO PROPERTY FOUND FOR " + waterConnection.getConnectionNo() + " WATER CONNECTION No");
 				}
-				waterConnection.setProperty(propertyList.get(0));
-			}
-		});
+			});
+		}
 	}
 
 	/**

@@ -13,12 +13,15 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository
+@Slf4j
 public class IdGenRepository {
 
 
@@ -53,7 +56,8 @@ public class IdGenRepository {
         try {
             response = restTemplate.postForObject( config.getIdGenHost()+ config.getIdGenPath(), req, IdGenerationResponse.class);
         } catch (HttpClientErrorException e) {
-            throw new ServiceCallException(e.getResponseBodyAsString());
+        	log.error("Unable to generate water connection ID", e);
+            throw new ServiceCallException("Id gen service threw an Exception");
         } catch (Exception e) {
             Map<String, String> map = new HashMap<>();
             map.put(e.getCause().getClass().getName(),e.getMessage());

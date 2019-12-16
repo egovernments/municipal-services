@@ -2,9 +2,11 @@ package org.egov.waterConnection.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.WaterDao;
@@ -66,5 +68,14 @@ public class WaterConnectionValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-
+	
+	public void validatePropertyForConnection(List<WaterConnection> waterConnectionList) {
+		waterConnectionList.forEach(waterConnection -> {
+			if (waterConnection.getProperty().getPropertyId() == null
+					|| waterConnection.getProperty().getPropertyId().isEmpty()) {
+				throw new CustomException("INVALID SEARCH",
+						"PROPERTY ID NOT FOUND FOR " + waterConnection.getConnectionNo() + " WATER CONNECTION NO");
+			}
+		});
+	}
 }
