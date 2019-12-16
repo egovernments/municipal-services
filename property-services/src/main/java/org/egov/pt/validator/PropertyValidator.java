@@ -377,7 +377,7 @@ public class PropertyValidator {
 
         // Search Based only on tenantId is not allowed
 		Boolean emptySearch = (propertyCriteria.getName() == null && propertyCriteria.getMobileNumber() == null
-				&& CollectionUtils.isEmpty(propertyCriteria.getPropertyIds())
+				&& CollectionUtils.isEmpty(propertyCriteria.getPropertyIds()) && CollectionUtils.isEmpty(propertyCriteria.getUuids())
 				&& CollectionUtils.isEmpty(propertyCriteria.getOldpropertyids()));
 
         if(emptySearch)
