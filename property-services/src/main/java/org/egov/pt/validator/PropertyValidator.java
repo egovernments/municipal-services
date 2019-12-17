@@ -381,7 +381,7 @@ public class PropertyValidator {
 		Boolean isUserCitizen = userType.equalsIgnoreCase("CITIZEN");
 		
 		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
-				&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
+				&& CollectionUtils.isEmpty(criteria.getPropertyIds())
 				&& CollectionUtils.isEmpty(criteria.getOwnerIds()) 
 				&& CollectionUtils.isEmpty(criteria.getUuids())
 				&& null == criteria.getMobileNumber()

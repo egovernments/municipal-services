@@ -104,7 +104,7 @@ public class PropertyQueryBuilder {
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
-		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
+		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
 		&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
 		&& CollectionUtils.isEmpty(criteria.getUuids())
 		&& null == criteria.getMobileNumber()
