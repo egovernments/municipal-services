@@ -76,7 +76,6 @@ public class EnrichmentService {
 		});
 
 		property.setAuditDetails(propertyAuditDetails);
-		property.setStatus(Status.ACTIVE);
 
 		setIdgenIds(request);
 		enrichBoundary(request);
@@ -137,6 +136,7 @@ public class EnrichmentService {
 			
 			String pId = getIdList(requestInfo, tenantId, config.getPropertyIdGenName(), config.getPropertyIdGenFormat(), 1).get(0);
 			property.setPropertyId(pId);
+			property.setStatus(Status.ACTIVE);
 		} else {
 			
 			String ackNo = getIdList(requestInfo, tenantId, config.getAcknowldgementIdGenName(), config.getAcknowldgementIdGenFormat(), 1).get(0);

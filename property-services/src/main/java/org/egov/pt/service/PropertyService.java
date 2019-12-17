@@ -123,7 +123,7 @@ public class PropertyService {
 
 		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
-		if (criteria.getMobileNumber() != null || criteria.getName() != null) {
+		if (criteria.getMobileNumber() != null || criteria.getName() != null || criteria.getOwnerIds() != null) {
 			
 			String userTenant = criteria.getTenantId();
 			if(criteria.getTenantId() == null)
@@ -132,6 +132,7 @@ public class PropertyService {
 			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
 			userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 			userSearchRequest.setName(criteria.getName());
+			userSearchRequest.setUuid(criteria.getOwnerIds());
 
 			UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
 			if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
@@ -162,8 +163,8 @@ public class PropertyService {
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
 
-		List<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)
-				.map(OwnerInfo::getUuid).collect(Collectors.toList());
+		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)
+				.map(OwnerInfo::getUuid).collect(Collectors.toSet());
 
 		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
 		userSearchRequest.setUuid(ownerIds);

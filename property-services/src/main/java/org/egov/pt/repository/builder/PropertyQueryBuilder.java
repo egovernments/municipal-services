@@ -5,9 +5,11 @@ import java.util.Set;
 
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.PropertyCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 @Component
 public class PropertyQueryBuilder {
@@ -18,6 +20,7 @@ public class PropertyQueryBuilder {
 	private static final String SELECT = "SELECT ";
 	private static final String INNER_JOIN = "INNER JOIN";
 	private static final String LEFT_JOIN  =  "LEFT OUTER JOIN";
+	private static final String AND_QUERY = " AND ";
 	
 	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner where userid IN ";
 
@@ -101,36 +104,61 @@ public class PropertyQueryBuilder {
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
+		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
+		&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
+		&& CollectionUtils.isEmpty(criteria.getUuids())
+		&& null == criteria.getMobileNumber()
+		&& null == criteria.getName();
+		
+		if(isEmpty)
+			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
+		
 		StringBuilder builder = new StringBuilder(QUERY);
+		Boolean appendAndQuery = false;
 
-		builder.append(" property.tenantid=? ");
-		preparedStmtList.add(criteria.getTenantId());
+		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
+			builder.append(" property.tenantid=?");
+			preparedStmtList.add(criteria.getTenantId());
+			appendAndQuery = true;
+		}
 
 		if (null != criteria.getStatus()) {
 
-			builder.append(" property.status = ?");
+			if(appendAndQuery)
+				builder.append(AND_QUERY);
+			builder.append("property.status = ?");
 			preparedStmtList.add(criteria.getStatus());
+			appendAndQuery= true;
 		}
 
 		Set<String> propertyIds = criteria.getPropertyIds();
 		if (!CollectionUtils.isEmpty(propertyIds)) {
 
-			builder.append("and property.propertyid IN (").append(createQuery(propertyIds)).append(")");
+			if(appendAndQuery)
+				builder.append(AND_QUERY);
+			builder.append("property.propertyid IN (").append(createQuery(propertyIds)).append(")");
 			addToPreparedStatement(preparedStmtList, propertyIds);
+			appendAndQuery= true;
 		}
 		
 		Set<String> uuids = criteria.getUuids();
 		if (!CollectionUtils.isEmpty(uuids)) {
 
-			builder.append("and property.id IN (").append(createQuery(uuids)).append(")");
+			if(appendAndQuery)
+				builder.append(AND_QUERY);
+			builder.append("property.id IN (").append(createQuery(uuids)).append(")");
 			addToPreparedStatement(preparedStmtList, uuids);
+			appendAndQuery= true;
 		}
 
 		Set<String> oldpropertyids = criteria.getOldpropertyids();
 		if (!CollectionUtils.isEmpty(oldpropertyids)) {
 
-			builder.append("and property.oldpropertyid IN (").append(createQuery(oldpropertyids)).append(")");
+			if(appendAndQuery)
+				builder.append(AND_QUERY);
+			builder.append("property.oldpropertyid IN (").append(createQuery(oldpropertyids)).append(")");
 			addToPreparedStatement(preparedStmtList, oldpropertyids);
+			appendAndQuery= true;
 		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

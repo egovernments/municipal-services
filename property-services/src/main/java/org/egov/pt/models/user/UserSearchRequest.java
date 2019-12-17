@@ -2,6 +2,7 @@ package org.egov.pt.models.user;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 
@@ -25,7 +26,7 @@ public class UserSearchRequest {
 	private RequestInfo requestInfo;
 
 	@JsonProperty("uuid")
-	private List<String> uuid;
+	private Set<String> uuid;
 
 	@JsonProperty("id")
 	private List<String> id;

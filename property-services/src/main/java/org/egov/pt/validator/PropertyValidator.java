@@ -407,19 +407,19 @@ public class PropertyValidator {
 		}
 
 		if (criteria.getName() != null && !allowedParams.contains("name"))
-			throw new CustomException("EG_PT_INVALID_SEARCH", "Search based on name is not available for" + userType);
+			throw new CustomException("EG_PT_INVALID_SEARCH", "Search based on name is not available for : " + userType);
 
         if(criteria.getMobileNumber()!=null && !allowedParams.contains("mobileNumber"))
-            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on mobileNumber is not available for" + userType);
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on mobileNumber is not available for : " + userType);
 
         if(!CollectionUtils.isEmpty(criteria.getPropertyIds()) && !allowedParams.contains("ids"))
-            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ids is not available for" + userType);
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ids is not available for : " + userType);
 
         if(!CollectionUtils.isEmpty(criteria.getOldpropertyids()) && !allowedParams.contains("oldpropertyids"))
-            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on oldPropertyId is not available for userType" + userType);
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on oldPropertyId is not available for userType : " + userType);
 
         if(!CollectionUtils.isEmpty(criteria.getOwnerIds()) && !allowedParams.contains("ownerids"))
-            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ownerId is not available for" + userType);
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ownerId is not available for : " + userType);
     }
 
 	/**
