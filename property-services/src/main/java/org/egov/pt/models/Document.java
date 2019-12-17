@@ -20,10 +20,6 @@ public class Document {
         @JsonProperty("id")
         private String id ;
         
-        @JsonProperty("tenantId")
-        @NotNull
-        private String tenantId ;
-        
         @JsonProperty("documentType")
         @NotNull
         private String documentType ;

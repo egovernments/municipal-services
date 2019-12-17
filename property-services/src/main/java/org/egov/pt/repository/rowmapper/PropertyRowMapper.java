@@ -214,7 +214,6 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			.status(Status.fromValue(rs.getString("owndocstatus")))
 			.fileStore(rs.getString("owndocfileStore"))
 			.documentType(rs.getString("owndoctype"))
-			.tenantId(rs.getString("owndoctenantid"))
 			.documentUid(rs.getString("owndocuid"))
 			.id(docId)
 			.build();
