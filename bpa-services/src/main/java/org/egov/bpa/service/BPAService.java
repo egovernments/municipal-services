@@ -69,7 +69,7 @@ public class BPAService {
 	public BPA create(BPARequest bpaRequest) {
 
 		   Object mdmsData = util.mDMSCall(bpaRequest);
-		   edcrService.validateEdcrPlan(bpaRequest);
+		   edcrService.validateEdcrPlan(bpaRequest,mdmsData);
 		    bpaValidator.validateCreate(bpaRequest,mdmsData);
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
 	       
