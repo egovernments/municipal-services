@@ -1,17 +1,14 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
+  version: 1.0.0
   title: eGov Property Tax Information System.
-  description: >
-    APIs for Property Tax module. This modules handles assessment of new
-    properties, changes to existing properties (Detail Updates, division of
-    property, etc.),  search of required properties and property tax.
+  description: |
+    APIs for Property Tax module. This modules handles assessment of new properties, changes to existing properties (Detail Updates, division of property, etc.),  search of required properties and property tax.
   contact:
     name: Egovernments Foundation
     email: contact@egovernments.org
 x-module: PT
-x-common-path: >-
-  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml
+x-common-path: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml'
 paths:
   /property/_create:
     post:
@@ -29,8 +26,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       tags:
         - Property
       requestBody:
@@ -58,8 +54,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
@@ -73,10 +68,8 @@ paths:
       description: |
         Get the properties list based on the input parameters.
       parameters:
-        - $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-0-3.yml#/components/parameters/RequestInfo
-        - $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-0-3.yml#/components/parameters/tenantId
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-0-3.yml#/components/parameters/RequestInfo'
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-0-3.yml#/components/parameters/tenantId'
         - name: name
           in: query
           description: Name of owner whose property is to be searched.
@@ -85,23 +78,13 @@ paths:
           schema:
             type: string
             format: varchar
-        - name: ids
+        - name: propertyIds
           in: query
           description: List of system generated ids of properties.
           required: false
           schema:
             type: string
             format: varchar
-        - name: assessmentNumbers
-          in: query
-          required: false
-          description: List of assessmentNumbers to search.
-          schema:
-            type: string
-            exclusiveMinimum: true
-            exclusiveMaximum: false
-            minLength: 4
-            maxLength: 128
         - name: oldpropertyids
           in: query
           required: false
@@ -131,8 +114,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       tags:
         - Property
   /property/_delete:
@@ -153,15 +135,14 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PropertyDeleteRequest'
         description: Request header for the property delete Request.
-        required: true      
+        required: true
   /property/_cancel:
     post:
       summary: deactivate/cancel an active property.
@@ -180,26 +161,22 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PropertyDeleteRequest'
         description: Request header for the property delete Request.
-        required: true              
-      
+        required: true
   /assessment/_search:
     post:
       summary: Get the list of Asssessments defined in the system.
       description: |
         Get the assessments list based on the input parameters.
       parameters:
-        - $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/components/parameters/requestInfo
-        - $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/components/parameters/tenantId
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/components/parameters/requestInfo'
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/components/parameters/tenantId'
         - name: propertyIds
           in: query
           description: List of system generated ids of properties.
@@ -229,20 +206,16 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       tags:
         - Assessment
       requestBody:
         content:
           application/json:
             schema:
-              $ref: https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         description: Details for the new assessment + RequestInfo meta data.
         required: true
-        
-        
-        
   /assessment/_create:
     post:
       summary: Create new assessment.
@@ -259,8 +232,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       tags:
         - Assessment
       requestBody:
@@ -270,7 +242,6 @@ paths:
               $ref: '#/components/schemas/AssessmentRequest'
         description: Details for the new assessment + RequestInfo meta data.
         required: true
-        
   /assessment/_update:
     post:
       summary: Update existing asessment.
@@ -289,8 +260,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
@@ -316,8 +286,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
@@ -343,8 +312,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: >-
-                  https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
       requestBody:
         content:
           application/json:
@@ -352,17 +320,13 @@ paths:
               $ref: '#/components/schemas/AssessmentDeleteRequest'
         description: Request header for the assessment Request.
         required: true
-        
 servers:
-  - url: https://egov-micro-dev.egovernments.org
+  - url: 'https://egov-micro-dev.egovernments.org'
 components:
   schemas:
     PropertyInfo:
       type: object
-      description: >-
-        This is lightweight property object that can be used as reference by
-        definitions needing property linking. Actual Property Object extends
-        this to include more elaborate attributes of the property.
+      description: This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
       properties:
         id:
           type: string
@@ -390,11 +354,7 @@ components:
           readOnly: true
         oldPropertyId:
           type: string
-          description: >-
-            Old upic no of the Property. ULBs have the existing property in
-            their system/manual records with their identification number, they
-            want to continue the old reference number in this case the same
-            identification number will be captured here.
+          description: 'Old upic no of the Property. ULBs have the existing property in their system/manual records with their identification number, they want to continue the old reference number in this case the same identification number will be captured here.'
           maxLength: 256
           minLength: 1
         status:
@@ -416,27 +376,20 @@ components:
           properties:
             acknowldgementNumber:
               type: string
-              description: >-
-                Acknowldgement number given to citizen on submitting the
-                application for creation or modification of the property.
+              description: Acknowldgement number given to citizen on submitting the application for creation or modification of the property.
               maxLength: 64
               minLength: 1
               readOnly: true
             propertyType:
               type: string
-              description: >-
-                Type of a property like Private, Vacant Land, State Government,
-                Central Government etc.
+              description: 'Type of a property like Private, Vacant Land, State Government, Central Government etc.'
               maxLength: 64
               example: VACANT
             usageCategory:
               type: string
-              description: >-
-                This is about the usage of the property like Residential,
-                Non-residential, Mixed(Property which is getting used for
-                Residential, Non-residential purpose)
+              description: 'This is about the usage of the property like Residential, Non-residential, Mixed(Property which is getting used for Residential, Non-residential purpose)'
               maxLength: 64
-              example: RESIDENTIAL              
+              example: RESIDENTIAL
             ownershipCategory:
               type: string
               description: The type of ownership of the property.
@@ -447,33 +400,23 @@ components:
               items:
                 $ref: '#/components/schemas/OwnerInfo'
             institution:
-              description: >-
-                The details of institution if the ownershipCategory is
-                institutional
+              description: The details of institution if the ownershipCategory is institutional
               items:
                 $ref: '#/components/schemas/Institution'
-                
             creationReason:
               type: string
-              description: >-
-                New property comes into system either property is newly
-                constructed or existing property got sub divided. Here the
-                reason for creation will be captured.
+              description: New property comes into system either property is newly constructed or existing property got sub divided. Here the reason for creation will be captured.
               enum:
                 - NEWPROPERTY
                 - SUBDIVISION
             occupancyDate:
               type: integer
               format: int64
-              description: >-
-                Property is constructed but the tax will be applicable only from
-                the occupation date (time in epoch). System capture that date
-                here.
+              description: Property is constructed but the tax will be applicable only from the occupation date (time in epoch). System capture that date here.
             constructionDate:
               type: integer
               format: int64
-              description: >-
-                The date when the property was constructed
+              description: The date when the property was constructed
             noOfFloors:
               type: integer
               format: int64
@@ -484,30 +427,22 @@ components:
               description: Land area of the property in sq ft
             source:
               type: string
-              description: >-
-                Source of a property data. The properties will be created in a
-                system by different mboules
+              description: Source of a property data. The properties will be created in a system by different mboules
               enum:
                 - PT
                 - TL
                 - WAS
                 - DATA_MIGRATION
             documents:
-              description: >-
-                The documents attached during property create, modification or any
-                transaction happened on the property.
+              description: 'The documents attached during property create, modification or any transaction happened on the property.'
               type: array
               items:
                 $ref: '#/components/schemas/Document'
             additionalDetails:
               type: object
               description: 'The json (array of ''#/definitions/Factor'')'
-                
-
     Assessment:
-      description: >-
-        Financial year wise property details will be capture here. For each
-        financial year property details may change.
+      description: Financial year wise property details will be capture here. For each financial year property details may change.
       type: object
       properties:
         financialYear:
@@ -527,9 +462,7 @@ components:
         assessmentDate:
           type: integer
           format: int64
-          description: >-
-            There will be work flow to create a new property in a system. The
-            assessment date is the final approval and UPIC no generation date.
+          description: There will be work flow to create a new property in a system. The assessment date is the final approval and UPIC no generation date.
         status:
           type: string
           description: status of the Property
@@ -538,10 +471,7 @@ components:
             - INACTIVE
         source:
           type: string
-          description: >-
-            Source of a assessment data. The properties will be created in a
-            system based on the data avaialble in their manual records or during
-            field survey. There can be more from client to client.
+          description: Source of a assessment data. The properties will be created in a system based on the data avaialble in their manual records or during field survey. There can be more from client to client.
           enum:
             - MUNICIPAL_RECORDS
             - FIELD_SURVEY
@@ -550,20 +480,14 @@ components:
           format: float
           description: Total built up area in sq ft
         auditDetails:
-          $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/AuditDetails
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/AuditDetails'
         units:
-          description: >-
-            List of Units in the property. E.g. A property might have 2 units in
-            ground floor and 1 ion first floor. Unit can be Room, floor or any
-            bounded area with a defined usage.
+          description: 'List of Units in the property. E.g. A property might have 2 units in ground floor and 1 ion first floor. Unit can be Room, floor or any bounded area with a defined usage.'
           type: array
           items:
             $ref: '#/components/schemas/Unit'
         documents:
-          description: >-
-            The documents attached during assessment, modification or any
-            transaction happened on the property.
+          description: 'The documents attached during assessment, modification or any transaction happened on the property.'
           type: array
           items:
             $ref: '#/components/schemas/Document'
@@ -572,21 +496,15 @@ components:
           description: 'The json (array of ''#/definitions/Factor'')'
         channel:
           type: string
-          description: >-
-            Property can be created from different channels Eg. System
-            (properties created by ULB officials), CFC Counter (From citizen
-            faciliation counters) etc. Here we are defining some known channels,
-            there can be more client to client.
+          description: 'Property can be created from different channels Eg. System (properties created by ULB officials), CFC Counter (From citizen faciliation counters) etc. Here we are defining some known channels, there can be more client to client.'
           enum:
             - SYSTEM
             - CFC_COUNTER
             - CITIZEN
             - DATA_ENTRY
             - MIGRATION
-      required: 
-          - financialYear
-          
-            
+      required:
+        - financialYear
     Institution:
       type: object
       properties:
@@ -606,78 +524,64 @@ components:
           type: string
           maxLength: 64
           description: Designation of the person doing the assessment on behalf of the institution
-
-   
     OwnerInfo:
       type: object
       properties:
-          name:
-            type: string
-            description: >-
-              The name of the owner.
-            maxLength: 256
-          mobileNumber:
-            type: string
-            description: >-
-              MobileNumber of the owner.
-            maxLength: 256
-          gender:
-            type: string
-            description: >-
-              Gender of the owner.
-            maxLength: 256
-          fatherOrHusbandName:
-            type: string
-            description: >-
-              Father or Husband name of the owner.
-            maxLength: 256
-          correspondenceAddress:
-            type: string
-            description: >-
-              The current address of the owner for correspondence.
-            maxLength: 1024
-          isPrimaryOwner:
-            type: boolean
-            description: The owner is primary or not
-          ownerShipPercentage:
-            type: number
-            format: double
-            description: Ownership percentage.
-          ownerType:
-            type: string
-            description: >-
-              Type of owner, based on this option Exemptions will be applied.
-              This is master data defined in mdms.
-            maxLength: 256
-          institutionId:
-            type: string
-            description: >-
-              The id of the institution if the owner is the authorized person
-              for one
-            maxLength: 64
-          documents:
-            description: The documents attached by owner for exemption.
-            type: array
-            items:
-              $ref: '#/components/schemas/Document'
-          relationship:
-            type: string
-            description: The relationship of gaurdian.
-            enum:
-              - FATHER
-              - HUSBAND
+        name:
+          type: string
+          description: The name of the owner.
+          maxLength: 256
+        mobileNumber:
+          type: string
+          description: MobileNumber of the owner.
+          maxLength: 256
+        gender:
+          type: string
+          description: Gender of the owner.
+          maxLength: 256
+        fatherOrHusbandName:
+          type: string
+          description: Father or Husband name of the owner.
+          maxLength: 256
+        correspondenceAddress:
+          type: string
+          description: The current address of the owner for correspondence.
+          maxLength: 1024
+        isPrimaryOwner:
+          type: boolean
+          description: The owner is primary or not
+        ownerShipPercentage:
+          type: number
+          format: double
+          description: Ownership percentage.
+        ownerType:
+          type: string
+          description: 'Type of owner, based on this option Exemptions will be applied. This is master data defined in mdms.'
+          maxLength: 256
+        institutionId:
+          type: string
+          description: The id of the institution if the owner is the authorized person for one
+          maxLength: 64
+        documents:
+          description: The documents attached by owner for exemption.
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+        relationship:
+          type: string
+          description: The relationship of gaurdian.
+          enum:
+            - FATHER
+            - HUSBAND
       required:
-          - name
-          - mobileNumber
-          - gender
-          - fatherOrHusbandName
-          - relationship
-
-   
+        - name
+        - mobileNumber
+        - gender
+        - fatherOrHusbandName
+        - relationship
     Address:
       allOf:
-        - $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-0.yml#/definitions/Address
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-0.yml#/definitions/Address'
         - type: object
           description: Address of the property.
           properties:
@@ -692,16 +596,12 @@ components:
               maxLength: 64
               minLength: 2
             locality:
-              $ref: >-
-                https://raw.githubusercontent.com/egovernments/egov-services/master/docs/egov-location/contracts/v11-0-0.yml#/definitions/Boundary
-          required: 
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/egov-location/contracts/v11-0-0.yml#/definitions/Boundary'
+          required:
             - locality
-    
     Document:
       type: object
-      description: >-
-        This object holds list of documents attached during the transaciton for
-        a property
+      description: This object holds list of documents attached during the transaciton for a property
       properties:
         id:
           type: string
@@ -709,9 +609,7 @@ components:
           description: system id of the Document.
         documentType:
           type: string
-          description: >-
-            unique document type code, should be validated with document type
-            master
+          description: 'unique document type code, should be validated with document type master'
         fileStore:
           type: string
           description: File store reference key.
@@ -743,10 +641,7 @@ components:
           nullable: false
         usageCategory:
           type: string
-          description: >-
-            This is about the usage of the property like Residential,
-            Non-residential, Mixed(Property witch is gettiong used for
-            Residential, Non-residential purpose)
+          description: 'This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)'
           maxLength: 64
           minLength: 1
         occupancyType:
@@ -771,105 +666,81 @@ components:
           format: double
           description: 'Annual rental value(arv), if occupancy type is Tenant.'
     PropertyRequest:
-      description: >-
-        Contract class to receive request. Array of Property items  are used in
-        case of create . Where as single Property item is used for update
+      description: Contract class to receive request. Array of Property items  are used in case of create . Where as single Property item is used for update
       properties:
         RequestInfo:
-          $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         Property:
           description: Used for search result and create only
           $ref: '#/components/schemas/Property'
     PropertyResponse:
-      description: >-
-        Contract class to send response.  Property items  is used in
-        case of search results or response for create. Where as single Property
-        item is used for update
+      description: Contract class to send response.  Property items  is used in case of search results or response for create. Where as single Property item is used for update
       properties:
         ResponseInfo:
-          $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
         Properties:
           description: Used for search result and create only
           items:
             $ref: '#/components/schemas/Property'
-            
     PropertyDeleteRequest:
       description: Class to send the request body for property delete
       properties:
         RequestInfo:
-           $ref: >-
-              https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         tenantId:
           type: string
           description: The tenantId of the property to be deleted
-        propertyId: 
+        propertyId:
           type: string
           description: The propertyId of the property to be deleted
-
     PropertyDeleteResponse:
       description: Class to send the request body for property delete
       properties:
         ResponseInfo:
-           $ref: >-
-              https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
         tenantId:
           type: string
           description: The tenantId of the property to be deleted
-        propertyId: 
+        propertyId:
           type: string
           description: The propertyId of the property to be deleted
-
-            
     AssessmentRequest:
-      description: >-
-        Contract class to receive request. Array of assessment items  are used
-        in case of create . Where as single assessment item is used for update
+      description: Contract class to receive request. Array of assessment items  are used in case of create . Where as single assessment item is used for update
       properties:
         RequestInfo:
-          $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         Assessments:
           description: Used for search result and create only
           $ref: '#/components/schemas/Assessment'
     AssessmentResponse:
-      description: >-
-        Contract class to send response. Array of assessment items  are used in
-        case of search results or response for create. Where as single
-        assessment item is used for update
+      description: Contract class to send response. Array of assessment items  are used in case of search results or response for create. Where as single assessment item is used for update
       properties:
         ResponseInfo:
-          $ref: >-
-            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
         Assessments:
           description: Used for search result and create only
           type: array
           items:
             $ref: '#/components/schemas/Assessment'
-            
     AssessmentDeleteRequest:
       description: Class to send the request body for assessment delete
       properties:
         RequestInfo:
-           $ref: >-
-              https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         tenantId:
           type: string
           description: The tenantId of the assessment to be deleted
-        assessmentNumber: 
+        assessmentNumber:
           type: string
           description: The assessment number of the property to be deleted
-            
     AssessmentDeleteResponse:
       description: Class to send the request body for property delete
       properties:
         ResponseInfo:
-           $ref: >-
-              https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
         tenantId:
           type: string
           description: The tenantId of the assessment to be deleted
-        assessmentNumber: 
+        assessmentNumber:
           type: string
           description: The assessment number of the property to be deleted
