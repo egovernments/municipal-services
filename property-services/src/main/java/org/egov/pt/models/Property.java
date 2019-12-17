@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
+import org.egov.pt.models.workflow.ProcessInstance;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -64,6 +65,7 @@ public class Property extends PropertyInfo {
 	private Double landArea;
 
 	@JsonProperty("source")
+	@NotNull
 	private Source source;
 
 	@JsonProperty("documents")
@@ -75,6 +77,9 @@ public class Property extends PropertyInfo {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("workflow")
+	private ProcessInstance workflow;
 
 	public enum Source {
 

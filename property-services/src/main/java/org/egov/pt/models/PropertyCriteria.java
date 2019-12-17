@@ -2,8 +2,6 @@ package org.egov.pt.models;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
 import org.egov.pt.models.enums.Status;
 
 import lombok.AllArgsConstructor;
@@ -21,7 +19,6 @@ import lombok.ToString;
 @Builder
 public class PropertyCriteria {
 
-	@NotNull
 	private String tenantId;
 
 	private Set<String> propertyIds;

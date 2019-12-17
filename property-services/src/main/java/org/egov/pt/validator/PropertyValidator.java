@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Institution;
@@ -25,10 +26,10 @@ import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.google.common.collect.Sets;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +51,9 @@ public class PropertyValidator {
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
     
-    @Value("${egov.mdms.host}")
-    private String mdmsHost;
-
-    @Value("${egov.mdms.search.endpoint}")
-    private String mdmsEndpoint;
-
-
+    @Autowired
+    private PropertyConfiguration configs;
+    
 
     /**
      * Validate the masterData and ctizenInfo of the given propertyRequest
@@ -68,12 +65,14 @@ public class PropertyValidator {
 
 		validateMasterData(request, errorMap);
 		validateMobileNumber(request, errorMap);
+		validateFields(request, errorMap);
+		
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
 
-    /**
+	/**
      * Validates the masterData,CitizenInfo and the authorization of the assessee for update
      * @param request PropertyRequest for update
      */
@@ -140,9 +139,11 @@ public class PropertyValidator {
      *
      */
     public Map<String,List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names, String filter,String jsonpath, RequestInfo requestInfo){
-        StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
+
+    	StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
         MdmsCriteriaReq criteriaReq = propertyUtil.prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
         Optional<Object> response = serviceRequestRepository.fetchResult(uri, criteriaReq);
+        
         try {
         	if(response.isPresent()) {
                 return JsonPath.read(response.get(),jsonpath);
@@ -155,6 +156,30 @@ public class PropertyValidator {
         
         return null;
     }
+    
+    private void validateFields(PropertyRequest request, Map<String, String> errorMap) {
+
+    	Property property = request.getProperty();
+    	
+    	if(configs.getIsWorkflowEnabled() && null == property.getWorkflow())
+    		errorMap.put("EG_PR_WF_NOT_NULL", "Wokflow is enabled for create please provide the necessary info in workflow field in property");
+    	
+    	Long constructionDate = property.getConstructionDate();
+    	Long occupancyDate = property.getOccupancyDate();
+    			
+    	if(constructionDate != null && occupancyDate  != null && occupancyDate.compareTo(constructionDate) < 0 )
+    		errorMap.put("EG_PT_DATE_ERROR", "Occuopancy date cannot be lesser than construction date ");
+    	
+    	if(constructionDate != null && constructionDate.compareTo(System.currentTimeMillis()) >= 0)
+    		errorMap.put("EG_PT_CONSDATE_ERROR", "Construction date cannot be a future date ");
+    	
+    	if(occupancyDate != null && occupancyDate.compareTo(System.currentTimeMillis()) >= 0)
+    		errorMap.put("EG_PT_OCCUPANCYDATE_ERROR", "Occupancy date cannot be a future date ");
+    	
+    	if(property.getLandArea().compareTo(configs.getMinumumLandArea()) < 0 )
+    		errorMap.put("EG_PT_ERROR", "Land Area cannot be lesser than minimum value : " + configs.getMinumumLandArea() + " " + configs.getLandAreaUnit());
+    	
+	}
 
     /**
      *Checks if the codes of all fields are in the list of codes obtain from master data
@@ -241,9 +266,6 @@ public class PropertyValidator {
 			if (!CollectionUtils.isEmpty(property.getOwners()))
 				propertyCriteria.setOwnerIds(property.getOwners().stream().filter(owner -> owner.getUuid() != null)
 						.map(OwnerInfo::getUuid).collect(Collectors.toSet()));
-
-			if (!CollectionUtils.isEmpty(property.getDocuments()))
-				property.getDocuments().stream().filter(doc -> doc.getId() != null).collect(Collectors.toSet());
 		}
 
         return propertyCriteria;
@@ -347,41 +369,57 @@ public class PropertyValidator {
 	/**
 	 * Validator for search criteria
 	 * 
-	 * @param propertyCriteria
+	 * @param criteria
 	 * @param requestInfo
 	 */
-    public void validatePropertyCriteria(PropertyCriteria propertyCriteria,RequestInfo requestInfo) {
+    public void validatePropertyCriteria(PropertyCriteria criteria,RequestInfo requestInfo) {
     	
 		List<String> allowedParams = null;
-
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
+		
+		User user = requestInfo.getUserInfo();
+		String userType = requestInfo.getUserInfo().getType();
+		Boolean isUserCitizen = userType.equalsIgnoreCase("CITIZEN");
+		
+		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
+				&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
+				&& CollectionUtils.isEmpty(criteria.getOwnerIds()) 
+				&& CollectionUtils.isEmpty(criteria.getUuids())
+				&& null == criteria.getMobileNumber()
+				&& null == criteria.getName();
+		
+		if (isUserCitizen) {
+			
+			if (isCriteriaEmpty)
+				criteria.setOwnerIds(Sets.newHashSet(user.getUuid()));
+			
 			allowedParams = Arrays.asList(propertyConfiguration.getCitizenSearchParams().split(","));
-		else
+		}
+		
+		else {
+			
+			if(criteria.getTenantId() == null)
+				throw new CustomException("EG_PT_INVALID_SEARCH"," TenantId is mandatory for search by " + userType);
+			
+			if(criteria.getTenantId() != null && isCriteriaEmpty)
+				throw new CustomException("EG_PT_INVALID_SEARCH"," Search is not allowed on empty Criteria, Atleast one criteria should be provided with tenantId for " + userType);
+			
 			allowedParams = Arrays.asList(propertyConfiguration.getEmployeeSearchParams().split(","));
+		}
 
-		if (propertyCriteria.getName() != null && !allowedParams.contains("name"))
-			throw new CustomException("INVALID SEARCH", "Search based on name is not available");
+		if (criteria.getName() != null && !allowedParams.contains("name"))
+			throw new CustomException("EG_PT_INVALID_SEARCH", "Search based on name is not available for" + userType);
 
-        if(propertyCriteria.getMobileNumber()!=null && !allowedParams.contains("mobileNumber"))
-            throw new CustomException("INVALID SEARCH","Search based on mobileNumber is not available");
+        if(criteria.getMobileNumber()!=null && !allowedParams.contains("mobileNumber"))
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on mobileNumber is not available for" + userType);
 
-        if(!CollectionUtils.isEmpty(propertyCriteria.getPropertyIds()) && !allowedParams.contains("ids"))
-            throw new CustomException("INVALID SEARCH","Search based on ids is not available");
+        if(!CollectionUtils.isEmpty(criteria.getPropertyIds()) && !allowedParams.contains("ids"))
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ids is not available for" + userType);
 
-        if(!CollectionUtils.isEmpty(propertyCriteria.getOldpropertyids()) && !allowedParams.contains("oldpropertyids"))
-            throw new CustomException("INVALID SEARCH","Search based on oldPropertyId is not available");
+        if(!CollectionUtils.isEmpty(criteria.getOldpropertyids()) && !allowedParams.contains("oldpropertyids"))
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on oldPropertyId is not available for userType" + userType);
 
-//        if(!CollectionUtils.isEmpty(propertyCriteria.getOwnerids()) && !allowedParams.contains("ownerids"))
-//            throw new CustomException("INVALID SEARCH","Search based on ownerId is not available");
-
-
-        // Search Based only on tenantId is not allowed
-		Boolean emptySearch = (propertyCriteria.getName() == null && propertyCriteria.getMobileNumber() == null
-				&& CollectionUtils.isEmpty(propertyCriteria.getPropertyIds()) && CollectionUtils.isEmpty(propertyCriteria.getUuids())
-				&& CollectionUtils.isEmpty(propertyCriteria.getOldpropertyids()));
-
-        if(emptySearch)
-            throw new CustomException("INVALID SEARCH","Search is not allowed on tenantId alone");
+        if(!CollectionUtils.isEmpty(criteria.getOwnerIds()) && !allowedParams.contains("ownerids"))
+            throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ownerId is not available for" + userType);
     }
 
 	/**

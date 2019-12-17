@@ -1,6 +1,7 @@
 package org.egov.pt.models;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.egov.pt.models.enums.Type;
 
@@ -64,5 +65,7 @@ public class Address {
 	private String street;
 
 	@JsonProperty("locality")
+	@NotNull
+	@Valid
 	private Boundary locality;
 }

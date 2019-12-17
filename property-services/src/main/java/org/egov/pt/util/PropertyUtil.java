@@ -3,6 +3,7 @@ package org.egov.pt.util;
 import static org.egov.pt.util.PTConstants.NOTIFICATION_LOCALE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +17,9 @@ import org.egov.mdms.model.ModuleDetail;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.AuditDetails;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.workflow.ProcessInstance;
+import org.egov.pt.models.workflow.ProcessInstanceRequest;
+import org.egov.pt.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -91,5 +95,37 @@ public class PropertyUtil {
         return uri;
     }
 
+	public ProcessInstanceRequest getProcessInstanceForPayment(PropertyRequest propertyRequest) {
+
+			Property property = propertyRequest.getProperty();
+			
+			ProcessInstance process = ProcessInstance.builder()
+				.businessService(config.getPropertyRegistryWf())
+				.businessId(property.getAcknowldgementNumber())
+				.comment("Payment for property processed")
+				.assignee(property.getOwners().get(0))
+				.moduleName("PT")
+				.action("PAY")
+				.build();
+			
+			return ProcessInstanceRequest.builder()
+					.requestInfo(propertyRequest.getRequestInfo())
+					.processInstances(Arrays.asList(process))
+					.build();
+	}
+	
+	public ProcessInstanceRequest getProcessInstanceForProperty(PropertyRequest request) {
+		
+		Property property = request.getProperty();
+		ProcessInstance wf = property.getWorkflow();
+		
+		wf.setBusinessId(property.getAcknowldgementNumber());
+		wf.setAssignee(property.getOwners().get(0));
+		
+		return ProcessInstanceRequest.builder()
+				.processInstances(Arrays.asList(request.getProperty().getWorkflow()))
+				.requestInfo(request.getRequestInfo())
+				.build();
+	}
 
 }

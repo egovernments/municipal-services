@@ -11,11 +11,14 @@ import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
+import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.User;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
+import org.egov.pt.models.workflow.ProcessInstanceRequest;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.PropertyRepository;
+import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,12 @@ public class PropertyService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private Workflowservice wfService;
+    
+    @Autowired
+    private PropertyUtil util;
+    
 	/**
 	 * Assign ids through enrichment and pushes to kafka
 	 *
@@ -54,6 +63,8 @@ public class PropertyService {
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
+		if (config.getIsWorkflowEnabled())
+			updateWorkflow(request);
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperty();
 	}
@@ -68,12 +79,33 @@ public class PropertyService {
 
 		propertyValidator.validateUpdateRequest(request);
 		userService.createUser(request);
+		if (config.getIsWorkflowEnabled())
+			updateWorkflow(request);
 		producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperty();
 	}
 
 
+	/**
+	 * method to prepare process instance request 
+	 * and assign status back to property
+	 * 
+	 * @param request
+	 */
+	private void updateWorkflow(PropertyRequest request) {
 
+		Property property = request.getProperty();
+
+		ProcessInstanceRequest workflowReq = util.getProcessInstanceForProperty(request);
+		String status = wfService.callWorkFlow(workflowReq);
+		if (status.equalsIgnoreCase(config.getWfStatusActive()) && property.getPropertyId() == null) {
+			
+			String pId = enrichmentService.getIdList(request.getRequestInfo(), property.getTenantId(), config.getPropertyIdGenName(), config.getPropertyIdGenFormat(), 1).get(0);
+			request.getProperty().setPropertyId(pId);
+		}
+		request.getProperty().setStatus(Status.fromValue(status));
+	}
+	
     /**
      * Search property with given PropertyCriteria
      *
@@ -92,9 +124,12 @@ public class PropertyService {
 		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
 		if (criteria.getMobileNumber() != null || criteria.getName() != null) {
+			
+			String userTenant = criteria.getTenantId();
+			if(criteria.getTenantId() == null)
+				userTenant = requestInfo.getUserInfo().getTenantId();
 
-			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(),
-					requestInfo);
+			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
 			userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 			userSearchRequest.setName(criteria.getName());
 

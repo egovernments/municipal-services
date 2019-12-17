@@ -11,6 +11,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
+import java.util.List;
 import java.util.TimeZone;
 
 
@@ -143,7 +145,6 @@ public class PropertyConfiguration {
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
 	
-	
 	//Assessments V2
 	@Value("${egov.pt.assessment.create.topic}")
 	private String createAssessmentTopic;
@@ -152,5 +153,43 @@ public class PropertyConfiguration {
 	private String updateAssessmentTopic;
 	
 
+    // Workflow
+	
+    @Value("${property.workflow.name}")
+    private String propertyRegistryWf;
+	
+    @Value("${pt.business.codes}")
+    private List<String> businessServiceList;
+
+    @Value("${workflow.context.path}")
+    private String wfHost;
+
+    @Value("${workflow.transition.path}")
+    private String wfTransitionPath;
+
+    @Value("${workflow.businessservice.search.path}")
+    private String wfBusinessServiceSearchPath;
+
+    @Value("${is.workflow.enabled}")
+    private Boolean isWorkflowEnabled;
+    
+    @Value("${workflow.status.active}")
+    private String wfStatusActive;
+    
+    // ##### mdms 
+    
+    @Value("${egov.mdms.host}")
+    private String mdmsHost;
+
+    @Value("${egov.mdms.search.endpoint}")
+    private String mdmsEndpoint;
+    
+    // Registry 
+    
+    @Value("${property.min.landarea}")
+	private Double minumumLandArea;
+    
+    @Value("${property.unit.landarea}")
+	private String landAreaUnit;
 
 }

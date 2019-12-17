@@ -46,7 +46,7 @@ public class EnrichmentService {
 
 
     /**
-     * Assigns UUIDs to all id fields and also assigns acknowledgementnumber and assessmentnumber generated from idgen
+     * Assigns UUIDs to all id fields and also assigns acknowledgement-number and assessment-number generated from id-gen
      * @param request  PropertyRequest received for property creation
      * @param onlyPropertyDetail if true only the fields related to propertyDetail are enriched(assigned)
      */
@@ -111,7 +111,7 @@ public class EnrichmentService {
      * @param count Number of ids to be generated
      * @return List of ids generated using idGen service
      */
-	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
+	public List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
 		
 		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
 				.getIdResponses();
@@ -132,12 +132,17 @@ public class EnrichmentService {
 		Property property = request.getProperty();
 		String tenantId = property.getTenantId();
 		RequestInfo requestInfo = request.getRequestInfo();
-		
-		String pId = getIdList(requestInfo,tenantId,config.getPropertyIdGenName(),config.getPropertyIdGenFormat(),1).get(0);
-        String ackNo = getIdList(requestInfo, tenantId,config.getAcknowldgementIdGenName(),config.getAcknowldgementIdGenFormat(),1).get(0);
 
-		property.setPropertyId(pId);
-		property.setAcknowldgementNumber(ackNo);
+		if (!config.getIsWorkflowEnabled()) {
+			
+			String pId = getIdList(requestInfo, tenantId, config.getPropertyIdGenName(), config.getPropertyIdGenFormat(), 1).get(0);
+			property.setPropertyId(pId);
+		} else {
+			
+			String ackNo = getIdList(requestInfo, tenantId, config.getAcknowldgementIdGenName(), config.getAcknowldgementIdGenFormat(), 1).get(0);
+			property.setAcknowldgementNumber(ackNo);
+		}
+
 	}
 
 
