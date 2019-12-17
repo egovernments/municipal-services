@@ -47,11 +47,11 @@ public class BPA {
 	
 	public enum RiskTypeEnum {
 		
-		HIGH("HIGH"),
+		HIGH("High"),
 
-		LOW("LOW"),
+		LOW("Low"),
 		
-		MEDIUM("MEDIUM");
+		MEDIUM("Medium");
 
 		private String value;
 
@@ -94,13 +94,17 @@ public class BPA {
 	@JsonProperty("serviceType")
 	private String serviceType;
 
+
+    @Size(max=64)
 	@JsonProperty("status")
 	private String status;
+	
 	
 	@Size(max = 64)
 	@JsonProperty("action")
 	private String action;
 	
+
 	@NotNull
 	@JsonProperty("address")
 	private Address address;

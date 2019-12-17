@@ -46,12 +46,13 @@ public class BPAValidator {
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData){
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		BPA bpa = request.getBPA();
+//		String filterExp = "$.[?(@.applicationType=='"+bpa.getApplicationType()+"' && @.ServiceType=='"+bpa.getServiceType()+"' && @.RiskType=='"+bpa.getRiskType()+"' && @.WFState=='"+bpa.getAction()+"')].docTypes";
 		
-		String filterExp = "$.[?(@.applicationType=='"+bpa.getApplicationType()+"' && @.ServiceType=='"+bpa.getServiceType()+"' && @.RiskType=='High')].docTypes";
-		JSONArray docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
+		String filterExp = "$.[?(@.applicationType=='"+bpa.getApplicationType()+"' && @.ServiceType=='"+bpa.getServiceType()+"' && @.RiskType=='"+bpa.getRiskType()+"')].docTypes";
+		List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
 		
 		filterExp = "$.[?(@.required==true)].code";
-		JSONArray requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
+		List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
 		
 		List<String> documentTypes = masterData.get(BPAConstants.DOCUMENT_TYPE);
 		
