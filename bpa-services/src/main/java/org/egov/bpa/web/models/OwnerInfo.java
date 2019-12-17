@@ -41,9 +41,6 @@ public class OwnerInfo extends User{
 	
 	@JsonProperty("documents")
 	private List<Document> documents;
-	
-	@JsonProperty("userActive")
-    private Boolean userActive;
 
 	public enum RelationshipEnum {
 		FATHER("FATHER"),
@@ -103,7 +100,7 @@ public class OwnerInfo extends User{
             this.isPrimaryOwner = isPrimaryOwner;
             this.ownerShipPercentage = ownerShipPercentage;
             this.ownerType = ownerType;
-            this.userActive = userActive;
+//            this.userActive = userActive;
             this.relationship=relationship;
             this.institutionId=institutionId;
             this.documents=documents;

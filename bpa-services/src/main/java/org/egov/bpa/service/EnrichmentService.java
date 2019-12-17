@@ -79,7 +79,7 @@ public class EnrichmentService {
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
 			// owner.setUuid(UUID.randomUUID().toString());
 
-				owner.setUserActive(true);
+//				owner.setUserActive(true);
 				/*
 				 * owner.setTenantId(bpaRequest.getBPA().getTenantId());
 				 * owner.setAuditDetails(auditDetails);
@@ -182,8 +182,8 @@ public class EnrichmentService {
 			});
 
 			bpaRequest.getBPA().getOwners().forEach(owner -> {
-				if (owner.getUuid() == null || owner.getUserActive() == null)
-					owner.setUserActive(true);
+//				if (owner.getUuid() == null || owner.getUserActive() == null)
+//					owner.setUserActive(true);
 				if (!CollectionUtils.isEmpty(owner.getDocuments()))
 					owner.getDocuments().forEach(document -> {
 						if (document.getId() == null) {

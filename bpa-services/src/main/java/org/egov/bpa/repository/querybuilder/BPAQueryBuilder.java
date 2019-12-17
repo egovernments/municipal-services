@@ -24,9 +24,9 @@ public class BPAQueryBuilder {
 			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
 			+ "bpa_createdTime,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
-			+ "bpaowner.id as bpaowner_uuid,bpaowner.active as useractive,"
+			+ "bpaowner.id as bpaowner_uuid,"
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
-			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestore as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,bpaownerdoc.active as ownerdocactive,"
+			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestore as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
 			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestore as bpa_doc_filestore"
 			+ " FROM eg_bpa_buildingplan bpa"
 			+ INNER_JOIN_STRING
@@ -79,7 +79,7 @@ public class BPAQueryBuilder {
 					.append(")");
 			addToPreparedStatement(preparedStmtList, ownerIds);
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpaowner.active = ? ) ");
+//			builder.append(" bpaowner.active = ? ) ");
 			preparedStmtList.add(true);
 		}
 

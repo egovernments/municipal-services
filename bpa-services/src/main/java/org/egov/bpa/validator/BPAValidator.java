@@ -226,26 +226,26 @@ public class BPAValidator {
 		validateBPAUnits(bpaRequest);
 		validateDuplicateDocuments(bpaRequest);
 		setFieldsFromSearch(bpaRequest, searchResult, mdmsData);
-		validateOwnerActiveStatus(bpaRequest);
+//		validateOwnerActiveStatus(bpaRequest);
 
 	}
 
-	private void validateOwnerActiveStatus(BPARequest bpaRequest) {
-		Map<String, String> errorMap = new HashMap<>();
-		Boolean flag = false;
-		for (OwnerInfo ownerInfo : bpaRequest.getBPA().getOwners()) {
-			if (ownerInfo.getUserActive()) {
-				flag = true;
-				break;
-			}
-		}
-		if (!flag)
-			errorMap.put("INVALID OWNER",
-					"All owners are inactive for application:  "
-							+ bpaRequest.getBPA().getApplicationNo());
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-	}
+//	private void validateOwnerActiveStatus(BPARequest bpaRequest) {
+//		Map<String, String> errorMap = new HashMap<>();
+//		Boolean flag = false;
+//		for (OwnerInfo ownerInfo : bpaRequest.getBPA().getOwners()) {
+//			if (ownerInfo.getUserActive()) {
+//				flag = true;
+//				break;
+//			}
+//		}
+//		if (!flag)
+//			errorMap.put("INVALID OWNER",
+//					"All owners are inactive for application:  "
+//							+ bpaRequest.getBPA().getApplicationNo());
+//		if (!errorMap.isEmpty())
+//			throw new CustomException(errorMap);
+//	}
 
 	private void setFieldsFromSearch(BPARequest bpaRequest,
 			List<BPA> searchResult, Object mdmsData) {
@@ -364,7 +364,7 @@ public class BPAValidator {
 		List<String> ownerIds = new LinkedList<>();
 		if (!CollectionUtils.isEmpty(searchedBpa.getOwners())) {
 			searchedBpa.getOwners().forEach(owner -> {
-				if (owner.getUserActive() != null)
+				if (owner.getUuid() != null)
 					ownerIds.add(owner.getUuid());
 			});
 		}

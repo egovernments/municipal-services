@@ -137,8 +137,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		Double ownerShipPercentage = (Double) rs
 				.getObject("ownershippercentage");
 
-		if (rs.getBoolean("useractive")
-				&& rs.getString("bpaowner_uuid") != null) {
+		if (rs.getString("bpaowner_uuid") != null) {
 			OwnerInfo owner = OwnerInfo.builder()
 					.uuid(rs.getString("bpaowner_uuid"))
 					.isPrimaryOwner(isPrimaryOwner)
