@@ -76,7 +76,7 @@ public class AssessmentQueryBuilder {
 			preparedStatementValues.put("status", criteria.getStatus().toString());
 		}
 		
-		query.append(" ORDER BY createdtime DESC"); //default ordering on the platform.
+		query.append(" ORDER BY ass.createdtime DESC"); //default ordering on the platform.
 		query.append(" OFFSET :offset");
 		preparedStatementValues.put("offset", null == criteria.getOffset() ? configs.getDefaultOffset() : criteria.getOffset());		
 		query.append(" LIMIT :limit");
