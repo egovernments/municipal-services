@@ -9,11 +9,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.model.MasterDetail;
-import org.egov.waterConnection.model.MdmsCriteria;
-import org.egov.waterConnection.model.MdmsCriteriaReq;
-import org.egov.waterConnection.model.ModuleDetail;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.PropertyCriteria;
 import org.egov.waterConnection.model.PropertyRequest;
