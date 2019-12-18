@@ -164,7 +164,7 @@ public class PaymentNotificationService {
             valMap.put(consumerCodeKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.consumerCode")).get(0));
             valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
             valMap.put(payerMobileNumberKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber")).get(0));
-            valMap.put(paidByKey,context.read("$.Payment.paidBy"));
+            valMap.put(paidByKey,context.read("$.Payment.payerName"));
             Integer amountPaid = ((List<Integer>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.amountPaid")).get(0);
             valMap.put(amountPaidKey,amountPaid.toString());
             valMap.put(receiptNumberKey,((List<String>)context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].receiptNumber")).get(0));
