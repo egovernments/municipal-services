@@ -58,13 +58,13 @@ public class WSCalculationValidator {
 		List<MeterReading> previousMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria);
 		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
 			Integer currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
-			if (meterReading.getCurrentReading() <= currentMeterReading) {
+			if (meterReading.getCurrentReading() < currentMeterReading) {
 				errorMap.put("INVALID METER READING CONNECTION",
 						"Current meter reading has to be greater than the past last readings in the meter reading table !");
 			}
 		}
 		
-		if (meterReading.getCurrentReading() <= meterReading.getLastReading()) {
+		if (meterReading.getCurrentReading() < meterReading.getLastReading()) {
 			errorMap.put("INVALID METER READING CONNECTION",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
