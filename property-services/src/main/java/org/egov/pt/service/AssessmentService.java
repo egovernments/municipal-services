@@ -39,6 +39,9 @@ public class AssessmentService {
 	@Autowired
 	private AssessmentRepository repository;
 	
+	@Autowired
+	private EnrichmentService enrichmentService;
+	
 	
 	/**
 	 * Method to create an assessment asynchronously.
@@ -78,7 +81,7 @@ public class AssessmentService {
 	private void enrichAssessmentCreate(AssessmentRequest request) {
 		Assessment assessment = request.getAssessment();
 		assessment.setId(String.valueOf(UUID.randomUUID()));
-		assessment.setAssessmentNumber("assessmentNo");
+		assessment.setAssessmentNumber(getAssessmentNo(request));
 		if(null == assessment.getStatus()) 
 			assessment.setStatus(Status.ACTIVE);
 
@@ -154,5 +157,11 @@ public class AssessmentService {
 	public List<Assessment> searchAssessments(RequestInfo requestInfo, AssessmentSearchCriteria criteria) {
 		List<Assessment> assessments = repository.getAssessments(criteria);
 		return assessments;
+	}
+	
+	
+	private String getAssessmentNo(AssessmentRequest request) {
+		return enrichmentService.getIdList(request.getRequestInfo(), request.getAssessment().getTenantId(), 
+				props.getAssessmentIdGenName(), props.getAssessmentIdGenFormat(), 1).get(0);
 	}
 }
