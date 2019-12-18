@@ -45,6 +45,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			property.setPropertyId(rs.getString("property_id"));
 			waterConnection.setProperty(property);
 			//Add documents id's
+			waterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));;
 			waterConnectionList.add(waterConnection);
 		}
 		return waterConnectionList;
