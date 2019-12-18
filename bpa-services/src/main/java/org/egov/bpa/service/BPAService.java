@@ -74,12 +74,9 @@ public class BPAService {
 	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
 	       
 	        userService.createUser(bpaRequest);
+	        
+			wfIntegrator.callWorkFlow(bpaRequest);
 			
-	        /*
-			 * call workflow service if it's enable else uses internal workflow process
-			 */
-			if (config.getIsExternalWorkFlowEnabled())
-				wfIntegrator.callWorkFlow(bpaRequest);
 			repository.save(bpaRequest);
 			return bpaRequest.getBPA();
 	}
@@ -160,15 +157,15 @@ public class BPAService {
         bpaValidator.validateUpdate(bpaRequest,searchResult,mdmsData);
         Map<String,Difference> diffMap = diffService.getDifference(bpaRequest,searchResult);
         Map<String,Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,searchResult);
-        
-        
-        
-    	  /*call workflow service if it's enable else uses internal workflow process*/
-        
-    		/*if (config.getIsExternalWorkFlowEnabled())
+//        
+//        
+//        
+//    	  /*call workflow service if it's enable else uses internal workflow process*/
+//        
+//    		if (config.getIsExternalWorkFlowEnabled())
     			wfIntegrator.callWorkFlow(bpaRequest);
-    		else
-    			bpaWorkflowService.updateStatus(bpaRequest);*/
+//    		else
+//    			bpaWorkflowService.updateStatus(bpaRequest);
 
     		enrichmentService.postStatusEnrichment(bpaRequest);
     		   userService.createUser(bpaRequest);

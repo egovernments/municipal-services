@@ -14,6 +14,7 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -90,15 +91,15 @@ public class WorkflowIntegrator {
 
 			JSONObject obj = new JSONObject();
 			Map<String, String> uuidmap = new HashMap<>();
-//			uuidmap.put(UUIDKEY, bpa.getAssignee());
+			uuidmap.put(UUIDKEY, bpa.getAssignee());
 			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(ACTIONKEY, bpa.getAction());
 //			obj.put(COMMENTKEY, bpa.getComment());
-			/*if (!StringUtils.isEmpty(bpa.getAssignee()))
-				obj.put(ASSIGNEEKEY, uuidmap);*/
+			if (!StringUtils.isEmpty(bpa.getAssignee()))
+				obj.put(ASSIGNEEKEY, uuidmap);
 			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
 			array.add(obj);
 //		}
@@ -143,6 +144,8 @@ public class WorkflowIntegrator {
 					DocumentContext instanceContext = JsonPath.parse(object);
 					idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
 				});
+		// setting the status back to BPA object from wf response
+		bpa.setStatus( idStatusMap.get(bpa.getApplicationNo()) );
 
 	}
 }

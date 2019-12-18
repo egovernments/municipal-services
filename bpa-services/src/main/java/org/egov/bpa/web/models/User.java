@@ -127,6 +127,7 @@ public class User {
      private List<Role> roles;
 
      @Size(max=100)
+     @NotNull
      @JsonProperty("fatherOrHusbandName")
      private String fatherOrHusbandName;
 

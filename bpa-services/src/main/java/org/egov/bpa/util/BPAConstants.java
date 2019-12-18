@@ -66,7 +66,8 @@ public class BPAConstants {
 	public static final String APPLICATION_TYPE = "ApplicationType";
 	
 	public static final String DOCUMENT_TYPE_MAPPING = "DocTypeMapping";
-	
+
+	public static final String RISKTYPE_COMPUTATION = "RiskTypeComputation";
 	public static final String DOCUMENT_TYPE = "DocumentType";
 	
 	public static final String OWNER_TYPE = "OwnerType";
@@ -96,12 +97,16 @@ public class BPAConstants {
 	public static final String ACTION_APPROVE = "APPROVE";
 
 	public static final String ACTION_FORWORD = "FORWARD";
+	
+	public static final String ACTION_MARK = "MARK";
+	
+	public static final String ACTION_SENDBACK="SENDBACK";
 
-	public static final String ACTION_UPDTEDOCVERIFICATION = "UPDTEDOCVERIFICATION";
+	public static final String ACTION_DOC_VERIFICATION_FORWARD = "DOC_VERIFICATION_FORWARD";
 
-	public static final String ACTION_FIELDINSPECTION = "FIELDINSPECTION";
+	public static final String ACTION_FIELDINSPECTION_FORWARD = "FIELDINSPECTION_FORWARD";
 
-	public static final String ACTION_NOCUPDATION = "NOCUPDATION";
+	public static final String ACTION_NOC_FORWARD = "NOC_FORWARD";
 
 	public static final String ACTION_PENDINGAPPROVAL = "PENDINGAPPROVAL";
 
@@ -116,25 +121,25 @@ public class BPAConstants {
 
 	// BPA Status
 
-	public static final String STATUS_INITIATED = "INITIATED";
+	public static final String STATUS_INITIATED = "INPROGRESS";
 
-	public static final String STATUS_APPLIED = "APPLIED";
+	public static final String STATUS_APPLIED = "INPROGRESS";
 
 	public static final String STATUS_APPROVED = "APPROVED";
 
 	public static final String STATUS_REJECTED = "REJECTED";
 
-	public static final String STATUS_DOCUMENTVERIFICATION = "DOCUMENTVERIFICATION";
+	public static final String STATUS_DOCUMENTVERIFICATION = "INPROGRESS";
 
-	public static final String STATUS_FIELDINSPECTION = "FIELDINSPECTION";
+	public static final String STATUS_FIELDINSPECTION = "INPROGRESS";
 
-	public static final String STATUS_NOCUPDATION = "FIELDINSPECTION";
+	public static final String STATUS_NOCUPDATION = "INPROGRESS";
 
-	public static final String STATUS_PENDINGAPPROVAL = "PENDINGAPPROVAL";
+	public static final String STATUS_PENDINGAPPROVAL = "INPROGRESS";
 
 	public static final String STATUS_CANCELLED = "CANCELLED";
 
-	public static final String STATUS_PAID = "PAID";
+	public static final String STATUS_PAID = "INPROGRESS";
 
 	public static final String BILL_AMOUNT_JSONPATH = "$.billResponse.Bill[0].billDetails[0].totalAmount";
 	

@@ -65,38 +65,22 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 		
-		List<String> edcrNumbers = criteria.getEdcrNumber();
+		List<String> edcrNumbers = criteria.getEdcrNumbers();
 		if (!CollectionUtils.isEmpty(edcrNumbers)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
 			addToPreparedStatement(preparedStmtList, edcrNumbers);
 		}
 
-		List<String> ownerIds = criteria.getOwnerIds();
-		if (!CollectionUtils.isEmpty(ownerIds)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" (bpaowner.id IN (").append(createQuery(ownerIds))
-					.append(")");
-			addToPreparedStatement(preparedStmtList, ownerIds);
-			addClauseIfRequired(preparedStmtList, builder);
-//			builder.append(" bpaowner.active = ? ) ");
-			preparedStmtList.add(true);
-		}
 
-		/*String applicationNos = criteria.getApplicationNo();
+		List<String> applicationNos = criteria.getApplicationNos();
 		if (!CollectionUtils.isEmpty(applicationNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos))
-			.append(")");
+			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos)).append(")");
 			addToPreparedStatement(preparedStmtList, applicationNos);
-//			preparedStmtList.add(criteria.getApplicationNo());
-		}*/
+		}
 		
-		if(criteria.getApplicationNo()!=null){
-            addClauseIfRequired(preparedStmtList,builder);
-            builder.append(" bpa.applicationNo = ? ");
-            preparedStmtList.add(criteria.getApplicationNo());
-        }
+		
 		
 		if (criteria.getMobileNumber() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -104,25 +88,10 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(criteria.getMobileNumber());
 		}
 
-		if (criteria.getStatus() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("  bpa.status = ? ");
-			preparedStmtList.add(criteria.getStatus());
-		}
 
-		if (criteria.getFromDate() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("  bpa.applicationDate >= ? ");
-			preparedStmtList.add(criteria.getFromDate());
-		}
+		
 
-		if (criteria.getToDate() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("  bpa.applicationDate <= ? ");
-			preparedStmtList.add(criteria.getToDate());
-		}
-
-		// enrichCriteriaForUpdateSearch(builder,preparedStmtList,criteria);
+		
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList,
 				criteria);

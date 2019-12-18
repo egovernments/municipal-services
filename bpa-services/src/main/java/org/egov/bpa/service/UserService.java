@@ -49,57 +49,37 @@ public class UserService {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		Role role = getCitizenRole();
 
-		bpa.getOwners().forEach(owner ->
-		{
-							if (owner.getUuid() == null) {
-								addUserDefaultFields(bpa.getTenantId(), role,
-										owner);
-								StringBuilder uri = new StringBuilder(config
-										.getUserHost()).append(
-										config.getUserContextPath()).append(
-										config.getUserCreateEndpoint());
-								setUserName(owner);
+		bpa.getOwners().forEach(owner -> {
+			if (owner.getUuid() == null) {
+				addUserDefaultFields(bpa.getTenantId().split("\\.")[0], role, owner);
+				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
+						.append(config.getUserCreateEndpoint());
+				setUserName(owner);
 
-								UserDetailResponse userDetailResponse = userCall(
-										new CreateUserRequest(requestInfo,
-												owner), uri);
-								if (userDetailResponse.getUser().get(0)
-										.getUuid() == null) {
-									throw new CustomException(
-											"INVALID USER RESPONSE",
-											"The user created has uuid as null");
-								}
-								log.info("owner created --> "
-										+ userDetailResponse.getUser().get(0)
-												.getUuid());
-								log.info("owner created Id --> "
-										+ userDetailResponse.getUser().get(0)
-												.getId());
-								setOwnerFields(owner, userDetailResponse,
-										requestInfo);
-							} else {
-								log.info("owner Exists ========>");
-								UserDetailResponse userDetailResponse = userExists(
-										owner, requestInfo);
-								if (userDetailResponse.getUser().isEmpty())
-									throw new CustomException("INVALID USER",
-											"The uuid " + owner.getUuid()
-													+ " does not exists");
-								StringBuilder uri = new StringBuilder(config
-										.getUserHost());
-								uri = uri.append(config.getUserContextPath())
-										.append(config.getUserUpdateEndpoint());
-								OwnerInfo user = new OwnerInfo();
-								user.addUserWithoutAuditDetail(owner);
-								addNonUpdatableFields(user, userDetailResponse
-										.getUser().get(0));
-								userDetailResponse = userCall(
-										new CreateUserRequest(requestInfo, user),
-										uri);
-								setOwnerFields(owner, userDetailResponse,
-										requestInfo);
-							}
-						});
+				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+				if (userDetailResponse.getUser().get(0).getUuid() == null) {
+					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
+				}
+				log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
+				setOwnerFields(owner, userDetailResponse, requestInfo);
+			} else {
+				log.info("owner Exists ========>");
+				if(owner.getTenantId() ==null) {
+					owner.setTenantId( bpa.getTenantId());
+				}
+				UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
+				if (userDetailResponse.getUser().isEmpty())
+					throw new CustomException("INVALID USER", "The uuid " + owner.getUuid() + " does not exists");
+				StringBuilder uri = new StringBuilder(config.getUserHost());
+				uri = uri.append(config.getUserContextPath()).append(config.getUserUpdateEndpoint());
+				OwnerInfo user = new OwnerInfo();
+				user.addUserWithoutAuditDetail(owner);
+				addNonUpdatableFields(user, userDetailResponse.getUser().get(0));
+				userDetailResponse = userCall(new CreateUserRequest(requestInfo, user), uri);
+				setOwnerFields(owner, userDetailResponse, requestInfo);
+			}
+		});
 	}
 
 	/**
@@ -126,9 +106,9 @@ public class UserService {
 	 *            The requestInfo of the request
 	 * @return The search response from the user service
 	 */
-	private UserDetailResponse userExists(OwnerInfo owner,RequestInfo requestInfo) {
+	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
-		userSearchRequest.setTenantId(owner.getTenantId());
+		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(owner.getMobileNumber());
 		userSearchRequest.setName(owner.getName());
 		userSearchRequest.setRequestInfo(requestInfo);
@@ -140,11 +120,11 @@ public class UserService {
 		return userCall(userSearchRequest, uri);
 	}
 
-
 	/**
 	 * Sets the username as uuid
 	 * 
-	 * @param owner The owner to whom the username is to assigned
+	 * @param owner
+	 *            The owner to whom the username is to assigned
 	 */
 	private void setUserName(OwnerInfo owner) {
 		// String username = UUID.randomUUID().toString();
@@ -162,8 +142,7 @@ public class UserService {
 	 * @param requestInfo
 	 *            The requestInfo of the request
 	 */
-	private void setOwnerFields(OwnerInfo owner,
-			UserDetailResponse userDetailResponse, RequestInfo requestInfo) {
+	private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse, RequestInfo requestInfo) {
 		owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
 		owner.setId(userDetailResponse.getUser().get(0).getId());
 		owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
@@ -184,8 +163,7 @@ public class UserService {
 	 * @param owner
 	 *            The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, Role role,
-			OwnerInfo owner) {
+	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner) {
 		owner.setActive(true);
 		owner.setTenantId(tenantId);
 		owner.setRoles(Collections.singletonList(role));
@@ -205,8 +183,7 @@ public class UserService {
 	}
 
 	/**
-	 * Returns UserDetailResponse by calling user service with given uri and
-	 * object
+	 * Returns UserDetailResponse by calling user service with given uri and object
 	 * 
 	 * @param userRequest
 	 *            Request object for user service
@@ -222,15 +199,12 @@ public class UserService {
 		else if (uri.toString().contains(config.getUserCreateEndpoint()))
 			dobFormat = "dd/MM/yyyy";
 		try {
-			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
-					.fetchResult(uri, userRequest);
+			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
 			parseResponse(responseMap, dobFormat);
-			UserDetailResponse userDetailResponse = mapper.convertValue(
-					responseMap, UserDetailResponse.class);
+			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
 			return userDetailResponse;
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("IllegalArgumentException",
-					"ObjectMapper not able to convertValue in userCall");
+			throw new CustomException("IllegalArgumentException", "ObjectMapper not able to convertValue in userCall");
 		}
 	}
 
@@ -241,24 +215,17 @@ public class UserService {
 	 *            LinkedHashMap got from user api response
 	 */
 	private void parseResponse(LinkedHashMap responeMap, String dobFormat) {
-		List<LinkedHashMap> users = (List<LinkedHashMap>) responeMap
-				.get("user");
+		List<LinkedHashMap> users = (List<LinkedHashMap>) responeMap.get("user");
 		String format1 = "dd-MM-yyyy HH:mm:ss";
 		if (users != null) {
 			users.forEach(map -> {
-				map.put("createdDate",
-						dateTolong((String) map.get("createdDate"), format1));
+				map.put("createdDate", dateTolong((String) map.get("createdDate"), format1));
 				if ((String) map.get("lastModifiedDate") != null)
-					map.put("lastModifiedDate",
-							dateTolong((String) map.get("lastModifiedDate"),
-									format1));
+					map.put("lastModifiedDate", dateTolong((String) map.get("lastModifiedDate"), format1));
 				if ((String) map.get("dob") != null)
-					map.put("dob",
-							dateTolong((String) map.get("dob"), dobFormat));
+					map.put("dob", dateTolong((String) map.get("dob"), dobFormat));
 				if ((String) map.get("pwdExpiryDate") != null)
-					map.put("pwdExpiryDate",
-							dateTolong((String) map.get("pwdExpiryDate"),
-									format1));
+					map.put("pwdExpiryDate", dateTolong((String) map.get("pwdExpiryDate"), format1));
 			});
 		}
 	}
@@ -292,12 +259,9 @@ public class UserService {
 	 *            The requestInfo of the request
 	 * @return Search response from user service based on ownerIds
 	 */
-	public UserDetailResponse getUser(BPASearchCriteria criteria,
-			RequestInfo requestInfo) {
-		UserSearchRequest userSearchRequest = getUserSearchRequest(criteria,
-				requestInfo);
-		StringBuilder uri = new StringBuilder(config.getUserHost())
-				.append(config.getUserSearchEndpoint());
+	public UserDetailResponse getUser(BPASearchCriteria criteria, RequestInfo requestInfo) {
+		UserSearchRequest userSearchRequest = getUserSearchRequest(criteria, requestInfo);
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
 		return userDetailResponse;
 	}
@@ -311,11 +275,10 @@ public class UserService {
 	 *            The requestInfo of the request
 	 * @return The UserSearchRequest based on ownerIds
 	 */
-	private UserSearchRequest getUserSearchRequest(BPASearchCriteria criteria,
-			RequestInfo requestInfo) {
+	private UserSearchRequest getUserSearchRequest(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setRequestInfo(requestInfo);
-		userSearchRequest.setTenantId(criteria.getTenantId());
+		userSearchRequest.setTenantId(criteria.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType("CITIZEN");

@@ -44,6 +44,8 @@ public class BPAWorkflowService {
      */
     private void changeStatus(BPARequest request){
        Map<String,String> actionToStatus =  workflowConfig.getActionStatusMap();
+       BPA bpa = request.getBPA();
+       bpa.setStatus(actionToStatus.get(bpa.getAction()));
     }
 
 }

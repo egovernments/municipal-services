@@ -77,13 +77,24 @@ public class BPAValidator {
 
 				List<String> addedDocTypes= new ArrayList<String>();
 				bpa.getDocuments().forEach(document -> {
-					String documentNs = document.getDocumentType().split("\\.")[0];
+					String docType = document.getDocumentType();
+					int lastIndex = docType.lastIndexOf(".") ;
+					String documentNs ="";
+					if( lastIndex > 1) {
+						documentNs = docType.substring(0, lastIndex);
+					}else if(lastIndex ==1) {
+						throw new CustomException("Invlaid Document Type ERROR",
+								document.getDocumentType() + " is Invalid");
+					}else {
+						documentNs = docType;
+					}
+					
 					addedDocTypes.add(documentNs);
 				});
 				requiredDocTypes.forEach(docType ->{
 					System.out.println(docType);
 					String docType1 = docType.toString();
-					if(!addedDocTypes.contains(docType1.split("\\.")[0])){
+					if(!addedDocTypes.contains(docType1)){
 						throw new CustomException("Mandatory Documents missing ERROR",
 								"Document Type "+ docType1 + " is Missing");
 					}
@@ -183,12 +194,12 @@ public class BPAValidator {
 	private void validateSearchParams(BPASearchCriteria criteria,
 			List<String> allowedParams) {
 
-		if (criteria.getApplicationNo() != null
+		if (criteria.getApplicationNos() != null
 				&& !allowedParams.contains("applicationNo"))
 			throw new CustomException("INVALID SEARCH",
 					"Search on applicationNo is not allowed");
 		
-		if (criteria.getEdcrNumber() != null
+		if (criteria.getEdcrNumbers() != null
 				&& !allowedParams.contains("edcrNumber"))
 			throw new CustomException("INVALID SEARCH",
 					"Search on edcrNumber is not allowed");

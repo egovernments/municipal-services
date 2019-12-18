@@ -68,7 +68,7 @@ public class EDCRService {
 		BPA bpa = request.getBPA();
 		
 		uri.append(config.getGetPlanEndPoint());
-		uri.append("?").append("tenantId=").append(this.edcrTenantId);
+		uri.append("?").append("tenantId=").append(bpa.getTenantId());
 		uri.append("&").append("edcrNumber=").append(edcrNo);
 		RequestInfo edcrRequestInfo = new RequestInfo();
 		BeanUtils.copyProperties(request.getRequestInfo(), edcrRequestInfo);
@@ -101,23 +101,23 @@ public class EDCRService {
 			Double buildingHeight = Collections.max(buildingHeights);
 			String OccupancyType = OccupancyTypes.get(0); // Assuming OccupancyType would be same in the list
 			Double plotArea = plotAreas.get(0);
-//			
-//			String filterExp = "$.[?(@.fromPlotArea > '"+plotArea+"' && @.toPlotArea <= '"+plotArea+"' ) || ( @.fromBuildingHeight>'"+buildingHeight+"'  && @.toBuildingHeight <= '"+buildingHeight+"' )].RiskType";
-//			List<String> riskTypes = JsonPath.read(masterData.get(BPAConstants.RISKTYPE_COMPUTATION), filterExp);
-//			
-//			
-//			if( !CollectionUtils.isEmpty(riskTypes) && 
-//					OccupancyType.equals(BPAConstants.RESIDENTIAL_OCCUPANCY) ) {
-//				expectedRiskType = (RiskTypeEnum) riskTypes.get(0);
-//				
-//				if(expectedRiskType == null || !expectedRiskType.equals(riskType) ) {
-//					throw new CustomException("INVALID RISK TYPE",
-//							"The Risk Type is not valid " + riskType);
-//				}
-//			}else {
-//				throw new CustomException("INVALID OccupancyType",
-//						"The OccupancyType " + OccupancyType + " is not supported! " );
-//			}
+			List jsonOutput = JsonPath.read(masterData, BPAConstants.RISKTYPE_COMPUTATION);
+			String filterExp = "$.[?((@.fromPlotArea < "+plotArea+" && @.toPlotArea >= "+plotArea+") || ( @.fromBuildingHeight < "+buildingHeight+"  &&  @.toBuildingHeight >= "+buildingHeight+"  ))].riskType";
+						
+			List<String> riskTypes = JsonPath.read(jsonOutput, filterExp);
+			
+			if( !CollectionUtils.isEmpty(riskTypes) && 
+					OccupancyType.equals(BPAConstants.RESIDENTIAL_OCCUPANCY) ) {
+				expectedRiskType = RiskTypeEnum.fromValue( riskTypes.get(0));
+				
+				if(expectedRiskType == null || !expectedRiskType.equals(riskType) ) {
+					throw new CustomException("INVALID RISK TYPE",
+							"The Risk Type is not valid " + riskType);
+				}
+			}else {
+				throw new CustomException("INVALID OccupancyType",
+						"The OccupancyType " + OccupancyType + " is not supported! " );
+			}
 		}
 	}
 	

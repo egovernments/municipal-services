@@ -133,7 +133,7 @@ public class BPARepository {
             return;
         bpaData.forEach(bpa -> {
         	bpa.getOwners().sort(Comparator.comparing(User::getUuid));
-            bpa.getUnits().sort(Comparator.comparing(Unit::getId));
+//            bpa.getUnits().sort(Comparator.comparing(Unit::getId));
             if(!CollectionUtils.isEmpty(bpa.getDocuments()))
                 bpa.getDocuments().sort(Comparator.comparing(Document::getId));
         });

@@ -88,9 +88,11 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.applicationNo(applicationNo)
 						.status(rs.getString("status"))
 						.tenantId(tenantId)
-						.edcrNumber("edcrnumber")
-						.serviceType("servicetype")
-						.ownershipCategory("ownershipcategory")
+						.edcrNumber(rs.getString("edcrnumber"))
+						.serviceType(rs.getString("servicetype"))
+						.applicationType(rs.getString("applicationType"))
+						.riskType(BPA.RiskTypeEnum.fromValue(rs.getString("riskType")))
+						.ownershipCategory(rs.getString("ownershipcategory"))
 						.address(address)
 						.id(id).build();
 
@@ -146,7 +148,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					.relationship(
 							OwnerInfo.RelationshipEnum.fromValue(rs
 									.getString("relationship")))
-					.userActive(rs.getBoolean("useractive"))
 					.institutionId(rs.getString("institutionid")).build();
 			bpa.addOwnersItem(owner);
 		}
@@ -155,8 +156,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		String docowner = rs.getString("docuserid");
 		String docId = rs.getString("docdetailid");
 		if (bpaId.equalsIgnoreCase(docId) && docowner != null
-				&& rs.getBoolean("ownerdocactive")
-				&& rs.getBoolean("useractive")) {
+				&& rs.getBoolean("ownerdocactive")) {
 			bpa.getOwners().forEach(ownerInfo -> {
 				if (docowner.equalsIgnoreCase(ownerInfo.getUuid()))
 					ownerInfo.addDocumentsItem(ownerDocument);

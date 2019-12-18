@@ -111,6 +111,13 @@ public class ActionValidator {
        Map<String,List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
         Map<String,String> errorMap = new HashMap<>();
         BPA bpa = request.getBPA();
+        
+        if(actionStatusMap.get(bpa.getStatus().toString())!=null){
+            if(!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
+                errorMap.put("UNAUTHORIZED ACTION","The action "+bpa.getAction() +" cannot be applied on the status "+bpa.getStatus());
+            }
+         if(!errorMap.isEmpty())
+             throw new CustomException(errorMap);
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }

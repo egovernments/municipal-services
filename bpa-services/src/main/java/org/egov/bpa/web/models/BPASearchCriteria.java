@@ -28,24 +28,16 @@ public class BPASearchCriteria {
 	    @JsonProperty("ids")
 	    private List<String> ids;
 
-	    @JsonProperty("applicationNo")
-	    private List<String> applicationNo;
+	    @JsonProperty("applicationNos")
+	    private List<String> applicationNos;
 
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;
 
-	    @JsonProperty("edcrNumber")
-	    private List<String> edcrNumber;
+	    @JsonProperty("edcrNumbers")
+	    private List<String> edcrNumbers;
 	    
-	    @JsonIgnore
-	    private String accountId;
-
-
-	    @JsonProperty("fromDate")
-	    private Long fromDate = null;
-
-	    @JsonProperty("toDate")
-	    private Long toDate = null;
+	   
 
 
 	    @JsonProperty("offset")
@@ -58,18 +50,17 @@ public class BPASearchCriteria {
 	    private List<String> ownerIds;
 
 
+
 	    public boolean isEmpty() {
-	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null &&
-	                this.fromDate == null && this.toDate == null && this.ownerIds == null && this.edcrNumber == null
+	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNos == null
+	                && this.mobileNumber == null && this.edcrNumbers == null
 	                
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
-	        return (this.tenantId != null && this.status == null && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null &&
-	                this.fromDate == null && this.toDate == null && this.ownerIds == null && this.edcrNumber == null
+	        return (this.tenantId != null &&  this.ids == null && this.applicationNos == null
+	                && this.mobileNumber == null && this.edcrNumbers == null
 	        );
 	    }
 }

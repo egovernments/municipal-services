@@ -117,6 +117,8 @@ public class BPAUtil {
 	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).filter(filterCode).build());
 	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
 	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
+	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.RISKTYPE_COMPUTATION).build());
+	        bpaMasterDtls.add(MasterDetail.builder().name("CalculationType").build());
 	        ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
 	                .moduleName(BPAConstants.BPA_MODULE).build();
 	        
@@ -150,7 +152,7 @@ public class BPAUtil {
 
 	    public Object mDMSCall(BPARequest bpaRequest){
 	        RequestInfo requestInfo = bpaRequest.getRequestInfo();
-	        String tenantId = bpaRequest.getBPA().getTenantId();
+	        String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
 	        MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo,tenantId);
 	        Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 	        return result;

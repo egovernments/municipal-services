@@ -93,7 +93,7 @@ public class PaymentUpdateService {
 				BPASearchCriteria searchCriteria = new BPASearchCriteria();
 				searchCriteria.setTenantId(valMap.get(tenantId));
 				List<String> code = Arrays.asList(valMap.get(consumerCode));
-				searchCriteria.setApplicationNo(code);
+				searchCriteria.setApplicationNos(code);
 				List<BPA> bpa = bpaService.getBPAWithOwnerInfo(searchCriteria,
 						requestInfo);
 
@@ -104,7 +104,7 @@ public class PaymentUpdateService {
 				if (CollectionUtils.isEmpty(bpa))
 					throw new CustomException("INVALID RECEIPT",
 							"No tradeLicense found for the comsumerCode "
-									+ searchCriteria.getApplicationNo());
+									+ searchCriteria.getApplicationNos());
 
 				bpa.forEach(license -> license
 						.setAction(BPAConstants.ACTION_PAY));

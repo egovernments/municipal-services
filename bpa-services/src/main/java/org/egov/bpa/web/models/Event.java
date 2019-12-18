@@ -1,10 +1,8 @@
 package org.egov.bpa.web.models;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
-
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

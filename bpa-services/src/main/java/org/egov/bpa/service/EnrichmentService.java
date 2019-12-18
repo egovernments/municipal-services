@@ -77,14 +77,7 @@ public class EnrichmentService {
 
 		// owners
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
-			// owner.setUuid(UUID.randomUUID().toString());
-
-//				owner.setUserActive(true);
-				/*
-				 * owner.setTenantId(bpaRequest.getBPA().getTenantId());
-				 * owner.setAuditDetails(auditDetails);
-				 * owner.setInstitutionId(UUID.randomUUID().toString());
-				 */
+		
 				if (!CollectionUtils.isEmpty(owner.getDocuments()))
 					owner.getDocuments().forEach(document -> {
 						document.setId(UUID.randomUUID().toString());
@@ -296,7 +289,7 @@ public class EnrichmentService {
 		if (criteria.isEmpty()
 				&& requestInfo.getUserInfo().getType()
 						.equalsIgnoreCase("CITIZEN")) {
-			criteria.setAccountId(requestInfo.getUserInfo().getUuid());
+//			criteria.setAccountId(requestInfo.getUserInfo().getUuid());
 			criteria.setMobileNumber(requestInfo.getUserInfo().getUserName());
 			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
 		}
@@ -315,6 +308,7 @@ public class EnrichmentService {
 		Set<String> bpaIds = new HashSet<>();
 		bpa.forEach(data -> bpaIds.add(data.getId()));
 		criteria.setIds(new LinkedList<>(bpaIds));
+		criteria.setTenantId(bpa.get(0).getTenantId());
 		return criteria;
 	}
 

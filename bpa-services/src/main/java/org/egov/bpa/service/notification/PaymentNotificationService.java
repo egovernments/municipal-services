@@ -126,7 +126,7 @@ public class PaymentNotificationService {
         
         List<String> code = Arrays.asList(consumerCode);
         
-        searchCriteria.setApplicationNo(code);
+        searchCriteria.setApplicationNos(code);
         
 //        searchCriteria.setApplicationNo(consumerCode);
         searchCriteria.setTenantId(tenantId);

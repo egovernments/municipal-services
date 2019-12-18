@@ -47,11 +47,11 @@ public class BPA {
 	
 	public enum RiskTypeEnum {
 		
-		HIGH("High"),
+		HIGH("HIGH"),
 
-		LOW("Low"),
+		LOW("LOW"),
 		
-		MEDIUM("Medium");
+		MEDIUM("MEDIUM");
 
 		private String value;
 
@@ -127,6 +127,10 @@ public class BPA {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@Size(max=64)
+    @JsonProperty("assignee")
+    private String assignee = null;
 	
 	@Valid
 	@JsonProperty("wfDocuments")
