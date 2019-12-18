@@ -69,8 +69,7 @@ const envVariables = {
   EGOV_USER_USERNAME_PREFIX: process.env.EGOV_USER_USERNAME_PREFIX || "FN-",
 
   //idgen service configurations
-  EGOV_IDGEN_HOST:
-    process.env.EGOV_IDGEN_HOST || "http://localhost:8087",
+  EGOV_IDGEN_HOST: process.env.EGOV_IDGEN_HOST || "http://localhost:8087",
   EGOV_IDGEN_CONTEXT_PATH: process.env.EGOV_IDGEN_CONTEXT_PATH || "/egov-idgen",
   EGOV_IDGEN_GENERATE_ENPOINT:
     process.env.EGOV_IDGEN_GENERATE_ENPOINT || "/id/_generate",
@@ -134,6 +133,8 @@ const envVariables = {
   //pagination configurations
   EGOV_FN_DEFAULT_OFFSET: process.env.EGOV_FN_DEFAULT_OFFSET || 0,
   EGOV_FN_DEFAULT_LIMIT: process.env.EGOV_FN_DEFAULT_OFFSET || 10,
-  EGOV_FN_MAX_OFFSET: process.env.EGOV_FN_DEFAULT_OFFSET || 100
+  EGOV_FN_MAX_OFFSET: process.env.EGOV_FN_DEFAULT_OFFSET || 100,
+
+  ACTION_PAY: "PAY"
 };
 export default envVariables;

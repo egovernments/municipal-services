@@ -2,6 +2,9 @@ const kafka = require("kafka-node");
 import envVariables from "../envVariables";
 import producer from "./producer";
 import get from "lodash/get";
+import set from "lodash/set";
+import { searchApiResponse } from "../api/search";
+import { updateApiResponse } from "../api/update";
 // import { httpRequest } from "../api";
 
 var options = {
@@ -34,7 +37,7 @@ console.log("Consumer ");
 
 consumerGroup.on("message", function(message) {
   console.log("consumer-topic", message.topic);
-  console.log("consumer-value", JSON.parse(message.value));
+  // console.log("consumer-value", JSON.parse(message.value));
   const value = JSON.parse(message.value);
 
   let payloads = [];
@@ -51,7 +54,7 @@ consumerGroup.on("message", function(message) {
     };
 
     payloads.push({
-      topic:envVariables.KAFKA_TOPICS_EVENT_NOTIFICATION,
+      topic: envVariables.KAFKA_TOPICS_EVENT_NOTIFICATION,
       messages: JSON.stringify(requestPayload)
     });
     // httpRequest({
@@ -169,54 +172,50 @@ consumerGroup.on("message", function(message) {
       sendEventNotificaiton();
     }
   };
-  const FireNOCPaymentStatus = (Payment) => {
-    console.log("Payments..",Payment);
-    let tenantId = get(
-      Payment,
-      "tenantId"
-    );
-      console.log(tenantId);
-      let businessService = get(
-        Payment,
-        "paymentDetails[0].businessService"
-      );
-      console.log(businessService)
-    let applicationNumber = get(
-        Payment,
-        "paymentDetails[0].bill[0].consumerCode"
-      );
-      console.log(applicationNumber);
-      let applicationNumber1 = get(
-        Payment,
-        "paymentDetails[0].bill.consumerCode"
-      );
-      console.log(applicationNumber1);
-      let applicationNumber2 = get(
-        Payment,
-        "paymentDetails.bill.consumerCode"
-      );
-      console.log(applicationNumber2);
-
-    
-    // for (let i = 0; i < Payments.length; i++) {
-    //   let applicationNumber = get(
-    //     Payments[i],
-    //     "paymentDetails.bill.consumerCode"
-    //   );
-    //   let status = get(
-    //     FireNOCs[i],
-    //     "FireNOCs[i].fireNOCDetails.status"
-    //   );
-    //   fireNOCRequest["status"]= `${status}`;
-
-    //   payloads.push({
-    //     topic,
-    //     messages: JSON.stringify(fireNOCRequest)
-    //   });
-  
-
-    // }
-  
+  const FireNOCPaymentStatus = async value => {
+    try {
+      const { Payment, RequestInfo } = value;
+      let tenantId = get(Payment, "tenantId");
+      const { paymentDetails } = Payment;
+      if (paymentDetails) {
+        for (var index = 0; index < paymentDetails.length; index++) {
+          let businessService = get(paymentDetails[index], "businessService");
+          if (businessService === envVariables.BUSINESS_SERVICE) {
+            let applicationNumber = get(
+              paymentDetails[index],
+              "bill.consumerCode"
+            );
+            const query = {
+              tenantId,
+              applicationNumber
+            };
+            const body = { RequestInfo };
+            const searchRequest = { body, query };
+            const searchResponse = await searchApiResponse(searchRequest);
+            const { FireNOCs } = searchResponse;
+            if (!FireNOCs.length) {
+              throw "FIRENOC Search error";
+            }
+            for (
+              var firenocIndex = 0;
+              firenocIndex < FireNOCs.length;
+              firenocIndex++
+            ) {
+              set(
+                FireNOCs[firenocIndex],
+                "fireNOCDetails.action",
+                envVariables.ACTION_PAY
+              );
+            }
+            const updateBody = { RequestInfo, FireNOCs };
+            const updateRequest = { body: updateBody };
+            const updateResponse = await updateApiResponse(updateRequest);
+          }
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
   switch (message.topic) {
@@ -245,12 +244,10 @@ consumerGroup.on("message", function(message) {
     //   }
     //   break;
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
-        {
-          const { Payment } = value;
-          console.log("value",value);
-          FireNOCPaymentStatus(Payment);
-        }
-       break;
+      {
+        FireNOCPaymentStatus(value);
+      }
+      break;
   }
 
   producer.send(payloads, function(err, data) {
