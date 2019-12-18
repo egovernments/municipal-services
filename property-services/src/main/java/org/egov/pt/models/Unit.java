@@ -23,13 +23,6 @@ public class Unit   {
 	
         @JsonProperty("id")
         private String id;
-        
-        @JsonProperty("assessmentId")
-        private String assessmentId;
-
-        @JsonProperty("tenantId")
-        @NotNull
-        private String tenantId;
 
         @JsonProperty("floorNo")
         private String floorNo;

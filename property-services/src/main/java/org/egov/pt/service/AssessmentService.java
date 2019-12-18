@@ -94,7 +94,6 @@ public class AssessmentService {
 		if(!CollectionUtils.isEmpty(assessment.getUnits())) {
 			for(Unit unit: assessment.getUnits()) {
 				unit.setId(String.valueOf(UUID.randomUUID()));
-				unit.setAssessmentId(assessment.getId());
 				unit.setActive(true);
 				unit.setAuditDetails(auditDetails);
 			}
@@ -128,7 +127,6 @@ public class AssessmentService {
 			for(Unit unit: assessment.getUnits()) {
 				if(StringUtils.isEmpty(unit.getId())) {
 					unit.setId(String.valueOf(UUID.randomUUID()));
-					unit.setAssessmentId(assessment.getId());
 					unit.setActive(true);
 					unit.setAuditDetails(auditDetails);
 				}
