@@ -6,7 +6,6 @@ import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 // import util from "util";
-import db from "./db";
 import middleware from "./middleware";
 import api from "./api";
 import config from "./config.json";
@@ -17,7 +16,6 @@ import "./kafka/consumer";
 var swaggerUi = require("swagger-ui-express"),
   swaggerDocument = require("./swagger.json");
 const { createTerminus } = require("@godaddy/terminus");
-
 
 let app = express();
 app.server = http.createServer(app);
@@ -46,25 +44,22 @@ app.use(tracer());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // internal middleware
-app.use(middleware({ config, db }));
+app.use(middleware({ config }));
 
 // app.use(validator(opts));
 
 // api router
 
-app.use("/", api({ config, db }));
+app.use("/", api({ config }));
 
 //error handler middleware
-app.use((err, req, res, next) =>{
-
+app.use((err, req, res, next) => {
   console.log(err);
   if (!err.errorType) {
     res.status(err.status).json(err.data);
-  }
-  else if (err.errorType=="custom") {
+  } else if (err.errorType == "custom") {
     res.status(400).json(err.errorReponse);
-  }
-  else {
+  } else {
     res.status(500);
     res.send("Oops, something went wrong.");
   }

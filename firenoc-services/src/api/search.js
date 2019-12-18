@@ -181,33 +181,33 @@ import { actions } from "../utils/search";
 import { validateFireNOCSearchModel } from "../utils/modelValidation";
 import envVariables from "../envVariables";
 const asyncHandler = require("express-async-handler");
-export default ({ config, db }) => {
+import db from "../db";
+
+export default ({ config }) => {
   let api = Router();
   api.post(
     "/_search",
     asyncHandler(async (request, res, next) => {
-      let response = await searchApiResponse(request,res,db,next)
-      res.json(response)
+      let response = await searchApiResponse(request, next);
+      res.json(response);
     })
   );
   return api;
 };
-export const searchApiResponse =async( request, res, db,next)=>{
+export const searchApiResponse = async (request, next = {}) => {
   let response = {
     ResponseInfo: requestInfoToResponseInfo(request.body.RequestInfo, true),
     FireNOCs: []
   };
   const queryObj = JSON.parse(JSON.stringify(request.query));
+  console.log("request", request.query);
   // console.log(queryObj);
   let errors = validateFireNOCSearchModel(queryObj);
   if (errors.length > 0) {
     next({
       errorType: "custom",
       errorReponse: {
-        ResponseInfo: requestInfoToResponseInfo(
-          request.body.RequestInfo,
-          true
-        ),
+        ResponseInfo: requestInfoToResponseInfo(request.body.RequestInfo, true),
         Errors: errors
       }
     });
@@ -222,13 +222,10 @@ export const searchApiResponse =async( request, res, db,next)=>{
   const userUUID = get(request.body, "RequestInfo.userInfo.uuid");
   const isUser = some(roles, { code: "CITIZEN" }) && userUUID;
   if (isUser) {
-    const mobileNumber = get(
-      request.body,
-      "RequestInfo.userInfo.mobileNumber"
-    );
+    const mobileNumber = get(request.body, "RequestInfo.userInfo.mobileNumber");
     const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
-     console.log("mobileNumber",mobileNumber);
-    console.log("tenedrIDD",tenantId);
+    console.log("mobileNumber", mobileNumber);
+    console.log("tenedrIDD", tenantId);
     text = `${text} where (FN.createdby = '${userUUID}' OR`;
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
@@ -298,23 +295,16 @@ export const searchApiResponse =async( request, res, db,next)=>{
     queryObj.hasOwnProperty("fromDate") &&
     queryObj.hasOwnProperty("toDate")
   ) {
-    sqlQuery = `${sqlQuery} FN.createdtime >= ${
-      queryObj.fromDate
-    } AND FN.createdtime <= ${queryObj.toDate} ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} AND FN.createdtime <= ${queryObj.toDate} ORDER BY FN.uuid`;
   } else if (
     queryObj.hasOwnProperty("fromDate") &&
     !queryObj.hasOwnProperty("toDate")
   ) {
-    sqlQuery = `${sqlQuery} FN.createdtime >= ${
-      queryObj.fromDate
-    } ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} ORDER BY FN.uuid`;
   } else if (!isEmpty(queryObj)) {
-    sqlQuery = `${sqlQuery.substring(
-      0,
-      sqlQuery.length - 3
-    )} ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
   }
-  const dbResponse=await db.query(sqlQuery);
+  const dbResponse = await db.query(sqlQuery);
   if (dbResponse.err) {
     console.log(err.stack);
   } else {
@@ -329,8 +319,6 @@ export const searchApiResponse =async( request, res, db,next)=>{
         : [];
   }
   return response;
-
-
 
   // , async (err, dbRes) => {
   //   if (err) {
@@ -348,4 +336,4 @@ export const searchApiResponse =async( request, res, db,next)=>{
   //    return (response);
   //   }
   // });
-}
+};
