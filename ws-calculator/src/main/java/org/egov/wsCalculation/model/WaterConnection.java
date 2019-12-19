@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -54,6 +55,23 @@ public class WaterConnection extends Connection {
 	@JsonProperty("documents")
 	@Valid
 	private List<Document> documents = null;
+	
+	
+	@JsonProperty("connectionExecutionDate")
+	private Long connectionExecutionDate = 0l;
+
+	public Connection connectionExecutionDate(Long connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
+		return this;
+	}
+
+	public Long getConnectionExecutionDate() {
+		return connectionExecutionDate;
+	}
+
+	public void setConnectionExecutionDate(Long connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
+	}
 
 	public WaterConnection connectionCategory(String connectionCategory) {
 		this.connectionCategory = connectionCategory;
