@@ -25,8 +25,6 @@ public class WSCalculatorQueryBuilder {
 	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading mr";
 	
 	private final static String tenentIdWaterConnectionSearchQuery="select DISTINCT tenantid from connection";
-	
-	private final static String connectionNoWaterConnectionSearchQuery = "SELECT conn.connectionNo as conn_no FROM water_service_connection wc INNER JOIN connection conn ON wc.connection_id = conn.id";
 	/**
 	 * 
 	 * @param criteria
@@ -139,26 +137,5 @@ public class WSCalculatorQueryBuilder {
 	private String addOrderBy(String query) {
 		query = query + " ORDER BY mr.currentReadingDate DESC";
 		return query;
-	}
-	
-	public String getConnectionNumberFromWaterServicesQuery(List<Object> preparedStatement, String connectionType,
-			String tenentId) {
-		StringBuilder query = new StringBuilder(connectionNoWaterConnectionSearchQuery);
-		boolean isAnyCriteriaMatch = false;
-		if (connectionType != null && !connectionType.isEmpty()) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" wc.connectionType = ? ");
-			preparedStatement.add(connectionType);
-			isAnyCriteriaMatch = true;
-		}
-
-		if (tenentId != null && !tenentId.isEmpty()) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.tenantId = ? ");
-			preparedStatement.add(tenentId);
-			isAnyCriteriaMatch = true;
-		}
-		return query.toString();
-
 	}
 }
