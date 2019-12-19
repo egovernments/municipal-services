@@ -206,7 +206,9 @@ public class BPAConfiguration {
     @Value("${workflow.businessservice.search.path}")
     private String wfBusinessServiceSearchPath;
 
-
+    @Value("${workflow.process.path}")
+    private String wfProcessPath;
+    
     @Value("${is.external.workflow.enabled}")
     private Boolean isExternalWorkFlowEnabled;
 

@@ -129,12 +129,13 @@ public class BPA {
 	private AuditDetails auditDetails;
 	
 	@Size(max=64)
-    @JsonProperty("assignee")
-    private String assignee = null;
+    @JsonProperty("assignees")
+    private List<String> assignees = null;
 	
 	@Valid
 	@JsonProperty("wfDocuments")
 	private List<Document> wfDocuments;
+	
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)

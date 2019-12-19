@@ -1,20 +1,22 @@
 package org.egov.bpa.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.validator.MDMSValidator;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPA.RiskTypeEnum;
 import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.edcr.RequestInfoWrapper;
+import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.edcr.RequestInfo;
+import org.egov.bpa.web.models.edcr.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.json.JSONObject;
@@ -29,8 +31,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.TypeRef;
 
-import net.minidev.json.JSONArray;
-
 @Service
 public class EDCRService {
 
@@ -40,10 +40,12 @@ public class EDCRService {
 
 	private BPAConfiguration config;
 	
-	private String edcrTenantId="jupiter";
 	
 	@Autowired
 	private MDMSValidator mdmsValidator;
+	
+	@Autowired
+	BPARepository bpaRepository;
 
 	@Autowired
 	public EDCRService(ServiceRequestRepository serviceRequestRepository,
@@ -66,6 +68,16 @@ public class EDCRService {
 		RiskTypeEnum riskType = request.getBPA().getRiskType();
 		StringBuilder uri = new StringBuilder(config.getEdcrHost());
 		BPA bpa = request.getBPA();
+		
+		BPASearchCriteria criteria = new BPASearchCriteria();
+		List<String> edcrNumbers = new ArrayList<String>();
+		edcrNumbers.add(bpa.getEdcrNumber());
+		criteria.setEdcrNumbers(edcrNumbers);
+		List<BPA> bpas = bpaRepository.getBPAData(criteria);
+		if(!CollectionUtils.isEmpty(bpas)) {
+			throw new CustomException(" Duplicate EDCR ", " Application already exists with EDCR Number "+ bpa.getEdcrNumber());
+		}
+		
 		
 		uri.append(config.getGetPlanEndPoint());
 		uri.append("?").append("tenantId=").append(bpa.getTenantId());

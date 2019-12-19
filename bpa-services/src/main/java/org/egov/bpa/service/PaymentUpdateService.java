@@ -99,7 +99,7 @@ public class PaymentUpdateService {
 
 				BusinessService businessService = workflowService
 						.getBusinessService(bpa.get(0).getTenantId(),
-								requestInfo);
+								requestInfo,null);
 
 				if (CollectionUtils.isEmpty(bpa))
 					throw new CustomException("INVALID RECEIPT",
@@ -131,12 +131,8 @@ public class PaymentUpdateService {
 
 				enrichmentService.postStatusEnrichment(updateRequest);
 
-				/*
-				 * calling repository to update the object in TL tables
-				 */
-				Map<String, Boolean> idToIsStateUpdatableMap = util
-						.getIdToIsStateUpdatableMap(businessService, bpa);
-				repository.update(updateRequest, idToIsStateUpdatableMap);
+				
+				repository.update(updateRequest, workflowService.isStateUpdatable(updateRequest.getBPA().getStatus(), businessService));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

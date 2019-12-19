@@ -44,7 +44,7 @@ public class WorkflowIntegrator {
 
 	private static final String DOCUMENTSKEY = "documents";
 
-	private static final String ASSIGNEEKEY = "assignee";
+	private static final String ASSIGNEEKEY = "assignees";
 
 	private static final String UUIDKEY = "uuid";
 
@@ -90,15 +90,15 @@ public class WorkflowIntegrator {
 		BPA bpa = bpaRequest.getBPA();
 
 			JSONObject obj = new JSONObject();
-			Map<String, String> uuidmap = new HashMap<>();
-			uuidmap.put(UUIDKEY, bpa.getAssignee());
+			Map<String, List<String>> uuidmap = new HashMap<>();
+			uuidmap.put(UUIDKEY, bpa.getAssignees());
 			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(ACTIONKEY, bpa.getAction());
 //			obj.put(COMMENTKEY, bpa.getComment());
-			if (!StringUtils.isEmpty(bpa.getAssignee()))
+			if (!StringUtils.isEmpty(bpa.getAssignees()))
 				obj.put(ASSIGNEEKEY, uuidmap);
 			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
 			array.add(obj);

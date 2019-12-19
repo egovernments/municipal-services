@@ -9,7 +9,9 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAConstants.*;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.models.workflow.Action;
 import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.web.models.workflow.ProcessInstance;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
@@ -20,120 +22,167 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ActionValidator {
 
+	private WorkflowConfig workflowConfig;
 
-    private WorkflowConfig workflowConfig;
+	private WorkflowService workflowService;
 
-    private WorkflowService workflowService;
+	@Autowired
+	public ActionValidator(WorkflowConfig workflowConfig, WorkflowService workflowService) {
+		this.workflowConfig = workflowConfig;
+		this.workflowService = workflowService;
+	}
 
-    @Autowired
-    public ActionValidator(WorkflowConfig workflowConfig, WorkflowService workflowService) {
-        this.workflowConfig = workflowConfig;
-        this.workflowService = workflowService;
-    }
+	/**
+	 * Validates create request
+	 * 
+	 * @param request
+	 *            The BPA Create request
+	 */
+	public void validateCreateRequest(BPARequest request) {
+		Map<String, String> errorMap = new HashMap<>();
 
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
 
+	/**
+	 * Validates the update request
+	 * 
+	 * @param request
+	 *            The BPA update request
+	 */
+	public void validateUpdateRequest(BPARequest request, BusinessService businessService) {
+		validateDocumentsForUpdate(request);
+		validateRoleAction(request);
+//		validateAction(request);
+		validateIds(request, businessService);
+	}
 
+	/**
+	 * Validates the applicationDocument
+	 * 
+	 * @param request
+	 *            The bpa create or update request
+	 */
+	private void validateDocumentsForUpdate(BPARequest request) {
+		Map<String, String> errorMap = new HashMap<>();
+		BPA bpa = request.getBPA();
+		if (BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())) {
+			if (bpa.getDocuments() != null)
+				errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
+		}
+		if (BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())) {
+			if (bpa.getDocuments() == null)
+				errorMap.put("INVALID STATUS", "Status cannot be APPLY when application document are not provided");
+		}
 
-    /**
-     * Validates create request
-     * @param request The BPA Create request
-     */
-	public void validateCreateRequest(BPARequest request){
-        Map<String,String> errorMap = new HashMap<>();
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
 
-        if(!errorMap.isEmpty())
-            throw new CustomException(errorMap);
-    }
+	/**
+	 * Validates if the role of the logged in user can perform the given action
+	 * 
+	 * @param request
+	 *            The bpa create or update request
+	 */
+	private void validateRoleAction(BPARequest request) {
+		BPA bpa = request.getBPA();
+		Map<String, String> errorMap = new HashMap<>();
+		RequestInfo requestInfo = request.getRequestInfo();
+		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
+				request.getRequestInfo(), bpa.getApplicationNo());
+		if(processInstance == null ) {
+			errorMap.put("UNAUTHORIZED UPDATE", "Process Instnce does not exists for Application");
+		}
+		List<Action> actions = processInstance.getNextActions();
+		List<Role> roles = requestInfo.getUserInfo().getRoles();
+		List<String> validActions = new LinkedList<>();
+		
+		roles.forEach(role -> {
+			actions.forEach(action -> {
+				if (action.getRoles().contains(role.getCode())) {
+					validActions.add(action.getAction());
+				}
+			});
+		});
 
+		if (!validActions.contains(bpa.getAction())) {
+			errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
+		}
+		if (!errorMap.isEmpty()) {
+			throw new CustomException(errorMap);
+		}
+			
+	}
 
-    /**
-     * Validates the update request
-     * @param request The BPA update request
-     */
-    public void validateUpdateRequest(BPARequest request,BusinessService businessService){
-        validateDocumentsForUpdate(request);
-//        validateRole(request);
-        validateAction(request);
-        validateIds(request,businessService);
-    }
+	/**
+	 * Validate if the action can be performed on the current status
+	 * 
+	 * @param request
+	 *            The bpa update request
+	 */
+	private void validateAction(BPARequest request) {
+		Map<String, List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
+		Map<String, String> errorMap = new HashMap<>();
+		BPA bpa = request.getBPA();
 
+		if (actionStatusMap.get(bpa.getStatus().toString()) != null) {
+			if (!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
+				errorMap.put("UNAUTHORIZED ACTION",
+						"The action " + bpa.getAction() + " cannot be applied on the status " + bpa.getStatus());
+		}
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
 
-    /**
-     * Validates the applicationDocument
-     * @param request The bpa create or update request
-     */
-    private void validateDocumentsForUpdate(BPARequest request){
-        Map<String,String> errorMap = new HashMap<>();
-        BPA bpa = request.getBPA();
-        if(BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())){
-            if(bpa.getDocuments()!=null)
-                errorMap.put("INVALID STATUS","Status cannot be INITIATE when application document are provided");
-        }
-        if(BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())){
-            if(bpa.getDocuments()==null)
-                errorMap.put("INVALID STATUS","Status cannot be APPLY when application document are not provided");
-        }
-
-        if(!errorMap.isEmpty())
-            throw new CustomException(errorMap);
-    }
-
-
-    /**
-     * Validates if the role of the logged in user can perform the given action
-     * @param request The bpa create or update request
-     */
-    private void validateRole(BPARequest request){
-       Map<String,List<String>> roleActionMap = workflowConfig.getRoleActionMap();
-       Map<String,String> errorMap = new HashMap<>();
-       BPA bpa = request.getBPA();
-       RequestInfo requestInfo = request.getRequestInfo();
-       List<Role> roles = requestInfo.getUserInfo().getRoles();
-
-       List<String> actions = new LinkedList<>();
-       roles.forEach(role -> {
-           if(!CollectionUtils.isEmpty(roleActionMap.get(role.getCode())))
-           {
-               actions.addAll(roleActionMap.get(role.getCode()));}
-       });
-
-
-       if(!errorMap.isEmpty())
-           throw new CustomException(errorMap);
-    }
-
-
-    /**
-     * Validate if the action can be performed on the current status
-     * @param request The bpa update request
-     */
-    private void validateAction(BPARequest request){
-       Map<String,List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
-        Map<String,String> errorMap = new HashMap<>();
-        BPA bpa = request.getBPA();
-        
-        if(actionStatusMap.get(bpa.getStatus().toString())!=null){
-            if(!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
-                errorMap.put("UNAUTHORIZED ACTION","The action "+bpa.getAction() +" cannot be applied on the status "+bpa.getStatus());
-            }
-         if(!errorMap.isEmpty())
-             throw new CustomException(errorMap);
-        if(!errorMap.isEmpty())
-            throw new CustomException(errorMap);
-    }
-
-
-    /**
-     * Validates if the any new object is added in the request
-     * @param request The bpa update request
-     */
-    private void validateIds(BPARequest request,BusinessService businessService){
-        Map<String,String> errorMap = new HashMap<>();
-        BPA bpa = request.getBPA();
-        if(!errorMap.isEmpty())
-            throw new CustomException(errorMap);
-    }
-
-
+	/**
+	 * Validates if the any new object is added in the request
+	 * 
+	 * @param request
+	 *            The bpa update request
+	 */
+	private void validateIds(BPARequest request, BusinessService businessService) {
+		Map<String, String> errorMap = new HashMap<>();
+		BPA bpa = request.getBPA();
+		
+		if( !workflowService.isStateUpdatable(bpa.getStatus(), businessService)) {
+			if(bpa.getId() == null) {
+				errorMap.put("INVALID UPDATE", "Id of Application cannot be null");
+			}
+			if(bpa.getAddress() == null) {
+				errorMap.put("INVALID UPDATE", "Id of address cannot be null");
+			}
+			if(!CollectionUtils.isEmpty(bpa.getOwners())) {
+				bpa.getOwners().forEach(owner -> {
+	                if(owner.getUuid()==null)
+	                    errorMap.put("INVALID UPDATE", "Id of owner cannot be null");
+	                if(!CollectionUtils.isEmpty(owner.getDocuments())){
+	                    owner.getDocuments().forEach(document -> {
+	                        if(document.getId()==null)
+	                            errorMap.put("INVALID UPDATE", "Id of owner document cannot be null");
+	                    });
+	                  }
+	                });
+			}
+			if(!CollectionUtils.isEmpty(bpa.getUnits())) {
+				bpa.getUnits().forEach(tradeUnit -> {
+	                if(tradeUnit.getId()==null)
+	                    errorMap.put("INVALID UPDATE", "Id of tradeUnit cannot be null");
+	            });
+			}
+			 if(!CollectionUtils.isEmpty(bpa.getDocuments())){
+				 bpa.getDocuments().forEach(document -> {
+                     if(document.getId()==null)
+                         errorMap.put("INVALID UPDATE", "Id of applicationDocument cannot be null");
+                 });
+             }
+			
+		}
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
 
 }

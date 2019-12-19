@@ -70,21 +70,21 @@ public class BPARepository {
 	
 	
 	
-	public void update(BPARequest bpaRequest,Map<String,Boolean> idToIsStateUpdatableMap) {
+	public void update(BPARequest bpaRequest, boolean isStateUpdatable) {
         RequestInfo requestInfo = bpaRequest.getRequestInfo();
         
 
-        BPA bpaForStatusUpdate = new BPA();
-        BPA bpaForUpdate = new BPA();
-        BPA bpaForAdhocChargeUpdate = new BPA();
+        BPA bpaForStatusUpdate =null;
+        BPA bpaForUpdate =null;
+        BPA bpaForAdhocChargeUpdate =null;
 
         BPA bpa = bpaRequest.getBPA();
 
-            if (idToIsStateUpdatableMap.get("9d2f4ea3-bd58-4b41-a38e-da36f6ccd5d0")) {
-            	bpaForUpdate = bpa;
+            if (isStateUpdatable) {
+            		bpaForUpdate = bpa;
             }
-            else if(bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC))
-                bpaForAdhocChargeUpdate = bpa;
+//            else if(bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC))
+//                bpaForAdhocChargeUpdate = bpa;
             else {
                 bpaForStatusUpdate = bpa;
             }
@@ -96,8 +96,8 @@ public class BPARepository {
         if (bpaForStatusUpdate != null)
             producer.push(config.getUpdateWorkflowTopic(), new BPARequest(requestInfo, bpaForStatusUpdate));
 
-        if(bpaForAdhocChargeUpdate != null)
-            producer.push(config.getUpdateAdhocTopic(),new BPARequest(requestInfo,bpaForAdhocChargeUpdate));
+//        if(bpaForAdhocChargeUpdate != null)
+//            producer.push(config.getUpdateAdhocTopic(),new BPARequest(requestInfo,bpaForAdhocChargeUpdate));
 
     }
 	

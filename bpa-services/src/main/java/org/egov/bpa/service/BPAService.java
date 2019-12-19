@@ -15,17 +15,20 @@ import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
 import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.web.models.workflow.ProcessInstance;
 import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.BPAWorkflowService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class BPAService {
-	
+
 	@Autowired
 	private BPARepository bpaRequestInfoDao;
 
@@ -33,168 +36,174 @@ public class BPAService {
 	private WorkflowIntegrator wfIntegrator;
 
 	@Autowired
-    private EnrichmentService enrichmentService;
+	private EnrichmentService enrichmentService;
 
 	@Autowired
-    private EDCRService edcrService;
+	private EDCRService edcrService;
 
 	@Autowired
-    private UserService userService;
+	private UserService userService;
 
 	@Autowired
-    private BPARepository repository;
+	private BPARepository repository;
 
 	@Autowired
 	private ActionValidator actionValidator;
 
-    @Autowired
-    private BPAValidator bpaValidator;
+	@Autowired
+	private BPAValidator bpaValidator;
 
+	@Autowired
+	private BPAUtil util;
 
-    @Autowired
-    private BPAUtil util;
+	@Autowired
+	private DiffService diffService;
 
-    @Autowired
-    private DiffService diffService;
+	@Autowired
+	private BPAConfiguration config;
 
-    @Autowired
-    private BPAConfiguration config;
+	@Autowired
+	private WorkflowService workflowService;
 
-    @Autowired
-    private WorkflowService workflowService;
-    
-    
-    @Autowired
-    private BPAWorkflowService bpaWorkflowService;
+	@Autowired
+	private BPAWorkflowService bpaWorkflowService;
+
 	public BPA create(BPARequest bpaRequest) {
 
-		   Object mdmsData = util.mDMSCall(bpaRequest);
-		   edcrService.validateEdcrPlan(bpaRequest,mdmsData);
-		    bpaValidator.validateCreate(bpaRequest,mdmsData);
-	        enrichmentService.enrichBPACreateRequest(bpaRequest,mdmsData);
-	       
-	        userService.createUser(bpaRequest);
-	        
-			wfIntegrator.callWorkFlow(bpaRequest);
-			
-			repository.save(bpaRequest);
-			return bpaRequest.getBPA();
-	}
-	
+		Object mdmsData = util.mDMSCall(bpaRequest);
+		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
+			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
+		}
+		edcrService.validateEdcrPlan(bpaRequest, mdmsData);
+		bpaValidator.validateCreate(bpaRequest, mdmsData);
+		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
 
-	/**
-     *  Searches the Bpa for the given criteria if search is on owner paramter then first user service
-     *  is called followed by query to db
-     * @param criteria The object containing the paramters on which to search
-     * @param requestInfo The search request's requestInfo
-     * @return List of bpa for the given criteria
-     */
-    public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo){
-        List<BPA> bpa;
-        bpaValidator.validateSearch(requestInfo,criteria);
-        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
-         if(criteria.getMobileNumber()!=null){
-             bpa = getBPAFromMobileNumber(criteria,requestInfo);
-         }
-         else {
-             bpa = getBPAWithOwnerInfo(criteria,requestInfo);
-         }
-       return bpa;
-    }
-	
+		userService.createUser(bpaRequest);
 
-    /**
-     * Returns the bpa with enrivhed owners from user servise
-     * @param criteria The object containing the paramters on which to search
-     * @param requestInfo The search request's requestInfo
-     * @return List of bpa for the given criteria
-     */
-    public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria,RequestInfo requestInfo){
-        List<BPA> bpa = repository.getBPAData(criteria);
-        if(bpa.isEmpty())
-            return Collections.emptyList();
-        bpa = enrichmentService.enrichBPASearch(bpa,criteria,requestInfo);
-        return bpa;
-    }
-   
-    
-    
-	  private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria,
-			RequestInfo requestInfo) {
-		  
-		  List<BPA> bpa = new LinkedList<>();
-	        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
-	        // If user not found with given user fields return empty list
-	        if(userDetailResponse.getUser().size()==0){
-	            return Collections.emptyList();
-	        }
-	        enrichmentService.enrichBPACriteriaWithOwnerids(criteria,userDetailResponse);
-	        bpa = repository.getBPAData(criteria);
+		wfIntegrator.callWorkFlow(bpaRequest);
 
-	        if(bpa.size()==0){
-	            return Collections.emptyList();
-	        }
-
-	        // Add bpaId of all bpa's owned by the user
-	        criteria=enrichmentService.getBPACriteriaFromIds(bpa);
-	        //Get all bpa with ownerInfo enriched from user service
-	        bpa = getBPAWithOwnerInfo(criteria,requestInfo);
-	        return bpa;
+		repository.save(bpaRequest);
+		return bpaRequest.getBPA();
 	}
 
+	/**
+	 * Searches the Bpa for the given criteria if search is on owner paramter then
+	 * first user service is called followed by query to db
+	 * 
+	 * @param criteria
+	 *            The object containing the paramters on which to search
+	 * @param requestInfo
+	 *            The search request's requestInfo
+	 * @return List of bpa for the given criteria
+	 */
+	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
+		List<BPA> bpa;
+		bpaValidator.validateSearch(requestInfo, criteria);
+		enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo, criteria);
+		if (criteria.getMobileNumber() != null) {
+			bpa = getBPAFromMobileNumber(criteria, requestInfo);
+		} else {
+			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
+		}
+		return bpa;
+	}
 
 	/**
-     * Updates the bpa
-     * @param bpaRequest The update Request
-     * @return Updated bpa
-     */
-    public BPA update(BPARequest bpaRequest){
-        Object mdmsData = util.mDMSCall(bpaRequest);
-        BusinessService businessService = workflowService.getBusinessService(bpaRequest.getBPA().getTenantId(), bpaRequest.getRequestInfo());
-        List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest); 
-        actionValidator.validateUpdateRequest(bpaRequest,businessService);
-        enrichmentService.enrichBPAUpdateRequest(bpaRequest,businessService);
-        bpaValidator.validateUpdate(bpaRequest,searchResult,mdmsData);
-        Map<String,Difference> diffMap = diffService.getDifference(bpaRequest,searchResult);
-        Map<String,Boolean> idToIsStateUpdatableMap = util.getIdToIsStateUpdatableMap(businessService,searchResult);
-//        
-//        
-//        
-//    	  /*call workflow service if it's enable else uses internal workflow process*/
-//        
-//    		if (config.getIsExternalWorkFlowEnabled())
-    			wfIntegrator.callWorkFlow(bpaRequest);
-//    		else
-//    			bpaWorkflowService.updateStatus(bpaRequest);
+	 * Returns the bpa with enrivhed owners from user servise
+	 * 
+	 * @param criteria
+	 *            The object containing the paramters on which to search
+	 * @param requestInfo
+	 *            The search request's requestInfo
+	 * @return List of bpa for the given criteria
+	 */
+	public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria, RequestInfo requestInfo) {
+		List<BPA> bpa = repository.getBPAData(criteria);
+		if (bpa.isEmpty())
+			return Collections.emptyList();
+		bpa = enrichmentService.enrichBPASearch(bpa, criteria, requestInfo);
+		return bpa;
+	}
 
-    		enrichmentService.postStatusEnrichment(bpaRequest);
-    		   userService.createUser(bpaRequest);
-//            calculationService.addCalculation(bpaRequest);
-//            editNotificationService.sendEditNotification(bpaRequest,diffMap);
+	private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria, RequestInfo requestInfo) {
 
-            repository.update(bpaRequest,idToIsStateUpdatableMap);
-            return bpaRequest.getBPA();
-        
-        
-    }
-    
-    
-    /**
-     * Returns bpa from db for the update request
-     * @param request The update request
-     * @return List of bpas
-     */
-    public List<BPA> getBPAWithOwnerInfo(BPARequest request){
-       BPASearchCriteria criteria = new BPASearchCriteria();
-        List<String> ids = new LinkedList<>();
-        	ids.add( request.getBPA().getId());
+		List<BPA> bpa = new LinkedList<>();
+		UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
+		// If user not found with given user fields return empty list
+		if (userDetailResponse.getUser().size() == 0) {
+			return Collections.emptyList();
+		}
+		enrichmentService.enrichBPACriteriaWithOwnerids(criteria, userDetailResponse);
+		bpa = repository.getBPAData(criteria);
 
-        criteria.setTenantId(request.getBPA().getTenantId());
-        criteria.setIds(ids);
-        
-        List<BPA> bpa = repository.getBPAData(criteria);
-        
-        bpa = enrichmentService.enrichBPASearch(bpa,criteria,request.getRequestInfo());
-        return bpa;
-    }
+		if (bpa.size() == 0) {
+			return Collections.emptyList();
+		}
+
+		// Add bpaId of all bpa's owned by the user
+		criteria = enrichmentService.getBPACriteriaFromIds(bpa);
+		// Get all bpa with ownerInfo enriched from user service
+		bpa = getBPAWithOwnerInfo(criteria, requestInfo);
+		return bpa;
+	}
+
+	/**
+	 * Updates the bpa
+	 * 
+	 * @param bpaRequest
+	 *            The update Request
+	 * @return Updated bpa
+	 */
+	public BPA update(BPARequest bpaRequest) {
+		Object mdmsData = util.mDMSCall(bpaRequest);
+		BPA bpa = bpaRequest.getBPA();
+		
+		BusinessService businessService = workflowService.getBusinessService(bpa.getTenantId(),
+				bpaRequest.getRequestInfo(),bpa.getApplicationNo());
+		
+		List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest);
+		if(CollectionUtils.isEmpty(searchResult)) {
+			 throw new CustomException("UPDATE ERROR", "Failed to Update the Application");
+		}
+		Difference diffMap = diffService.getDifference(bpaRequest, searchResult);
+		actionValidator.validateUpdateRequest(bpaRequest, businessService);
+		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
+		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,workflowService.getCurrentState(bpa.getStatus(), businessService));
+		
+		
+		//
+		//
+		//
+		// /*call workflow service if it's enable else uses internal workflow process*/
+		
+		wfIntegrator.callWorkFlow(bpaRequest);
+		
+
+		enrichmentService.postStatusEnrichment(bpaRequest);
+		userService.createUser(bpaRequest);
+		repository.update(bpaRequest,workflowService.isStateUpdatable(bpa.getStatus(), businessService));
+		return bpaRequest.getBPA();
+
+	}
+
+	/**
+	 * Returns bpa from db for the update request
+	 * 
+	 * @param request
+	 *            The update request
+	 * @return List of bpas
+	 */
+	public List<BPA> getBPAWithOwnerInfo(BPARequest request) {
+		BPASearchCriteria criteria = new BPASearchCriteria();
+		List<String> ids = new LinkedList<>();
+		ids.add(request.getBPA().getId());
+
+		criteria.setTenantId(request.getBPA().getTenantId());
+		criteria.setIds(ids);
+
+		List<BPA> bpa = repository.getBPAData(criteria);
+
+		bpa = enrichmentService.enrichBPASearch(bpa, criteria, request.getRequestInfo());
+		return bpa;
+	}
 }

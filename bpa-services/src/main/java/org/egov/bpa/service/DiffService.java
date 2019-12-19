@@ -12,6 +12,7 @@ import org.egov.bpa.web.models.Difference;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
+import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,25 +29,19 @@ public class DiffService {
 	 *            The searched bpa corresponding to the request
 	 * @return List of Difference object
 	 */
-	public Map<String, Difference> getDifference(BPARequest request,
+	public Difference getDifference(BPARequest request,
 			List<BPA> searchResult) {
 
 		BPA bpa = request.getBPA();
-		Map<String, Difference> diffMap = new LinkedHashMap<>();
-		Map<String, BPA> idToBpaMap = new HashMap<>();
 
-		idToBpaMap.put(bpa.getId(), bpa);
-
-		BPA bpaFromSearch;
-
-		bpaFromSearch = idToBpaMap.get(bpa.getId());
+		BPA bpaFromSearch = searchResult.get(0);
 		Difference diff = new Difference();
 		diff.setId(bpa.getId());
 		diff.setFieldsChanged(getUpdatedFields(bpa, bpaFromSearch));
+		diff.setClassesAdded(getObjectsAdded(bpa, bpaFromSearch));
 		diff.setClassesRemoved(getObjectsRemoved(bpa, bpaFromSearch));
-		diffMap.put(bpa.getId(), diff);
 
-		return diffMap;
+		return diff;
 	}
 
 	/**
@@ -71,12 +66,12 @@ public class DiffService {
 		if (CollectionUtils.isEmpty(changes))
 			return updatedFields;
 
-		changes.forEach(change -> {
-			/*
-			 * if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
-			 * updatedFields.add(change.getPropertyName()); }
-			 */
-		});
+//		changes.forEach(change -> {
+//			/*
+//			 * if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
+//			 * updatedFields.add(change.getPropertyName()); }
+//			 */
+//		});
 		return updatedFields;
 
 	}
@@ -108,5 +103,31 @@ public class DiffService {
 		return classRemoved;
 	}
 
+	/**
+     * Gives the names of the classes whose object are added or removed between the given BPA
+     *
+     * @param BPAFromUpdate License from update request
+     * @param BPAFromSearch License from db on which update is called
+     * @return Names of Classes added or removed during update
+     */
+    private List<String> getObjectsAdded(BPA BPAFromUpdate, BPA BPAFromSearch) {
+
+        Javers javers = JaversBuilder.javers().build();
+        Diff diff = javers.compare(BPAFromSearch, BPAFromUpdate);
+        List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
+        ;
+
+        List<String> classModified = new LinkedList<>();
+
+        if (CollectionUtils.isEmpty(objectsAdded))
+            return classModified;
+
+        objectsAdded.forEach(object -> {
+            String className = object.getClass().toString().substring(object.getClass().toString().lastIndexOf('.') + 1);
+            if (!classModified.contains(className))
+                classModified.add(className);
+        });
+        return classModified;
+    }
 
 }

@@ -63,11 +63,14 @@ public class EnrichmentService {
 				.setTenantId(bpaRequest.getBPA().getTenantId());
 
 		// units
-		bpaRequest.getBPA().getUnits().forEach(unit -> {
-			unit.setTenantId(bpaRequest.getBPA().getTenantId());
-			unit.setId(UUID.randomUUID().toString());
-			unit.setAuditDetails(auditDetails);
-		});
+		if(!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnits())) {
+			bpaRequest.getBPA().getUnits().forEach(unit -> {
+				unit.setTenantId(bpaRequest.getBPA().getTenantId());
+				unit.setId(UUID.randomUUID().toString());
+				unit.setAuditDetails(auditDetails);
+			});
+		}
+		
 		
 		// BPA Documents
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
@@ -83,6 +86,15 @@ public class EnrichmentService {
 						document.setId(UUID.randomUUID().toString());
 					});
 			});
+		
+//		if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())){
+//			bpaRequest.getBPA().getInstitution().setId(UUID.randomUUID().toString());
+//			bpaRequest.getBPA().getInstitution().setActive(true);
+//			bpaRequest.getBPA().getInstitution().setTenantId(tradeLicense.getTenantId());
+//			bpaRequest.getBPA().getOwners().forEach(owner -> {
+//                owner.setInstitutionId(bpaRequest.getBPA().getInstitution().getId());
+//            });
+//        }
 
 		setIdgenIds(bpaRequest);
 		setStatusForCreate(bpaRequest);
@@ -167,37 +179,53 @@ public class EnrichmentService {
 				businessService)) {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
 
-			bpaRequest.getBPA().getUnits().forEach(unit -> {
-				if (unit.getId() == null) {
-					unit.setTenantId(bpaRequest.getBPA().getTenantId());
-					unit.setId(UUID.randomUUID().toString());
-				}
-			});
-
-			bpaRequest.getBPA().getOwners().forEach(owner -> {
-//				if (owner.getUuid() == null || owner.getUserActive() == null)
-//					owner.setUserActive(true);
-				if (!CollectionUtils.isEmpty(owner.getDocuments()))
-					owner.getDocuments().forEach(document -> {
-						if (document.getId() == null) {
-							document.setId(UUID.randomUUID().toString());
-						}
-					});
-			});
-
-			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments())) {
-				bpaRequest.getBPA().getDocuments().forEach(document -> {
-					if (document.getId() == null) {
-						document.setId(UUID.randomUUID().toString());
+			if(!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnits())) {
+				bpaRequest.getBPA().getUnits().forEach(unit -> {
+					if (unit.getId() == null) {
+						unit.setTenantId(bpaRequest.getBPA().getTenantId());
+						unit.setId(UUID.randomUUID().toString());
 					}
 				});
 			}
+			
+			if(!CollectionUtils.isEmpty(bpaRequest.getBPA().getOwners())) {
+				bpaRequest.getBPA().getOwners().forEach(owner -> {
+					if (!CollectionUtils.isEmpty(owner.getDocuments()))
+						owner.getDocuments().forEach(document -> {
+							if (document.getId() == null) {
+								document.setId(UUID.randomUUID().toString());
+							}
+						});
+				});
+				//TODO as of now institution is out of scope
+//				 if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())
+//	                        && bpaRequest.getBPA().getInstitution().getId()==null){
+//					 bpaRequest.getBPA().getInstitution().setId(UUID.randomUUID().toString());
+//					 bpaRequest.getBPA().getInstitution().setActive(true);
+//					 bpaRequest.getBPA().getInstitution().setTenantId(tradeLicense.getTenantId());
+//					 bpaRequest.getBPA().getOwners().forEach(owner -> {
+//	                        owner.setInstitutionId(tradeLicense.getTradeLicenseDetail().getInstitution().getId());
+//	                    });
+//	                }
+			}else {
+				throw new CustomException("INVALID UPDATE",
+						"Owners cannot be empty");
+			}
+
+			
+		}
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getWfDocuments())) {
+			bpaRequest.getBPA().getWfDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+			});
 		}
 
 	}
 
 	public void postStatusEnrichment(BPARequest bpaRequest) {
-		// TODO Auto-generated method stub
+		// TODO Nothing as of now, logic like generating permit number and etc.. would be done here.
 
 	}
 
