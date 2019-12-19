@@ -55,7 +55,9 @@ public class BPAValidator {
 		// @.ServiceType=='"+bpa.getServiceType()+"' &&
 		// @.RiskType=='"+bpa.getRiskType()+"')].docTypes";
 		List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
-
+		if(CollectionUtils.isEmpty(docTypeMappings)) {
+			return ;
+		}
 		filterExp = "$.[?(@.required==true)].code";
 		List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
 
