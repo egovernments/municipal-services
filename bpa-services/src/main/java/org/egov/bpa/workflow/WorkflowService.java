@@ -88,7 +88,7 @@ public class WorkflowService {
         url.append("?tenantId=");
         url.append(tenantId);
         if(businessService) {
-        		url.append("&businessService=");
+        		url.append("&businessServices=");
         		 url.append(config.getBusinessServiceValue());
 	    }else {
 	    		url.append("&businessIds=");
@@ -112,7 +112,7 @@ public class WorkflowService {
            if(state.getApplicationStatus()!=null && state.getApplicationStatus().equalsIgnoreCase(string.toString()))
                return state.getIsStateUpdatable();
        }
-       return null;
+       return Boolean.FALSE;
     }
     /**
      * Returns boolean value to specifying if the state is updatable
