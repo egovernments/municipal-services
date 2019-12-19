@@ -20,7 +20,6 @@ export default ({ config }) => {
     "/_create",
     asyncHandler(async ({ body }, res, next) => {
       let response = await createApiResponse({ body }, res, next);
-      console.log("reponseGaya", response);
       res.json(response);
     })
   );
