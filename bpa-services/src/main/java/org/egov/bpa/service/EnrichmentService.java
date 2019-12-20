@@ -1,6 +1,7 @@
 package org.egov.bpa.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.idgen.IdResponse;
 import org.egov.bpa.web.models.user.UserDetailResponse;
+import org.egov.bpa.web.models.user.UserSearchRequest;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
@@ -98,6 +100,7 @@ public class EnrichmentService {
 
 		setIdgenIds(bpaRequest);
 		setStatusForCreate(bpaRequest);
+		boundaryService.getAreaType(bpaRequest,config.getHierarchyTypeCode());
 	}
 
 	/**
@@ -229,17 +232,21 @@ public class EnrichmentService {
 
 	}
 
-	public List<BPA> enrichBPASearch(List<BPA> bpa, BPASearchCriteria criteria,
+	public List<BPA> enrichBPASearch(List<BPA> bpas, BPASearchCriteria criteria,
 			RequestInfo requestInfo) {
 
 		BPASearchCriteria searchCriteria = enrichBPASearchCriteriaWithOwnerids(
-				criteria, bpa);
-		// enrichBoundary(new BPARequest(requestInfo, (BPA) bpa)); // some
-		// pending
-		UserDetailResponse userDetailResponse = userService.getUser(
-				searchCriteria, requestInfo);
-		enrichOwner(userDetailResponse, bpa); // completed
-		return bpa;
+				criteria, bpas);
+		List<BPARequest> bprs = new ArrayList<BPARequest>();
+		bpas.forEach(bpa -> {
+			bprs.add(new BPARequest( requestInfo,bpa));
+		});
+		
+		 enrichBoundary(bprs); // some
+	
+		UserDetailResponse userDetailResponse  = userService.getUsersForBpas(bpas);
+		enrichOwner(userDetailResponse, bpas); // completed
+		return bpas;
 	}
 
 	private void enrichOwner(UserDetailResponse userDetailResponse,
@@ -253,7 +260,7 @@ public class EnrichmentService {
 					owner -> {
 						if (userIdToOwnerMap.get(owner.getUuid()) == null)
 							throw new CustomException("OWNER SEARCH ERROR",
-									"The owner of the bpaCategoryDetail "
+									"The owner of the bpa "
 											+ bpa.getId()
 											+ " is not coming in user search");
 						else
@@ -277,9 +284,12 @@ public class EnrichmentService {
 		return searchCriteria;
 	}
 
-	private void enrichBoundary(BPARequest bpaRequest) {
-		BPARequest request = getRequestByTenantId(bpaRequest);
-		boundaryService.getAreaType(request, config.getHierarchyTypeCode());
+	private void enrichBoundary(List<BPARequest> bpaRequests) {
+		bpaRequests.forEach(bpaRequest->{
+			BPARequest request = getRequestByTenantId(bpaRequest);
+			boundaryService.getAreaType(bpaRequest, config.getHierarchyTypeCode());
+		});
+		
 	}
 
 	private BPARequest getRequestByTenantId(BPARequest bpaRequest) {
@@ -358,5 +368,7 @@ public class EnrichmentService {
 		}
 
 	}
+	
+	
 
 }

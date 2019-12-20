@@ -12,6 +12,7 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.workflow.Action;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.web.models.workflow.ProcessInstance;
+import org.egov.bpa.web.models.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
@@ -53,7 +54,7 @@ public class ActionValidator {
 	 */
 	public void validateUpdateRequest(BPARequest request, BusinessService businessService) {
 		validateDocumentsForUpdate(request);
-		validateRoleAction(request);
+		validateRoleAction(request,businessService);
 //		validateAction(request);
 		validateIds(request, businessService);
 	}
@@ -86,30 +87,36 @@ public class ActionValidator {
 	 * @param request
 	 *            The bpa create or update request
 	 */
-	private void validateRoleAction(BPARequest request) {
+	private void validateRoleAction(BPARequest request, BusinessService businessService) {
 		BPA bpa = request.getBPA();
 		Map<String, String> errorMap = new HashMap<>();
 		RequestInfo requestInfo = request.getRequestInfo();
-		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
-				request.getRequestInfo(), bpa.getApplicationNo());
-		if(processInstance == null ) {
-			errorMap.put("UNAUTHORIZED UPDATE", "Process Instnce does not exists for Application");
-		}
-		List<Action> actions = processInstance.getNextActions();
-		List<Role> roles = requestInfo.getUserInfo().getRoles();
-		List<String> validActions = new LinkedList<>();
-		
-		roles.forEach(role -> {
-			actions.forEach(action -> {
-				if (action.getRoles().contains(role.getCode())) {
-					validActions.add(action.getAction());
-				}
+//		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
+//				request.getRequestInfo(), bpa.getApplicationNo());
+//		if(processInstance == null ) {
+//			errorMap.put("UNAUTHORIZED UPDATE", "Process Instnce does not exists for Application");
+//		}
+		State state = workflowService.getCurrentStateObj(bpa.getStatus(), businessService);
+		if(state != null ) {
+			List<Action> actions = state.getActions();
+			List<Role> roles = requestInfo.getUserInfo().getRoles();
+			List<String> validActions = new LinkedList<>();
+			
+			roles.forEach(role -> {
+				actions.forEach(action -> {
+					if (action.getRoles().contains(role.getCode())) {
+						validActions.add(action.getAction());
+					}
+				});
 			});
-		});
 
-		if (!validActions.contains(bpa.getAction())) {
-			errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
+			if (!validActions.contains(bpa.getAction())) {
+				errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
+			}
+		}else {
+			errorMap.put("UNAUTHORIZED UPDATE", "No workflow state configured for the current status of the application");
 		}
+		
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
 		}

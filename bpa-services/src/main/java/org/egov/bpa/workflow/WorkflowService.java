@@ -115,10 +115,10 @@ public class WorkflowService {
        return Boolean.FALSE;
     }
     /**
-     * Returns boolean value to specifying if the state is updatable
+     * Returns State name fo the current state of the document
      * @param string The stateCode of the bpa
      * @param businessService The BusinessService of the application flow
-     * @return State object to be fetched
+     * @return State String to be fetched
      */
     public String getCurrentState(String string, BusinessService businessService){
        for(State state : businessService.getStates()){
@@ -128,6 +128,19 @@ public class WorkflowService {
        return null;
     }
 
+    /**
+     * Returns  State Obj fo the current state of the document
+     * @param string The stateCode of the bpa
+     * @param businessService The BusinessService of the application flow
+     * @return State object to be fetched
+     */
+    public State getCurrentStateObj(String string, BusinessService businessService){
+       for(State state : businessService.getStates()){
+           if(state.getApplicationStatus()!=null && state.getApplicationStatus().equalsIgnoreCase(string.toString()))
+               return state;
+       }
+       return null;
+    }
 
 
 }

@@ -2,6 +2,7 @@ package org.egov.bpa.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -114,8 +115,13 @@ public class UserService {
 		userSearchRequest.setRequestInfo(requestInfo);
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType(owner.getType());
+		
+		if (owner.getId() != null)
+			userSearchRequest.setId(Arrays.asList(owner.getId().toString()));
+		
 		if (owner.getUuid() != null)
 			userSearchRequest.setUuid(Arrays.asList(owner.getUuid()));
+		
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
 	}
@@ -182,6 +188,26 @@ public class UserService {
 		return role;
 	}
 
+	public UserDetailResponse getUsersForBpas(List<BPA> bpas) {
+		UserSearchRequest userSearchRequest = new UserSearchRequest();
+		 List<String> ids = new ArrayList<String>();
+		 List<String> uuids = new ArrayList<String>();
+		 bpas.forEach(bpa -> {
+			 bpa.getOwners().forEach(owner->{
+				 if (owner.getId() != null)
+					 ids.add(owner.getId().toString());
+					
+					if (owner.getUuid() != null)
+						uuids.add(owner.getUuid().toString());
+			 });
+			 
+		});
+			
+		 userSearchRequest.setId(ids);
+		 userSearchRequest.setUuid(uuids);
+			StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+			return userCall(userSearchRequest, uri);
+	}
 	/**
 	 * Returns UserDetailResponse by calling user service with given uri and object
 	 * 
@@ -191,7 +217,7 @@ public class UserService {
 	 *            The address of the endpoint
 	 * @return Response from user service as parsed as userDetailResponse
 	 */
-	private UserDetailResponse userCall(Object userRequest, StringBuilder uri) {
+	UserDetailResponse userCall(Object userRequest, StringBuilder uri) {
 		String dobFormat = null;
 		if (uri.toString().contains(config.getUserSearchEndpoint())
 				|| uri.toString().contains(config.getUserUpdateEndpoint()))

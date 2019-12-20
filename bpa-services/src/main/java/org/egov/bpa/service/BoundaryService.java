@@ -1,8 +1,10 @@
 package org.egov.bpa.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 
 @Service
 @Slf4j
@@ -69,14 +72,14 @@ public class BoundaryService {
 					.append(hierarchyTypeCode);
 		uri.append("&").append("boundaryType=").append("Locality");
 
-		if (!CollectionUtils.isEmpty(localities)) {
-			uri.append("&").append("codes=");
-			for (int i = 0; i < localities.size(); i++) {
-				uri.append(localities.get(i));
-				if (i != localities.size() - 1)
-					uri.append(",");
-			}
-		}
+//		if (!CollectionUtils.isEmpty(localities)) {
+//			uri.append("&").append("codes=");
+//			for (int i = 0; i < localities.size(); i++) {
+//				uri.append(localities.get(i));
+//				if (i != localities.size() - 1)
+//					uri.append(",");
+//			}
+//		}
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
 				.fetchResult(uri, request.getRequestInfo());
 		if (CollectionUtils.isEmpty(responseMap))
@@ -88,14 +91,14 @@ public class BoundaryService {
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		Object boundaryObject = context.read(propertyIdToJsonPath.get(request
+		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request
 				.getBPA().getId()));
-		if (!(boundaryObject instanceof ArrayList)
-				|| CollectionUtils.isEmpty((ArrayList) boundaryObject))
+		
+		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject) ))
 			throw new CustomException("BOUNDARY MDMS DATA ERROR",
 					"The boundary data was not found");
 
-		ArrayList boundaryResponse = context.read(propertyIdToJsonPath
+		LinkedList<Object> boundaryResponse = context.read(propertyIdToJsonPath
 				.get(request.getBPA().getId()));
 		Boundary boundary = mapper.convertValue(boundaryResponse.get(0),
 				Boundary.class);
