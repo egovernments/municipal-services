@@ -1,14 +1,18 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
@@ -17,9 +21,11 @@ import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.WaterConnection;
+import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.MRConstants;
+import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wsCalculation.validator.MDMSValidator;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +68,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	MDMSValidator mdmsValidator;
+	
+	@Autowired
+	private WSCalculationUtil wSCalculationUtil;
+	
+	@Autowired
+	private ServiceRequestRepository repository;
 
 
 
@@ -187,28 +199,56 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	@Override
 	public void jobscheduler() {
 		// TODO Auto-generated method stub
-		ArrayList<String> tenentIds =	wSCalculationDao.searchTenentIds();
-	  
-	  for(String tenentId : tenentIds){
-		 Map<String, Object> billingPeriodJson = ((Map<String,Object>)mdmsValidator.validateMasterDataWithoutFilter(tenentId));
-		 List<Map<String, Object>> jsonOutput = (List<Map<String, Object>>) billingPeriodJson;
-		
-		String jsonPath = MRConstants.JSONPATH_ROOT;
-			try {
-			
-				Map<String, Object> financialYearProperties = jsonOutput.get(0);
-				log.info(financialYearProperties.toString());
-			
-			} catch (IndexOutOfBoundsException e) {
-				throw new CustomException(WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND,
-						WSCalculationConstant.EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG );
+		ArrayList<String> tenentIds = wSCalculationDao.searchTenentIds();
+          
+		for (String tenentId : tenentIds) {
+			RequestInfo requestInfo = new RequestInfo();
+			User user = new User();
+			user.setTenantId(tenentId);
+			requestInfo.setUserInfo(user);
+			String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
+			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, "Non Metered", tenentId);
+			StringBuilder url = calculatorUtil.getMdmsSearchUrl();
+			Object res = repository.fetchResult(url, mdmsCriteriaReq);
+			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+			if (res == null) {
+				throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY",
+						"ERROR IN FETCHING THE BILLING FREQUENCY");
 			}
-		
-		
-		
-	  }
-        
+			getBillingPeriod(mdmsResponse, requestInfo, tenentId);
+
+		}}
 	
 
+	@SuppressWarnings("unchecked")
+	public void getBillingPeriod(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenentId) {
+		log.info("Billing Frequency Map" + mdmsResponse.toString());
+		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+		Map<String, Object> billingPeriod = new HashMap<>();
+		LocalDateTime demandStartingDate = LocalDateTime.now();
+		Long demandGenerateDateMillis = (Long) master.get(WSCalculationConstant.Demand_Generate_Date_String);
+
+		String connectionType = "Non-metred";
+
+       if(demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis)/86400){
+
+		ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenentId);
+		for (String connectionNo : connectionNos) {
+
+			CalculationReq calculationReq = new CalculationReq();
+			CalculationCriteria calculationCriteria = new CalculationCriteria();
+			calculationCriteria.setTenantId(tenentId);
+			calculationCriteria.setConnectionNo(connectionNo);
+
+			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+			calculationCriteriaList.add(calculationCriteria);
+
+			calculationReq.setRequestInfo(requestInfo);
+			calculationReq.setCalculationCriteria(calculationCriteriaList);
+
+			getCalculation(calculationReq);
+
+		}
+		}
 	}
 }

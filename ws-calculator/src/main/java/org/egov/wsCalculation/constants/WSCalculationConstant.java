@@ -213,6 +213,8 @@ public class WSCalculationConstant {
 	
 	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
 	
+	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
+	
 	
 
 }
