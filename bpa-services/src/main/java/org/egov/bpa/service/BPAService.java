@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.models.BPA;
@@ -58,6 +59,9 @@ public class BPAService {
 
 	@Autowired
 	private DiffService diffService;
+	
+	@Autowired
+	private CalculationService calculationService;
 
 	@Autowired
 	private BPAConfiguration config;
@@ -81,8 +85,9 @@ public class BPAService {
 		userService.createUser(bpaRequest);
 
 		wfIntegrator.callWorkFlow(bpaRequest);
-
 		repository.save(bpaRequest);
+		
+		calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
 		return bpaRequest.getBPA();
 	}
 
@@ -185,6 +190,17 @@ public class BPAService {
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		userService.createUser(bpaRequest);
 		repository.update(bpaRequest,workflowService.isStateUpdatable(bpa.getStatus(), businessService));
+		
+		// Generate the sanction Demand
+		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
+				bpaRequest.getRequestInfo(), bpa.getApplicationNo());
+		if(processInstance != null) {
+			if(processInstance.getState().getState().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+				calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+			}
+			
+		}
+		
 		return bpaRequest.getBPA();
 
 	}

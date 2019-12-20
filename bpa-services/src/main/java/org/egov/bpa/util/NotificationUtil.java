@@ -184,7 +184,7 @@ public class NotificationUtil {
 	 */
 	private StringBuilder getBillUri(BPA bpa) {
 		StringBuilder builder = new StringBuilder(config.getCalculatorHost());
-		builder.append(config.getGetBillEndpoint());
+//		builder.append(config.getGetBillEndpoint());
 		builder.append("?tenantId=");
 		builder.append(bpa.getTenantId());
 		builder.append("&consumerCode=");

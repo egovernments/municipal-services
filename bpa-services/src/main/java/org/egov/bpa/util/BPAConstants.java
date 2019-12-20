@@ -177,6 +177,12 @@ public class BPAConstants {
 	// OCCUPANCY TYPE
 	
 	public static final String RESIDENTIAL_OCCUPANCY = "A";
+	
+	// CALCULATION FEEe
+	public static final String APPLICATION_FEE_KEY="ApplicationFee";
+	public static final String SANCTION_FEE_KEY="SanctionFee";
+	
+	public static final String SANC_FEE_STATE="PENDING_SANC_FEE_PAYMENT";
 
 
 }
