@@ -20,7 +20,9 @@ import org.egov.pt.calculator.web.models.demand.BillAccountDetail;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.demand.DemandDetail;
 import org.egov.pt.calculator.web.models.demand.DemandResponse;
+import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
+import org.egov.pt.calculator.web.models.property.PropertyCalculatorWrapper;
 import org.egov.pt.calculator.web.models.property.PropertyRequest;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -265,7 +267,7 @@ public class CalculatorUtils {
                 .append(configurations.getDemandSearchEndPoint()).append(CalculatorConstants.URL_PARAMS_SEPARATER)
                 .append(CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL).append(assessment.getTenantId())
                 .append(CalculatorConstants.SEPARATER)
-                .append(CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME).append(assessment.getPropertyId() + CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR + assessment.getAssessmentNumber());
+                .append(CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME).append(assessment.getPropertyID() + CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR + assessment.getAssessmentNumber());
     }
 
 
@@ -386,14 +388,14 @@ public class CalculatorUtils {
             preparedStmtList.add(assessment.getAssessmentNumber());
         }
 
-        if (assessment.getDemandId() != null) {
+/*        if (assessment.getDemandId() != null) {
             query.append(" AND a1.demandId=?");
             preparedStmtList.add(assessment.getDemandId());
-        }
+        }*/
 
-        if (assessment.getPropertyId() != null) {
+        if (assessment.getPropertyID() != null) {
             query.append(" AND a1.propertyId=?");
-            preparedStmtList.add(assessment.getPropertyId());
+            preparedStmtList.add(assessment.getPropertyID());
         }
 
         query.append(" ORDER BY createdtime");
@@ -417,19 +419,19 @@ public class CalculatorUtils {
 
         preparedStmtList.add(assessment.getTenantId());
 
-        if (assessment.getDemandId() != null) {
+/*        if (assessment.getDemandId() != null) {
             query.append(" AND a1.demandId=?");
             preparedStmtList.add(assessment.getDemandId());
-        }
+        }*/
 
-        if (assessment.getPropertyId() != null) {
+        if (assessment.getPropertyID() != null) {
             query.append(" AND a1.propertyId=?");
-            preparedStmtList.add(assessment.getPropertyId());
+            preparedStmtList.add(assessment.getPropertyID());
         }
 
-        if (assessment.getAssessmentYear() != null) {
+        if (assessment.getFinancialYear() != null) { // this was assessmentYear before, check again.
             query.append(" AND a1.assessmentyear=?");
-            preparedStmtList.add(assessment.getAssessmentYear());
+            preparedStmtList.add(assessment.getFinancialYear());
         }
 
         query.append(" AND a1.active IS TRUE");
@@ -572,7 +574,7 @@ public class CalculatorUtils {
         criteria.setFromDate(calculationCriteria.getFromDate());
         criteria.setToDate(calculationCriteria.getToDate());
         criteria.setTenantId(calculationCriteria.getTenantId());
-        criteria.setPropertyId(calculationCriteria.getProperty().getPropertyId());
+        criteria.setPropertyId(calculationCriteria.getPropertyCalculatorWrapper().getProperty().getPropertyId());
 
         DemandResponse res = mapper.convertValue(
                 repository.fetchResult(getDemandSearchUrl(criteria), new RequestInfoWrapper(requestInfo)),
@@ -621,8 +623,11 @@ public class CalculatorUtils {
 
         request.getProperties().forEach(property -> {
             CalculationCriteria criteria = new CalculationCriteria();
+            PropertyCalculatorWrapper wrapper = new PropertyCalculatorWrapper();
+            wrapper.setProperty(property);
+            wrapper.setAssessment(null);
             criteria.setTenantId(tenantId);
-            criteria.setProperty(property);
+            criteria.setPropertyCalculatorWrapper(wrapper);
             calculationCriterias.add(criteria);
         });
 

@@ -8,9 +8,9 @@ import org.egov.pt.calculator.repository.AssessmentRepository;
 import org.egov.pt.calculator.repository.PTCalculatorRepository;
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
-import org.egov.pt.calculator.web.models.Assessment;
 import org.egov.pt.calculator.web.models.CalculationReq;
 import org.egov.pt.calculator.web.models.demand.Demand;
+import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyResponse;
@@ -57,9 +57,11 @@ public class AssessmentService {
 		demands.forEach(demand -> {
 
 			String[] consumerCodeSplitArray = demand.getConsumerCode().split(CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR);
-			assessments.add(Assessment.builder().propertyId(consumerCodeSplitArray[0]).assessmentYear(consumerCodeFinYearMap.get(demand.getConsumerCode()))
-					.uuid(UUID.randomUUID().toString()).assessmentNumber(consumerCodeSplitArray[1])
-					.tenantId(demand.getTenantId()).demandId(demand.getId()).auditDetails(details).build());
+			assessments.add(Assessment.builder().propertyID(consumerCodeSplitArray[0]).financialYear(consumerCodeFinYearMap.get(demand.getConsumerCode()))
+					.id(UUID.randomUUID().toString()).assessmentNumber(consumerCodeSplitArray[1])
+					.tenantId(demand.getTenantId())
+					//.demandId(demand.getId())
+					.auditDetails(details).build());
 		});
 		return repository.saveAssessments(assessments, info);
 	}
@@ -103,10 +105,10 @@ public class AssessmentService {
 		Map<String, String> errorMap = new HashMap<>();
 
 		calculationReq.getCalculationCriteria().forEach(calculationCriteria -> {
-			if (propertyMap.containsKey(calculationCriteria.getAssessmentNumber()))
+/*			if (propertyMap.containsKey(calculationCriteria.getAssessmentNumber()))
 				calculationCriteria.setProperty(propertyMap.get(calculationCriteria.getAssessmentNumber()));
 			else errorMap.put("INVALID_CRITERIA", "Property for the assessment number : "
-					+ calculationCriteria.getAssessmentNumber() + " is not found ");
+					+ calculationCriteria.getAssessmentNumber() + " is not found ");*/
 		});
 
 		if (!errorMap.isEmpty())
@@ -142,9 +144,9 @@ public class AssessmentService {
 
 		Map<String, Property> propertyMap = new HashMap<>();
 
-		response.getProperties().forEach(property -> {
+/*		response.getProperties().forEach(property -> {
 			propertyMap.put(property.getPropertyDetails().get(0).getAssessmentNumber(), property);
-		});
+		});*/
 
 		return propertyMap;
 	}

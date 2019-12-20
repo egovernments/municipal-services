@@ -15,6 +15,7 @@ import org.egov.pt.calculator.validator.CalculationValidator;
 import org.egov.pt.calculator.web.models.*;
 import org.egov.pt.calculator.web.models.collections.Receipt;
 import org.egov.pt.calculator.web.models.demand.*;
+import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyDetail;
@@ -96,11 +97,11 @@ public class DemandService {
 		Map<String, Calculation> propertyCalculationMap = estimationService.getEstimationPropertyMap(request,masterMap);
 		for (CalculationCriteria criteria : criterias) {
 
-			Property property = criteria.getProperty();
+			Property property = criteria.getPropertyCalculatorWrapper().getProperty();
 
-			PropertyDetail detail = property.getPropertyDetails().get(0);
+			Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
 
-			Calculation calculation = propertyCalculationMap.get(property.getPropertyDetails().get(0).getAssessmentNumber());
+			Calculation calculation = propertyCalculationMap.get(detail.getAssessmentNumber());
 			
 			String assessmentNumber = detail.getAssessmentNumber();
 
@@ -120,7 +121,7 @@ public class DemandService {
 
 			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
 
-				Demand demand = prepareDemand(property, calculation ,oldDemand);
+				Demand demand = prepareDemand(detail, property, calculation ,oldDemand);
 
 				demands.add(demand);
 				consumerCodeFinYearMap.put(demand.getConsumerCode(), detail.getFinancialYear());
@@ -298,7 +299,7 @@ public class DemandService {
 	protected BigDecimal getCarryForwardAndCancelOldDemand(BigDecimal newTax, CalculationCriteria criteria, RequestInfo requestInfo
 			,Demand demand, boolean cancelDemand) {
 
-		Property property = criteria.getProperty();
+		Property property = criteria.getPropertyCalculatorWrapper().getProperty();
 
 		BigDecimal carryForward = BigDecimal.ZERO;
 		BigDecimal oldTaxAmt = BigDecimal.ZERO;
@@ -372,17 +373,13 @@ public class DemandService {
 	 * @param calculation
 	 * @return
 	 */
-	private Demand prepareDemand(Property property, Calculation calculation,Demand demand) {
+	private Demand prepareDemand(Assessment detail, Property property, Calculation calculation,Demand demand) {
 
 		String tenantId = property.getTenantId();
-		PropertyDetail detail = property.getPropertyDetails().get(0);
-		String propertyType = detail.getPropertyType();
+		String propertyType = property.getPropertyType();
 		String consumerCode = property.getPropertyId();
 		OwnerInfo owner = null;
-		if (null != detail.getCitizenInfo())
-			owner = detail.getCitizenInfo();
-		else
-			owner = detail.getOwners().iterator().next();
+		owner = property.getOwners().stream().filter(obj -> obj.getIsPrimaryOwner()).collect(Collectors.toList()).get(0);
 		
 	//	Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
 

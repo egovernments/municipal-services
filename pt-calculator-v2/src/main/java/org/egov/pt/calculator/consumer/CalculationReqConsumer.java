@@ -44,7 +44,7 @@ public class CalculationReqConsumer {
             List<Property> propertiesNotForDemandGen = new LinkedList<>();
 
             propertyRequest.getProperties().forEach(property -> {
-                if(!config.getSourcesToBeIgnored().contains(property.getPropertyDetails().get(0).getSource()))
+                if(!config.getSourcesToBeIgnored().contains(property.getSource().toString()))
                     propertiesForDemandGen.add(property);
                 else propertiesNotForDemandGen.add(property);
             });

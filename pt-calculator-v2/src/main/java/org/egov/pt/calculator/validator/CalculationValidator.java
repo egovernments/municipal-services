@@ -23,6 +23,7 @@ import org.egov.pt.calculator.web.models.GetBillCriteria;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.demand.DemandDetail;
 import org.egov.pt.calculator.web.models.demand.DemandRequest;
+import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyDetail;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
@@ -47,16 +48,16 @@ public class CalculationValidator {
 	 * 
 	 * @param detail property detail
 	 */
-	public void validatePropertyForCalculation (PropertyDetail detail) {
+	public void validatePropertyForCalculation (Assessment detail, Property property) {
 		
 		Map<String, String> error = new HashMap<>();
 
-        boolean isVacantLand = PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType());
+        boolean isVacantLand = PT_TYPE_VACANT_LAND.equalsIgnoreCase(property.getPropertyType());
 
-        if(null == detail.getLandArea() && null == detail.getBuildUpArea())
+        if(null == property.getLandArea() && null == detail.getBuildUpArea())
         	error.put(PT_ESTIMATE_AREA_NULL, PT_ESTIMATE_AREA_NULL_MSG);
         
-        if (isVacantLand && null == detail.getLandArea())
+        if (isVacantLand && null == property.getLandArea())
             error.put(PT_ESTIMATE_VACANT_LAND_NULL, PT_ESTIMATE_VACANT_LAND_NULL_MSG);
 
         if (!isVacantLand && CollectionUtils.isEmpty(detail.getUnits()))
@@ -94,7 +95,7 @@ public class CalculationValidator {
 	public void getCarryForwardAndCancelOldDemand(BigDecimal newTax, CalculationCriteria criteria, RequestInfo requestInfo
 			, Demand demand) {
 
-		Property property = criteria.getProperty();
+		Property property = criteria.getPropertyCalculatorWrapper().getProperty();
 
 		BigDecimal oldTaxAmt = BigDecimal.ZERO;
 

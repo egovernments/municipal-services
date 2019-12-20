@@ -1,6 +1,8 @@
 package org.egov.pt.calculator.util;
 
 import org.egov.pt.calculator.service.MasterDataService;
+import org.egov.pt.calculator.web.models.property.Assessment;
+import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyDetail;
 import org.egov.pt.calculator.web.models.property.Unit;
 import org.egov.tracer.model.CustomException;
@@ -17,14 +19,14 @@ public class PBFirecessUtils {
     private MasterDataService mDataService;
 
 
-    public BigDecimal calculateFireCess(PropertyDetail propertyDetails, Map<String, Object> applicableMaster ){
-        String propertyUsageCategoryMajor = propertyDetails.getUsageCategoryMajor();
+    public BigDecimal calculateFireCess(Property property, Assessment propertyDetails, Map<String, Object> applicableMaster ){
+        String propertyUsageCategoryMajor = property.getUsageCategory();
         List<Unit> units = propertyDetails.getUnits();
-        Map propertyAttributes = (LinkedHashMap) propertyDetails.getAdditionalDetails();
+        Map propertyAttributes = (LinkedHashMap) property.getAdditionalDetails();
         Set<String> unitSet = new HashSet<>();
 
         for (Unit unit : units) {
-            unitSet.add(unit.getUsageCategoryMajor());
+            unitSet.add(unit.getUsageCategory());
         }
         BigDecimal firecess_category_major = BigDecimal.ZERO;
         BigDecimal firecess_building_height = BigDecimal.ZERO;
@@ -63,7 +65,7 @@ public class PBFirecessUtils {
      * @param assessmentYear
      * @return
      */
-    public BigDecimal getPBFireCess(BigDecimal payableTax, String assessmentYear,List<Object> masterList, PropertyDetail propertyDetail) {
+    public BigDecimal getPBFireCess(Property property, BigDecimal payableTax, String assessmentYear,List<Object> masterList, Assessment propertyDetail) {
         BigDecimal fireCess = BigDecimal.ZERO;
 
         if (payableTax.doubleValue() == 0.0)
@@ -78,7 +80,7 @@ public class PBFirecessUtils {
 
         if ((Boolean)CessMap.get("dynamicFirecess"))
         {
-            firecessRate = calculateFireCess(propertyDetail, CessMap);
+            firecessRate = calculateFireCess(property, propertyDetail, CessMap);
         } else {
             firecessRate = new BigDecimal ((Integer) CessMap.get("rate"));
         }

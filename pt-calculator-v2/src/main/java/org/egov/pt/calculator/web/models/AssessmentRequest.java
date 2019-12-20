@@ -3,6 +3,7 @@ package org.egov.pt.calculator.web.models;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.calculator.web.models.property.Assessment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

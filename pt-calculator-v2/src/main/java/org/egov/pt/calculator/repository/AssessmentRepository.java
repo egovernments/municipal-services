@@ -7,7 +7,7 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.calculator.repository.rowmapper.AssessmentRowMapper;
 import org.egov.pt.calculator.util.CalculatorUtils;
-import org.egov.pt.calculator.web.models.Assessment;
+import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -59,11 +59,11 @@ public class AssessmentRepository {
 				Assessment current = assessments.get(rowNum);
 				AuditDetails audit = current.getAuditDetails();
 
-				ps.setString(1, current.getUuid());
+				ps.setString(1, current.getId());
 				ps.setString(2, current.getAssessmentNumber());
-				ps.setString(3, current.getAssessmentYear());
-				ps.setString(4, current.getDemandId());
-				ps.setString(5, current.getPropertyId());
+				ps.setString(3, current.getFinancialYear());
+				//ps.setString(4, current.getDemandId());
+				ps.setString(5, current.getPropertyID());
 				ps.setString(6, current.getTenantId());
 				ps.setString(7, audit.getCreatedBy());
 				ps.setLong(8, audit.getCreatedTime());

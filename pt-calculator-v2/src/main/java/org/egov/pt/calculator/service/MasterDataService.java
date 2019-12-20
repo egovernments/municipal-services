@@ -319,7 +319,7 @@ public class MasterDataService {
 	public Map<String,Object> getMasterMap(CalculationReq request){
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
-		Set<String> assessmentYears = request.getCalculationCriteria().stream().map(cal -> cal.getProperty().getPropertyDetails().get(0).getFinancialYear())
+		Set<String> assessmentYears = request.getCalculationCriteria().stream().map(cal -> cal.getPropertyCalculatorWrapper().getAssessment().getFinancialYear())
 				.collect(Collectors.toSet());
 		Map<String,Object> masterMap = new HashMap<>();
 		List<TaxPeriod> taxPeriods = getTaxPeriodList(requestInfo,tenantId);

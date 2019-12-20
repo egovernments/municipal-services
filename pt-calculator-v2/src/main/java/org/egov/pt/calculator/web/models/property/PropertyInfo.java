@@ -1,12 +1,17 @@
 package org.egov.pt.calculator.web.models.property;
 
+import java.util.List;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,72 +21,64 @@ import lombok.Setter;
  * This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
  */
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
-//@Builder
-@EqualsAndHashCode(of= {"propertyId","tenantId"})
 public class PropertyInfo   {
-        @JsonProperty("propertyId")
-        public String propertyId;
 
-        @JsonProperty("tenantId")
-        public String tenantId;
+	@JsonProperty("id")
+	private String id;
 
-        @JsonProperty("acknowldgementNumber")
-        public String acknowldgementNumber;
+	@JsonProperty("propertyId")
+	private String propertyId;
 
-    @JsonProperty("oldPropertyId")
-    @Pattern(regexp = "^[//a-zA-Z0-9#://-]*$", message = "Invalid existing property Id. should be AlphaNumeric with -, /, #, : special characters allowed")
-    public String oldPropertyId;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-              /**
-   * status of the Property
-   */
-  public enum StatusEnum {
-    ACTIVE("ACTIVE"),
-    
-    INACTIVE("INACTIVE");
+	@JsonProperty("accountId")
+	private String accountId;
 
-    private String value;
+	@JsonProperty("oldPropertyId")
+	private String oldPropertyId;
 
-    StatusEnum(String value) {
-      this.value = value;
-    }
+	@JsonProperty("status")
+	private Status status;
 
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
+	@JsonProperty("address")
+	@NotNull
+	private Address address;
 
-    @JsonCreator
-    public static StatusEnum fromValue(String text) {
-      for (StatusEnum b : StatusEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-        @JsonProperty("status")
-        public StatusEnum status;
+	@JsonProperty("parentProperties")
+	private List<String> parentProperties;
+	
+	
+	public enum Status {
+		  
+		  ACTIVE("ACTIVE"),
+		  
+		  INACTIVE("INACTIVE");
 
-        @Valid
-        @JsonProperty("address")
-        public Address address;
+		  private String value;
 
+		  Status(String value) {
+		    this.value = value;
+		  }
 
+		  @Override
+		  @JsonValue
+		  public String toString() {
+		    return String.valueOf(value);
+		  }
 
-
-    protected PropertyInfo(String propertyId, String tenantId, String acknowldgementNumber, String oldPropertyId, StatusEnum status, Address address) {
-        this.propertyId = propertyId;
-        this.tenantId = tenantId;
-        this.acknowldgementNumber = acknowldgementNumber;
-        this.oldPropertyId = oldPropertyId;
-        this.status = status;
-        this.address = address;
-    }
+		  @JsonCreator
+		  public static Status fromValue(String text) {
+		    for (Status b : Status.values()) {
+		      if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+		        return b;
+		      }
+		    }
+		    return null;
+		  }
+		}
 }
 

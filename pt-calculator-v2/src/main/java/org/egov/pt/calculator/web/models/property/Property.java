@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,22 +29,77 @@ import lombok.ToString;
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class Property extends PropertyInfo{
 
+	@JsonProperty("acknowldgementNumber")
+	private String acknowldgementNumber;
+
+	@JsonProperty("propertyType")
+	private String propertyType;
+
+	@JsonProperty("usageCategory")
+	private String usageCategory;
+
+	@JsonProperty("ownershipCategory")
+	private String ownershipCategory;
+
+	@JsonProperty("owners")
+	@Valid
+	@NotNull
+	private List<OwnerInfo> owners;
+
+	@JsonProperty("institution")
+	@Valid
+	private List<Institution> institution;
+
+	@JsonProperty("creationReason")
+	private CreationReason creationReason;
+
+	@JsonProperty("occupancyDate")
+	private Long occupancyDate;
+
+	@JsonProperty("constructionDate")
+	private Long constructionDate;
+
+	@JsonProperty("noOfFloors")
+	private Long noOfFloors;
+
+	@JsonProperty("landArea")
+	@Min(1)
+	private Double landArea;
+
+	@JsonProperty("source")
+	@NotNull
+	private Source source;
+
+	@JsonProperty("documents")
+	@Valid
+	private List<Document> documents;
+
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
+	
+	@JsonProperty("workflow")
+	private ProcessInstance workflow;
 
+	public enum Source {
 
-	public enum CreationReasonEnum {
-		NEWPROPERTY("NEWPROPERTY"),
+		PT("PT"),
 
-		SUBDIVISION("SUBDIVISION");
+		TL("TL"),
+
+		WAS("WAS"),
+
+		DATA_MIGRATION("DATA_MIGRATION");
 
 		private String value;
 
-		CreationReasonEnum(String value) {
+		Source(String value) {
 			this.value = value;
 		}
 
@@ -54,9 +110,9 @@ public class Property extends PropertyInfo{
 		}
 
 		@JsonCreator
-		public static CreationReasonEnum fromValue(String text) {
-			for (CreationReasonEnum b : CreationReasonEnum.values()) {
-				if (String.valueOf(b.value).equals(text)) {
+		public static Source fromValue(String text) {
+			for (Source b : Source.values()) {
+				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
 					return b;
 				}
 			}
@@ -64,118 +120,89 @@ public class Property extends PropertyInfo{
 		}
 	}
 
-	@JsonProperty("creationReason")
-	private CreationReasonEnum creationReason;
-
-	@JsonProperty("occupancyDate")
-	private Long occupancyDate;
-
-	@Valid
-	@JsonProperty("propertyDetails")
-	private List<PropertyDetail> propertyDetails;
-
-
-	public Property addpropertyDetailsItem(PropertyDetail propertyDetailsItem) {
-		if (this.propertyDetails == null) {
-			this.propertyDetails = new ArrayList<>();
+	public Property addOwnersItem(OwnerInfo ownersItem) {
+		if (this.owners == null) {
+			this.owners = new ArrayList<>();
 		}
-		this.propertyDetails.add(propertyDetailsItem);
+
+		if (null != ownersItem)
+			this.owners.add(ownersItem);
 		return this;
 	}
 
+	public Property addInstitutionItem(Institution institutionItem) {
 
-	public static PropertyBuilder builder(){
-		return new PropertyBuilder();
+		if (this.institution == null) {
+			this.institution = new ArrayList<>();
+		}
+
+		if (null != institutionItem)
+			this.institution.add(institutionItem);
+		return this;
 	}
 
-    public static class PropertyBuilder{
-
-		private CreationReasonEnum creationReason;
-		private Long occupancyDate;
-		
-		@NotNull
-		@Valid
-		private List<PropertyDetail>  propertyDetails;
-		private AuditDetails auditDetails;
-
-		private String propertyId;
-		
-		@NotEmpty
-		private String tenantId;
-		private String acknowldgementNumber;
-		private String oldPropertyId;
-		private StatusEnum status;
-		
-		@NotNull
-		@Valid
-		private Address address;
-
-
-
-		public PropertyBuilder creationReason(CreationReasonEnum creationReason){
-			this.creationReason=creationReason;
-			return this;
+	public Property addDocumentsItem(Document documentsItem) {
+		if (this.documents == null) {
+			this.documents = new ArrayList<>();
 		}
 
-		public PropertyBuilder occupancyDate(Long occupancyDate){
-			this.occupancyDate=occupancyDate;
-			return this;
+		if (null != documentsItem)
+			this.documents.add(documentsItem);
+		return this;
+	}
+	
+	public enum CreationReason {
+		  
+		  NEWPROPERTY("NEWPROPERTY"),
+		  
+		  SUBDIVISION("SUBDIVISION");
+
+		  private String value;
+
+		  CreationReason(String value) {
+		    this.value = value;
+		  }
+
+		  @Override
+		  @JsonValue
+		  public String toString() {
+		    return String.valueOf(value);
+		  }
+
+		  @JsonCreator
+		  public static CreationReason fromValue(String text) {
+		    for (CreationReason b : CreationReason.values()) {
+		      if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+		        return b;
+		      }
+		    }
+		    return null;
+		  }
 		}
 
-		public PropertyBuilder propertyDetail( List<PropertyDetail> propertyDetails){
-			this.propertyDetails=propertyDetails;
-			return this;
-		}
-
-		public PropertyBuilder auditDetails(AuditDetails auditDetails){
-			this.auditDetails=auditDetails;
-			return this;
-		}
-
-		public PropertyBuilder propertyId(String propertyId){
-			this.propertyId =propertyId ;
-			return this;
-		}
-
-		public PropertyBuilder tenantId(String tenantId){
-			this.tenantId =tenantId ;
-			return this;
-		}
-
-		public PropertyBuilder acknowldgementNumber(String acknowldgementNumber){
-			this.acknowldgementNumber =acknowldgementNumber ;
-			return this;
-		}
-
-		public PropertyBuilder oldPropertyId(String oldPropertyId){
-			this.oldPropertyId=oldPropertyId;
-			return this;
-		}
-
-		public PropertyBuilder status(StatusEnum status){
-			this.status = status;
-			return this;
-		}
-
-		public PropertyBuilder address(Address address){
-			this.address = address;
-			return this;
-		}
-
-		public Property build(){
-			return new Property(this);
-		}
-
-
+	@Builder
+	public Property(String id, String propertyId, String tenantId, String accountId, String oldPropertyId,
+			Status status, Address address, List<String> parentProperties, String acknowldgementNumber,
+			String propertyType, String usageCategory, String ownershipCategory, List<OwnerInfo> owners,
+			List<Institution> institution, CreationReason creationReason, Long occupancyDate, Long constructionDate,
+			Long noOfFloors, Double landArea, Source source, List<Document> documents, Object additionalDetails,
+			AuditDetails auditDetails) {
+		super(id, propertyId, tenantId, accountId, oldPropertyId, status, address, parentProperties);
+		this.acknowldgementNumber = acknowldgementNumber;
+		this.propertyType = propertyType;
+		this.usageCategory = usageCategory;
+		this.ownershipCategory = ownershipCategory;
+		this.owners = owners;
+		this.institution = institution;
+		this.creationReason = creationReason;
+		this.occupancyDate = occupancyDate;
+		this.constructionDate = constructionDate;
+		this.noOfFloors = noOfFloors;
+		this.landArea = landArea;
+		this.source = source;
+		this.documents = documents;
+		this.additionalDetails = additionalDetails;
+		this.auditDetails = auditDetails;
 	}
 
-
-	public Property(PropertyBuilder builder) {
-		super(builder.propertyId,builder.tenantId,builder.acknowldgementNumber,builder.oldPropertyId,builder.status,builder.address);
-		this.auditDetails = builder.auditDetails;
-		this.creationReason = builder.creationReason;
-		this.occupancyDate = builder.occupancyDate;
-		this.propertyDetails = builder.propertyDetails;
-
-	}
 }
