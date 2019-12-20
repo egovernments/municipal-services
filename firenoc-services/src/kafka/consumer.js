@@ -174,6 +174,7 @@ consumerGroup.on("message", function(message) {
   };
   const FireNOCPaymentStatus = async value => {
     try {
+      console.log("Consumer Payment data"+JSON.stringify(value));
       const { Payment, RequestInfo } = value;
       let tenantId = get(Payment, "tenantId");
       const { paymentDetails } = Payment;
