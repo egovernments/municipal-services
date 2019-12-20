@@ -29,7 +29,7 @@ export default ({ config }) => {
   );
   return api;
 };
-export const updateApiResponse = async ({ body }, next) => {
+export const updateApiResponse = async ({ body }, next = {}) => {
   console.log("Update Body: "+JSON.stringify(body));
   let payloads = [];
   let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
