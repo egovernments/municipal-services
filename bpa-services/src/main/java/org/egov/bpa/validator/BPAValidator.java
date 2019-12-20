@@ -98,6 +98,11 @@ public class BPAValidator {
 
 				List<String> addedDocTypes = new ArrayList<String>();
 				allDocuments.forEach(document -> {
+					
+					if(document.getFileStore() == null) {
+						throw new CustomException("Invlaid Document",
+								"filestore cannot be null"+document.toString() );
+					}
 					String docType = document.getDocumentType();
 					int lastIndex = docType.lastIndexOf(".");
 					String documentNs = "";
@@ -154,8 +159,8 @@ public class BPAValidator {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.isEmpty())
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
 
-		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
-			throw new CustomException("INVALID SEARCH", "Search based only on tenantId is not allowed");
+//		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
+//			throw new CustomException("INVALID SEARCH", "Search based only on tenantId is not allowed");
 
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && !criteria.tenantIdOnly()
 				&& criteria.getTenantId() == null)
@@ -165,8 +170,8 @@ public class BPAValidator {
 				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
 			throw new CustomException("INVALID SEARCH", "TenantId is mandatory in search");
 
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
-			throw new CustomException("INVALID SEARCH", "Search only on tenantId is not allowed");
+//		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
+//			throw new CustomException("INVALID SEARCH", "Search only on tenantId is not allowed");
 
 		String allowedParamStr = null;
 

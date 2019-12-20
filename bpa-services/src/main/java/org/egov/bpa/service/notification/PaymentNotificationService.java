@@ -65,6 +65,10 @@ public class PaymentNotificationService {
      * Generates sms from the input record and Sends smsRequest to SMSService
      * @param record The kafka message from receipt create topic
      */
+    /**
+     * Generates sms from the input record and Sends smsRequest to SMSService
+     * @param record The kafka message from receipt create topic
+     */
     public void process(HashMap<String, Object> record){
         try{
             String jsonString = new JSONObject(record).toString();
@@ -72,7 +76,6 @@ public class PaymentNotificationService {
             Map<String,String> valMap = enrichValMap(documentContext);
             Map<String, Object> info = documentContext.read("$.RequestInfo");
             RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-//            RequestInfo requestInfo = new RequestInfo();
 
             if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessService())){
                 BPA bpa = getBPAFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
@@ -86,64 +89,8 @@ public class PaymentNotificationService {
             e.printStackTrace();
         }
     }
- 
 
-    /**
-     * Enriches the map with values from receipt
-     * @param context The documentContext of the receipt
-     * @return The map containing required fields from receipt
-     */
-    private Map<String,String> enrichValMap(DocumentContext context){
-        Map<String,String> valMap = new HashMap<>();
-        try{
-            valMap.put(businessServiceKey,context.read("$.Receipt[0].Bill[0].billDetails[0].businessService"));
-            valMap.put(consumerCodeKey,context.read("$.Receipt[0].Bill[0].billDetails[0].consumerCode"));
-            valMap.put(tenantIdKey,context.read("$.Receipt[0].tenantId"));
-            valMap.put(payerMobileNumberKey,context.read("$.Receipt[0].Bill[0].mobileNumber"));
-            valMap.put(paidByKey,context.read("$.Receipt[0].Bill[0].paidBy"));
-            Integer amountPaid = context.read("$.Receipt[0].instrument.amount");
-            valMap.put(amountPaidKey,amountPaid.toString());
-            valMap.put(receiptNumberKey,context.read("$.Receipt[0].Bill[0].billDetails[0].receiptNumber"));
 
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new CustomException("RECEIPT ERROR","Unable to fetch values from receipt");
-        }
-        return valMap;
-    }
-    
-    /**
-     * Searches the tradeLicense based on the consumer code as applicationNumber
-     * @param tenantId tenantId of the tradeLicense
-     * @param consumerCode The consumerCode of the receipt
-     * @param requestInfo The requestInfo of the request
-     * @return TradeLicense for the particular consumerCode
-     */
-    private BPA getBPAFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo){
-
-        BPASearchCriteria searchCriteria = new BPASearchCriteria();
-        
-        List<String> code = Arrays.asList(consumerCode);
-        
-        searchCriteria.setApplicationNos(code);
-        
-//        searchCriteria.setApplicationNo(consumerCode);
-        searchCriteria.setTenantId(tenantId);
-        List<BPA> licenses = bpaService.getBPAWithOwnerInfo(searchCriteria,requestInfo);
-
-        if(CollectionUtils.isEmpty(licenses))
-            throw new CustomException("INVALID RECEIPT","No license found for the consumerCode: "
-                    +consumerCode+" and tenantId: "+tenantId);
-
-        if(licenses.size()!=1)
-            throw new CustomException("INVALID RECEIPT","Multiple license found for the consumerCode: "
-                    +consumerCode+" and tenantId: "+tenantId);
-
-        return licenses.get(0);
-
-    }
-    
     /**
      * Creates the SMSRequest
      * @param license The TradeLicense for which the receipt is generated
@@ -161,7 +108,8 @@ public class PaymentNotificationService {
 
             return totalSMS;
     }
-    
+
+
     /**
      * Creates SMSRequest for the owners
      * @param license The tradeLicense for which the receipt is created
@@ -187,6 +135,7 @@ public class PaymentNotificationService {
         return smsRequests;
     }
 
+
     /**
      * Creates SMSRequest to be send to the payer
      * @param valMap The Map containing the values from receipt
@@ -198,6 +147,60 @@ public class PaymentNotificationService {
         String customizedMsg = message.replace("<1>",valMap.get(paidByKey));
         SMSRequest smsRequest = new SMSRequest(valMap.get(payerMobileNumberKey),customizedMsg);
         return smsRequest;
+    }
+
+
+    /**
+     * Enriches the map with values from receipt
+     * @param context The documentContext of the receipt
+     * @return The map containing required fields from receipt
+     */
+    private Map<String,String> enrichValMap(DocumentContext context){
+        Map<String,String> valMap = new HashMap<>();
+        try{
+            valMap.put(businessServiceKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
+            valMap.put(consumerCodeKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
+            valMap.put(tenantIdKey,context.read("$.Payments[0].tenantId"));
+            valMap.put(payerMobileNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber"));
+            valMap.put(paidByKey,context.read("$.Payments[0].paidBy"));
+            Integer amountPaid = context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.amountPaid");
+            valMap.put(amountPaidKey,amountPaid.toString());
+            valMap.put(receiptNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].receiptNumber"));
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new CustomException("RECEIPT ERROR","Unable to fetch values from receipt");
+        }
+        return valMap;
+    }
+
+
+    /**
+     * Searches the tradeLicense based on the consumer code as applicationNumber
+     * @param tenantId tenantId of the tradeLicense
+     * @param consumerCode The consumerCode of the receipt
+     * @param requestInfo The requestInfo of the request
+     * @return TradeLicense for the particular consumerCode
+     */
+    private BPA getBPAFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo){
+
+    	BPASearchCriteria searchCriteria = new BPASearchCriteria();
+    	List<String> codes = Arrays.asList(consumerCode);
+        searchCriteria.setApplicationNos(codes);
+        searchCriteria.setTenantId(tenantId);
+        List<BPA> bpas = bpaService.getBPAWithOwnerInfo(searchCriteria,requestInfo);
+
+        if(CollectionUtils.isEmpty(bpas))
+            throw new CustomException("INVALID RECEIPT","No Appllication found for the consumerCode: "
+                    +consumerCode+" and tenantId: "+tenantId);
+
+        if(bpas.size()!=1)
+            throw new CustomException("INVALID RECEIPT","Multiple Application found for the consumerCode: "
+                    +consumerCode+" and tenantId: "+tenantId);
+
+        return bpas.get(0);
+
     }
     
 }

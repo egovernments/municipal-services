@@ -158,6 +158,9 @@ public class BPAService {
 		Object mdmsData = util.mDMSCall(bpaRequest);
 		BPA bpa = bpaRequest.getBPA();
 		
+		if(bpa.getId() == null) {
+			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
+		}
 		BusinessService businessService = workflowService.getBusinessService(bpa.getTenantId(),
 				bpaRequest.getRequestInfo(),bpa.getApplicationNo());
 		
