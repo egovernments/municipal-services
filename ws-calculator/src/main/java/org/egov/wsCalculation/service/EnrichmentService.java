@@ -43,7 +43,7 @@ public class EnrichmentService {
 
 	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
 		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
-		meterConnectionRequest.getMeterReading().setCurrentReadingDate(Instant.now().getEpochSecond() * 1000);
+		//meterConnectionRequest.getMeterReading().setCurrentReadingDate(Instant.now().getEpochSecond() * 1000);
 		//setIdgenIds(meterConnectionRequest);
 	}
 
