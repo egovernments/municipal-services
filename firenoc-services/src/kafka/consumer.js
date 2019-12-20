@@ -193,7 +193,7 @@ consumerGroup.on("message", function(message) {
             const body = { RequestInfo };
             const searchRequest = { body, query };
             const searchResponse = await searchApiResponse(searchRequest);
-            console.log("search response: "+searchResponse);
+            console.log("search response: "+JSON.stringify(searchResponse));
             const { FireNOCs } = searchResponse;
             if (!FireNOCs.length) {
               throw "FIRENOC Search error";
@@ -211,9 +211,9 @@ consumerGroup.on("message", function(message) {
             }
             const updateBody = { RequestInfo, FireNOCs };
             const updateRequest = { body: updateBody };
-            console.log("update Request: "+updateRequest);
+            console.log("update Request: "+JSON.stringify(updateRequest));
             const updateResponse = await updateApiResponse(updateRequest);
-            console.log("update Response: "+updateResponse);
+            console.log("update Response: "+JSON.stringify(updateResponse));
           }
         }
       }
