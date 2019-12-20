@@ -135,7 +135,7 @@ public class TradeLicenseService {
                         }
                     }
                     if (tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense)) {
-                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same tradetype: "+tradetypeOfNewLicense);
+                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same license type: "+tradetypeOfNewLicense);
                     }
                 }
             }
