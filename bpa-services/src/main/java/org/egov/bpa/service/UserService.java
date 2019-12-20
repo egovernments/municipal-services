@@ -56,7 +56,7 @@ public class UserService {
 				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 						.append(config.getUserCreateEndpoint());
 				setUserName(owner);
-
+				owner.setType("CITIZEN");
 				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 				if (userDetailResponse.getUser().get(0).getUuid() == null) {
 					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
@@ -110,11 +110,11 @@ public class UserService {
 	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
-		userSearchRequest.setMobileNumber(owner.getMobileNumber());
-		userSearchRequest.setName(owner.getName());
-		userSearchRequest.setRequestInfo(requestInfo);
-		userSearchRequest.setActive(true);
-		userSearchRequest.setUserType(owner.getType());
+//		userSearchRequest.setMobileNumber(owner.getMobileNumber());
+//		userSearchRequest.setName(owner.getName());
+//		userSearchRequest.setRequestInfo(requestInfo);
+//		userSearchRequest.setActive(true);
+//		userSearchRequest.setUserType(owner.getType());
 		
 		if (owner.getId() != null)
 			userSearchRequest.setId(Arrays.asList(owner.getId().toString()));

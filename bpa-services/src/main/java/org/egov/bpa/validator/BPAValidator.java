@@ -41,6 +41,16 @@ public class BPAValidator {
 		validateDuplicateDocuments(bpaRequest);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateApplicationDocuments(bpaRequest, mdmsData, null);
+		validateUser(bpaRequest);
+	}
+	private void validateUser(BPARequest bpaRequest) {
+		BPA bpa = bpaRequest.getBPA();
+		bpa.getOwners().forEach(user->{
+			if(org.springframework.util.StringUtils.isEmpty(user.getRelationship())) {
+				throw new CustomException("BPA.CREATE.USER",
+						" Owner relation ship is mandatory " + user.toString());
+			}
+		});
 	}
 
 	@SuppressWarnings("static-access")

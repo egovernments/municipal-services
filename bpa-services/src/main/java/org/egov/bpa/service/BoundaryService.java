@@ -72,14 +72,14 @@ public class BoundaryService {
 					.append(hierarchyTypeCode);
 		uri.append("&").append("boundaryType=").append("Locality");
 
-//		if (!CollectionUtils.isEmpty(localities)) {
-//			uri.append("&").append("codes=");
-//			for (int i = 0; i < localities.size(); i++) {
-//				uri.append(localities.get(i));
-//				if (i != localities.size() - 1)
-//					uri.append(",");
-//			}
-//		}
+		if (!CollectionUtils.isEmpty(localities)) {
+			uri.append("&").append("codes=");
+			for (int i = 0; i < localities.size(); i++) {
+				uri.append(localities.get(i));
+				if (i != localities.size() - 1)
+					uri.append(",");
+			}
+		}
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
 				.fetchResult(uri, request.getRequestInfo());
 		if (CollectionUtils.isEmpty(responseMap))
