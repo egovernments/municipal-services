@@ -47,6 +47,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   );
 
   let errors = await validateFireNOCModel(body, mdms);
+  console.log("Error Check:"+JSON.stringify(errors));
   if (errors.length > 0) {
     next({
       errorType: "custom",
