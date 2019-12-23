@@ -47,7 +47,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   );
 
   let errors = await validateFireNOCModel(body, mdms);
-  console.log("Error Check:"+JSON.stringify(errors));
+  //console.log("Error Check:"+JSON.stringify(errors));
   if (errors.length > 0) {
     return next({
       errorType: "custom",
@@ -66,7 +66,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
 
   //applay workflow
   let workflowResponse = await createWorkFlow(body);
-  console.log("workflowResponse"+JSON.stringify(workflowResponse));
+  //console.log("workflowResponse"+JSON.stringify(workflowResponse));
 
   //calculate call
   let { FireNOCs = [], RequestInfo = {} } = body;
@@ -75,7 +75,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   }
 
   body.FireNOCs = updateStatus(FireNOCs, workflowResponse);
-  console.log("Fire NoC body"+JSON.stringify(body.FireNOCs));
+  //console.log("Fire NoC body"+JSON.stringify(body.FireNOCs));
 
   payloads.push({
     topic: envVariables.KAFKA_TOPICS_FIRENOC_UPDATE,
