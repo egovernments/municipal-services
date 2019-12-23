@@ -43,17 +43,20 @@ public class sWQueryBuilder {
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		String resultantQuery = query.toString();
 		boolean isAnyCriteriaMatch = false;
-//		if(criteria == null && criteria.isEmpty()){
-//		Set<String> propertyIds = new HashSet<>();
-//		List<Property> propertyList = waterServicesUtil.propertySearchForCitizen(requestInfo);
-//		propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
-//		if (!propertyIds.isEmpty()) {
-//			addClauseIfRequired(preparedStatement, query);
-//			query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
-//			addToPreparedStatement(preparedStatement, propertyIds);
-//			isAnyCriteriaMatch = true;
-//		}
-//	}
+		// if(criteria == null && criteria.isEmpty()){
+		// Set<String> propertyIds = new HashSet<>();
+		// List<Property> propertyList =
+		// waterServicesUtil.propertySearchForCitizen(requestInfo);
+		// propertyList.forEach(property ->
+		// propertyIds.add(property.getPropertyId()));
+		// if (!propertyIds.isEmpty()) {
+		// addClauseIfRequired(preparedStatement, query);
+		// query.append(" conn.property_id in
+		// (").append(createQuery(propertyIds)).append(" )");
+		// addToPreparedStatement(preparedStatement, propertyIds);
+		// isAnyCriteriaMatch = true;
+		// }
+		// }
 		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
 				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -70,6 +73,13 @@ public class sWQueryBuilder {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
+			isAnyCriteriaMatch = true;
+		}
+
+		if (criteria.getPropertyId() != null && !criteria.getPropertyId().isEmpty()) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.property_id = ? ");
+			preparedStatement.add(criteria.getPropertyId());
 			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
@@ -97,7 +107,7 @@ public class sWQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
-		if(isAnyCriteriaMatch == false)
+		if (isAnyCriteriaMatch == false)
 			return null;
 		resultantQuery = query.toString();
 		if (query.toString().indexOf("WHERE") > -1)
