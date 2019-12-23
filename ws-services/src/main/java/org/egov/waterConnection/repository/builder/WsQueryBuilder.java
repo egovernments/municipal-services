@@ -30,7 +30,6 @@ public class WsQueryBuilder {
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 	
-	private final static String connectionNoWaterConnectionSearchQuery = "SELECT conn.connectionNo as conn_no FROM water_service_connection wc INNER JOIN connection conn ON wc.connection_id = conn.id";
 
 
 	/**
