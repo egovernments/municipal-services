@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.ServiceRequestRepository;
+import org.egov.tl.util.BPANotificationUtil;
 import org.egov.tl.util.NotificationUtil;
 import org.egov.tl.util.TLConstants;
 import org.egov.tl.web.models.*;
@@ -30,13 +31,15 @@ public class TLNotificationService {
 
     private NotificationUtil util;
 
+	private BPANotificationUtil bpaNotificationUtil;
 
-    @Autowired
-    public TLNotificationService(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, NotificationUtil util) {
-        this.config = config;
-        this.serviceRequestRepository = serviceRequestRepository;
-        this.util = util;
-    }
+	@Autowired
+	public TLNotificationService(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, NotificationUtil util, BPANotificationUtil bpaNotificationUtil) {
+		this.config = config;
+		this.serviceRequestRepository = serviceRequestRepository;
+		this.util = util;
+		this.bpaNotificationUtil = bpaNotificationUtil;
+	}
 
     /**
      * Creates and send the sms based on the tradeLicenseRequest
@@ -67,15 +70,15 @@ public class TLNotificationService {
 				}
 				break;
 
-//			case businessService_BPA:
-//				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
-//				if(null != config.getIsBPASMSEnabled()) {
-//					if(config.getIsBPASMSEnabled()) {
-//						enrichSMSRequest(request,smsRequestsBPA);
-//						if(!CollectionUtils.isEmpty(smsRequestsBPA))
-//							util.sendSMS(smsRequestsBPA,true);
-//					}
-//				}
+			case businessService_BPA:
+				List<SMSRequest> smsRequestsBPA = new LinkedList<>();
+				if (null != config.getIsBPASMSEnabled()) {
+					if (config.getIsBPASMSEnabled()) {
+						enrichSMSRequest(request, smsRequestsBPA);
+						if (!CollectionUtils.isEmpty(smsRequestsBPA))
+							util.sendSMS(smsRequestsBPA, true);
+					}
+				}
 //				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
 //					if(config.getIsUserEventsNotificationEnabledForBPA()) {
 //						EventRequest eventRequest = getEvents(request);
@@ -83,7 +86,7 @@ public class TLNotificationService {
 //							util.sendEventNotification(eventRequest);
 //					}
 //				}
-//				break;
+				break;
 		}
     }
 
@@ -95,9 +98,18 @@ public class TLNotificationService {
      */
     private void enrichSMSRequest(TradeLicenseRequest request,List<SMSRequest> smsRequests){
         String tenantId = request.getLicenses().get(0).getTenantId();
-        String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
         for(TradeLicense license : request.getLicenses()){
-            String message = util.getCustomizedMsg(request.getRequestInfo(),license,localizationMessages);
+			String businessService = license.getBusinessService();
+			if (businessService == null)
+				businessService = businessService_TL;
+			String message = null;
+			if (businessService.equals(businessService_TL)) {
+				String localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+				message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+			} else {
+				String localizationMessages = bpaNotificationUtil.getLocalizationMessages(tenantId, request.getRequestInfo());
+				message = bpaNotificationUtil.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+			}
             if(message==null) continue;
 
             Map<String,String > mobileNumberToOwner = new HashMap<>();

@@ -286,7 +286,11 @@ public class TradeLicenseService {
                 break;
         }
         calculationService.addCalculation(tradeLicenseRequest);
-        editNotificationService.sendEditNotification(tradeLicenseRequest, diffMap);
+        switch (businessServicefromPath) {
+            case businessService_TL:
+                editNotificationService.sendEditNotification(tradeLicenseRequest, diffMap);
+                break;
+        }
         repository.update(tradeLicenseRequest, idToIsStateUpdatableMap);
         return tradeLicenseRequest.getLicenses();
     }

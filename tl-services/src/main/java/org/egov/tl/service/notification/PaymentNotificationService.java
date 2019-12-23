@@ -7,8 +7,11 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.TradeLicenseService;
+import org.egov.tl.util.BPANotificationUtil;
 import org.egov.tl.util.NotificationUtil;
 import org.egov.tl.web.models.*;
+import org.egov.tl.web.models.collection.PaymentDetail;
+import org.egov.tl.web.models.collection.PaymentRequest;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static org.egov.tl.util.BPAConstants.NOTIFICATION_APPROVED;
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
@@ -37,14 +38,16 @@ public class PaymentNotificationService {
     
     private ObjectMapper mapper;
 
+    private BPANotificationUtil bpaNotificationUtil;
 
     @Autowired
     public PaymentNotificationService(TLConfiguration config, TradeLicenseService tradeLicenseService,
-                                      NotificationUtil util,ObjectMapper mapper) {
+                                      NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil) {
         this.config = config;
         this.tradeLicenseService = tradeLicenseService;
         this.util = util;
         this.mapper = mapper;
+        this.bpaNotificationUtil = bpaNotificationUtil;
     }
 
 
@@ -81,17 +84,29 @@ public class PaymentNotificationService {
             if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceTL())||valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceBPA())){
                 TradeLicense license = getTradeLicenseFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
                                                                        requestInfo);
-                String localizationMessages = util.getLocalizationMessages(license.getTenantId(),requestInfo);
-                List<SMSRequest> smsRequests = getSMSRequests(license,valMap,localizationMessages);
                 switch(valMap.get(businessServiceKey))
                 {
                     case businessService_TL:
-                        util.sendSMS(smsRequests,config.getIsTLSMSEnabled());
+                        String localizationMessages = util.getLocalizationMessages(license.getTenantId(), requestInfo);
+                        List<SMSRequest> smsRequests = getSMSRequests(license, valMap, localizationMessages);
+                        util.sendSMS(smsRequests, config.getIsTLSMSEnabled());
                         break;
 
-//                    case businessService_BPA:
-//                        util.sendSMS(smsRequests,config.getIsBPASMSEnabled());
-//                        break;
+                    case businessService_BPA:
+                        localizationMessages = bpaNotificationUtil.getLocalizationMessages(license.getTenantId(), requestInfo);
+                        PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
+                        String totalAmountPaid = paymentRequest.getPayment().getTotalAmountPaid().toString();
+                        Map<String, String> mobileNumberToOwner = new HashMap<>();
+                        String locMessage = bpaNotificationUtil.getMessageTemplate(NOTIFICATION_APPROVED, localizationMessages);
+                        String message = bpaNotificationUtil.getPendingDocVerificationMsg(license, locMessage, localizationMessages, totalAmountPaid);
+                        license.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                            if (owner.getMobileNumber() != null)
+                                mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+                        });
+                        List<SMSRequest> smsList = new ArrayList<>();
+                        smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+                        util.sendSMS(smsList, config.getIsBPASMSEnabled());
+                        break;
                 }
             }
         }
