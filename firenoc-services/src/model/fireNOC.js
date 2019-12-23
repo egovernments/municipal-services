@@ -646,7 +646,7 @@ const RequestInfo = {
       maxLength: 256
     },
     authToken: {
-      type: "string",
+      type: ["string", "null"],
       description:
         "//session/jwt/saml token/oauth token - the usual value that would go into HTTP bearer token"
     },
