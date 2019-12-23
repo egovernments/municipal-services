@@ -19,6 +19,7 @@ import org.egov.swCalculation.model.CalculationRes;
 import org.egov.swCalculation.model.Category;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxHeadMaster;
+import org.egov.swCalculation.repository.SewerageCalculatorDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	
 	@Autowired
 	DemandService demandService;
+	
+	@Autowired
+	SewerageCalculatorDao sewerageCalculatorDao;
 	
 	/**
 	 * Get Calculation Request and return Calculated Response
@@ -151,6 +155,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
+		List<String> tenantIds = sewerageCalculatorDao.getTenantId();
 	}
 	
 }
