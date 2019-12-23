@@ -1,7 +1,41 @@
 package org.egov.pt.calculator.service;
 
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_AREA;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_ERROR_CODE;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_ERROR_MESSAGE;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_FLOOR;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_USAGE_DETAIL;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_ESTIMATE_ARV_NULL;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_ESTIMATE_ARV_NULL_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.EXEMPTION_FIELD_NAME;
+import static org.egov.pt.calculator.util.CalculatorConstants.OWNER_TYPE_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADVANCE_CARRYFORWARD;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_CANCER_CESS;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_replace_id;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_FIRE_CESS;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_OWNER_EXEMPTION;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TAX;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_INTEREST;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_PENALTY;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TYPE_VACANT_LAND;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_UNIT_USAGE_EXEMPTION;
+import static org.egov.pt.calculator.util.CalculatorConstants.TAXHEADMASTER_MASTER_KEY;
+import static org.egov.pt.calculator.util.CalculatorConstants.USAGE_MAJOR_MASTER;
+
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -11,14 +45,19 @@ import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.util.PBFirecessUtils;
 import org.egov.pt.calculator.validator.CalculationValidator;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.BillingSlab;
+import org.egov.pt.calculator.web.models.BillingSlabSearchCriteria;
+import org.egov.pt.calculator.web.models.Calculation;
+import org.egov.pt.calculator.web.models.CalculationCriteria;
+import org.egov.pt.calculator.web.models.CalculationReq;
+import org.egov.pt.calculator.web.models.CalculationRes;
+import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.demand.Category;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
 import org.egov.pt.calculator.web.models.property.Assessment;
 import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.Property;
-import org.egov.pt.calculator.web.models.property.PropertyDetail;
 import org.egov.pt.calculator.web.models.property.Unit;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +66,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-
-import static org.egov.pt.calculator.util.CalculatorConstants.*;
 
 @Service
 @Slf4j
@@ -91,17 +128,16 @@ public class EstimationService {
 	public Map<String, Calculation> getEstimationPropertyMap(CalculationReq request,Map<String,Object> masterMap) {
 
 		RequestInfo requestInfo = request.getRequestInfo();
-		List<CalculationCriteria> criteriaList = request.getCalculationCriteria();
+		CalculationCriteria criteria = request.getCalculationCriteria();
 		Map<String, Calculation> calculationPropertyMap = new HashMap<>();
-		for (CalculationCriteria criteria : criteriaList) {
-			Property property = criteria.getPropertyCalculatorWrapper().getProperty();
-			Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
-			calcValidator.validatePropertyForCalculation(detail, property);
-			String assessmentNumber = detail.getAssessmentNumber();
-			Calculation calculation = getCalculation(requestInfo, criteria,masterMap);
-			calculation.setServiceNumber(property.getPropertyId());
-			calculationPropertyMap.put(assessmentNumber, calculation);
-		}
+		Property property = criteria.getPropertyCalculatorWrapper().getProperty();
+		Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
+		calcValidator.validatePropertyForCalculation(detail, property);
+		String assessmentNumber = detail.getAssessmentNumber();
+		Calculation calculation = getCalculation(requestInfo, criteria,masterMap);
+		calculation.setServiceNumber(property.getPropertyId());
+		calculationPropertyMap.put(assessmentNumber, calculation);
+
 		return calculationPropertyMap;
 	}
 
@@ -114,7 +150,7 @@ public class EstimationService {
 	 */
     public CalculationRes getTaxCalculation(CalculationReq request) {
 
-        CalculationCriteria criteria = request.getCalculationCriteria().get(0);
+        CalculationCriteria criteria = request.getCalculationCriteria();
         Property property = criteria.getPropertyCalculatorWrapper().getProperty();
         Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
         calcValidator.validatePropertyForCalculation(detail, property);
@@ -398,8 +434,6 @@ public class EstimationService {
 
         Property property = criteria.getPropertyCalculatorWrapper().getProperty();
         Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
-        String assessmentYear = detail.getFinancialYear();
-        String assessmentNumber = null != detail.getAssessmentNumber() ? detail.getAssessmentNumber() : criteria.getAssessmentNumber();
         String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 

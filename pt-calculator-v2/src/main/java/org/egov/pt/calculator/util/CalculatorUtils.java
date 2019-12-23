@@ -615,25 +615,17 @@ public class CalculatorUtils {
      * @param request PropertyRequest for which calculation has to be done
      * @return Calculation Request based on PropertyRequest
      */
-    public CalculationReq createCalculationReq(PropertyRequest request) {
+    public CalculationReq createCalculationReq(RequestInfo requestInfo, PropertyCalculatorWrapper wrapper) {
 
-        String tenantId = request.getProperties().get(0).getTenantId();
-        RequestInfo requestInfo = request.getRequestInfo();
-        List<CalculationCriteria> calculationCriterias = new LinkedList<>();
+        String tenantId = wrapper.getProperty().getTenantId();
 
-        request.getProperties().forEach(property -> {
-            CalculationCriteria criteria = new CalculationCriteria();
-            PropertyCalculatorWrapper wrapper = new PropertyCalculatorWrapper();
-            wrapper.setProperty(property);
-            wrapper.setAssessment(null);
-            criteria.setTenantId(tenantId);
-            criteria.setPropertyCalculatorWrapper(wrapper);
-            calculationCriterias.add(criteria);
-        });
+        CalculationCriteria criteria = new CalculationCriteria();
+        criteria.setTenantId(tenantId);
+        criteria.setPropertyCalculatorWrapper(wrapper);
 
         CalculationReq calculationReq = new CalculationReq();
         calculationReq.setRequestInfo(requestInfo);
-        calculationReq.setCalculationCriteria(calculationCriterias);
+        calculationReq.setCalculationCriteria(criteria);
 
         return calculationReq;
     }

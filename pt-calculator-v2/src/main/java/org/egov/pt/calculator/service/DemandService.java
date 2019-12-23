@@ -87,49 +87,45 @@ public class DemandService {
 	 */
 	public Map<String, Calculation> generateDemands(CalculationReq request) {
 
-		List<CalculationCriteria> criterias = request.getCalculationCriteria();
+		CalculationCriteria criteria = request.getCalculationCriteria();
 		List<Demand> demands = new ArrayList<>();
 		List<String> lesserAssessments = new ArrayList<>();
-		Map<String, String> consumerCodeFinYearMap = new HashMap<>();
 		Map<String,Object> masterMap = mDataService.getMasterMap(request);
 
 
 		Map<String, Calculation> propertyCalculationMap = estimationService.getEstimationPropertyMap(request,masterMap);
-		for (CalculationCriteria criteria : criterias) {
+		
+		Property property = criteria.getPropertyCalculatorWrapper().getProperty();
 
-			Property property = criteria.getPropertyCalculatorWrapper().getProperty();
+		Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
 
-			Assessment detail = criteria.getPropertyCalculatorWrapper().getAssessment();
+		Calculation calculation = propertyCalculationMap.get(detail.getAssessmentNumber());
+		
+		String assessmentNumber = detail.getAssessmentNumber();
 
-			Calculation calculation = propertyCalculationMap.get(detail.getAssessmentNumber());
-			
-			String assessmentNumber = detail.getAssessmentNumber();
+		// pt_tax for the new assessment
+		BigDecimal newTax =  BigDecimal.ZERO;
+		Optional<TaxHeadEstimate> advanceCarryforwardEstimate = propertyCalculationMap.get(assessmentNumber).getTaxHeadEstimates()
+		.stream().filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(CalculatorConstants.PT_TAX))
+			.findAny();
+		if(advanceCarryforwardEstimate.isPresent())
+			newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
 
-			// pt_tax for the new assessment
-			BigDecimal newTax =  BigDecimal.ZERO;
-			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = propertyCalculationMap.get(assessmentNumber).getTaxHeadEstimates()
-			.stream().filter(estimate -> estimate.getTaxHeadCode().equalsIgnoreCase(CalculatorConstants.PT_TAX))
-				.findAny();
-			if(advanceCarryforwardEstimate.isPresent())
-				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
+		Demand oldDemand = utils.getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),criteria);
 
-			Demand oldDemand = utils.getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),criteria);
+		// true represents that the demand should be updated from this call
+		BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
+				request.getRequestInfo(),oldDemand, true);
 
-			// true represents that the demand should be updated from this call
-			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
-					request.getRequestInfo(),oldDemand, true);
+		if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
 
-			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
+			Demand demand = prepareDemand(detail, property, calculation ,oldDemand);
 
-				Demand demand = prepareDemand(detail, property, calculation ,oldDemand);
-
-				demands.add(demand);
-				consumerCodeFinYearMap.put(demand.getConsumerCode(), detail.getFinancialYear());
-
-			}else {
-				lesserAssessments.add(assessmentNumber);
-			}
+			demands.add(demand);
+		}else {
+			lesserAssessments.add(assessmentNumber);
 		}
+
 		
 		if (!CollectionUtils.isEmpty(lesserAssessments)) {
 			throw new CustomException(CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR,

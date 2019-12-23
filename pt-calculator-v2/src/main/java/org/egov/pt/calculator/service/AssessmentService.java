@@ -104,12 +104,12 @@ public class AssessmentService {
 
 		Map<String, String> errorMap = new HashMap<>();
 
-		calculationReq.getCalculationCriteria().forEach(calculationCriteria -> {
-/*			if (propertyMap.containsKey(calculationCriteria.getAssessmentNumber()))
+/*		calculationReq.getCalculationCriteria().forEach(calculationCriteria -> {
+			if (propertyMap.containsKey(calculationCriteria.getAssessmentNumber()))
 				calculationCriteria.setProperty(propertyMap.get(calculationCriteria.getAssessmentNumber()));
 			else errorMap.put("INVALID_CRITERIA", "Property for the assessment number : "
-					+ calculationCriteria.getAssessmentNumber() + " is not found ");*/
-		});
+					+ calculationCriteria.getAssessmentNumber() + " is not found ");
+		});*/
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -125,14 +125,10 @@ public class AssessmentService {
 	 */
 	private Map<String, Property> getPropertyMap(CalculationReq calculationReq) {
 
-		String tenantId = calculationReq.getCalculationCriteria().get(0).getTenantId();
+		String tenantId = calculationReq.getCalculationCriteria().getTenantId();
 		RequestInfo requestInfo = calculationReq.getRequestInfo();
 		List<String> assessmentNumbers = new LinkedList<>();
-
-		calculationReq.getCalculationCriteria().forEach(calculationCriteria ->
-		{
-			assessmentNumbers.add(calculationCriteria.getAssessmentNumber());
-		});
+		assessmentNumbers.add(calculationReq.getCalculationCriteria().getAssessmentNumber());
 
 		StringBuilder url = utils.getPTSearchQuery(tenantId, assessmentNumbers);
 

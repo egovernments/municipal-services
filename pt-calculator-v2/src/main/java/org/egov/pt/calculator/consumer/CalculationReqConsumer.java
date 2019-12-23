@@ -49,11 +49,11 @@ public class CalculationReqConsumer {
                 else propertiesNotForDemandGen.add(property);
             });
 
-            if(!CollectionUtils.isEmpty(propertiesForDemandGen))
+/*            if(!CollectionUtils.isEmpty(propertiesForDemandGen))
             {
                 CalculationReq calculationReq = utils.createCalculationReq(propertyRequest);
                 demandService.generateDemands(calculationReq);
-            }
+            }*/
         } catch (final Exception e) {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }

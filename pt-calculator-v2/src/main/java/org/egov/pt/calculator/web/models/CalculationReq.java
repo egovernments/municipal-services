@@ -1,7 +1,5 @@
 package org.egov.pt.calculator.web.models;
 
-import java.util.List;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -38,13 +36,7 @@ public class CalculationReq   {
         @Valid
         @NotNull
         @JsonProperty("CalculationCriteria")
-        private List<CalculationCriteria> calculationCriteria;
-
-
-        public CalculationReq addCalulationCriteriaItem(CalculationCriteria calulationCriteriaItem) {
-        this.calculationCriteria.add(calulationCriteriaItem);
-        return this;
-        }
+        private CalculationCriteria calculationCriteria;
 
 }
 
