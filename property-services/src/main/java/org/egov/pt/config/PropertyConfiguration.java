@@ -191,5 +191,9 @@ public class PropertyConfiguration {
     
     @Value("${property.unit.landarea}")
 	private String landAreaUnit;
+    
+    
+    @Value("${property.module.name}")
+	private String propertyModuleName;    
 
 }

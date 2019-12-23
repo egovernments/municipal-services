@@ -105,10 +105,11 @@ public class PropertyQueryBuilder {
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
-		&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
-		&& CollectionUtils.isEmpty(criteria.getUuids())
-		&& null == criteria.getMobileNumber()
-		&& null == criteria.getName();
+					&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
+					&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
+					&& CollectionUtils.isEmpty(criteria.getUuids())
+					&& null == criteria.getMobileNumber()
+					&& null == criteria.getName();
 		
 		if(isEmpty)
 			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
@@ -138,6 +139,16 @@ public class PropertyQueryBuilder {
 				builder.append(AND_QUERY);
 			builder.append("property.propertyid IN (").append(createQuery(propertyIds)).append(")");
 			addToPreparedStatement(preparedStmtList, propertyIds);
+			appendAndQuery= true;
+		}
+		
+		Set<String> acknowledgementIds = criteria.getAcknowledgementIds();
+		if (!CollectionUtils.isEmpty(acknowledgementIds)) {
+
+			if(appendAndQuery)
+				builder.append(AND_QUERY);
+			builder.append("property.acknowldgementnumber IN (").append(createQuery(acknowledgementIds)).append(")");
+			addToPreparedStatement(preparedStmtList, acknowledgementIds);
 			appendAndQuery= true;
 		}
 		

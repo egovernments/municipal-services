@@ -23,6 +23,8 @@ public class PropertyCriteria {
 
 	private Set<String> propertyIds;
 	
+	private Set<String> acknowledgementIds;
+	
 	private Set<String> uuids;
 
 	private Set<String> oldpropertyids;

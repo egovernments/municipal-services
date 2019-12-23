@@ -61,9 +61,6 @@ public class BillAccountDetail {
 	@JsonProperty("additionalDetails")
 	private JsonNode additionalDetails;
 
-	@JsonProperty("purpose")
-	private Purpose purpose;
-
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 }

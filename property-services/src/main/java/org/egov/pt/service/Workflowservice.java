@@ -47,8 +47,7 @@ public class Workflowservice {
 
 		try {
 
-			response = rest.postForObject(configs.getWfHost().concat(configs.getWfTransitionPath()), workflowReq,
-					ProcessInstanceResponse.class);
+			response = rest.postForObject(configs.getWfHost().concat(configs.getWfTransitionPath()), workflowReq, ProcessInstanceResponse.class);
 		} catch (HttpClientErrorException ex) {
 
 			throw new ServiceCallException(ex.getMessage());

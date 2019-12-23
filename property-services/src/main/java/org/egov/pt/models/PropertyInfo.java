@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.egov.pt.models.enums.Status;
+import org.javers.core.metamodel.annotation.DiffInclude;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -30,6 +31,7 @@ public class PropertyInfo {
 	private String accountId;
 
 	@JsonProperty("oldPropertyId")
+	@DiffInclude
 	private String oldPropertyId;
 
 	@JsonProperty("status")

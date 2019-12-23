@@ -114,13 +114,21 @@ public class PropertyUtil {
 					.build();
 	}
 	
-	public ProcessInstanceRequest getProcessInstanceForProperty(PropertyRequest request) {
+	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, Boolean isCreate) {
 		
 		Property property = request.getProperty();
-		ProcessInstance wf = property.getWorkflow();
+		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
 		
 		wf.setBusinessId(property.getAcknowldgementNumber());
-		wf.setAssignee(property.getOwners().get(0));
+		wf.setTenantId(property.getTenantId());
+		
+		if (isCreate) {
+			
+			wf.setAssignee(property.getOwners().get(0));
+			wf.setBusinessService(config.getPropertyRegistryWf());
+			wf.setModuleName(config.getPropertyModuleName());
+			wf.setAction("OPEN");
+		}
 		
 		return ProcessInstanceRequest.builder()
 				.processInstances(Arrays.asList(request.getProperty().getWorkflow()))

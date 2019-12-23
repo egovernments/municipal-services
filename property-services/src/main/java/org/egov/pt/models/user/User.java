@@ -161,9 +161,6 @@ public class User   {
         @JsonProperty("lastModifiedDate")
         private Long lastModifiedDate;
 
-        @JsonProperty("otpReference")
-        private String otpReference;
-
         @Size(max=256)
         @JsonProperty("tenantId")
         private String tenantId;

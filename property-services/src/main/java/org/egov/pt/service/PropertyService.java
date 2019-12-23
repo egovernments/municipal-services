@@ -21,6 +21,10 @@ import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.javers.core.Javers;
+import org.javers.core.JaversBuilder;
+import org.javers.core.diff.Diff;
+import org.javers.core.diff.ListCompareAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -53,7 +57,7 @@ public class PropertyService {
     private PropertyUtil util;
     
 	/**
-	 * Assign ids through enrichment and pushes to kafka
+	 * Assign Ids through enrichment and pushes to Kafka
 	 *
 	 * @param request PropertyRequest containing list of properties to be created
 	 * @return List of properties successfully created
@@ -64,7 +68,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled())
-			updateWorkflow(request);
+			updateWorkflow(request, true);
 		producer.push(config.getSavePropertyTopic(), request);
 		return request.getProperty();
 	}
@@ -77,14 +81,55 @@ public class PropertyService {
 	 */
 	public Property updateProperty(PropertyRequest request) {
 
-		propertyValidator.validateUpdateRequest(request);
-		userService.createUser(request);
+		Property propertyFromSearch = propertyValidator.validateUpdateRequest(request);
+		//userService.createUser(request);
 		if (config.getIsWorkflowEnabled())
-			updateWorkflow(request);
-		producer.push(config.getUpdatePropertyTopic(), request);
+			processWorkflowAndPersistData(request, propertyFromSearch);
+		else
+			producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperty();
 	}
+	
+	/**
+	 * method to process requests for workflow
+	 * @param request
+	 */
+	private void processWorkflowAndPersistData(PropertyRequest request, Property propertyFromDb) {
 
+		Boolean isDiffOnWorkflowFields = false;
+		
+		  Javers javers = JaversBuilder.javers()
+		          .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
+		          .build();
+		Diff diff = javers.compare(propertyFromDb, request.getProperty());
+		diff.getChanges().forEach(change -> {
+
+			System.out.println("The change is : " + change);
+		});
+		/*
+		 * 
+		 * 1. is record active or not
+		 * 
+		 * 2. if inactive get workflow information
+		 * 
+		 * 3. check if update is possible, if yes the do update else throw error
+		 * 
+		 * 4. if record is active and changes are there , then trigger the workflow they are asking for 
+		 * then persist the record
+		 * 
+		 * 5. 
+		 */
+		
+		if (propertyFromDb.getStatus().equals(Status.ACTIVE)) {
+
+			
+			updateWorkflow(request, false);
+		} else if (isDiffOnWorkflowFields) {
+
+			updateWorkflow(request, false);
+		}
+		producer.push(config.getUpdatePropertyTopic(), request);
+	}
 
 	/**
 	 * method to prepare process instance request 
@@ -92,11 +137,11 @@ public class PropertyService {
 	 * 
 	 * @param request
 	 */
-	private void updateWorkflow(PropertyRequest request) {
+	private void updateWorkflow(PropertyRequest request, Boolean isCreate) {
 
 		Property property = request.getProperty();
 
-		ProcessInstanceRequest workflowReq = util.getProcessInstanceForProperty(request);
+		ProcessInstanceRequest workflowReq = util.getWfForPropertyRegistry(request, isCreate);
 		String status = wfService.callWorkFlow(workflowReq);
 		if (status.equalsIgnoreCase(config.getWfStatusActive()) && property.getPropertyId() == null) {
 			

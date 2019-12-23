@@ -3,7 +3,6 @@ package org.egov.pt.validator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,7 +75,7 @@ public class PropertyValidator {
      * Validates the masterData,CitizenInfo and the authorization of the assessee for update
      * @param request PropertyRequest for update
      */
-    public void validateUpdateRequest(PropertyRequest request){ 
+    public Property validateUpdateRequest(PropertyRequest request){ 
     	
     	Map<String, String> errorMap = new HashMap<>();
     	
@@ -98,6 +97,8 @@ public class PropertyValidator {
         
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+		
+		return propertiesFromSearchResponse.get(0);
     }
 
     /**
@@ -161,9 +162,9 @@ public class PropertyValidator {
 
     	Property property = request.getProperty();
     	
-    	if(configs.getIsWorkflowEnabled() && null == property.getWorkflow())
-    		errorMap.put("EG_PR_WF_NOT_NULL", "Wokflow is enabled for create please provide the necessary info in workflow field in property");
-    	
+//    	if(configs.getIsWorkflowEnabled() && null == property.getWorkflow())
+//    		errorMap.put("EG_PR_WF_NOT_NULL", "Wokflow is enabled for create please provide the necessary info in workflow field in property");
+   	
     	Long constructionDate = property.getConstructionDate();
     	Long occupancyDate = property.getOccupancyDate();
     			
@@ -237,8 +238,8 @@ public class PropertyValidator {
 
 		Property property = request.getProperty();
 
-		if (property.getPropertyId() == null)
-			errorMap.put("INVALID PROPERTY", "Property cannot be updated without propertyId");
+		if (!(property.getPropertyId() != null || property.getAcknowldgementNumber() != null))
+			errorMap.put("INVALID PROPERTY", "Property cannot be updated without propertyId or acknowledgement number");
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -252,24 +253,21 @@ public class PropertyValidator {
      */
     public PropertyCriteria getPropertyCriteriaForSearch(PropertyRequest request) {
 
-        Property property=request.getProperty();
-        
-        PropertyCriteria propertyCriteria = new PropertyCriteria();  
-        propertyCriteria.setTenantId(property.getTenantId());
-        
-        Set<String> ids = new HashSet<>();
-        ids.add(property.getPropertyId());
-        propertyCriteria.setPropertyIds(ids);
-        
-		if (!CollectionUtils.isEmpty(ids)) {
+		Property property = request.getProperty();
 
-			if (!CollectionUtils.isEmpty(property.getOwners()))
-				propertyCriteria.setOwnerIds(property.getOwners().stream().filter(owner -> owner.getUuid() != null)
-						.map(OwnerInfo::getUuid).collect(Collectors.toSet()));
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		propertyCriteria.setTenantId(property.getTenantId());
+
+		if (null != property.getPropertyId()) {
+
+			propertyCriteria.setPropertyIds(Sets.newHashSet(property.getPropertyId()));
+		} else if (null != property.getAcknowldgementNumber()) {
+
+			propertyCriteria.setAcknowledgementIds(Sets.newHashSet(property.getAcknowldgementNumber()));
 		}
 
-        return propertyCriteria;
-    }
+		return propertyCriteria;
+	}
 
     /**
      * Checks if the property ids in search response are same as in request
@@ -381,6 +379,7 @@ public class PropertyValidator {
 		Boolean isUserCitizen = userType.equalsIgnoreCase("CITIZEN");
 		
 		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
+				&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
 				&& CollectionUtils.isEmpty(criteria.getPropertyIds())
 				&& CollectionUtils.isEmpty(criteria.getOwnerIds()) 
 				&& CollectionUtils.isEmpty(criteria.getUuids())
