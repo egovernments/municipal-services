@@ -200,7 +200,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	public void jobscheduler() {
 		// TODO Auto-generated method stub
 		ArrayList<String> tenentIds = wSCalculationDao.searchTenentIds();
-          
+
 		for (String tenentId : tenentIds) {
 			RequestInfo requestInfo = new RequestInfo();
 			User user = new User();
@@ -217,7 +217,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			}
 			getBillingPeriod(mdmsResponse, requestInfo, tenentId);
 
-		}}
+		}
+	}
 	
 
 	@SuppressWarnings("unchecked")
@@ -230,7 +231,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		String connectionType = "Non-metred";
 
-       if(demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis)/86400){
+        if(demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis)/86400){
 
 		ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenentId);
 		for (String connectionNo : connectionNos) {
