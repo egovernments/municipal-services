@@ -2,6 +2,7 @@ package org.egov.swCalculation.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -142,8 +143,20 @@ public class EstimationService {
 	
 	
 	public String getAssessmentYear() {
-		return Integer.toString(YearMonth.now().getYear()) + "-"
-				+ (Integer.toString(YearMonth.now().getYear() + 1).substring(0, 2));
+		LocalDateTime localDateTime = LocalDateTime.now();
+		int currentMonth = localDateTime.getMonthValue();
+		String assesmentYear = "";
+		if (currentMonth >= 4) {
+			assesmentYear = Integer.toString(YearMonth.now().getYear()) + "-";
+			assesmentYear = assesmentYear
+					+ (Integer.toString(YearMonth.now().getYear() + 1).substring(2, assesmentYear.length() - 1));
+		} else {
+			assesmentYear = Integer.toString(YearMonth.now().getYear() - 1) + "-";
+			assesmentYear = assesmentYear
+					+ (Integer.toString(YearMonth.now().getYear()).substring(2, assesmentYear.length() - 1));
+
+		}
+		return assesmentYear;
 	}
 	
 	
