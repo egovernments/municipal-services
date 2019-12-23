@@ -1,7 +1,10 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -142,6 +145,12 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			calculations.add(calculation);
 		}
 		return calculations;
+	}
+	
+	public void generateDemandBasedOnTimePeriod() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
 	}
 	
 }
