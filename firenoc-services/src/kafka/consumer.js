@@ -212,7 +212,7 @@ consumerGroup.on("message", function(message) {
             const updateBody = { RequestInfo, FireNOCs };
             const updateRequest = { body: updateBody };
             console.log("update Request: "+JSON.stringify(updateRequest));
-            const updateResponse = await updateApiResponse(updateRequest);
+            const updateResponse = await updateApiResponse(updateRequest,next);
             console.log("update Response: "+JSON.stringify(updateResponse));
           }
         }

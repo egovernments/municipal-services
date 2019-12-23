@@ -56,7 +56,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
         Errors: errors
       }
     });
-    //return;
+    return;
   }
 
   body = await addUUIDAndAuditDetails(body);
