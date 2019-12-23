@@ -626,4 +626,8 @@ public class DemandService {
 		url.append("{3}");
 		return url.toString();
 	}
+	
+	public void generateDemandForTenantId(String tenantId) {
+		
+	}
 }

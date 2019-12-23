@@ -156,6 +156,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
 		List<String> tenantIds = sewerageCalculatorDao.getTenantId();
+		tenantIds.forEach(tenantId -> {
+			demandService.generateDemandForTenantId(tenantId);
+		});
 	}
 	
 }
