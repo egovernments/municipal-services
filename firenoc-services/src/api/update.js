@@ -66,6 +66,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
 
   //applay workflow
   let workflowResponse = await createWorkFlow(body);
+  console.log("workflowResponse"+JSON.stringify(workflowResponse));
 
   //calculate call
   let { FireNOCs = [], RequestInfo = {} } = body;
@@ -74,6 +75,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   }
 
   body.FireNOCs = updateStatus(FireNOCs, workflowResponse);
+  console.log("Fire NoC body"+JSON.stringify(body.FireNOCs));
 
   payloads.push({
     topic: envVariables.KAFKA_TOPICS_FIRENOC_UPDATE,
