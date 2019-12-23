@@ -115,9 +115,15 @@ public class WsQueryBuilder {
 		if (isAnyCriteriaMatch == false)
 			return null;
 		resultantQuery = query.toString();
+		resultantQuery = addOrderBy(resultantQuery);
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
+	}
+	
+	private String addOrderBy(String query) {
+		query = query + " ORDER BY wc.connectionExecutionDate DESC";
+		return query;
 	}
 
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
