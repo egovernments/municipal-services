@@ -62,9 +62,9 @@ public class sWQueryBuilder {
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
+				addToPreparedStatement(preparedStatement, propertyIds);
+				isAnyCriteriaMatch = true;
 			}
-			addToPreparedStatement(preparedStatement, propertyIds);
-			isAnyCriteriaMatch = true;
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
