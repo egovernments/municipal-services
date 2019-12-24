@@ -131,11 +131,13 @@ export const searchApiResponse = async (request, next = {}) => {
   } else if (!isEmpty(queryObj)) {
     sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
   }
+  //console.log("SQL QUery:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
+  //console.log("dbResponse"+JSON.stringify(dbResponse));
   if (dbResponse.err) {
     console.log(err.stack);
   } else {
-    // console.log(JSON.stringify(res.rows));
+     //console.log(JSON.stringify(dbResponse.rows));
     response.FireNOCs =
       dbResponse.rows && !isEmpty(dbResponse.rows)
         ? await mergeSearchResults(
