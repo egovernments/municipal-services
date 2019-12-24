@@ -6,4 +6,6 @@ public interface SewerageCalculatorDao {
 
 	public List<String> getTenantId();
 	
+	public List<String> getConnectionsNoList(String tenantId, String connectionType);
+	
 }

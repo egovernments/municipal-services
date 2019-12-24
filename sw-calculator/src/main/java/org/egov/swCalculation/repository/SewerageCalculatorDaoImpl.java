@@ -29,4 +29,14 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 		return tenentIds;
 	}
 
+	@Override
+	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+		List<String> connectionNosList = new ArrayList<>();
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		log.info("sewerage "+ connectionType + " connection list : "+query);
+		connectionNosList = jdbcTemplate.queryForList(query, String.class);
+		return connectionNosList;
+	}
+
 }

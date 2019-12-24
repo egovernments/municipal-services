@@ -142,5 +142,13 @@ public class SWCalculationConstant {
 	public static final String ConnectionType = "connectionType";
 	
 	public static final String SW_MODULE = "sw-services-calculation";
+	
+	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
+	
+	public static final String Quaterly_Billing_Period = "quaterly";
+	
+	public static final String Monthly_Billing_Period = "monthly";
+	
+	public static final String Billing_Cycle_String="billingCycle";
 
 }
