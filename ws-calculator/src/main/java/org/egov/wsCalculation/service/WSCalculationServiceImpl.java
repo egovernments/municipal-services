@@ -2,6 +2,7 @@ package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -231,25 +232,41 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		String connectionType = "Non-metred";
 
-        if(demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis)/86400){
+		if (demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis) / 86400) {
 
-		ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenentId);
-		for (String connectionNo : connectionNos) {
+			ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenentId);
+			for (String connectionNo : connectionNos) {
 
-			CalculationReq calculationReq = new CalculationReq();
-			CalculationCriteria calculationCriteria = new CalculationCriteria();
-			calculationCriteria.setTenantId(tenentId);
-			calculationCriteria.setConnectionNo(connectionNo);
+				CalculationReq calculationReq = new CalculationReq();
+				CalculationCriteria calculationCriteria = new CalculationCriteria();
+				calculationCriteria.setTenantId(tenentId);
+				calculationCriteria.setConnectionNo(connectionNo);
 
-			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-			calculationCriteriaList.add(calculationCriteria);
+				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+				calculationCriteriaList.add(calculationCriteria);
 
-			calculationReq.setRequestInfo(requestInfo);
-			calculationReq.setCalculationCriteria(calculationCriteriaList);
+				calculationReq.setRequestInfo(requestInfo);
+				calculationReq.setCalculationCriteria(calculationCriteriaList);
 
-			getCalculation(calculationReq);
+				getCalculation(calculationReq);
 
+			}
 		}
-		}
+	}
+
+	/**
+	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
+	 */
+	public void generateDemandBasedOnTimePeriod() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
+		List<String> tenantIds = wSCalculationDao.getTenantId();
+		if (tenantIds.isEmpty())
+			return;
+		log.info("Tenant Ids : " + tenantIds.toString());
+		tenantIds.forEach(tenantId -> {
+			demandService.generateDemandForTenantId(tenantId);
+		});
 	}
 }

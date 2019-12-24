@@ -62,7 +62,8 @@ public class CalculatorController {
 	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
 		List<Demand> demands = demandService.updateDemands(getBillCriteria, requestInfoWrapper);
-		DemandResponse response = DemandResponse.builder().demands(demands).responseInfo(
+		DemandResponse response = DemandResponse.builder().demands(demands)
+				.responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -70,7 +71,7 @@ public class CalculatorController {
 	
 	@PostMapping("/_jobscheduler")
 	public void jobscheduler() {
-		wSCalculationService.jobscheduler();
+		wSCalculationService.generateDemandBasedOnTimePeriod();
 	}
 
 }

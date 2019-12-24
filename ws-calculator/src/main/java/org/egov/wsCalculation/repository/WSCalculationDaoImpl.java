@@ -131,5 +131,24 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		connectionNos = (ArrayList<String>)jdbcTemplate.query(query,preparedStatement.toArray(),demandSchedulerRowMapper);
 		return connectionNos;
 	}
+	
+	@Override
+	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+		List<String> connectionNosList = new ArrayList<>();
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		log.info("sewerage " + connectionType + " connection list : " + query);
+		connectionNosList = jdbcTemplate.queryForList(query, String.class);
+		return connectionNosList;
+	}
+
+	@Override
+	public List<String> getTenantId() {
+		ArrayList<String> tenentIds = new ArrayList<>();
+		String query = queryBuilder.getDistinctTenantIds();
+		log.info("Tenant Id's List Query : " + query);
+		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
+		return tenentIds;
+	}
 
 }

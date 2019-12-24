@@ -21,5 +21,9 @@ public interface WSCalculationDao {
 	public List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria);
 	
 	public int isMeterReadingConnectionExist(List<String> ids);
+	
+	public List<String> getConnectionsNoList(String tenantId, String connectionType);
+	
+	public List<String> getTenantId();
 
 }

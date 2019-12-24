@@ -15,4 +15,6 @@ public interface WSCalculationService {
 	public List<Calculation> getCalculation(CalculationReq calculationReq);
 	
 	public void jobscheduler();
+	
+	public void generateDemandBasedOnTimePeriod();
 }
