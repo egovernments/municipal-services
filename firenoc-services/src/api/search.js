@@ -28,7 +28,7 @@ export const searchApiResponse = async (request, next = {}) => {
   };
   const queryObj = JSON.parse(JSON.stringify(request.query));
   console.log("request", request.query);
-  // console.log(queryObj);
+  console.log("Query object:"+JSON.stringify(queryObj));
   let errors = validateFireNOCSearchModel(queryObj);
   if (errors.length > 0) {
     next({
