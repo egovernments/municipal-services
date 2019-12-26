@@ -150,5 +150,26 @@ public class SWCalculationConstant {
 	public static final String Monthly_Billing_Period = "monthly";
 	
 	public static final String Billing_Cycle_String="billingCycle";
+	
+    public static final String MODULE = "rainmaker-tl";
+
+    public static final String NOTIFICATION_LOCALE = "en_IN";
+    
+
+    // ACTION_STATUS combinations for notification
+
+    public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+
+    public static final String ACTION_STATUS_APPLIED  = "APPLY_APPLIED";
+
+    public static final String ACTION_STATUS_APPROVED  = "APPROVE_PENDINGPAYMENT";
+
+    public static final String ACTION_STATUS_REJECTED  = "REJECT_REJECTED";
+
+    public static final String ACTION_STATUS_FIELDINSPECTION  = "FORWARD_FIELDINSPECTION";
+
+    public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
+
+    public static final String ACTION_STATUS_PAID  = "PAID";
 
 }
