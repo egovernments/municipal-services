@@ -582,8 +582,8 @@ public class EstimationService {
 
 			Double floorNo = Double.parseDouble(unit.getFloorNo());
 
-			boolean isMajorMatching = billSlb.getUsageCategoryMajor().equalsIgnoreCase(unit.getUsageCategory())
-					|| (billSlb.getUsageCategoryMajor().equalsIgnoreCase(all));
+			boolean isMajorMatching = billSlb.getUsageCategory().equalsIgnoreCase(unit.getUsageCategory())
+					|| (billSlb.getUsageCategory().equalsIgnoreCase(all));
 
 			boolean isFloorMatching = billSlb.getFromFloor() <= floorNo && billSlb.getToFloor() >= floorNo;
 
