@@ -151,9 +151,9 @@ public class SWCalculationConstant {
 	
 	public static final String Billing_Cycle_String="billingCycle";
 	
-    public static final String MODULE = "rainmaker-tl";
+	public static final String MODULE = "rainmaker-common";
 
-    public static final String NOTIFICATION_LOCALE = "en_IN";
+	public static final String NOTIFICATION_LOCALE = "en_IN";
     
 
     // ACTION_STATUS combinations for notification
@@ -171,5 +171,7 @@ public class SWCalculationConstant {
     public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
 
     public static final String ACTION_STATUS_PAID  = "PAID";
+    
+    public static final String SMS_RECEIVER_MASTER  = "SMSReceiver";
 
 }
