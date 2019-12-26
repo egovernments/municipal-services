@@ -173,5 +173,8 @@ public class SWCalculationConstant {
     public static final String ACTION_STATUS_PAID  = "PAID";
     
     public static final String SMS_RECEIVER_MASTER  = "SMSReceiver";
+    
+    public static final String DEMAND_SUCCESS_MESSAGE = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
+    public static final String DEMAND_FAILURE_MESSAGE = "SEWERAGE_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
 
 }
