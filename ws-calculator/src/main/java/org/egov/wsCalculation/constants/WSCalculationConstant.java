@@ -221,9 +221,9 @@ public class WSCalculationConstant {
     
     public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
     
-    public static final String DEMAND_SUCCESS_MESSAGE = "WATER_CONNECTION_DEMAND_SUCCESSFUL_MESSAGE";
+    public static final String DEMAND_SUCCESS_MESSAGE = "WATER_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
     
-    public static final String DEMAND_FAILURE_MESSAGE = "WATER_CONNECTION_DEMAND_FAILURE_MESSAGE";
+    public static final String DEMAND_FAILURE_MESSAGE = "WATER_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
 	 
 	 
 
