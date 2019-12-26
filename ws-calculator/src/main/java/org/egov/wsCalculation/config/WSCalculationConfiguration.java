@@ -90,6 +90,27 @@ public class WSCalculationConfiguration {
 
 	 @Value("${egov.wc.search.endpoint}")
 	 private String waterConnectionSearchEndPoint;
+	 
+	 //Demand Topic
+	 @Value("${ws.calculator.demand.successful}")
+	 private String onDemandsSaved;
+
+	 @Value("${ws.calculator.demand.failed}")
+	 private String onDemandsFailure;
+	 
+	 
+	//Localization
+	@Value("${egov.localization.host}")
+	private String localizationHost;
+	
+	@Value("${egov.localization.context.path}")
+	private String localizationContextPath;
+	
+	@Value("${egov.localization.search.endpoint}")
+	private String localizationSearchEndpoint;
+	
+	@Value("${egov.localization.statelevel}")
+	private Boolean isLocalizationStateLevel;
 	  
 
 }
