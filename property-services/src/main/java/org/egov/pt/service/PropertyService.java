@@ -21,6 +21,7 @@ import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.javers.common.collections.Sets;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
@@ -107,21 +108,18 @@ public class PropertyService {
 			System.out.println("The change is : " + change);
 		});
 		/*
+		 * 1. Record is created in inactive state and will be the same unless wanted by the requester to be made active, if requested to be made active the property will be put through workflow 
 		 * 
-		 * 1. is record active or not
+		 * 	  either create or update
 		 * 
-		 * 2. if inactive get workflow information
+		 * 2. if record is in workflow and update of fields is allowed then proceed else throw error update not allowed
 		 * 
-		 * 3. check if update is possible, if yes the do update else throw error
+		 * 3. if record is active and verifiable fields are changed then workflow will be triggered else direct update will be done
 		 * 
-		 * 4. if record is active and changes are there , then trigger the workflow they are asking for 
-		 * then persist the record
-		 * 
-		 * 5. 
+		 * 4. if request is for mutation then create mutation flow
 		 */
 		
 		if (propertyFromDb.getStatus().equals(Status.ACTIVE)) {
-
 			
 			updateWorkflow(request, false);
 		} else if (isDiffOnWorkflowFields) {
@@ -160,38 +158,82 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
-		Set<String> ownerIds = new HashSet<String>();
-		
-		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
-			ownerIds.addAll(criteria.getOwnerIds());
-		criteria.setOwnerIds(null);
-
 		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
 		if (criteria.getMobileNumber() != null || criteria.getName() != null || criteria.getOwnerIds() != null) {
 			
-			String userTenant = criteria.getTenantId();
-			if(criteria.getTenantId() == null)
-				userTenant = requestInfo.getUserInfo().getTenantId();
+			Boolean shouldReturnEmptyList = enrichCriteriaFromUser(criteria, requestInfo);
 
-			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
-			userSearchRequest.setMobileNumber(criteria.getMobileNumber());
-			userSearchRequest.setName(criteria.getName());
-			userSearchRequest.setUuid(criteria.getOwnerIds());
-
-			UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-			if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
+			if (shouldReturnEmptyList)
 				return Collections.emptyList();
-
-			// fetching property id from owner-id and enriching criteria
-			ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
-			criteria.setUuids(new HashSet<>(repository.getPropertyIds(ownerIds)));
 
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
 		} else {
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
 		}
 		return properties;
+	}
+	
+	/**
+	 * 
+	 * Method to enrich property search criteria with user based criteria info
+	 * 
+	 * If no info found based on user criteria boolean true will be returned so that empty list can be returned 
+	 * 
+	 * else returns false to continue the normal flow
+	 * 
+	 * The enrichment of object is done this way(instead of directly applying in the search query) to fetch multiple owners related to property at once
+	 * 
+	 * @param criteria
+	 * @param requestInfo
+	 * @return
+	 */
+	private Boolean enrichCriteriaFromUser(PropertyCriteria criteria, RequestInfo requestInfo) {
+		
+		Set<String> ownerIds = new HashSet<String>();
+		
+		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			ownerIds.addAll(criteria.getOwnerIds());
+		criteria.setOwnerIds(null);
+		
+		String userTenant = criteria.getTenantId();
+		if(criteria.getTenantId() == null)
+			userTenant = requestInfo.getUserInfo().getTenantId();
+
+		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
+		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
+		userSearchRequest.setName(criteria.getName());
+		userSearchRequest.setUuid(criteria.getOwnerIds());
+
+		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
+			return true;
+
+		// fetching property id from owner table and enriching criteria
+		ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
+		List<String> propertyIds = repository.getPropertyIds(ownerIds);
+
+		// returning empty list if no property id found for user criteria
+		if (CollectionUtils.isEmpty(propertyIds)) {
+
+			return true;
+		} else if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+
+			// eliminating property Ids not matching with Ids found using user data
+
+			Set<String> givenIds = criteria.getPropertyIds();
+
+			givenIds.forEach(id -> {
+
+				if (!propertyIds.contains(id))
+					givenIds.remove(id);
+			});
+		} else {
+
+			criteria.setPropertyIds(Sets.asSet(propertyIds));
+		}
+		
+		return false;
 	}
 
 	/**
