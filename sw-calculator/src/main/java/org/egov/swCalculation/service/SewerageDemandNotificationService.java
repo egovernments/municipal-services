@@ -95,15 +95,15 @@ public class SewerageDemandNotificationService {
     
     private void enrichNotificationReceiver(List<NotificationReceiver> notificationReceiverList,DemandNotificationObj request){
     	
-    	List<BillingSlab> mappingBillingSlab;
-		try {
-			mappingBillingSlab = mapper.readValue(
-					billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER).toJSONString(),
-					mapper.getTypeFactory().constructCollectionType(List.class, BillingSlab.class));
-		} catch (IOException e) {
-			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
-		}
-    	
+//    	List<BillingSlab> mappingBillingSlab;
+////		try {
+////			mappingBillingSlab = mapper.readValue(
+////					billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER).toJSONString(),
+////					mapper.getTypeFactory().constructCollectionType(List.class, BillingSlab.class));
+////		} catch (IOException e) {
+//			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
+//		}
+//    	
     	
     }
     
