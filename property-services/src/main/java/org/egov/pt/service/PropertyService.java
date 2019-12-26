@@ -1,13 +1,11 @@
 package org.egov.pt.service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
+import org.egov.pt.models.Difference;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
@@ -55,6 +53,8 @@ public class PropertyService {
     
     @Autowired
     private PropertyUtil util;
+
+
     
 	/**
 	 * Assign Ids through enrichment and pushes to Kafka
@@ -83,53 +83,15 @@ public class PropertyService {
 
 		Property propertyFromSearch = propertyValidator.validateUpdateRequest(request);
 		//userService.createUser(request);
-		if (config.getIsWorkflowEnabled())
-			processWorkflowAndPersistData(request, propertyFromSearch);
+		if (config.getIsWorkflowEnabled()){
+
+		}
 		else
 			producer.push(config.getUpdatePropertyTopic(), request);
 		return request.getProperty();
 	}
 	
-	/**
-	 * method to process requests for workflow
-	 * @param request
-	 */
-	private void processWorkflowAndPersistData(PropertyRequest request, Property propertyFromDb) {
 
-		Boolean isDiffOnWorkflowFields = false;
-		
-		  Javers javers = JaversBuilder.javers()
-		          .withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
-		          .build();
-		Diff diff = javers.compare(propertyFromDb, request.getProperty());
-		diff.getChanges().forEach(change -> {
-
-			System.out.println("The change is : " + change);
-		});
-		/*
-		 * 
-		 * 1. is record active or not
-		 * 
-		 * 2. if inactive get workflow information
-		 * 
-		 * 3. check if update is possible, if yes the do update else throw error
-		 * 
-		 * 4. if record is active and changes are there , then trigger the workflow they are asking for 
-		 * then persist the record
-		 * 
-		 * 5. 
-		 */
-		
-		if (propertyFromDb.getStatus().equals(Status.ACTIVE)) {
-
-			
-			updateWorkflow(request, false);
-		} else if (isDiffOnWorkflowFields) {
-
-			updateWorkflow(request, false);
-		}
-		producer.push(config.getUpdatePropertyTopic(), request);
-	}
 
 	/**
 	 * method to prepare process instance request 
