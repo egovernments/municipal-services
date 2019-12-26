@@ -111,6 +111,12 @@ public class WSCalculationConfiguration {
 	
 	@Value("${egov.localization.statelevel}")
 	private Boolean isLocalizationStateLevel;
-	  
+	
+	 //SMS
+    @Value("${kafka.topics.notification.sms}")
+    private String smsNotifTopic;
+
+    @Value("${notification.sms.enabled}")
+    private Boolean isSMSEnabled;
 
 }

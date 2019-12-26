@@ -20,6 +20,8 @@ public class DemandNotificationObj {
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo = null;
 
+	private String tenantId;
+
 	private String billingCycle;
 
 	private Set<String> waterConnectionIds;

@@ -214,6 +214,18 @@ public class WSCalculationConstant {
 	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
 	
 	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
+	
+	public static final String NOTIFICATION_LOCALE = "en_IN";
+	
+    public static final String MODULE = "rainmaker-common";
+    
+    public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
+    
+    public static final String DEMAND_SUCCESS_MESSAGE = "WATER_CONNECTION_DEMAND_SUCCESSFUL_MESSAGE";
+    
+    public static final String DEMAND_FAILURE_MESSAGE = "WATER_CONNECTION_DEMAND_FAILURE_MESSAGE";
+	 
+	 
 
 	
 	
