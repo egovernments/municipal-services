@@ -228,6 +228,9 @@ public class PropertyService {
 				if (!propertyIds.contains(id))
 					givenIds.remove(id);
 			});
+
+			if (CollectionUtils.isEmpty(givenIds))
+				return true;
 		} else {
 
 			criteria.setPropertyIds(Sets.asSet(propertyIds));
