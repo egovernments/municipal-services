@@ -273,8 +273,8 @@ public class NotificationUtil {
 	 * @return customized message for cancelled
 	 */
 	private String getCitizenSendBack(TradeLicense license, String message) {
-		message = message.replace("<2>", license.getTradeName());
-		message = message.replace("<3>", license.getLicenseNumber());
+		message = message.replace("<2>", license.getApplicationNumber());
+		message = message.replace("<3>", license.getTradeName());
 
 		return message;
 	}
@@ -289,8 +289,8 @@ public class NotificationUtil {
 	 * @return customized message for cancelled
 	 */
 	private String getCitizenForward(TradeLicense license, String message) {
-		message = message.replace("<2>", license.getTradeName());
-		message = message.replace("<3>", license.getLicenseNumber());
+		message = message.replace("<2>", license.getApplicationNumber());
+		message = message.replace("<3>", license.getTradeName());
 
 		return message;
 	}
