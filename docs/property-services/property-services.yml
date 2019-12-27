@@ -617,6 +617,28 @@ components:
           type: string
           maxLength: 64
           description: 'The unique id(Pancard Number,Adhar etc.) of the given Document.'
+    PropertySubProcess:
+      type: object
+      description: This object holds information about property sub process such as mutation, bifurcation and amalgamation for a property
+      properties:
+        id:
+          type: string
+          maxLength: 64
+          readOnly: true
+          description: system id of the Document.
+        type:
+          type: string
+          maxLength: 64
+          description: type of process being applied on the proeprty(mutation, amalgamation, bifurcation).
+        parentPropertyIds:
+          type: array
+          items: 
+           type: string
+        childProperties:
+          type: array
+          items:
+           $ref: '#/components/schemas/Property'
+          description: File store reference key.
     Unit:
       type: object
       properties:
@@ -671,8 +693,9 @@ components:
         RequestInfo:
           $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
         Property:
-          description: Used for search result and create only
           $ref: '#/components/schemas/Property'
+        SubProcess:
+          $ref: '#/components/schemas/PropertySubProcess'
     PropertyResponse:
       description: Contract class to send response.  Property items  is used in case of search results or response for create. Where as single Property item is used for update
       properties:
