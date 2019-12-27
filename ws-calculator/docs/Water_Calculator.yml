@@ -1,0 +1,424 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: eGov Water Calculation Module.
+  description: |
+    APIs for Water Calculation module. This provide APIs for calculation of different tax head and update demand.
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+tags:
+  -
+    name: calculator-controller
+    description: 'Calculator Controller'
+paths:
+  /waterCalculator/_calculate:
+    post:
+      tags:
+        - calculator-controller
+      summary: calculate
+      operationId: calculateUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        -
+          in: body
+          name: calculationReq
+          description: calculationReq
+          required: true
+          schema:
+            $ref: '#/definitions/CalculationReq'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CalculationRes'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not Found'
+  /waterCalculator/_updateDemand:
+    post:
+      tags:
+        - calculator-controller
+      summary: updateDemands
+      operationId: updateDemandsUsingPOST
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        -
+          in: body
+          name: requestInfoWrapper
+          description: requestInfoWrapper
+          required: true
+          schema:
+            $ref: '#/definitions/RequestInfoWrapper'
+        -
+          name: consumerCodes
+          in: query
+          required: false
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+        -
+          name: connectionNumber
+          in: query
+          required: false
+          type: string
+        -
+          name: amountExpected
+          in: query
+          required: false
+          type: number
+        -
+          name: connectionId
+          in: query
+          required: false
+          type: string
+        -
+          name: assessmentYear
+          in: query
+          required: false
+          type: string
+        -
+          name: tenantId
+          in: query
+          required: false
+          type: string
+        -
+          name: billId
+          in: query
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/DemandResponse'
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: 'Not Found'
+definitions:
+  AuditDetails:
+    type: object
+    properties:
+      createdBy:
+        type: string
+        description: 'username (preferred) or userid of the user that created the object'
+      createdTime:
+        type: integer
+        format: int64
+        description: 'epoch of the time object is created'
+      lastModifiedBy:
+        type: string
+        description: 'username (preferred) or userid of the user that last modified the object'
+      lastModifiedTime:
+        type: integer
+        format: int64
+        description: 'epoch of the time object is last modified'
+    description: 'Collection of audit related fields used by most models'
+  Calculation:
+    type: object
+    properties:
+      applicationNo:
+        type: string
+      billingSlabIds:
+        type: array
+        items:
+          type: string
+      connectionNo:
+        type: string
+      exemption:
+        type: number
+      penalty:
+        type: number
+      rebate:
+        type: number
+      taxAmount:
+        type: number
+      taxHeadEstimates:
+        type: array
+        items:
+          $ref: '#/definitions/TaxHeadEstimate'
+      tenantId:
+        type: string
+      totalAmount:
+        type: number
+      waterConnection:
+        $ref: '#/definitions/WaterConnection'
+  CalculationCriteria:
+    type: object
+    properties:
+      assessmentYear:
+        type: string
+      connectionNo:
+        type: string
+      currentReading:
+        type: number
+        format: double
+      lastReading:
+        type: number
+        format: double
+      meterStatus:
+        type: integer
+        format: int32
+      tenantId:
+        type: string
+      waterConnection:
+        $ref: '#/definitions/WaterConnection'
+  CalculationReq:
+    type: object
+    properties:
+      CalculationCriteria:
+        type: array
+        items:
+          $ref: '#/definitions/CalculationCriteria'
+      RequestInfo:
+        $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+  CalculationRes:
+    type: object
+    properties:
+      Calculation:
+        type: array
+        items:
+          $ref: '#/definitions/Calculation'
+      ResponseInfo:
+        $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+  Demand:
+    type: object
+    properties:
+      additionalDetails:
+        type: object
+      auditDetails:
+        $ref: '#/definitions/AuditDetails'
+      billExpiryTime:
+        type: integer
+        format: int64
+      businessService:
+        type: string
+      consumerCode:
+        type: string
+      consumerType:
+        type: string
+      demandDetails:
+        type: array
+        items:
+          $ref: '#/definitions/DemandDetail'
+      id:
+        type: string
+      minimumAmountPayable:
+        type: number
+      payer:
+        $ref: '#/definitions/User'
+      status:
+        type: string
+        enum:
+          - ACTIVE
+          - CANCELLED
+          - ADJUSTED
+      taxPeriodFrom:
+        type: integer
+        format: int64
+      taxPeriodTo:
+        type: integer
+        format: int64
+      tenantId:
+        type: string
+  DemandDetail:
+    type: object
+    properties:
+      auditDetails:
+        $ref: '#/definitions/AuditDetails'
+      collectionAmount:
+        type: number
+      demandId:
+        type: string
+      id:
+        type: string
+      taxAmount:
+        type: number
+      taxHeadMasterCode:
+        type: string
+      tenantId:
+        type: string
+  DemandResponse:
+    type: object
+    properties:
+      Demands:
+        type: array
+        items:
+          $ref: '#/definitions/Demand'
+      ResponseInfo:
+        $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+  Document:
+    type: object
+    properties:
+      additionalDetails:
+        type: object
+        description: 'Json object to capture any extra information which is not accommodated by model'
+      documentType:
+        type: string
+        description: 'unique document type code, should be validated with document type master'
+      documentUid:
+        type: string
+        description: 'The unique id(Pancard Number,Adhar etc.) of the given Document.'
+      fileStore:
+        type: string
+        description: 'File store reference key.'
+      id:
+        type: string
+        description: 'system id of the Document.'
+  RequestInfoWrapper:
+    type: object
+    properties:
+      RequestInfo:
+        $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+  Role:
+    type: object
+    properties:
+      code:
+        type: string
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      tenantId:
+        type: string
+  TaxHeadEstimate:
+    type: object
+    properties:
+      category:
+        type: string
+        enum:
+          - TAX
+          - FEE
+          - REBATE
+          - EXEMPTION
+          - ADVANCE_COLLECTION
+          - PENALTY
+          - FINES
+          - CHARGES
+      estimateAmount:
+        type: number
+      taxHeadCode:
+        type: string
+  User:
+    type: object
+    properties:
+      emailId:
+        type: string
+      id:
+        type: integer
+        format: int64
+      mobileNumber:
+        type: string
+      name:
+        type: string
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/Role'
+      tenantId:
+        type: string
+      type:
+        type: string
+      userName:
+        type: string
+      uuid:
+        type: string
+  WaterConnection:
+    type: object
+    required:
+      - calculationAttribute
+      - connectionCategory
+      - connectionType
+      - uom
+      - waterSource
+    properties:
+      applicationNo:
+        type: string
+        description: 'Formatted application number, which will be generated using ID-Gen at the time .'
+        readOnly: true
+      applicationStatus:
+        type: string
+        enum:
+          - Rejected
+          - Approved
+          - Canceled
+          - InProgress
+      calculationAttribute:
+        type: string
+        description: 'The calculation attribute of water connection.'
+      connectionCategory:
+        type: string
+        description: 'It is a master data, defined in MDMS'
+      connectionNo:
+        type: string
+        description: 'Formatted connection number, which will be generated using ID-Gen service after aproval of connection application in case of new application. If the source of data is "DATA_ENTRY" then application status will be considered as "APROVED" application.'
+        readOnly: true
+      connectionType:
+        type: string
+        description: 'It is a master data, defined in MDMS.'
+      documents:
+        type: array
+        description: 'The documents attached by owner for exemption.'
+        items:
+          $ref: '#/definitions/Document'
+      id:
+        type: string
+        description: 'Unique Identifier of the connection for internal reference.'
+        readOnly: true
+      meterId:
+        type: string
+        description: 'Unique id of the meter.'
+      meterInstallationDate:
+        type: integer
+        format: int64
+        description: 'The date of meter installation date.'
+      noOfTaps:
+        type: integer
+        format: int32
+        description: 'No of taps for non-metered calculation attribute.'
+      oldConnectionNo:
+        type: string
+        description: 'Mandatory if source is "DATA_ENTRY".'
+        readOnly: true
+      pipeSize:
+        type: number
+        format: double
+        description: 'Pipe size for non-metered calulation attribute.'
+      property:
+        $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/rainmaker/property-tax/property-v2.0.yml#/components/schemas/Property'
+      rainWaterHarvesting:
+        type: boolean
+        example: false
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      uom:
+        type: string
+        description: 'The Unit of measurement for water connection.'
+      waterSource:
+        type: string
+        description: 'It is a namespaced master data, defined in MDMS'
+      waterSubSource:
+        type: string
+        description: 'It is a namespaced master data, defined in MDMS.'
+    description: 'This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.'
