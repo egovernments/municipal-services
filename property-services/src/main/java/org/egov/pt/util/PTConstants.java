@@ -1,5 +1,9 @@
 package org.egov.pt.util;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class PTConstants {
 
     private PTConstants() {}
@@ -67,6 +71,36 @@ public class PTConstants {
 	public static final String  USREVENTS_EVENT_NAME = "Property Tax";
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-PT";
 
+
+
+	// Variable names for diff
+
+
+    public static final String VARIABLE_ACTION = "action";
+
+    public static final String VARIABLE_WFDOCUMENTS = "wfDocuments";
+
+    public static final String VARIABLE_ACTIVE = "active";
+
+    public static final String VARIABLE_USERACTIVE = "status";
+
+    public static final String VARIABLE_CREATEDBY = "createdBy";
+
+    public static final String VARIABLE_LASTMODIFIEDBY = "lastModifiedBy";
+
+    public static final String VARIABLE_CREATEDTIME = "createdTime";
+
+    public static final String VARIABLE_LASTMODIFIEDTIME = "lastModifiedTime";
+
+    public static final String VARIABLE_OWNER = "ownerInfo";
+
+
+    public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,
+            VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME));
+
+    public static final List<String> FIELDS_FOR_OWNER_MUTATION = Collections.unmodifiableList(Arrays.asList("name","gender","fatherOrHusbandName"));
+
+    public static final List<String> FIELDS_FOR_PROPERTY_MUTATION = Collections.unmodifiableList(Arrays.asList("propertyType","usageCategory","ownershipCategory","noOfFloors","landArea"));
 
 
 }
