@@ -19,6 +19,7 @@ import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.javers.common.collections.Sets;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
@@ -93,6 +94,7 @@ public class PropertyService {
 	
 
 
+
 	/**
 	 * method to prepare process instance request 
 	 * and assign status back to property
@@ -122,38 +124,85 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
-		Set<String> ownerIds = new HashSet<String>();
-		
-		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
-			ownerIds.addAll(criteria.getOwnerIds());
-		criteria.setOwnerIds(null);
-
 		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
 		if (criteria.getMobileNumber() != null || criteria.getName() != null || criteria.getOwnerIds() != null) {
 			
-			String userTenant = criteria.getTenantId();
-			if(criteria.getTenantId() == null)
-				userTenant = requestInfo.getUserInfo().getTenantId();
+			Boolean shouldReturnEmptyList = enrichCriteriaFromUser(criteria, requestInfo);
 
-			UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
-			userSearchRequest.setMobileNumber(criteria.getMobileNumber());
-			userSearchRequest.setName(criteria.getName());
-			userSearchRequest.setUuid(criteria.getOwnerIds());
-
-			UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-			if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
+			if (shouldReturnEmptyList)
 				return Collections.emptyList();
-
-			// fetching property id from owner-id and enriching criteria
-			ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
-			criteria.setUuids(new HashSet<>(repository.getPropertyIds(ownerIds)));
 
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
 		} else {
 			properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
 		}
 		return properties;
+	}
+	
+	/**
+	 * 
+	 * Method to enrich property search criteria with user based criteria info
+	 * 
+	 * If no info found based on user criteria boolean true will be returned so that empty list can be returned 
+	 * 
+	 * else returns false to continue the normal flow
+	 * 
+	 * The enrichment of object is done this way(instead of directly applying in the search query) to fetch multiple owners related to property at once
+	 * 
+	 * @param criteria
+	 * @param requestInfo
+	 * @return
+	 */
+	private Boolean enrichCriteriaFromUser(PropertyCriteria criteria, RequestInfo requestInfo) {
+		
+		Set<String> ownerIds = new HashSet<String>();
+		
+		if(!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			ownerIds.addAll(criteria.getOwnerIds());
+		criteria.setOwnerIds(null);
+		
+		String userTenant = criteria.getTenantId();
+		if(criteria.getTenantId() == null)
+			userTenant = requestInfo.getUserInfo().getTenantId();
+
+		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(userTenant, requestInfo);
+		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
+		userSearchRequest.setName(criteria.getName());
+		userSearchRequest.setUuid(criteria.getOwnerIds());
+
+		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
+			return true;
+
+		// fetching property id from owner table and enriching criteria
+		ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
+		List<String> propertyIds = repository.getPropertyIds(ownerIds);
+
+		// returning empty list if no property id found for user criteria
+		if (CollectionUtils.isEmpty(propertyIds)) {
+
+			return true;
+		} else if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+
+			// eliminating property Ids not matching with Ids found using user data
+
+			Set<String> givenIds = criteria.getPropertyIds();
+
+			givenIds.forEach(id -> {
+
+				if (!propertyIds.contains(id))
+					givenIds.remove(id);
+			});
+
+			if (CollectionUtils.isEmpty(givenIds))
+				return true;
+		} else {
+
+			criteria.setPropertyIds(Sets.asSet(propertyIds));
+		}
+		
+		return false;
 	}
 
 	/**

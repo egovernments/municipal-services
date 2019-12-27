@@ -22,7 +22,9 @@ public class PropertyQueryBuilder {
 	private static final String LEFT_JOIN  =  "LEFT OUTER JOIN";
 	private static final String AND_QUERY = " AND ";
 	
-	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_owner where userid IN ";
+	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_property where id in (select propertyid from eg_pt_owner where userid IN {replace})";
+	
+	private static String REPLACE_STRING = "{replace}";
 
 	 // Select query
 	
@@ -178,12 +180,12 @@ public class PropertyQueryBuilder {
 
 	public String getPropertyIdsQuery(Set<String> ownerIds, List<Object> preparedStmtList) {
 
-		StringBuilder query = new StringBuilder(PROEPRTY_ID_QUERY);
-		query.append("(");
+		StringBuilder query = new StringBuilder("(");
 		query.append(createQuery(ownerIds));
 		addToPreparedStatement(preparedStmtList, ownerIds);
 		query.append(")");
-		return query.toString();
+		
+		return PROEPRTY_ID_QUERY.replace(REPLACE_STRING, query).toString();
 	}
 
 	private String createQuery(Set<String> ids) {

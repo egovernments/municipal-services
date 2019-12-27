@@ -16,6 +16,7 @@ import org.egov.pt.models.Document;
 import org.egov.pt.models.Institution;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.Property.Source;
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Relationship;
 import org.egov.pt.models.enums.Status;
@@ -68,6 +69,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.acknowldgementNumber(rs.getString("acknowldgementNumber"))
 						.status(Status.fromValue(rs.getString("propertystatus")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
+						.source(Source.fromValue(rs.getString("source")))
 						.usageCategory(rs.getString("pusagecategory"))
 						.oldPropertyId(rs.getString("oldPropertyId"))
 						.propertyType(rs.getString("propertytype"))

@@ -206,57 +206,18 @@ public class BillingSlabValidator {
 				List<String> allowedPropertyTypes = JsonPath.read(propertyTypes,BillingSlabConstants.MDMS_CODE_JSONPATH);
 				if(!allowedPropertyTypes.contains(billingSlab.getPropertyType())) {
 					errorMap.put("INVALID_PROPERTY_TYPE","Property Type provided is invalid");
-				}else {
-					if (!StringUtils.isEmpty(billingSlab.getPropertySubType()) && !billingSlab.getPropertySubType().equalsIgnoreCase(BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB)) {
-						if (!CollectionUtils.isEmpty(propertySubtypes)) {
-							List<String> allowedPropertySubTypes = JsonPath.read(propertySubtypes,"$.*.[?(@.propertyType=='" + billingSlab.getPropertyType() + "')].code");
-							if (!allowedPropertySubTypes.contains(billingSlab.getPropertySubType())) {
-								errorMap.put("INVALID_PROPERTY_SUBTYPE", "Property Subtype provided is invalid");
-							}
-						}
-					}
 				}
 			}
 			if(!StringUtils.isEmpty(billingSlab.getOwnerShipCategory())) {
 				List<String> allowedOwnerShipCategories = JsonPath.read(ownerShipCategory,BillingSlabConstants.MDMS_CODE_JSONPATH);
 				if(!allowedOwnerShipCategories.contains(billingSlab.getOwnerShipCategory()) && !(billingSlab.getOwnerShipCategory().equalsIgnoreCase(allValue)) ) {
 					errorMap.put("INVALID_OWNERSHIP_CATEGORY","Ownership category is invalid");
-
-				}else {
-					if (!CollectionUtils.isEmpty(subOwnerShipCategory)) {
-						List<String> allowedsubOwnerShipCategories = JsonPath.read(subOwnerShipCategory,"$.*.[?(@.ownerShipCategory=='" + billingSlab.getOwnerShipCategory() + "')].code");
-						if (!allowedsubOwnerShipCategories.contains(billingSlab.getSubOwnerShipCategory()) && !(billingSlab.getSubOwnerShipCategory().equalsIgnoreCase(allValue))) {
-							errorMap.put("INVALID_SUBOWNERSHIP_CATEGORY","Subownership category is invalid");
-
-						}
-					}
 				}
 			}
-			if(!StringUtils.isEmpty(billingSlab.getUsageCategoryMajor())) {
+			if(!StringUtils.isEmpty(billingSlab.getUsageCategory())) {
 				List<String> allowedUsageCategoryMajor = JsonPath.read(usageCategoryMajor, BillingSlabConstants.MDMS_CODE_JSONPATH);
-				if(!allowedUsageCategoryMajor.contains(billingSlab.getUsageCategoryMajor()) && !(billingSlab.getUsageCategoryMajor().equalsIgnoreCase(allValue)) ) {
+				if(!allowedUsageCategoryMajor.contains(billingSlab.getUsageCategory()) && !(billingSlab.getUsageCategory().equalsIgnoreCase(allValue)) ) {
 					errorMap.put("INVALID_USAGECATEGORY_MAJOR","Usage category Major is invalid");
-				}else {
-					if (!CollectionUtils.isEmpty(usageCategoryMinors) && !StringUtils.isEmpty(billingSlab.getUsageCategoryMinor()) && !billingSlab.getUsageCategoryMinor().equalsIgnoreCase(BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB)) {
-						List<String> allowedUsageCategoryMinors = JsonPath.read(usageCategoryMinors, "$.*.[?(@.usageCategoryMajor=='" + billingSlab.getUsageCategoryMajor() + "')].code");
-						if (!allowedUsageCategoryMinors.contains(billingSlab.getUsageCategoryMinor())) {
-							errorMap.put("INVALID_USAGE_CATEGORY_MINOR","Usage category minor is invalid");
-						} else {
-							if (!CollectionUtils.isEmpty(allowedUsageCategoryMinors) && !StringUtils.isEmpty(billingSlab.getUsageCategorySubMinor()) && !billingSlab.getUsageCategorySubMinor().equalsIgnoreCase(BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB)) {
-								List<String> allowedUsageCategorySubMinors = JsonPath.read(usageCategorySubMinor,"$.*.[?(@.usageCategoryMinor=='" + billingSlab.getUsageCategoryMinor() + "')].code");
-								if (!allowedUsageCategorySubMinors.contains(billingSlab.getUsageCategorySubMinor())) {
-									errorMap.put("INVALID_USAGE_CATEGORY_SUBMINOR","Provided Usage category sub minor is invalid");
-								}else {
-									if (!CollectionUtils.isEmpty(allowedUsageCategorySubMinors) && !StringUtils.isEmpty(billingSlab.getUsageCategoryDetail()) && !billingSlab.getUsageCategoryDetail().equalsIgnoreCase(BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB)) {
-										List<String> allowedUsageCategoryDetail = JsonPath.read(usageCategoryDetail ,"$.*.[?(@.usageCategorySubMinor=='" + billingSlab.getUsageCategorySubMinor() + "')].code");
-										if (!allowedUsageCategoryDetail.contains(billingSlab.getUsageCategoryDetail())) {
-											errorMap.put("INVALID_USAGE_CATEGORY_DETAIL","Provided Usage category detail is invalid");
-										}
-									}
-								}
-							}
-						}
-					}
 				}
 			}
 		}

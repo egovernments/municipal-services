@@ -91,7 +91,11 @@ public class Property extends PropertyInfo {
 
 		WAS("WAS"),
 
-		DATA_MIGRATION("DATA_MIGRATION");
+		DATA_MIGRATION("DATA_MIGRATION"),
+		
+		WEBAPP("WEBAPP"),
+		
+		MOBILEAPP("MOBILEAPP");
 
 		private String value;
 

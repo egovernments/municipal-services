@@ -58,20 +58,23 @@ public class EnrichmentService {
 
 		property.setId(UUID.randomUUID().toString());
 		property.setAccountId(requestInfo.getUserInfo().getUuid());
-		property.getDocuments().forEach(doc -> {
-			doc.setId(UUID.randomUUID().toString());
-			doc.setStatus(Status.ACTIVE);
-		});
+		if (!CollectionUtils.isEmpty(property.getDocuments()))
+			property.getDocuments().forEach(doc -> {
+				doc.setId(UUID.randomUUID().toString());
+				doc.setStatus(Status.ACTIVE);
+			});
 
 		property.getAddress().setTenantId(property.getTenantId());
 		property.getAddress().setId(UUID.randomUUID().toString());
 
 		property.getOwners().forEach(owner -> {
 
-			owner.getDocuments().forEach(doc -> {
-				doc.setId(UUID.randomUUID().toString());
-				doc.setStatus(Status.ACTIVE);
-			});
+			if (!CollectionUtils.isEmpty(owner.getDocuments()))
+				owner.getDocuments().forEach(doc -> {
+					doc.setId(UUID.randomUUID().toString());
+					doc.setStatus(Status.ACTIVE);
+				});
+			
 			owner.setStatus(Status.ACTIVE);
 		});
 

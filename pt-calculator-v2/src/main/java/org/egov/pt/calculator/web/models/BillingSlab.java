@@ -38,33 +38,14 @@ public class BillingSlab   {
         @JsonProperty("propertyType")
         private String propertyType;
 
-        @NotNull
-        @JsonProperty("propertySubType")
-        private String propertySubType;
 
         @NotNull
-        @JsonProperty("usageCategoryMajor")
-        private String usageCategoryMajor;
-
-        @NotNull
-        @JsonProperty("usageCategoryMinor")
-        private String usageCategoryMinor;
-
-        @NotNull
-        @JsonProperty("usageCategorySubMinor")
-        private String usageCategorySubMinor;
-
-        @NotNull
-        @JsonProperty("usageCategoryDetail")
-        private String usageCategoryDetail;
+        @JsonProperty("usageCategory")
+        private String usageCategory;
 
         @NotNull
         @JsonProperty("ownerShipCategory")
         private String ownerShipCategory;
-
-        @NotNull
-        @JsonProperty("subOwnerShipCategory")
-        private String subOwnerShipCategory;
 
         @NotNull
         @JsonProperty("areaType")
@@ -102,10 +83,6 @@ public class BillingSlab   {
         
         @JsonProperty("arvPercent")
         private Double arvPercent;
-        
-/*        @NotNull
-        @JsonProperty("fromDate")
-        private Long fromDate;*/
         
         @JsonProperty("auditDetails")
         private AuditDetails auditDetails;
