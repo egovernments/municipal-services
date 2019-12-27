@@ -38,13 +38,11 @@ public class MeterServicesImpl implements MeterService {
 	@Autowired
 	EstimationService estimationService;
 
-	private ServiceRequestRepository serviceRequestRepository;
 
 	private EnrichmentService enrichmentService;
 
 	@Autowired
-	public MeterServicesImpl(ServiceRequestRepository serviceRequestRepository, EnrichmentService enrichmentService) {
-		this.serviceRequestRepository = serviceRequestRepository;
+	public MeterServicesImpl(EnrichmentService enrichmentService) {
 		this.enrichmentService = enrichmentService;
 	}
 

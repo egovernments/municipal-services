@@ -7,17 +7,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
-import org.egov.common.contract.response.ResponseInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
-import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Category;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
@@ -25,7 +22,6 @@ import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
-import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wsCalculation.validator.MDMSValidator;
 import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +66,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	MDMSValidator mdmsValidator;
 	
 	@Autowired
-	private WSCalculationUtil wSCalculationUtil;
-	
-	@Autowired
 	private ServiceRequestRepository repository;
 
 
@@ -84,6 +77,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		
 		return calculations;
 	}
 
