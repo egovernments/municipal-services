@@ -129,7 +129,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge);
 		
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(sewerageCharge)
 				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
 				.billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).sewerageConnection(criteria.getSewerageConnection()).build();
 	}
