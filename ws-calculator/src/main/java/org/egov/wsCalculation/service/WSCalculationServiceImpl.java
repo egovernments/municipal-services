@@ -16,9 +16,11 @@ import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Category;
+import org.egov.wsCalculation.model.DemandNotificationObj;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.WaterConnection;
+import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
@@ -31,6 +33,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.Calculation;
 
@@ -67,7 +70,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private ServiceRequestRepository repository;
-
+	
+	@Autowired
+	WSCalculationProducer wSCalculationProducer;
+     
+	@Autowired
+	WSCalculationConfiguration config;
 
 
 	/**
@@ -77,7 +85,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
-		
 		return calculations;
 	}
 
@@ -168,7 +175,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		// throw new CustomException(EG_PT_DEPRECIATING_ASSESSMENT_ERROR,
 		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
 
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(waterCharge)
 				.waterConnection(waterConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	

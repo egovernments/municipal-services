@@ -20,11 +20,10 @@ public class DemandNotificationConsumer {
 
 	@Autowired
 	private DemandNotificationService notificationService;
-	
+
 	@Autowired
 	private ObjectMapper mapper;
-	
-	
+
 	/**
 	 * 
 	 * @param request
@@ -39,8 +38,10 @@ public class DemandNotificationConsumer {
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + request + " on topic: " + topic + ": " + e);
 		}
-		log.info("Demand Notification Object Received: Billing Cycle "
-				+ notificationObj.getBillingCycle() + " Demand Generated Successfully :  "+ notificationObj.isSuccess() +" Water Connection List :"+ notificationObj.getWaterConnectionIds().toString());
+		log.info("Demand Notification Object Received: Billing Cycle " + (notificationObj.getBillingCycle() == null ? ""
+				: notificationObj.getBillingCycle()) + " Demand Generated Successfully :  " + notificationObj.isSuccess()
+						+ " Water Connection List :" + (notificationObj.getWaterConnectionIds() == null ? ""
+								: notificationObj.getWaterConnectionIds().toString()));
 		notificationService.process(notificationObj, topic);
 	}
 }

@@ -72,8 +72,8 @@ public class DemandNotificationService {
 		try {
 			JSONArray receiver = masterDataService.getMasterListOfReceiver(notificationObj.getRequestInfo(),
 					notificationObj.getTenantId());
-			receiverList = mapper.readValue(receiver.toJSONString(),
-					mapper.getTypeFactory().constructCollectionType(List.class, NotificationReceiver.class));
+			receiverList.addAll(mapper.readValue(receiver.toJSONString(),
+					mapper.getTypeFactory().constructCollectionType(List.class, NotificationReceiver.class)));
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Notification Receiver List Can Not Be Parsed!!");
 		}
