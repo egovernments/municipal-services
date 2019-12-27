@@ -88,12 +88,12 @@ public class NotificationUtil {
 			break;
 
 		case ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION:
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION, localizationMessage);
+			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_SENDBACK_CITIZEN, localizationMessage);
 			message = getCitizenSendBack(license, messageTemplate);
 			break;
 
 		case ACTION_FORWARD_CITIZENACTIONREQUIRED:
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION, localizationMessage);
+			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FORWARD_CITIZEN, localizationMessage);
 			message = getCitizenForward(license, messageTemplate);
 			break;
 
