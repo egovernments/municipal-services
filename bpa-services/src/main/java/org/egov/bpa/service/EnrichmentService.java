@@ -75,10 +75,10 @@ public class EnrichmentService {
 		
 		
 		// BPA Documents
-		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
+		/*if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
 				document.setId(UUID.randomUUID().toString());
-			});
+			});*/
 
 		// owners
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
@@ -182,6 +182,7 @@ public class EnrichmentService {
 				businessService)) {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
 
+			//BPA Units
 			if(!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnits())) {
 				bpaRequest.getBPA().getUnits().forEach(unit -> {
 					if (unit.getId() == null) {
@@ -191,6 +192,7 @@ public class EnrichmentService {
 				});
 			}
 			
+			//BPA Owner Documents
 			if(!CollectionUtils.isEmpty(bpaRequest.getBPA().getOwners())) {
 				bpaRequest.getBPA().getOwners().forEach(owner -> {
 					if (!CollectionUtils.isEmpty(owner.getDocuments()))
@@ -200,6 +202,9 @@ public class EnrichmentService {
 							}
 						});
 				});
+				
+				
+				
 				//TODO as of now institution is out of scope
 //				 if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())
 //	                        && bpaRequest.getBPA().getInstitution().getId()==null){
@@ -217,6 +222,14 @@ public class EnrichmentService {
 
 			
 		}
+		// BPA Documents
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
+			bpaRequest.getBPA().getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+			});
+		// BPA WfDocuments
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getWfDocuments())) {
 			bpaRequest.getBPA().getWfDocuments().forEach(document -> {
 				if (document.getId() == null) {

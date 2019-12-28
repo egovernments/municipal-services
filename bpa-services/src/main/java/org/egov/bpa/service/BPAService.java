@@ -174,9 +174,9 @@ public class BPAService {
 			 throw new CustomException("UPDATE ERROR", "Failed to Update the Application");
 		}
 		Difference diffMap = diffService.getDifference(bpaRequest, searchResult);
-		actionValidator.validateUpdateRequest(bpaRequest, businessService);
-		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,workflowService.getCurrentState(bpa.getStatus(), businessService));
+		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
+		actionValidator.validateUpdateRequest(bpaRequest, businessService);
 		
 		
 		//

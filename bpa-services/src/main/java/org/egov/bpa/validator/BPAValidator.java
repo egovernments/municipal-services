@@ -2,6 +2,7 @@ package org.egov.bpa.validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +39,9 @@ public class BPAValidator {
 	private BPAConfiguration config;
 
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData) {
-		validateDuplicateDocuments(bpaRequest);
+//		validateDuplicateDocuments(bpaRequest);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
-		validateApplicationDocuments(bpaRequest, mdmsData, null);
+//		validateApplicationDocuments(bpaRequest, mdmsData, null);
 		validateUser(bpaRequest);
 	}
 	private void validateUser(BPARequest bpaRequest) {
@@ -135,8 +136,8 @@ public class BPAValidator {
 	}
 
 	private void validateDuplicateDocuments(BPARequest request) {
-		List<String> documentFileStoreIds = new LinkedList();
 		if (request.getBPA().getDocuments() != null) {
+			List<String> documentFileStoreIds = new LinkedList();
 			request.getBPA().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStore()))
 					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
@@ -221,19 +222,25 @@ public class BPAValidator {
 
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException("INVALID SEARCH", "Search on limit is not allowed");
+		
+		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
+			throw new CustomException("INVALID SEARCH",
+					"From date cannot be a future date");
 
+		if (criteria.getToDate() != null && criteria.getFromDate() != null && (criteria.getFromDate() > criteria.getToDate()))
+			throw new CustomException("INVALID SEARCH",
+					"To date cannot be prior to from date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
 
 		BPA bpa = bpaRequest.getBPA();
-
+		validateApplicationDocuments(bpaRequest, mdmsData, currentState);
 		validateAllIds(searchResult, bpa);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateBPAUnits(bpaRequest);
 		validateDuplicateDocuments(bpaRequest);
 		setFieldsFromSearch(bpaRequest, searchResult, mdmsData);
-		validateApplicationDocuments(bpaRequest, mdmsData, currentState);
 
 	}
 

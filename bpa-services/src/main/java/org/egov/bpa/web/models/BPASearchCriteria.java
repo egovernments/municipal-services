@@ -49,18 +49,22 @@ public class BPASearchCriteria {
 	    @JsonIgnore
 	    private List<String> ownerIds;
 
+	    @JsonProperty("fromDate")
+	    private Long fromDate;
 
+	    @JsonProperty("toDate")
+	    private Long toDate;
 
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNos == null
-	                && this.mobileNumber == null && this.edcrNumbers == null
+	                && this.mobileNumber == null && this.edcrNumbers == null && this.fromDate == null && this.toDate == null
 	                
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
 	        return (this.tenantId != null &&  this.ids == null && this.applicationNos == null
-	                && this.mobileNumber == null && this.edcrNumbers == null
+	                && this.mobileNumber == null && this.edcrNumbers == null && this.fromDate == null && this.toDate == null
 	        );
 	    }
 }

@@ -89,9 +89,12 @@ public class BPAQueryBuilder {
 		}
 
 
-		
-
-		
+		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdtime BETWEEN ")
+					.append(criteria.getFromDate()).append(" AND ")
+					.append(criteria.getToDate());
+		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList,
 				criteria);
