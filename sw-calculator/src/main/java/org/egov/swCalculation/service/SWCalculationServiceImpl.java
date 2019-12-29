@@ -17,6 +17,7 @@ import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.CalculationRes;
 import org.egov.swCalculation.model.Category;
+import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxHeadMaster;
 import org.egov.swCalculation.repository.SewerageCalculatorDao;
@@ -71,6 +72,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
+		
+		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
 
 
 		// String assessmentNumber = null != detail.getAssessmentNumber() ?
@@ -129,9 +132,10 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge);
 		
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(sewerageCharge)
-				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).sewerageConnection(criteria.getSewerageConnection()).build();
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+				.charge(sewerageCharge).sewerageConnection(sewerageConnection).rebate(rebate).tenantId(tenantId)
+				.taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo())
+				.build();
 	}
 	
 	/**

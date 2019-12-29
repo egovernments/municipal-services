@@ -2,6 +2,8 @@ package org.egov.swCalculation.util;
 
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +16,9 @@ import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.DemandDetail;
 import org.egov.swCalculation.model.DemandDetailAndCollection;
+import org.egov.swCalculation.model.DemandNotificationObj;
 import org.egov.swCalculation.model.GetBillCriteria;
+import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
 import org.egov.swCalculation.producer.WSCalculationProducer;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
@@ -22,6 +26,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -169,22 +175,6 @@ public class SWCalculationUtil {
 
 	}
 	
-	/**
-	 * Send the SMSRequest on the SMSNotification kafka topic
-	 * 
-	 * @param smsRequestList
-	 *            The list of SMSRequest to be sent
-	 */
-	public void sendSMS(List<SMSRequest> smsRequestList) {
-		if (config.getIsSMSEnabled()) {
-			if (CollectionUtils.isEmpty(smsRequestList))
-				log.info("Messages from localization couldn't be fetched!");
-			for (SMSRequest smsRequest : smsRequestList) {
-				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
-			}
-		}
-	}
 	
 	/**
 	 * Creates sms request for the each owners
@@ -205,11 +195,12 @@ public class SWCalculationUtil {
 	}
 	
 	
+
 	/**
 	 * Returns the uri for the localization call
 	 * 
 	 * @param tenantId
-	 *            TenantId of the sewerageRequest
+	 *            TenantId demand Notification Obj
 	 * @return The uri for localization search call
 	 */
 	public StringBuilder getUri(String tenantId, RequestInfo requestInfo) {
@@ -228,12 +219,12 @@ public class SWCalculationUtil {
 
 		return uri;
 	}
-
+	
 	/**
 	 * Fetches messages from localization service
 	 * 
 	 * @param tenantId
-	 *            tenantId of the sewerage
+	 *            tenantId of the tradeLicense
 	 * @param requestInfo
 	 *            The requestInfo of the request
 	 * @return Localization messages for the module
@@ -246,58 +237,70 @@ public class SWCalculationUtil {
 	}
 	
 	/**
-	 * Creates customized message based on tradelicense
+	 * Extracts message for the specific code
+	 * 
+	 * @param notificationCode The code for which message is required
+	 * @param localizationMessage The localization messages
+	 * @return message for the specific code
+	 */
+	private String getMessageTemplate(String notificationCode, String localizationMessage) {
+		String path = "$..messages[?(@.code==\"{}\")].message";
+		path = path.replace("{}", notificationCode);
+		String message = null;
+		try {
+			Object messageObj = JsonPath.parse(localizationMessage).read(path);
+			message = ((ArrayList<String>) messageObj).get(0);
+		} catch (Exception e) {
+			log.warn("Fetching from localization failed", e);
+		}
+		return message;
+	}
+	
+	public String getCustomizedMsg(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_SUCCESS_MESSAGE, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
+		}
+		return messageString;
+	}
+	
+	
+	/**
 	 * 
 	 * @param license
-	 *            The tradeLicense for which message is to be sent
-	 * @param localizationMessage
-	 *            The messages from localization
-	 * @return customized message based on tradelicense
+	 * @param messages
+	 * @return
 	 */
-//	public String getCustomizedMsg(RequestInfo requestInfo, TradeLicense license, String localizationMessage) {
-//		String message = null, messageTemplate;
-//		String ACTION_STATUS = license.getAction() + "_" + license.getStatus();
-////		switch (ACTION_STATUS) {
-//
-////		case ACTION_STATUS_INITIATED:
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_INITIATED, localizationMessage);
-////			message = getInitiatedMsg(license, messageTemplate);
-////			break;
-////
-////		case ACTION_STATUS_APPLIED:
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPLIED, localizationMessage);
-////			message = getAppliedMsg(license, messageTemplate);
-////			break;
-////
-////		/*
-////		 * case ACTION_STATUS_PAID : messageTemplate =
-////		 * getMessageTemplate(TLConstants.NOTIFICATION_PAID,localizationMessage);
-////		 * message = getApprovalPendingMsg(license,messageTemplate); break;
-////		 */
-////
-////		case ACTION_STATUS_APPROVED:
-////			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPROVED, localizationMessage);
-////			message = getApprovedMsg(license, amountToBePaid, messageTemplate);
-////			break;
-////
-////		case ACTION_STATUS_REJECTED:
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_REJECTED, localizationMessage);
-////			message = getRejectedMsg(license, messageTemplate);
-////			break;
-////
-////		case ACTION_STATUS_FIELDINSPECTION:
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION, localizationMessage);
-////			message = getFieldInspectionMsg(license, messageTemplate);
-////			break;
-////
-////		case ACTION_CANCEL_CANCELLED:
-////			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_CANCELLED, localizationMessage);
-////			message = getCancelledMsg(license, messageTemplate);
-////			break;
-////		}
-//
-//		return message;
-//	}
+	public String getAppliedMsg(NotificationReceiver receiver, String message, DemandNotificationObj obj) {
+		message = message.replace("<First Name>", receiver.getFirstName() == null ? "" : receiver.getFirstName());
+		message = message.replace("<Last Name>", receiver.getLastName() == null ? "" : receiver.getLastName());
+		message = message.replace("<service name>", receiver.getServiceName() == null ? "" : receiver.getServiceName());
+		message = message.replace("<ULB Name>", receiver.getUlbName() == null ? "" : receiver.getUlbName());
+		message = message.replace("<billing cycle>", obj.getBillingCycle() == null ? "" : obj.getBillingCycle());
+		return message;
+	}
+	
+	
+	/**
+	 * Send the SMSRequest on the SMSNotification kafka topic
+	 * @param smsRequestList The list of SMSRequest to be sent
+	 */
+	public void sendSMS(List<SMSRequest> smsRequestList) {
+		if (config.getIsSMSEnabled()) {
+			if (CollectionUtils.isEmpty(smsRequestList))
+				log.info("Messages from localization couldn't be fetched!");
+			for (SMSRequest smsRequest : smsRequestList) {
+				producer.push(config.getSmsNotifTopic(), smsRequest);
+				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+			}
+		}
+	}
+	
+
+	
+
 
 }

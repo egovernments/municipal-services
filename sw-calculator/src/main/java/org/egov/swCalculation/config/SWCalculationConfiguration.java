@@ -78,7 +78,7 @@ public class SWCalculationConfiguration {
 
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
-
+   
 
 
     //Localization

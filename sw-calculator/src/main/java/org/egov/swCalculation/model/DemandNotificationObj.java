@@ -32,7 +32,8 @@ public class DemandNotificationObj {
     @JsonProperty("RequestInfo")
     private RequestInfo requestInfo = null;
     
-    private String  tenentId;
+    
+    private String tenantId;
     
 
 }

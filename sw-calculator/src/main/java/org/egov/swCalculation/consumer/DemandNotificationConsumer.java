@@ -41,9 +41,11 @@ public class DemandNotificationConsumer {
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
 		}
-		log.info("Demand Notification object Received: Billing Cycle " + demandNotificationObj.getBillingCycle()
-				+ "Demand Generated Successfully" + demandNotificationObj.isSuccess()
-				+ "for sewerage connection numbers :" + demandNotificationObj.getSewerageConnetionIds().toString());
+		log.info("Demand Notification Object Received: Billing Cycle "
+				+ (demandNotificationObj.getBillingCycle() == null ? "" : demandNotificationObj.getBillingCycle())
+				+ " Demand Generated Successfully :  " + demandNotificationObj.isSuccess() + " Water Connection List :"
+				+ (demandNotificationObj.getSewerageConnetionIds() == null ? ""
+						: demandNotificationObj.getSewerageConnetionIds().toString()));
 		notificationService.process(demandNotificationObj, topic);
 	}
 
