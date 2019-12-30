@@ -63,7 +63,7 @@ public class TLNotificationService {
 				}
 				if(null != config.getIsUserEventsNotificationEnabledForTL()) {
 					if(config.getIsUserEventsNotificationEnabledForTL()) {
-						EventRequest eventRequest = getEvents(request);
+						EventRequest eventRequest = getEventsForTL(request);
 						if(null != eventRequest)
 							util.sendEventNotification(eventRequest);
 					}
@@ -79,13 +79,13 @@ public class TLNotificationService {
 							util.sendSMS(smsRequestsBPA, true);
 					}
 				}
-//				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
-//					if(config.getIsUserEventsNotificationEnabledForBPA()) {
-//						EventRequest eventRequest = getEvents(request);
-//						if(null != eventRequest)
-//							util.sendEventNotification(eventRequest);
-//					}
-//				}
+				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
+					if(config.getIsUserEventsNotificationEnabledForBPA()) {
+						EventRequest eventRequest = getEventsForBPA(request);
+						if(null != eventRequest)
+							util.sendEventNotification(eventRequest);
+					}
+				}
 				break;
 		}
     }
@@ -130,7 +130,7 @@ public class TLNotificationService {
      * @param request
      * @return
      */
-    private EventRequest getEvents(TradeLicenseRequest request) {
+    private EventRequest getEventsForTL(TradeLicenseRequest request) {
     	List<Event> events = new ArrayList<>();
         String tenantId = request.getLicenses().get(0).getTenantId();
         String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
@@ -187,6 +187,64 @@ public class TLNotificationService {
         }
 		
     }
+
+	private EventRequest getEventsForBPA(TradeLicenseRequest request) {
+		List<Event> events = new ArrayList<>();
+		String tenantId = request.getLicenses().get(0).getTenantId();
+		String localizationMessages = bpaNotificationUtil.getLocalizationMessages(tenantId,request.getRequestInfo());
+		for(TradeLicense license : request.getLicenses()){
+
+			String message = bpaNotificationUtil.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+			if(message == null) continue;
+			Map<String,String > mobileNumberToOwner = new HashMap<>();
+			license.getTradeLicenseDetail().getOwners().forEach(owner -> {
+				if(owner.getMobileNumber()!=null)
+					mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+			});
+			List<SMSRequest> smsRequests = util.createSMSRequest(message,mobileNumberToOwner);
+			Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
+			Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), request.getLicenses().get(0).getTenantId());
+			if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+				log.info("UUID search failed!");
+				continue;
+			}
+			Map<String,String > mobileNumberToMsg = smsRequests.stream().collect(Collectors.toMap(SMSRequest::getMobileNumber, SMSRequest::getMessage));
+			for(String mobile: mobileNumbers) {
+				if(null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberToMsg.get(mobile)) {
+					log.error("No UUID/SMS for mobile {} skipping event", mobile);
+					continue;
+				}
+				List<String> toUsers = new ArrayList<>();
+				toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+				Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
+				List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
+//				Action action = null;
+//				if(payTriggerList.contains(license.getStatus())) {
+//					List<ActionItem> items = new ArrayList<>();
+//					String actionLink = config.getPayLink().replace("$mobile", mobile)
+//							.replace("$applicationNo", license.getApplicationNumber())
+//							.replace("$tenantId", license.getTenantId());
+//					actionLink = config.getUiAppHost() + actionLink;
+//					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
+//					items.add(item);
+//					action = Action.builder().actionUrls(items).build();
+//				}
+
+
+				events.add(Event.builder().tenantId(license.getTenantId()).description(mobileNumberToMsg.get(mobile))
+						.eventType(TLConstants.USREVENTS_EVENT_TYPE).name(TLConstants.USREVENTS_EVENT_NAME)
+						.postedBy(TLConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
+						.eventDetails(null).build());
+
+			}
+		}
+		if(!CollectionUtils.isEmpty(events)) {
+			return EventRequest.builder().requestInfo(request.getRequestInfo()).events(events).build();
+		}else {
+			return null;
+		}
+
+	}
     
     
     

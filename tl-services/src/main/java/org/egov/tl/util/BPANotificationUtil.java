@@ -110,7 +110,7 @@ public class BPANotificationUtil {
                 message = getPendingPaymentMsg(license, messageTemplate, localizationMessage);
                 break;
 
-            // handled in receipt consumer
+            // payment notification handled in receipt consumer
 //            case ACTION_STATUS_PENDINGDOCVERIFICATION:
 //                break;
 
