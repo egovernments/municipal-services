@@ -1,6 +1,5 @@
 package org.egov.swCalculation.util;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,19 +43,19 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class SWCalculationUtil {
-	
+
 	@Autowired
 	SWCalculationConfiguration configurations;
-	
+
 	@Autowired
 	private SWCalculationConfiguration config;
-    
+
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
 	private WSCalculationProducer producer;
-	
+
 	/**
 	 * Returns the tax head search Url with tenantId and SW service name
 	 * parameters
@@ -72,7 +71,7 @@ public class SWCalculationUtil {
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
 				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 	}
-	
+
 	/**
 	 * Returns the tax head search Url with tenantId and SW service name
 	 * parameters
@@ -88,7 +87,7 @@ public class SWCalculationUtil {
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
 				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 	}
-	
+
 	/**
 	 * Creates generate bill url using tenantId,consumerCode and businessService
 	 * 
@@ -109,7 +108,7 @@ public class SWCalculationUtil {
 
 		return url.toString();
 	}
-	
+
 	/**
 	 * method to create demandsearch url with demand criteria
 	 *
@@ -136,7 +135,7 @@ public class SWCalculationUtil {
 					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
 
 	}
-	
+
 	/**
 	 * Returns url for demand update Api
 	 *
@@ -146,7 +145,7 @@ public class SWCalculationUtil {
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getDemandUpdateEndPoint());
 	}
-	
+
 	public DemandDetailAndCollection getLatestDemandDetailByTaxHead(String taxHeadCode,
 			List<DemandDetail> demandDetails) {
 		List<DemandDetail> details = demandDetails.stream()
@@ -174,13 +173,12 @@ public class SWCalculationUtil {
 				.build();
 
 	}
-	
-	
+
 	/**
 	 * Creates sms request for the each owners
 	 * 
 	 * @param message
-	 *            The message for the specific tradeLicense
+	 *            The message for the specific sewerage connection
 	 * @param mobileNumberToOwnerName
 	 *            Map of mobileNumber to OwnerName
 	 * @return List of SMSRequest
@@ -193,8 +191,6 @@ public class SWCalculationUtil {
 		}
 		return smsRequest;
 	}
-	
-	
 
 	/**
 	 * Returns the uri for the localization call
@@ -219,12 +215,12 @@ public class SWCalculationUtil {
 
 		return uri;
 	}
-	
+
 	/**
 	 * Fetches messages from localization service
 	 * 
 	 * @param tenantId
-	 *            tenantId of the tradeLicense
+	 *            tenantId of the sewerage connection
 	 * @param requestInfo
 	 *            The requestInfo of the request
 	 * @return Localization messages for the module
@@ -235,12 +231,14 @@ public class SWCalculationUtil {
 		String jsonString = new JSONObject(responseMap).toString();
 		return jsonString;
 	}
-	
+
 	/**
 	 * Extracts message for the specific code
 	 * 
-	 * @param notificationCode The code for which message is required
-	 * @param localizationMessage The localization messages
+	 * @param notificationCode
+	 *            The code for which message is required
+	 * @param localizationMessage
+	 *            The localization messages
 	 * @return message for the specific code
 	 */
 	private String getMessageTemplate(String notificationCode, String localizationMessage) {
@@ -255,7 +253,7 @@ public class SWCalculationUtil {
 		}
 		return message;
 	}
-	
+
 	public String getCustomizedMsg(String topic, String localizationMessage) {
 		String messageString = null;
 		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
@@ -266,8 +264,7 @@ public class SWCalculationUtil {
 		}
 		return messageString;
 	}
-	
-	
+
 	/**
 	 * 
 	 * @param license
@@ -282,11 +279,12 @@ public class SWCalculationUtil {
 		message = message.replace("<billing cycle>", obj.getBillingCycle() == null ? "" : obj.getBillingCycle());
 		return message;
 	}
-	
-	
+
 	/**
 	 * Send the SMSRequest on the SMSNotification kafka topic
-	 * @param smsRequestList The list of SMSRequest to be sent
+	 * 
+	 * @param smsRequestList
+	 *            The list of SMSRequest to be sent
 	 */
 	public void sendSMS(List<SMSRequest> smsRequestList) {
 		if (config.getIsSMSEnabled()) {
@@ -298,9 +296,5 @@ public class SWCalculationUtil {
 			}
 		}
 	}
-	
-
-	
-
 
 }
