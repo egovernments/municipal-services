@@ -114,7 +114,6 @@ public class BillingSlabValidator {
 
 		if (!CollectionUtils.isEmpty(dbSlabs)) {
 			for (int i = 0; i < incomingSlabs.size(); i++) {
-				Integer index = null;
 				if (dbSlabs.contains(incomingSlabs.get(i))) {
 					log.info("Equals passed!");
 					errorList.add(i);
@@ -159,35 +158,18 @@ public class BillingSlabValidator {
 		final String allValue = BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB;
 		
 		List<Object> propertyTypes = new ArrayList<>();
-		List<Object> propertySubtypes = new ArrayList<>();
-		List<Object> usageCategoryMajor = new ArrayList<>();
-		List<Object> usageCategoryMinors = new ArrayList<>();
-		List<Object> usageCategorySubMinor = new ArrayList<>();
-		List<Object> usageCategoryDetail = new ArrayList<>();
+		List<Object> usageCategoryMajor = new ArrayList<>();;
 		List<Object> ownerShipCategory = new ArrayList<>();
-		List<Object> subOwnerShipCategory = new ArrayList<>();
 		List<Object> occupancyType = new ArrayList<>();
 		
 		try {
-			propertyTypes = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_PROPERTYTYPE_MASTER_NAME);
-			propertySubtypes = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_PROPERTYSUBTYPE_MASTER_NAME);
-			
+			propertyTypes = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_PROPERTYTYPE_MASTER_NAME);			
 			usageCategoryMajor = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_USAGEMAJOR_MASTER_NAME);
-			usageCategoryMinors = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_USAGEMINOR_MASTER_NAME);
-			usageCategorySubMinor = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_USAGESUBMINOR_MASTER_NAME);
-			usageCategoryDetail = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_USAGEDETAIL_MASTER_NAME);
-			
 			ownerShipCategory = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_OWNERSHIP_MASTER_NAME);
-			subOwnerShipCategory = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_SUBOWNERSHIP_MASTER_NAME);
 			
 			occupancyType = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_OCCUPANCYTYPE_MASTER_NAME);
 		} catch (Exception e) {
-			if (CollectionUtils.isEmpty(propertySubtypes) && CollectionUtils.isEmpty(usageCategoryMinors)
-					&& CollectionUtils.isEmpty(usageCategorySubMinor)
-					&& CollectionUtils.isEmpty(subOwnerShipCategory)) {
-				log.error("MDMS data couldn't be fetched. Skipping code validation.....", e);
-				return;
-			}
+			throw new CustomException("MDMS_FETCH_FAILED", "Data from MDMS couldn't be fetched");
 		}
 		/*
 		 * occupancy type is not allowed to have ALL string value

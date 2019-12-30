@@ -112,7 +112,6 @@ public class EstimationService {
 	 * @return Map of assessment number to Calculation
 	 */
 	public Map<String, Calculation> calculateAndCreateDemand(CalculationReq calculationReq){
-	//	assessmentService.enrichAssessment(calculationReq);
 		Map<String,Calculation> res = demandService.generateDemands(calculationReq);
 		return res;
 	}
