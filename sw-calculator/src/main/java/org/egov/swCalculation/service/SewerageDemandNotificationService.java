@@ -16,14 +16,16 @@ import org.egov.swCalculation.model.SewerageConnectionRequest;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-
+@Service
+@Slf4j
 public class SewerageDemandNotificationService {
 
 	@Autowired

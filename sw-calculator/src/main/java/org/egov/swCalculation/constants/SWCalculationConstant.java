@@ -146,21 +146,6 @@ public class SWCalculationConstant {
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
-	// ACTION_STATUS combinations for notification
-
-	public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
-
-	public static final String ACTION_STATUS_APPLIED = "APPLY_APPLIED";
-
-	public static final String ACTION_STATUS_APPROVED = "APPROVE_PENDINGPAYMENT";
-
-	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
-
-	public static final String ACTION_STATUS_FIELDINSPECTION = "FORWARD_FIELDINSPECTION";
-
-	public static final String ACTION_CANCEL_CANCELLED = "CANCEL_CANCELLED";
-
-	public static final String ACTION_STATUS_PAID = "PAID";
 
 	public static final String SMS_RECEIVER_MASTER = "SMSReceiver";
 
