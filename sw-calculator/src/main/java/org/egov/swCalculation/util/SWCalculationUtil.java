@@ -19,7 +19,7 @@ import org.egov.swCalculation.model.DemandNotificationObj;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
-import org.egov.swCalculation.producer.WSCalculationProducer;
+import org.egov.swCalculation.producer.SWCalculationProducer;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class SWCalculationUtil {
 	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
-	private WSCalculationProducer producer;
+	private SWCalculationProducer producer;
 
 	/**
 	 * Returns the tax head search Url with tenantId and SW service name

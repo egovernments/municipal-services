@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class WSCalculationProducer {
+public class SWCalculationProducer {
 
 	@Autowired
 	private CustomKafkaTemplate<String, Object> kafkaTemplate;
