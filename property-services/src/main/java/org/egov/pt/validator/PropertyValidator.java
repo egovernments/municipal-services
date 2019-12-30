@@ -27,6 +27,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import com.google.common.collect.Sets;
 import com.jayway.jsonpath.JsonPath;
@@ -205,12 +206,38 @@ public class PropertyValidator {
 			errorMap.put("Invalid USageCategory", "The USageCategory '" + property.getUsageCategory() + "' does not exists");
 		}
 
-		property.getOwners().forEach(owner -> {
+		if(property.getOwners().contains(null))
+			errorMap.put("INVALID ENTRY IN OWNER LIST", " The Owner list cannot contain null values");
 
-			if (owner.getOwnerType() != null && !codes.get(PTConstants.MDMS_PT_OWNERTYPE).contains(owner.getOwnerType())) {
+		if (!CollectionUtils.isEmpty(errorMap))
+			throw new CustomException(errorMap);
+		
+		Integer primaryOwnerCount = 0;
+
+		for(OwnerInfo owner : property.getOwners()) {
+
+			if (!CollectionUtils.isEmpty(owner.getDocuments()) && owner.getDocuments().contains(null))
+				errorMap.put("INVALID ENTRY IN OWNER DOCS", " The OwnerType documents cannot contain null values");
+
+			if (ObjectUtils.isEmpty(owner.getOwnerType()) || owner.getOwnerType() != null
+					&& !codes.get(PTConstants.MDMS_PT_OWNERTYPE).contains(owner.getOwnerType())) {
+				
 				errorMap.put("INVALID OWNERTYPE", "The OwnerType '" + owner.getOwnerType() + "' does not exists");
 			}
-		});
+			
+			if(owner.getIsPrimaryOwner() == true)
+				primaryOwnerCount++;
+
+		}
+		
+		if(primaryOwnerCount != 1)
+			errorMap.put("EG_PT_PRIMARY OWNER MISMATCH"," A property should always have one primary owner");
+
+		if(!CollectionUtils.isEmpty(property.getDocuments()) && property.getDocuments().contains(null))
+			errorMap.put("INVALID ENTRY IN PROPERTY DOCS", " The proeprty documents cannot contain null values");
+		
+		
+		
 
 		return errorMap;
 

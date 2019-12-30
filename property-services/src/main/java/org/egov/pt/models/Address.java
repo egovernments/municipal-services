@@ -37,7 +37,7 @@ public class Address {
 	private String addressNumber;
 
 	@JsonProperty("type")
-	@Valid
+	@NotNull
 	private Type type;
 
 	@JsonProperty("addressLine1")
@@ -53,6 +53,7 @@ public class Address {
 	private String city;
 
 	@JsonProperty("pincode")
+	@NotNull
 	private String pincode;
 
 	@JsonProperty("detail")
