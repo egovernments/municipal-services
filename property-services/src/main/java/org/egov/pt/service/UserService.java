@@ -73,8 +73,6 @@ public class UserService {
 			addUserDefaultFields(property.getTenantId(), role, owner);
 			UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
 
-			// remove after testing 
-			owner.setTenantId("pb");
 			if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
 				
 				/*
@@ -103,8 +101,6 @@ public class UserService {
 				owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
 				addUserDefaultFields(property.getTenantId(), role, owner);
 
-				// remove after testing 
-				owner.setTenantId("pb");
 				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
 				userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 				if (userDetailResponse.getUser().get(0).getUuid() == null) {
