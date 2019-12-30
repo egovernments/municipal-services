@@ -341,7 +341,7 @@ public class EnrichmentService {
         AuditDetails auditDetails = tradeUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
         tradeLicenseRequest.getLicenses().forEach(tradeLicense -> {
             tradeLicense.setAuditDetails(auditDetails);
-
+            enrichAssignes(tradeLicense);
             String nameOfBusinessService = tradeLicense.getBusinessService();
             if(nameOfBusinessService==null)
             {
@@ -524,6 +524,28 @@ public class EnrichmentService {
         return criteria;
     }
 
+    /**
+     * In case of SENDBACKTOCITIZEN enrich the assignee with the owners and creator of license
+     * @param license License to be enriched
+     */
+    public void enrichAssignes(TradeLicense license){
+
+            if(license.getAction().equalsIgnoreCase(CITIZEN_SENDBACK_ACTION)){
+
+                    List<String> assignes = new LinkedList<>();
+
+                    // Adding owners to assignes list
+                    license.getTradeLicenseDetail().getOwners().forEach(ownerInfo -> {
+                       assignes.add(ownerInfo.getUuid());
+                    });
+
+                    // Adding creator of license
+                    if(license.getAccountId()!=null)
+                        assignes.add(license.getAccountId());
+
+                    license.setAssignee(assignes);
+            }
+    }
 
 
 
