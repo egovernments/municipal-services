@@ -25,7 +25,7 @@ public class AssessmentQueryBuilder {
 			+ "doc.id as doc_id, doc.entityid as doc_entityid, doc.documentType as doc_documenttype, doc.fileStore as doc_filestore, doc.documentuid as doc_documentuid, "
 			+ "doc.status as doc_status, doc.tenantid as doc_tenantid, "
 			+ "doc.createdby as doc_createdby, doc.createdtime as doc_createdtime, doc.lastmodifiedby as doc_lastmodifiedby, doc.lastmodifiedtime as doc_lastmodifiedtime " 
-			+ "FROM eg_pt_assessments ass INNER JOIN eg_pt_unit unit ON ass.id = unit.assessmentId INNER JOIN eg_pt_document doc ON ass.id = doc.entityid ";
+			+ "FROM eg_pt_assessments ass LEFT OUTER JOIN eg_pt_unit unit ON ass.id = unit.assessmentId LEFT OUTER JOIN eg_pt_document doc ON ass.id = doc.entityid ";
 	
 	
     public String getSearchQuery(AssessmentSearchCriteria criteria, Map<String, Object> preparedStatementValues) {
