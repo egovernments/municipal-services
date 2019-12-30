@@ -43,7 +43,7 @@ public class DemandNotificationConsumer {
 		}
 		log.info("Demand Notification Object Received: Billing Cycle "
 				+ (demandNotificationObj.getBillingCycle() == null ? "" : demandNotificationObj.getBillingCycle())
-				+ " Demand Generated Successfully :  " + demandNotificationObj.isSuccess() + " Water Connection List :"
+				+ " Demand Generated Successfully :  " + demandNotificationObj.isSuccess() + " Sewerage Connection List :"
 				+ (demandNotificationObj.getSewerageConnetionIds() == null ? ""
 						: demandNotificationObj.getSewerageConnetionIds().toString()));
 		notificationService.process(demandNotificationObj, topic);
