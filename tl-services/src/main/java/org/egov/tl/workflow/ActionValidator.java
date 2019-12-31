@@ -167,7 +167,7 @@ public class ActionValidator {
         request.getLicenses().forEach(license -> {
 
             String namefBusinessService=license.getBusinessService();
-            if((namefBusinessService.equals(businessService_TL)) || (namefBusinessService.equals(businessService_BPA) && (!license.getStatus().equalsIgnoreCase(STATUS_INITIATED))))
+            if((namefBusinessService==null) || (namefBusinessService.equals(businessService_TL))||(namefBusinessService.equals(businessService_BPA) && (!license.getStatus().equalsIgnoreCase(STATUS_INITIATED))))
             {
                 if(!workflowService.isStateUpdatable(license.getStatus(), businessService)) {
                     if (license.getId() == null)
