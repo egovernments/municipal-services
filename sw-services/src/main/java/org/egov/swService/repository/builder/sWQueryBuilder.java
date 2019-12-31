@@ -43,22 +43,7 @@ public class sWQueryBuilder {
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		String resultantQuery = query.toString();
 		boolean isAnyCriteriaMatch = false;
-		// if(criteria == null && criteria.isEmpty()){
-		// Set<String> propertyIds = new HashSet<>();
-		// List<Property> propertyList =
-		// waterServicesUtil.propertySearchForCitizen(requestInfo);
-		// propertyList.forEach(property ->
-		// propertyIds.add(property.getPropertyId()));
-		// if (!propertyIds.isEmpty()) {
-		// addClauseIfRequired(preparedStatement, query);
-		// query.append(" conn.property_id in
-		// (").append(createQuery(propertyIds)).append(" )");
-		// addToPreparedStatement(preparedStatement, propertyIds);
-		// isAnyCriteriaMatch = true;
-		// }
-		// }
-		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
-				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
+		if ((criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));

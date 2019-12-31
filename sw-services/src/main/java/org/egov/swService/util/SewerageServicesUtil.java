@@ -133,10 +133,10 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if ((sewerageConnectionSearchCriteria.getTenantId() == null
-				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
-			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-		}
+//		if ((sewerageConnectionSearchCriteria.getTenantId() == null
+//				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
+//			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
+//		}
 		if ((sewerageConnectionSearchCriteria.getMobileNumber() == null
 				|| sewerageConnectionSearchCriteria.getMobileNumber().isEmpty())) {
 			return Collections.emptyList();
