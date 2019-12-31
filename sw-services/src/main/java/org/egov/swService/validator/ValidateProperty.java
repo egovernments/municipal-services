@@ -72,7 +72,7 @@ public class ValidateProperty {
 			if (sewerageConnection.getProperty().getPropertyId() == null
 					|| sewerageConnection.getProperty().getPropertyId().isEmpty()) {
 				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getId() + " SEWERAGE CONNECTION ID");
+						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION ID");
 			}
 		});
 	}
