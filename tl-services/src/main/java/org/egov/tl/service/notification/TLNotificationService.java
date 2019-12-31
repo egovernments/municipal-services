@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.egov.tl.util.BPAConstants.NOTIFICATION_APPROVED;
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
@@ -82,7 +83,7 @@ public class TLNotificationService {
 				}
 				if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
 					if(config.getIsUserEventsNotificationEnabledForBPA()) {
-						EventRequest eventRequest = getEventsForBPA(request);
+						EventRequest eventRequest = getEventsForBPA(request, false, null);
 						if(null != eventRequest)
 							util.sendEventNotification(eventRequest);
 					}
@@ -189,13 +190,19 @@ public class TLNotificationService {
 		
     }
 
-	public EventRequest getEventsForBPA(TradeLicenseRequest request) {
+	public EventRequest getEventsForBPA(TradeLicenseRequest request, boolean isStatusPaid, String paidMessage) {
 		List<Event> events = new ArrayList<>();
 		String tenantId = request.getLicenses().get(0).getTenantId();
-		String localizationMessages = bpaNotificationUtil.getLocalizationMessages(tenantId,request.getRequestInfo());
 		for(TradeLicense license : request.getLicenses()){
-
-			String message = bpaNotificationUtil.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+			String message = null;
+			if(isStatusPaid)
+			{
+				message = paidMessage;
+			}
+			else {
+				String localizationMessages = bpaNotificationUtil.getLocalizationMessages(tenantId,request.getRequestInfo());
+				message = bpaNotificationUtil.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
+			}
 			if(message == null) continue;
 			Map<String,String > mobileNumberToOwner = new HashMap<>();
 			license.getTradeLicenseDetail().getOwners().forEach(owner -> {
