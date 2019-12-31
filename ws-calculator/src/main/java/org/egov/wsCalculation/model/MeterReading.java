@@ -46,7 +46,7 @@ public class MeterReading {
 
 		BREAKDOWN("Breakdown"),
 
-		NO_METER("No meter"),
+		NO_METER("No-meter"),
 
 		RESET("Reset"),
 

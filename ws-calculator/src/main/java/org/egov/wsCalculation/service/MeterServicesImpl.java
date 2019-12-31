@@ -59,7 +59,7 @@ public class MeterServicesImpl implements MeterService {
 		// mDMSValidator.validateMasterData(meterConnectionRequest);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
-		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
+		wSCalculationDao.savemeterReading(meterConnectionRequest);
 		List<CalculationCriteria> criterias = new ArrayList<>();
 		meterReadingsList.forEach(reading -> {
 			CalculationCriteria criteria = new CalculationCriteria();

@@ -10,7 +10,7 @@ import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 
 public interface WSCalculationDao {
 
-	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest);
+	public void savemeterReading(MeterConnectionRequest meterConnectionRequest);
 	
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria);
 	

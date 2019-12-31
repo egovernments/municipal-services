@@ -55,7 +55,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	 *         returning list of water connection
 	 */
 	@Override
-	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest) {
+	public void savemeterReading(MeterConnectionRequest meterConnectionRequest) {
 		wSCalculationProducer.push(createMeterConnection, meterConnectionRequest);
 	}
 	/**
