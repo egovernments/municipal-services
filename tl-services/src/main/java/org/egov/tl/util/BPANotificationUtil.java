@@ -115,7 +115,7 @@ public class BPANotificationUtil {
 //                break;
 
             case ACTION_STATUS_PENDINGAPPROVAL:
-                messageTemplate = getMessageTemplate(NOTIFICATION_PENDINDAPPROVAL, localizationMessage);
+                messageTemplate = getMessageTemplate(NOTIFICATION_PENDINGAPPROVAL, localizationMessage);
                 message = getPendingApprovalMsg(license, messageTemplate);
                 break;
 

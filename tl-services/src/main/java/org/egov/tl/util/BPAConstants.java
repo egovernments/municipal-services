@@ -27,7 +27,10 @@ public class BPAConstants {
 
     public static final String NOTIFICATION_REJECTED = "bpa.en.counter.rejected";
 
-    public static final String NOTIFICATION_PENDINDAPPROVAL = "bpa.en.counter.pendingapproval";
+    public static final String NOTIFICATION_PENDINGAPPROVAL = "bpa.en.counter.pendingapproval";
+
+
+    public static final String NOTIFICATION_PENDINGDOCVERIFICATION = "bpa.en.counter.pendingdocverification";
 
     public static final String TRADE_LOCALISATION_PREFIX = "TRADELICENSE_TRADETYPE_";
 

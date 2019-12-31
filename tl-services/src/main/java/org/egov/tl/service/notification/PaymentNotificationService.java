@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 import static org.egov.tl.util.BPAConstants.NOTIFICATION_APPROVED;
+import static org.egov.tl.util.BPAConstants.NOTIFICATION_PENDINGDOCVERIFICATION;
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
@@ -111,7 +112,7 @@ public class PaymentNotificationService {
                         PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
                         String totalAmountPaid = paymentRequest.getPayment().getTotalAmountPaid().toString();
                         Map<String, String> mobileNumberToOwner = new HashMap<>();
-                        String locMessage = bpaNotificationUtil.getMessageTemplate(NOTIFICATION_APPROVED, localizationMessages);
+                        String locMessage = bpaNotificationUtil.getMessageTemplate(NOTIFICATION_PENDINGDOCVERIFICATION, localizationMessages);
                         String message = bpaNotificationUtil.getPendingDocVerificationMsg(license, locMessage, localizationMessages, totalAmountPaid);
                         license.getTradeLicenseDetail().getOwners().forEach(owner -> {
                             if (owner.getMobileNumber() != null)
