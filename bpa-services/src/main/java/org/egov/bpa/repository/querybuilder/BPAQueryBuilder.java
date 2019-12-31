@@ -53,9 +53,15 @@ public class BPAQueryBuilder {
 		StringBuilder builder = new StringBuilder(QUERY);
 
 		if (criteria.getTenantId() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.tenantid=? ");
-			preparedStmtList.add(criteria.getTenantId());
+			if (criteria.getTenantId().equals("pb")) {
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append(" bpa.tenantid like ?");
+				preparedStmtList.add('%' + criteria.getTenantId() + '%');
+			} else {
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append(" bpa.tenantid=? ");
+				preparedStmtList.add(criteria.getTenantId());
+			}
 		}
 
 		List<String> ids = criteria.getIds();
@@ -95,6 +101,8 @@ public class BPAQueryBuilder {
 					.append(criteria.getFromDate()).append(" AND ")
 					.append(criteria.getToDate());
 		}
+		
+		
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList,
 				criteria);
