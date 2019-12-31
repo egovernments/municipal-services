@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.ServiceRequestRepository;
+import org.egov.tl.util.BPAConstants;
 import org.egov.tl.util.BPANotificationUtil;
 import org.egov.tl.util.NotificationUtil;
 import org.egov.tl.util.TLConstants;
@@ -188,7 +189,7 @@ public class TLNotificationService {
 		
     }
 
-	private EventRequest getEventsForBPA(TradeLicenseRequest request) {
+	public EventRequest getEventsForBPA(TradeLicenseRequest request) {
 		List<Event> events = new ArrayList<>();
 		String tenantId = request.getLicenses().get(0).getTenantId();
 		String localizationMessages = bpaNotificationUtil.getLocalizationMessages(tenantId,request.getRequestInfo());
@@ -232,8 +233,8 @@ public class TLNotificationService {
 
 
 				events.add(Event.builder().tenantId(license.getTenantId()).description(mobileNumberToMsg.get(mobile))
-						.eventType(TLConstants.USREVENTS_EVENT_TYPE).name(TLConstants.USREVENTS_EVENT_NAME)
-						.postedBy(TLConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
+						.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
+						.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
 						.eventDetails(null).actions(action).build());
 
 			}

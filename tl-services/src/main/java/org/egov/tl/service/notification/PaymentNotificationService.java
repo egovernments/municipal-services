@@ -3,6 +3,8 @@ package org.egov.tl.service.notification;
 import com.jayway.jsonpath.DocumentContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
+import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
@@ -40,14 +42,17 @@ public class PaymentNotificationService {
 
     private BPANotificationUtil bpaNotificationUtil;
 
+    private TLNotificationService tlNotificationService;
+
     @Autowired
     public PaymentNotificationService(TLConfiguration config, TradeLicenseService tradeLicenseService,
-                                      NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil) {
+                                      NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil,TLNotificationService tlNotificationService) {
         this.config = config;
         this.tradeLicenseService = tradeLicenseService;
         this.util = util;
         this.mapper = mapper;
         this.bpaNotificationUtil = bpaNotificationUtil;
+        this.tlNotificationService = tlNotificationService;
     }
 
 
@@ -74,16 +79,25 @@ public class PaymentNotificationService {
      * @param record The kafka message from receipt create topic
      */
     public void process(HashMap<String, Object> record){
+        processBusinessService(record, businessService_TL);
+        processBusinessService(record, businessService_BPA);
+    }
+
+
+    private void processBusinessService(HashMap<String, Object> record, String businessService)
+    {
         try{
             String jsonString = new JSONObject(record).toString();
             DocumentContext documentContext = JsonPath.parse(jsonString);
-            Map<String,String> valMap = enrichValMap(documentContext);
+            Map<String,String> valMap = enrichValMap(documentContext, businessService);
+            if(!StringUtils.equals(businessService,valMap.get(businessServiceKey)))
+                return;
             Map<String, Object> info = documentContext.read("$.RequestInfo");
             RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 
             if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceTL())||valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessServiceBPA())){
                 TradeLicense license = getTradeLicenseFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
-                                                                       requestInfo);
+                        requestInfo,valMap.get(businessServiceKey));
                 switch(valMap.get(businessServiceKey))
                 {
                     case businessService_TL:
@@ -106,6 +120,15 @@ public class PaymentNotificationService {
                         List<SMSRequest> smsList = new ArrayList<>();
                         smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
                         util.sendSMS(smsList, config.getIsBPASMSEnabled());
+
+                        if(null != config.getIsUserEventsNotificationEnabledForBPA()) {
+                            if(config.getIsUserEventsNotificationEnabledForBPA()) {
+                                TradeLicenseRequest tradeLicenseRequest=TradeLicenseRequest.builder().requestInfo(requestInfo).licenses(Collections.singletonList(license)).build();
+                                EventRequest eventRequest = tlNotificationService.getEventsForBPA(tradeLicenseRequest);
+                                if(null != eventRequest)
+                                    util.sendEventNotification(eventRequest);
+                            }
+                        }
                         break;
                 }
             }
@@ -114,8 +137,6 @@ public class PaymentNotificationService {
             e.printStackTrace();
         }
     }
-
-
     /**
      * Creates the SMSRequest
      * @param license The TradeLicense for which the receipt is generated
@@ -180,18 +201,22 @@ public class PaymentNotificationService {
      * @param context The documentContext of the receipt
      * @return The map containing required fields from receipt
      */
-    private Map<String,String> enrichValMap(DocumentContext context){
+    private Map<String,String> enrichValMap(DocumentContext context, String businessService){
         Map<String,String> valMap = new HashMap<>();
         try{
-            valMap.put(businessServiceKey,context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].businessService"));
-            valMap.put(consumerCodeKey,context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
-            valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
-            valMap.put(payerMobileNumberKey,context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber"));
-            valMap.put(paidByKey,context.read("$.Payment.paidBy"));
-            Integer amountPaid = context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].bill.amountPaid");
-            valMap.put(amountPaidKey,amountPaid.toString());
-            valMap.put(receiptNumberKey,context.read("$.Payment.paymentDetails[?(@.businessService=='TL')].receiptNumber"));
 
+            List <String>businessServiceList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].businessService");
+            List <String>consumerCodeList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].bill.consumerCode");
+            List <String>mobileNumberList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].bill.mobileNumber");
+            List <Integer>amountPaidList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].bill.amountPaid");
+            List <String>receiptNumberList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].receiptNumber");
+            valMap.put(businessServiceKey,businessServiceList.isEmpty()?null:businessServiceList.get(0));
+            valMap.put(consumerCodeKey,consumerCodeList.isEmpty()?null:consumerCodeList.get(0));
+            valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
+            valMap.put(payerMobileNumberKey,mobileNumberList.isEmpty()?null:mobileNumberList.get(0));
+            valMap.put(paidByKey,context.read("$.Payment.paidBy"));
+            valMap.put(amountPaidKey,amountPaidList.isEmpty()?null:String.valueOf(amountPaidList.get(0)));
+            valMap.put(receiptNumberKey,receiptNumberList.isEmpty()?null:receiptNumberList.get(0));
         }
         catch (Exception e){
             e.printStackTrace();
@@ -208,11 +233,12 @@ public class PaymentNotificationService {
      * @param requestInfo The requestInfo of the request
      * @return TradeLicense for the particular consumerCode
      */
-    private TradeLicense getTradeLicenseFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo){
+    private TradeLicense getTradeLicenseFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo, String businessService){
 
         TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
         searchCriteria.setApplicationNumber(consumerCode);
         searchCriteria.setTenantId(tenantId);
+        searchCriteria.setBusinessService(businessService);
         List<TradeLicense> licenses = tradeLicenseService.getLicensesWithOwnerInfo(searchCriteria,requestInfo);
 
         if(CollectionUtils.isEmpty(licenses))
@@ -226,11 +252,4 @@ public class PaymentNotificationService {
         return licenses.get(0);
 
     }
-
-
-
-
-
-
-
 }

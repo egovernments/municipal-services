@@ -31,4 +31,8 @@ public class BPAConstants {
 
     public static final String TRADE_LOCALISATION_PREFIX = "TRADELICENSE_TRADETYPE_";
 
+    public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+    public static final String  USREVENTS_EVENT_NAME = "BPA Registration";
+    public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPAREG";
+
 }
