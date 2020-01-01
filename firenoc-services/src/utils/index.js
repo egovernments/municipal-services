@@ -90,7 +90,7 @@ export const createWorkFlow = async body => {
     RequestInfo: body.RequestInfo,
     ProcessInstances: processInstances
   };
-  // console.log("requestBody", JSON.stringify(requestBody));
+  console.log("requestBody", JSON.stringify(requestBody));
   let workflowResponse = await httpRequest({
     hostURL: envVariables.EGOV_WORKFLOW_HOST,
     endPoint: envVariables.EGOV_WORKFLOW_TRANSITION_ENDPOINT,
