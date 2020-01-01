@@ -87,17 +87,17 @@ export const createWorkFlow = async body => {
     };
   });
 
-  for(var index =0; index < body.RequestInfo.UserInfo.roles.length;index++){
-    let tenantId = get(body.RequestInfo.UserInfo,"tenantId");
-    set(body.RequestInfo.UserInfo.roles[index],"tenantId",tenantId);
-    console.log("Workflow TenantId",get(body.RequestInfo.UserInfo.roles[index],"tenantId"));
+  for(var index =0; index < body.RequestInfo.userInfo.roles.length;index++){
+    let tenantId = get(body.RequestInfo.userInfo,"tenantId");
+    set(body.RequestInfo.userInfo.roles[index],"tenantId",tenantId);
+    console.log("Workflow TenantId",get(body.RequestInfo.userInfo.roles[index],"tenantId"));
   }
 
   let requestBody = {
     RequestInfo: body.RequestInfo,
     ProcessInstances: processInstances
   };
-  console.log("requestBody", JSON.stringify(requestBody));
+  console.log("Workflow requestBody", JSON.stringify(requestBody));
   let workflowResponse = await httpRequest({
     hostURL: envVariables.EGOV_WORKFLOW_HOST,
     endPoint: envVariables.EGOV_WORKFLOW_TRANSITION_ENDPOINT,
