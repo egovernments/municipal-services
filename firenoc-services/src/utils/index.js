@@ -86,6 +86,13 @@ export const createWorkFlow = async body => {
       moduleName: envVariables.BUSINESS_SERVICE
     };
   });
+
+  for(var index =0; index < body.RequestInfo.UserInfo.roles.length;index++){
+    let tenantId = get(body.RequestInfo.UserInfo,"tenantId");
+    set(body.RequestInfo.UserInfo.roles[index],"tenantId",tenantId);
+    console.log("Workflow TenantId",get(body.RequestInfo.UserInfo.roles[index],"tenantId"));
+  }
+
   let requestBody = {
     RequestInfo: body.RequestInfo,
     ProcessInstances: processInstances
