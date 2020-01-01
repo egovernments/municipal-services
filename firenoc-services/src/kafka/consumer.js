@@ -209,6 +209,13 @@ consumerGroup.on("message", function(message) {
                 envVariables.ACTION_PAY
               );
             }
+
+            for(var index =0; index < RequestInfo.userInfo.roles.length;index++){
+              let tenantId = get(RequestInfo.userInfo,"tenantId");
+              set(RequestInfo.userInfo.roles[index],"tenantId",tenantId);
+              console.log("Workflow TenantId",get(body.RequestInfo.userInfo.roles[index],"tenantId"));
+            }
+
             const updateBody = { RequestInfo, FireNOCs };
             const updateRequest = { body: updateBody };
             console.log("update Request: "+JSON.stringify(updateRequest));
