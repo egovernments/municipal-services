@@ -66,7 +66,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
 
   //applay workflow
   let workflowResponse = await createWorkFlow(body);
-  console.log("workflowResponse"+JSON.stringify(workflowResponse));
+  //console.log("workflowResponse"+JSON.stringify(workflowResponse));
 
   //calculate call
   let { FireNOCs = [], RequestInfo = {} } = body;
