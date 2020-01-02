@@ -48,7 +48,7 @@ public class WSCalculationValidator {
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if(connection == null) {
-			errorMap.put("INVALID METER READING CONNECTION",
+			errorMap.put("INVALID METER READING CONNECTION NUMBER",
 					"Invalid water connection number");
 		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
@@ -59,23 +59,23 @@ public class WSCalculationValidator {
 		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
 			Double currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
 			if (meterReading.getCurrentReading() < currentMeterReading) {
-				errorMap.put("INVALID METER READING CONNECTION",
+				errorMap.put("INVALID METER READING CONNECTION NUMBER",
 						"Current meter reading has to be greater than the past last readings in the meter reading table !");
 			}
 		}
 		
 		if (meterReading.getCurrentReading() < meterReading.getLastReading()) {
-			errorMap.put("INVALID METER READING CONNECTION",
+			errorMap.put("INVALID METER READING LAST READING",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
 		
 		if (meterReading.getMeterStatus() == null) {
-			errorMap.put("INVALID METER READING CONNECTION",
+			errorMap.put("INVALID METER READING STATUS",
 					"Meter status can not be null");
 		}
 		
 		if (isUpdate && (meterReading.getCurrentReading() == null)) {
-			errorMap.put("INVALID METER READING CONNECTION",
+			errorMap.put("INVALID CURRENT METER READING",
 					"Current Meter Reading cannot be update without current meter reading");
 		}
 
@@ -86,7 +86,7 @@ public class WSCalculationValidator {
 			}
 		}
 		if (meterReading.getBillingPeriod() == null || meterReading.getBillingPeriod().isEmpty()) {
-			errorMap.put("INVALID METER READING CONNECTION", "Meter Reading cannot be updated without billing period");
+			errorMap.put("INVALID BILLING PERIOD", "Meter Reading cannot be updated without billing period");
 		}
 		
 		if (!errorMap.isEmpty()) {

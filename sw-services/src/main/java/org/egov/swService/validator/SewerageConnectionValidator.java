@@ -31,11 +31,11 @@ public class SewerageConnectionValidator {
 		if (isUpdate && sewerageConnection.getConnectionNo() != null && !sewerageConnection.getConnectionNo().isEmpty()) {
 			int n = sewarageDao.isSewerageConnectionExist(Arrays.asList(sewerageConnection.getConnectionNo()));
 			if (n == 0) {
-				errorMap.put("INVALID SEWARAGE CONNECTION", "Sewarage connection id not present");
+				errorMap.put("INVALID SEWARAGE CONNECTION NUMBER", "Sewarage connection id not present");
 			}
 		}
 		if (sewerageConnection.getConnectionType() == null || sewerageConnection.getConnectionType().isEmpty()) {
-			errorMap.put("INVALID SEWERAGE CONNECTION",
+			errorMap.put("INVALID SEWERAGE CONNECTION TYPE",
 					"SewerageConnection cannot be created  without connection type");
 		}
 
