@@ -103,12 +103,18 @@ public class AssessmentValidator {
 			errorMap.put(ErrorConstants.NO_ASSESSMENTS_FOUND_CODE, ErrorConstants.NO_ASSESSMENTS_FOUND_MSG);
 		} else {
 			Assessment assessmentFromDB = assessments.get(0);
-			if (assessmentFromDB.getDocuments().size() > assessment.getDocuments().size()) {
-				errorMap.put("MISSING_DOCUMENTS", "Please send all the documents belonging to this assessment");
+			if(!CollectionUtils.isEmpty(assessment.getDocuments()) && !CollectionUtils.isEmpty(assessmentFromDB.getDocuments())) {
+				if (assessmentFromDB.getDocuments().size() > assessment.getDocuments().size()) {
+					errorMap.put("MISSING_DOCUMENTS", "Please send all the documents belonging to this assessment");
+				}
 			}
-			if (assessmentFromDB.getUnits().size() > assessment.getUnits().size()) {
-				errorMap.put("MISSING_UNITS", "Please send all the units belonging to this assessment");
+
+			if(!CollectionUtils.isEmpty(assessment.getUnits()) && !CollectionUtils.isEmpty(assessmentFromDB.getUnits())) {
+				if (assessmentFromDB.getUnits().size() > assessment.getUnits().size()) {
+					errorMap.put("MISSING_UNITS", "Please send all the units belonging to this assessment");
+				}
 			}
+
 			if(!CollectionUtils.isEmpty(assessmentFromDB.getUnits())) {
 				Set<String> existingUnits = assessmentFromDB.getUnits().stream().map(Unit::getId)
 						.collect(Collectors.toSet());
