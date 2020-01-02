@@ -10,6 +10,7 @@ import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.BillingSlab;
 import org.egov.swCalculation.model.DemandNotificationObj;
+import org.egov.swCalculation.model.EmailRequest;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
 import org.egov.swCalculation.model.SewerageConnectionRequest;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
+
 @Service
 @Slf4j
 public class SewerageDemandNotificationService {
@@ -41,13 +43,15 @@ public class SewerageDemandNotificationService {
 	SWCalculationConfiguration config;
 
 	public void process(DemandNotificationObj noiticationObj, String topic) {
-		List<SMSRequest> smsRequests = new LinkedList<>();
-		if (null != config.getIsSMSEnabled()) {
-			if (config.getIsSMSEnabled()) {
-				enrichSMSRequest(noiticationObj, smsRequests, topic);
-				if (!CollectionUtils.isEmpty(smsRequests))
-					util.sendSMS(smsRequests);
-			}
+		if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
+			List<SMSRequest> smsRequests = new LinkedList<>();
+			enrichSMSRequest(noiticationObj, smsRequests, topic);
+			if (!CollectionUtils.isEmpty(smsRequests))
+				util.sendSMS(smsRequests);
+		}
+		if (config.getIsMailEnabled() != null && config.getIsMailEnabled()) {
+			List<EmailRequest> emailRequests = new LinkedList<>();
+			enrichEmailRequest(noiticationObj, emailRequests, topic);
 		}
 	}
 
@@ -76,6 +80,23 @@ public class SewerageDemandNotificationService {
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Notification Receiver List Can Not Be Parsed!!");
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private void enrichEmailRequest(DemandNotificationObj notificationObj, List<EmailRequest> emailRequest,
+			String topic) {
+		// String tenantId = notificationObj.getTenantId();
+		// String loclizationMessage = util.getLocalizationMessages(tenantId,
+		// notificationObj.getRequestInfo());
+		// String emailBody = util.getCustomizedMsg(topic, loclizationMessage);
+		// List<NotificationReceiver> receiverList = new ArrayList<>();
+		// enrichNotificationReceivers(receiverList, notificationObj);
+		// receiverList.forEach(receiver -> {
+		// String message = util.getAppliedMsg(receiver, messageTemplate,
+		// notificationObj);
+		// SMSRequest sms = new SMSRequest(receiver.getMobileNumber(), message);
+		// smsRequest.add(sms);
+		// });
 	}
 
 }

@@ -16,6 +16,7 @@ import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.DemandDetail;
 import org.egov.swCalculation.model.DemandDetailAndCollection;
 import org.egov.swCalculation.model.DemandNotificationObj;
+import org.egov.swCalculation.model.EmailRequest;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
@@ -295,6 +296,33 @@ public class SWCalculationUtil {
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			}
 		}
+	}
+	
+	/**
+	 * Send the SMSRequest on the EmailNotification kafka topic
+	 * @param emailRequest The list of EmailRequest to be sent
+	 */
+	public void sendEmail(List<EmailRequest> emailRequestList) {
+		if (config.getIsSMSEnabled()) {
+			if (CollectionUtils.isEmpty(emailRequestList))
+				log.info("Messages from localization couldn't be fetched!");
+			emailRequestList.forEach(emailRequest -> {
+				producer.push(config.getEmailNotifyTopic(), emailRequest);
+				log.info("Email To : " + emailRequest.getEmail() + " Body: " + emailRequest.getBody()+" Subject: "+ emailRequest.getSubject());
+			});
+		}
+	}
+	
+	
+	public String getCustomizedMsgForEmail(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_SUCCESS_MESSAGE_EMAIL, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE_EMAIL, localizationMessage);
+		}
+		return messageString;
 	}
 
 }

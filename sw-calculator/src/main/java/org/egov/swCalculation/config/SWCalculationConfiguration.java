@@ -78,6 +78,15 @@ public class SWCalculationConfiguration {
 
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
+    
+    
+    //Email
+    @Value("${notification.mail.enabled}")
+    private Boolean isMailEnabled;
+    
+    
+    @Value("${kafka.topics.notification.mail.name}")
+    private String emailNotifyTopic;
    
 
 
