@@ -145,7 +145,6 @@ public class PropertyValidator {
     	StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
         MdmsCriteriaReq criteriaReq = propertyUtil.prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
         Optional<Object> response = serviceRequestRepository.fetchResult(uri, criteriaReq);
-        
         try {
         	if(response.isPresent()) {
                 return JsonPath.read(response.get(),jsonpath);

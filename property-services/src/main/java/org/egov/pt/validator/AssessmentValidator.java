@@ -151,7 +151,7 @@ public class AssessmentValidator {
 		if (assessment.getAssessmentDate() > new Date().getTime()) {
 			errorMap.put(ErrorConstants.ASSMENT_DATE_FUTURE_ERROR_CODE, ErrorConstants.ASSMENT_DATE_FUTURE_ERROR_MSG);
 		}
-
+		validateFinancialYear(assessmentReq, errorMap);
 		if (isUpdate) {
 			if (null == assessment.getStatus()) {
 				errorMap.put("ASSMNT_STATUS_EMPTY", "Assessment Status cannot be empty");
@@ -217,5 +217,20 @@ public class AssessmentValidator {
         	throw new CustomException("MASTER_FETCH_FAILED", "Couldn't fetch master data for validation");
         }
 	}
+	
+    /**
+     * Validates the financial year in PropertyRequest by comparing data from MDMS
+     * @param request PropertRequest received for update or create
+     * @param errorMap ErrorMap to catch all the errors
+     */
+    private void validateFinancialYear(AssessmentRequest request, Map<String,String> errorMap){
+        String tenantId = request.getAssessment().getTenantId();
+        RequestInfo requestInfo = request.getRequestInfo();
+        String filter = "$.*.[?(@.module=='PT')].finYearRange";
+        Map<String,List<String>> years = propertyValidator.getAttributeValues(tenantId.split("\\.")[0],PTConstants.MDMS_PT_EGF_MASTER,
+        		Arrays.asList("FinancialYear"),filter,PTConstants.JSONPATH_FINANCIALYEAR,requestInfo);
+        if(!years.get(PTConstants.MDMS_PT_FINANCIALYEAR).contains(request.getAssessment().getFinancialYear()))
+            errorMap.put("INVALID FINANCIALYEAR","The finacialYear '"+request.getAssessment().getFinancialYear()+"' is not valid for PT");
+    }
 
 }
