@@ -9,6 +9,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.DemandNotificationObj;
+import org.egov.wsCalculation.model.EmailRequest;
 import org.egov.wsCalculation.model.NotificationReceiver;
 import org.egov.wsCalculation.model.SMSRequest;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
@@ -98,10 +99,21 @@ public class NotificationUtil {
 	public String getCustomizedMsg(String topic, String localizationMessage) {
 		String messageString = null;
 		if (topic.equalsIgnoreCase(config.getOnDemandsSaved())) {
-			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_SUCCESS_MESSAGE, localizationMessage);
+			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_SUCCESS_MESSAGE_SMS, localizationMessage);
 		}
 		if (topic.equalsIgnoreCase(config.getOnDemandsFailure())) {
-			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
+			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE_SMS, localizationMessage);
+		}
+		return messageString;
+	}
+	
+	public String getCustomizedMsgForEmail(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getOnDemandsSaved())) {
+			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_SUCCESS_MESSAGE_EMAIL, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getOnDemandsFailure())) {
+			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE_EMAIL, localizationMessage);
 		}
 		return messageString;
 	}
@@ -135,6 +147,20 @@ public class NotificationUtil {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			}
+		}
+	}
+	/**
+	 * Send the SMSRequest on the EmailNotification kafka topic
+	 * @param emailRequest The list of EmailRequest to be sent
+	 */
+	public void sendEmail(List<EmailRequest> emailRequestList) {
+		if (config.getIsSMSEnabled()) {
+			if (CollectionUtils.isEmpty(emailRequestList))
+				log.info("Messages from localization couldn't be fetched!");
+			emailRequestList.forEach(emailRequest -> {
+				producer.push(config.getEmailNotifyTopic(), emailRequest);
+				log.info("Email To : " + emailRequest.getEmail() + " Body: " + emailRequest.getBody()+" Subject: "+ emailRequest.getSubject());
+			});
 		}
 	}
 }

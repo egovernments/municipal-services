@@ -118,5 +118,13 @@ public class WSCalculationConfiguration {
 
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
+    
+    @Value("${notification.email.enabled}")
+    private Boolean isEmailEnabled;
+    
+  //Email
+    @Value("${kafka.topics.notification.mail.name}")
+    private String emailNotifyTopic;
+    
 
 }

@@ -12,6 +12,7 @@ import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.DemandNotificationObj;
+import org.egov.wsCalculation.model.EmailRequest;
 import org.egov.wsCalculation.model.NotificationReceiver;
 import org.egov.wsCalculation.model.SMSRequest;
 import org.egov.wsCalculation.util.NotificationUtil;
@@ -42,13 +43,15 @@ public class DemandNotificationService {
 	WSCalculationConfiguration config;
 
 	public void process(DemandNotificationObj noiticationObj, String topic) {
-		List<SMSRequest> smsRequests = new LinkedList<>();
-		if (null != config.getIsSMSEnabled()) {
-			if (config.getIsSMSEnabled()) {
-				enrichSMSRequest(noiticationObj, smsRequests, topic);
-				if (!CollectionUtils.isEmpty(smsRequests))
-					util.sendSMS(smsRequests);
-			}
+		if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
+			List<SMSRequest> smsRequests = new LinkedList<>();
+			enrichSMSRequest(noiticationObj, smsRequests, topic);
+			if (!CollectionUtils.isEmpty(smsRequests))
+				util.sendSMS(smsRequests);
+		}
+		if (config.getIsEmailEnabled() != null && config.getIsEmailEnabled()) {
+			List<EmailRequest> emailRequests = new LinkedList<>();
+			enrichEmailRequest(noiticationObj, emailRequests, topic);
 		}
 	}
 
@@ -65,7 +68,7 @@ public class DemandNotificationService {
 			smsRequest.add(sms);
 		});
 	}
-
+	
 	@SuppressWarnings("unused")
 	private void enrichNotificationReceivers(List<NotificationReceiver> receiverList,
 			DemandNotificationObj notificationObj) {
@@ -77,6 +80,20 @@ public class DemandNotificationService {
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Notification Receiver List Can Not Be Parsed!!");
 		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void enrichEmailRequest(DemandNotificationObj notificationObj, List<EmailRequest> emailRequest, String topic) {
+//		String tenantId = notificationObj.getTenantId();
+//		String loclizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
+//		String emailBody = util.getCustomizedMsg(topic, loclizationMessage);
+//		List<NotificationReceiver> receiverList = new ArrayList<>();
+//		enrichNotificationReceivers(receiverList, notificationObj);
+//		receiverList.forEach(receiver -> {
+//			String message = util.getAppliedMsg(receiver, messageTemplate, notificationObj);
+//			SMSRequest sms = new SMSRequest(receiver.getMobileNumber(), message);
+//			smsRequest.add(sms);
+//		});
 	}
 
 }
