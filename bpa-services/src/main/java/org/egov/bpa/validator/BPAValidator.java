@@ -336,11 +336,11 @@ public class BPAValidator {
 				applicationDocIds.add(document.getId());
 			});
 		}
-		if (!CollectionUtils.isEmpty(searchedBpa.getWfDocuments())) {
-			searchedBpa.getWfDocuments().forEach(document -> {
-				applicationDocIds.add(document.getId());
-			});
-		}
+//		if (!CollectionUtils.isEmpty(searchedBpa.getWfDocuments())) {
+//			searchedBpa.getWfDocuments().forEach(document -> {
+//				applicationDocIds.add(document.getId());
+//			});
+//		}
 		return applicationDocIds;
 	}
 
