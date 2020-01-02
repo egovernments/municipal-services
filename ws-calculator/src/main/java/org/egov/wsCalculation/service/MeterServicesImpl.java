@@ -68,6 +68,8 @@ public class MeterServicesImpl implements MeterService {
 			criteria.setCurrentReading(reading.getCurrentReading());
 			criteria.setLastReading(reading.getLastReading());
 			criteria.setConnectionNo(reading.getConnectionNo());
+			criterias.add(criteria);
+			
 		});
 		CalculationReq calculationRequest = CalculationReq.builder()
 				.requestInfo(meterConnectionRequest.getRequestInfo()).calculationCriteria(criterias).build();
