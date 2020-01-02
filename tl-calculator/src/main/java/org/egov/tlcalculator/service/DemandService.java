@@ -22,7 +22,9 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static org.egov.tlcalculator.utils.TLCalculatorConstants.BILLINGSLAB_KEY;
 import static org.egov.tlcalculator.utils.TLCalculatorConstants.MDMS_ROUNDOFF_TAXHEAD;
 
 
@@ -171,6 +173,16 @@ public class DemandService {
 
              addRoundOffTaxHead(calculation.getTenantId(),demandDetails);
 
+            List<String> combinedBillingSlabs = new LinkedList<>();
+
+            if(calculation.getTradeTypeBillingIds()!=null && !CollectionUtils.isEmpty(calculation.getTradeTypeBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getTradeTypeBillingIds().getBillingSlabIds());
+
+            if(calculation.getAccessoryBillingIds()!=null  && !CollectionUtils.isEmpty(calculation.getAccessoryBillingIds().getBillingSlabIds()))
+                combinedBillingSlabs.addAll(calculation.getAccessoryBillingIds().getBillingSlabIds());
+
+
+
              demands.add(Demand.builder()
                     .consumerCode(consumerCode)
                     .demandDetails(demandDetails)
@@ -181,6 +193,7 @@ public class DemandService {
                     .taxPeriodTo(taxPeriods.get(TLCalculatorConstants.MDMS_ENDDATE))
                     .consumerType("tradelicense")
                     .businessService(config.getBusinessService())
+                    .additionalDetails(Collections.singletonMap(BILLINGSLAB_KEY, combinedBillingSlabs))
                     .build());
         }
         return demandRepository.saveDemand(requestInfo,demands);

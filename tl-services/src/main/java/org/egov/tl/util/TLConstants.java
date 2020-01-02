@@ -134,7 +134,7 @@ public class TLConstants {
 
     public static final String STATUS_PAID  = "PAID";
 
-    public static final String BILL_AMOUNT_JSONPATH = "$.billResponse.Bill[0].billDetails[0].totalAmount";
+    public static final String BILL_AMOUNT_JSONPATH = "$.billResponse.Bill[0].totalAmount";
 
 
     // ACTION_STATUS combinations for notification
@@ -173,6 +173,8 @@ public class TLConstants {
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	public static final String  USREVENTS_EVENT_NAME = "Trade License";
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-TL";
+
+	public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";
 
 
     public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,

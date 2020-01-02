@@ -70,6 +70,7 @@ config:
       - work-dir: "firenoc-calculator/migration"
         image-name: "firenoc-calculator-db"
 
+
   - name: "municipal-services/ws-services"
     build:
       - work-dir: "ws-services"
@@ -116,3 +117,4 @@ config:
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "bpa-services/src/main/resources/db"
         image-name: "bpa-services-db"             
+
