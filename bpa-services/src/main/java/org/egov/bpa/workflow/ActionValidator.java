@@ -68,14 +68,14 @@ public class ActionValidator {
 	private void validateDocumentsForUpdate(BPARequest request) {
 		Map<String, String> errorMap = new HashMap<>();
 		BPA bpa = request.getBPA();
-		if (BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())) {
+		/*if (BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())) {
 			if (bpa.getDocuments() != null)
 				errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
 		}
 		if (BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())) {
 			if (bpa.getDocuments() == null)
 				errorMap.put("INVALID STATUS", "Status cannot be APPLY when application document are not provided");
-		}
+		}*/
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
