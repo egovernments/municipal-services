@@ -121,10 +121,10 @@ public class WaterServicesUtil {
 	 */
 	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if ((waterConnectionSearchCriteria.getTenantId() == null
-				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
-			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-		}
+//		if ((waterConnectionSearchCriteria.getTenantId() == null
+//				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
+//			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
+//		}
 		if ((waterConnectionSearchCriteria.getMobileNumber() == null
 				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
 			return Collections.emptyList();

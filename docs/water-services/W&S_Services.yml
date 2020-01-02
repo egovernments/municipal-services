@@ -1,0 +1,611 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: eGov Water and Sewerage(W&S)  System.
+  description: |
+    APIs for W&S module. This provide APIs for create new property, update existing property, search existing property.
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+x-module: WC & SWC
+x-common-path: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml'
+paths:
+  /wc/_create:
+    post:
+      summary: Apply for new water connection.
+      description: | 
+        Citizen or employee can apply for new water connection.
+      x-roles: 'WC_CEMP,CITIZEN'
+      responses:
+        '201':
+          description: Water connection application is submitted sucessfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WaterConnectionResponse'
+        '400':
+          description: Failed to submit application
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Water
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaterConnectionRequest'
+        description: Details for the new property + RequestHeader meta data.
+        required: true
+  /wc/_update:
+    post:
+      summary: Update existing water connection details.
+      description: Updates a given `water connection` with newer details.
+      x-roles: 'WC_CEMP,CITIZEN'
+      tags:
+        - Water
+      responses:
+        '200':
+          description: Water connection details has been submitted sucessfully with new details
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WaterConnectionResponse'
+        '400':
+          description: Update water connection details failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaterConnectionRequest'
+        description: Request of water connection details.
+        required: true
+  /wc/_search:
+    post:
+      summary: Get the list of exsting water connections.
+      description: |
+        Get the water connections list based on the input parameters.
+      x-roles: 'WC_CEMP,CITIZEN'
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: ids
+          in: query
+          description: List of system generated ids of water connection.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: connectionNo
+          in: query
+          required: false
+          description: List of water connection numbers to search..
+          schema:
+            type: array
+            items:
+              type: string
+        - name: oldConnectionNo
+          in: query
+          required: false
+          description: List of old water connection numbers to search..
+          schema:
+            type: array
+            items:
+              type: string
+        - name: mobileNumber
+          in: query
+          description: MobileNumber of owner whose water connection is to be searched.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: fromDate
+          in: query
+          description: Fetches properties with created time after fromDate.
+          required: false
+          schema:
+            type: number
+        - name: toDate
+          in: query
+          description: Fetches properties with created time till toDate.
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/WaterConnectionResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Water
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: RequestHeader meta data.
+        required: true
+  /wc/_delete:
+    post:
+      summary: Delete existing water connection.
+      description: Delete existing water connection.
+      x-roles: WC_ADMIN
+      tags:
+        - Water
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: connectionNo
+          in: query
+          required: true
+          description: The connection no to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 2
+            maxLength: 64
+      responses:
+        '200':
+          description: Deleted water connection successful
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        '404':
+          description: Delete Property failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: Request header for the connection delete Request.
+        required: true
+  /wc/_cancel:
+    post:
+      summary: Deactivate existing water connection.
+      description: Deactivate existing water connection.
+      x-roles: WC_ADMIN
+      tags:
+        - Water
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: propertyId
+          in: query
+          required: true
+          description: The properrtyId to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 4
+            maxLength: 128
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: Request header for the property delete Request.
+        required: true
+      responses:
+        '200':
+          description: Property deactivated successful
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+  
+  /swc/_create:
+    post:
+      summary: Apply for new Sewerage connection.
+      description: | 
+        Citizen or employee can apply for new Sewerage connection.
+      x-roles: 'SWC_CEMP,CITIZEN'
+      responses:
+        '201':
+          description: Sewerage connection application is submitted sucessfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SewerageConnectionResponse'
+        '400':
+          description: Failed to submit application
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Sewerage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SewerageConnectionRequest'
+        description: Details for the new Sewerage Connection + RequestHeader meta data.
+        required: true
+  /swc/_update:
+    post:
+      summary: Update existing Sewerage connection details.
+      description: Updates a given `Sewerage connection` with newer details.
+      x-roles: 'SWC_CEMP,CITIZEN'
+      tags:
+        - Sewerage
+      responses:
+        '200':
+          description: Sewerage connection details has been submitted sucessfully with new details
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SewerageConnectionResponse'
+        '400':
+          description: Update Sewerage connection details failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SewerageConnectionRequest'
+        description: Request of Sewerage connection details.
+        required: true
+  /swc/_search:
+    post:
+      summary: Get the list of exsting Sewerage connections.
+      description: |
+        Get the water connections list based on the input parameters.
+      x-roles: 'SWC_CEMP,CITIZEN'
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: ids
+          in: query
+          description: List of system generated ids of Sewerage connection.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: connectionNo
+          in: query
+          required: false
+          description: List of Sewerage connection numbers to search..
+          schema:
+            type: array
+            items:
+              type: string
+        - name: oldConnectionNo
+          in: query
+          required: false
+          description: List of old Sewerage connection numbers to search..
+          schema:
+            type: array
+            items:
+              type: string
+        - name: mobileNumber
+          in: query
+          description: MobileNumber of owner whose Sewerage connection is to be searched.
+          required: false
+          schema:
+            type: integer
+            format: int64
+        - name: fromDate
+          in: query
+          description: Fetches Sewerage Connection with created time after fromDate.
+          required: false
+          schema:
+            type: number
+        - name: toDate
+          in: query
+          description: Fetches Sewerage Connection with created time till toDate.
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SewerageConnectionResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Sewerage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: RequestHeader meta data.
+        required: true
+  /swc/_delete:
+    post:
+      summary: Delete existing Sewerage connection.
+      description: Delete existing Sewerage connection.
+      x-roles: SWC_ADMIN
+      tags:
+        - Sewerage
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: connectionNo
+          in: query
+          required: true
+          description: The connection no to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 2
+            maxLength: 64
+      responses:
+        '200':
+          description: Deleted Sewerage connection successful
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        '404':
+          description: Delete Sewerage connection failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: Request header for the connection delete Request.
+        required: true
+  /swc/_cancel:
+    post:
+      summary: Deactivate existing water connection.
+      description: Deactivate existing water connection.
+      x-roles: WC_ADMIN
+      tags:
+        - Sewerage
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: connectionNo
+          in: query
+          required: true
+          description: The properrtyId to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 4
+            maxLength: 128
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        description: Request header for the property delete Request.
+        required: true
+      responses:
+        '200':
+          description: Property deactivated successful
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+servers:
+# Added by API Auto Mocking Plugin
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/egov-foundation/Water-Sewerage-1.0/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/egovernmets-faoundat/Water-Sewerage-1.0/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: 'https://virtserver.swaggerhub.com/egovernmets-faundation/PT-2.0/1.0.0'
+  - url: 'https://egov-micro-dev.egovernments.org'
+components:
+  schemas:
+    
+    Connection:
+      description: This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
+      properties:
+        id:
+          type: string
+          description: Unique Identifier of the connection for internal reference.
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+        property:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/rainmaker/property-tax/property-v2.0.yml#/components/schemas/Property'
+        applicationNo:
+          type: string
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+          description: Formatted application number, which will be generated using ID-Gen at the time .
+        applicationStatus:
+          type: string
+          enum: 
+           - Rejected
+           - Approved
+           - Canceled
+           - InProgress
+        status:
+          type: string
+          enum: 
+            - Active
+            - Inactive
+        connectionNo:
+          type: string
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+          description: Formatted connection number, which will be generated using ID-Gen service after aproval of connection application in case of new application. If the source of data is "DATA_ENTRY" then application status will be considered as "APROVED" application.
+        oldConnectionNo:
+          type: string
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+          description: Mandatory if source is "DATA_ENTRY".
+        documents:
+          description: The documents attached by owner for exemption.
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Document'
+      required:
+        - connectionType
+        - connectionCategory
+    
+    WaterConnection:
+      allOf:
+        - $ref: '#/components/schemas/Connection'
+        - type: object
+
+          description: This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
+          properties:
+            connectionCategory:
+              type: string 
+              minLength: 2
+              maxLength: 32
+              description: It is a master data, defined in MDMS
+            rainWaterHarvesting:
+              type: boolean
+            connectionType:
+              type: string
+              minLength: 2
+              maxLength: 32
+              description: It is a master data, defined in MDMS.
+            waterSource:
+              type: string
+              minLength: 2
+              maxLength: 64
+              description: It is a namespaced master data, defined in MDMS
+            meterId:
+              type: string
+              minLength: 2
+              maxLength: 64
+              description: Unique id of the meter.
+            meterInstallationDate:
+              type: integer
+              format: int64
+              description: The date of meter installation date.
+            documents:
+              description: The documents attached by owner for exemption.
+              type: array
+              items:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Document'
+          required:
+            - connectionType
+            - waterSource
+            - connectionCategory
+        
+    SewerageConnection:
+      allOf:
+        - $ref: '#/components/schemas/Connection'
+        - type: object
+
+          description: This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
+          properties:
+            connectionExecutionDate:
+              type: number
+              format: int64
+              readOnly: true
+              minLength: 1
+              maxLength: 64
+          required:
+            - connectionExecutionDate
+          
+        
+    WaterConnectionRequest:
+      description: Contract class to receive request. Array of Property items  are used in case of create . Where as single Property item is used for update
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        WaterConnection:
+          $ref: '#/components/schemas/WaterConnection'
+    WaterConnectionResponse:
+      description: Contains the ResponseHeader and the created/updated property
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        WaterConnection:
+          type: array
+          items:
+            $ref: '#/components/schemas/WaterConnection'
+          
+    SewerageConnectionRequest:
+      description: Contract class to receive request. Array of Property items  are used in case of create . Where as single Property item is used for update
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/RequestInfo'
+        SewerageConnection:
+          $ref: '#/components/schemas/SewerageConnection'
+    SewerageConnectionResponse:
+      description: Contains the ResponseHeader and the created/updated property
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        SewerageConnections:
+          type: array
+          items:
+            $ref: '#/components/schemas/SewerageConnection'
+
+####################### Master data schema(MDMS) #######################     
+      
+    ConnectionCategory:
+      type: object
+      properties:
+        code:
+          type: string
+          description: code of the connection category
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: describes Whether propertyType is Active or not.
+      required:
+        - code
+        
+    ConnectionType:
+      type: object
+      properties:
+        code:
+          type: string
+          description: code of the connection type
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: Whether UsageCategoryMajor is Active or not.
+      required:
+        - code

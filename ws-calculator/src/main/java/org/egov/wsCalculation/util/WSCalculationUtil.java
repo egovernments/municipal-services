@@ -3,6 +3,7 @@ package org.egov.wsCalculation.util;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,8 @@ import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandDetail;
 import org.egov.wsCalculation.model.DemandDetailAndCollection;
 import org.egov.wsCalculation.model.GetBillCriteria;
+import org.egov.wsCalculation.repository.ServiceRequestRepository;
+import org.json.JSONObject;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,12 +37,7 @@ public class WSCalculationUtil {
 
 	@Autowired
 	private WSCalculationConfiguration configurations;
-
-
-
-	@Value("${customization.allowdepreciationonnoreceipts:false}")
-	Boolean allowDepreciationsOnNoReceipts;
-
+	
 	/**
 	 * Returns the tax head search Url with tenantId and WS service name
 	 * parameters
@@ -103,42 +101,7 @@ public class WSCalculationUtil {
 		return new StringBuilder().append(configurations.getMdmsHost()).append(configurations.getMdmsEndPoint());
 	}
 
-	/**
-	 * Query to fetch latest assessment for the given criteria
-	 *
-	 * @param assessment
-	 * @return
-	 */
-	public String getMaxAssessmentQuery(Assessment assessment, List<Object> preparedStmtList) {
-
-		StringBuilder query = new StringBuilder("SELECT * FROM eg_pt_assessment a1 INNER JOIN "
-
-				+ "(select Max(createdtime) as maxtime, propertyid, assessmentyear from eg_pt_assessment WHERE Active = TRUE group by propertyid, assessmentyear) a2 "
-
-				+ "ON a1.createdtime=a2.maxtime and a1.propertyid=a2.propertyid where a1.tenantId=? ");
-
-		preparedStmtList.add(assessment.getTenantId());
-
-		if (assessment.getDemandId() != null) {
-			query.append(" AND a1.demandId=?");
-			preparedStmtList.add(assessment.getDemandId());
-		}
-
-		if (assessment.getConnectionId() != null) {
-			query.append(" AND a1.propertyId=?");
-			preparedStmtList.add(assessment.getConnectionId());
-		}
-
-		if (assessment.getAssessmentYear() != null) {
-			query.append(" AND a1.assessmentyear=?");
-			preparedStmtList.add(assessment.getAssessmentYear());
-		}
-
-		query.append(" AND a1.active IS TRUE");
-
-		return query.toString();
-	}
-
+	
 	/**
 	 * Returns the insert query for assessment
 	 * 
@@ -203,37 +166,6 @@ public class WSCalculationUtil {
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getDemandUpdateEndPoint());
 	}
-
-	/**
-	 * Check if Depreciation is allowed for this Property. In case there is no
-	 * receipt the depreciation will be allowed
-	 * 
-	 * @param assessmentYear
-	 *            The year for which existing receipts needs to be checked
-	 * @param tenantId
-	 *            The tenant id of the property
-	 * @param connectionId
-	 *            The connection id
-	 * @param requestInfoWrapper
-	 *            The incoming requestInfo
-	 */
-
-	// public Boolean isAssessmentDepreciationAllowed(String assessmentYear,
-	// String tenantId, String propertyId,
-	// RequestInfoWrapper requestInfoWrapper) {
-	// boolean isDepreciationAllowed = false;
-	// if (allowDepreciationsOnNoReceipts) {
-	// List<Receipt> receipts =
-	// rcptService.getReceiptsFromPropertyAndFY(assessmentYear,tenantId,
-	// propertyId,
-	// requestInfoWrapper);
-	//
-	// if (receipts.size() == 0)
-	// isDepreciationAllowed = true;
-	// }
-	//
-	// return isDepreciationAllowed;
-	// }
 
 	/**
 	 * method to create demand search url with demand criteria
@@ -343,5 +275,7 @@ public class WSCalculationUtil {
 				.build();
 
 	}
+	
+
 	
 }

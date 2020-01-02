@@ -71,4 +71,44 @@ public class SWCalculationConfiguration {
 	@Value("${egov.demand.billexpirytime}")
 	private Long demandBillExpiry;
 	
+	
+    //SMS
+    @Value("${kafka.topics.notification.sms}")
+    private String smsNotifTopic;
+
+    @Value("${notification.sms.enabled}")
+    private Boolean isSMSEnabled;
+    
+    
+    //Email
+    @Value("${notification.mail.enabled}")
+    private Boolean isMailEnabled;
+    
+    
+    @Value("${kafka.topics.notification.mail.name}")
+    private String emailNotifyTopic;
+   
+
+
+    //Localization
+    @Value("${egov.localization.host}")
+    private String localizationHost;
+
+    @Value("${egov.localization.context.path}")
+    private String localizationContextPath;
+
+    @Value("${egov.localization.search.endpoint}")
+    private String localizationSearchEndpoint;
+
+    @Value("${egov.localization.statelevel}")
+    private Boolean isLocalizationStateLevel;
+    
+    @Value("${sw.calculator.demand.successful}")
+    private String onDemandSuccess;
+    
+    @Value("${sw.calculator.demand.failed}")
+    private String onDemandFailed;
+    
+  
+	
 }

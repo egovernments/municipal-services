@@ -141,5 +141,20 @@ public class CalculatorUtil {
 		url.append("{2}");
 		return url.toString();
 	}
+	
+	
+	/**
+	 * Methods provides all the usage category master for Water Service module
+	 */
+	public MdmsCriteriaReq getMdmsReqCriteria(RequestInfo requestInfo, String tenantId,
+			ArrayList<String> masterDetails, String moduleName) {
+
+		List<MasterDetail> details = new ArrayList<>();
+		masterDetails.forEach(masterName -> details.add(MasterDetail.builder().name(masterName).build()));
+		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details).moduleName(moduleName).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
 
 }

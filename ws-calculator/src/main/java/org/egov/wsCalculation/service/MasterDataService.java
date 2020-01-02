@@ -31,6 +31,7 @@ import org.egov.wsCalculation.model.TaxPeriodResponse;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
+import org.javers.common.collections.Arrays;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -460,5 +461,17 @@ public class MasterDataService {
 	}
 	public LocalDateTime setCurrentDateValueToStartingOfDay(LocalDateTime localDateTime) {
 		return localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+	}
+	
+	public JSONArray getMasterListOfReceiver(RequestInfo requestInfo, String tenantId) {
+		ArrayList<String> masterDetails = new ArrayList<>();
+		masterDetails.add(WSCalculationConstant.SMS_RECIEVER_MASTER);
+		MdmsResponse response = mapper.convertValue(
+				repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), calculatorUtils
+						.getMdmsReqCriteria(requestInfo, tenantId, masterDetails, WSCalculationConstant.WS_TAX_MODULE)),
+				MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
+		JSONArray receiverList = res.get(WSCalculationConstant.SMS_RECIEVER_MASTER);
+		return receiverList;
 	}
 }

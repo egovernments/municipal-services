@@ -1,5 +1,6 @@
 package org.egov.waterConnection.service;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -77,6 +78,7 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		if (isCreate) {
 			waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
+			waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(Instant.now().getEpochSecond() * 1000);
 			setWaterConnectionIdgenIds(waterConnectionRequest);
 		}
 	}

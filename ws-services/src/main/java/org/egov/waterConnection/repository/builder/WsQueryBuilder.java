@@ -25,10 +25,11 @@ public class WsQueryBuilder {
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
-			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
+			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id, wc.connectionExecutionDate, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
 			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
 			+ INNER_JOIN_STRING + " connection conn ON wc.connection_id = conn.id";
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
+	
 
 
 	/**
@@ -45,20 +46,7 @@ public class WsQueryBuilder {
 		StringBuilder query = new StringBuilder(WATER_SEARCH_Query);
 		String resultantQuery = query.toString();
 		boolean isAnyCriteriaMatch = false;
-//		if(criteria == null && criteria.isEmpty()){
-//			Set<String> propertyIds = new HashSet<>();
-//			List<Property> propertyList = waterServicesUtil.propertySearchForCitizen(requestInfo);
-//			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
-//			if (!propertyIds.isEmpty()) {
-//				addClauseIfRequired(preparedStatement, query);
-//				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
-//				addToPreparedStatement(preparedStatement, propertyIds);
-//				isAnyCriteriaMatch = true;
-//			}
-//		}
-		
-		if ((criteria.getTenantId() != null && !criteria.getTenantId().isEmpty())
-				&& (criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
+		if ((criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
@@ -68,7 +56,13 @@ public class WsQueryBuilder {
 				addToPreparedStatement(preparedStatement, propertyIds);
 				isAnyCriteriaMatch = true;
 			}
-			
+
+		}
+		if (criteria.getPropertyId() != null && !criteria.getPropertyId().isEmpty()) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.property_id = ? ");
+			preparedStatement.add(criteria.getPropertyId());
+			isAnyCriteriaMatch = true;
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
@@ -101,12 +95,18 @@ public class WsQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
-		if(isAnyCriteriaMatch == false)
+		if (isAnyCriteriaMatch == false)
 			return null;
 		resultantQuery = query.toString();
+		resultantQuery = addOrderBy(resultantQuery);
 		if (query.toString().indexOf("WHERE") > -1)
 			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return resultantQuery;
+	}
+	
+	private String addOrderBy(String query) {
+		query = query + " ORDER BY wc.connectionExecutionDate DESC";
+		return query;
 	}
 
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
@@ -170,4 +170,5 @@ public class WsQueryBuilder {
 		addToPreparedStatement(preparedStatement, listOfIds);
 		return query.toString();
 	}
+	
 }

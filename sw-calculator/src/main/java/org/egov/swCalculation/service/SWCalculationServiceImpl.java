@@ -1,7 +1,10 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,8 +17,10 @@ import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.CalculationRes;
 import org.egov.swCalculation.model.Category;
+import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxHeadMaster;
+import org.egov.swCalculation.repository.SewerageCalculatorDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +40,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	PayService payService;
 	
 	@Autowired
-	DemandService demandService;
+	DemandService demandService;	
+	
+	@Autowired
+	SewerageCalculatorDao sewerageCalculatorDao;
+
 	
 	/**
 	 * Get Calculation Request and return Calculated Response
@@ -45,6 +54,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		
 		return new CalculationRes(new ResponseInfo(),calculations);
 	}
 
@@ -64,6 +74,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
+		
+		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
 
 
 		// String assessmentNumber = null != detail.getAssessmentNumber() ?
@@ -123,8 +135,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge);
 		
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates)
-				.billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).sewerageConnection(criteria.getSewerageConnection()).build();
+				.charge(sewerageCharge).sewerageConnection(sewerageConnection).rebate(rebate).tenantId(tenantId)
+				.taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo())
+				.build();
 	}
 	
 	/**
@@ -142,6 +155,22 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			calculations.add(calculation);
 		}
 		return calculations;
+	}
+	
+	/**
+	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
+	 */
+	public void generateDemandBasedOnTimePeriod() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
+		List<String> tenantIds = sewerageCalculatorDao.getTenantId();
+		if (tenantIds.isEmpty())
+			return;
+		log.info("Tenant Ids : " + tenantIds.toString());
+		tenantIds.forEach(tenantId -> {
+			demandService.generateDemandForTenantId(tenantId);
+		});
 	}
 	
 }

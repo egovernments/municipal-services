@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.wsCalculation.model.CalculationCriteria;
+import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
@@ -32,22 +34,21 @@ public class MeterServicesImpl implements MeterService {
 	
 	@Autowired
 	WSCalculationService wSCalculationService;
+	
+	@Autowired
+	EstimationService estimationService;
 
-	private ServiceRequestRepository serviceRequestRepository;
 
 	private EnrichmentService enrichmentService;
 
 	@Autowired
-	public MeterServicesImpl(ServiceRequestRepository serviceRequestRepository, EnrichmentService enrichmentService) {
-		this.serviceRequestRepository = serviceRequestRepository;
+	public MeterServicesImpl(EnrichmentService enrichmentService) {
 		this.enrichmentService = enrichmentService;
 	}
 
 	/**
 	 * 
-	 * @param meterConnectionRequest
-	 *            MeterConnectionRequest contains meter reading connection to be
-	 *            created
+	 * @param meterConnectionRequest MeterConnectionRequest contains meter reading connection to be created
 	 * @return List of MeterReading after create
 	 */
 
@@ -55,16 +56,24 @@ public class MeterServicesImpl implements MeterService {
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
-		//mDMSValidator.validateMasterData(meterConnectionRequest);
+		// mDMSValidator.validateMasterData(meterConnectionRequest);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
-		
-		
-		// Object result =
-		// serviceRequestRepository.fetchResult(meterReadingUtil.getDemandGenerationCreateURL(),
-		// meterConnectionRequest);
-		// meterReadingUtil.getMeterReadingDetails(result);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
-		wSCalculationDao.saveWaterConnection(meterConnectionRequest);
+		wSCalculationDao.savemeterReading(meterConnectionRequest);
+		List<CalculationCriteria> criterias = new ArrayList<>();
+		meterReadingsList.forEach(reading -> {
+			CalculationCriteria criteria = new CalculationCriteria();
+			criteria.setTenantId(meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+			criteria.setAssessmentYear(estimationService.getAssessmentYear());
+			criteria.setCurrentReading(reading.getCurrentReading());
+			criteria.setLastReading(reading.getLastReading());
+			criteria.setConnectionNo(reading.getConnectionNo());
+			criterias.add(criteria);
+			
+		});
+		CalculationReq calculationRequest = CalculationReq.builder()
+				.requestInfo(meterConnectionRequest.getRequestInfo()).calculationCriteria(criterias).build();
+		wSCalculationService.getCalculation(calculationRequest);
 		return meterReadingsList;
 	}
 	

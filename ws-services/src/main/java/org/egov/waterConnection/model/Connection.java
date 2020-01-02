@@ -115,7 +115,8 @@ public class Connection {
 		this.id = id;
 		return this;
 	}
-
+	
+	
 	/**
 	 * Unique Identifier of the connection for internal reference.
 	 * 

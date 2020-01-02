@@ -20,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonPropertyOrder({ "tenantId", "totalAmount", "taxAmount", "exemption", "rebate", "exemption", "penalty" })
+@JsonPropertyOrder({ "tenantId", "totalAmount",  "charge", "taxAmount", "exemption", "rebate", "exemption", "penalty" })
 public class Calculation {
 
 	@JsonProperty("applicationNo")
@@ -43,6 +43,9 @@ public class Calculation {
 
 	@JsonProperty("rebate")
 	private BigDecimal rebate;
+	
+	@JsonProperty("charge")
+	private BigDecimal charge;
 
 	List<TaxHeadEstimate> taxHeadEstimates;
 

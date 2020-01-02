@@ -1,6 +1,7 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,9 +16,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
+import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.Calculation;
+import org.egov.swCalculation.model.CalculationCriteria;
+import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.Demand;
 import org.egov.swCalculation.model.Demand.StatusEnum;
 import org.egov.swCalculation.model.DemandDetail;
@@ -31,6 +35,8 @@ import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxPeriod;
 import org.egov.swCalculation.repository.DemandRepository;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
+import org.egov.swCalculation.repository.SewerageCalculatorDao;
+import org.egov.swCalculation.util.CalculatorUtils;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -71,7 +78,15 @@ public class DemandService {
 	
 	@Autowired
 	PayService payService;
-
+	
+    @Autowired
+    CalculatorUtils calculatorUtils;
+    
+    @Autowired
+    SewerageCalculatorDao sewerageCalculatorDao;
+    
+    @Autowired
+    SWCalculationService swCalculationService;
 
 	/**
 	 * Creates or updates Demand
@@ -625,5 +640,71 @@ public class DemandService {
 		url.append("consumerCode=");
 		url.append("{3}");
 		return url.toString();
+	}
+	
+	/**
+	 * 
+	 * @param tenantId TenantId for getting master data.
+	 */
+	public void generateDemandForTenantId(String tenantId) {
+		RequestInfo requestInfo = new RequestInfo();
+		User user = new User();
+		user.setTenantId(tenantId);
+		requestInfo.setUserInfo(user);
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo,
+				SWCalculationConstant.nonMeterdConnection, tenantId);
+		String jsonPath = SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
+		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
+		Object res = repository.fetchResult(url, mdmsCriteriaReq);
+		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+		if (res == null) {
+			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		generateDemandForULB(mdmsResponse, requestInfo, tenantId);
+	}
+	
+	/**
+	 * 
+	 * @param mdmsResponse
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	@SuppressWarnings("unchecked")
+	public void generateDemandForULB(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenantId) {
+		log.info("Billing Frequency Map" + mdmsResponse.toString());
+		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+		String connectionType = SWCalculationConstant.nonMeterdConnection;
+		Long demandGenerateDateMillis = (Long) master.get(SWCalculationConstant.Demand_Generate_Date_String);
+		String billingFrequency = (String) master.get(SWCalculationConstant.Billing_Cycle_String);
+		long startDay = ((demandGenerateDateMillis) / 86400000);
+		boolean isTriggerEnable = isCurrentDateIsMatching(billingFrequency, startDay);
+		if (isTriggerEnable) {
+			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(connectionType, tenantId);
+			for (String connectionNo : connectionNos) {
+				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+						.connectionNo(connectionNo).build();
+				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+				calculationCriteriaList.add(calculationCriteria);
+				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+						.requestInfo(requestInfo).build();
+				swCalculationService.getCalculation(calculationReq);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param billingFrequency
+	 * @param dayOfMonth
+	 * @return true if current day is for generation of demand
+	 */
+	private boolean isCurrentDateIsMatching(String billingFrequency, long dayOfMonth) {
+		if (billingFrequency.equalsIgnoreCase(SWCalculationConstant.Monthly_Billing_Period)
+				&& (dayOfMonth == LocalDateTime.now().getMonthValue())) {
+			return true;
+		} else if (billingFrequency.equalsIgnoreCase(SWCalculationConstant.Quaterly_Billing_Period)) {
+			return false;
+		}
+		return false;
 	}
 }

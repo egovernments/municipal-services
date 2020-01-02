@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -29,6 +28,9 @@ public class Property extends PropertyInfo {
 
 	@JsonProperty("propertyType")
 	private String propertyType;
+
+	@JsonProperty("usageCategory")
+	private String usageCategory;
 
 	@JsonProperty("ownershipCategory")
 	private String ownershipCategory;
@@ -138,12 +140,14 @@ public class Property extends PropertyInfo {
 	@Builder
 	public Property(String id, String propertyId, String tenantId, String accountId, String oldPropertyId,
 			Status status, Address address, List<String> parentProperties, String acknowldgementNumber,
-			String propertyType, String ownershipCategory, List<OwnerInfo> owners, List<Institution> institution,
-			CreationReason creationReason, Long occupancyDate, Long constructionDate, Long noOfFloors, Double landArea,
-			Source source, List<Document> documents, Object additionalDetails, AuditDetails auditDetails) {
+			String propertyType, String usageCategory, String ownershipCategory, List<OwnerInfo> owners,
+			List<Institution> institution, CreationReason creationReason, Long occupancyDate, Long constructionDate,
+			Long noOfFloors, Double landArea, Source source, List<Document> documents, Object additionalDetails,
+			AuditDetails auditDetails) {
 		super(id, propertyId, tenantId, accountId, oldPropertyId, status, address, parentProperties);
 		this.acknowldgementNumber = acknowldgementNumber;
 		this.propertyType = propertyType;
+		this.usageCategory = usageCategory;
 		this.ownershipCategory = ownershipCategory;
 		this.owners = owners;
 		this.institution = institution;

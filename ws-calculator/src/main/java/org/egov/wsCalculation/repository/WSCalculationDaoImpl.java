@@ -10,6 +10,7 @@ import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.builder.WSCalculatorQueryBuilder;
+import org.egov.wsCalculation.rowmapper.DemandSchedulerRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingCurrentReadingRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	@Autowired
 	MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
 	
+	
+	@Autowired
+	DemandSchedulerRowMapper demandSchedulerRowMapper;
 
 	@Value("${egov.meterservice.createmeterconnection}")
 	private String createMeterConnection;
@@ -51,7 +55,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	 *         returning list of water connection
 	 */
 	@Override
-	public void saveWaterConnection(MeterConnectionRequest meterConnectionRequest) {
+	public void savemeterReading(MeterConnectionRequest meterConnectionRequest) {
 		wSCalculationProducer.push(createMeterConnection, meterConnectionRequest);
 	}
 	/**
@@ -111,6 +115,38 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		if (query == null)
 			return tenentIds;
 		log.info("Query: " + query);
+		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
+		return tenentIds;
+	}
+	
+	@Override
+	public ArrayList<String> searchConnectionNos(String connectionType,String tenentId) {
+		ArrayList<String> connectionNos = new ArrayList<>();
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getConnectionNumberFromWaterServicesQuery(preparedStatement,connectionType,tenentId);
+		if (query == null)
+			return connectionNos;
+		log.info("Query: " + query);
+
+		connectionNos = (ArrayList<String>)jdbcTemplate.query(query,preparedStatement.toArray(),demandSchedulerRowMapper);
+		return connectionNos;
+	}
+	
+	@Override
+	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+		List<String> connectionNosList = new ArrayList<>();
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		log.info("sewerage " + connectionType + " connection list : " + query);
+		connectionNosList = jdbcTemplate.queryForList(query, String.class);
+		return connectionNosList;
+	}
+
+	@Override
+	public List<String> getTenantId() {
+		ArrayList<String> tenentIds = new ArrayList<>();
+		String query = queryBuilder.getDistinctTenantIds();
+		log.info("Tenant Id's List Query : " + query);
 		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
 		return tenentIds;
 	}

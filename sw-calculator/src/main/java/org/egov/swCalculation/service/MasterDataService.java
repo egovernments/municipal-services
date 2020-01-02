@@ -337,4 +337,16 @@ public class MasterDataService {
 		getBillingPeriod(mdmsResponse, masterMap);
 		return masterMap;
 	}
+	
+	public JSONArray getMasterListOfReceiver(RequestInfo requestInfo, String tenantId) {
+		ArrayList<String> masterDetails = new ArrayList<>();
+		masterDetails.add(SWCalculationConstant.SMS_RECIEVER_MASTER);
+		MdmsResponse response = mapper.convertValue(
+				repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), calculatorUtils
+						.getMdmsReqCriteria(requestInfo, tenantId, masterDetails, SWCalculationConstant.SW_TAX_MODULE)),
+				MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(SWCalculationConstant.SW_TAX_MODULE);
+		JSONArray receiverList = res.get(SWCalculationConstant.SMS_RECIEVER_MASTER);
+		return receiverList;
+	}
 }

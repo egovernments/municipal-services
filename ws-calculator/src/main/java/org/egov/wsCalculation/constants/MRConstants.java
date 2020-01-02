@@ -1,4 +1,4 @@
-package org.egov.wsCalculation.util;
+package org.egov.wsCalculation.constants;
 
 public class MRConstants {
 
