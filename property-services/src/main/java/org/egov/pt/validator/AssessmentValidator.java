@@ -132,6 +132,7 @@ public class AssessmentValidator {
 			}
 			
 			if(!CollectionUtils.isEmpty(assessmentFromDB.getDocuments())) {
+				
 				Set<String> existingDocs = assessmentFromDB.getDocuments().stream().map(Document::getId)
 						.collect(Collectors.toSet());
 				if (!CollectionUtils.isEmpty(assessment.getDocuments())) {
