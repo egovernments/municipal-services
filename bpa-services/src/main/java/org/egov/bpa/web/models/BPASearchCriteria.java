@@ -37,8 +37,8 @@ public class BPASearchCriteria {
 	    @JsonProperty("edcrNumbers")
 	    private List<String> edcrNumbers;
 	    
-	   
-
+	    @JsonProperty("createdBy")
+	    private String createdBy;
 
 	    @JsonProperty("offset")
 	    private Integer offset;
