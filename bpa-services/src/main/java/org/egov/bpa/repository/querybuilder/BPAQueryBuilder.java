@@ -51,12 +51,30 @@ public class BPAQueryBuilder {
 			List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
+		
+			
 
 		if (criteria.getTenantId() != null) {
 			if (criteria.getTenantId().equals("pb")) {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
+				
+//				if(criteria.getAccountId()!=null){
+		            addClauseIfRequired(preparedStmtList,builder);
+		            builder.append(" bpa.createdby = ? ");
+		            preparedStmtList.add(criteria.getCreatedBy());
+
+		           /* List<String> ownerIds = criteria.getOwnerIds();
+		            if(!CollectionUtils.isEmpty(ownerIds)) {
+		                builder.append(" OR (bpaowner.id IN (").append(createQuery(ownerIds)).append(")");
+		                addToPreparedStatement(preparedStmtList,ownerIds);
+		            }*/
+
+//		            return builder.toString();
+//		        }
+				
+				
 			} else {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid=? ");

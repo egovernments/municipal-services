@@ -340,7 +340,7 @@ public class EnrichmentService {
 		if (criteria.isEmpty()
 				&& requestInfo.getUserInfo().getType()
 						.equalsIgnoreCase("CITIZEN")) {
-//			criteria.setAccountId(requestInfo.getUserInfo().getUuid());
+			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			criteria.setMobileNumber(requestInfo.getUserInfo().getUserName());
 			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
 		}
