@@ -4,7 +4,11 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -206,7 +211,7 @@ public class MasterDataService {
 	 * @return Master For Billing Period
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getBillingFrequencyMasterData(RequestInfo requestInfo,
+	public Map<String, Object> getBillingFrequencyMasterData(CalculationCriteria criteria, RequestInfo requestInfo,
 			String connectionType, String tenantId, Map<String, Object> masterMap) {
 		String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
@@ -216,7 +221,7 @@ public class MasterDataService {
 		if (res == null) {
 			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
 		}
-		getBillingPeriod(mdmsResponse, masterMap);
+		getBillingPeriod(criteria, mdmsResponse, masterMap);
 		return masterMap;
 	}
 	
@@ -227,19 +232,27 @@ public class MasterDataService {
 	 * @return master map with date period
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getBillingPeriod(ArrayList<?> mdmsResponse, Map<String, Object> masterMap) {
+	public Map<String, Object> getBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
+			Map<String, Object> masterMap) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		Map<String, Object> billingPeriod = new HashMap<>();
 		LocalDateTime demandStartingDate = LocalDateTime.now();
 		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
 		Long demandEndDateMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
+		if (criteria.getBillingPeriod() != null && ((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
+				.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period))) {
+			HashMap<String, Long> demandStartAndEndDate = getDemandStartAndEndValue(criteria.getBillingPeriod());
+			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, demandStartAndEndDate.get("startDate"));
+			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, demandStartAndEndDate.get("endDate"));
+		} else {
+			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
+					Timestamp.valueOf(demandStartingDate).getTime());
+			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
+					Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
+		}
 		Long demandExpiryDateMillis = (Long) master.get(WSCalculationConstant.Demand_Expiry_Date_String);
-		billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
-				Timestamp.valueOf(demandStartingDate).getTime());
-		billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
-				Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
-		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String,demandExpiryDateMillis);
+		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String, demandExpiryDateMillis);
 		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
 	}
@@ -473,5 +486,39 @@ public class MasterDataService {
 		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
 		JSONArray receiverList = res.get(WSCalculationConstant.SMS_RECIEVER_MASTER);
 		return receiverList;
+	}
+	
+	public HashMap<String, Long> getDemandStartAndEndValue(String billingPeriodString) {
+		HashMap<String, Long> dateMap = new HashMap<>();
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("MMM-yyyy");
+			ZoneId defaultZoneId = ZoneId.systemDefault();
+			String dateAndYearMap[] = billingPeriodString.split("-");
+
+			System.out.println(dateAndYearMap[0].trim());
+			Date billingDate = sdf.parse(dateAndYearMap[0].trim() + "-" + dateAndYearMap[1].trim());
+			Instant instant = billingDate.toInstant();
+			LocalDate billingLocalDate = instant.atZone(defaultZoneId).toLocalDate();
+			LocalDate localDateTime = LocalDate.now();
+			YearMonth month = YearMonth.from(billingLocalDate);
+			if ((billingLocalDate.getYear() == localDateTime.getYear())
+					&& (billingLocalDate.getMonthValue() > localDateTime.getMonthValue())) {
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			}
+			if ((billingLocalDate.getYear() > localDateTime.getYear())) {
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			}
+			LocalDate start = month.atDay(1);
+			LocalDate end = month.atEndOfMonth();
+			long startDate = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() * 1000;
+			long endDate = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() * 1000;
+			dateMap.put("startDate", startDate);
+			dateMap.put("endDate", endDate);
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing period can not parsed!!");
+		}
+		return dateMap;
 	}
 }
