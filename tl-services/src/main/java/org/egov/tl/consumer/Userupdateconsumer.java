@@ -24,7 +24,6 @@ public class Userupdateconsumer {
         try {
             tradeLicenseRequest = mapper.convertValue(record, TradeLicenseRequest.class);
             userService.createUser(tradeLicenseRequest, true);
-            log.info("added User for " + tradeLicenseRequest.getLicenses().get(0).getApplicationNumber());
         } catch (final Exception e) {
             log.error("Error occurred while adding roles for BPA user " + e);
         }
