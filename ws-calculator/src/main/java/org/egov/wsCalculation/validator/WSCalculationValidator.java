@@ -54,7 +54,7 @@ public class WSCalculationValidator {
 		}
 		if (!connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 			errorMap.put("INVALID CONNECTION TYPE",
-					"Meter reading can not be create for : " + connection.getConnectionType());
+					"Meter reading can not be create for : " + connection.getConnectionType() +" connection");
 		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
 		Set<String> connectionNos= new HashSet<>();
