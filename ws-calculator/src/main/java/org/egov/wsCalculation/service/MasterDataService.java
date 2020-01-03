@@ -510,8 +510,8 @@ public class MasterDataService {
 			}
 			LocalDate start = month.atDay(1);
 			LocalDate end = month.atEndOfMonth();
-			long startDate = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() * 1000;
-			long endDate = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() * 1000;
+			long startDate = start.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+			long endDate = end.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			dateMap.put("startDate", startDate);
 			dateMap.put("endDate", endDate);
 
