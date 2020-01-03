@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
@@ -50,6 +51,10 @@ public class WSCalculationValidator {
 		if(connection == null) {
 			errorMap.put("INVALID METER READING CONNECTION NUMBER",
 					"Invalid water connection number");
+		}
+		if (!connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+			errorMap.put("INVALID CONNECTION TYPE",
+					"Meter reading can not be create for : " + connection.getConnectionType());
 		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
 		Set<String> connectionNos= new HashSet<>();
