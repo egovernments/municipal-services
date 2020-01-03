@@ -42,18 +42,13 @@ public class TradeLicenseConsumer {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }
         log.info("TradeLicense Received: "+tradeLicenseRequest.getLicenses().get(0).getApplicationNumber());
-
-
-        if(!tradeLicenseRequest.getLicenses().isEmpty())
-        {
+        if (!tradeLicenseRequest.getLicenses().isEmpty()) {
             String businessService = tradeLicenseRequest.getLicenses().get(0).getBusinessService();
             if (businessService == null)
                 businessService = businessService_TL;
-            switch (businessService)
-            {
+            switch (businessService) {
                 case businessService_BPA:
-                    try
-                    {
+                    try {
                         tradeLicenseService.checkEndStateAndAddBPARoles(tradeLicenseRequest);
                     } catch (final Exception e) {
                         log.error("Error occurred while adding roles for BPA user " + e);
