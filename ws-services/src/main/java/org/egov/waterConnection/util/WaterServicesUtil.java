@@ -209,7 +209,7 @@ public class WaterServicesUtil {
 	 * 
 	 * @return search url for property search
 	 */
-	private String getPropertySearchURL() {
+	private String getpropertySearchURLForMobileSearch() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
 		url.append("tenantId=");
@@ -219,18 +219,35 @@ public class WaterServicesUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-
-	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
-		String url = getPropertySearchURL();
-		url = url.replace("{1}", tenantId).replace("{2}", mobileNumber);
-		return new StringBuilder(url);
-	}
 	
 	/**
 	 * 
 	 * @return search url for property search
 	 */
-	private String getPropertySearchURLForCreate() {
+	private String getpropertySearchURLForMobileSearchCitizen() {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		url.append("?");
+		url.append("mobileNumber=");
+		url.append("{2}");
+		return url.toString();
+	}
+
+	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
+		String url = getpropertySearchURLForMobileSearchCitizen();
+		if(tenantId != null)
+			url = getpropertySearchURLForMobileSearch();
+		if (url.indexOf("{1}") > 0)
+			url = url.replace("{1}", tenantId);
+		if (url.indexOf("{2}") > 0)
+			url = url.replace("{2}", mobileNumber);
+		return new StringBuilder(url);
+	}
+	
+	/**
+	 * 
+	 * @return search url for property search employee
+	 */
+	private String getPropertySearchURLForEmployee() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
 		url.append("tenantId=");
@@ -241,10 +258,27 @@ public class WaterServicesUtil {
 		return url.toString();
 	}
 	
+	/**
+	 * 
+	 * @return search url for property search citizen
+	 */
+	private String getPropertySearchURLForCitizen() {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		url.append("?");
+		url.append("propertyIds=");
+		url.append("{2}");
+		return url.toString();
+	}
+	
 	
 	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
-		String url = getPropertySearchURLForCreate();
-		url = url.replace("{1}", tenantId).replace("{2}", propertyIds);
+		String url = getPropertySearchURLForCitizen();
+		if (tenantId != null)
+			url = getPropertySearchURLForEmployee();
+		if (url.indexOf("{1}") > 0)
+			url = url.replace("{1}", tenantId);
+		if (url.indexOf("{2}") > 0)
+			url = url.replace("{2}", propertyIds);
 		return new StringBuilder(url);
 	}
 }
