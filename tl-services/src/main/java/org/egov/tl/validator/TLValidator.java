@@ -75,7 +75,7 @@ public class TLValidator {
                 break;
 
             case businessService_BPA:
-                validateBPASpecificNotNullFields(request);
+                validateBPASpecificValidations(request);
                 break;
         }
         mdmsValidator.validateMdmsData(request, mdmsData);
@@ -113,7 +113,7 @@ public class TLValidator {
         });
     }
 
-    private void validateBPASpecificNotNullFields(TradeLicenseRequest request) {
+    private void validateBPASpecificValidations(TradeLicenseRequest request) {
 
         request.getLicenses().forEach(license -> {
             Map<String, String> errorMap = new HashMap<>();
@@ -126,7 +126,8 @@ public class TLValidator {
                     errorMap.put("NULL_INSTITUTIONNAME", " Institute name can not be null");
                 if (license.getTradeLicenseDetail().getInstitution().getAddress() == null)
                     errorMap.put("NULL_ADDRESS", " Institute address can not be null");
-
+                if (license.getTradeLicenseDetail().getTradeUnits().size()>1)
+                    errorMap.put("NOTALLOWED_TRADEUNITS", " More than one tradeunit not supported in BPA");
                 if (!errorMap.isEmpty())
                     throw new CustomException(errorMap);
             }
@@ -229,7 +230,7 @@ public class TLValidator {
                 break;
 
             case businessService_BPA:
-                validateBPASpecificNotNullFields(request);
+                validateBPASpecificValidations(request);
                 break;
         }
         mdmsValidator.validateMdmsData(request, mdmsData);
