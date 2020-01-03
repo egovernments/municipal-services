@@ -15,6 +15,7 @@ import org.egov.tl.web.models.user.UserDetailResponse;
 import org.egov.tl.web.models.user.UserSearchRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -92,7 +93,7 @@ public class UserService{
                         break;
                 }
                 if (owner.getUuid() == null) {
-                    addUserDefaultFields(tradeLicense.getTenantId(), role, owner);
+                    addUserDefaultFields(tradeLicense.getTenantId(), role, owner, businessService);
                     //  UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
                     StringBuilder uri = new StringBuilder(config.getUserHost())
                             .append(config.getUserContextPath())
@@ -272,11 +273,18 @@ public class UserService{
      * @param role The role of the user set in this case to CITIZEN
      * @param owner The user whose fields are to be set
      */
-    private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner){
+    private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner, String businessService){
         owner.setActive(true);
         owner.setTenantId(tenantId.split("\\.")[0]);
         owner.setRoles(Collections.singletonList(role));
         owner.setType("CITIZEN");
+        switch (businessService)
+        {
+            // for mseva notifications
+            case businessService_BPA:
+                owner.setPermanentCity(tenantId.split("\\.")[0]);
+                break;
+        }
     }
 
 
