@@ -162,6 +162,20 @@ public class TradeLicenseService {
        return licenses;
     }
 
+    public void checkEndStateAndAddBPARoles(TradeLicenseRequest tradeLicenseRequest) {
+        List<String> endstates = tradeUtil.getBPAEndState(tradeLicenseRequest);
+        List<TradeLicense> licensesToAddRoles = new ArrayList<>();
+        for (int i = 0; i < tradeLicenseRequest.getLicenses().size(); i++) {
+            TradeLicense license = tradeLicenseRequest.getLicenses().get(0);
+            if ((license.getStatus() != null) && license.getStatus().equalsIgnoreCase(endstates.get(i))) {
+                licensesToAddRoles.add(license);
+            }
+        }
+        if (!licensesToAddRoles.isEmpty()) {
+            TradeLicenseRequest tradeLicenseRequestForUserUpdate = TradeLicenseRequest.builder().licenses(licensesToAddRoles).requestInfo(tradeLicenseRequest.getRequestInfo()).build();
+            userService.createUser(tradeLicenseRequestForUserUpdate, true);
+        }
+    }
 
     public List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
         List<TradeLicense> licenses = new LinkedList<>();
@@ -280,11 +294,6 @@ public class TradeLicenseService {
         }
         enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
         userService.createUser(tradeLicenseRequest, false);
-        switch (businessServicefromPath) {
-            case businessService_BPA:
-                userService.addUserRolesAsynchronously(tradeLicenseRequest,endStates);
-                break;
-        }
         calculationService.addCalculation(tradeLicenseRequest);
         switch (businessServicefromPath) {
             case businessService_TL:

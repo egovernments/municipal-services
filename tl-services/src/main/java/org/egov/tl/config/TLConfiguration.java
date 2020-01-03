@@ -91,9 +91,6 @@ public class TLConfiguration {
     @Value("${egov.idgen.bpa.licensenumber.format}")
     private String licenseNumberIdgenFormatBPA;
 
-    @Value("${kafka.topics.user.update}")
-    private String userUpdateTopic;
-
     //Persister Config
     @Value("${persister.save.tradelicense.topic}")
     private String saveTopic;
