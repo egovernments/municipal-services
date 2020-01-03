@@ -98,29 +98,37 @@ public class TLValidator {
 
     private void validateTLSpecificNotNullFields(TradeLicenseRequest request) {
         request.getLicenses().forEach(license -> {
+            Map<String, String> errorMap = new HashMap<>();
             if (license.getFinancialYear() == null)
-                throw new CustomException("NULL_FINANCIALYEAR", " Financial Year cannot be null");
+                errorMap.put("NULL_FINANCIALYEAR", " Financial Year cannot be null");
             if (license.getTradeLicenseDetail().getStructureType() == null)
-                throw new CustomException("NULL_STRUCTURETYPE", " Structure Type cannot be null");
+                errorMap.put("NULL_STRUCTURETYPE", " Structure Type cannot be null");
             if (license.getTradeLicenseDetail().getSubOwnerShipCategory() == null)
-                throw new CustomException("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
+                errorMap.put("NULL_SUBOWNERSHIPCATEGORY", " SubOwnership Category cannot be null");
             if ((license.getTradeLicenseDetail().getAddress().getLocality() == null)||(license.getTradeLicenseDetail().getAddress().getLocality().getCode() == null))
-                throw new CustomException("NULL_LOCALITY", " Locality cannot be null");
+                errorMap.put("NULL_LOCALITY", " Locality cannot be null");
+
+            if (!errorMap.isEmpty())
+                throw new CustomException(errorMap);
         });
     }
 
     private void validateBPASpecificNotNullFields(TradeLicenseRequest request) {
 
         request.getLicenses().forEach(license -> {
+            Map<String, String> errorMap = new HashMap<>();
             if (license.getTradeLicenseDetail().getSubOwnerShipCategory().contains("INSTITUTION")) {
                 if (license.getTradeLicenseDetail().getInstitution().getContactNo() == null)
-                    throw new CustomException("NULL_INSTITUTIONCONTACTNO", " Institution Contact No cannot be null");
+                    errorMap.put("NULL_INSTITUTIONCONTACTNO", " Institution Contact No cannot be null");
                 if (license.getTradeLicenseDetail().getInstitution().getName() == null)
-                    throw new CustomException("NULL_AUTHORISEDPERSONNAME", " Authorised person name can not be null");
+                    errorMap.put("NULL_AUTHORISEDPERSONNAME", " Authorised person name can not be null");
                 if (license.getTradeLicenseDetail().getInstitution().getInstituionName() == null)
-                    throw new CustomException("NULL_INSTITUTIONNAME", " Institute name can not be null");
+                    errorMap.put("NULL_INSTITUTIONNAME", " Institute name can not be null");
                 if (license.getTradeLicenseDetail().getInstitution().getAddress() == null)
-                    throw new CustomException("NULL_ADDRESS", " Institute address can not be null");
+                    errorMap.put("NULL_ADDRESS", " Institute address can not be null");
+
+                if (!errorMap.isEmpty())
+                    throw new CustomException(errorMap);
             }
         });
 

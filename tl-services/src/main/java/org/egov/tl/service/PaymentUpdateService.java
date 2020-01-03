@@ -55,7 +55,7 @@ public class PaymentUpdateService {
 	private TradeUtil util;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-	private Boolean wfFallbackEnabled;
+	private Boolean pickWFServiceNameFromTradeTypeOnly;
 
 	@Autowired
 	public PaymentUpdateService(TradeLicenseService tradeLicenseService, TLConfiguration config, TLRepository repository,
@@ -107,7 +107,7 @@ public class PaymentUpdateService {
 
 						case businessService_BPA:
 							String tradeType = licenses.get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-							if (wfFallbackEnabled)
+							if (pickWFServiceNameFromTradeTypeOnly)
 								tradeType = tradeType.split("\\.")[0];
 							wfbusinessServiceName = tradeType;
 							break;

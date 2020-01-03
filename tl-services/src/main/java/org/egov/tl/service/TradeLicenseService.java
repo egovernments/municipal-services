@@ -56,7 +56,7 @@ public class TradeLicenseService {
     private  TradeUtil tradeUtil;
 
     @Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-    private Boolean wfFallbackEnabled;
+    private Boolean pickWFServiceNameFromTradeTypeOnly;
 
     @Autowired
     public TradeLicenseService(WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService,
@@ -241,7 +241,7 @@ public class TradeLicenseService {
 
             case businessService_BPA:
                 String tradeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-                if (wfFallbackEnabled)
+                if (pickWFServiceNameFromTradeTypeOnly)
                     tradeType = tradeType.split("\\.")[0];
                 businessServiceName = tradeType;
                 break;

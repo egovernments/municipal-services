@@ -67,7 +67,7 @@ public class WorkflowIntegrator {
 	private TLConfiguration config;
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-	private Boolean wfFallbackEnabled;
+	private Boolean pickWFServiceNameFromTradeTypeOnly;
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, TLConfiguration config) {
@@ -120,7 +120,7 @@ public class WorkflowIntegrator {
 
 					case businessService_BPA:
 						String tradeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-						if(wfFallbackEnabled)
+						if(pickWFServiceNameFromTradeTypeOnly)
 						{
 							tradeType=tradeType.split("\\.")[0];
 						}
