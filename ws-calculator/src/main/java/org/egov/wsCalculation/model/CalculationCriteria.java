@@ -48,5 +48,9 @@ public class CalculationCriteria   {
         @JsonProperty("currentReading")
         private Double currentReading = null;
         
+        @JsonProperty("billingPeriod")
+        private String billingPeriod = null;
+        
+        
 }
 
