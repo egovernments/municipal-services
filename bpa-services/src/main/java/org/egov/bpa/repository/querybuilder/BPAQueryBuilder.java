@@ -59,19 +59,18 @@ public class BPAQueryBuilder {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
-				
 
-		            builder.append(" OR bpa.createdby = ? ");
-		            preparedStmtList.add(criteria.getCreatedBy());
+				addClauseIfRequired(preparedStmtList, builder);
+				builder.append(" ( bpa.createdby = ? ");
+				preparedStmtList.add(criteria.getCreatedBy());
 
-		            List<String> ownerIds = criteria.getOwnerIds();
-		            if(!CollectionUtils.isEmpty(ownerIds)) {
-		                builder.append(" OR (bpaowner.id IN (").append(createQuery(ownerIds)).append(")");
-		                addToPreparedStatement(preparedStmtList,ownerIds);
-		            }
+				List<String> ownerIds = criteria.getOwnerIds();
+				if (!CollectionUtils.isEmpty(ownerIds)) {
+					builder.append(" OR (bpaowner.id IN (")
+							.append(createQuery(ownerIds)).append("))");
+					addToPreparedStatement(preparedStmtList, ownerIds);
+				}
 
-				
-				
 			} else {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid=? ");
