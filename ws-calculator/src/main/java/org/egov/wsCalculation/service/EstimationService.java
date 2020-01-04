@@ -172,19 +172,58 @@ public class EstimationService {
 		 if(totalUOM == 0.0)
 			 return waterCharge;
 
-		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
+		if (isRangeCalculation(waterConnection.getCalculationAttribute()) && waterConnection.getConnectionType().equals(WSCalculationConstant.meteredConnectionType)) {
 			for (BillingSlab billingSlab : billingSlabs) {
 				for (Slab slab : billingSlab.slabs) {
+					if(totalUOM < slab.from) {
+						if(totalUOM > slab.to)
+						{
+							waterCharge= waterCharge.add(BigDecimal.valueOf(((slab.to)-(slab.from))* slab.charge));
+							if (slab.minimumCharge > waterCharge.doubleValue()) {
+								waterCharge = BigDecimal.valueOf(slab.minimumCharge);
+							}
+							
+						} else if(slab.to > totalUOM) {
+							waterCharge=waterCharge.add(BigDecimal.valueOf((totalUOM-(slab.from))* slab.charge));
+							if (slab.minimumCharge > waterCharge.doubleValue()) {
+								waterCharge = BigDecimal.valueOf(slab.minimumCharge);
+							}
+						}
+					} else 
+						break;
+/*					if (totalUOM >= slab.from && totalUOM > slab.to)
+					{
+						waterCharge= waterCharge.add(BigDecimal.valueOf(((slab.to)-(slab.from))* slab.charge));
+					}
+					
 					if (totalUOM >= slab.from && totalUOM < slab.to) {
-						waterCharge = BigDecimal.valueOf((totalUOM * slab.charge));
+						totalUOM=totalUOM-slab.from;
+						
+						waterCharge = waterCharge.add(BigDecimal.valueOf((totalUOM * slab.charge)));
 						if (slab.minimumCharge > waterCharge.doubleValue()) {
 							waterCharge = BigDecimal.valueOf(slab.minimumCharge);
 						}
 						break;
+*/					}
+//				}
+			}
+		}
+		
+		else if (isRangeCalculation(waterConnection.getCalculationAttribute()) && waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection )) {
+				for (BillingSlab billingSlab : billingSlabs) {
+					for (Slab slab : billingSlab.slabs) {
+						if (totalUOM >= slab.from && totalUOM < slab.to) {
+							waterCharge = BigDecimal.valueOf((totalUOM * slab.charge));
+							if (slab.minimumCharge > waterCharge.doubleValue()) {
+								waterCharge = BigDecimal.valueOf(slab.minimumCharge);
+							}
+							break;
+						}
 					}
 				}
 			}
-		} else {
+		
+		 else {
 			for (BillingSlab billingSlab : billingSlabs) {
 				waterCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
 				break;
