@@ -55,23 +55,11 @@ public class BPAQueryBuilder {
 			
 
 		if (criteria.getTenantId() != null) {
-			if (criteria.getTenantId().equals("pb")) {
+			if (criteria.getTenantId().split("\\.").length == 1) {
+
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
-				
-
-		            builder.append(" OR bpa.createdby = ? ");
-		            preparedStmtList.add(criteria.getCreatedBy());
-
-		            List<String> ownerIds = criteria.getOwnerIds();
-		            if(!CollectionUtils.isEmpty(ownerIds)) {
-		                builder.append(" OR (bpaowner.id IN (").append(createQuery(ownerIds)).append(")");
-		                addToPreparedStatement(preparedStmtList,ownerIds);
-		            }
-
-				
-				
 			} else {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" bpa.tenantid=? ");
@@ -107,7 +95,13 @@ public class BPAQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpaowner.mobileNumber = ? ");
 			preparedStmtList.add(criteria.getMobileNumber());
-		}
+			
+		}else if(criteria.getCreatedBy() != null ) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" ( bpa.createdby = ? ");
+			preparedStmtList.add(criteria.getCreatedBy());
+			builder.append(" OR bpaowner.id = ? )");
+			preparedStmtList.add(criteria.getCreatedBy());}
 
 
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
@@ -145,6 +139,7 @@ public class BPAQueryBuilder {
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
 
+		System.out.println("========>>>>> "+finalQuery);
 		return finalQuery;
 
 	}

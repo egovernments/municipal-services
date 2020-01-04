@@ -1,5 +1,7 @@
 package org.egov.bpa.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +24,7 @@ import org.egov.bpa.workflow.BPAWorkflowService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,10 +107,16 @@ public class BPAService {
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa;
 		bpaValidator.validateSearch(requestInfo, criteria);
-		enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo, criteria);
 		if (criteria.getMobileNumber() != null) {
 			bpa = getBPAFromMobileNumber(criteria, requestInfo);
 		} else {
+			List<String> roles = new ArrayList<>();
+			for (Role role : requestInfo.getUserInfo().getRoles()) {
+				roles.add(role.getCode());
+			}
+			if( criteria.tenantIdOnly() && roles.contains("CITIZEN")) {
+				criteria.setCreatedBy( requestInfo.getUserInfo().getUuid());
+			}
 			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
 		}
 		return bpa;
