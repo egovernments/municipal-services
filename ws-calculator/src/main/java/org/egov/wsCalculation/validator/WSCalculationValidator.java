@@ -14,6 +14,7 @@ import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.repository.WSCalculationDao;
+import org.egov.wsCalculation.service.MasterDataService;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,6 +33,9 @@ public class WSCalculationValidator {
 	
 	@Autowired
 	CalculatorUtil calculationUtil;
+	
+	@Autowired
+	MasterDataService masterDataService;
 
 	/**
 	 * 
@@ -45,7 +49,8 @@ public class WSCalculationValidator {
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
-		
+		if(meterReading.getBillingPeriod() != null)
+		masterDataService.getDemandStartAndEndValue(meterReading.getBillingPeriod());
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if(connection == null) {
