@@ -60,9 +60,8 @@ public class BPAQueryBuilder {
 				builder.append(" bpa.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
 				
-//				if(criteria.getAccountId()!=null){
-		            addClauseIfRequired(preparedStmtList,builder);
-		            builder.append(" bpa.createdby = ? ");
+
+		            builder.append(" OR bpa.createdby = ? ");
 		            preparedStmtList.add(criteria.getCreatedBy());
 
 		           /* List<String> ownerIds = criteria.getOwnerIds();
@@ -71,8 +70,6 @@ public class BPAQueryBuilder {
 		                addToPreparedStatement(preparedStmtList,ownerIds);
 		            }*/
 
-//		            return builder.toString();
-//		        }
 				
 				
 			} else {
