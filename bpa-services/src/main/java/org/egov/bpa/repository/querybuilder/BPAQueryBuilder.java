@@ -64,11 +64,11 @@ public class BPAQueryBuilder {
 		            builder.append(" OR bpa.createdby = ? ");
 		            preparedStmtList.add(criteria.getCreatedBy());
 
-		           /* List<String> ownerIds = criteria.getOwnerIds();
+		            List<String> ownerIds = criteria.getOwnerIds();
 		            if(!CollectionUtils.isEmpty(ownerIds)) {
 		                builder.append(" OR (bpaowner.id IN (").append(createQuery(ownerIds)).append(")");
 		                addToPreparedStatement(preparedStmtList,ownerIds);
-		            }*/
+		            }
 
 				
 				
