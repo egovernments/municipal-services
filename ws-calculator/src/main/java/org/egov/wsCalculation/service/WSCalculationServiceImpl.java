@@ -189,7 +189,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
-			masterDataService.getBillingFrequencyMasterData(request.getRequestInfo(), criteria.getWaterConnection().getConnectionType(), tenantId ,masterMap);
+			masterDataService.getBillingFrequencyMasterData(criteria, request.getRequestInfo(), criteria.getWaterConnection().getConnectionType(), tenantId ,masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}
