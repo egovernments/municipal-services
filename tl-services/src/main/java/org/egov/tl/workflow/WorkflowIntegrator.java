@@ -25,8 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 
-import static org.egov.tl.util.TLConstants.CITIZEN_SENDBACK_ACTION;
-
+import static org.egov.tl.util.TLConstants.*;
 @Service
 @Slf4j
 public class WorkflowIntegrator {
@@ -49,7 +48,9 @@ public class WorkflowIntegrator {
 
 	private static final String UUIDKEY = "uuid";
 
-	private static final String MODULENAMEVALUE = "TL";
+	private static final String TLMODULENAMEVALUE = "TL";
+
+	private static final String BPAMODULENAMEVALUE = "BPAREG";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
 
@@ -65,6 +66,8 @@ public class WorkflowIntegrator {
 
 	private TLConfiguration config;
 
+	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
+	private Boolean pickWFServiceNameFromTradeTypeOnly;
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, TLConfiguration config) {
@@ -84,80 +87,101 @@ public class WorkflowIntegrator {
 	public void callWorkFlow(TradeLicenseRequest tradeLicenseRequest) {
 
 		String wfTenantId = tradeLicenseRequest.getLicenses().get(0).getTenantId();
-
+		String businessServiceFromMDMS = tradeLicenseRequest.getLicenses().isEmpty()?null:tradeLicenseRequest.getLicenses().get(0).getBusinessService();
+		if (businessServiceFromMDMS == null)
+			businessServiceFromMDMS = businessService_TL;
 		JSONArray array = new JSONArray();
 		for (TradeLicense license : tradeLicenseRequest.getLicenses()) {
+			if((businessServiceFromMDMS.equals(businessService_TL))||(!license.getAction().equalsIgnoreCase(TRIGGER_NOWORKFLOW))) {
+				JSONObject obj = new JSONObject();
 
-			JSONObject obj = new JSONObject();
-			List<Map<String, String>> uuidmaps = new LinkedList<>();
 
-			if(!CollectionUtils.isEmpty(license.getAssignee())){
+				List<Map<String, String>> uuidmaps = new LinkedList<>();
 
-				// Adding assignes to processInstance
-				license.getAssignee().forEach(assignee -> {
-					Map<String, String> uuidMap = new HashMap<>();
-					uuidMap.put(UUIDKEY, assignee);
-					uuidmaps.add(uuidMap);
-				});
+				if(!CollectionUtils.isEmpty(license.getAssignee())){
 
+					// Adding assignes to processInstance
+					license.getAssignee().forEach(assignee -> {
+						Map<String, String> uuidMap = new HashMap<>();
+						uuidMap.put(UUIDKEY, assignee);
+						uuidmaps.add(uuidMap);
+					});
+
+				}
+
+				obj.put(BUSINESSIDKEY, license.getApplicationNumber());
+				obj.put(TENANTIDKEY, wfTenantId);
+				switch(businessServiceFromMDMS)
+				{
+					case businessService_TL:
+						obj.put(BUSINESSSERVICEKEY, config.getTlBusinessServiceValue());
+						obj.put(MODULENAMEKEY, TLMODULENAMEVALUE);
+						break;
+
+					case businessService_BPA:
+						String tradeType = tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+						if(pickWFServiceNameFromTradeTypeOnly)
+						{
+							tradeType=tradeType.split("\\.")[0];
+						}
+						obj.put(BUSINESSSERVICEKEY, tradeType);
+						obj.put(MODULENAMEKEY, BPAMODULENAMEVALUE);
+						break;
+				}
+				obj.put(ACTIONKEY, license.getAction());
+				obj.put(COMMENTKEY, license.getComment());
+				if (!CollectionUtils.isEmpty(license.getAssignee()))
+					obj.put(ASSIGNEEKEY, uuidmaps);
+				obj.put(DOCUMENTSKEY, license.getWfDocuments());
+				array.add(obj);
 			}
-
-
-			obj.put(BUSINESSIDKEY, license.getApplicationNumber());
-			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-			obj.put(ACTIONKEY, license.getAction());
-			obj.put(COMMENTKEY, license.getComment());
-			if (!CollectionUtils.isEmpty(license.getAssignee()))
-				obj.put(ASSIGNEEKEY, uuidmaps);
-			obj.put(DOCUMENTSKEY, license.getWfDocuments());
-			array.add(obj);
 		}
+		if(!array.isEmpty())
+		{
+			JSONObject workFlowRequest = new JSONObject();
+			workFlowRequest.put(REQUESTINFOKEY, tradeLicenseRequest.getRequestInfo());
+			workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
+			String response = null;
+			try {
+				response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest, String.class);
+			} catch (HttpClientErrorException e) {
 
-		JSONObject workFlowRequest = new JSONObject();
-		workFlowRequest.put(REQUESTINFOKEY, tradeLicenseRequest.getRequestInfo());
-		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-		String response = null;
-		try {
-			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest, String.class);
-		} catch (HttpClientErrorException e) {
+				/*
+				 * extracting message from client error exception
+				 */
+				DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
+				List<Object> errros = null;
+				try {
+					errros = responseContext.read("$.Errors");
+				} catch (PathNotFoundException pnfe) {
+					log.error("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+							" Unable to read the json path in error object : " + pnfe.getMessage());
+					throw new CustomException("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+							" Unable to read the json path in error object : " + pnfe.getMessage());
+				}
+				throw new CustomException("EG_WF_ERROR", errros.toString());
+			} catch (Exception e) {
+				throw new CustomException("EG_WF_ERROR",
+						" Exception occured while integrating with workflow : " + e.getMessage());
+			}
 
 			/*
-			 * extracting message from client error exception
+			 * on success result from work-flow read the data and set the status back to TL
+			 * object
 			 */
-			DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-			List<Object> errros = null;
-			try {
-				errros = responseContext.read("$.Errors");
-			} catch (PathNotFoundException pnfe) {
-				log.error("EG_TL_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_TL_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-			}
-			throw new CustomException("EG_WF_ERROR", errros.toString());
-		} catch (Exception e) {
-			throw new CustomException("EG_WF_ERROR",
-					" Exception occured while integrating with workflow : " + e.getMessage());
+			DocumentContext responseContext = JsonPath.parse(response);
+			List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
+			Map<String, String> idStatusMap = new HashMap<>();
+			responseArray.forEach(
+					object -> {
+
+						DocumentContext instanceContext = JsonPath.parse(object);
+						idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+					});
+
+			// setting the status back to TL object from wf response
+			tradeLicenseRequest.getLicenses()
+					.forEach(tlObj -> tlObj.setStatus(idStatusMap.get(tlObj.getApplicationNumber())));
 		}
-
-		/*
-		 * on success result from work-flow read the data and set the status back to TL
-		 * object
-		 */
-		DocumentContext responseContext = JsonPath.parse(response);
-		List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-		Map<String, String> idStatusMap = new HashMap<>();
-		responseArray.forEach(
-				object -> {
-
-					DocumentContext instanceContext = JsonPath.parse(object);
-					idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-				});
-
-		// setting the status back to TL object from wf response
-		tradeLicenseRequest.getLicenses()
-				.forEach(tlObj -> tlObj.setStatus(idStatusMap.get(tlObj.getApplicationNumber())));
 	}
 }

@@ -22,6 +22,8 @@ import org.egov.pt.calculator.web.models.CalculationCriteria;
 import org.egov.pt.calculator.web.models.CalculationReq;
 import org.egov.pt.calculator.web.models.CalculationRes;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
+import org.egov.pt.calculator.web.models.collections.*;
+import org.egov.pt.calculator.web.models.demand.Bill;
 import org.egov.pt.calculator.web.models.demand.Category;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
 import org.egov.pt.calculator.web.models.property.*;
@@ -318,7 +320,6 @@ public class EstimationService {
 	 * @param taxAmt tax amount for which rebate & penalty will be applied
 	 * @param usageExemption  total exemption value given for all unit usages
 	 * @param property proeprty  object
-
 	 * @param propertyBasedExemptionMasterMap property masters which contains exemption values associated with them
 	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
 	 * @param build
@@ -326,7 +327,6 @@ public class EstimationService {
 	private List<TaxHeadEstimate> getEstimatesForTax(RequestInfo requestInfo,BigDecimal taxAmt, BigDecimal usageExemption, Property property,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap,Map<String, Object> masterMap) {
-
 
 
 		PropertyDetail detail = property.getPropertyDetails().get(0);
