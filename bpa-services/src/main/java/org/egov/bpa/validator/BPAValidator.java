@@ -84,12 +84,12 @@ public class BPAValidator {
 
 		if (!CollectionUtils.isEmpty(allDocuments)) {
 
-			allDocuments.forEach(document -> {
+			/*allDocuments.forEach(document -> {
 
 				if (!validDocumentTypes.contains(document.getDocumentType())) {
 					throw new CustomException("Unkonwn Document Type ERROR", document.getDocumentType() + " is Unkown");
 				}
-			});
+			});*/
 
 			if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
 
