@@ -176,7 +176,9 @@ public class EstimationService {
 		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
 			if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 				for (BillingSlab billingSlab : billingSlabs) {
+					Double minimumCharge = billingSlabs.get(0).slabs.get(0).minimumCharge;
 					for (Slab slab : billingSlab.slabs) {
+						minimumCharge = slab.minimumCharge;
 						if (totalUOM > slab.to) {
 							waterCharge = waterCharge.add(BigDecimal.valueOf(((slab.to) - (slab.from)) * slab.charge));
 							totalUOM = totalUOM - ((slab.to) - (slab.from));
@@ -186,7 +188,9 @@ public class EstimationService {
 							break;
 						}
 					}
-
+					if (minimumCharge > waterCharge.doubleValue()) {
+						waterCharge = BigDecimal.valueOf(minimumCharge);
+					}
 				}
 			}
 			else if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
