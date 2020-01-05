@@ -515,8 +515,11 @@ public class MasterDataService {
 			dateMap.put("startDate", startDate);
 			dateMap.put("endDate", endDate);
 
-		} catch (Exception ex) {
+		} catch (CustomException | ParseException ex) {
 			ex.printStackTrace();
+			if(ex instanceof CustomException) 
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			
 			throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing period can not parsed!!");
 		}
 		return dateMap;
