@@ -62,7 +62,7 @@ public class BPAService {
 
 	@Autowired
 	private DiffService diffService;
-	
+
 	@Autowired
 	private CalculationService calculationService;
 
@@ -79,7 +79,8 @@ public class BPAService {
 
 		Object mdmsData = util.mDMSCall(bpaRequest);
 		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
-			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
+			throw new CustomException(" Invalid Tenant ",
+					" Application cannot be create at StateLevel");
 		}
 		edcrService.validateEdcrPlan(bpaRequest, mdmsData);
 		bpaValidator.validateCreate(bpaRequest, mdmsData);
@@ -89,14 +90,15 @@ public class BPAService {
 
 		wfIntegrator.callWorkFlow(bpaRequest);
 		repository.save(bpaRequest);
-		
-		calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
+
+		calculationService.addCalculation(bpaRequest,
+				BPAConstants.APPLICATION_FEE_KEY);
 		return bpaRequest.getBPA();
 	}
 
 	/**
-	 * Searches the Bpa for the given criteria if search is on owner paramter then
-	 * first user service is called followed by query to db
+	 * Searches the Bpa for the given criteria if search is on owner paramter
+	 * then first user service is called followed by query to db
 	 * 
 	 * @param criteria
 	 *            The object containing the paramters on which to search
@@ -114,9 +116,12 @@ public class BPAService {
 			for (Role role : requestInfo.getUserInfo().getRoles()) {
 				roles.add(role.getCode());
 			}
-			if( criteria.tenantIdOnly() && roles.contains("CITIZEN")) {
-				criteria.setCreatedBy( requestInfo.getUserInfo().getUuid());
+
+			if ((criteria.tenantIdOnly() || criteria.isEmpty())
+					&& roles.contains("CITIZEN")) {
+				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			}
+
 			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
 		}
 		return bpa;
@@ -131,7 +136,8 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
-	public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria, RequestInfo requestInfo) {
+	public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria,
+			RequestInfo requestInfo) {
 		List<BPA> bpa = repository.getBPAData(criteria);
 		if (bpa.isEmpty())
 			return Collections.emptyList();
@@ -139,15 +145,18 @@ public class BPAService {
 		return bpa;
 	}
 
-	private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria, RequestInfo requestInfo) {
+	private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria,
+			RequestInfo requestInfo) {
 
 		List<BPA> bpa = new LinkedList<>();
-		UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
+		UserDetailResponse userDetailResponse = userService.getUser(criteria,
+				requestInfo);
 		// If user not found with given user fields return empty list
 		if (userDetailResponse.getUser().size() == 0) {
 			return Collections.emptyList();
 		}
-		enrichmentService.enrichBPACriteriaWithOwnerids(criteria, userDetailResponse);
+		enrichmentService.enrichBPACriteriaWithOwnerids(criteria,
+				userDetailResponse);
 		bpa = repository.getBPAData(criteria);
 
 		if (bpa.size() == 0) {
@@ -171,45 +180,54 @@ public class BPAService {
 	public BPA update(BPARequest bpaRequest) {
 		Object mdmsData = util.mDMSCall(bpaRequest);
 		BPA bpa = bpaRequest.getBPA();
-		
-		if(bpa.getId() == null) {
-			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
+
+		if (bpa.getId() == null) {
+			throw new CustomException("UPDATE ERROR",
+					"Application Not found in the System" + bpa);
 		}
-		BusinessService businessService = workflowService.getBusinessService(bpa.getTenantId(),
-				bpaRequest.getRequestInfo(),bpa.getApplicationNo());
-		
+		BusinessService businessService = workflowService.getBusinessService(
+				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa.getApplicationNo());
+
 		List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest);
-		if(CollectionUtils.isEmpty(searchResult)) {
-			 throw new CustomException("UPDATE ERROR", "Failed to Update the Application");
+		if (CollectionUtils.isEmpty(searchResult)) {
+			throw new CustomException("UPDATE ERROR",
+					"Failed to Update the Application");
 		}
-		Difference diffMap = diffService.getDifference(bpaRequest, searchResult);
-		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,workflowService.getCurrentState(bpa.getStatus(), businessService));
+		Difference diffMap = diffService
+				.getDifference(bpaRequest, searchResult);
+		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
+				workflowService.getCurrentState(bpa.getStatus(),
+						businessService));
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		actionValidator.validateUpdateRequest(bpaRequest, businessService);
-		
-		
+
 		//
 		//
 		//
-		// /*call workflow service if it's enable else uses internal workflow process*/
-		
+		// /*call workflow service if it's enable else uses internal workflow
+		// process*/
+
 		wfIntegrator.callWorkFlow(bpaRequest);
-		
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		userService.createUser(bpaRequest);
-		repository.update(bpaRequest,workflowService.isStateUpdatable(bpa.getStatus(), businessService));
-		
+		repository.update(bpaRequest, workflowService.isStateUpdatable(
+				bpa.getStatus(), businessService));
+
 		// Generate the sanction Demand
-		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
-				bpaRequest.getRequestInfo(), bpa.getApplicationNo());
-		if(processInstance != null) {
-			if(processInstance.getState().getState().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
-				calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+		ProcessInstance processInstance = workflowService.getProcessInstance(
+				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa.getApplicationNo());
+		if (processInstance != null) {
+			if (processInstance.getState().getState()
+					.equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+				calculationService.addCalculation(bpaRequest,
+						BPAConstants.SANCTION_FEE_KEY);
 			}
-			
+
 		}
-		
+
 		return bpaRequest.getBPA();
 
 	}
@@ -231,7 +249,8 @@ public class BPAService {
 
 		List<BPA> bpa = repository.getBPAData(criteria);
 
-		bpa = enrichmentService.enrichBPASearch(bpa, criteria, request.getRequestInfo());
+		bpa = enrichmentService.enrichBPASearch(bpa, criteria,
+				request.getRequestInfo());
 		return bpa;
 	}
 }
