@@ -156,7 +156,7 @@ public class EstimationService {
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
 		}
-		
+
 		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
@@ -164,52 +164,32 @@ public class EstimationService {
 			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
 		billingSlabIds.add(billingSlabs.get(0).id);
-		log.info(" Billing Slab Id For Water Charge Calculation --->  "+billingSlabIds.toString());
-		
-		//WaterCharge Calculation
-		 Double totalUOM = 0.0;
-		 totalUOM = getUnitOfMeasurement(waterConnection, criteria);
-		 if(totalUOM == 0.0)
-			 return waterCharge;
+		log.info(" Billing Slab Id For Water Charge Calculation --->  " + billingSlabIds.toString());
 
-		if (isRangeCalculation(waterConnection.getCalculationAttribute()) && waterConnection.getConnectionType().equals(WSCalculationConstant.meteredConnectionType)) {
-			for (BillingSlab billingSlab : billingSlabs) {
-				for (Slab slab : billingSlab.slabs) {
-					if(totalUOM < slab.from) {
-						if(totalUOM > slab.to)
-						{
-							waterCharge= waterCharge.add(BigDecimal.valueOf(((slab.to)-(slab.from))* slab.charge));
-							if (slab.minimumCharge > waterCharge.doubleValue()) {
-								waterCharge = BigDecimal.valueOf(slab.minimumCharge);
-							}
-							
-						} else if(slab.to > totalUOM) {
-							waterCharge=waterCharge.add(BigDecimal.valueOf((totalUOM-(slab.from))* slab.charge));
-							if (slab.minimumCharge > waterCharge.doubleValue()) {
-								waterCharge = BigDecimal.valueOf(slab.minimumCharge);
-							}
-						}
-					} else 
-						break;
-/*					if (totalUOM >= slab.from && totalUOM > slab.to)
-					{
-						waterCharge= waterCharge.add(BigDecimal.valueOf(((slab.to)-(slab.from))* slab.charge));
-					}
-					
-					if (totalUOM >= slab.from && totalUOM < slab.to) {
-						totalUOM=totalUOM-slab.from;
-						
-						waterCharge = waterCharge.add(BigDecimal.valueOf((totalUOM * slab.charge)));
-						if (slab.minimumCharge > waterCharge.doubleValue()) {
-							waterCharge = BigDecimal.valueOf(slab.minimumCharge);
-						}
-						break;
-*/					}
-//				}
-			}
-		}
+		// WaterCharge Calculation
+		Double totalUOM = 0.0;
+		totalUOM = getUnitOfMeasurement(waterConnection, criteria);
+		if (totalUOM == 0.0)
+			return waterCharge;
 		
-		else if (isRangeCalculation(waterConnection.getCalculationAttribute()) && waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection )) {
+		// IF calculation type is flat then take flat rate else take slab and calculate the charge
+		if (isRangeCalculation(waterConnection.getCalculationAttribute())) {
+			if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+				for (BillingSlab billingSlab : billingSlabs) {
+					for (Slab slab : billingSlab.slabs) {
+						if (totalUOM > slab.to) {
+							waterCharge = waterCharge.add(BigDecimal.valueOf(((slab.to) - (slab.from)) * slab.charge));
+							totalUOM = totalUOM - ((slab.to) - (slab.from));
+						} else if (totalUOM < slab.to) {
+							waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * slab.charge));
+							totalUOM = ((slab.to) - (slab.from)) - totalUOM;
+							break;
+						}
+					}
+
+				}
+			}
+			else if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
 				for (BillingSlab billingSlab : billingSlabs) {
 					for (Slab slab : billingSlab.slabs) {
 						if (totalUOM >= slab.from && totalUOM < slab.to) {
@@ -222,8 +202,7 @@ public class EstimationService {
 					}
 				}
 			}
-		
-		 else {
+		} else {
 			for (BillingSlab billingSlab : billingSlabs) {
 				waterCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
 				break;
