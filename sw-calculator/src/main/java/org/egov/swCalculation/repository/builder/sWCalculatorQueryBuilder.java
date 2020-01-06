@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 public class sWCalculatorQueryBuilder {
-
-	private static final String connectionNoListQuery = "SELECT distinct(connectionno) FROM eg_sw_connection sw";
-
+	
+	private static final String INNER_JOIN_STRING = "INNER JOIN";
+	
+	private static final String connectionNoListQuery = "SELECT distinct(conn.eg_sw_connection) FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
+	
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
 	public String getDistinctTenantIds() {
@@ -24,12 +26,12 @@ public class sWCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" sw.connectionType = ? ");
+		query.append(" sw.connectiontype = ? ");
 		preparedStatement.add(connectionType);
 
 		// add tenantid
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" sw.tenantid = ? ");
+		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		return query.toString();
 	}
@@ -38,7 +40,7 @@ public class sWCalculatorQueryBuilder {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {
-			queryString.append(" AND");
+			queryString.append(" AND ");
 		}
 	}
 }

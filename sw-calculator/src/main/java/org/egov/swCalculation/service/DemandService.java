@@ -87,6 +87,9 @@ public class DemandService {
     
     @Autowired
     SWCalculationService swCalculationService;
+    
+    @Autowired
+    EstimationService estimationService;
 
 	/**
 	 * Creates or updates Demand
@@ -674,14 +677,15 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		String connectionType = SWCalculationConstant.nonMeterdConnection;
-		Long demandGenerateDateMillis = (Long) master.get(SWCalculationConstant.Demand_Generate_Date_String);
+		Integer demandGenerateDateMillis = (Integer) master.get(SWCalculationConstant.Demand_Generate_Date_String);
 		String billingFrequency = (String) master.get(SWCalculationConstant.Billing_Cycle_String);
 		long startDay = ((demandGenerateDateMillis) / 86400000);
 		boolean isTriggerEnable = isCurrentDateIsMatching(billingFrequency, startDay);
-		if (isTriggerEnable) {
+		
+			String assessmentYear = estimationService.getAssessmentYear();
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(connectionType, tenantId);
 			for (String connectionNo : connectionNos) {
-				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId).assessmentYear(assessmentYear)
 						.connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
@@ -689,7 +693,7 @@ public class DemandService {
 						.requestInfo(requestInfo).build();
 				swCalculationService.getCalculation(calculationReq);
 			}
-		}
+		
 	}
 	
 	/**
@@ -700,11 +704,11 @@ public class DemandService {
 	 */
 	private boolean isCurrentDateIsMatching(String billingFrequency, long dayOfMonth) {
 		if (billingFrequency.equalsIgnoreCase(SWCalculationConstant.Monthly_Billing_Period)
-				&& (dayOfMonth == LocalDateTime.now().getMonthValue())) {
+				&& (dayOfMonth == LocalDateTime.now().getDayOfMonth())) {
 			return true;
 		} else if (billingFrequency.equalsIgnoreCase(SWCalculationConstant.Quaterly_Billing_Period)) {
 			return false;
 		}
-		return false;
+		return true;
 	}
 }

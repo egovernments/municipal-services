@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.swCalculation.repository.builder.sWCalculatorQueryBuilder;
+import org.egov.swCalculation.rowMapper.DemandSchedulerRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -19,6 +20,9 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 	
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	DemandSchedulerRowMapper demandSchedulerRowMapper;
 
 	@Override
 	public List<String> getTenantId() {
@@ -34,8 +38,8 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 		List<String> connectionNosList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
-		log.info("sewerage "+ connectionType + " connection list : "+query);
-		connectionNosList = jdbcTemplate.queryForList(query, String.class);
+		log.info("sewerage " + connectionType + " connection list : " + query);
+		connectionNosList = jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 		return connectionNosList;
 	}
 
