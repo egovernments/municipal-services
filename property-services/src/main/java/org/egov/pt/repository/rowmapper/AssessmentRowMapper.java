@@ -74,8 +74,14 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				
 				assessmentMap.put(assessment.getId(), assessment);
 			}else {
-				assessment.getUnits().add(getUnit(rs));
-				assessment.getDocuments().add(getDocument(rs));
+				Unit unit = getUnit(rs);
+				if(null != unit) {
+					assessment.getUnits().add(unit);
+				}
+				Document doc = getDocument(rs);
+				if(null != doc) {
+					assessment.getDocuments().add(doc);
+				}
 			}
 		}
 
