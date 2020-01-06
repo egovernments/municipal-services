@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -78,6 +77,9 @@ public class EnrichmentService {
 			owner.setStatus(Status.ACTIVE);
 		});
 
+		if (!CollectionUtils.isEmpty(property.getInstitution()))
+			property.getInstitution().forEach(institute -> institute.setId(UUID.randomUUID().toString()));
+
 		property.setAuditDetails(propertyAuditDetails);
 
 		setIdgenIds(request);
@@ -89,17 +91,44 @@ public class EnrichmentService {
      * @param request  PropertyRequest received for property update
      * @param propertiesFromResponse Properties returned by calling search based on ids in PropertyRequest
      */
-    public void enrichUpdateRequest(PropertyRequest request,List<Property> propertiesFromResponse) {
+    public void enrichUpdateRequest(PropertyRequest request,Property propertyFromDb) {
     	
     	Property property = request.getProperty();
         RequestInfo requestInfo = request.getRequestInfo();
-        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), false);
+        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), true);
 
-		Map<String, Property> propertyIdMap = propertiesFromResponse.stream()
-				.collect(Collectors.toMap(Property::getId, Function.identity()));
+		if (!CollectionUtils.isEmpty(property.getDocuments()))
+			property.getDocuments().forEach(doc -> {
 
+				if (doc.getId() == null) {
+					doc.setId(UUID.randomUUID().toString());
+					doc.setStatus(Status.ACTIVE);
+				}
+			});
+		
+		property.getOwners().forEach(owner -> {
+
+			if (!CollectionUtils.isEmpty(owner.getDocuments()))
+				owner.getDocuments().forEach(doc -> {
+					if (doc.getId() == null) {
+						doc.setId(UUID.randomUUID().toString());
+						doc.setStatus(Status.ACTIVE);
+					}
+				});
+
+			owner.setStatus(Status.ACTIVE);
+		});
+		
+		if (!CollectionUtils.isEmpty(property.getInstitution()))
+			property.getInstitution().forEach(institute -> {
+
+				if (null == institute.getId())
+					institute.setId(UUID.randomUUID().toString());
+			});
+		
+		
             property.setAuditDetails(auditDetails);
-            Property propertyFromDb = propertyIdMap.get(property.getPropertyId());
+            property.setAccountId(propertyFromDb.getAccountId());
             property.getAddress().setId(propertyFromDb.getAddress().getId());
     }
 

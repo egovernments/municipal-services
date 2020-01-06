@@ -145,7 +145,6 @@ public class PropertyValidator {
     	StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
         MdmsCriteriaReq criteriaReq = propertyUtil.prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
         Optional<Object> response = serviceRequestRepository.fetchResult(uri, criteriaReq);
-        
         try {
         	if(response.isPresent()) {
                 return JsonPath.read(response.get(),jsonpath);
@@ -319,6 +318,9 @@ public class PropertyValidator {
 		
 		if(CollectionUtils.isEmpty(institutions))
 			return;
+		if(institutions.contains(null))
+			errorMap.put("INVALID ENTRY IN INSTITUTIONS LIST", " The Institution list cannot contain null values");
+
 		
 		Boolean isOwnerCategoryInstitution = property.getOwnershipCategory().contains("INSTITUTIONAL");
 		
@@ -383,7 +385,7 @@ public class PropertyValidator {
 			owners.forEach(owner -> {
 				if (owner.getAltContactNumber() == null)
 					errorMap.put("INVALID OWNER",
-							"TelephoneNumber cannot be null for institution : " + owner.getName());
+							" Alternate ContactNumber cannot be null for institution : " + owner.getName());
 			});
 		}
 
