@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPA;
@@ -75,10 +76,12 @@ public class EnrichmentService {
 		
 		
 		// BPA Documents
-		/*if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
-				document.setId(UUID.randomUUID().toString());
-			});*/
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+			});
 
 		// owners
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
@@ -242,6 +245,17 @@ public class EnrichmentService {
 
 	public void postStatusEnrichment(BPARequest bpaRequest) {
 		// TODO Nothing as of now, logic like generating permit number and etc.. would be done here.
+		BPA bpa = bpaRequest.getBPA();
+		
+		BusinessService businessService = workflowService.getBusinessService(
+				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa.getApplicationNo());
+		
+		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
+		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
+			List<IdResponse> idResponses =  idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(), config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
+			bpa.setPermitOrderNo(idResponses.get(0).getId());
+		}
 
 	}
 
@@ -341,7 +355,7 @@ public class EnrichmentService {
 				&& requestInfo.getUserInfo().getType()
 						.equalsIgnoreCase("CITIZEN")) {
 			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
-//			criteria.setMobileNumber(requesstInfo.getUserInfo().getUserName());
+//			criteria.setMobileNumber(requestInfo.getUserInfo().getUserName());
 			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
 		}
 

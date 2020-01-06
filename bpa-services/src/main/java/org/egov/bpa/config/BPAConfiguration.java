@@ -63,6 +63,12 @@ public class BPAConfiguration {
 
     @Value("${egov.idgen.bpa.applicationNum.format}")
     private String applicationNoIdgenFormat;
+    
+    @Value("${egov.idgen.bpa.permitNum.name}")
+    private String permitNoIdgenName;
+
+    @Value("${egov.idgen.bpa.permitNum.format}")
+    private String permitNoIdgenFormat;
 
 
 

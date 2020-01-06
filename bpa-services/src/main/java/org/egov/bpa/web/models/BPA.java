@@ -39,6 +39,10 @@ public class BPA {
 	@Size(max = 64)
 	@JsonProperty("applicationNo")
 	private String applicationNo;
+	
+	@Size(max = 64)
+	@JsonProperty("permitOrderNo")
+	private String permitOrderNo;
 
 	@Size(max = 64)
 	@NotNull
@@ -99,6 +103,9 @@ public class BPA {
 	@JsonProperty("status")
 	private String status;
 	
+    @Size(max=500)
+	@JsonProperty("remarks")
+	private String remarks;
 	
 	@Size(max = 64)
 	@JsonProperty("action")

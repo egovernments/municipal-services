@@ -183,6 +183,7 @@ public class BPAConstants {
 	public static final String SANCTION_FEE_KEY="SanctionFee";
 	
 	public static final String SANC_FEE_STATE="PENDING_SANC_FEE_PAYMENT";
+	public static final String APPROVED_STATE ="APPROVED";
 
 
 }
