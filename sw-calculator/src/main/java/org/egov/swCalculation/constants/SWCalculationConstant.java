@@ -132,7 +132,7 @@ public class SWCalculationConstant {
 
 	public static final String ConnectionType = "connectionType";
 
-	public static final String SW_MODULE = "sw-services-masters";
+	public static final String SW_MODULE = "sw-services-calculation";
 
 	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
 
