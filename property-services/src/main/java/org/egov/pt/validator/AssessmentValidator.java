@@ -114,7 +114,7 @@ public class AssessmentValidator {
 					errorMap.put("MISSING_UNITS", "Please send all the units belonging to this assessment");
 				}
 			}
-
+      
 			if(!CollectionUtils.isEmpty(assessmentFromDB.getUnits())) {
 				Set<String> existingUnits = assessmentFromDB.getUnits().stream().map(Unit::getId)
 						.collect(Collectors.toSet());
@@ -132,7 +132,6 @@ public class AssessmentValidator {
 			}
 			
 			if(!CollectionUtils.isEmpty(assessmentFromDB.getDocuments())) {
-				
 				Set<String> existingDocs = assessmentFromDB.getDocuments().stream().map(Document::getId)
 						.collect(Collectors.toSet());
 				if (!CollectionUtils.isEmpty(assessment.getDocuments())) {
@@ -146,6 +145,7 @@ public class AssessmentValidator {
 					}
 				}
 			}
+
 			
 		assessment.setAdditionalDetails(utils.jsonMerge(assessmentFromDB.getAdditionalDetails(), assessment.getAdditionalDetails()));
 			
