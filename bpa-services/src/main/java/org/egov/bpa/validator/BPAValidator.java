@@ -41,7 +41,7 @@ public class BPAValidator {
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData) {
 //		validateDuplicateDocuments(bpaRequest);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
-//		validateApplicationDocuments(bpaRequest, mdmsData, null);
+		validateApplicationDocuments(bpaRequest, mdmsData, null);
 		validateUser(bpaRequest);
 	}
 	private void validateUser(BPARequest bpaRequest) {
@@ -66,14 +66,7 @@ public class BPAValidator {
 		// @.ServiceType=='"+bpa.getServiceType()+"' &&
 		// @.RiskType=='"+bpa.getRiskType()+"')].docTypes";
 		List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
-		if(CollectionUtils.isEmpty(docTypeMappings)) {
-			return ;
-		}
-		filterExp = "$.[?(@.required==true)].code";
-		List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
-
-		List<String> validDocumentTypes = masterData.get(BPAConstants.DOCUMENT_TYPE);
-
+		
 		List<Document> allDocuments = new ArrayList<Document>();
 		if (bpa.getDocuments() != null) {
 			allDocuments.addAll(bpa.getDocuments());
@@ -81,6 +74,29 @@ public class BPAValidator {
 		if (bpa.getWfDocuments() != null) {
 			allDocuments.addAll(bpa.getWfDocuments());
 		}
+		
+		allDocuments.forEach(document -> {
+			
+			if(document.getFileStore() == null && document.getFileStoreId() == null) {
+				throw new CustomException("Invlaid Document",
+						"filestore cannot be null"+document.toString() );
+			}else if(document.getFileStoreId() == null){
+				document.setFileStoreId(document.getFileStore());
+			}else if(document.getFileStore() == null){
+				document.setFileStore(document.getFileStoreId());
+			}
+		});
+		
+		if(CollectionUtils.isEmpty(docTypeMappings)) {
+			return ;
+		}
+		
+		filterExp = "$.[?(@.required==true)].code";
+		List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
+
+		List<String> validDocumentTypes = masterData.get(BPAConstants.DOCUMENT_TYPE);
+
+		
 
 		if (!CollectionUtils.isEmpty(allDocuments)) {
 
@@ -90,7 +106,10 @@ public class BPAValidator {
 					throw new CustomException("Unkonwn Document Type ERROR", document.getDocumentType() + " is Unkown");
 				}
 			});*/
+			
 
+			
+			
 			if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
 
 				throw new CustomException("Mandatory Documents missing ERROR",
@@ -100,10 +119,7 @@ public class BPAValidator {
 				List<String> addedDocTypes = new ArrayList<String>();
 				allDocuments.forEach(document -> {
 					
-					if(document.getFileStore() == null) {
-						throw new CustomException("Invlaid Document",
-								"filestore cannot be null"+document.toString() );
-					}
+					
 					String docType = document.getDocumentType();
 					int lastIndex = docType.lastIndexOf(".");
 					String documentNs = "";

@@ -106,11 +106,26 @@ public class BPA {
     @Size(max=500)
 	@JsonProperty("remarks")
 	private String remarks;
+    
+    @Size(max=500)
+  	@JsonProperty("comment")
+  	private String comment;
 	
 	@Size(max = 64)
 	@JsonProperty("action")
 	private String action;
 	
+	@Size(max = 64)
+	@JsonProperty("holdingNo")
+	private String holdingNo;
+	
+	@Size(max = 250)
+	@JsonProperty("registrationDetails")
+	private String registrationDetails;
+	
+	@Size(max = 250)
+	@JsonProperty("govtOrQuasi")
+	private String govtOrQuasi;
 
 	@NotNull
 	@JsonProperty("address")

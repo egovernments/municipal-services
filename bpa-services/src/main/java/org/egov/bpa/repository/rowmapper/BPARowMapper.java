@@ -41,6 +41,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		while (rs.next()) {
 			String id = rs.getString("bpa_id");
 			String applicationNo = rs.getString("applicationno");
+			String permitNumber = rs.getString("permitorderno");
 			BPA currentbpa = buildingMap.get(id);
 			String tenantId = rs.getString("bpa_tenantId");
 			if (currentbpa == null) {
@@ -88,11 +89,16 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.applicationNo(applicationNo)
 						.status(rs.getString("status"))
 						.tenantId(tenantId)
+						.permitOrderNo(permitNumber)
 						.edcrNumber(rs.getString("edcrnumber"))
 						.serviceType(rs.getString("servicetype"))
 						.applicationType(rs.getString("applicationType"))
 						.riskType(BPA.RiskTypeEnum.fromValue(rs.getString("riskType")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
+						.holdingNo(rs.getString("holdingNo"))
+						.govtOrQuasi(rs.getString("govtOrQuasi"))
+						.registrationDetails(rs.getString("registrationDetails"))
+						.remarks(rs.getString("remarks"))
 						.address(address)
 						.id(id).build();
 
