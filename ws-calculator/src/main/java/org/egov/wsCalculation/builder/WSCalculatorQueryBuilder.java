@@ -31,7 +31,7 @@ public class WSCalculatorQueryBuilder {
 	
 	private final static String connectionNoWaterConnectionSearchQuery = "SELECT conn.connectionNo as conn_no FROM water_service_connection wc INNER JOIN connection conn ON wc.connection_id = conn.id";
 	
-	private static final String connectionNoListQuery = "SELECT distinct(connectionno) FROM connection ws";
+	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM connection conn INNER JOIN water_service_connection ws ON conn.id = ws.connection_id";
 
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM connection ws";
 
@@ -181,12 +181,12 @@ public class WSCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" ws.connectionType = ? ");
+		query.append(" ws.connectiontype = ? ");
 		preparedStatement.add(connectionType);
 
 		// add tenantid
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" ws.tenantid = ? ");
+		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		return query.toString();
 	}

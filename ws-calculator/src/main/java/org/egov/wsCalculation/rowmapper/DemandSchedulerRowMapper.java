@@ -19,7 +19,7 @@ public class DemandSchedulerRowMapper implements ResultSetExtractor<List<String>
 	public List<String> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		List<String> connectionLists = new ArrayList<>();
 		while (rs.next()) {
-			connectionLists.add(rs.getString("conn_no"));
+			connectionLists.add(rs.getString("connectionno"));
 		}
 		return connectionLists;
 	}

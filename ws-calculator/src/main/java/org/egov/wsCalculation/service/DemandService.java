@@ -87,6 +87,9 @@ public class DemandService {
     
     @Autowired
     CalculatorUtil calculatorUtils;
+    
+    @Autowired
+    EstimationService estimationService;
 
 
 	/**
@@ -700,14 +703,15 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		String connectionType = WSCalculationConstant.nonMeterdConnection;
-		Long demandGenerateDateMillis = (Long) master.get(WSCalculationConstant.Demand_Generate_Date_String);
+		int demandGenerateDateMillis = (int) master.get(WSCalculationConstant.Demand_Generate_Date_String);
 		String billingFrequency = (String) master.get(WSCalculationConstant.Billing_Cycle_String);
 		long startDay = ((demandGenerateDateMillis) / 86400000);
 		boolean isTriggerEnable = isCurrentDateIsMatching(billingFrequency, startDay);
 		if (isTriggerEnable) {
-			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(connectionType, tenantId);
+			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId, connectionType);
+			String assessmentYear = estimationService.getAssessmentYear();
 			for (String connectionNo : connectionNos) {
-				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId).assessmentYear(assessmentYear)
 						.connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
@@ -726,12 +730,12 @@ public class DemandService {
 	 */
 	private boolean isCurrentDateIsMatching(String billingFrequency, long dayOfMonth) {
 		if (billingFrequency.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period)
-				&& (dayOfMonth == LocalDateTime.now().getMonthValue())) {
+				&& (dayOfMonth == LocalDateTime.now().getDayOfMonth())) {
 			return true;
 		} else if (billingFrequency.equalsIgnoreCase(WSCalculationConstant.Quaterly_Billing_Period)) {
 			return false;
 		}
-		return false;
+		return true;
 	}
 
 }

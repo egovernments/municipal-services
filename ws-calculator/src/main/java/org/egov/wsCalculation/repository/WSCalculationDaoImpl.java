@@ -42,6 +42,7 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	
 	@Autowired
 	DemandSchedulerRowMapper demandSchedulerRowMapper;
+	
 
 	@Value("${egov.meterservice.createmeterconnection}")
 	private String createMeterConnection;
@@ -137,8 +138,8 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		List<String> connectionNosList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
-		log.info("sewerage " + connectionType + " connection list : " + query);
-		connectionNosList = jdbcTemplate.queryForList(query, String.class);
+		log.info("water " + connectionType + " connection list : " + query);
+		connectionNosList = jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 		return connectionNosList;
 	}
 
