@@ -302,7 +302,7 @@ public class MasterDataService {
 		LocalDateTime demandStartingDate = LocalDateTime.now();
 		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
 		Long demandEndDateMillis = (Long) master.get(SWCalculationConstant.Demand_End_Date_String);
-		Long demandExpiryDateMillis = (Long) master.get(SWCalculationConstant.Demand_Expiry_Date_String);
+		Long demandExpiryDateMillis = Long.valueOf((int)master.get(SWCalculationConstant.Demand_Expiry_Date_String));
 		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES,
 				Timestamp.valueOf(demandStartingDate).getTime());
 		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES,

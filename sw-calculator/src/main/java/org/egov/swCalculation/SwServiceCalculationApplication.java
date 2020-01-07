@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ComponentScan(basePackages = { "org.egov.swcalculation", "org.egov.swCalculation.controller",
 		"org.egov.swcalculation.config", "org.egov.swCalculation.repository", "org.egov.swCalculation.service",
 		"org.egov.swCalculation.util", "org.egov.swCalculation.producer", "org.egov.swCalculation.consumer",
-		"org.egov.swCalculation.validator","org.egov.swCalculation.config"})
+		"org.egov.swCalculation.validator","org.egov.swCalculation.config","org.egov.swCalculation.rowMapper"})
 public class SwServiceCalculationApplication {
 	@Value("${app.timezone}")
 	private String timeZone;
