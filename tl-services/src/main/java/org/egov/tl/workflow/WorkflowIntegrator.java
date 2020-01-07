@@ -1,6 +1,7 @@
 package org.egov.tl.workflow;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +24,8 @@ import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+
+import static org.egov.tl.util.TLConstants.CITIZEN_SENDBACK_ACTION;
 
 @Service
 @Slf4j
@@ -41,7 +45,7 @@ public class WorkflowIntegrator {
 
 	private static final String DOCUMENTSKEY = "documents";
 
-	private static final String ASSIGNEEKEY = "assignee";
+	private static final String ASSIGNEEKEY = "assignes";
 
 	private static final String UUIDKEY = "uuid";
 
@@ -85,16 +89,28 @@ public class WorkflowIntegrator {
 		for (TradeLicense license : tradeLicenseRequest.getLicenses()) {
 
 			JSONObject obj = new JSONObject();
-			Map<String, String> uuidmap = new HashMap<>();
-			uuidmap.put(UUIDKEY, license.getAssignee());
+			List<Map<String, String>> uuidmaps = new LinkedList<>();
+
+			if(!CollectionUtils.isEmpty(license.getAssignee())){
+
+				// Adding assignes to processInstance
+				license.getAssignee().forEach(assignee -> {
+					Map<String, String> uuidMap = new HashMap<>();
+					uuidMap.put(UUIDKEY, assignee);
+					uuidmaps.add(uuidMap);
+				});
+
+			}
+
+
 			obj.put(BUSINESSIDKEY, license.getApplicationNumber());
 			obj.put(TENANTIDKEY, wfTenantId);
 			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(ACTIONKEY, license.getAction());
 			obj.put(COMMENTKEY, license.getComment());
-			if (!StringUtils.isEmpty(license.getAssignee()))
-				obj.put(ASSIGNEEKEY, uuidmap);
+			if (!CollectionUtils.isEmpty(license.getAssignee()))
+				obj.put(ASSIGNEEKEY, uuidmaps);
 			obj.put(DOCUMENTSKEY, license.getWfDocuments());
 			array.add(obj);
 		}

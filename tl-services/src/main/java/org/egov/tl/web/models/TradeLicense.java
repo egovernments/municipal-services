@@ -130,9 +130,8 @@ public class  TradeLicense   {
         @JsonProperty("action")
         private String action = null;
 
-        @Size(max=64)
         @JsonProperty("assignee")
-        private String assignee = null;
+        private List<String> assignee = null;
 
         @Valid
         @JsonProperty("wfDocuments")
