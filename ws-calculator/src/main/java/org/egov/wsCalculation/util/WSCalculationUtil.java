@@ -111,24 +111,6 @@ public class WSCalculationUtil {
 		return WSCalculationConstant.QUERY_ASSESSMENT_INSERT;
 	}
 
-	/**
-	 * Adds up the collection amount from the given demand and the previous advance
-	 * carry forward together as new advance carry forward
-	 *
-	 * @param demand
-	 * @return carryForward
-	 */
-	public BigDecimal getTotalCollectedAmountAndPreviousCarryForward(Demand demand) {
-
-		BigDecimal carryForward = BigDecimal.ZERO;
-		for (DemandDetail detail : demand.getDemandDetails()) {
-
-			carryForward = carryForward.add(detail.getCollectionAmount());
-			if (detail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_ADVANCE_CARRYFORWARD))
-				carryForward = carryForward.add(detail.getTaxAmount());
-		}
-		return carryForward;
-	}
 
 	/**
 	 * method to create demandsearch url with demand criteria
@@ -275,7 +257,5 @@ public class WSCalculationUtil {
 				.build();
 
 	}
-	
-
 	
 }

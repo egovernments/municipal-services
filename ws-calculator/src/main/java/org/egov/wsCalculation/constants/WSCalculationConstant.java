@@ -30,8 +30,6 @@ public class WSCalculationConstant {
 	public static final String EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG = "Depreciating assessments are not allowed for the same assessment year,"
 			+ "please kindly update the values for the following properties with assessmentNumbers : ";
 
-	public static final String WS_ADVANCE_CARRYFORWARD = "WS_ADVANCE_CARRYFORWARD";
-
 	public static final String FINANCIAL_YEAR_MASTER = "FinancialYear";
 
 	public static final String FINANCIAL_YEAR_RANGE_FEILD_NAME = "finYearRange";
@@ -39,10 +37,9 @@ public class WSCalculationConstant {
 	public static final String MDMS_STARTDATE = "startingDate";
 
 	public static final String MDMS_ENDDATE = "endingDate";
-	
-	 public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
-	 
-	 
+
+	public static final String MDMS_FINANCIALYEAR = "FinancialYear";
+
 	/*
 	 * Module names
 	 */
@@ -84,24 +81,6 @@ public class WSCalculationConstant {
 	public static final String WATER_TAX_MODULE = "WaterTax";
 
 	/*
-	 * Master names
-	 */
-
-	public static final String USAGE_MAJOR_MASTER = "UsageCategoryMajor";
-
-	public static final String USAGE_MINOR_MASTER = "UsageCategoryMinor";
-
-	public static final String USAGE_SUB_MINOR_MASTER = "UsageCategorySubMinor";
-
-	public static final String USAGE_DETAIL_MASTER = "UsageCategoryDetail";
-
-	public static final String OWNER_TYPE_MASTER = "OwnerType";
-
-	public static final List<String> PROPERTY_BASED_EXEMPTION_MASTERS = Collections.unmodifiableList(Arrays.asList(
-			USAGE_MAJOR_MASTER, USAGE_MINOR_MASTER, USAGE_SUB_MINOR_MASTER, USAGE_DETAIL_MASTER, OWNER_TYPE_MASTER));
-
-
-	/*
 	 * exceptions
 	 */
 	public static final String CONNECT_EXCEPTION_KEY = "CONNECTION_FAILED";
@@ -140,7 +119,7 @@ public class WSCalculationConstant {
 	public static final String FLAT_AMOUNT_FIELD_NAME = "flatAmount";
 
 	public static final String RATE_FIELD_NAME = "rate";
-	
+
 	public static final String DAYA_APPLICABLE_NAME = "applicableAfterDays";
 
 	/*
@@ -162,7 +141,7 @@ public class WSCalculationConstant {
 	public static final String WS_Round_Off = "WS_Round_Off";
 
 	public static final String WS_TAX_MODULE = "ws-services-calculation";
-	
+
 	public static final String WS_MODULE = "ws-services-masters";
 
 	public static final String WC_PENANLTY_MASTER = "Penalty";
@@ -175,64 +154,62 @@ public class WSCalculationConstant {
 
 	public static final String CODE_FIELD_NAME = "code";
 
-	public static final List<String> WS_BASED_EXEMPTION_MASTERS = Collections
-			.unmodifiableList(Arrays.asList(USAGE_MAJOR_MASTER));
-
 	public static final List<String> WS_BILLING_SLAB_MASTERS = Collections
 			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
 
-	
 	public static final Long TIMEZONE_OFFSET = 19800000l;
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(WS_CHARGE));
-	
-	public static final String flatRateCalculationAttribute = "Flat";
-	
-	public static final String meteredConnectionType = "Metered";
-	
-	public static final String nonMeterdConnection = "Non Metered";
-	
-	public static final String noOfTapsConst = "No. of taps";
-	
-	public static final String pipeSizeConst = "Pipe Size";
-	
-	public static final String BillingPeriod = "billingPeriod";
-	
-	public static final String ConnectionType = "connectionType";
-	
-	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
-	
-	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
-	
-	public static final String Quaterly_Billing_Period = "quaterly";
-	
-	public static final String Monthly_Billing_Period = "monthly";
-	
-	public static final String Billing_Cycle_String="billingCycle";
-	
-	public static final String Demand_End_Date_String = "demandEndDateMillis";
-	
-	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
-	
-	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
-	
-	public static final String NOTIFICATION_LOCALE = "en_IN";
-	
-    public static final String MODULE = "rainmaker-common";
-    
-    public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
-    
-    public static final String DEMAND_SUCCESS_MESSAGE_SMS = "WATER_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
-    
-    public static final String DEMAND_FAILURE_MESSAGE_SMS = "WATER_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
-    
-    public static final String DEMAND_SUCCESS_MESSAGE_EMAIL = "WATER_CONNECTION_DEMAND_SUCCESSFUL_EMAIL_MESSAGE";
-    
-    public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "WATER_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
-	
-    
-	 
 
+	public static final String flatRateCalculationAttribute = "Flat";
+
+	public static final String meteredConnectionType = "Metered";
+
+	public static final String nonMeterdConnection = "Non Metered";
+
+	public static final String noOfTapsConst = "No. of taps";
+
+	public static final String pipeSizeConst = "Pipe Size";
+
+	public static final String BillingPeriod = "billingPeriod";
+
+	public static final String ConnectionType = "connectionType";
+
+	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
+
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
+
+	public static final String Quaterly_Billing_Period = "quaterly";
+
+	public static final String Monthly_Billing_Period = "monthly";
+
+	public static final String Billing_Cycle_String = "billingCycle";
+
+	public static final String Demand_End_Date_String = "demandEndDateMillis";
+
+	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
+
+	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
+
+	public static final String NOTIFICATION_LOCALE = "en_IN";
+
+	public static final String MODULE = "rainmaker-common";
+
+	public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
+
+	public static final String DEMAND_SUCCESS_MESSAGE_SMS = "WATER_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
+
+	public static final String DEMAND_FAILURE_MESSAGE_SMS = "WATER_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
+
+	public static final String DEMAND_SUCCESS_MESSAGE_EMAIL = "WATER_CONNECTION_DEMAND_SUCCESSFUL_EMAIL_MESSAGE";
+
+	public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "WATER_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
+
+	public static final String WATER_CONNECTION_BILL_GENERATION_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_MESSAGE";
 	
+	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	
+	public static final String  USREVENTS_EVENT_NAME = "WATER BILL GENERATION";
+	
+	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
 
 }

@@ -35,6 +35,7 @@ import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxPeriod;
 import org.egov.wsCalculation.model.WaterConnection;
+import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.repository.DemandRepository;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
@@ -90,6 +91,9 @@ public class DemandService {
     
     @Autowired
     EstimationService estimationService;
+    
+    @Autowired
+    WSCalculationProducer wsCalculationProducer;
 
 
 	/**
@@ -212,7 +216,12 @@ public class DemandService {
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
-		return demandRepository.saveDemand(requestInfo, demands);
+		List<Demand> demandRes = new LinkedList<>();
+		demandRes = demandRepository.saveDemand(requestInfo, demands);
+		demandRes.forEach(demand -> {
+			fetchBill(demand.getTenantId(), demand.getConsumerCode(), requestInfo);
+		});
+		return demandRes;
 	}
 
 	/**
@@ -482,7 +491,6 @@ public class DemandService {
 
 		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
-		
 		if(consumerCodeToDemandMap.size() != getBillCriteria.getConsumerCodes().size()) {
 			throw new CustomException("DEMAND NOT FOUND",
 					"No demand found for the criteria");
@@ -736,6 +744,24 @@ public class DemandService {
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean fetchBill(String tenantId, String consumerCode, RequestInfo requestInfo) {
+		boolean notificationSent = false;
+		try {
+			String uri = calculatorUtils.getFetchBillURL(tenantId, consumerCode).toString();
+			Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+					RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+			HashMap<String, Object> billResponse = new HashMap<>();
+			billResponse.put("requestInfo", requestInfo);
+			billResponse.put("billResponse", result);
+			wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
+			notificationSent = true;
+		} catch (Exception ex) {
+			log.error("Fetch Bill Error");
+			ex.printStackTrace();
+		}
+		return notificationSent;
 	}
 
 }

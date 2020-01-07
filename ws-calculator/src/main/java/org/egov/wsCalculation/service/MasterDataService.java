@@ -257,31 +257,6 @@ public class MasterDataService {
 		return masterMap;
 	}
 	
-	/**
-	 * Method to enrich the water connection Master data Map
-	 * 
-	 * @param requestInfo
-	 * @param tenantId
-	 */
-	public void setPropertyMasterValues(RequestInfo requestInfo, String tenantId,
-			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
-			Map<String, JSONArray> timeBasedExemptionMasterMap) {
-
-		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-				calculatorUtils.getWaterConnectionModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
-		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WATER_TAX_MODULE);
-		for (Entry<String, JSONArray> entry : res.entrySet()) {
-
-			String masterName = entry.getKey();
-
-			/* Masters which need to be parsed will be contained in the list */
-			if (WSCalculationConstant.PROPERTY_BASED_EXEMPTION_MASTERS.contains(entry.getKey()))
-				propertyBasedExemptionMasterMap.put(masterName, getParsedMaster(entry));
-
-			/* Master not contained in list will be stored as it is */
-			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
-		}
-	}
 
 	/**
 	 * 
