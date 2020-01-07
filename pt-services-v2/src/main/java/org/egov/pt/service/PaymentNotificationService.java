@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
@@ -94,13 +96,7 @@ public class PaymentNotificationService {
                 mobileNumbers = propertyAttributes.get("mobileNumbers");
                 addUserNumber(topic, requestInfo, valMap, mobileNumbers);
                 valMap.put("financialYear", propertyAttributes.get("financialYear").get(0));
-                valMap.put("oldPropertyId", propertyAttributes.get("oldPropertyId").get(0));				
-                String payLink = propertyConfiguration.getPayLink()
-						.replace("$consumerCode", valMap.get("propertyId"))
-						.replace("$tenantId", valMap.get("tenantId"));
-                payLink = propertyConfiguration.getUiAppHost() + payLink;
-			     
-	            valMap.put("payLink", payLink);				
+                valMap.put("oldPropertyId", propertyAttributes.get("oldPropertyId").get(0));							
 
                 StringBuilder uri = util.getUri(valMap.get("tenantId"), requestInfo);
                 LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, requestInfo);
@@ -113,7 +109,7 @@ public class PaymentNotificationService {
                     Object messageObj = JsonPath.parse(messagejson).read(path);
                     String message = ((ArrayList<String>) messageObj).get(0);
                     customMessage = getCustomizedMessage(valMap, message, path);
-                    smsRequests = getSMSRequests(mobileNumbers, customMessage);
+                    smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
                 }
                 if (valMap.get("oldPropertyId") == null && topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
                     smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
@@ -186,7 +182,7 @@ public class PaymentNotificationService {
         Object messageObj = JsonPath.parse(messagejson).read(path);
         String message = ((ArrayList<String>)messageObj).get(0);
         String customMessage = getCustomizedOldPropertyIdAbsentMessage(message,valMap);
-        return getSMSRequests(mobileNumbers,customMessage);
+        return getSMSRequests(mobileNumbers,customMessage, valMap);
     }
 
 
@@ -427,16 +423,12 @@ public class PaymentNotificationService {
      * @param valMap The map of the required values
      * @return Customized message depending on values in valMap
      */
-   private String getCustomizedOnlinePaymentMessage(String message,Map<String,String> valMap){
+   private String getCustomizedOnlinePaymentMessage(String message, Map<String,String> valMap){
         message = message.replace("< insert amount paid>",valMap.get("amountPaid"));
         message = message.replace("< insert payment transaction id from PG>",valMap.get("transactionId"));
         message = message.replace("<insert Property Tax Assessment ID>",valMap.get("propertyId"));
         message = message.replace("<pt due>.",valMap.get("amountDue"));
-        if(Double.valueOf(valMap.get("amountDue")) > 0) {
-            message = message.replace("<pay_link>","Pay here: " + valMap.get("payLink"));
-        }else {
-            message = message.replace("<pay_link>", "");
-        }
+        message = message.replace("<pay_link>.", "$paylink");
    //     message = message.replace("<FY>",valMap.get("financialYear"));
         return message;
    }
@@ -451,7 +443,7 @@ public class PaymentNotificationService {
         message = message.replace("<amount>",valMap.get("amountPaid"));
         message = message.replace("<insert mode of payment>",valMap.get("paymentMode"));
         message = message.replace("<Enter pending amount>",valMap.get("amountDue"));
-        message = message.replace("<insert inactive citizen application web URL>.", valMap.get("payLink"));
+        message = message.replace("<pay_link>.", "$paylink");
   //      message = message.replace("<Insert FY>",valMap.get("financialYear"));
         return message;
     }
@@ -488,11 +480,23 @@ public class PaymentNotificationService {
      * @param customizedMessage The message to sent
      * @return List of SMSRequest
      */
-    private List<SMSRequest> getSMSRequests(List<String> mobileNumbers, String customizedMessage){
+    private List<SMSRequest> getSMSRequests(List<String> mobileNumbers, String customizedMessage, Map<String, String> valMap){
         List<SMSRequest> smsRequests = new ArrayList<>();
         mobileNumbers.forEach(mobileNumber-> {
         	String message = customizedMessage;
-        	message = message.replace("$mobile", mobileNumber);
+        	if(null != valMap.get("amountDue")) {
+                if(Double.valueOf(valMap.get("amountDue")) > 0) {
+                	String link = propertyConfiguration.getPayLink()
+    						.replace("$consumerCode", valMap.get("propertyId"))
+    						.replace("$tenantId", valMap.get("tenantId"))
+    						.replace("$mobile", mobileNumber);
+                	link = getShortenedURL(link);
+                    message = message.replace("$paylink", "You can pay your Property Tax online here - " + link);
+                }else {
+                    message = message.replace("$paylink", "");
+                }
+        	}
+        	
             if(mobileNumber!=null)
             {
                 SMSRequest smsRequest = new SMSRequest(mobileNumber,message);
@@ -515,6 +519,21 @@ public class PaymentNotificationService {
                 log.info(smsRequest.toString());
             }
         }
+    }
+    
+    
+    private String getShortenedURL(String longURL) {
+    	Map<String, String> request = new HashMap<>();
+    	request.put("url", longURL);
+    	StringBuilder uri = new StringBuilder();
+    	uri.append(propertyConfiguration.getShortenerHost()).append(propertyConfiguration.getShortenerEndpoint());
+    	String shortenedURL = serviceRequestRepository.getShortenedURL(uri, request);
+    	if(StringUtils.isEmpty(shortenedURL)) {
+    		log.info("Shortened URL generation failed.");
+    		shortenedURL = longURL; 
+    	}
+    	
+    	return shortenedURL;
     }
 
 }
