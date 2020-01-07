@@ -84,11 +84,15 @@ public class SWCalculationConfiguration {
     @Value("${notification.mail.enabled}")
     private Boolean isMailEnabled;
     
-    
     @Value("${kafka.topics.notification.mail.name}")
     private String emailNotifyTopic;
-   
-
+    
+    //User-events
+    @Value("${egov.user.event.notification.enabled}")
+	private Boolean isUserEventsNotificationEnabled;
+	
+	@Value("${egov.usr.events.create.topic}")
+	private String saveUserEventsTopic;
 
     //Localization
     @Value("${egov.localization.host}")
@@ -108,6 +112,42 @@ public class SWCalculationConfiguration {
     
     @Value("${sw.calculator.demand.failed}")
     private String onDemandFailed;
+    
+    @Value("${sw.calculator.bill.successful}")
+    private String onBillSuccessful;
+    
+    @Value("${sw.calculator.bill.failed}")
+    private String onBillFailed;
+    
+    // User Config
+    @Value("${egov.user.host}")
+    private String userHost;
+
+    @Value("${egov.user.context.path}")
+    private String userContextPath;
+
+    @Value("${egov.user.create.path}")
+    private String userCreateEndpoint;
+
+    @Value("${egov.user.search.path}")
+    private String userSearchEndpoint;
+
+    @Value("${egov.user.update.path}")
+    private String userUpdateEndpoint;
+    
+	@Value("${egov.usr.events.pay.triggers}")
+	private String payTriggers;
+	
+	@Value("${egov.ui.app.host}")
+	private String uiAppHost;
+	
+	@Value("${egov.usr.events.pay.code}")
+	private String payCode;
+	
+	@Value("${egov.usr.events.pay.link}")
+	private String payLink;
+    
+    
     
   
 	

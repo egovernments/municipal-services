@@ -33,6 +33,7 @@ import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.model.TaxPeriod;
+import org.egov.swCalculation.producer.SWCalculationProducer;
 import org.egov.swCalculation.repository.DemandRepository;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.egov.swCalculation.repository.SewerageCalculatorDao;
@@ -90,6 +91,9 @@ public class DemandService {
     
     @Autowired
     EstimationService estimationService;
+    
+    @Autowired
+    SWCalculationProducer producer;
 
 	/**
 	 * Creates or updates Demand
@@ -205,7 +209,28 @@ public class DemandService {
 					.taxPeriodTo(toDate).consumerType("sewerageConnection").billExpiryTime(expiryDate)
 					.businessService(configs.getBusinessService()).status(StatusEnum.valueOf("ACTIVE")).build());
 		}
-		return demandRepository.saveDemand(requestInfo, demands);
+		List<Demand> demandsToReturn = new LinkedList<>();
+		demandsToReturn=demandRepository.saveDemand(requestInfo, demands);
+		demandsToReturn.forEach(demand ->{
+			
+		});
+		return demandsToReturn;
+	}
+	
+	
+	public boolean fetchBill(String tenantId, String consumerCode){
+		boolean notificationSent = false;
+		try{
+//			String url =calculatorUtils.get
+//					Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
+//							RequestInfoWrapper.builder().requestInfo(requestInfo).build());	
+//			producer.push(topic, result);
+					notificationSent=true;		
+		}
+		catch(Exception ex){
+			throw new CustomException("NOTIFICATION ERROR", "Failed to send notification for sewerage");
+		}
+		return notificationSent;
 	}
 
 	/**

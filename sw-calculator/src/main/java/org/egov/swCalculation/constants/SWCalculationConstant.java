@@ -163,8 +163,53 @@ public class SWCalculationConstant {
     public static final String DEMAND_SUCCESS_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_EMAIL_MESSAGE";
 
     public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
-	;
 	
+	 public static final String BILL_SUCCESS_MESSAGE = "SEWERAGE_CONNECTION_BILL_FAILURE_MESSAGE";
+		;
 	
+    public static final String NOTIFICATION_INITIATED = "tl.en.counter.initiate";
+
+    public static final String NOTIFICATION_APPLIED = "tl.en.counter.submit";
+
+    public static final String NOTIFICATION_FIELD_INSPECTION = "tl.en.field.inspection";
+
+    public static final String NOTIFICATION_PAYMENT_OWNER = "tl.en.counter.payment.successful.owner";
+
+    public static final String NOTIFICATION_PAYMENT_PAYER = "tl.en.counter.payment.successful.payer";
+
+    public static final String NOTIFICATION_PAID = "tl.en.counter.pending.approval";
+
+    public static final String NOTIFICATION_APPROVED = "tl.en.counter.approved";
+
+    public static final String NOTIFICATION_REJECTED = "tl.en.counter.rejected";
+
+    public static final String NOTIFICATION_CANCELLED = "tl.en.counter.cancelled";
+
+    public static final String NOTIFICATION_FIELD_CHANGED = "tl.en.edit.field.change";
+    
+    
+
+    // ACTION_STATUS combinations for notification
+
+    public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+
+    public static final String ACTION_STATUS_APPLIED  = "APPLY_APPLIED";
+
+    public static final String ACTION_STATUS_APPROVED  = "APPROVE_PENDINGPAYMENT";
+
+    public static final String ACTION_STATUS_REJECTED  = "REJECT_REJECTED";
+
+    public static final String ACTION_STATUS_FIELDINSPECTION  = "FORWARD_FIELDINSPECTION";
+
+    public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
+
+    public static final String ACTION_STATUS_PAID  = "PAID";
+    
+    
+	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+	
+	public static final String  USREVENTS_EVENT_NAME = "Sewerage Connection";
+	
+	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
 
 }
