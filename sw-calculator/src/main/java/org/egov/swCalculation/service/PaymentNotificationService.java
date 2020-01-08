@@ -172,7 +172,7 @@ public class PaymentNotificationService {
 			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
 			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
 			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
-			mappedRecord.put(totalBillAmount, String.valueOf(context.read("$.Bill[0].totalAmount")));
+			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
 			Date expiryDate = new Date((Long) context.read("$.Bill[0].billDetails[0].expiryDate"));
 			mappedRecord.put(dueDate, formatter.format(expiryDate));
 		} catch (Exception ex) {

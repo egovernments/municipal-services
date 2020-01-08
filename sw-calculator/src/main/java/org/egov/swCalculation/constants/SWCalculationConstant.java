@@ -206,7 +206,7 @@ public class SWCalculationConstant {
 
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
 
-	public static final String WATER_CONNECTION_BILL_GENERATION_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_MESSAGE";
+	public static final String SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE = "SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE";
 	
 	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
 	

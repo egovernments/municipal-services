@@ -266,7 +266,7 @@ public class SWCalculationUtil {
 			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
 		}
 		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
-			messageString = getMessageTemplate(SWCalculationConstant.WATER_CONNECTION_BILL_GENERATION_MESSAGE,
+			messageString = getMessageTemplate(SWCalculationConstant.SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE,
 					localizationMessage);
 		}
 		return messageString;
