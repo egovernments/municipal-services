@@ -1,6 +1,6 @@
 package org.egov.swCalculation.controller;
 
-import java.util.List;
+
 
 import javax.validation.Valid;
 
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +41,6 @@ public class SWCalculationController {
 	ResponseInfoFactory responseInfoFactory;
 	
 	
-	
 	@PostMapping("/_calculate")
 	public ResponseEntity<CalculationRes> calculate(@RequestBody @Valid CalculationReq calculationReq) {
 		return new ResponseEntity<>(sWCalculationService.getCalculation(calculationReq), HttpStatus.OK);
@@ -52,6 +50,11 @@ public class SWCalculationController {
 	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
 		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
+	}
+	
+	@PostMapping("/_jobscheduler")
+	public void jobscheduler() {
+		sWCalculationService.generateDemandBasedOnTimePeriod();
 	}
 
 }

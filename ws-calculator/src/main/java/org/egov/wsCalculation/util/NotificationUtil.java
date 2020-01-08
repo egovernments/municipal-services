@@ -10,6 +10,7 @@ import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.DemandNotificationObj;
 import org.egov.wsCalculation.model.EmailRequest;
+import org.egov.wsCalculation.model.EventRequest;
 import org.egov.wsCalculation.model.NotificationReceiver;
 import org.egov.wsCalculation.model.SMSRequest;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
@@ -70,6 +71,8 @@ public class NotificationUtil {
 	 * @return Localization messages for the module
 	 */
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
+		@SuppressWarnings("rawtypes")
+	
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
@@ -103,6 +106,10 @@ public class NotificationUtil {
 		}
 		if (topic.equalsIgnoreCase(config.getOnDemandsFailure())) {
 			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE_SMS, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
+			messageString = getMessageTemplate(WSCalculationConstant.WATER_CONNECTION_BILL_GENERATION_MESSAGE,
+					localizationMessage);
 		}
 		return messageString;
 	}
@@ -162,5 +169,14 @@ public class NotificationUtil {
 				log.info("Email To : " + emailRequest.getEmail() + " Body: " + emailRequest.getBody()+" Subject: "+ emailRequest.getSubject());
 			});
 		}
+	}
+	
+	/**
+	 * Pushes the event request to Kafka Queue.
+	 * 
+	 * @param request
+	 */
+	public void sendEventNotification(EventRequest request) {
+		producer.push(config.getSaveUserEventsTopic(), request);
 	}
 }

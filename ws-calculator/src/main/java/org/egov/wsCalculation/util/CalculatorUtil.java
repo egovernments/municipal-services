@@ -157,4 +157,19 @@ public class CalculatorUtil {
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 
+	
+	/**
+	 * 
+	 * @param tenantId
+	 * @return uri of fetch bill
+	 */
+	public StringBuilder getFetchBillURL(String tenantId, String consumerCode) {
+
+		return new StringBuilder().append(calculationConfig.getBillingServiceHost())
+				.append(calculationConfig.getFetchBillEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
+				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
+				.append(consumerCode).append(WSCalculationConstant.SEPARATER)
+				.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(WSCalculationConstant.WATER_TAX_SERVICE_CODE);
+	}
 }

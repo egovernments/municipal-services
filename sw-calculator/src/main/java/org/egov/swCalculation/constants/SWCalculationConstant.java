@@ -104,7 +104,7 @@ public class SWCalculationConstant {
 
 	public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
-	public static final Long TIMEZONE_OFFSET = 19800000l;
+;
 
 	public static final String SW_Round_Off = "SW_Round_Off";
 
@@ -132,7 +132,7 @@ public class SWCalculationConstant {
 
 	public static final String ConnectionType = "connectionType";
 
-	public static final String SW_MODULE = "sw-services-masters";
+	public static final String SW_MODULE = "sw-services-calculation";
 
 	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
 
@@ -146,25 +146,70 @@ public class SWCalculationConstant {
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
-
 	public static final String SMS_RECEIVER_MASTER = "SMSReceiver";
 
 	public static final String DEMAND_SUCCESS_MESSAGE = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
-	
+
 	public static final String DEMAND_FAILURE_MESSAGE = "SEWERAGE_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
 
 	public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
-	
-	
-    public static final String DEMAND_SUCCESS_MESSAGE_SMS = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
 
-    public static final String DEMAND_FAILURE_MESSAGE_SMS = "SEWERAGE_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
+	public static final String DEMAND_SUCCESS_MESSAGE_SMS = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_SMS_MESSAGE";
 
-    public static final String DEMAND_SUCCESS_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_EMAIL_MESSAGE";
+	public static final String DEMAND_FAILURE_MESSAGE_SMS = "SEWERAGE_CONNECTION_DEMAND_FAILURE_SMS_MESSAGE";
 
-    public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
-	;
+	public static final String DEMAND_SUCCESS_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_SUCCESSFUL_EMAIL_MESSAGE";
+
+	public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "SEWERAGE_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
+
+	public static final String BILL_SUCCESS_MESSAGE = "SEWERAGE_CONNECTION_BILL_FAILURE_MESSAGE";;
+
+	public static final String NOTIFICATION_INITIATED = "tl.en.counter.initiate";
+
+	public static final String NOTIFICATION_APPLIED = "tl.en.counter.submit";
+
+	public static final String NOTIFICATION_FIELD_INSPECTION = "tl.en.field.inspection";
+
+	public static final String NOTIFICATION_PAYMENT_OWNER = "tl.en.counter.payment.successful.owner";
+
+	public static final String NOTIFICATION_PAYMENT_PAYER = "tl.en.counter.payment.successful.payer";
+
+	public static final String NOTIFICATION_PAID = "tl.en.counter.pending.approval";
+
+	public static final String NOTIFICATION_APPROVED = "tl.en.counter.approved";
+
+	public static final String NOTIFICATION_REJECTED = "tl.en.counter.rejected";
+
+	public static final String NOTIFICATION_CANCELLED = "tl.en.counter.cancelled";
+
+	public static final String NOTIFICATION_FIELD_CHANGED = "tl.en.edit.field.change";
+
+	// ACTION_STATUS combinations for notification
+
+	public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+
+	public static final String ACTION_STATUS_APPLIED = "APPLY_APPLIED";
+
+	public static final String ACTION_STATUS_APPROVED = "APPROVE_PENDINGPAYMENT";
+
+	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
+
+	public static final String ACTION_STATUS_FIELDINSPECTION = "FORWARD_FIELDINSPECTION";
+
+	public static final String ACTION_CANCEL_CANCELLED = "CANCEL_CANCELLED";
+
+	public static final String ACTION_STATUS_PAID = "PAID";
+
+	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+
+	public static final String USREVENTS_EVENT_NAME = "SEWERAGE BILL GENERATION";
+
+	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
+
+	public static final String SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE = "SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE";
 	
+	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
 	
+	public static final String SEWERAGE_TAX_SERVICE_CODE = "SW";
 
 }

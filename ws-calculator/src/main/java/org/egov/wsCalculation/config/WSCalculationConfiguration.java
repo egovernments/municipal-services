@@ -50,6 +50,9 @@ public class WSCalculationConfiguration {
 	@Value("${egov.demand.search.endpoint}")
 	private String demandSearchEndPoint;
 	
+	@Value("${egov.bill.fetch.endpoint}")
+	private String fetchBillEndPoint;
+	
 	@Value("${egov.demand.billexpirytime}")
 	private Long demandBillExpiryTime;
 
@@ -126,5 +129,40 @@ public class WSCalculationConfiguration {
     @Value("${kafka.topics.notification.mail.name}")
     private String emailNotifyTopic;
     
+    //User Configuration
+    @Value("${egov.user.host}")
+    private String userHost;
+
+    @Value("${egov.user.context.path}")
+    private String userContextPath;
+
+
+    @Value("${egov.user.search.path}")
+    private String userSearchEndpoint;
+    
+    //payment 
+    @Value("${egov.usr.events.pay.triggers}")
+   	private String billgenTopic;
+    
+    
+    //USER EVENTS
+	@Value("${egov.ui.app.host}")
+	private String uiAppHost;
+    
+	@Value("${egov.usr.events.create.topic}")
+	private String saveUserEventsTopic;
+		
+	@Value("${egov.usr.events.pay.link}")
+	private String payLink;
+	
+	@Value("${egov.usr.events.pay.code}")
+	private String payCode;
+	
+	@Value("${egov.user.event.notification.enabled}")
+	private Boolean isUserEventsNotificationEnabled;
+
+	@Value("${kafka.topics.billgen.topic}")
+   	private String payTriggers;
+
 
 }

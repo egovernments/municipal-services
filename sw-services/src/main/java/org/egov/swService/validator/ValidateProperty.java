@@ -62,8 +62,13 @@ public class ValidateProperty {
 		} else {
 			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);
 		}
-		if (propertyList != null && !propertyList.isEmpty())
+		if (propertyList != null && !propertyList.isEmpty()) {
+           if (propertyList.get(0).getUsageCategory() == null || propertyList.get(0).getUsageCategory().isEmpty()) {
+				throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
+						"Sewerage connection cannot be enriched without property usage type");
+			}
 			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
+		}
 	}
 
 	public void validatePropertyForConnection(List<SewerageConnection> sewerageConnectionList) {

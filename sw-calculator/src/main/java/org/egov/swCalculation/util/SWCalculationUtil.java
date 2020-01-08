@@ -17,9 +17,11 @@ import org.egov.swCalculation.model.DemandDetail;
 import org.egov.swCalculation.model.DemandDetailAndCollection;
 import org.egov.swCalculation.model.DemandNotificationObj;
 import org.egov.swCalculation.model.EmailRequest;
+import org.egov.swCalculation.model.EventRequest;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
+import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.producer.SWCalculationProducer;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;
@@ -263,6 +265,10 @@ public class SWCalculationUtil {
 		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
 			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
 		}
+		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
+			messageString = getMessageTemplate(SWCalculationConstant.SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE,
+					localizationMessage);
+		}
 		return messageString;
 	}
 
@@ -325,4 +331,15 @@ public class SWCalculationUtil {
 		return messageString;
 	}
 
+	
+	/**
+	 * Pushes the event request to Kafka Queue.
+	 * 
+	 * @param request
+	 */
+	public void sendEventNotification(EventRequest request) {
+		producer.push(config.getSaveUserEventsTopic(), request);
+	}
+	
+	
 }
