@@ -22,38 +22,7 @@ public class PayService {
 	
 	@Autowired
 	EstimationService estimationService;
-	
-	/**
-	 * 
-	 * @param taxAmt
-	 * @param collectedSWTax
-	 * @param assessmentYear
-	 * @param timeBasedExmeptionMasterMap
-	 * @return
-	 */
-	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedSWTax,
-			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap) {
-
-		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
-			return null;
-		Map<String, BigDecimal> estimates = new HashMap<>();
-		BigDecimal rebate = getRebate(taxAmt, assessmentYear,
-				timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_REBATE_MASTER));
-		BigDecimal penalty = BigDecimal.ZERO;
-		BigDecimal interest = BigDecimal.ZERO;
-
-		if (rebate.equals(BigDecimal.ZERO)) {
-			penalty = getPenalty(taxAmt, assessmentYear,
-					timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_PENANLTY_MASTER));
-//			interest = getInterest(taxAmt, assessmentYear,
-//					timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER), receipts);
-		}
-		estimates.put(SWCalculationConstant.SW_TIME_REBATE, rebate.setScale(2, 2).negate());
-		estimates.put(SWCalculationConstant.SW_TIME_PENALTY, penalty.setScale(2, 2));
-		estimates.put(SWCalculationConstant.SW_TIME_INTEREST, BigDecimal.ZERO);
-		return estimates;
-	}
-	
+		
 	
 	/**
 	 * Returns the Amount of Rebate that can be applied on the given tax amount for
@@ -89,22 +58,7 @@ public class PayService {
 	 * @param assessmentYear
 	 * @return
 	 */
-	public BigDecimal getPenalty(BigDecimal taxAmt, String assessmentYear, JSONArray penaltyMasterList) {
 
-		BigDecimal penaltyAmt = BigDecimal.ZERO;
-		Map<String, Object> penalty = mDService.getApplicableMaster(assessmentYear, penaltyMasterList);
-		if (null == penalty) return penaltyAmt;
-
-		String[] time = getStartTime(assessmentYear,penalty);
-		Calendar cal = Calendar.getInstance();
-		setDateToCalendar(time, cal);
-		Long currentIST = System.currentTimeMillis()+SWCalculationConstant.TIMEZONE_OFFSET;
-
-		if (cal.getTimeInMillis() < currentIST)
-			penaltyAmt = mDService.calculateApplicables(taxAmt, penalty);
-
-		return penaltyAmt;
-	}
 	
 	
 	/**
