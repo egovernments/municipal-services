@@ -24,6 +24,9 @@ public class WSConfiguration {
 	@Value("${egov.waterservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
+	@Value("${egov.waterservice.pagination.max.limit}")
+	private Integer maxLimit;
+	
 	 //IDGEN
     @Value("${egov.idgen.wcid.name}")
     private String waterConnectionIdGenName;
