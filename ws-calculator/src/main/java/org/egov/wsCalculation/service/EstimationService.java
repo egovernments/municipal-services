@@ -219,8 +219,8 @@ public class EstimationService {
 		Property property = waterConnection.getProperty();
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-//		final String buildingType = property.getPropertyType();
-		final String buildingType = "Domestic";
+		final String buildingType = property.getUsageCategory();
+		//final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
 		final String calculationAttribute = waterConnection.getCalculationAttribute();
 		final String unitOfMeasurement = waterConnection.getUom();
