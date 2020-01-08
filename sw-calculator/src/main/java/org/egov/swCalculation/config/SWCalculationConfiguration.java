@@ -126,14 +126,9 @@ public class SWCalculationConfiguration {
     @Value("${egov.user.context.path}")
     private String userContextPath;
 
-    @Value("${egov.user.create.path}")
-    private String userCreateEndpoint;
 
     @Value("${egov.user.search.path}")
     private String userSearchEndpoint;
-
-    @Value("${egov.user.update.path}")
-    private String userUpdateEndpoint;
    
 	
 	@Value("${egov.ui.app.host}")
