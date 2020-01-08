@@ -1,6 +1,7 @@
 package org.egov.wsCalculation.service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -252,7 +253,8 @@ public class MasterDataService {
 					Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
 		}
 		log.info("Demand Expiry Date : "+ master.get(WSCalculationConstant.Demand_Expiry_Date_String));
-		Long demandExpiryDateMillis = Long.valueOf((int)master.get(WSCalculationConstant.Demand_Expiry_Date_String));
+		BigInteger expiryDate = new BigInteger(String.valueOf(master.get(WSCalculationConstant.Demand_Expiry_Date_String)));
+		Long demandExpiryDateMillis  = expiryDate.longValue();
 		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String, demandExpiryDateMillis);
 		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
