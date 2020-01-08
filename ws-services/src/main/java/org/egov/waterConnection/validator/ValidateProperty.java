@@ -62,8 +62,19 @@ public class ValidateProperty {
 		} else {
 			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);
 		}
-		if (propertyList != null && !propertyList.isEmpty())
+	
+		if (propertyList != null && !propertyList.isEmpty()) {
+
+			if (propertyList.get(0).getUsageCategory() == null || propertyList.get(0).getUsageCategory().isEmpty()) {
+				throw new CustomException("INVALID WATER CONNECTION PROPERTY USAGE TYPE",
+						"Water connection cannot be enriched without property usage type");
+			}
 			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
+		} else {
+			throw new CustomException("INVALID WATER CONNECTION PROPERTY",
+					"Water connection cannot be enriched without property");
+		}
+		
 	}
 	
 }
