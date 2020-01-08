@@ -12,7 +12,7 @@ public class sWCalculatorQueryBuilder {
 	
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	
-	private static final String connectionNoListQuery = "SELECT distinct(conn.eg_sw_connection) FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
+	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
 	
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
