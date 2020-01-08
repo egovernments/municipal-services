@@ -104,7 +104,7 @@ public class SWCalculationConstant {
 
 	public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
-	public static final Long TIMEZONE_OFFSET = 19800000l;
+;
 
 	public static final String SW_Round_Off = "SW_Round_Off";
 
