@@ -6,4 +6,6 @@ import org.egov.swCalculation.model.CalculationRes;
 public interface SWCalculationService {
 
 	public CalculationRes getCalculation(CalculationReq calculationReq);
+	
+	public void generateDemandBasedOnTimePeriod();
 }

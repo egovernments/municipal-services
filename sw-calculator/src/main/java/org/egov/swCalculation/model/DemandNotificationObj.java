@@ -22,18 +22,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class DemandNotificationObj {
-	
-	private String  billingCycle;
-	
+
+	private String billingCycle;
+
 	private Set<String> sewerageConnetionIds;
-	
-	private boolean  isSuccess;
-	
-    @JsonProperty("RequestInfo")
-    private RequestInfo requestInfo = null;
-    
-    
-    private String tenantId;
-    
+
+	private boolean isSuccess;
+
+	@JsonProperty("RequestInfo")
+	private RequestInfo requestInfo = null;
+
+	private String tenantId;
 
 }

@@ -54,7 +54,6 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		Map<String, Object> masterMap = mDataService.getMasterMap(request);
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
-		
 		return new CalculationRes(new ResponseInfo(),calculations);
 	}
 

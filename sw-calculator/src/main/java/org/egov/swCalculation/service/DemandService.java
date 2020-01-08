@@ -211,24 +211,27 @@ public class DemandService {
 		}
 		List<Demand> demandsToReturn = new LinkedList<>();
 		demandsToReturn=demandRepository.saveDemand(requestInfo, demands);
-		demandsToReturn.forEach(demand ->{
-			
+		demandsToReturn.forEach(demand -> {
+			fetchBill(demand.getTenantId(), demand.getConsumerCode(), requestInfo);
 		});
 		return demandsToReturn;
 	}
 	
 	
-	public boolean fetchBill(String tenantId, String consumerCode){
+	public boolean fetchBill(String tenantId, String consumerCode, RequestInfo requestInfo) {
 		boolean notificationSent = false;
-		try{
-//			String url =calculatorUtils.get
-//					Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
-//							RequestInfoWrapper.builder().requestInfo(requestInfo).build());	
-//			producer.push(topic, result);
-					notificationSent=true;		
-		}
-		catch(Exception ex){
-			throw new CustomException("NOTIFICATION ERROR", "Failed to send notification for sewerage");
+		try {
+			String uri = calculatorUtils.getFetchBillURL(tenantId, consumerCode).toString();
+			Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+					RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+			HashMap<String, Object> billResponse = new HashMap<>();
+			billResponse.put("requestInfo", requestInfo);
+			billResponse.put("billResponse", result);
+			producer.push(configs.getPayTriggers(), billResponse);
+			notificationSent = true;
+		} catch (Exception ex) {
+			log.error("Fetch Bill Error");
+			ex.printStackTrace();
 		}
 		return notificationSent;
 	}

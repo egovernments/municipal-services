@@ -134,9 +134,7 @@ public class SWCalculationConfiguration {
 
     @Value("${egov.user.update.path}")
     private String userUpdateEndpoint;
-    
-	@Value("${egov.usr.events.pay.triggers}")
-	private String payTriggers;
+   
 	
 	@Value("${egov.ui.app.host}")
 	private String uiAppHost;
@@ -146,6 +144,13 @@ public class SWCalculationConfiguration {
 	
 	@Value("${egov.usr.events.pay.link}")
 	private String payLink;
+	
+	@Value("${egov.bill.fetch.endpoint}")
+	private String fetchBillEndPoint;
+	
+
+	@Value("${kafka.topics.billgen.topic}")
+   	private String payTriggers;
     
     
     
