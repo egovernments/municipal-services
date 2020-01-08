@@ -36,6 +36,10 @@ public class WaterConnectionValidator {
 		if (isUpdate && (waterConnection.getConnectionNo() == null || waterConnection.getConnectionNo().isEmpty())) {
 			errorMap.put("INVALID WATER CONNECTION NUMBER", "WaterConnection cannot be update without connection no");
 		}
+		
+		if (waterConnection.getProperty().getUsageCategory() == null || waterConnection.getProperty().getUsageCategory().isEmpty()) {
+			errorMap.put("INVALID WATER CONNECTION PROPERTY USAGE TYPE", "WaterConnection cannot be created without property usage type");
+		}
 		if (waterConnection.getConnectionType() == WCConstants.METER_STATUS) {
 			if (waterConnection.getMeterId() == null) {
 				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");

@@ -38,6 +38,10 @@ public class SewerageConnectionValidator {
 			errorMap.put("INVALID SEWERAGE CONNECTION TYPE",
 					"SewerageConnection cannot be created  without connection type");
 		}
+		
+		if (sewerageConnection.getProperty().getUsageCategory() == null || sewerageConnection.getProperty().getUsageCategory().isEmpty()) {
+			errorMap.put("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE", "SewerageConnection cannot be created without property usage type");
+		}
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
