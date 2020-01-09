@@ -142,7 +142,7 @@ public class SWCalculationConstant {
 
 	public static final String Billing_Cycle_String = "billingCycle";
 
-	public static final String MODULE = "rainmaker-common";
+	public static final String MODULE = "rainmaker-ws";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 

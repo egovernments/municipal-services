@@ -4,8 +4,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -22,6 +24,7 @@ import org.egov.wsCalculation.model.Event;
 import org.egov.wsCalculation.model.EventRequest;
 import org.egov.wsCalculation.model.OwnerInfo;
 import org.egov.wsCalculation.model.Recepient;
+import org.egov.wsCalculation.model.SMSRequest;
 import org.egov.wsCalculation.model.Source;
 import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
@@ -63,27 +66,49 @@ public class PaymentNotificationService {
 	String totalBillAmount = "billAmount";
 	String dueDate = "dueDate";
 	
+	/**
+	 * 
+	 * @param record record is bill response.
+	 * @param topic topic is bill generation topic for water.
+	 */
 	public void process(HashMap<String, Object> record, String topic) {
 		try {
-			if (null != config.getIsUserEventsNotificationEnabled()) {
-				if (config.getIsUserEventsNotificationEnabled()) {
-					HashMap<String, Object> billRes = (HashMap<String, Object>)record.get("billResponse");
-					String jsonString = new JSONObject(billRes).toString();
-					DocumentContext context = JsonPath.parse(jsonString);
-					HashMap<String, String> mappedRecord = mapRecords(context);
-					Map<String, Object> info = (Map<String, Object>)record.get("requestInfo");
-					RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-					if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
-						WaterConnection waterConnection = calculatorUtil.getWaterConnection(requestInfo,
-								mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
-						if (waterConnection == null) {
-							throw new CustomException("Water Connection not found for given criteria ",
-									"Water Connection are not present for " + mappedRecord.get(consumerCode)
-											+ " connection no");
-						}
-						EventRequest eventRequest = getEventRequest(mappedRecord, waterConnection, topic, requestInfo);
-						if (null != eventRequest)
-							notificationUtil.sendEventNotification(eventRequest);
+			HashMap<String, Object> billRes = (HashMap<String, Object>) record.get("billResponse");
+			String jsonString = new JSONObject(billRes).toString();
+			DocumentContext context = JsonPath.parse(jsonString);
+			HashMap<String, String> mappedRecord = mapRecords(context);
+			Map<String, Object> info = (Map<String, Object>) record.get("requestInfo");
+			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
+			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
+				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
+					WaterConnection waterConnection = calculatorUtil.getWaterConnection(requestInfo,
+							mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+					if (waterConnection == null) {
+						throw new CustomException("Water Connection not found for given criteria ",
+								"Water Connection are not present for " + mappedRecord.get(consumerCode)
+										+ " connection no");
+					}
+					EventRequest eventRequest = getEventRequest(mappedRecord, waterConnection, topic, requestInfo);
+					if (eventRequest != null) {
+						log.info("In App Notification :: -> "+ mapper.writeValueAsString(eventRequest));
+						notificationUtil.sendEventNotification(eventRequest);
+					}
+				}
+			}
+			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
+				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
+					WaterConnection waterConnection = calculatorUtil.getWaterConnection(requestInfo,
+							mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+					if (waterConnection == null) {
+						throw new CustomException("Water Connection not found for given criteria ",
+								"Water Connection are not present for " + mappedRecord.get(consumerCode)
+										+ " connection no");
+					}
+					List<SMSRequest> smsRequests = new LinkedList<>();
+					smsRequests = getSmsRequest(mappedRecord, waterConnection, topic, requestInfo);
+					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+						log.info("SMS Notification :: -> "+ mapper.writeValueAsString(smsRequests));
+						notificationUtil.sendSMS(smsRequests);
 					}
 				}
 			}
@@ -94,6 +119,14 @@ public class PaymentNotificationService {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param mappedRecord
+	 * @param waterConnection
+	 * @param topic
+	 * @param requestInfo
+	 * @return
+	 */
 	private EventRequest getEventRequest(HashMap<String, String> mappedRecord, WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
 		List<Event> events = new ArrayList<>();
@@ -151,6 +184,37 @@ public class PaymentNotificationService {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param mappedRecord
+	 * @param waterConnection
+	 * @param topic
+	 * @param requestInfo
+	 * @return
+	 */
+	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, WaterConnection waterConnection, String topic,
+			RequestInfo requestInfo) {
+		List<SMSRequest> smsRequest = new ArrayList<>();
+		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
+		String message = notificationUtil.getCustomizedMsg(topic, localizationMessage);
+		if (message == null) {
+			log.info("No message Found For Topic : " + topic);
+			return null;
+		}
+		Map<String, String> mobileNumbersAndNames = new HashMap<>();
+		waterConnection.getProperty().getOwners().forEach(owner -> {
+			if (owner.getMobileNumber() != null)
+				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
+		});
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
+				message);
+		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
+			SMSRequest req = new SMSRequest(mobileNumber, messg);
+			smsRequest.add(req);
+		});
+		return smsRequest;
+	}
+	
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,
 			HashMap<String, String> mapRecords, String message) {
 		Map<String, String> messagetoreturn = new HashMap<>();
@@ -169,6 +233,7 @@ public class PaymentNotificationService {
 		}
 		return messagetoreturn;
 	}
+	
 	/**
 	 * 
 	 * @param context
