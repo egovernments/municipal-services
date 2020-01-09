@@ -82,7 +82,7 @@ public class PayService {
 		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
 		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
 		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
-		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
+		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER));
 		estimates.put(WSCalculationConstant.WS_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, interest.setScale(2, 2));
 		return estimates;

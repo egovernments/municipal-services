@@ -151,5 +151,15 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
 		return tenentIds;
 	}
+	
+	@Override
+	public int isBillingPeriodExists(String connectionNo, String billingPeriod) {
+		int n = 0;
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.isBillingPeriodExists(connectionNo, billingPeriod, preparedStatement);
+		log.info("Is BillingPeriod Exits Query: " + query);
+		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
+		return n;
+	}
 
 }

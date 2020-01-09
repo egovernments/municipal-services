@@ -190,6 +190,15 @@ public class WSCalculatorQueryBuilder {
 		preparedStatement.add(tenantId);
 		return query.toString();
 	}
-
+	
+	public String isBillingPeriodExists(String connectionNo, String billingPeriod, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
+		query.append(" connectionNo = ? ");
+		preparedStatement.add(connectionNo);
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" billingPeriod = ? ");
+		preparedStatement.add(billingPeriod);
+		return query.toString();
+	}
 
 }

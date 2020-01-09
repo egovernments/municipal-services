@@ -1,6 +1,7 @@
 package org.egov.swCalculation.service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -302,11 +303,13 @@ public class MasterDataService {
 		LocalDateTime demandStartingDate = LocalDateTime.now();
 		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
 		Long demandEndDateMillis = (Long) master.get(SWCalculationConstant.Demand_End_Date_String);
-		Long demandExpiryDateMillis = Long.valueOf((int)master.get(SWCalculationConstant.Demand_Expiry_Date_String));
+		BigInteger expiryDate = new BigInteger(String.valueOf(master.get(SWCalculationConstant.Demand_Expiry_Date_String)));
+		Long demandExpiryDateMillis  = expiryDate.longValue();
 		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES,
 				Timestamp.valueOf(demandStartingDate).getTime());
 		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES,
 				Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
+
 		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String,demandExpiryDateMillis);
 		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
