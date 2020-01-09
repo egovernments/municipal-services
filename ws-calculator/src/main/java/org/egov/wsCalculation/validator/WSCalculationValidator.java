@@ -54,11 +54,11 @@ public class WSCalculationValidator {
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if(connection == null) {
-			errorMap.put("INVALID METER READING CONNECTION NUMBER",
+			errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER",
 					"Invalid water connection number");
 		}
-		if (!connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
-			errorMap.put("INVALID CONNECTION TYPE",
+		if (connection != null && !connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+			errorMap.put("INVALID_WATER_CONNECTION_TYPE",
 					"Meter reading can not be create for : " + connection.getConnectionType() +" connection");
 		}
 		MeterReadingSearchCriteria criteria= new MeterReadingSearchCriteria();
@@ -69,35 +69,39 @@ public class WSCalculationValidator {
 		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
 			Double currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0).getCurrentReading();
 			if (meterReading.getCurrentReading() < currentMeterReading) {
-				errorMap.put("INVALID METER READING CONNECTION NUMBER",
-						"Current meter reading has to be greater than the past last readings in the meter reading table !");
+				errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER",
+						"Current meter reading has to be greater than the past last readings in the meter reading!");
 			}
 		}
 		
 		if (meterReading.getCurrentReading() < meterReading.getLastReading()) {
-			errorMap.put("INVALID METER READING LAST READING",
+			errorMap.put("INVALID_METER_READING_LAST_READING",
 					"Current Meter Reading cannot be less than last meter reading");
 		}
 		
 		if (meterReading.getMeterStatus() == null) {
-			errorMap.put("INVALID METER READING STATUS",
+			errorMap.put("INVALID_METER_READING_STATUS",
 					"Meter status can not be null");
 		}
 		
 		if (isUpdate && (meterReading.getCurrentReading() == null)) {
-			errorMap.put("INVALID CURRENT METER READING",
+			errorMap.put("INVALID_CURRENT_METER_READING",
 					"Current Meter Reading cannot be update without current meter reading");
 		}
 
 		if (isUpdate && meterReading.getId() != null && !meterReading.getId().isEmpty()) {
 			int n = wSCalculationDao.isMeterReadingConnectionExist(Arrays.asList(meterReading.getId()));
 			if (n > 0) {
-				errorMap.put("INVALID METER READING CONNECTION", "Meter reading Id already present");
+				errorMap.put("INVALID_METER_READING_CONNECTION", "Meter reading Id already present");
 			}
 		}
 		if (meterReading.getBillingPeriod() == null || meterReading.getBillingPeriod().isEmpty()) {
-			errorMap.put("INVALID BILLING PERIOD", "Meter Reading cannot be updated without billing period");
+			errorMap.put("INVALID_BILLING_PERIOD", "Meter Reading cannot be updated without billing period");
 		}
+
+		int billingPeriodNumber = wSCalculationDao.isBillingPeriodExists(meterReading.getConnectionNo(), meterReading.getBillingPeriod());
+		if(billingPeriodNumber > 0)
+			errorMap.put("INVALID_METER_READING_BILLING_PERIOD", "Billing Period Already Exists");
 		
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
