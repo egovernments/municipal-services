@@ -1,11 +1,13 @@
 package org.egov.swCalculation.service;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,8 +20,10 @@ import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.Action;
 import org.egov.swCalculation.model.ActionItem;
+import org.egov.swCalculation.model.DemandNotificationObj;
 import org.egov.swCalculation.model.Event;
 import org.egov.swCalculation.model.EventRequest;
+import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.OwnerInfo;
 import org.egov.swCalculation.model.Recepient;
 import org.egov.swCalculation.model.SMSRequest;
@@ -39,6 +43,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Slf4j
 @Component
@@ -59,6 +64,9 @@ public class PaymentNotificationService {
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
 
+	@Autowired
+	MasterDataService service;
+
 	String tenantId = "tenantId";
 	String serviceName = "serviceName";
 	String consumerCode = "consumerCode";
@@ -67,14 +75,14 @@ public class PaymentNotificationService {
 
 	public void process(HashMap<String, Object> record, String topic) {
 		try {
+			HashMap<String, Object> billRes = (HashMap<String, Object>) record.get("billResponse");
+			String jsonString = new JSONObject(billRes).toString();
+			DocumentContext context = JsonPath.parse(jsonString);
+			HashMap<String, String> mappedRecord = mapRecords(context);
+			Map<String, Object> info = (Map<String, Object>) record.get("requestInfo");
+			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 			if (null != config.getIsUserEventsNotificationEnabled()) {
 				if (config.getIsUserEventsNotificationEnabled()) {
-					HashMap<String, Object> billRes = (HashMap<String, Object>) record.get("billResponse");
-					String jsonString = new JSONObject(billRes).toString();
-					DocumentContext context = JsonPath.parse(jsonString);
-					HashMap<String, String> mappedRecord = mapRecords(context);
-					Map<String, Object> info = (Map<String, Object>) record.get("requestInfo");
-					RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 					if (mappedRecord.get(serviceName).equalsIgnoreCase(SWCalculationConstant.SERVICE_FIELD_VALUE_SW)) {
 						SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
 								mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
@@ -87,13 +95,67 @@ public class PaymentNotificationService {
 								requestInfo);
 						if (null != eventRequest)
 							util.sendEventNotification(eventRequest);
+
 					}
 				}
 			}
 
-		} catch (Exception ex) {
+			if (config.getIsSMSEnabled() != null) {
+				if (config.getIsSMSEnabled()) {
+					List<SMSRequest> smsRequests = new LinkedList<>();
+					if (mappedRecord.get(serviceName).equalsIgnoreCase(SWCalculationConstant.SERVICE_FIELD_VALUE_SW)) {
+						SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
+								mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+						if (sewerageConnection == null) {
+							throw new CustomException("Sewerage Connection not found for given criteria ",
+									"Sewerage Connection are not present for " + mappedRecord.get(consumerCode)
+											+ " connection no");
+						}
+						enrichSMSRequest(smsRequests, topic, mappedRecord, requestInfo, sewerageConnection);
+						if (!CollectionUtils.isEmpty(smsRequests))
+							util.sendSMS(smsRequests);
+					}
+				}
+			}
+		}
+
+		catch (Exception ex) {
 			log.error(ex.toString());
 			log.error("Error occured while processing the record from topic : " + topic);
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private void enrichSMSRequest(List<SMSRequest> smsRequest, String topic, HashMap<String, String> mappedRecord,
+			RequestInfo requestInfo, SewerageConnection sewerageConnection) {
+		String localizationMessages = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
+		String message = util.getCustomizedMsg(topic, localizationMessages);
+
+		if (message == null) {
+			log.info("No message Found For Topic : " + topic);
+		}
+		Map<String, String> mobileNumbersAndNames = new HashMap<>();
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
+				message);
+		sewerageConnection.getProperty().getOwners().forEach(owner -> {
+			if (owner.getMobileNumber() != null)
+				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
+			SMSRequest sms = new SMSRequest(owner.getMobileNumber(), message);
+			smsRequest.add(sms);
+		});
+
+	}
+
+	@SuppressWarnings("unused")
+	private void enrichNotificationReceivers(List<NotificationReceiver> receiverList,
+			DemandNotificationObj notificationObj) {
+		try {
+			JSONArray receiver = service.getMasterListOfReceiver(notificationObj.getRequestInfo(),
+					notificationObj.getTenantId());
+			receiverList.addAll(mapper.readValue(receiver.toJSONString(),
+					mapper.getTypeFactory().constructCollectionType(List.class, NotificationReceiver.class)));
+		} catch (IOException e) {
+			throw new CustomException("Parsing Exception", " Notification Receiver List Can Not Be Parsed!!");
 		}
 	}
 
