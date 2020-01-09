@@ -100,20 +100,20 @@ public class PaymentNotificationService {
 				}
 			}
 
-			if (config.getIsSMSEnabled() != null) {
-				if (config.getIsSMSEnabled()) {
+			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
+				if (mappedRecord.get(serviceName).equalsIgnoreCase(SWCalculationConstant.SERVICE_FIELD_VALUE_SW)) {
+					SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
+							mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+					if (sewerageConnection == null) {
+						throw new CustomException("Water Connection not found for given criteria ",
+								"Water Connection are not present for " + mappedRecord.get(consumerCode)
+										+ " connection no");
+					}
 					List<SMSRequest> smsRequests = new LinkedList<>();
-					if (mappedRecord.get(serviceName).equalsIgnoreCase(SWCalculationConstant.SERVICE_FIELD_VALUE_SW)) {
-						SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
-								mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
-						if (sewerageConnection == null) {
-							throw new CustomException("Sewerage Connection not found for given criteria ",
-									"Sewerage Connection are not present for " + mappedRecord.get(consumerCode)
-											+ " connection no");
-						}
-						enrichSMSRequest(smsRequests, topic, mappedRecord, requestInfo, sewerageConnection);
-						if (!CollectionUtils.isEmpty(smsRequests))
-							util.sendSMS(smsRequests);
+					smsRequests = getSmsRequest(mappedRecord, sewerageConnection, topic, requestInfo);
+					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
+						util.sendSMS(smsRequests);
 					}
 				}
 			}
@@ -123,6 +123,29 @@ public class PaymentNotificationService {
 			log.error(ex.toString());
 			log.error("Error occured while processing the record from topic : " + topic);
 		}
+	}
+
+	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, SewerageConnection sewerageConnection,
+			String topic, RequestInfo requestInfo) {
+		List<SMSRequest> smsRequest = new ArrayList<>();
+		String localizationMessage = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
+		String message = util.getCustomizedMsg(topic, localizationMessage);
+		if (message == null) {
+			log.info("No message Found For Topic : " + topic);
+			return null;
+		}
+		Map<String, String> mobileNumbersAndNames = new HashMap<>();
+		sewerageConnection.getProperty().getOwners().forEach(owner -> {
+			if (owner.getMobileNumber() != null)
+				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
+		});
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
+				message);
+		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
+			SMSRequest req = new SMSRequest(mobileNumber, messg);
+			smsRequest.add(req);
+		});
+		return smsRequest;
 	}
 
 	@SuppressWarnings("unused")
