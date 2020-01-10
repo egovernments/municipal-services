@@ -30,7 +30,7 @@ public class MDMSValidator {
 
 		  Map<String, List<String>> masterData = getAttributeValues(mdmsData);
 	        String[] masterArray = { BPAConstants.SERVICE_TYPE, BPAConstants.APPLICATION_TYPE,
-	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE};
+	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE,BPAConstants.SUB_OCCUPANCY_TYPE,BPAConstants.USAGES};
 
 	        validateIfMasterPresent(masterArray, masterData);
 
