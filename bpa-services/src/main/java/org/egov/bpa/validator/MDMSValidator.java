@@ -29,9 +29,8 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		  Map<String, List<String>> masterData = getAttributeValues(mdmsData);
-	        
 	        String[] masterArray = { BPAConstants.SERVICE_TYPE, BPAConstants.APPLICATION_TYPE,
-	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE};
+	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE};
 
 	        validateIfMasterPresent(masterArray, masterData);
 
@@ -59,8 +58,22 @@ public class MDMSValidator {
 	 	                        + owner + "' does not exists");
 	 	            
 	                });
+	            
+	            if(!masterData.get(BPAConstants.OCCUPANCY_TYPE).
+	                    contains(bpaRequest.getBPA().getOccupancyType()))
+	                errorMap.put("INVALID OCCUPANCYTYPE", "The OccupancyType '"
+	                        + bpaRequest.getBPA().getOccupancyType() + "' does not exists");
 
+	            if(!masterData.get(BPAConstants.SUB_OCCUPANCY_TYPE).
+	                    contains(bpaRequest.getBPA().getSubOccupancyType()))
+	                errorMap.put("INVALID SUBOCCUPANCYTYPE", "The SubOccupancyType '"
+	                        + bpaRequest.getBPA().getSubOccupancyType() + "' does not exists");
 
+	            if(!masterData.get(BPAConstants.USAGES).
+	                    contains(bpaRequest.getBPA().getUsages()))
+	                errorMap.put("INVALID USAGES", "The Usages '"
+	                        + bpaRequest.getBPA().getUsages() + "' does not exists");
+	            
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
 	}
@@ -83,11 +96,11 @@ public class MDMSValidator {
 
         List<String> modulepaths = Arrays.asList(BPAConstants.BPA_JSONPATH_CODE,
         		BPAConstants.COMMON_MASTER_JSONPATH_CODE);
-
         final Map<String, List<String>> mdmsResMap = new HashMap<>();
         modulepaths.forEach( modulepath -> {
             try {
                 mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
+                System.out.println(mdmsResMap);
             } catch (Exception e) {
                 log.error("Error while fetvhing MDMS data", e);
                 throw new CustomException(BPAConstants.INVALID_TENANT_ID_MDMS_KEY, BPAConstants.INVALID_TENANT_ID_MDMS_MSG);

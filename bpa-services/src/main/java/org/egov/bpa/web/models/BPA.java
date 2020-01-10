@@ -119,6 +119,19 @@ public class BPA {
 	@JsonProperty("holdingNo")
 	private String holdingNo;
 	
+	@Size(max = 64)
+	@JsonProperty("occupancyType")
+	private String occupancyType;
+	
+	@Size(max = 64)
+	@JsonProperty("subOccupancyType")
+	private String subOccupancyType;
+	
+
+	@Size(max = 64)
+	@JsonProperty("usages")
+	private String usages;
+	
 	@Size(max = 250)
 	@JsonProperty("registrationDetails")
 	private String registrationDetails;
