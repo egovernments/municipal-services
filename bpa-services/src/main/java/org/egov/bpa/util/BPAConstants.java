@@ -65,9 +65,16 @@ public class BPAConstants {
 	
 	public static final String APPLICATION_TYPE = "ApplicationType";
 	
+	public static final String OCCUPANCY_TYPE = "OccupancyType";
+	
+	public static final String SUB_OCCUPANCY_TYPE = "SubOccupancyType";
+	
+	public static final String USAGES = "Usages";
+	
 	public static final String DOCUMENT_TYPE_MAPPING = "DocTypeMapping";
 
 	public static final String RISKTYPE_COMPUTATION = "RiskTypeComputation";
+	
 	public static final String DOCUMENT_TYPE = "DocumentType";
 	
 	public static final String OWNER_TYPE = "OwnerType";
