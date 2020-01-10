@@ -400,9 +400,6 @@ components:
         plinthArea:
           type: number
           description: Area of the extension builtup of the Unit, Like balcony, sitouts.
-        totalUnitArea:
-          type: number
-          description: Area of the defined Unit in sq ft(builtup + plinth area).
         superBuiltUpArea:
           type: number
           description: Total built up area in sq ft(built-up area + Common area = Super built-up area)
