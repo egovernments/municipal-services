@@ -43,7 +43,7 @@ public class BPAQueryBuilder {
 			+ "eg_bpa_geolocation bpageolocation ON bpageolocation.addressid = bpaaddress.id";;
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_id) offset_ FROM "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_lastModifiedTime DESC) offset_ FROM "
 			+ "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
