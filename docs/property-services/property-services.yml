@@ -322,6 +322,11 @@ components:
           minLength: 2
           type: string
           description: tenant id of the Property
+        surveyId:
+          maxLength: 256
+          minLength: 2
+          type: string
+          description: survey id of the Property
         accountId:
           maxLength: 64
           minLength: 1
