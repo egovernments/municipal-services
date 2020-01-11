@@ -12,6 +12,7 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -59,17 +60,20 @@ public class MDMSValidator {
 	 	            
 	                });
 	            
-	            if(!masterData.get(BPAConstants.OCCUPANCY_TYPE).
+	            if( !StringUtils.isEmpty(bpaRequest.getBPA().getOccupancyType()) &&
+	            		!masterData.get(BPAConstants.OCCUPANCY_TYPE).
 	                    contains(bpaRequest.getBPA().getOccupancyType()))
 	                errorMap.put("INVALID OCCUPANCYTYPE", "The OccupancyType '"
 	                        + bpaRequest.getBPA().getOccupancyType() + "' does not exists");
 
-	            if(!masterData.get(BPAConstants.SUB_OCCUPANCY_TYPE).
+	            if( !StringUtils.isEmpty(bpaRequest.getBPA().getSubOccupancyType()) && 
+	            		!masterData.get(BPAConstants.SUB_OCCUPANCY_TYPE).
 	                    contains(bpaRequest.getBPA().getSubOccupancyType()))
 	                errorMap.put("INVALID SUBOCCUPANCYTYPE", "The SubOccupancyType '"
 	                        + bpaRequest.getBPA().getSubOccupancyType() + "' does not exists");
 
-	            if(!masterData.get(BPAConstants.USAGES).
+	            if(!StringUtils.isEmpty(bpaRequest.getBPA().getUsages()) && 
+	            		!masterData.get(BPAConstants.USAGES).
 	                    contains(bpaRequest.getBPA().getUsages()))
 	                errorMap.put("INVALID USAGES", "The Usages '"
 	                        + bpaRequest.getBPA().getUsages() + "' does not exists");
