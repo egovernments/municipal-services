@@ -26,7 +26,6 @@ public class WSCalculationConfiguration {
 	@Value("${egov.ws_calculation.meterReading.default.offset}")
 	private Integer meterReadingDefaultOffset;
 
-
 	/*
 	 * Calculator Configs
 	 */
@@ -49,10 +48,10 @@ public class WSCalculationConfiguration {
 
 	@Value("${egov.demand.search.endpoint}")
 	private String demandSearchEndPoint;
-	
+
 	@Value("${egov.bill.fetch.endpoint}")
 	private String fetchBillEndPoint;
-	
+
 	@Value("${egov.demand.billexpirytime}")
 	private Long demandBillExpiryTime;
 
@@ -65,9 +64,9 @@ public class WSCalculationConfiguration {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndPoint;
-	
-    @Value("${egov.bill.gen.endpoint}")
-    private String billGenerateEndpoint;
+
+	@Value("${egov.bill.gen.endpoint}")
+	private String billGenerateEndpoint;
 
 	// water demand configs
 
@@ -79,93 +78,94 @@ public class WSCalculationConfiguration {
 
 	@Value("${ws.financialyear.start.month}")
 	private String financialYearStartMonth;
-	
-	
+
 	@Value("${egov.demand.businessservice}")
 	private String businessService;
-	  
+
 	@Value("${egov.demand.minimum.payable.amount}")
-	 private BigDecimal minimumPayableAmount;
-	  
-	 //water Registry
-	 @Value("${egov.ws.host}")
-	 private String waterConnectionHost;
+	private BigDecimal minimumPayableAmount;
 
-	 @Value("${egov.wc.search.endpoint}")
-	 private String waterConnectionSearchEndPoint;
-	 
-	 //Demand Topic
-	 @Value("${ws.calculator.demand.successful}")
-	 private String onDemandsSaved;
+	// water Registry
+	@Value("${egov.ws.host}")
+	private String waterConnectionHost;
 
-	 @Value("${ws.calculator.demand.failed}")
-	 private String onDemandsFailure;
-	 
-	 
-	//Localization
+	@Value("${egov.wc.search.endpoint}")
+	private String waterConnectionSearchEndPoint;
+
+	// Demand Topic
+	@Value("${ws.calculator.demand.successful}")
+	private String onDemandsSaved;
+
+	@Value("${ws.calculator.demand.failed}")
+	private String onDemandsFailure;
+
+	// Localization
 	@Value("${egov.localization.host}")
 	private String localizationHost;
-	
+
 	@Value("${egov.localization.context.path}")
 	private String localizationContextPath;
-	
+
 	@Value("${egov.localization.search.endpoint}")
 	private String localizationSearchEndpoint;
-	
+
 	@Value("${egov.localization.statelevel}")
 	private Boolean isLocalizationStateLevel;
-	
-	 //SMS
-    @Value("${kafka.topics.notification.sms}")
-    private String smsNotifTopic;
 
-    @Value("${notification.sms.enabled}")
-    private Boolean isSMSEnabled;
-    
-    @Value("${notification.email.enabled}")
-    private Boolean isEmailEnabled;
-    
-  //Email
-    @Value("${kafka.topics.notification.mail.name}")
-    private String emailNotifyTopic;
-    
-    //User Configuration
-    @Value("${egov.user.host}")
-    private String userHost;
+	// SMS
+	@Value("${kafka.topics.notification.sms}")
+	private String smsNotifTopic;
 
-    @Value("${egov.user.context.path}")
-    private String userContextPath;
+	@Value("${notification.sms.enabled}")
+	private Boolean isSMSEnabled;
 
+	@Value("${notification.email.enabled}")
+	private Boolean isEmailEnabled;
 
-    @Value("${egov.user.search.path}")
-    private String userSearchEndpoint;
-    
-    //payment 
-    @Value("${egov.usr.events.pay.triggers}")
-   	private String billgenTopic;
-    
-    
-    //USER EVENTS
+	// Email
+	@Value("${kafka.topics.notification.mail.name}")
+	private String emailNotifyTopic;
+
+	// User Configuration
+	@Value("${egov.user.host}")
+	private String userHost;
+
+	@Value("${egov.user.context.path}")
+	private String userContextPath;
+
+	@Value("${egov.user.search.path}")
+	private String userSearchEndpoint;
+
+	// payment
+	@Value("${egov.usr.events.pay.triggers}")
+	private String billgenTopic;
+
+	// USER EVENTS
 	@Value("${egov.ui.app.host}")
 	private String uiAppHost;
-    
+
 	@Value("${egov.usr.events.create.topic}")
 	private String saveUserEventsTopic;
-		
+
 	@Value("${egov.usr.events.pay.link}")
 	private String payLink;
-	
+
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
-	
+
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
 
 	@Value("${kafka.topics.billgen.topic}")
-   	private String payTriggers;
-	
+	private String payTriggers;
+
 	@Value("${egov.watercalculatorservice.createdemand}")
 	private String createDemand;
 
+	@Value("${kafka.producer.config.batch_size_config}")
+	private String batchSize;
+
+	@Value("${persister.demand.based.dead.letter.topic.batch}")
+	private String deadLetterTopic;
 
 }

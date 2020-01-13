@@ -719,7 +719,8 @@ public class DemandService {
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
 						.requestInfo(requestInfo).build();
-				swCalculationService.getCalculation(calculationReq);
+				
+				producer.push(configs.getCreateDemand(), calculationReq);
 			}
 		}
 		
