@@ -44,7 +44,7 @@ public class WorkflowIntegrator {
 
 	private static final String DOCUMENTSKEY = "documents";
 
-	private static final String ASSIGNEEKEY = "assignees";
+	private static final String ASSIGNEEKEY = "assignes";
 
 	private static final String UUIDKEY = "uuid";
 
