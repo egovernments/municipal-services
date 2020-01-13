@@ -163,6 +163,9 @@ public class WSCalculationConfiguration {
 
 	@Value("${kafka.topics.billgen.topic}")
    	private String payTriggers;
+	
+	@Value("${egov.watercalculatorservice.createdemand}")
+	private String createDemand;
 
 
 }
