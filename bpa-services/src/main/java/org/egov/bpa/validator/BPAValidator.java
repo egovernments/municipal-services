@@ -68,6 +68,21 @@ public class BPAValidator {
 			allDocuments.addAll(bpa.getDocuments());
 		}
 		
+		if(bpa.getWfDocuments() != null){
+			bpa.getWfDocuments().forEach(document -> {
+				
+				if(document.getFileStore() == null && document.getFileStoreId() == null) {
+					throw new CustomException("Invlaid Document",
+							"filestore cannot be null"+document.toString() );
+				}else if(document.getFileStoreId() == null){
+					document.setFileStoreId(document.getFileStore());
+				}else if(document.getFileStore() == null){
+					document.setFileStore(document.getFileStoreId());
+				}
+			});
+		}
+		
+		
 		allDocuments.forEach(document -> {
 			
 			if(document.getFileStore() == null && document.getFileStoreId() == null) {
@@ -93,12 +108,12 @@ public class BPAValidator {
 
 		if (!CollectionUtils.isEmpty(allDocuments)) {
 
-			/*allDocuments.forEach(document -> {
+			allDocuments.forEach(document -> {
 
 				if (!validDocumentTypes.contains(document.getDocumentType())) {
 					throw new CustomException("Unkonwn Document Type ERROR", document.getDocumentType() + " is Unkown");
 				}
-			});*/
+			});
 			
 
 			
