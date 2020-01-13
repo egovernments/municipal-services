@@ -195,7 +195,9 @@ public class CalculationService {
       if(totalTax.compareTo(BigDecimal.ZERO) == -1)
           throw new CustomException("INVALID AMOUNT","Tax amount is negative");
       
-      totalTax = modifyTotalTax(totalTax, calulationCriteria.getTradelicense());
+      if(null != calulationCriteria.getTradelicense().getValidFrom() && null != calulationCriteria.getTradelicense().getValidTo())  {
+          totalTax = modifyTotalTax(totalTax, calulationCriteria.getTradelicense());
+      }
 
       estimate.setEstimateAmount(totalTax);
       estimate.setCategory(Category.TAX);
@@ -216,6 +218,7 @@ public class CalculationService {
    * @return
    */
   private BigDecimal modifyTotalTax(BigDecimal totalTax, TradeLicense tradeLicense) {	  
+	  log.info("totalTax: "+totalTax);
 	  Calendar cal = Calendar.getInstance();
 	  cal.setTimeInMillis(tradeLicense.getValidFrom());
 	  int fromYear = cal.get(Calendar.YEAR);
@@ -225,6 +228,8 @@ public class CalculationService {
 	  if((toYear - fromYear) > 0) {
 		  totalTax =  totalTax.multiply(BigDecimal.valueOf(toYear - fromYear));
 	  }
+	  log.info("diff: "+(toYear - fromYear));
+	  log.info("totalTax: "+totalTax);
 	  
 	  return totalTax;
 
