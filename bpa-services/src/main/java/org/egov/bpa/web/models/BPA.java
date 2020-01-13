@@ -165,7 +165,7 @@ public class BPA {
 	
 	@Size(max=64)
     @JsonProperty("assignees")
-    private List<String> assignees = null;
+    private List<User> assignees = null;
 	
 	@Valid
 	@JsonProperty("wfDocuments")
