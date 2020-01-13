@@ -49,6 +49,8 @@ public class WSCalculationValidator {
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
+		
+		//Future Billing Period Check
 		if(meterReading.getBillingPeriod() != null)
 		masterDataService.getDemandStartAndEndValue(meterReading.getBillingPeriod());
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
