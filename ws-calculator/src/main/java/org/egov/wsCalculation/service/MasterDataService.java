@@ -241,11 +241,10 @@ public class MasterDataService {
 		LocalDateTime demandStartingDate = LocalDateTime.now();
 		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
 		Long demandEndDateMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
-		if (criteria.getBillingPeriod() != null && ((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
+		if (((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
 				.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period))) {
-			HashMap<String, Long> demandStartAndEndDate = getDemandStartAndEndValue(criteria.getBillingPeriod());
-			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, demandStartAndEndDate.get("startDate"));
-			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, demandStartAndEndDate.get("endDate"));
+			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
+			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 		} else {
 			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
 					Timestamp.valueOf(demandStartingDate).getTime());

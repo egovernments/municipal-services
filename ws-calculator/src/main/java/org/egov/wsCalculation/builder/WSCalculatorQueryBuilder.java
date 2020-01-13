@@ -179,6 +179,9 @@ public class WSCalculatorQueryBuilder {
 	
 	public String getConnectionNumberList(String tenantId, String connectionType, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
+		String resultantQuery = connectionNoListQuery;
+		
+		MeterReadingSearchCriteria criteria = new MeterReadingSearchCriteria();
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" ws.connectiontype = ? ");
@@ -188,7 +191,15 @@ public class WSCalculatorQueryBuilder {
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
-		return query.toString();
+		
+		
+		
+		resultantQuery = query.toString();
+		resultantQuery = addOrderBy(resultantQuery);
+		if (query.toString().indexOf("WHERE") > -1)
+			resultantQuery = addPaginationWrapper(resultantQuery, preparedStatement, criteria);
+		return resultantQuery;
+		
 	}
 	
 	public String isBillingPeriodExists(String connectionNo, String billingPeriod, List<Object> preparedStatement) {

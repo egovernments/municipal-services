@@ -23,34 +23,36 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class CalculationCriteria   {
+public class CalculationCriteria {
+
+	@JsonProperty("waterConnection")
+	private WaterConnection waterConnection;
+
+	@NotNull
+	@JsonProperty("connectionNo")
+	private String connectionNo;
+
+	@JsonProperty("assessmentYear")
+	private String assessmentYear;
+
+	@NotNull
+	@JsonProperty("tenantId")
+	private String tenantId;
+
+	@JsonProperty("meterStatus")
+	private Integer meterStatus = null;
+
+	@JsonProperty("lastReading")
+	private Double lastReading = null;
+
+	@JsonProperty("currentReading")
+	private Double currentReading = null;
 	
-        @JsonProperty("waterConnection")
-        private WaterConnection waterConnection;
-        
-        @NotNull
-        @JsonProperty("connectionNo")
-        private String connectionNo;
+	//Demand Generation
+	@JsonProperty("from")
+	private Long from;
 
-        @JsonProperty("assessmentYear")
-        private String assessmentYear;
+	@JsonProperty("to")
+	private Long to;
 
-        @NotNull
-        @JsonProperty("tenantId")
-        private String tenantId;
-        
-        @JsonProperty("meterStatus")
-        private Integer meterStatus = null;
-        
-        @JsonProperty("lastReading")
-        private Double lastReading = null;
-
-        @JsonProperty("currentReading")
-        private Double currentReading = null;
-        
-        @JsonProperty("billingPeriod")
-        private String billingPeriod = null;
-        
-        
 }
-

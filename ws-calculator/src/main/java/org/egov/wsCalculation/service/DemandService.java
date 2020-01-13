@@ -491,10 +491,10 @@ public class DemandService {
 
 		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
-		if(consumerCodeToDemandMap.size() != getBillCriteria.getConsumerCodes().size()) {
-			throw new CustomException("DEMAND NOT FOUND",
-					"No demand found for the criteria");
-		}
+//		if(consumerCodeToDemandMap.size() != getBillCriteria.getConsumerCodes().size()) {
+//			throw new CustomException("DEMAND NOT FOUND",
+//					"No demand found for the criteria");
+//		}
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
 
 		String tenantId = getBillCriteria.getTenantId();
@@ -725,7 +725,9 @@ public class DemandService {
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
 						.requestInfo(requestInfo).build();
-				wsCalculationService.getCalculation(calculationReq);
+				
+				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);			
+			
 			}
 		}
 	}
