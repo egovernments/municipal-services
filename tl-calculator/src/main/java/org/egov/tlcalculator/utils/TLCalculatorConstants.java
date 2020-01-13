@@ -30,6 +30,19 @@ public class TLCalculatorConstants {
     public static final String MDMS_CALCULATIONTYPE_FINANCIALYEAR_PATH = "$.MdmsRes.TradeLicense.CalculationType[?(@.financialYear=='{}')]";
 
     public static final String MDMS_ROUNDOFF_TAXHEAD= "TL_ROUNDOFF";
+    
+    public static final String MDMS_BPL_ECONOMIC_STATUS_CODE = "BPL";
+    
+    public static final String MDMS_TAXHEAD_MASTER = "TaxHeadMaster";
+    
+    public static final String MDMS_BILLINGSERVICE_MODULE = "BillingService";
+    
+    public static final String MDMS_BILLINGSERVICE_PATH = "$.MdmsRes.BillingService";
+    
+    public static final String MDMS_TAXHEAD_PATH = "$.MdmsRes.BillingService.TaxHeadMaster[?(@.code==\"{}\")].value";
+
+
+
 
 
 

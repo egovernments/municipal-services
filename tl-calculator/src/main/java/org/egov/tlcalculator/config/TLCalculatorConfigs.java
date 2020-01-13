@@ -67,6 +67,18 @@ public class TLCalculatorConfigs {
 
     @Value("${egov.taxhead.adhoc.exemption}")
     private String adhocExemptionTaxHead;
+    
+    @Value("${egov.taxhead.appl.fees}")
+    private String applicationFeesTaxHead;
+    
+    @Value("${egov.taxhead.order.fees}")
+    private String orderFeesTaxHead;
+    
+    @Value("${egov.taxhead.appl.fees.amount}")
+    private BigDecimal applicationFeesAmount;
+    
+    @Value("${egov.taxhead.order.fees.amount}")
+    private BigDecimal orderFeesAmount;
 
 
     //MDMS

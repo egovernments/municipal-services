@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -125,11 +128,27 @@ public class CalculationService {
 
       estimates.addAll(estimatesAndSlabs.getEstimates());
 
+      estimates.add(getApplicationFees(calulationCriteria, mdmsData)); //added by default.
+      
+      if(isOwnerBPL(calulationCriteria.getTradelicense())) {
+          estimates.add(getOrderFees(calulationCriteria, mdmsData)); //order fees added only for BPL
+          BigDecimal baseTax = BigDecimal.ZERO;
+          for(TaxHeadEstimate estimate : estimatesAndSlabs.getEstimates()) {
+        	  if(estimate.getTaxHeadCode().equals(config.getBaseTaxHead())) {
+        		  baseTax = estimate.getEstimateAmount();
+        	  }
+          } 
+          calulationCriteria.getTradelicense().getTradeLicenseDetail().setAdhocExemption(baseTax); //baseTax will be exempted for BPL.
+          
+      }
+
       if(calulationCriteria.getTradelicense().getTradeLicenseDetail().getAdhocPenalty()!=null)
           estimates.add(getAdhocPenalty(calulationCriteria));
-
+      
       if(calulationCriteria.getTradelicense().getTradeLicenseDetail().getAdhocExemption()!=null)
           estimates.add(getAdhocExemption(calulationCriteria));
+      
+      
 
       estimatesAndSlabs.setEstimates(estimates);
 
@@ -173,8 +192,10 @@ public class CalculationService {
       TaxHeadEstimate estimate = new TaxHeadEstimate();
       BigDecimal totalTax = tradeUnitFee.add(accessoryFee);
 
-      if(totalTax.compareTo(BigDecimal.ZERO)==-1)
+      if(totalTax.compareTo(BigDecimal.ZERO) == -1)
           throw new CustomException("INVALID AMOUNT","Tax amount is negative");
+      
+      totalTax = modifyTotalTax(totalTax, calulationCriteria.getTradelicense());
 
       estimate.setEstimateAmount(totalTax);
       estimate.setCategory(Category.TAX);
@@ -183,6 +204,108 @@ public class CalculationService {
       estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));
 
       return estimatesAndSlabs;
+  }
+  
+  
+  /**
+   * The final tax needs to be multiplied with no of years the license is valid for.
+   * eg - (2018-2019) total * 1, (2018-2020) total * 2, (2018 - 2021) total * 3 etc.
+   * 
+   * @param totalTax
+   * @param tradeLicense
+   * @return
+   */
+  private BigDecimal modifyTotalTax(BigDecimal totalTax, TradeLicense tradeLicense) {	  
+	  Calendar cal = Calendar.getInstance();
+	  cal.setTimeInMillis(tradeLicense.getValidFrom());
+	  int fromYear = cal.get(Calendar.YEAR);
+	  cal.setTimeInMillis(tradeLicense.getValidTo());
+	  int toYear = cal.get(Calendar.YEAR);
+	  
+	  if((toYear - fromYear) > 0) {
+		  totalTax =  totalTax.multiply(BigDecimal.valueOf(toYear - fromYear));
+	  }
+	  
+	  return totalTax;
+
+  }
+  
+  
+  /**
+   * Checks if the owner of TL is a BPL holder.
+   * 
+   * @param tradeLicense
+   * @return
+   */
+  private boolean isOwnerBPL(TradeLicense tradeLicense) {
+	  ObjectMapper mapper = new ObjectMapper();
+	  Boolean isOwnerBPL= false;
+      try {
+          Map<String, Object> addtionalDetails = mapper.convertValue(tradeLicense.getTradeLicenseDetail().getAdditionalDetail(),
+        		  Map.class);
+          if(addtionalDetails.get("economicStatus").toString().equals(TLCalculatorConstants.MDMS_BPL_ECONOMIC_STATUS_CODE))
+        	  isOwnerBPL = true;
+      }catch(Exception e) {
+    	  log.error("Couldn't fetch economic status of the owner: ", e);
+      }
+      
+      return isOwnerBPL;
+  }
+  
+  /**
+   * Adds order fees to BPL card holders.
+   * 
+   * @param calulationCriteria
+   * @return
+   */
+  private TaxHeadEstimate getOrderFees(CalulationCriteria calulationCriteria, Object mdmsData) {
+      TaxHeadEstimate estimate = new TaxHeadEstimate();
+      Map<String, BigDecimal> fees = getFeesFromMDMS(mdmsData);
+      estimate.setEstimateAmount(fees.get(config.getOrderFeesTaxHead()));
+      estimate.setTaxHeadCode(config.getOrderFeesTaxHead());
+      estimate.setCategory(Category.FEE);
+      
+      return estimate;
+
+  }
+  
+  
+  /**
+   * Adds application fees by default.
+   * 
+   * @param calulationCriteria
+   * @return
+   */
+  private TaxHeadEstimate getApplicationFees(CalulationCriteria calulationCriteria, Object mdmsData) {
+      TaxHeadEstimate estimate = new TaxHeadEstimate();
+      Map<String, BigDecimal> fees = getFeesFromMDMS(mdmsData);
+      estimate.setEstimateAmount(fees.get(config.getApplicationFeesTaxHead()));
+      estimate.setTaxHeadCode(config.getApplicationFeesTaxHead());
+      estimate.setCategory(Category.FEE);
+      
+      return estimate;
+
+  }
+  
+  private Map<String, BigDecimal> getFeesFromMDMS(Object mdmsData){
+	  List<Object> taxHeadDetails = new ArrayList<>();
+	  Map<String, BigDecimal> fees = new HashMap<>();
+	  try {
+		  taxHeadDetails = JsonPath.read(mdmsData,TLCalculatorConstants.MDMS_BILLINGSERVICE_PATH);
+		  String appFeesPath = TLCalculatorConstants.MDMS_TAXHEAD_PATH.replace("{}",config.getApplicationFeesTaxHead());
+		  String orderFeesPath = TLCalculatorConstants.MDMS_TAXHEAD_PATH.replace("{}",config.getOrderFeesTaxHead());
+		  
+		  fees.put(config.getApplicationFeesTaxHead(), (BigDecimal) JsonPath.read(taxHeadDetails, appFeesPath));
+		  fees.put(config.getOrderFeesTaxHead(), (BigDecimal) JsonPath.read(taxHeadDetails, orderFeesPath));
+		  
+	  }catch(Exception e) {
+		  log.error("Fees couldn't be fetched from master: ", e);
+		  
+		  fees.put(config.getApplicationFeesTaxHead(), config.getApplicationFeesAmount());
+		  fees.put(config.getOrderFeesTaxHead(), config.getOrderFeesAmount());
+	  }
+	  
+	  return fees;
   }
 
 

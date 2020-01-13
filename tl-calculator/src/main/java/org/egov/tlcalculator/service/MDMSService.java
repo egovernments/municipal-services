@@ -61,10 +61,18 @@ public class MDMSService {
                 .filter(filterCodeForUom).build());
         ModuleDetail tlModuleDtls = ModuleDetail.builder().masterDetails(tlMasterDetails)
                 .moduleName(TLCalculatorConstants.MDMS_TRADELICENSE).build();
+        
+        List<MasterDetail> taxHeadMasters = new ArrayList<>();
+        tlMasterDetails.add(MasterDetail.builder().name(TLCalculatorConstants.MDMS_TAXHEAD_MASTER)
+                .filter(filterCodeForUom).build());
+        ModuleDetail billingServicModuleDtls = ModuleDetail.builder().masterDetails(taxHeadMasters)
+                .moduleName(TLCalculatorConstants.MDMS_BILLINGSERVICE_MODULE).build();
+        
 
         List<ModuleDetail> moduleDetails = new ArrayList<>();
         moduleDetails.add(fyModuleDtls);
         moduleDetails.add(tlModuleDtls);
+        moduleDetails.add(billingServicModuleDtls);
 
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
                 .build();
