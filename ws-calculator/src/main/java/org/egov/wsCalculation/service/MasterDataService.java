@@ -236,27 +236,33 @@ public class MasterDataService {
 	public Map<String, Object> getBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
 			Map<String, Object> masterMap) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
-		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
-		Map<String, Object> billingPeriod = new HashMap<>();
-		LocalDateTime demandStartingDate = LocalDateTime.now();
-		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
-		Long demandEndDateMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
-		if (((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
-				.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period))) {
-			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
-			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
-		} else {
-			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
-					Timestamp.valueOf(demandStartingDate).getTime());
-			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
-					Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
-		}
-		log.info("Demand Expiry Date : "+ master.get(WSCalculationConstant.Demand_Expiry_Date_String));
-		BigInteger expiryDate = new BigInteger(String.valueOf(master.get(WSCalculationConstant.Demand_Expiry_Date_String)));
-		Long demandExpiryDateMillis  = expiryDate.longValue();
-		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String, demandExpiryDateMillis);
-		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
-		return masterMap;
+        Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+        Map<String, Object> billingPeriod = new HashMap<>();
+
+        if (((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
+                    .equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period)
+                    && master.get(WSCalculationConstant.ConnectionType).toString()
+                                .equalsIgnoreCase(WSCalculationConstant.meteredConnectionType))) {
+              billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
+              billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
+        } else {
+
+              LocalDateTime demandEndDate = LocalDateTime.now();
+              demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
+              Long endDaysMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
+
+              billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
+                          Timestamp.valueOf(demandEndDate).getTime() - endDaysMillis);
+              billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
+                          Timestamp.valueOf(demandEndDate).getTime());
+        }
+        log.info("Demand Expiry Date : " + master.get(WSCalculationConstant.Demand_Expiry_Date_String));
+        BigInteger expiryDate = new BigInteger(
+                    String.valueOf(master.get(WSCalculationConstant.Demand_Expiry_Date_String)));
+        Long demandExpiryDateMillis = expiryDate.longValue();
+        billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String, demandExpiryDateMillis);
+        masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
+        return masterMap;
 	}
 	
 
