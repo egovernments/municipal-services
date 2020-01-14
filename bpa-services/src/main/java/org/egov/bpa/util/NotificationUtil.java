@@ -101,12 +101,12 @@ public class NotificationUtil {
 
 			break;
 			
-		case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
-			/*messageTemplate = getMessageTemplate(
+		/*case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
+			messageTemplate = getMessageTemplate(
 					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = getInitiatedMsg(bpa, messageTemplate);
 			message = "Dear <1>, The payment for you application with the application no as: " + bpa.getApplicationNo() + " is done Successfully. Waiting for Docverification.";
-			break;
+			break;*/
 			
 		case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
 			/*messageTemplate = getMessageTemplate(
