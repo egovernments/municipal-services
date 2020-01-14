@@ -218,7 +218,6 @@ public class CalculationService {
    * @return
    */
   private BigDecimal modifyTotalTax(BigDecimal totalTax, TradeLicense tradeLicense) {	  
-	  log.info("totalTax: "+totalTax);
 	  Calendar cal = Calendar.getInstance();
 	  cal.setTimeInMillis(tradeLicense.getValidFrom());
 	  int fromYear = cal.get(Calendar.YEAR);
@@ -228,8 +227,6 @@ public class CalculationService {
 	  if((toYear - fromYear) > 0) {
 		  totalTax =  totalTax.multiply(BigDecimal.valueOf(toYear - fromYear));
 	  }
-	  log.info("diff: "+(toYear - fromYear));
-	  log.info("totalTax: "+totalTax);
 	  
 	  return totalTax;
 
@@ -293,19 +290,14 @@ public class CalculationService {
   }
   
   private Map<String, BigDecimal> getFeesFromMDMS(Object mdmsData){
-	  List<Object> taxHeadDetails = new ArrayList<>();
 	  Map<String, BigDecimal> fees = new HashMap<>();
 	  try {
-		  taxHeadDetails = JsonPath.read(mdmsData,TLCalculatorConstants.MDMS_BILLINGSERVICE_PATH);
 		  String appFeesPath = TLCalculatorConstants.MDMS_TAXHEAD_PATH.replace("{}",config.getApplicationFeesTaxHead());
 		  String orderFeesPath = TLCalculatorConstants.MDMS_TAXHEAD_PATH.replace("{}",config.getOrderFeesTaxHead());
-		  
-		  fees.put(config.getApplicationFeesTaxHead(), (BigDecimal) JsonPath.read(taxHeadDetails, appFeesPath));
-		  fees.put(config.getOrderFeesTaxHead(), (BigDecimal) JsonPath.read(taxHeadDetails, orderFeesPath));
-		  
+		  fees.put(config.getApplicationFeesTaxHead(), (BigDecimal) JsonPath.read(mdmsData, appFeesPath));
+		  fees.put(config.getOrderFeesTaxHead(), (BigDecimal) JsonPath.read(mdmsData, orderFeesPath));
 	  }catch(Exception e) {
 		  log.error("Fees couldn't be fetched from master: ", e);
-		  
 		  fees.put(config.getApplicationFeesTaxHead(), config.getApplicationFeesAmount());
 		  fees.put(config.getOrderFeesTaxHead(), config.getOrderFeesAmount());
 	  }

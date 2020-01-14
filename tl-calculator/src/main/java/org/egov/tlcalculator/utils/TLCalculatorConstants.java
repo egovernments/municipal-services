@@ -37,7 +37,7 @@ public class TLCalculatorConstants {
     
     public static final String MDMS_BILLINGSERVICE_MODULE = "BillingService";
     
-    public static final String MDMS_BILLINGSERVICE_PATH = "$.MdmsRes.BillingService";
+    public static final String MDMS_BILLINGSERVICE_PATH = "$.MdmsRes.BillingService.TaxHeadMaster";
     
     public static final String MDMS_TAXHEAD_PATH = "$.MdmsRes.BillingService.TaxHeadMaster[?(@.code==\"{}\")].value";
 
