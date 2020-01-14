@@ -12,12 +12,16 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.service.BPAService;
+import org.egov.bpa.service.UserService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Event;
 import org.egov.bpa.web.models.EventRequest;
 import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
+import org.egov.bpa.web.models.BPASearchCriteria;
 @Slf4j
 @Service
 public class BPANotificationService {
@@ -34,7 +39,10 @@ public class BPANotificationService {
     private ServiceRequestRepository serviceRequestRepository;
 
     private NotificationUtil util;
-
+    
+    @Autowired
+    private UserService userService;
+ 
 
     @Autowired
     public BPANotificationService(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository, NotificationUtil util) {
@@ -78,7 +86,9 @@ public class BPANotificationService {
                 if(owner.getMobileNumber()!=null)
                     mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
             });
-            List<SMSRequest> smsRequests = util.createSMSRequest(message,mobileNumberToOwner);
+            List<Map> users = new ArrayList<Map>();
+            users.add(mobileNumberToOwner);
+            List<SMSRequest> smsRequests = util.createSMSRequest(message,users);
         	Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
         	Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
     		
@@ -88,7 +98,6 @@ public class BPANotificationService {
     				log.error("No UUID/SMS for mobile {} skipping event", mobile);
     				continue;
     			}
-    			
     		}
         if(!CollectionUtils.isEmpty(events)) {
     		return EventRequest.builder().requestInfo(bpaRequest.getRequestInfo()).events(events).build();
@@ -139,13 +148,29 @@ public class BPANotificationService {
       String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); //--Localization service changes to be done.
       if(message == null){  
        message ="Application creation successfull";}
-            Map<String,String > mobileNumberToOwner = new HashMap<>();
-
+            Map<String,String> mobileNumberToOwner = new HashMap<>();
+            String stakeUUID= bpaRequest.getBPA().getAuditDetails().getCreatedBy();
+            List<String> data = new ArrayList<String>();
+           data.add(stakeUUID);
+           BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
+           bpaSearchCriteria.setOwnerIds(data);
+           bpaSearchCriteria.setTenantId(tenantId);
+           UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
+           mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
+           List<Map> users = new ArrayList<Map>();
+           users.add(mobileNumberToOwner);
             bpaRequest.getBPA().getOwners().forEach(owner -> {
-                if(owner.getMobileNumber()!=null)
-                    mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+							System.out.println(owner.getUuid());
+							if(owner.isPrimaryOwner()){
+							if (owner.getMobileNumber() != null) {
+								mobileNumberToOwner.put(
+										owner.getMobileNumber(),
+										owner.getName());
+								users.add(mobileNumberToOwner);
+							}
+							}
             });
-            smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
+            smsRequests.addAll(util.createSMSRequest(message,users));
 	}
 
 }

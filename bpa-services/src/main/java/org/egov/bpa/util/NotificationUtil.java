@@ -359,12 +359,16 @@ public class NotificationUtil {
 	 * @return List of SMSRequest
 	 */
 	public List<SMSRequest> createSMSRequest(String message,
-			Map<String, String> mobileNumberToOwnerName) {
+			List<Map> users) {
 		List<SMSRequest> smsRequest = new LinkedList<>();
+		for(Map<String,String > mobileNumberToOwnerName: users){
+			
+		
 		for (Map.Entry<String, String> entryset : mobileNumberToOwnerName
 				.entrySet()) {
 			String customizedMsg = message.replace("<1>", entryset.getValue());
 			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
+		}
 		}
 		return smsRequest;
 	}

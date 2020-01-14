@@ -122,7 +122,9 @@ public class PaymentNotificationService {
                         mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
                 });
                 List<SMSRequest> smsList = new ArrayList<>();
-                smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+                List<Map> users = new ArrayList<Map>();
+                users.add(mobileNumberToOwner);
+                smsList.addAll(util.createSMSRequest(message, users));
                 util.sendSMS(smsList, config.getIsSMSEnabled());
 
                /* if(null != config.getIsUserEventsNotificationEnabled()) {
