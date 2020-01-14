@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
@@ -86,21 +87,36 @@ public class PaymentUpdateService {
 			for(PaymentDetail paymentDetail : paymentDetails){
 				
 				List<String> businessServices = new ArrayList<String>(Arrays.asList(config.getBusinessService().split(",")));
-				if (businessServices.contains(paymentDetail.getBusinessService())) {
+				if (paymentDetail.getBusinessService().equalsIgnoreCase(BPAConstants.APPL_FEE) || paymentDetail.getBusinessService().equalsIgnoreCase(BPAConstants.SANC_FEE)) {
 					BPASearchCriteria searchCriteria = new BPASearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
-					List<BPA> bpas = repository.getBPAData(searchCriteria); //bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
+					List<BPA> bpas = bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
+					/*String wfbusinessServiceName = null;
+					wfbusinessServiceName = config.getBusinessServiceValue();*/
+					
+				BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(), requestInfo,codes.get(0));
 
-					BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(), requestInfo,codes.get(0));
 
-
-					if (CollectionUtils.isEmpty(bpas))
+					if (CollectionUtils.isEmpty(bpas)){
 						throw new CustomException("INVALID RECEIPT",
-								"No tradeLicense found for the comsumerCode " + searchCriteria.getApplicationNos());
+								"No tradeLicense found for the comsumerCode "
+										+ searchCriteria.getApplicationNos());
+					}
+					
+					switch (bpas.get(0).getStatus()) {
+					case BPAConstants.INPROGRESS_STATUS:
+						bpas.forEach(bpa -> bpa
+								.setAction(BPAConstants.APPL_FEE));
+						break;
 
-					bpas.forEach(bpa -> bpa.setAction("PAY"));
+					default:
+						bpas.forEach(bpa -> bpa
+								.setAction(BPAConstants.SANC_FEE));
+						break;
+					}
+//					bpas.forEach(bpa -> bpa.setAction("PAY"));
 
 					// FIXME check if the update call to repository can be avoided
 					// FIXME check why aniket is not using request info from consumer
@@ -111,19 +127,23 @@ public class PaymentUpdateService {
 					BPARequest updateRequest = BPARequest.builder().requestInfo(requestInfo)
 							.BPA(bpas.get(0)).build();
 					
-
 					/*
 					 * calling workflow to update status
 					 */
-					wfIntegrator.callWorkFlow(updateRequest);
+						wfIntegrator.callWorkFlow(updateRequest);
 
-					log.info(" the status of the application is : " + updateRequest.getBPA().getStatus());
+						log.info(" the status of the application is : "
+								+ updateRequest.getBPA().getStatus());
 
-					enrichmentService.postStatusEnrichment(updateRequest);
+						/*
+						 * calling repository to update the object in TL tables
+						 */
+						enrichmentService.postStatusEnrichment(updateRequest);
 
-					
-					repository.update(updateRequest,false);
-			}
+						repository.update(updateRequest, workflowService.isStateUpdatable(
+								updateRequest.getBPA().getStatus(), businessService));
+				
+		 }
 		 }
 		} catch (Exception e) {
 			e.printStackTrace();

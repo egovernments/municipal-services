@@ -8,6 +8,8 @@ public class BPAConstants {
 	// MDMS
 
 	public static final String BPA_MODULE = "BPA";
+	
+	public static final String BPA_BusinessService = "BPA";
 
 	public static final String BPA_MODULE_CODE = "BPA";
 
@@ -15,9 +17,11 @@ public class BPAConstants {
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
-	public static final String NOTIFICATION_INITIATED = "bpa.en.counter.initiate";
-
-	public static final String NOTIFICATION_APPLIED = "bpa.en.counter.submit";
+	public static final String NOTIFICATION_INITIATED = "tl.en.counter.initiate";
+	
+	public static final String NOTIFICATION_PANDING_APPL_FEE = "tl.en.counter.appl.fee";
+	
+	public static final String NOTIFICATION_APPLIED = "tl.en.counter.submit";
 
 	public static final String NOTIFICATION_DOCUMENT_VERIFICATION = "bpa.en.document";
 
@@ -25,7 +29,7 @@ public class BPAConstants {
 
 	public static final String NOTIFICATION_NOC_UPDATION = "bpa.en.field.inspection";
 
-	public static final String NOTIFICATION_PAYMENT_OWNER = "bpa.en.counter.payment.successful.owner";
+	public static final String NOTIFICATION_PAYMENT_OWNER = "tl.en.counter.payment.successful.owner";
 
 	public static final String NOTIFICATION_PAYMENT_PAYER = "bpa.en.counter.payment.successful.payer";
 
@@ -153,11 +157,25 @@ public class BPAConstants {
 
 	// ACTION_STATUS combinations for notification
 
-	public static final String ACTION_STATUS_INITIATED = "INITIATED_ACTIVE";
-
+	public static final String ACTION_STATUS_INITIATED = "INITIATE_INPROGRESS";
+	
+	public static final String ACTION_STATUS_PENDING_APPL_FEE = "APPLY_PENDING_APPL_FEE";
+	
+	public static final String ACTION_STATUS_DOC_VERIFICATION = "PAY_DOC_VERIFICATION_INPROGRESS";
+	
+	public static final String ACTION_STATUS_FI_VERIFICATION = "FORWARD_FIELDINSPECTION_INPROGRESS";
+	
+	public static final String ACTION_STATUS_NOC_VERIFICATION = "FORWARD_NOC_VERIFICATION_INPROGRESS";
+	
+	public static final String ACTION_STATUS_PENDING_APPROVAL = "FORWARD_APPROVAL_INPROGRESS";
+	
+	public static final String ACTION_STATUS_PENDING_SANC_FEE = "APPROVE_PENDING_SANC_FEE_PAYMENT";
+	
+	public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
+	
+	
+	
 	public static final String ACTION_STATUS_APPLIED = "APPLIED";
-
-	public static final String ACTION_STATUS_APPROVED = "APPROVE_PENDINGPAYMENT";
 
 	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
 
@@ -192,5 +210,10 @@ public class BPAConstants {
 	public static final String SANC_FEE_STATE="PENDING_SANC_FEE_PAYMENT";
 	public static final String APPROVED_STATE ="APPROVED";
 
+
+	public static final String APPL_FEE ="BPA.NC_APP_FEE";
+	
+	public static final String SANC_FEE ="BPA.NC_SAN_FEE";
+	public static final String INPROGRESS_STATUS="INPROGRESS";
 
 }

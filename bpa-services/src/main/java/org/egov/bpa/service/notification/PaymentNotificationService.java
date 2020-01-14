@@ -1,17 +1,25 @@
 package org.egov.bpa.service.notification;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.minidev.json.JSONArray;
+
+import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.BPAService;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.web.models.BPA;
+import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.models.collection.PaymentRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -69,26 +77,70 @@ public class PaymentNotificationService {
      * Generates sms from the input record and Sends smsRequest to SMSService
      * @param record The kafka message from receipt create topic
      */
-    public void process(HashMap<String, Object> record){
-        try{
-            String jsonString = new JSONObject(record).toString();
-            DocumentContext documentContext = JsonPath.parse(jsonString);
-            Map<String,String> valMap = enrichValMap(documentContext);
-            Map<String, Object> info = documentContext.read("$.RequestInfo");
-            RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
+	public void process(HashMap<String, Object> record) {
+		try {
+			String jsonString = new JSONObject(record).toString();
+			DocumentContext documentContext = JsonPath.parse(jsonString);
+			Map<String, String> valMap = enrichValMap(documentContext);
+			if (!StringUtils.equals(BPAConstants.APPL_FEE,
+					valMap.get(businessServiceKey)))
+				return;
+			if (!StringUtils.equals(BPAConstants.SANC_FEE,
+					valMap.get(businessServiceKey)))
+				return;
+			Map<String, Object> info = documentContext.read("$.RequestInfo");
+			RequestInfo requestInfo = mapper.convertValue(info,
+					RequestInfo.class);
 
-            if(valMap.get(businessServiceKey).equalsIgnoreCase(config.getBusinessService())){
-                BPA bpa = getBPAFromConsumerCode(valMap.get(tenantIdKey),valMap.get(consumerCodeKey),
-                                                                       requestInfo);
-                String localizationMessages = util.getLocalizationMessages(bpa.getTenantId(),requestInfo);
-                List<SMSRequest> smsRequests = getSMSRequests(bpa,valMap,localizationMessages);
-                util.sendSMS(smsRequests);
-            }
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+			if (config.getBusinessService().contains(valMap.get(businessServiceKey))) {
+				BPA bpa = getBPAFromConsumerCode(valMap.get(tenantIdKey),
+						valMap.get(consumerCodeKey), requestInfo,
+						valMap.get(businessServiceKey));
+				String localizationMessages = util.getLocalizationMessages(
+						bpa.getTenantId(), requestInfo);
+//				List<SMSRequest> smsRequests = getSMSRequests(bpa, valMap,localizationMessages);
+//				util.sendSMS(smsRequests, config.getIsSMSEnabled());
+				
+				
+				
+                PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
+                String totalAmountPaid = paymentRequest.getPayment().getTotalAmountPaid().toString();
+                Map<String, String> mobileNumberToOwner = new HashMap<>();
+                
+                String paymentState = null;
+                if(bpa.getStatus() == "INPROGRESS"){
+                	paymentState = BPAConstants.ACTION_STATUS_DOC_VERIFICATION;
+                }else{
+                	paymentState = BPAConstants.ACTION_STATUS_APPROVED;
+                }
+                
+//                String locMessage = util.getMessageTemplate(paymentState, localizationMessages);
+//                String message = util.getDocumentVerificationMsg(bpa, locMessage, localizationMessages, totalAmountPaid);
+                String message = "Dear <1>, The payment for you application with the application no as: " + bpa.getApplicationNo() + " is done Successfully. Waiting for Docverification.";
+                bpa.getOwners().forEach(owner -> {
+                    if (owner.getMobileNumber() != null)
+                        mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+                });
+                List<SMSRequest> smsList = new ArrayList<>();
+                smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+                util.sendSMS(smsList, config.getIsSMSEnabled());
+
+               /* if(null != config.getIsUserEventsNotificationEnabled()) {
+                    if(config.getIsUserEventsNotificationEnabled()) {
+                        BPARequest bpaRequest =BPARequest.builder().requestInfo(requestInfo).BPA(bpa).build();
+                        EventRequest eventRequest = BPANotificationService.getEvents(bpaRequest);
+                        if(null != eventRequest)
+                            util.sendEventNotification(eventRequest);
+                    }
+                }*/
+				
+			
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 
     /**
@@ -157,15 +209,16 @@ public class PaymentNotificationService {
      */
     private Map<String,String> enrichValMap(DocumentContext context){
         Map<String,String> valMap = new HashMap<>();
+//        business Service filtration should be genaric not specific
         try{
-            valMap.put(businessServiceKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
-            valMap.put(consumerCodeKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
-            valMap.put(tenantIdKey,context.read("$.Payments[0].tenantId"));
-            valMap.put(payerMobileNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.mobileNumber"));
-            valMap.put(paidByKey,context.read("$.Payments[0].paidBy"));
-            Integer amountPaid = context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.amountPaid");
+            valMap.put(businessServiceKey,(String) ((JSONArray)context.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].businessService")).get(0));
+            valMap.put(consumerCodeKey,(String) ((JSONArray)context.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].bill.consumerCode")).get(0));
+            valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
+            valMap.put(payerMobileNumberKey,(String) ((JSONArray)context.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].bill.mobileNumber")).get(0));
+            valMap.put(paidByKey,context.read("$.Payment.paidBy"));
+            Integer amountPaid = (Integer) ((JSONArray) context.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].bill.amountPaid")).get(0);
             valMap.put(amountPaidKey,amountPaid.toString());
-            valMap.put(receiptNumberKey,context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].receiptNumber"));
+            valMap.put(receiptNumberKey, (String)((JSONArray) context.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].receiptNumber")).get(0));
 
         }
         catch (Exception e){
@@ -183,7 +236,7 @@ public class PaymentNotificationService {
      * @param requestInfo The requestInfo of the request
      * @return TradeLicense for the particular consumerCode
      */
-    private BPA getBPAFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo){
+    private BPA getBPAFromConsumerCode(String tenantId,String consumerCode,RequestInfo requestInfo,String businessService){
 
     	BPASearchCriteria searchCriteria = new BPASearchCriteria();
     	List<String> codes = Arrays.asList(consumerCode);

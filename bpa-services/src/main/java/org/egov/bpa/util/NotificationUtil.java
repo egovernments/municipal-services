@@ -69,7 +69,7 @@ public class NotificationUtil {
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa,
 			String localizationMessage) {
 
-		String message = null, messageTemplate;
+/*		String message = null, messageTemplate;
 
 		String ACTION_STATUS = "INITIATED" + "_" + bpa.getStatus();
 		switch (ACTION_STATUS) {
@@ -79,49 +79,122 @@ public class NotificationUtil {
 					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 			break;
-		}
+		}return message;*/
 
+		
+		
+		String message = null, messageTemplate;
+		String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
+		switch (ACTION_STATUS) {
+
+		case BPAConstants.ACTION_STATUS_INITIATED:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);
+			break;
+
+		case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application for BUILDING_PLAN_SCRUTINY is applied. Application is waiting for APPLICATION FEE Payment.";
+
+			break;
+			
+		case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, The payment for you application with the application no as: " + bpa.getApplicationNo() + " is done Successfully. Waiting for Docverification.";
+			break;
+			
+		case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application DOC verification for " + bpa.getApplicationNo() + " is done Successfully. Waiting for field inspection.";
+
+			break;
+			
+		case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application Field inspection for " + bpa.getApplicationNo() + " is done Successfully. Waiting for NOC verification.";
+
+			break;
+			
+		case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application NOC verification for " + bpa.getApplicationNo() + " is done Successfully. Waiting for Approval.";
+
+			break;
+		case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is approved, waiting for sanction fee payment.";
+
+			break;
+			
+		case BPAConstants.ACTION_STATUS_APPROVED:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is approved successfully.";
+
+			break;
+		case BPAConstants.ACTION_STATUS_REJECTED:
+			/*messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);*/
+			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is Rejected.";
+
+			break;
+		/*case ACTION_STATUS_APPLIED:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_APPLIED, localizationMessage);
+			message = getAppliedMsg(bpa, messageTemplate);
+			break;
+
+		case ACTION_STATUS_PAID:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_PAID, localizationMessage);
+			message = getApprovalPendingMsg(bpa, messageTemplate);
+			break;
+
+		case ACTION_STATUS_DOCUMENTVERIFICATION:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_DOCUMENT_VERIFICATION,
+					localizationMessage);
+			message = getDocumentVerificationMsg(bpa, messageTemplate);
+			break;
+
+		case ACTION_STATUS_FIELDINSPECTION:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_FIELD_INSPECTION,
+					localizationMessage);
+			message = getFieldInspectionMsg(bpa, messageTemplate);
+			break;
+
+		case ACTION_STATUS_NOCUPDATION:
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_NOC_UPDATION, localizationMessage);
+			message = getNOCUpdationMsg(bpa, messageTemplate);
+			break;
+
+		case ACTION_STATUS_APPROVED:
+			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, bpa);
+			messageTemplate = getMessageTemplate(
+					BPAConstants.NOTIFICATION_APPROVED, localizationMessage);
+			message = getApprovedMsg(bpa, amountToBePaid, messageTemplate);
+			break;*/
+
+		}
 		return message;
 
-		/*
-		 * String message = null, messageTemplate; String ACTION_STATUS =
-		 * bpa.getAction() + "_" + bpa.getStatus(); switch (ACTION_STATUS) {
-		 * 
-		 * case BPAConstants.ACTION_STATUS_INITIATED: messageTemplate =
-		 * getMessageTemplate( BPAConstants.NOTIFICATION_INITIATED,
-		 * localizationMessage); message = getInitiatedMsg(bpa,
-		 * messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_APPLIED: messageTemplate = getMessageTemplate(
-		 * BPAConstants.NOTIFICATION_APPLIED, localizationMessage); message =
-		 * getAppliedMsg(bpa, messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_PAID: messageTemplate = getMessageTemplate(
-		 * BPAConstants.NOTIFICATION_PAID, localizationMessage); message =
-		 * getApprovalPendingMsg(bpa, messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_DOCUMENTVERIFICATION: messageTemplate =
-		 * getMessageTemplate( BPAConstants.NOTIFICATION_DOCUMENT_VERIFICATION,
-		 * localizationMessage); message = getDocumentVerificationMsg(bpa,
-		 * messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_FIELDINSPECTION: messageTemplate =
-		 * getMessageTemplate( BPAConstants.NOTIFICATION_FIELD_INSPECTION,
-		 * localizationMessage); message = getFieldInspectionMsg(bpa,
-		 * messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_NOCUPDATION: messageTemplate = getMessageTemplate(
-		 * BPAConstants.NOTIFICATION_NOC_UPDATION, localizationMessage); message
-		 * = getNOCUpdationMsg(bpa, messageTemplate); break;
-		 * 
-		 * case ACTION_STATUS_APPROVED: BigDecimal amountToBePaid =
-		 * getAmountToBePaid(requestInfo, bpa); messageTemplate =
-		 * getMessageTemplate( BPAConstants.NOTIFICATION_APPROVED,
-		 * localizationMessage); message = getApprovedMsg(bpa, amountToBePaid,
-		 * messageTemplate); break;
-		 * 
-		 * } return message;
-		 */
 	}
 
 	/**
@@ -133,14 +206,15 @@ public class NotificationUtil {
 	 *            The localization messages
 	 * @return message for the specific code
 	 */
-	private String getMessageTemplate(String notificationCode,
+	public String getMessageTemplate(String notificationCode,
 			String localizationMessage) {
 		String path = "$..messages[?(@.code==\"{}\")].message";
 		path = path.replace("{}", notificationCode);
 		String message = null;
 		try {
-			Object messageObj = JsonPath.parse(localizationMessage).read(path);
-			message = ((ArrayList<String>) messageObj).get(0);
+			LinkedList data  = JsonPath.parse(localizationMessage).read(path);
+			message = data.get(0).toString();
+			System.out.println(data);
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
 		}
@@ -217,8 +291,8 @@ public class NotificationUtil {
 				.append(config.getLocalizationSearchEndpoint()).append("?")
 				.append("locale=").append(locale).append("&tenantId=")
 				.append(tenantId).append("&module=")
-				.append(BPAConstants.BPA_MODULE);
-
+				.append("rainmaker-tl");
+		System.out.println("REquired Uri to test is: " + uri);
 		return uri;
 	}
 
@@ -237,10 +311,9 @@ public class NotificationUtil {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
 				.fetchResult(getUri(tenantId, requestInfo), requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
-
-		/* -- Localization service changes are required */
-
-		return "User creation is successfull";
+		System.out.println("message we are waiting for is: " + jsonString);
+		return jsonString;
+		// return "User creation is successfull";
 	}
 
 	/**
@@ -253,7 +326,8 @@ public class NotificationUtil {
 	 * @return customized message for initiate
 	 */
 	private String getInitiatedMsg(BPA bpa, String message) {
-		message = message.replace("<2>", bpa.getApplicationNo());
+		message = message.replace("<2>", bpa.getApplicationType());
+		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
 	}
 
@@ -263,8 +337,8 @@ public class NotificationUtil {
 	 * @param smsRequestList
 	 *            The list of SMSRequest to be sent
 	 */
-	public void sendSMS(List<SMSRequest> smsRequestList) {
-		if (config.getIsSMSEnabled()) {
+	public void sendSMS(List<SMSRequest> smsRequestList, boolean isSMSEnabled) {
+		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
