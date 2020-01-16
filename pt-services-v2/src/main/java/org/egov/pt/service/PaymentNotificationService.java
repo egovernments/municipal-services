@@ -75,7 +75,6 @@ public class PaymentNotificationService {
             String jsonString = new JSONObject(record).toString();
             DocumentContext documentContext = JsonPath.parse(jsonString);
             RequestInfo requestInfo = mapper.convertValue(record.get("RequestInfo"),RequestInfo.class);
-        //    if(requestInfo==null)
 
             List<Map<String,String>> valMaps = new LinkedList<>();
 
@@ -86,11 +85,10 @@ public class PaymentNotificationService {
             
             log.info("valMaps: "+valMaps);
             
-            if(null != valMaps.get(0).get("moduleId")) {
+            if(!CollectionUtils.isEmpty(valMaps) && null != valMaps.get(0).get("moduleId")) {
                 if(topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()) &&
                         CollectionUtils.isEmpty(valMaps) || !valMaps.get(0).get("moduleId").contains("PT"))
                 	return;
-            	
             }else {
             	return;
             }
