@@ -362,8 +362,8 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(TradeLicense license) {
-		StringBuilder builder = new StringBuilder(config.getCalculatorHost());
-		builder.append(config.getGetBillEndpoint());
+		StringBuilder builder = new StringBuilder(config.getBillingHost());
+		builder.append(config.getFetchBillEndpoint());
 		builder.append("?tenantId=");
 		builder.append(license.getTenantId());
 		builder.append("&consumerCode=");
