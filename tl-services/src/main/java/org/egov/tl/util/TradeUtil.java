@@ -168,11 +168,11 @@ public class TradeUtil {
     public Map<String,Long> getTaxPeriods(TradeLicense license,Object mdmsData){
         Map<String,Long> taxPeriods = new HashMap<>();
         try {
-            String jsonPath = TLConstants.MDMS_FINACIALYEAR_PATH.replace("{}",license.getFinancialYear());
+            /*String jsonPath = TLConstants.MDMS_FINACIALYEAR_PATH.replace("{}",license.getFinancialYear());
             List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
-            Map<String,Object> financialYearProperties = jsonOutput.get(0);
-            Object startDate = financialYearProperties.get(TLConstants.MDMS_STARTDATE);
-            Object endDate = financialYearProperties.get(TLConstants.MDMS_ENDDATE);
+            Map<String,Object> financialYearProperties = jsonOutput.get(0);*/
+            Object startDate = license.getValidFrom();
+            Object endDate = license.getValidTo();
             taxPeriods.put(TLConstants.MDMS_STARTDATE,(Long) startDate);
             taxPeriods.put(TLConstants.MDMS_ENDDATE,(Long) endDate);
 
