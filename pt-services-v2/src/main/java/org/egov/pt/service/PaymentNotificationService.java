@@ -496,6 +496,7 @@ public class PaymentNotificationService {
     						.replace("$consumerCode", valMap.get("propertyId"))
     						.replace("$tenantId", valMap.get("tenantId"))
     						.replace("$mobile", mobileNumber);
+                	link = propertyConfiguration.getUiAppHost() + link;
                 	link = getShortenedURL(link);
                     message = message.replace("$paylink", "You can pay your Property Tax online here - " + link);
                 }else {
