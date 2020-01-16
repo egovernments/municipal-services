@@ -21,6 +21,7 @@ import org.egov.pt.web.models.PropertyCriteria;
 import org.egov.pt.web.models.PropertyDetail;
 import org.egov.pt.web.models.PropertyRequest;
 import org.egov.pt.web.models.SMSRequest;
+import org.egov.pt.web.models.ShortenRequest;
 import org.egov.pt.web.models.collection.Bill;
 import org.egov.pt.web.models.collection.Payment;
 import org.egov.pt.web.models.collection.PaymentDetail;
@@ -528,13 +529,13 @@ public class PaymentNotificationService {
     
     
     private String getShortenedURL(String longURL) {
-    	Map<String, String> request = new HashMap<>();
-    	request.put("url", longURL);
+    	ShortenRequest shortenRequest = ShortenRequest.builder()
+    			.url(longURL).build();
     	StringBuilder uri = new StringBuilder();
     	uri.append(propertyConfiguration.getShortenerHost()).append(propertyConfiguration.getShortenerEndpoint());
     	String shortenedURL = null;
     	try {
-    		shortenedURL = serviceRequestRepository.getShortenedURL(uri, request);
+    		shortenedURL = serviceRequestRepository.getShortenedURL(uri, shortenRequest);
         	if(StringUtils.isEmpty(shortenedURL)) {
         		log.info("Shortened URL generation failed.");
         		shortenedURL = longURL; 
