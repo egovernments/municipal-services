@@ -82,7 +82,9 @@ public class PaymentNotificationService {
                 valMaps.addAll(getValuesFromPayment(record));
             else
                 valMaps.add(getValuesFromTransaction(documentContext));
-
+            
+            log.info("valMaps: "+valMaps);
+            
             if(topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()) &&
                     CollectionUtils.isEmpty(valMaps) || !valMaps.get(0).get("module").equalsIgnoreCase("PT"))
                 return;
@@ -530,9 +532,15 @@ public class PaymentNotificationService {
     	request.put("url", longURL);
     	StringBuilder uri = new StringBuilder();
     	uri.append(propertyConfiguration.getShortenerHost()).append(propertyConfiguration.getShortenerEndpoint());
-    	String shortenedURL = serviceRequestRepository.getShortenedURL(uri, request);
-    	if(StringUtils.isEmpty(shortenedURL)) {
-    		log.info("Shortened URL generation failed.");
+    	String shortenedURL = null;
+    	try {
+    		shortenedURL = serviceRequestRepository.getShortenedURL(uri, request);
+        	if(StringUtils.isEmpty(shortenedURL)) {
+        		log.info("Shortened URL generation failed.");
+        		shortenedURL = longURL; 
+        	}
+    	}catch(Exception e) {
+    		log.error("Shortened URL generation failed: ",e);
     		shortenedURL = longURL; 
     	}
     	
