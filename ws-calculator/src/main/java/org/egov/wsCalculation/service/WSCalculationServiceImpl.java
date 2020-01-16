@@ -45,9 +45,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	WSCalculationValidator wSCalculationValidator;
 
 	@Autowired
-	private MasterDataService mDataService;
-
-	@Autowired
 	private PayService payService;
 
 	@Autowired
@@ -66,9 +63,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	WSCalculationDao wSCalculationDao;
 	
 	@Autowired
-	MDMSValidator mdmsValidator;
-	
-	@Autowired
 	private ServiceRequestRepository repository;
 	
 	@Autowired
@@ -82,7 +76,21 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
+		Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
+				request.getCalculationCriteria().get(0).getTenantId());
+		List<Calculation> calculations = getCalculations(request, masterMap);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		return calculations;
+	}
+	
+	
+	/**
+	 * 
+	 * 
+	 * @param request
+	 * @return List of calculation.
+	 */
+	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return calculations;
@@ -162,34 +170,24 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		}
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(waterCharge);
-		// // false in the argument represents that the demand shouldn't be updated from
-		// // this call
-		// BigDecimal collectedAmtForOldDemand =
-		// demandService.getCarryForwardAndCancelOldDemand(ptTax, criteria,
-		// requestInfo, false);
-
-		// if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) > 0)
-		// estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_ADVANCE_CARRYFORWARD)
-		// .estimateAmount(collectedAmtForOldDemand).build());
-		// else if (collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) < 0)
-		// throw new CustomException(EG_PT_DEPRECIATING_ASSESSMENT_ERROR,
-		// EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE);
-
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(waterCharge)
 				.waterConnection(waterConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	
 	/**
 	 * 
-	 * @param request Contains calculation request
-	 * @return List of Calculation with different tax head
+	 * @param request would be calculations request
+	 * @param masterMap master data
+	 * @return all calculations including water charge and taxhead on that
 	 */
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
-		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
-			masterDataService.getBillingFrequencyMasterData(criteria, request.getRequestInfo(), criteria.getWaterConnection().getConnectionType(), tenantId ,masterMap);
+			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo(),
+					masterMap);
+			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+					.get(WSCalculationConstant.Billing_Period_Master);
+			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}
@@ -213,7 +211,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			Object res = repository.fetchResult(url, mdmsCriteriaReq);
 			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
 			if (res == null) {
-				throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY",
+				throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY",
 						"ERROR IN FETCHING THE BILLING FREQUENCY");
 			}
 			getBillingPeriod(mdmsResponse, requestInfo, tenentId);
@@ -226,7 +224,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	public void getBillingPeriod(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenentId) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
-		Map<String, Object> billingPeriod = new HashMap<>();
 		LocalDateTime demandStartingDate = LocalDateTime.now();
 		Long demandGenerateDateMillis = (Long) master.get(WSCalculationConstant.Demand_Generate_Date_String);
 

@@ -211,5 +211,7 @@ public class WSCalculationConstant {
 	public static final String  USREVENTS_EVENT_NAME = "WATER BILL GENERATION";
 	
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
+	
+	public static final String  Billing_Period_Master = "Billing_Period_Master";
 
 }

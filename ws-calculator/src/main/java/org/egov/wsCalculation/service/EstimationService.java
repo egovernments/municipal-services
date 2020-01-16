@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
@@ -63,10 +64,9 @@ public class EstimationService {
 	 *            request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo, Map<String, Object> masterData) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		WaterConnection waterConnection = null;
-		String assessmentYear = getAssessmentYear();
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 		if(criteria.getWaterConnection() == null && !criteria.getConnectionNo().isEmpty()) {
 			waterConnection = calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), tenantId);
@@ -78,12 +78,16 @@ public class EstimationService {
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		ArrayList<String> billingSlabIds = new ArrayList<>();
-		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
-				timeBasedExemptionMasterMap);
+		billingSlabMaster.put(WSCalculationConstant.WC_BILLING_SLAB_MASTER,
+				(JSONArray) masterData.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER));
+		timeBasedExemptionMasterMap.put(WSCalculationConstant.WC_WATER_CESS_MASTER,
+				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
+//		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
+//				timeBasedExemptionMasterMap);
 		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, billingSlabIds, requestInfo);
 		taxAmt = waterCharge;
-		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(assessmentYear, taxAmt,
-				criteria.getWaterConnection(), billingSlabMaster, timeBasedExemptionMasterMap,
+		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(taxAmt,
+				criteria.getWaterConnection(), timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
@@ -93,18 +97,16 @@ public class EstimationService {
 		return estimatesAndBillingSlabs;
 	}
 
- /**
-  * 
-  * @param assessmentYear Assessment year
-  * @param taxAmt taxable amount
-  * @param connection
-  * @param waterBasedExemptionMasterMap
-  * @param timeBasedExemeptionMasterMap
-  * @param requestInfoWrapper
-  * @return
-  */
-	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal waterCharge,
-			WaterConnection connection, Map<String, JSONArray> waterBasedExemptionMasterMap,
+	/**
+	 * 
+	 * @param waterCharge
+	 * @param connection
+	 * @param timeBasedExemeptionMasterMap
+	 * @param requestInfoWrapper
+	 * @return
+	 */
+	private List<TaxHeadEstimate> getEstimatesForTax(BigDecimal waterCharge,
+			WaterConnection connection,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		String assesmentYear = WSCalculationConstant.Assesment_Year;
@@ -113,12 +115,14 @@ public class EstimationService {
 				.estimateAmount(waterCharge.setScale(2, 2)).build());
 
 		// Water_cess
-		List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
-				.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
-		BigDecimal waterCess;
-		waterCess = waterCessUtil.getWaterCess(waterCharge, assesmentYear, waterCessMasterList);
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
-				.estimateAmount(waterCess).build());
+		if (timeBasedExemeptionMasterMap.get(WSCalculationConstant.WC_WATER_CESS_MASTER) != null) {
+			List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
+					.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
+			BigDecimal waterCess;
+			waterCess = waterCessUtil.getWaterCess(waterCharge, assesmentYear, waterCessMasterList);
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
+					.estimateAmount(waterCess).build());
+		}
 //		 get applicable rebate and penalty
 //		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
 //				assessmentYear, timeBasedExemeptionMasterMap);

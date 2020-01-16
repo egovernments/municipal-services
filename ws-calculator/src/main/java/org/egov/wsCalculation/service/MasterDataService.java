@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,13 +76,11 @@ public class MasterDataService {
 	 *            The calculation request
 	 * @return
 	 */
-	public Map<String, Object> getMasterMap(CalculationReq request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
+	public Map<String, Object> getMasterMap(RequestInfo requestInfo, String tenantId) {
 		Map<String, Object> masterMap = new HashMap<>();
 		List<TaxPeriod> taxPeriods = getTaxPeriodList(requestInfo, tenantId);
 		List<TaxHeadMaster> taxHeadMasters = getTaxHeadMasterMap(requestInfo, tenantId);
-		Map<String, Map<String, Object>> financialYearMaster = getFinancialYear(request);
+		Map<String, Map<String, Object>> financialYearMaster = getFinancialYear(requestInfo, tenantId);
 		masterMap.put(WSCalculationConstant.TAXPERIOD_MASTER_KEY, taxPeriods);
 		masterMap.put(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY, taxHeadMasters);
 		masterMap.put(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY, financialYearMaster);
@@ -121,10 +120,11 @@ public class MasterDataService {
 	}
 
 	/**
-	 * Method to enrich the Water Connection data Map
 	 * 
 	 * @param requestInfo
 	 * @param tenantId
+	 * @param billingSlabMaster
+	 * @param timeBasedExemptionMasterMap
 	 */
 	public void setWaterConnectionMasterValues(RequestInfo requestInfo, String tenantId,
 			Map<String, JSONArray> billingSlabMaster, Map<String, JSONArray> timeBasedExemptionMasterMap) {
@@ -144,6 +144,32 @@ public class MasterDataService {
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
 		}
 	}
+	
+	 /**
+	  * 
+	  * @param requestInfo
+	  * @param tenantId
+	  * @param masterMap
+	  */
+	public void loadBillingSlabsAndTimeBasedExemptions(RequestInfo requestInfo, String tenantId,
+			Map<String, Object> masterMap) {
+
+		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+				calculatorUtils.getWaterConnectionModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(WSCalculationConstant.WS_TAX_MODULE);
+		for (Entry<String, JSONArray> entry : res.entrySet()) {
+
+			String masterName = entry.getKey();
+
+			/* Masters which need to be parsed will be contained in the list */
+			if (WSCalculationConstant.WS_BILLING_SLAB_MASTERS.contains(entry.getKey()))
+				masterMap.put(masterName, entry.getValue());
+
+			/* Master not contained in list will be stored as it is */
+			masterMap.put(entry.getKey(), entry.getValue());
+		}
+	}
+
 
 	/**
 	 * Parses the master which has an exemption in them
@@ -179,11 +205,9 @@ public class MasterDataService {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<String, Object>> getFinancialYear(CalculationReq req) {
-		String tenantId = req.getCalculationCriteria().get(0).getTenantId();
-		RequestInfo requestInfo = req.getRequestInfo();
-		Set<String> assessmentYears = req.getCalculationCriteria().stream().map(cal -> cal.getAssessmentYear())
-				.collect(Collectors.toSet());
+	public Map<String, Map<String, Object>> getFinancialYear(RequestInfo requestInfo, String tenantId) {
+		Set<String> assessmentYears = new HashSet<>(1);
+		assessmentYears.add(estimationService.getAssessmentYear());
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getFinancialYearRequest(requestInfo, assessmentYears,
 				tenantId);
 		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
@@ -220,9 +244,9 @@ public class MasterDataService {
 		Object res = repository.fetchResult(url, mdmsCriteriaReq);
 		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
 		if (res == null) {
-			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
 		}
-		getBillingPeriod(criteria, mdmsResponse, masterMap);
+		enrichBillingPeriod(criteria, mdmsResponse, masterMap);
 		return masterMap;
 	}
 	
@@ -233,27 +257,33 @@ public class MasterDataService {
 	 * @return master map with date period
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> getBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
+	public Map<String, Object> enrichBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
 			Map<String, Object> masterMap) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		Map<String, Object> billingPeriod = new HashMap<>();
-		LocalDateTime demandStartingDate = LocalDateTime.now();
-		demandStartingDate = setCurrentDateValueToStartingOfDay(demandStartingDate);
-		Long demandEndDateMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
+
 		if (((master.get(WSCalculationConstant.Billing_Cycle_String)).toString()
-				.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period))) {
+				.equalsIgnoreCase(WSCalculationConstant.Monthly_Billing_Period)
+				&& master.get(WSCalculationConstant.ConnectionType).toString()
+						.equalsIgnoreCase(WSCalculationConstant.meteredConnectionType))) {
 			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
 			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 		} else {
+
+			LocalDateTime demandEndDate = LocalDateTime.now();
+			demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
+			Long endDaysMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
+
 			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES,
-					Timestamp.valueOf(demandStartingDate).getTime());
+					Timestamp.valueOf(demandEndDate).getTime() - endDaysMillis);
 			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES,
-					Timestamp.valueOf(demandStartingDate).getTime() + demandEndDateMillis);
+					Timestamp.valueOf(demandEndDate).getTime());
 		}
-		log.info("Demand Expiry Date : "+ master.get(WSCalculationConstant.Demand_Expiry_Date_String));
-		BigInteger expiryDate = new BigInteger(String.valueOf(master.get(WSCalculationConstant.Demand_Expiry_Date_String)));
-		Long demandExpiryDateMillis  = expiryDate.longValue();
+		log.info("Demand Expiry Date : " + master.get(WSCalculationConstant.Demand_Expiry_Date_String));
+		BigInteger expiryDate = new BigInteger(
+				String.valueOf(master.get(WSCalculationConstant.Demand_Expiry_Date_String)));
+		Long demandExpiryDateMillis = expiryDate.longValue();
 		billingPeriod.put(WSCalculationConstant.Demand_Expiry_Date_String, demandExpiryDateMillis);
 		masterMap.put(WSCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
@@ -501,4 +531,42 @@ public class MasterDataService {
 		}
 		return dateMap;
 	}
+	
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return all masters that is needed for calculation and demand generation.
+	 */
+	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId) {
+		Map<String, Object> master = new HashMap<>();
+		master = getMasterMap(requestInfo, tenantId);
+		loadBillingSlabsAndTimeBasedExemptions(requestInfo, tenantId, master);
+		loadBillingFrequencyMasterData(requestInfo, WSCalculationConstant.nonMeterdConnection, tenantId, master);
+		return master;
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionType
+	 * @param tenantId
+	 * @return Master For Billing Period
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo,
+			String connectionType, String tenantId, Map<String, Object> masterMap) {
+		String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
+		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
+		Object res = repository.fetchResult(url, mdmsCriteriaReq);
+		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+		if (res == null) {
+			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		masterMap.put(WSCalculationConstant.Billing_Period_Master, mdmsResponse);
+		return masterMap;
+	}
+	
 }
