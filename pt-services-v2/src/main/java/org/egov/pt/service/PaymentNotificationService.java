@@ -86,10 +86,14 @@ public class PaymentNotificationService {
             
             log.info("valMaps: "+valMaps);
             
-            if(topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()) &&
-                    CollectionUtils.isEmpty(valMaps) || !valMaps.get(0).get("module").equalsIgnoreCase("PT"))
-                return;
-
+            if(null != valMaps.get(0).get("moduleId")) {
+                if(topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()) &&
+                        CollectionUtils.isEmpty(valMaps) || !valMaps.get(0).get("moduleId").contains("PT"))
+                	return;
+            	
+            }else {
+            	return;
+            }
 
             for(Map<String,String> valMap : valMaps) {
 
@@ -434,7 +438,7 @@ public class PaymentNotificationService {
         message = message.replace("< insert payment transaction id from PG>",valMap.get("transactionId"));
         message = message.replace("<insert Property Tax Assessment ID>",valMap.get("propertyId"));
         message = message.replace("<pt due>.",valMap.get("amountDue"));
-        message = message.replace("<pay_link>.", "$paylink");
+        message = message.replace("<pay_link>", "$paylink");
    //     message = message.replace("<FY>",valMap.get("financialYear"));
         return message;
    }
@@ -449,7 +453,7 @@ public class PaymentNotificationService {
         message = message.replace("<amount>",valMap.get("amountPaid"));
         message = message.replace("<insert mode of payment>",valMap.get("paymentMode"));
         message = message.replace("<Enter pending amount>",valMap.get("amountDue"));
-        message = message.replace("<pay_link>.", "$paylink");
+        message = message.replace("<pay_link>", "$paylink");
   //      message = message.replace("<Insert FY>",valMap.get("financialYear"));
         return message;
     }
