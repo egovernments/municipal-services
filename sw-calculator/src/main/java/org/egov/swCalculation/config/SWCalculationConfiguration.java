@@ -151,6 +151,15 @@ public class SWCalculationConfiguration {
     private Integer batchSize;
     
     
+	@Value("${egov.seweragecalculatorservice.createdemand}")
+	private String createDemand;
+	
+    @Value("${persister.demand.based.dead.letter.topic.batch}")
+    private String deadLetterTopicBatch;
+
+    @Value("${persister.demand.based.dead.letter.topic.single}")
+    private String deadLetterTopicSingle;
+    
     
   
 	
