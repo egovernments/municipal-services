@@ -201,12 +201,11 @@ public class PaymentNotificationService {
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-		Map<String, String> mapOfPhnoAndUUIDs = sewerageConnection.getProperty().getOwners().stream()
-				.collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
+//		Map<String, String> mapOfPhnoAndUUIDs = sewerageConnection.getProperty().getOwners().stream()
+//				.collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
 
-		// Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers,
-		// requestInfo,
-		// waterConnection.getProperty().getTenantId());
+		 Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers,
+		 requestInfo, sewerageConnection.getProperty().getTenantId());
 
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
