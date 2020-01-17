@@ -211,5 +211,9 @@ public class SWCalculationConstant {
 	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
 	
 	public static final String SEWERAGE_TAX_SERVICE_CODE = "SW";
+	
+	public static final String  Billing_Period_Master = "Billing_Period_Master";
+	
+	public static final String Assesment_Year = "assessmentYear";
 
 }
