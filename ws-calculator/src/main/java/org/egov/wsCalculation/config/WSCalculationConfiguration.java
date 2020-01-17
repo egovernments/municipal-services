@@ -166,6 +166,9 @@ public class WSCalculationConfiguration {
 	
 	@Value("${egov.watercalculatorservice.createdemand}")
 	private String createDemand;
+	
+    @Value("${ws.demand.based.batch.size}")
+    private Integer batchSize;
 
 
 }

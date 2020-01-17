@@ -146,6 +146,9 @@ public class SWCalculationConfiguration {
 
 	@Value("${kafka.topics.billgen.topic}")
    	private String payTriggers;
+	
+    @Value("${sw.demand.based.batch.size}")
+    private Integer batchSize;
     
     
     
