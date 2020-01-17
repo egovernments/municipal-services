@@ -10,7 +10,6 @@ import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
-import org.egov.wsCalculation.service.DemandGenerationService;
 import org.egov.wsCalculation.service.WSCalculationService;
 import org.egov.wsCalculation.service.WSCalculationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
