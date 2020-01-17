@@ -68,32 +68,6 @@ public class BPAValidator {
 			allDocuments.addAll(bpa.getDocuments());
 		}
 		
-		if(bpa.getWfDocuments() != null){
-			bpa.getWfDocuments().forEach(document -> {
-				
-				if(document.getFileStore() == null && document.getFileStoreId() == null) {
-					throw new CustomException("Invlaid Document",
-							"filestore cannot be null"+document.toString() );
-				}else if(document.getFileStoreId() == null){
-					document.setFileStoreId(document.getFileStore());
-				}else if(document.getFileStore() == null){
-					document.setFileStore(document.getFileStoreId());
-				}
-			});
-		}
-		
-		
-		allDocuments.forEach(document -> {
-			
-			if(document.getFileStore() == null && document.getFileStoreId() == null) {
-				throw new CustomException("Invlaid Document",
-						"filestore cannot be null"+document.toString() );
-			}else if(document.getFileStoreId() == null){
-				document.setFileStoreId(document.getFileStore());
-			}else if(document.getFileStore() == null){
-				document.setFileStore(document.getFileStoreId());
-			}
-		});
 		
 		if(CollectionUtils.isEmpty(docTypeMappings)) {
 			return ;
@@ -163,11 +137,11 @@ public class BPAValidator {
 		if (request.getBPA().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList();
 			request.getBPA().getDocuments().forEach(document -> {
-				if (documentFileStoreIds.contains(document.getFileStore()))
+				if (documentFileStoreIds.contains(document.getFileStoreId()))
 					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
 							"Same document cannot be used multiple times");
 				else
-					documentFileStoreIds.add(document.getFileStore());
+					documentFileStoreIds.add(document.getFileStoreId());
 			});
 		}
 	}
@@ -325,7 +299,7 @@ public class BPAValidator {
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
 		compareIdList(getOwnerIds(searchedBpa), getOwnerIds(bpa), errorMap);
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
-		compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
+//		compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);

@@ -26,8 +26,8 @@ public class BPAQueryBuilder {
 			+ "bpa_createdTime,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
 			+ "bpaowner.id as bpaowner_uuid,"
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
-			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestore as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
-			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestore as bpa_doc_filestore"
+			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestoreid as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
+			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestoreid as bpa_doc_filestore"
 			+ " FROM eg_bpa_buildingplan bpa"
 			+ INNER_JOIN_STRING
 			+ "eg_bpa_address bpaaddress ON bpaaddress.buildingplanid = bpa.id"

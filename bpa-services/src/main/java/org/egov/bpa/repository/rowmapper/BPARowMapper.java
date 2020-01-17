@@ -138,7 +138,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		Document ownerDocument = Document.builder()
 				.id(rs.getString("ownerdocid"))
 				.documentType(rs.getString("ownerdocType"))
-				.fileStore(rs.getString("ownerfileStore"))
+				.fileStoreId(rs.getString("ownerfileStore"))
 				.documentUid(rs.getString("ownerdocuid")).build();
 
 		Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
@@ -172,7 +172,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		if (rs.getString("bpa_doc_id") != null) {
 			Document document = Document.builder()
 					.documentType(rs.getString("bpa_doc_documenttype"))
-					.fileStore(rs.getString("bpa_doc_filestore"))
+					.fileStoreId(rs.getString("bpa_doc_filestore"))
 					.id(rs.getString("bpa_doc_id")).build();
 			bpa.addDocumentsItem(document);
 		}

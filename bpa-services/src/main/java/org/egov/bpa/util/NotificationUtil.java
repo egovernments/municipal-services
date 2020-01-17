@@ -72,22 +72,11 @@ public class NotificationUtil {
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa,
 			String localizationMessage) {
 
-/*		String message = null, messageTemplate;
-
-		String ACTION_STATUS = "INITIATED" + "_" + bpa.getStatus();
-		switch (ACTION_STATUS) {
-
-		case ACTION_STATUS_INITIATED:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);
-			break;
-		}return message;*/
 
 		
 		
 		String message = null, messageTemplate;
-		if(bpa.getStatus().toUpperCase().contains(BPAConstants.ACTION_REJECT)) {
+		if(bpa.getStatus().toUpperCase().equals(BPAConstants.ACTION_REJECT)) {
 			messageTemplate = getMessageTemplate(
 					BPAConstants.APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
@@ -164,44 +153,7 @@ public class NotificationUtil {
 					message.replace("<4>", amount);
 				}
 			}
-		/*case ACTION_STATUS_APPLIED:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_APPLIED, localizationMessage);
-			message = getAppliedMsg(bpa, messageTemplate);
-			break;
-
-		case ACTION_STATUS_PAID:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_PAID, localizationMessage);
-			message = getApprovalPendingMsg(bpa, messageTemplate);
-			break;
-
-		case ACTION_STATUS_DOCUMENTVERIFICATION:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_DOCUMENT_VERIFICATION,
-					localizationMessage);
-			message = getDocumentVerificationMsg(bpa, messageTemplate);
-			break;
-
-		case ACTION_STATUS_FIELDINSPECTION:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_FIELD_INSPECTION,
-					localizationMessage);
-			message = getFieldInspectionMsg(bpa, messageTemplate);
-			break;
-
-		case ACTION_STATUS_NOCUPDATION:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_NOC_UPDATION, localizationMessage);
-			message = getNOCUpdationMsg(bpa, messageTemplate);
-			break;
-
-		case ACTION_STATUS_APPROVED:
-			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, bpa);
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_APPROVED, localizationMessage);
-			message = getApprovedMsg(bpa, amountToBePaid, messageTemplate);
-			break;*/
+		
 
 		}
 		return message;

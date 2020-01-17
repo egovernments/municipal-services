@@ -121,7 +121,7 @@ public class BPAConstants {
 
 	public static final String ACTION_PENDINGAPPROVAL = "PENDINGAPPROVAL";
 
-	public static final String ACTION_REJECT = "REJECT";
+	public static final String ACTION_REJECT = "REJECTED";
 
 	public static final String ACTION_CANCEL = "CANCEL";
 
