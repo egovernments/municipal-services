@@ -140,11 +140,11 @@ public class NotificationUtil {
 			
 			if(message.contains("<4>")) {
 				StringBuilder paymentUrl = new StringBuilder();
-				paymentUrl.append(config.getCollectionServiceHost()).append("?")
-						.append("tenantId=").append(bpa.getTenantId()).append("&consumerCode=")
+				paymentUrl.append(config.getCollectionServiceHost()).append(config.getCollectionServiceSearchEndPoint())
+						.append("?").append("tenantId=").append(bpa.getTenantId()).append("&consumerCode=")
 						.append(bpa.getApplicationNo());
-				LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository
-						.fetchResult(paymentUrl, requestInfo);
+				LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(paymentUrl,
+						requestInfo);
 				
 				if (!CollectionUtils.isEmpty(responseMap)){
 					String jsonString = new JSONObject(responseMap).toString();

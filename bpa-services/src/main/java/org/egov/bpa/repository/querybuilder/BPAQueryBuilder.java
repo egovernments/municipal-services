@@ -109,6 +109,10 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.createdtime BETWEEN ")
 					.append(criteria.getFromDate()).append(" AND ")
 					.append(criteria.getToDate());
+		}else if(criteria.getFromDate() != null && criteria.getToDate() == null){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdtime >= ")
+					.append(criteria.getFromDate());
 		}
 		
 		
@@ -130,14 +134,21 @@ public class BPAQueryBuilder {
 			limit = criteria.getLimit();
 
 		if (criteria.getLimit() != null
-				&& criteria.getLimit() > config.getMaxSearchLimit())
+				&& criteria.getLimit() > config.getMaxSearchLimit()) {
 			limit = config.getMaxSearchLimit();
+		}
+			
 
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+	
+		if(limit == -1) {
+			finalQuery = finalQuery.replace("WHERE offset_ > ? AND offset_ <= ?", "");
+		}else {
+			preparedStmtList.add(offset);
+			preparedStmtList.add(limit + offset);
+		}
 
 		System.out.println("========>>>>> "+finalQuery);
 		return finalQuery;
