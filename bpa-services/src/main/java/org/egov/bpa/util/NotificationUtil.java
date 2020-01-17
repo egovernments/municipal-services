@@ -254,7 +254,7 @@ public class NotificationUtil {
 				.append(config.getLocalizationSearchEndpoint()).append("?")
 				.append("locale=").append(locale).append("&tenantId=")
 				.append(tenantId).append("&module=")
-				.append("rainmaker-tl");
+				.append(BPAConstants.SEARCH_MODULE);
 		System.out.println("REquired Uri to test is: " + uri);
 		return uri;
 	}

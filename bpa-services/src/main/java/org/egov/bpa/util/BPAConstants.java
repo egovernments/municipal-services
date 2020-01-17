@@ -227,4 +227,5 @@ public class BPAConstants {
 	public static final String APPROVE_PERMIT_GENERATED ="APPROVED_AND_PERMIT_GENERATED_MSG";
 	public static final String APP_REJECTED ="APPLICATION_REJECTED_MSG";
 
+	public static final String SEARCH_MODULE = "rainmaker-bpa";
 }
