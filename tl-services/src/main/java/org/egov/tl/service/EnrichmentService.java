@@ -57,9 +57,9 @@ public class EnrichmentService {
             tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
 
             Map<String,Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense,mdmsData);
-            if(tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo()==null)
+            /*if(tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo()==null)
                 tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-            
+            */
 
             tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
             tradeLicense.getTradeLicenseDetail().getAddress().setId(UUID.randomUUID().toString());
