@@ -233,6 +233,9 @@ public class BPAConfiguration {
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;
+	
+	@Value("${egov.collectionservice.host}")
+	private String collectionServiceHost;
 
 
 }

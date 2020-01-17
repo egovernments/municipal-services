@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import static org.egov.bpa.util.BPAConstants.*;
@@ -84,75 +87,83 @@ public class NotificationUtil {
 		
 		
 		String message = null, messageTemplate;
-		String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
-		switch (ACTION_STATUS) {
-
-		case BPAConstants.ACTION_STATUS_INITIATED:
+		if(bpa.getStatus().toUpperCase().contains(BPAConstants.ACTION_REJECT)) {
 			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
+					BPAConstants.APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
-			break;
+		} else {
+			String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
+			switch (ACTION_STATUS) {
 
-		case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application for BUILDING_PLAN_SCRUTINY is applied. Application is waiting for APPLICATION FEE Payment.";
+			case BPAConstants.ACTION_STATUS_INITIATED:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.APP_CREATE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
 
-			break;
+			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.APP_FEE_PENDNG, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.PAYMENT_RECEIVE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+			case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.DOC_VERIFICATION, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.NOC_VERIFICATION, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.NOC_APPROVE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.PERMIT_FEE_GENERATED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				
+				break;
+				
+			case BPAConstants.ACTION_STATUS_APPROVED:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.APPROVE_PERMIT_GENERATED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+		}
 			
-		/*case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
-			messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);
-			message = "Dear <1>, The payment for you application with the application no as: " + bpa.getApplicationNo() + " is done Successfully. Waiting for Docverification.";
-			break;*/
-			
-		case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application DOC verification for " + bpa.getApplicationNo() + " is done Successfully. Waiting for field inspection.";
-
-			break;
-			
-		case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application Field inspection for " + bpa.getApplicationNo() + " is done Successfully. Waiting for NOC verification.";
-
-			break;
-			
-		case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application NOC verification for " + bpa.getApplicationNo() + " is done Successfully. Waiting for Approval.";
-
-			break;
-		case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is approved, waiting for sanction fee payment.";
-
-			break;
-			
-		case BPAConstants.ACTION_STATUS_APPROVED:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is approved successfully.";
-
-			break;
-		case BPAConstants.ACTION_STATUS_REJECTED:
-			/*messageTemplate = getMessageTemplate(
-					BPAConstants.NOTIFICATION_INITIATED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);*/
-			message = "Dear <1>, Your application with application no - " + bpa.getApplicationNo() + " is Rejected.";
-
-			break;
+			if(message.contains("<4>")) {
+				StringBuilder paymentUrl = new StringBuilder();
+				paymentUrl.append(config.getCollectionServiceHost()).append("?")
+						.append("tenantId=").append(bpa.getTenantId()).append("&consumerCode=")
+						.append(bpa.getApplicationNo());
+				LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository
+						.fetchResult(paymentUrl, requestInfo);
+				
+				if (!CollectionUtils.isEmpty(responseMap)){
+					String jsonString = new JSONObject(responseMap).toString();
+					DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+					String amount = context.read("Payments[0].totalDue");
+					message.replace("<4>", amount);
+				}
+			}
 		/*case ACTION_STATUS_APPLIED:
 			messageTemplate = getMessageTemplate(
 					BPAConstants.NOTIFICATION_APPLIED, localizationMessage);
@@ -326,7 +337,7 @@ public class NotificationUtil {
 	 * @return customized message for initiate
 	 */
 	private String getInitiatedMsg(BPA bpa, String message) {
-		message = message.replace("<2>", bpa.getApplicationType());
+		message = message.replace("<2>", bpa.getServiceType());
 		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
 	}

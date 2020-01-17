@@ -215,5 +215,16 @@ public class BPAConstants {
 	
 	public static final String SANC_FEE ="BPA.NC_SAN_FEE";
 	public static final String INPROGRESS_STATUS="INPROGRESS";
+	
+	//SMS Notification messages
+	public static final String APP_CREATE ="APPLICATION_CREATE_MSG";
+	public static final String APP_FEE_PENDNG ="APPLICATION_FEE_PENDING_MSG";
+	public static final String PAYMENT_RECEIVE ="PAYMENT_RECEIVED_MSG";
+	public static final String DOC_VERIFICATION ="DOC_VERIFICATION_DONE_MSG";
+	public static final String NOC_VERIFICATION ="NOC_FIELD_VERIFICATION_DONE_MSG";
+	public static final String NOC_APPROVE ="NOC_APPROVED_MSG";
+	public static final String PERMIT_FEE_GENERATED ="PERMIT_FEE_GENERATED_MSG";
+	public static final String APPROVE_PERMIT_GENERATED ="APPROVED_AND_PERMIT_GENERATED_MSG";
+	public static final String APP_REJECTED ="APPLICATION_REJECTED_MSG";
 
 }
