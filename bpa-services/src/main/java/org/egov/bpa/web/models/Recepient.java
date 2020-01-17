@@ -1,9 +1,12 @@
 package org.egov.bpa.web.models;
 
-import javax.validation.Valid;
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,37 +24,10 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-public class Event {
+public class Recepient {
 
-	@NotNull
-	private String tenantId;
+    private List<String> toRoles;
 
-	private String id;
-
-	private String referenceId;
-
-	@NotNull
-	private String eventType;
-
-	private String name;
-
-	@NotNull
-	private String description;
-
-	private Status status;
-
-	@NotNull
-	private Source source;
-
-	private String postedBy;
-
-	@Valid
-	@NotNull
-	private Recepient recepient;
-
-	private Action actions;
-
-	private EventDetails eventDetails;
-
+    private List<String> toUsers;
 
 }
