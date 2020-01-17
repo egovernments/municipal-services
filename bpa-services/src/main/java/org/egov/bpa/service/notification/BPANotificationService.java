@@ -68,15 +68,15 @@ public class BPANotificationService {
 		
     	List<Event> events = new ArrayList<>();
         String tenantId = bpaRequest.getBPA().getTenantId();
-//        String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  --need localization service changes.
-        String localizationMessages ="DATA";
-//            String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  --need localization service changes.
-        String message = "User creation successfull";
+        String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  //--need localization service changes.
+//        String localizationMessages ="DATA";
+            String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  //--need localization service changes.
+//        String message = "User creation successfull";
 		BPA bpaApplication = bpaRequest.getBPA();
-		List<Map> users = getUserList(bpaRequest);
+		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 
 
-            List<SMSRequest> smsRequests = util.createSMSRequest(message,users);
+            List<SMSRequest> smsRequests = util.createSMSRequest(message,mobileNumberToOwner);
         	Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
         	Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
     		
@@ -107,7 +107,6 @@ public class BPANotificationService {
 						.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
 						.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
 						.eventDetails(null).actions(action).build());
-
 			}
 
         if(!CollectionUtils.isEmpty(events)) {
@@ -159,11 +158,11 @@ public class BPANotificationService {
       String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); //--Localization service changes to be done.
       if(message == null){  
        message ="Application creation successfull";}
-           List<Map> users = getUserList(bpaRequest);
-            smsRequests.addAll(util.createSMSRequest(message,users));
+           Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
+            smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
 	}
 
-	private List<Map> getUserList (BPARequest bpaRequest){
+	private Map<String, String> getUserList (BPARequest bpaRequest){
 		Map<String,String> mobileNumberToOwner = new HashMap<>();
 		String tenantId = bpaRequest.getBPA().getTenantId();
 
@@ -175,8 +174,7 @@ public class BPANotificationService {
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
-		List<Map> users = new ArrayList<Map>();
-		users.add(mobileNumberToOwner);
+		
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
 			System.out.println(owner.getUuid());
 			if(owner.isPrimaryOwner()){
@@ -184,11 +182,10 @@ public class BPANotificationService {
 					mobileNumberToOwner.put(
 							owner.getMobileNumber(),
 							owner.getName());
-					users.add(mobileNumberToOwner);
 				}
 			}
 		});
-		return users;
+		return mobileNumberToOwner;
     }
 }
 
