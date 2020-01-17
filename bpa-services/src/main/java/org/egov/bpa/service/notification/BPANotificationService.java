@@ -1,11 +1,6 @@
 package org.egov.bpa.service.notification;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,11 +11,7 @@ import org.egov.bpa.service.BPAService;
 import org.egov.bpa.service.UserService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Event;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.models.*;
 import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,22 +64,19 @@ public class BPANotificationService {
 
 
 
-	private EventRequest getEvents(BPARequest bpaRequest) {
+	public EventRequest getEvents(BPARequest bpaRequest) {
 		
     	List<Event> events = new ArrayList<>();
         String tenantId = bpaRequest.getBPA().getTenantId();
-//        String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  --need localization service changes.
-        String localizationMessages ="DATA";
-//            String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  --need localization service changes.
-        String message = "User creation successfull";
-            Map<String,String > mobileNumberToOwner = new HashMap<>();
-            bpaRequest.getBPA().getOwners().forEach(owner -> {
-                if(owner.getMobileNumber()!=null)
-                    mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
-            });
-            List<Map> users = new ArrayList<Map>();
-            users.add(mobileNumberToOwner);
-            List<SMSRequest> smsRequests = util.createSMSRequest(message,users);
+        String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  //--need localization service changes.
+//        String localizationMessages ="DATA";
+            String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  //--need localization service changes.
+//        String message = "User creation successfull";
+		BPA bpaApplication = bpaRequest.getBPA();
+		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
+
+
+            List<SMSRequest> smsRequests = util.createSMSRequest(message,mobileNumberToOwner);
         	Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
         	Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
     		
@@ -98,7 +86,29 @@ public class BPANotificationService {
     				log.error("No UUID/SMS for mobile {} skipping event", mobile);
     				continue;
     			}
-    		}
+				List<String> toUsers = new ArrayList<>();
+				toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+				Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
+				List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
+				Action action = null;
+				if(payTriggerList.contains(bpaApplication.getStatus())) {
+					List<ActionItem> items = new ArrayList<>();
+					String actionLink = config.getPayLink().replace("$mobile", mobile)
+							.replace("$applicationNo", bpaApplication.getApplicationNo())
+							.replace("$tenantId", bpaApplication.getTenantId());
+					actionLink = config.getUiAppHost() + actionLink;
+					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
+					items.add(item);
+					action = Action.builder().actionUrls(items).build();
+				}
+
+
+				events.add(Event.builder().tenantId(bpaApplication.getTenantId()).description(mobileNumberToMsg.get(mobile))
+						.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
+						.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
+						.eventDetails(null).actions(action).build());
+			}
+
         if(!CollectionUtils.isEmpty(events)) {
     		return EventRequest.builder().requestInfo(bpaRequest.getRequestInfo()).events(events).build();
         }else {
@@ -148,29 +158,35 @@ public class BPANotificationService {
       String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); //--Localization service changes to be done.
       if(message == null){  
        message ="Application creation successfull";}
-            Map<String,String> mobileNumberToOwner = new HashMap<>();
-            String stakeUUID= bpaRequest.getBPA().getAuditDetails().getCreatedBy();
-            List<String> data = new ArrayList<String>();
-           data.add(stakeUUID);
-           BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
-           bpaSearchCriteria.setOwnerIds(data);
-           bpaSearchCriteria.setTenantId(tenantId);
-           UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
-           mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
-           List<Map> users = new ArrayList<Map>();
-           users.add(mobileNumberToOwner);
-            bpaRequest.getBPA().getOwners().forEach(owner -> {
-							System.out.println(owner.getUuid());
-							if(owner.isPrimaryOwner()){
-							if (owner.getMobileNumber() != null) {
-								mobileNumberToOwner.put(
-										owner.getMobileNumber(),
-										owner.getName());
-								users.add(mobileNumberToOwner);
-							}
-							}
-            });
-            smsRequests.addAll(util.createSMSRequest(message,users));
+           Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
+            smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
 	}
 
+	private Map<String, String> getUserList (BPARequest bpaRequest){
+		Map<String,String> mobileNumberToOwner = new HashMap<>();
+		String tenantId = bpaRequest.getBPA().getTenantId();
+
+		String stakeUUID= bpaRequest.getBPA().getAuditDetails().getCreatedBy();
+		List<String> data = new ArrayList<String>();
+		data.add(stakeUUID);
+		BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
+		bpaSearchCriteria.setOwnerIds(data);
+		bpaSearchCriteria.setTenantId(tenantId);
+		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
+		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
+		
+		bpaRequest.getBPA().getOwners().forEach(owner -> {
+			System.out.println(owner.getUuid());
+			if(owner.isPrimaryOwner()){
+				if (owner.getMobileNumber() != null) {
+					mobileNumberToOwner.put(
+							owner.getMobileNumber(),
+							owner.getName());
+				}
+			}
+		});
+		return mobileNumberToOwner;
+    }
 }
+
+

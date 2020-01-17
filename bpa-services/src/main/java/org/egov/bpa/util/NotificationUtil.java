@@ -322,16 +322,13 @@ public class NotificationUtil {
 	 * @return List of SMSRequest
 	 */
 	public List<SMSRequest> createSMSRequest(String message,
-			List<Map> users) {
+			Map<String, String> mobileNumberToOwner) {
 		List<SMSRequest> smsRequest = new LinkedList<>();
-		for(Map<String,String > mobileNumberToOwnerName: users){
-			
 		
-		for (Map.Entry<String, String> entryset : mobileNumberToOwnerName
+		for (Map.Entry<String, String> entryset : mobileNumberToOwner
 				.entrySet()) {
 			String customizedMsg = message.replace("<1>", entryset.getValue());
 			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
-		}
 		}
 		return smsRequest;
 	}

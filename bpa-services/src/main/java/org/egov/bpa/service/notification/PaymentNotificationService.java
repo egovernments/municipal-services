@@ -15,10 +15,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.models.*;
 import org.egov.bpa.web.models.collection.PaymentRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -43,14 +40,17 @@ public class PaymentNotificationService {
     
     private ObjectMapper mapper;
 
+    private BPANotificationService bpaNotificationService;
+
 
     @Autowired
     public PaymentNotificationService(BPAConfiguration config, BPAService bpaService,
-                                      NotificationUtil util,ObjectMapper mapper) {
+                                      NotificationUtil util,ObjectMapper mapper, BPANotificationService bpaNotificationService) {
         this.config = config;
         this.bpaService = bpaService;
         this.util = util;
         this.mapper = mapper;
+        this.bpaNotificationService = bpaNotificationService;
     }
 
 
@@ -124,17 +124,18 @@ public class PaymentNotificationService {
                 List<SMSRequest> smsList = new ArrayList<>();
                 List<Map> users = new ArrayList<Map>();
                 users.add(mobileNumberToOwner);
-                smsList.addAll(util.createSMSRequest(message, users));
+                smsList.addAll(util.createSMSRequest(message, mobileNumberToOwner));
                 util.sendSMS(smsList, config.getIsSMSEnabled());
 
-               /* if(null != config.getIsUserEventsNotificationEnabled()) {
+                if(null != config.getIsUserEventsNotificationEnabled()) {
                     if(config.getIsUserEventsNotificationEnabled()) {
                         BPARequest bpaRequest =BPARequest.builder().requestInfo(requestInfo).BPA(bpa).build();
-                        EventRequest eventRequest = BPANotificationService.getEvents(bpaRequest);
+                        EventRequest eventRequest = bpaNotificationService.getEvents(bpaRequest);
                         if(null != eventRequest)
                             util.sendEventNotification(eventRequest);
                     }
-                }*/
+                }
+
 				
 			
 				
