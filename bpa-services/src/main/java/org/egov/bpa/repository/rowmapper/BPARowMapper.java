@@ -63,12 +63,9 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 				Boundary locality = Boundary.builder()
 						.code(rs.getString("locality")).build();
 
-				GeoLocation location = GeoLocation.builder().latitude(latitude)
-						.build();
-
-				GeoLocation location2 = GeoLocation.builder().longitude(longitude)
-						.build();
-				
+				GeoLocation geoLocation = GeoLocation.builder()
+						.latitude(latitude)
+						.longitude(longitude).build();
 				
 				Address address = Address
 						.builder()
@@ -80,7 +77,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.country(rs.getString("country"))
 						.id(rs.getString("bpa_ad_id"))
 						.landmark(rs.getString("landmark")).locality(locality)
-//						.geoLocation(location).geoLocation(location2)
+						.geoLocation(geoLocation)
 						.pincode(rs.getString("pincode"))
 						.doorNo(rs.getString("doorno"))
 						.street(rs.getString("street")).tenantId(tenantId).build();
