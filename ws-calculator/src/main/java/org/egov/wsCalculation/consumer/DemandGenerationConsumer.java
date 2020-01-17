@@ -1,15 +1,21 @@
 package org.egov.wsCalculation.consumer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
+import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.service.DemandGenerationService;
 import org.egov.wsCalculation.service.WSCalculationService;
+import org.egov.wsCalculation.service.WSCalculationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -17,47 +23,92 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class DemandGenerationConsumer {
-
-	@Autowired
-	WSCalculationService wsCalculationService;
 	
-	@Autowired
-	DemandGenerationService demandGenerationService;
-
 	@Autowired
 	private ObjectMapper mapper;
-	@KafkaListener(topics = {
-			"${egov.watercalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactory")
-
-		
-		public void listen(final List<HashMap<String, Object>> records) {
-		CalculationReq calculationreq;
-		
-		try {
-			log.info("Consuming record: " + records);
-		} catch (final Exception e) {
-			log.error("Error while listening to value: " + records + " on topic: " +  ": " + e);
-		}
-		
-		demandGenerationService.process(records);
-	}
-
-	@KafkaListener(topics = {
-			"${persister.demand.based.dead.letter.topic.batch}" }, containerFactory = "kafkaListenerContainerFactory")
-	public void listenDeadLetterTopic(final List<Message<?>> records) {
-	}
 	
+	@Autowired
+	private WSCalculationConfiguration config;
+	
+	@Autowired
+	private WSCalculationServiceImpl wSCalculationServiceImpl;
+	
+	@Autowired
+	private WSCalculationProducer producer;
 	
 	/**
-	* Get CalculationReq and Calculate the Tax Head on Water Charge
-	*
-	* @param request
-	* @return List of calculation.
-	*/
-//	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
-//	List<Calculation> calculations = getCalculations(request, masterMap);
-//	demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
-//	return calculations;
-//	}
+	 * Listen the topic for processing the batch records.
+	 * 
+	 * @param records would be calculation criteria.
+	 */
+	@KafkaListener(topics = {"${egov.watercalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactory")
+	@SuppressWarnings("unchecked")
+	public void listen(final List<HashMap<String, Object>> records) {
+		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
+		Map<String, Object> masterMap = (Map<String, Object>) records.get(0).get("masterData");
+		RequestInfo requestInfo = mapper.convertValue(records.get(0).get("calculationReq"), CalculationReq.class)
+				.getRequestInfo();
+		records.forEach(record -> {
+			try {
+				CalculationReq calcReq = mapper.convertValue(records.get(0).get("calculationReq"),
+						CalculationReq.class);
+				calculationCriteria.addAll(calcReq.getCalculationCriteria());
+				log.info("Consuming record: " + record);
+			} catch (final Exception e) {
+				log.error("Error while listening to value: " + record + " on topic: " + ": " + e);
+			}
+		});
+		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
+				.requestInfo(requestInfo).build();
+		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
+		log.info("Number of batch records:  " + records.size());
+	}
+	
+	
 
+	/**
+	 * Listens on the dead letter topic of the bulk request and processes
+	 * every record individually and pushes failed records on error topic
+	 * @param records failed batch processing
+	 */
+	@KafkaListener(topics = {"${persister.demand.based.dead.letter.topic.batch}" }, containerFactory = "kafkaListenerContainerFactory")
+	@SuppressWarnings("unchecked")
+	public void listenDeadLetterTopic(List<HashMap<String, Object>> records) {
+		List<CalculationReq> CalculationReqList = new ArrayList<>();
+		Map<String, Object> masterMap = (Map<String, Object>) records.get(0).get("masterData");
+		records.forEach(record -> {
+			try {
+				CalculationReq calcReq = mapper.convertValue(records.get(0).get("calculationReq"),
+						CalculationReq.class);
+				CalculationReqList.add(calcReq);
+				log.info("Consuming record: " + record);
+			} catch (final Exception e) {
+				log.error("Error while listening to value: " + record + " on topic: " + ": " + e);
+			}
+			// processing single
+			CalculationReqList.forEach(calculationReq -> {
+				generateDemandInBatch(calculationReq, masterMap, config.getDeadLetterTopicSingle());
+			});
+		});
+	}
+	
+	/**
+	 * Generate demand in bulk on given criteria
+	 * 
+	 * @param request Calculation request
+	 * @param masterMap master data
+	 * @param errorTopic error topic
+	 */
+	private void generateDemandInBatch(CalculationReq request, Map<String, Object> masterMap, String errorTopic) {
+		try {
+			wSCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
+			if (errorTopic.equalsIgnoreCase(config.getDeadLetterTopicBatch()))
+				log.info("Batch Processed Successfully: {}", request.getCalculationCriteria());
+		} catch (Exception ex) {
+			log.error("Demand generation error: " + ex);
+			log.info("From Topic: " + errorTopic);
+			producer.push(errorTopic, request);
+		}
+
+	}
 }
