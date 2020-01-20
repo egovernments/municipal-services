@@ -51,9 +51,8 @@ public class PaymentUpdateService {
 	private BPAUtil util;
 
 	@Autowired
-	public PaymentUpdateService(BPAService bpaService, BPAConfiguration config,
-			BPARepository repository, WorkflowIntegrator wfIntegrator,
-			EnrichmentService enrichmentService, ObjectMapper mapper,
+	public PaymentUpdateService(BPAService bpaService, BPAConfiguration config, BPARepository repository,
+			WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService, ObjectMapper mapper,
 			WorkflowService workflowService, BPAUtil util) {
 		this.bpaService = bpaService;
 		this.config = config;
@@ -74,49 +73,36 @@ public class PaymentUpdateService {
 	/**
 	 * Process the message from kafka and updates the status to paid
 	 * 
-	 * @param record The incoming message from receipt create consumer
+	 * @param record
+	 *            The incoming message from receipt create consumer
 	 */
 	public void process(HashMap<String, Object> record) {
 
 		try {
-			PaymentRequest paymentRequest = mapper.convertValue(record,PaymentRequest.class);
+			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
 			String tenantId = paymentRequest.getPayment().getTenantId();
 
-			for(PaymentDetail paymentDetail : paymentDetails){
-				
-				List<String> businessServices = new ArrayList<String>(Arrays.asList(config.getBusinessService().split(",")));
-				if (paymentDetail.getBusinessService().equalsIgnoreCase(BPAConstants.APPL_FEE) || paymentDetail.getBusinessService().equalsIgnoreCase(BPAConstants.SANC_FEE)) {
+			for (PaymentDetail paymentDetail : paymentDetails) {
+
+				List<String> businessServices = new ArrayList<String>(
+						Arrays.asList(config.getBusinessService().split(",")));
+				if (businessServices.contains(paymentDetail.getBusinessService())) {
 					BPASearchCriteria searchCriteria = new BPASearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
-					List<BPA> bpas = bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
-					/*String wfbusinessServiceName = null;
-					wfbusinessServiceName = config.getBusinessServiceValue();*/
-					
-				BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(), requestInfo,codes.get(0));
+					List<BPA> bpas = repository.getBPAData(searchCriteria);
+					BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(),
+							requestInfo, codes.get(0));
 
-
-					if (CollectionUtils.isEmpty(bpas)){
+					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
-								"No tradeLicense found for the comsumerCode "
+								"No Building Plan Application found for the comsumerCode "
 										+ searchCriteria.getApplicationNos());
 					}
-					
-					switch (bpas.get(0).getStatus()) {
-					case BPAConstants.INPROGRESS_STATUS:
-						bpas.forEach(bpa -> bpa
-								.setAction(BPAConstants.APPL_FEE));
-						break;
-
-					default:
-						bpas.forEach(bpa -> bpa
-								.setAction(BPAConstants.SANC_FEE));
-						break;
-					}
-//					bpas.forEach(bpa -> bpa.setAction("PAY"));
+					bpas.forEach(bpa -> bpa.setAction("PAY"));
 
 					// FIXME check if the update call to repository can be avoided
 					// FIXME check why aniket is not using request info from consumer
@@ -124,32 +110,28 @@ public class PaymentUpdateService {
 
 					Role role = Role.builder().code("SYSTEM_PAYMENT").tenantId(bpas.get(0).getTenantId()).build();
 					requestInfo.getUserInfo().getRoles().add(role);
-					BPARequest updateRequest = BPARequest.builder().requestInfo(requestInfo)
-							.BPA(bpas.get(0)).build();
-					
+					BPARequest updateRequest = BPARequest.builder().requestInfo(requestInfo).BPA(bpas.get(0)).build();
+
 					/*
 					 * calling workflow to update status
 					 */
-						wfIntegrator.callWorkFlow(updateRequest);
+					wfIntegrator.callWorkFlow(updateRequest);
 
-						log.info(" the status of the application is : "
-								+ updateRequest.getBPA().getStatus());
+					log.info(" the status of the application is : " + updateRequest.getBPA().getStatus());
 
-						/*
-						 * calling repository to update the object in TL tables
-						 */
-						enrichmentService.postStatusEnrichment(updateRequest);
+					/*
+					 * calling repository to update the object in eg_bpa_buildingpaln tables
+					 */
+					enrichmentService.postStatusEnrichment(updateRequest);
 
-						repository.update(updateRequest, workflowService.isStateUpdatable(
-								updateRequest.getBPA().getStatus(), businessService));
-				
-		 }
-		 }
+					repository.update(updateRequest, false);
+
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	
 }
