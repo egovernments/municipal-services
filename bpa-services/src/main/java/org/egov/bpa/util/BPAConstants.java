@@ -151,9 +151,8 @@ public class BPAConstants {
 	public static final String STATUS_CANCELLED = "CANCELLED";
 
 	public static final String STATUS_PAID = "INPROGRESS";
-
-	public static final String BILL_AMOUNT_JSONPATH = "$.billResponse.Bill[0].billDetails[0].totalAmount";
 	
+	public static final String BILL_AMOUNT = "$.Demands[0].demandDetails[0].taxAmount";
 
 	// ACTION_STATUS combinations for notification
 

@@ -1,7 +1,7 @@
 package org.egov.bpa.util;
 
 import static org.egov.bpa.util.BPAConstants.ACTION_STATUS_INITIATED;
-import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT_JSONPATH;
+import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
 import static org.egov.bpa.util.BPAConstants.BPA_MODULE_CODE;
 import static org.egov.bpa.util.BPAConstants.DEFAULT_OBJECT_MODIFIED_MSG;
 
@@ -140,21 +140,9 @@ public class NotificationUtil {
 			
 			if(message.contains("<4>")) {
 				StringBuilder paymentUrl = new StringBuilder();
-				paymentUrl.append(config.getCollectionServiceHost()).append(config.getCollectionServiceSearchEndPoint())
-						.append("?").append("tenantId=").append(bpa.getTenantId()).append("&consumerCode=")
-						.append(bpa.getApplicationNo());
-				LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(paymentUrl,
-						requestInfo);
-				
-				if (!CollectionUtils.isEmpty(responseMap)){
-					String jsonString = new JSONObject(responseMap).toString();
-					DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
-					String amount = context.read("Payments[0].totalDue");
-					message.replace("<4>", amount);
-				}
+				BigDecimal amount= getAmountToBePaid(requestInfo, bpa);
+				message = message.replace("<4>", amount.toString());
 			}
-		
-
 		}
 		return message;
 
@@ -202,12 +190,12 @@ public class NotificationUtil {
 
 		BigDecimal amountToBePaid = null;
 		try {
-			Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT_JSONPATH);
+			Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT);
 			amountToBePaid = new BigDecimal(obj.toString());
 		} catch (Exception e) {
 			throw new CustomException("PARSING ERROR",
 					"Failed to parse the response using jsonPath: "
-							+ BILL_AMOUNT_JSONPATH);
+							+ BILL_AMOUNT);
 		}
 		return amountToBePaid;
 	}
@@ -220,14 +208,22 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(BPA bpa) {
-		StringBuilder builder = new StringBuilder(config.getCalculatorHost());
-//		builder.append(config.getGetBillEndpoint());
+		String status = bpa.getStatus();
+		String code = null;
+		if(status.equalsIgnoreCase("PENDING_APPL_FEE")){
+			code= "BPA.NC_APP_FEE";
+		}else{
+			code= "BPA.NC_SAN_FEE";
+		}
+		StringBuilder builder = new StringBuilder(config.getBillingHost());
+		builder.append(config.getDemandSearchEndpoint());
 		builder.append("?tenantId=");
 		builder.append(bpa.getTenantId());
 		builder.append("&consumerCode=");
 		builder.append(bpa.getApplicationNo());
 		builder.append("&businessService=");
-		builder.append(BPA_MODULE_CODE);
+		builder.append(code);
+		System.out.println( "PAyment checking url: "+ builder);
 		return builder;
 	}
 
