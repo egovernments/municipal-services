@@ -43,7 +43,7 @@ public class DemandGenerationConsumer {
 	 *            would be calculation criteria.
 	 */
 	@KafkaListener(topics = {
-			"${egov.watercalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactory")
+			"${egov.seweragecalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactory")
 	@SuppressWarnings("unchecked")
 	public void listen(final List<HashMap<String, Object>> records) {
 		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
