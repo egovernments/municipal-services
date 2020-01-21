@@ -133,11 +133,10 @@ public class CalculatorUtils {
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 
-	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String connectionType, String tenantId) {
+	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BillingPeriod).filter("[?(@."
-				+ SWCalculationConstant.ConnectionType + " == '" + connectionType + "' && @.active== " + true + ")]")
-				.build();
+		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BillingPeriod)
+				.filter("[?(@.active== " + true + ")]").build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.SW_MODULE)
 				.masterDetails(Arrays.asList(mstrDetail)).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)

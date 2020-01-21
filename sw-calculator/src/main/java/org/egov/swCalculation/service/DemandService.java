@@ -680,8 +680,7 @@ public class DemandService {
 		User user = new User();
 		user.setTenantId(tenantId);
 		requestInfo.setUserInfo(user);
-		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo,
-				SWCalculationConstant.nonMeterdConnection, tenantId);
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
 		String jsonPath = SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
 		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
 		Object res = repository.fetchResult(url, mdmsCriteriaReq);
