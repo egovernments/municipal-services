@@ -85,10 +85,10 @@ public class CalculatorUtil {
 	
 	
 	
-	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String connectionType, String tenantId) {
+	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
 		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.BillingPeriod)
-				.filter("[?(@." + WSCalculationConstant.ConnectionType + " == '" + connectionType + "' && @.active== "+true+")]")
+				.filter("[?(@.active== "+true+")]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.WS_MODULE)
 				.masterDetails(Arrays.asList(mstrDetail)).build();

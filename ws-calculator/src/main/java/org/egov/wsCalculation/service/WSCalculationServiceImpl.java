@@ -77,7 +77,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
 		Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
-				request.getCalculationCriteria().get(0).getTenantId(), WSCalculationConstant.meteredConnectionType);
+				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return calculations;
@@ -206,7 +206,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			user.setTenantId(tenentId);
 			requestInfo.setUserInfo(user);
 			String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
-			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, "Non Metered", tenentId);
+			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, tenentId);
 			StringBuilder url = calculatorUtil.getMdmsSearchUrl();
 			Object res = repository.fetchResult(url, mdmsCriteriaReq);
 			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
