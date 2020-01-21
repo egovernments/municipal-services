@@ -122,6 +122,9 @@ public class WSCalculationConfiguration {
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
     
+    @Value("${notification.sms.link}")
+    private String smsNotificationLink;
+    
     @Value("${notification.email.enabled}")
     private Boolean isEmailEnabled;
     
