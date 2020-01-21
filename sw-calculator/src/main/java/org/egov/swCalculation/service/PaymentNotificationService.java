@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -129,7 +130,7 @@ public class PaymentNotificationService {
 			String topic, RequestInfo requestInfo) {
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
-		String message = util.getCustomizedMsg(topic, localizationMessage);
+		String message = util.getCustomizedMsgForSMS(topic, localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -142,6 +143,13 @@ public class PaymentNotificationService {
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
+			if (messg.contains("<Link to Bill>")) {
+				String actionLink = config.getSmsNotificationLink()
+						.replace("$consumerCode", sewerageConnection.getConnectionNo())
+						.replace("$tenantId", sewerageConnection.getProperty().getTenantId());
+				actionLink = config.getUiAppHost() + actionLink;
+				messg = messg.replace("<Link to Bill>", actionLink);
+			}
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);
 		});
@@ -187,7 +195,7 @@ public class PaymentNotificationService {
 		List<Event> events = new ArrayList<>();
 
 		String localizationMessages = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
-		String message = util.getCustomizedMsg(topic, localizationMessages);
+		String message = util.getCustomizedMsgForInApp(topic, localizationMessages);
 
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
@@ -204,9 +212,7 @@ public class PaymentNotificationService {
 //		Map<String, String> mapOfPhnoAndUUIDs = sewerageConnection.getProperty().getOwners().stream()
 //				.collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
 
-		 Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers,
-		 requestInfo, sewerageConnection.getProperty().getTenantId());
-
+		 Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo, sewerageConnection.getProperty().getTenantId());
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
@@ -252,19 +258,31 @@ public class PaymentNotificationService {
 	public HashMap<String, String> mapRecords(DocumentContext context) {
 		HashMap<String, String> mappedRecord = new HashMap<>();
 		try {
-			DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
 			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
 			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
 			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
-			Date expiryDate = new Date((Long) context.read("$.Bill[0].billDetails[0].expiryDate"));
-			mappedRecord.put(dueDate, formatter.format(expiryDate));
+			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new CustomException("Bill Fetch Error", "Unable to fetch values from bill");
 		}
 
 		return mappedRecord;
+	}
+	
+	private String getLatestBillDetails(String billdetails) {
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		log.info("Bill Details : -> " + billdetails);
+		org.json.JSONArray jsonArray = new org.json.JSONArray(billdetails);
+		ArrayList<Long> billDates = new ArrayList<>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObj = jsonArray.getJSONObject(i);
+			billDates.add((Long) jsonObj.get("expiryDate"));
+		}
+		Collections.sort(billDates, Collections.reverseOrder());
+
+		return formatter.format(billDates.get(0));
 	}
 
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,

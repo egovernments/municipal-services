@@ -4,18 +4,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.response.ResponseInfo;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.Calculation;
 import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
-import org.egov.swCalculation.model.CalculationRes;
 import org.egov.swCalculation.model.Category;
 import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.TaxHeadEstimate;
@@ -46,26 +43,28 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	SewerageCalculatorDao sewerageCalculatorDao;
 
 	
-	/**
-	 * Get Calculation Request and return Calculated Response
-	 */
-	@Override
-	public CalculationRes getCalculation(CalculationReq request) {
-		Map<String, Object> masterMap = mDataService.getMasterMap(request);
-		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
-		return new CalculationRes(new ResponseInfo(),calculations);
-	}
 
 	
-/**
- * 
- * @param requestInfo
- * @param criteria
- * @param estimatesAndBillingSlabs
- * @param masterMap
- * @return
- */
+	/**
+	 * Get CalculationReq and Calculate the Tax Head on Water Charge
+	 */
+	public List<Calculation> getCalculation(CalculationReq request) {
+		Map<String, Object> masterMap = mDataService.loadMasterData(request.getRequestInfo(),
+				request.getCalculationCriteria().get(0).getTenantId(), SWCalculationConstant.nonMeterdConnection);
+		List<Calculation> calculations = getCalculations(request, masterMap);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		return calculations;
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param criteria
+	 * @param estimatesAndBillingSlabs
+	 * @param masterMap
+	 * @return
+	 * 
+	 */
 	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
 			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
 
@@ -132,29 +131,10 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		}
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge);
-		
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.charge(sewerageCharge).sewerageConnection(sewerageConnection).rebate(rebate).tenantId(tenantId)
-				.taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo())
-				.build();
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(sewerageCharge)
+				.sewerageConnection(sewerageConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
 	}
 	
-	/**
-	 * 
-	 * @param request Contains calculation request
-	 * @return List of Calculation with different tax head
-	 */
-	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
-		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
-		String tenantId = request.getCalculationCriteria().get(0).getTenantId();
-		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo());
-			mDataService.getBillingFrequencyMasterData(request.getRequestInfo(), criteria.getSewerageConnection().getConnectionType(), tenantId ,masterMap);
-			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
-			calculations.add(calculation);
-		}
-		return calculations;
-	}
 	
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
@@ -171,5 +151,39 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			demandService.generateDemandForTenantId(tenantId);
 		});
 	}
+	
+	/**
+	 * 
+	 * @param request would be calculations request
+	 * @param masterMap master data
+	 * @return all calculations including sewerage charge and taxhead on that
+	 */
+	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
+		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
+			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo(),
+					masterMap);
+			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+					.get(SWCalculationConstant.Billing_Period_Master);
+			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			calculations.add(calculation);
+		}
+		return calculations;
+	}
+
+	
+	/**
+	 * 
+	 * 
+	 * @param request
+	 * @return List of calculation.
+	 */
+	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
+		List<Calculation> calculations = getCalculations(request, masterMap);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
+		return calculations;
+	}
+	
 	
 }

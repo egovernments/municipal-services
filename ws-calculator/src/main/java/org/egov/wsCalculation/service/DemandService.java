@@ -715,7 +715,7 @@ public class DemandService {
 		String billingFrequency = (String) master.get(WSCalculationConstant.Billing_Cycle_String);
 		long startDay = ((demandGenerateDateMillis) / 86400000);
 		boolean isTriggerEnable = isCurrentDateIsMatching(billingFrequency, startDay);
-		if (isTriggerEnable) {
+		
 			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId, connectionType);
 			String assessmentYear = estimationService.getAssessmentYear();
 			for (String connectionNo : connectionNos) {
@@ -725,11 +725,18 @@ public class DemandService {
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
 						.requestInfo(requestInfo).build();
+				Map<String, Object> masterMap= new HashMap<>();
+				masterMap= null;
+				HashMap<String, Object> calculationRes = new HashMap<>();
+				calculationRes.put("masterData", masterMap);
+				calculationRes.put("calculationReq", calculationReq);
 				
-				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);			
+				wsCalculationProducer.push(configs.getCreateDemand(), calculationRes);
+			//	log.info("Prepared Statement" + calculationRes.toString());
+				
 			
 			}
-		}
+		
 	}
 
 	/**

@@ -79,6 +79,9 @@ public class SWCalculationConfiguration {
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
     
+    @Value("${notification.sms.link}")
+    private String smsNotificationLink;
+    
     
     //Email
     @Value("${notification.mail.enabled}")
@@ -146,7 +149,19 @@ public class SWCalculationConfiguration {
 
 	@Value("${kafka.topics.billgen.topic}")
    	private String payTriggers;
+	
+    @Value("${sw.demand.based.batch.size}")
+    private Integer batchSize;
     
+    
+	@Value("${egov.seweragecalculatorservice.createdemand}")
+	private String createDemand;
+	
+    @Value("${persister.demand.based.dead.letter.topic.batch}")
+    private String deadLetterTopicBatch;
+
+    @Value("${persister.demand.based.dead.letter.topic.single}")
+    private String deadLetterTopicSingle;
     
     
   
