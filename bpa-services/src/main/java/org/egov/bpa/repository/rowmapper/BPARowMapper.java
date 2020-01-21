@@ -119,7 +119,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		String bpaId = rs.getString("bpa_id");
 		
 		if (bpa == null) {
-			PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
+			PGobject pgObj = (PGobject) rs.getObject("additionaldetail"); //TODO add logic to identify duplicate additionalDetails and avoid duplicates in the search response
 			JsonNode additionalDetail = null;
 			try {
 				additionalDetail = mapper.readTree(pgObj.getValue());
@@ -129,23 +129,25 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
             bpa.setAdditionalDetails(additionalDetail);
 		}
 
-		if (rs.getString("bpa_un_id") != null) {
+		ArrayList<String> unitIds = new ArrayList<String>();
+		String unitId = rs.getString("bpa_un_id");
+		if (unitId != null && !unitIds.contains(unitId)) {
 			Unit unit = Unit.builder().id(rs.getString("bpa_un_id"))
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
+			unitIds.add(unitId);
 		}
 
-		Document ownerDocument = Document.builder()
-				.id(rs.getString("ownerdocid"))
-				.documentType(rs.getString("ownerdocType"))
-				.fileStoreId(rs.getString("ownerfileStore"))
-				.documentUid(rs.getString("ownerdocuid")).build();
+		
 
-		Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
-		Double ownerShipPercentage = (Double) rs
-				.getObject("ownershippercentage");
-
-		if (rs.getString("bpaowner_uuid") != null) {
+		
+		ArrayList<String> ownerIds = new ArrayList<String>();
+		String ownerId = rs.getString("bpaowner_uuid");
+		if (ownerId != null && !ownerIds.contains(ownerId)) {
+			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
+			Double ownerShipPercentage = (Double) rs
+					.getObject("ownershippercentage");
+			
 			OwnerInfo owner = OwnerInfo.builder()
 					.uuid(rs.getString("bpaowner_uuid"))
 					.isPrimaryOwner(isPrimaryOwner)
@@ -156,25 +158,43 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 									.getString("relationship")))
 					.institutionId(rs.getString("institutionid")).build();
 			bpa.addOwnersItem(owner);
+			ownerIds.add(ownerId);
 		}
-
+		
 		// Add owner document to the specific bpa for which it was used
 		String docowner = rs.getString("docuserid");
-		String docId = rs.getString("docdetailid");
-		if (bpaId.equalsIgnoreCase(docId) && docowner != null
-				&& rs.getBoolean("ownerdocactive")) {
+		String ownerDocId = rs.getString("ownerdocid");
+		ArrayList<String> ownerDocIds = new ArrayList<String>();
+		if ( ownerDocId != null && !ownerDocIds.contains(ownerDocId)) {
+			
 			bpa.getOwners().forEach(ownerInfo -> {
-				if (docowner.equalsIgnoreCase(ownerInfo.getUuid()))
-					ownerInfo.addDocumentsItem(ownerDocument);
+				if (docowner.equalsIgnoreCase(ownerInfo.getUuid())) {
+					Document ownerDocument;
+					try {
+						ownerDocument = Document.builder()
+								.id(rs.getString("ownerdocid"))
+								.documentType(rs.getString("ownerdocType"))
+								.fileStoreId(rs.getString("ownerfileStore"))
+								.documentUid(rs.getString("ownerdocuid")).build();
+						ownerInfo.addDocumentsItem(ownerDocument);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+					
 			});
 		}
 
-		if (rs.getString("bpa_doc_id") != null) {
+		ArrayList<String> docIds = new ArrayList<String>();
+		String documentId = rs.getString("bpa_doc_id");
+		if (documentId != null && !docIds.contains(documentId)) {
 			Document document = Document.builder()
 					.documentType(rs.getString("bpa_doc_documenttype"))
 					.fileStoreId(rs.getString("bpa_doc_filestore"))
-					.id(rs.getString("bpa_doc_id")).build();
+					.id(documentId).build();
 			bpa.addDocumentsItem(document);
+			docIds.add(documentId);
 		}
 
 	}
