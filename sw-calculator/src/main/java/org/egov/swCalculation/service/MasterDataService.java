@@ -301,7 +301,14 @@ public class MasterDataService {
 			Map<String, Object> masterMap) {
 		  log.info("Billing Frequency Map" + mdmsResponse.toString());
 
-          Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+		  Map<String, Object> master = new HashMap<>();
+			for (int i = 0; i < mdmsResponse.size(); i++) {
+				if ((((Map<String, Object>) mdmsResponse.get(i)).get(SWCalculationConstant.ConnectionType).toString())
+						.equalsIgnoreCase(criteria.getSewerageConnection().getConnectionType())) {
+					master = (Map<String, Object>) mdmsResponse.get(i);
+					break;
+				}
+			}
           Map<String, Object> billingPeriod = new HashMap<>();
 
           LocalDateTime demandEndDate = LocalDateTime.now();
@@ -336,7 +343,7 @@ public class MasterDataService {
 	public Map<String, Object> getBillingFrequencyMasterData(CalculationCriteria criteria, RequestInfo requestInfo,
 			String connectionType, String tenantId, Map<String, Object> masterMap) {
 		String jsonPath = SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
-		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
 		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
 		Object res = repository.fetchResult(url, mdmsCriteriaReq);
 		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
@@ -390,11 +397,11 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return all masters that is needed for calculation and demand generation.
 	 */
-	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId, String connectionType) {
+	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId) {
 		Map<String, Object> master = new HashMap<>();
 		master = getMasterMap(requestInfo, tenantId);
 		loadBillingSlabsAndTimeBasedExemptions(requestInfo, tenantId, master);
-		loadBillingFrequencyMasterData(requestInfo, connectionType, tenantId, master);
+		loadBillingFrequencyMasterData(requestInfo, tenantId, master);
 		return master;
 	}
 
@@ -406,10 +413,10 @@ public class MasterDataService {
 	 * @return Master For Billing Period
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String connectionType,
-			String tenantId, Map<String, Object> masterMap) {
+	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId, Map<String, Object> masterMap) {
+     
 		String jsonPath = SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
-		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, connectionType, tenantId);
+		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
 		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
 		Object res = repository.fetchResult(url, mdmsCriteriaReq);
 		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
@@ -420,3 +427,4 @@ public class MasterDataService {
 		return masterMap;
 	}
 }
+

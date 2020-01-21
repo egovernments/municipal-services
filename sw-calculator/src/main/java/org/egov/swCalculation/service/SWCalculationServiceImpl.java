@@ -49,8 +49,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
+		
 		Map<String, Object> masterMap = mDataService.loadMasterData(request.getRequestInfo(),
-				request.getCalculationCriteria().get(0).getTenantId(), SWCalculationConstant.nonMeterdConnection);
+				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getCalculations(request, masterMap);
 		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return calculations;
