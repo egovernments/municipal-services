@@ -186,18 +186,11 @@ public class WSCalculatorQueryBuilder {
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" ws.connectiontype = ? ");
 		preparedStatement.add(connectionType);
-
 		// add tenantid
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
-		
-		
-		
 		resultantQuery = query.toString();
-		resultantQuery = addOrderBy(resultantQuery);
-		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(resultantQuery, preparedStatement, criteria);
 		return resultantQuery;
 		
 	}
