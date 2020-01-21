@@ -300,6 +300,7 @@ public class MasterDataService {
 	public Map<String, Object> enrichBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
 			Map<String, Object> masterMap) {
 		  log.info("Billing Frequency Map" + mdmsResponse.toString());
+
           Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
           Map<String, Object> billingPeriod = new HashMap<>();
 
@@ -318,6 +319,7 @@ public class MasterDataService {
           masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
           return masterMap;
 	}
+
 	
 	public LocalDateTime setCurrentDateValueToStartingOfDay(LocalDateTime localDateTime) {
 		return localDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
