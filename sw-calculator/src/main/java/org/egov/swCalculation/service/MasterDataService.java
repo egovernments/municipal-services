@@ -388,11 +388,11 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return all masters that is needed for calculation and demand generation.
 	 */
-	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId) {
+	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId, String connectionType) {
 		Map<String, Object> master = new HashMap<>();
 		master = getMasterMap(requestInfo, tenantId);
 		loadBillingSlabsAndTimeBasedExemptions(requestInfo, tenantId, master);
-		loadBillingFrequencyMasterData(requestInfo, SWCalculationConstant.nonMeterdConnection, tenantId, master);
+		loadBillingFrequencyMasterData(requestInfo, connectionType, tenantId, master);
 		return master;
 	}
 

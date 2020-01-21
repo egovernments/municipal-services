@@ -79,6 +79,9 @@ public class SWCalculationConfiguration {
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
     
+    @Value("${notification.sms.link}")
+    private String smsNotificationLink;
+    
     
     //Email
     @Value("${notification.mail.enabled}")
