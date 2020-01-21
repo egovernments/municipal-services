@@ -204,12 +204,16 @@ public class WSCalculationConstant {
 
 	public static final String DEMAND_FAILURE_MESSAGE_EMAIL = "WATER_CONNECTION_DEMAND_FAILURE_EMAIL_MESSAGE";
 
-	public static final String WATER_CONNECTION_BILL_GENERATION_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_MESSAGE";
+	public static final String WATER_CONNECTION_BILL_GENERATION_SMS_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_SMS_MESSAGE";
+	
+	public static final String WATER_CONNECTION_BILL_GENERATION_APP_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_APP_MESSAGE";
 	
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	
 	public static final String  USREVENTS_EVENT_NAME = "WATER BILL GENERATION";
 	
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
+	
+	public static final String  Billing_Period_Master = "Billing_Period_Master";
 
 }

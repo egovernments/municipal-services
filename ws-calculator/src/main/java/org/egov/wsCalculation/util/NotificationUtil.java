@@ -99,7 +99,7 @@ public class NotificationUtil {
 		return message;
 	}
 	
-	public String getCustomizedMsg(String topic, String localizationMessage) {
+	public String getCustomizedMsgForSMS(String topic, String localizationMessage) {
 		String messageString = null;
 		if (topic.equalsIgnoreCase(config.getOnDemandsSaved())) {
 			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_SUCCESS_MESSAGE_SMS, localizationMessage);
@@ -108,7 +108,16 @@ public class NotificationUtil {
 			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE_SMS, localizationMessage);
 		}
 		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
-			messageString = getMessageTemplate(WSCalculationConstant.WATER_CONNECTION_BILL_GENERATION_MESSAGE,
+			messageString = getMessageTemplate(WSCalculationConstant.WATER_CONNECTION_BILL_GENERATION_SMS_MESSAGE,
+					localizationMessage);
+		}
+		return messageString;
+	}
+	
+	public String getCustomizedMsgForInApp(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
+			messageString = getMessageTemplate(WSCalculationConstant.WATER_CONNECTION_BILL_GENERATION_APP_MESSAGE,
 					localizationMessage);
 		}
 		return messageString;

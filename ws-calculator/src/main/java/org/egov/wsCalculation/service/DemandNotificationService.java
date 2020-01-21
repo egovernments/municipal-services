@@ -59,7 +59,7 @@ public class DemandNotificationService {
 	private void enrichSMSRequest(DemandNotificationObj notificationObj, List<SMSRequest> smsRequest, String topic) {
 		String tenantId = notificationObj.getTenantId();
 		String loclizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
-		String messageTemplate = util.getCustomizedMsg(topic, loclizationMessage);
+		String messageTemplate = util.getCustomizedMsgForSMS(topic, loclizationMessage);
 		List<NotificationReceiver> receiverList = new ArrayList<>();
 		enrichNotificationReceivers(receiverList, notificationObj);
 		receiverList.forEach(receiver -> {

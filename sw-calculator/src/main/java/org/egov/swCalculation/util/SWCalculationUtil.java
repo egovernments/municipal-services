@@ -265,8 +265,34 @@ public class SWCalculationUtil {
 		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
 			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
 		}
+		return messageString;
+	}
+	
+	public String getCustomizedMsgForSMS(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_SUCCESS_MESSAGE, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
+		}
 		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
-			messageString = getMessageTemplate(SWCalculationConstant.SEWERAGE_CONNECTION_BILL_GENERATION_MESSAGE,
+			messageString = getMessageTemplate(SWCalculationConstant.SEWERAGE_CONNECTION_BILL_GENERATION_SMS_MESSAGE,
+					localizationMessage);
+		}
+		return messageString;
+	}
+	
+	public String getCustomizedMsgForInApp(String topic, String localizationMessage) {
+		String messageString = null;
+		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_SUCCESS_MESSAGE, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
+			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE, localizationMessage);
+		}
+		if (topic.equalsIgnoreCase(config.getPayTriggers())) {
+			messageString = getMessageTemplate(SWCalculationConstant.SEWERAGE_CONNECTION_BILL_GENERATION_APP_MESSAGE,
 					localizationMessage);
 		}
 		return messageString;

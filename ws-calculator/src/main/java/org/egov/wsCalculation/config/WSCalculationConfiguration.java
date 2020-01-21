@@ -122,6 +122,9 @@ public class WSCalculationConfiguration {
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
     
+    @Value("${notification.sms.link}")
+    private String smsNotificationLink;
+    
     @Value("${notification.email.enabled}")
     private Boolean isEmailEnabled;
     
@@ -166,6 +169,15 @@ public class WSCalculationConfiguration {
 	
 	@Value("${egov.watercalculatorservice.createdemand}")
 	private String createDemand;
+	
+    @Value("${ws.demand.based.batch.size}")
+    private Integer batchSize;
+    
+    @Value("${persister.demand.based.dead.letter.topic.batch}")
+    private String deadLetterTopicBatch;
+
+    @Value("${persister.demand.based.dead.letter.topic.single}")
+    private String deadLetterTopicSingle;
 
 
 }

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.NotificationUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,7 +92,7 @@ public class PaymentNotificationService {
 					}
 					EventRequest eventRequest = getEventRequest(mappedRecord, waterConnection, topic, requestInfo);
 					if (eventRequest != null) {
-						log.info("In App Notification :: -> "+ mapper.writeValueAsString(eventRequest));
+						log.info("In App Notification :: -> " + mapper.writeValueAsString(eventRequest));
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 				}
@@ -107,7 +109,7 @@ public class PaymentNotificationService {
 					List<SMSRequest> smsRequests = new LinkedList<>();
 					smsRequests = getSmsRequest(mappedRecord, waterConnection, topic, requestInfo);
 					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification :: -> "+ mapper.writeValueAsString(smsRequests));
+						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
 				}
@@ -131,7 +133,7 @@ public class PaymentNotificationService {
 			RequestInfo requestInfo) {
 		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
-		String message = notificationUtil.getCustomizedMsg(topic, localizationMessage);
+		String message = notificationUtil.getCustomizedMsgForInApp(topic, localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -196,7 +198,7 @@ public class PaymentNotificationService {
 			RequestInfo requestInfo) {
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
-		String message = notificationUtil.getCustomizedMsg(topic, localizationMessage);
+		String message = notificationUtil.getCustomizedMsgForSMS(topic, localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -209,6 +211,13 @@ public class PaymentNotificationService {
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
+			if (messg.contains("<Link to Bill>")) {
+				String actionLink = config.getSmsNotificationLink()
+						.replace("$consumerCode", waterConnection.getConnectionNo())
+						.replace("$tenantId", waterConnection.getProperty().getTenantId());
+				actionLink = config.getUiAppHost() + actionLink;
+				messg = messg.replace("<Link to Bill>", actionLink);
+			}
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);
 		});
@@ -234,6 +243,7 @@ public class PaymentNotificationService {
 		return messagetoreturn;
 	}
 	
+	
 	/**
 	 * 
 	 * @param context
@@ -247,8 +257,7 @@ public class PaymentNotificationService {
 			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
 			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
-			Date expiryDate = new Date((Long)context.read("$.Bill[0].billDetails[0].expiryDate"));
-			mappedRecord.put(dueDate, formatter.format(expiryDate));
+			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 	            throw new CustomException("Bill Fetch Error","Unable to fetch values from bill");
@@ -257,6 +266,19 @@ public class PaymentNotificationService {
 		return mappedRecord;
 	}
 	
+	private String getLatestBillDetails(String billdetails) {
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		log.info("Bill Details : -> " + billdetails);
+		JSONArray jsonArray = new JSONArray(billdetails);
+		ArrayList<Long> billDates = new ArrayList<>();
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObj = jsonArray.getJSONObject(i);
+			billDates.add((Long) jsonObj.get("expiryDate"));
+		}
+		Collections.sort(billDates, Collections.reverseOrder());
+		
+		return formatter.format(billDates.get(0));
+	}
 	/**
      * Fetches UUIDs of CITIZENs based on the phone number.
      * 
