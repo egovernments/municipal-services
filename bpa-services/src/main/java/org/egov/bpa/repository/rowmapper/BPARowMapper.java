@@ -128,21 +128,20 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
             bpa.setAdditionalDetails(additionalDetail);
 		}
 
-		ArrayList<String> unitIds = new ArrayList<String>();
+		
 		String unitId = rs.getString("bpa_un_id");
-		if (unitId != null && !unitIds.contains(unitId)) {
+		if (unitId != null ) {
 			Unit unit = Unit.builder().id(rs.getString("bpa_un_id"))
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
-			unitIds.add(unitId);
 		}
 
 		
 
 		
-		ArrayList<String> ownerIds = new ArrayList<String>();
+		
 		String ownerId = rs.getString("bpaowner_uuid");
-		if (ownerId != null && !ownerIds.contains(ownerId)) {
+		if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
 			Double ownerShipPercentage = (Double) rs
 					.getObject("ownershippercentage");
@@ -157,14 +156,13 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 									.getString("relationship")))
 					.institutionId(rs.getString("institutionid")).build();
 			bpa.addOwnersItem(owner);
-			ownerIds.add(ownerId);
 		}
 		
 		// Add owner document to the specific bpa for which it was used
 		String docowner = rs.getString("docuserid");
 		String ownerDocId = rs.getString("ownerdocid");
-		ArrayList<String> ownerDocIds = new ArrayList<String>();
-		if ( ownerDocId != null && !ownerDocIds.contains(ownerDocId)) {
+		
+		if ( ownerDocId != null) {
 			
 			bpa.getOwners().forEach(ownerInfo -> {
 				if (docowner.equalsIgnoreCase(ownerInfo.getUuid())) {
@@ -185,15 +183,14 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			});
 		}
 
-		ArrayList<String> docIds = new ArrayList<String>();
+		
 		String documentId = rs.getString("bpa_doc_id");
-		if (documentId != null && !docIds.contains(documentId)) {
+		if (documentId != null ) {
 			Document document = Document.builder()
 					.documentType(rs.getString("bpa_doc_documenttype"))
 					.fileStoreId(rs.getString("bpa_doc_filestore"))
 					.id(documentId).build();
 			bpa.addDocumentsItem(document);
-			docIds.add(documentId);
 		}
 
 	}

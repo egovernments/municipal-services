@@ -17,6 +17,7 @@ import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -26,6 +27,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OwnerInfo extends User{
+	
+	@JsonIgnore
+	private ArrayList<String> docIds = new ArrayList<String>();
 	
 	@JsonProperty("isPrimaryOwner")
 	private boolean isPrimaryOwner;
@@ -110,8 +114,10 @@ public class OwnerInfo extends User{
             if (this.documents == null) {
                     this.documents = new ArrayList<>();
             }
-            if(!this.documents.contains(documentsItem))
-                    this.documents.add(documentsItem);
+            if(!this.docIds.contains(documentsItem.getId())){
+    			this.documents.add(documentsItem);
+    			this.docIds.add(documentsItem.getId());
+    		}
             return this;
     }
 

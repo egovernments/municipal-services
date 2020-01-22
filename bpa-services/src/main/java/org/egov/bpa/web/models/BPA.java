@@ -11,6 +11,7 @@ import org.egov.bpa.web.models.OwnerInfo.RelationshipEnum;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -32,6 +33,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Builder
 public class BPA {
 
+	@JsonIgnore
+	private ArrayList<String> docIds ;
+	@JsonIgnore
+	private ArrayList<String> unitIds;
+	@JsonIgnore
+	private ArrayList<String> ownerIds;
+	
 	@Size(max = 64)
 	@JsonProperty("id")
 	private String id;
@@ -175,16 +183,29 @@ public class BPA {
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
 			this.owners = new ArrayList<>();
-		if (!this.owners.contains(ownersItem))
+		
+		if(this.ownerIds == null){
+			this.ownerIds = new ArrayList<String>();
+		}
+		if(!this.ownerIds.contains(ownersItem.getUuid())){
 			this.owners.add(ownersItem);
+			this.ownerIds.add(ownersItem.getUuid());
+		}
+		
 		return this;
 	}
 
 	public BPA addUnitsItem(Unit unitsItem) {
 		if (this.units == null)
 			this.units = new ArrayList<>();
-		if (!this.units.contains(unitsItem))
+		
+		if(this.unitIds == null){
+			this.unitIds = new ArrayList<String>();
+		}
+		if(!this.unitIds.contains(unitsItem.getId())){
 			this.units.add(unitsItem);
+			this.unitIds.add(unitsItem.getId());
+		}
 		return this;
 	}
 
@@ -192,8 +213,15 @@ public class BPA {
 		if (this.documents == null) {
 			this.documents = new ArrayList<>();
 		}
-		if (!this.documents.contains(documentsItem))
+		if(this.docIds == null){
+			this.docIds = new ArrayList<String>();
+		}
+		
+		if(!this.docIds.contains(documentsItem.getId())){
 			this.documents.add(documentsItem);
+			this.docIds.add(documentsItem.getId());
+		}
+			
 		return this;
 	}
 /*
