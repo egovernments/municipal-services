@@ -99,7 +99,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.registrationDetails(rs.getString("registrationDetails"))
 						.remarks(rs.getString("remarks"))
 						.address(address)
-						.id(id).build();
+						.id(id)
+						.validityDate(rs.getLong("validityDate")).build();
 
 				buildingMap.put(id, currentbpa);
 			}
