@@ -34,7 +34,12 @@ public class MDMSValidator {
 	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE,BPAConstants.SUB_OCCUPANCY_TYPE,BPAConstants.USAGES};
 
 	        validateIfMasterPresent(masterArray, masterData);
-
+		
+		bpaRequest.getBPA().getOwners().forEach(owner -> {
+			if (owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
 	            if(!masterData.get(BPAConstants.OWNERSHIP_CATEGORY)
 	                    .contains(bpaRequest.getBPA().getOwnershipCategory()))
 	                errorMap.put("INVALID OWNERSHIPCATEGORY", "The OwnerShipCategory '"

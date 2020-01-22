@@ -185,6 +185,12 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR",
 					"Application Not found in the System" + bpa);
 		}
+		
+		bpa.getOwners().forEach(owner -> {
+			if(owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
 		BusinessService businessService = workflowService.getBusinessService(
 				bpa.getTenantId(), bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
