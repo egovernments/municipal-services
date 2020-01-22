@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,6 @@ import org.egov.bpa.web.models.Boundary;
 import org.egov.bpa.web.models.Document;
 import org.egov.bpa.web.models.GeoLocation;
 import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.Status;
 import org.egov.bpa.web.models.Unit;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +35,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 	public List<BPA> extractData(ResultSet rs) throws SQLException,
 			DataAccessException {
 
-		Map<String, BPA> buildingMap = new HashMap<>();
+		Map<String, BPA> buildingMap = new LinkedHashMap<String, BPA>();
 
 		while (rs.next()) {
 			String id = rs.getString("bpa_id");
