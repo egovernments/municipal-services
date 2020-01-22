@@ -20,6 +20,7 @@ import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.Slab;
 import org.egov.swCalculation.model.TaxHeadEstimate;
 import org.egov.swCalculation.util.CalculatorUtils;
+import org.egov.swCalculation.util.SewerageCessUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,18 +34,12 @@ import net.minidev.json.JSONArray;
 @Slf4j
 public class EstimationService {
 	
-	@Autowired
-	MasterDataService mDataService;
 	
 	@Autowired
-	CalculatorUtils calculatorUtil;
+	private CalculatorUtils calculatorUtil;
 	
 	@Autowired
-	PayService payService;
-	
-	@Autowired
-	SWCalculationService swCalculationService;
-
+	private SewerageCessUtil sewerageCessUtil;
 	
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head
@@ -102,16 +97,18 @@ public class EstimationService {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		String assesmentYear = SWCalculationConstant.Assesment_Year;
 		// sewerage_charge
-		
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_CHARGE)
+				.estimateAmount(sewarageCharge.setScale(2, 2)).build());
+	
+		//sewerage cess
 		if (timeBasedExemeptionMasterMap.get(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER) != null) {
 			List<Object> sewerageCessMasterList = timeBasedExemeptionMasterMap
 					.get(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER);
-			
-			
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_CHARGE)
-					.estimateAmount(sewarageCharge.setScale(2, 2)).build());
+			BigDecimal sewerageCess = BigDecimal.ZERO;
+			sewerageCess = sewerageCessUtil.getSewerageCess(sewarageCharge, assesmentYear, sewerageCessMasterList);
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_WATER_CESS)
+					.estimateAmount(sewerageCess).build());
 		}
-		
 		
 //		 get applicable rebate and penalty
 //		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
@@ -214,6 +211,7 @@ public class EstimationService {
 	 * @param requestInfoWrapper
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal sewarageCharge,
 			SewerageConnection sewerageConnection, Map<String, JSONArray> timeBasedExemeptionMasterMap,
 			RequestInfoWrapper requestInfoWrapper) {
