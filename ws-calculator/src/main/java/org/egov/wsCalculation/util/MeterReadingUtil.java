@@ -29,7 +29,7 @@ public class MeterReadingUtil {
 	private ServiceRequestRepository serviceRequestRepository;
 	
 	@Autowired
-	WSCalculationConfiguration config;
+	private WSCalculationConfiguration config;
 
 
 	@Autowired

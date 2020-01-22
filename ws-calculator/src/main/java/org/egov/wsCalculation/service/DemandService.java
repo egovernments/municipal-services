@@ -79,21 +79,18 @@ public class DemandService {
 
 	@Autowired
 	private DemandRepository demandRepository;
-	
-    @Autowired
-    WSCalculationService wsCalculationService;
     
     @Autowired
-    WSCalculationDao waterCalculatorDao;
+    private  WSCalculationDao waterCalculatorDao;
     
     @Autowired
-    CalculatorUtil calculatorUtils;
+    private CalculatorUtil calculatorUtils;
     
     @Autowired
-    EstimationService estimationService;
+    private EstimationService estimationService;
     
     @Autowired
-    WSCalculationProducer wsCalculationProducer;
+    private WSCalculationProducer wsCalculationProducer;
 
 
 	/**
