@@ -39,20 +39,10 @@ import net.minidev.json.JSONArray;
 public class EstimationService {
 
 	@Autowired
-	MasterDataService mDataService;
+	private WaterCessUtil waterCessUtil;
 	
 	@Autowired
-	WaterCessUtil waterCessUtil;
-	
-	@Autowired
-	PayService payService;
-	
-	@Autowired
-	WSCalculationService wSCalculationService;
-	
-	@Autowired
-	CalculatorUtil calculatorUtil;
-	
+	private CalculatorUtil calculatorUtil;
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head

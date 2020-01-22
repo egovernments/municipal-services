@@ -31,16 +31,16 @@ import net.minidev.json.JSONArray;
 public class DemandNotificationService {
 
 	@Autowired
-	NotificationUtil util;
+	private NotificationUtil util;
 
 	@Autowired
-	ObjectMapper mapper;
+	private ObjectMapper mapper;
 
 	@Autowired
-	MasterDataService masterDataService;
+	private MasterDataService masterDataService;
 
 	@Autowired
-	WSCalculationConfiguration config;
+	private WSCalculationConfiguration config;
 
 	public void process(DemandNotificationObj noiticationObj, String topic) {
 		if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {

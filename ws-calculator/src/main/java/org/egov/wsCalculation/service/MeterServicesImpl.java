@@ -21,22 +21,16 @@ import org.springframework.stereotype.Component;
 public class MeterServicesImpl implements MeterService {
 
 	@Autowired
-	MeterReadingUtil meterReadingUtil;
+	private WSCalculationDao wSCalculationDao;
 
 	@Autowired
-	WSCalculationDao wSCalculationDao;
-
-	@Autowired
-	MDMSValidator mDMSValidator;
-
-	@Autowired
-	WSCalculationValidator wsCalculationValidator;
+	private WSCalculationValidator wsCalculationValidator;
 	
 	@Autowired
-	WSCalculationService wSCalculationService;
+	private WSCalculationService wSCalculationService;
 	
 	@Autowired
-	EstimationService estimationService;
+	private EstimationService estimationService;
 
 
 	private EnrichmentService enrichmentService;

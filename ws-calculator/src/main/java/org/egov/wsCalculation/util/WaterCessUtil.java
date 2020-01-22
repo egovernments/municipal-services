@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WaterCessUtil {
 
 	@Autowired
-	MasterDataService mDataService;
+	private MasterDataService mDataService;
 
 	public BigDecimal getWaterCess(BigDecimal waterCharge, String assessmentYear, List<Object> masterList) {
 		BigDecimal waterCess = BigDecimal.ZERO;
