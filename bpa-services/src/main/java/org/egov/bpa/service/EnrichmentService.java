@@ -272,14 +272,13 @@ public class EnrichmentService {
 	public List<BPA> enrichBPASearch(List<BPA> bpas, BPASearchCriteria criteria,
 			RequestInfo requestInfo) {
 
-		BPASearchCriteria searchCriteria = enrichBPASearchCriteriaWithOwnerids(
-				criteria, bpas);
 		List<BPARequest> bprs = new ArrayList<BPARequest>();
 		bpas.forEach(bpa -> {
 			bprs.add(new BPARequest( requestInfo,bpa));
 		});
-		
-		 enrichBoundary(bprs); // some
+		if(criteria.getLimit() == null || !criteria.getLimit().equals(-1)){			
+			enrichBoundary(bprs); 
+		}
 	
 		UserDetailResponse userDetailResponse  = userService.getUsersForBpas(bpas);
 		enrichOwner(userDetailResponse, bpas); // completed
