@@ -234,6 +234,8 @@ public class BPAConfiguration {
 	@Value("${egov.collection.service.search.endpoint}")
 	private String collectionServiceSearchEndPoint;
 	
+	@Value("${egov.bpa.validity.date.in.months}")
+	private Integer validityInMonths;
 
 
 }

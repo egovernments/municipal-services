@@ -179,6 +179,8 @@ public class BPA {
 	@JsonProperty("wfDocuments")
 	private List<Document> wfDocuments;
 	
+	@JsonProperty("validityDate")
+	private Long validityDate;	
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
