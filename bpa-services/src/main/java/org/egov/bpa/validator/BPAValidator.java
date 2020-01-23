@@ -117,7 +117,6 @@ public class BPAValidator {
 					addedDocTypes.add(documentNs);
 				});
 				requiredDocTypes.forEach(docType -> {
-					System.out.println(docType);
 					String docType1 = docType.toString();
 					if (!addedDocTypes.contains(docType1)) {
 						throw new CustomException("Mandatory Documents missing ERROR",

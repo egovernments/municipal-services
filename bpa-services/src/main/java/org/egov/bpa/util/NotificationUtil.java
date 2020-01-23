@@ -165,7 +165,6 @@ public class NotificationUtil {
 		try {
 			LinkedList data  = JsonPath.parse(localizationMessage).read(path);
 			message = data.get(0).toString();
-			System.out.println(data);
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
 		}
@@ -223,7 +222,6 @@ public class NotificationUtil {
 		builder.append(bpa.getApplicationNo());
 		builder.append("&businessService=");
 		builder.append(code);
-		System.out.println( "PAyment checking url: "+ builder);
 		return builder;
 	}
 
@@ -251,7 +249,6 @@ public class NotificationUtil {
 				.append("locale=").append(locale).append("&tenantId=")
 				.append(tenantId).append("&module=")
 				.append(BPAConstants.SEARCH_MODULE);
-		System.out.println("REquired Uri to test is: " + uri);
 		return uri;
 	}
 
@@ -270,7 +267,6 @@ public class NotificationUtil {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
 				.fetchResult(getUri(tenantId, requestInfo), requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
-		System.out.println("message we are waiting for is: " + jsonString);
 		return jsonString;
 		// return "User creation is successfull";
 	}

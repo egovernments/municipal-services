@@ -150,7 +150,6 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(limit + offset);
 		}
 
-		System.out.println("========>>>>> "+finalQuery);
 		return finalQuery;
 
 	}

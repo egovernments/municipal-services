@@ -148,7 +148,6 @@ public class BPAUtil {
 
 	        MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria)
 	                .requestInfo(requestInfo).build();
-	        System.out.println("checkingdaajhasdfb" + mdmsCriteriaReq);
 	        return mdmsCriteriaReq;
 	    }
 

@@ -109,7 +109,6 @@ public class MDMSValidator {
         modulepaths.forEach( modulepath -> {
             try {
                 mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-                System.out.println(mdmsResMap);
             } catch (Exception e) {
                 log.error("Error while fetvhing MDMS data", e);
                 throw new CustomException(BPAConstants.INVALID_TENANT_ID_MDMS_KEY, BPAConstants.INVALID_TENANT_ID_MDMS_MSG);
