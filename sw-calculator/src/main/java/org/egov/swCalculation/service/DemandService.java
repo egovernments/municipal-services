@@ -721,7 +721,7 @@ public class DemandService {
 				HashMap<String, Object> calculationRes = new HashMap<>();
 				calculationRes.put("masterData", masterMap);
 				calculationRes.put("calculationReq", calculationReq);
-				producer.push(configs.getCreateDemand(), calculationRes);
+				producer.push(configs.getCreateDemand(), calculationReq);
 			}
 		}
 		
