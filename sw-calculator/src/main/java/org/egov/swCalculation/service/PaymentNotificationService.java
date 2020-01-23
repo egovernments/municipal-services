@@ -147,7 +147,7 @@ public class PaymentNotificationService {
 				String actionLink = config.getSmsNotificationLink()
 						.replace("$consumerCode", sewerageConnection.getConnectionNo())
 						.replace("$tenantId", sewerageConnection.getProperty().getTenantId());
-				actionLink = config.getUiAppHost() + actionLink;
+				actionLink = config.getNotificationUrl() + actionLink;
 				messg = messg.replace("<Link to Bill>", actionLink);
 			}
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
@@ -231,7 +231,7 @@ public class PaymentNotificationService {
 			String actionLink = config.getPayLink().replace("$mobile", mobile)
 					.replace("$consumerCode", sewerageConnection.getConnectionNo())
 					.replace("$tenantId", sewerageConnection.getProperty().getTenantId());
-			actionLink = config.getUiAppHost() + actionLink;
+			actionLink = config.getNotificationUrl()+ actionLink;
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 			items.add(item);
 			action = Action.builder().actionUrls(items).build();

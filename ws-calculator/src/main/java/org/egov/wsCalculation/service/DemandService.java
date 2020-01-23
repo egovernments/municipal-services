@@ -721,13 +721,7 @@ public class DemandService {
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
 						.requestInfo(requestInfo).build();
-				Map<String, Object> masterMap= new HashMap<>();
-				masterMap= null;
-				HashMap<String, Object> calculationRes = new HashMap<>();
-				calculationRes.put("masterData", masterMap);
-				calculationRes.put("calculationReq", calculationReq);
-				
-				wsCalculationProducer.push(configs.getCreateDemand(), calculationRes);
+				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 			//	log.info("Prepared Statement" + calculationRes.toString());
 				
 			

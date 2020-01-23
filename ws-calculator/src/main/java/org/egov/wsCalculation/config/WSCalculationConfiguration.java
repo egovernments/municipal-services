@@ -178,6 +178,10 @@ public class WSCalculationConfiguration {
 
     @Value("${persister.demand.based.dead.letter.topic.single}")
     private String deadLetterTopicSingle;
-
+    
+    
+    @Value("${notification.url}")
+    private String notificationUrl;
+    
 
 }
