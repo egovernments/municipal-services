@@ -254,15 +254,16 @@ public class EnrichmentService {
 				bpa.getTenantId(), bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 		
-		int vailidityInMonths = config.getValidityInMonths();
-		Calendar calendar = Calendar.getInstance();
-
-		// Adding 5years (60 months) to Current Date
-		calendar.add(Calendar.MONTH, vailidityInMonths);
-		bpa.setValidityDate(calendar.getTimeInMillis());
+		
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
 		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
+			int vailidityInMonths = config.getValidityInMonths();
+			Calendar calendar = Calendar.getInstance();
+
+			// Adding 5years (60 months) to Current Date
+			calendar.add(Calendar.MONTH, vailidityInMonths);
+			bpa.setValidityDate(calendar.getTimeInMillis());
 			List<IdResponse> idResponses =  idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(), config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setPermitOrderNo(idResponses.get(0).getId());
 		}
