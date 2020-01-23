@@ -29,13 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 public class NotificationUtil {
 
 	@Autowired
-	WSCalculationConfiguration config;
+	private WSCalculationConfiguration config;
 	
 	@Autowired
-	ServiceRequestRepository serviceRequestRepository;
+	private ServiceRequestRepository serviceRequestRepository;
 	
 	@Autowired
-	WSCalculationProducer producer;
+	private WSCalculationProducer producer;
 
 	/**
 	 * Returns the uri for the localization call

@@ -24,10 +24,10 @@ import net.minidev.json.JSONArray;
 public class PayService {
 
 	@Autowired
-	MasterDataService mDService;
+	private MasterDataService mDService;
 	
 	@Autowired
-	EstimationService estimationService;
+	private EstimationService estimationService;
 
 	/**
 	 * Decimal is ceiled for all the tax heads

@@ -42,35 +42,25 @@ import org.egov.wsCalculation.model.Calculation;
 public class WSCalculationServiceImpl implements WSCalculationService {
 
 	@Autowired
-	WSCalculationValidator wSCalculationValidator;
-
-	@Autowired
 	private PayService payService;
 
 	@Autowired
-	EstimationService estimationService;
+	private EstimationService estimationService;
 	
 	@Autowired
-	CalculatorUtil calculatorUtil;
+	private CalculatorUtil calculatorUtil;
 	
 	@Autowired
-	DemandService demandService;
+	private DemandService demandService;
 	
 	@Autowired
-    MasterDataService masterDataService; 
+	private MasterDataService masterDataService; 
 
 	@Autowired
-	WSCalculationDao wSCalculationDao;
+	private WSCalculationDao wSCalculationDao;
 	
 	@Autowired
 	private ServiceRequestRepository repository;
-	
-	@Autowired
-	WSCalculationProducer wSCalculationProducer;
-     
-	@Autowired
-	WSCalculationConfiguration config;
-
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge

@@ -64,10 +64,10 @@ public class MasterDataService {
 	private WSCalculationConfiguration config;
 
 	@Autowired
-	CalculatorUtil calculatorUtils;
+	private CalculatorUtil calculatorUtils;
 	
 	@Autowired
-	EstimationService estimationService;
+	private EstimationService estimationService;
 
 	/**
 	 * Fetches and creates map of all required masters
