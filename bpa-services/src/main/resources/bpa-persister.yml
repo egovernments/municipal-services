@@ -483,7 +483,7 @@ serviceMaps:
            
            - jsonPath: $.BPA.permitOrderNo
            
-           - jsonPath: $.BPA.id
-           
            - jsonPath: $.BPA.validityDate
+           
+           - jsonPath: $.BPA.id
 
