@@ -106,8 +106,8 @@ public class EnrichmentService {
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
 
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
-				config.getWaterConnectionIdGenFormat(), 1);
+		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterApplicationIdGenName(),
+				config.getWaterApplicationIdGenFormat(), 1);
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		Map<String, String> errorMap = new HashMap<>();
@@ -118,7 +118,7 @@ public class EnrichmentService {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		waterConnection.setConnectionNo(itr.next());
+		waterConnection.setApplicationNo(itr.next());
 
 	}
 

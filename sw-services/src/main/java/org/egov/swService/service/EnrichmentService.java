@@ -109,8 +109,8 @@ public class EnrichmentService {
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		SewerageConnection sewerageConnection = request.getSewerageConnection();
 
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getSewerageIdGenName(),
-				config.getSewerageIdGenFormat(), 1);
+		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getSewerageApplicationIdGenName(),
+				config.getSewerageApplicationIdGenFormat(), 1);
 		ListIterator<String> itr = applicationNumbers.listIterator();
 
 		Map<String, String> errorMap = new HashMap<>();
@@ -121,7 +121,7 @@ public class EnrichmentService {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		sewerageConnection.setConnectionNo(itr.next());
+		sewerageConnection.setApplicationNo(itr.next());
 	}
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
