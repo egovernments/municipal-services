@@ -88,24 +88,18 @@ public class PaymentNotificationService {
 				List<Map<String, String>> valMaps = new LinkedList<>();
 
 				if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())) {
-					log.info("Payment Topic....");
 					valMaps.addAll(getValuesFromPayment(record));
-					log.info("PaymentvalMap: "+valMaps);
 				}
 				else {
-					log.info("PG Topic.....");
 					valMaps.add(getValuesFromTransaction(documentContext));
-					log.info("PGvalMap: "+valMaps);
 				}
 
-				if (!CollectionUtils.isEmpty(valMaps) && null != valMaps.get(0).get("moduleId")) {
+				if (!CollectionUtils.isEmpty(valMaps) && null != valMaps.get(0).get("module")) {
 					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
 							&& !valMaps.get(0).get("module").equals(BUSINESSSERVICE_CODE)) {
-						log.info("Returning....");
 						return;
 					}
 				} else {
-					log.info("Else Returning....");
 					return;
 				}
 
@@ -118,31 +112,21 @@ public class PaymentNotificationService {
 					addUserNumber(topic, requestInfo, valMap, mobileNumbers);
 					valMap.put("financialYear", propertyAttributes.get("financialYear").get(0));
 					valMap.put("oldPropertyId", propertyAttributes.get("oldPropertyId").get(0));
-					log.info("valMap: " + valMap);
 					StringBuilder uri = util.getUri(valMap.get("tenantId"), requestInfo);
 					LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, requestInfo);
 					String messagejson = new JSONObject(responseMap).toString();
 					List<SMSRequest> smsRequests = new ArrayList<>();
 					String customMessage = null;
-					log.info("TOPIC: " + topic);
-					log.info("txnStatus: "+valMap.get("txnStatus"));
-					log.info("Condition 1: " + topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()));
-					log.info("Condition 2: " + (topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())
-							&& "FAILURE".equalsIgnoreCase(valMap.get("txnStatus"))));
-
 					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
 							|| (topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())
 									&& "FAILURE".equalsIgnoreCase(valMap.get("txnStatus")))) {
-						log.info("Inside IF");
 						String path = getJsonPath(topic, valMap);
 						Object messageObj = JsonPath.parse(messagejson).read(path);
 						String message = ((ArrayList<String>) messageObj).get(0);
 						customMessage = getCustomizedMessage(valMap, message, path);
-						log.info("customMessage: "+customMessage);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
 						log.info("smsRequests: " + smsRequests);
 					}
-					log.info("mobileNumbers: " + mobileNumbers);
 					if (valMap.get("oldPropertyId") == null
 							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
 						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
