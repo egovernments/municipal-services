@@ -75,9 +75,9 @@ public class PaymentNotificationService {
 	 */
 	public void process(HashMap<String, Object> record, String topic) {
 
-		if(null == propertyConfiguration.getIsSMSNotificationEnabled())
+		if (null == propertyConfiguration.getIsSMSNotificationEnabled())
 			propertyConfiguration.setIsSMSNotificationEnabled(true);
-		
+
 		if (propertyConfiguration.getIsSMSNotificationEnabled()) {
 
 			try {
@@ -118,17 +118,19 @@ public class PaymentNotificationService {
 					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
 							|| (topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())
 									&& "FAILURE".equalsIgnoreCase(valMap.get("txnStatus")))) {
+						log.info("Inside IF");
 						String path = getJsonPath(topic, valMap);
 						Object messageObj = JsonPath.parse(messagejson).read(path);
 						String message = ((ArrayList<String>) messageObj).get(0);
 						customMessage = getCustomizedMessage(valMap, message, path);
+						log.info("customMessage: "+customMessage);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
+						log.info("smsRequests: " + smsRequests);
 					}
-					log.info("mobileNumbers: "+mobileNumbers);
+					log.info("mobileNumbers: " + mobileNumbers);
 					if (valMap.get("oldPropertyId") == null
 							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
 						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
-					log.info("smsRequests: "+smsRequests);
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						log.info("Sending SMS.....");
 						sendSMS(smsRequests);
@@ -143,7 +145,7 @@ public class PaymentNotificationService {
 				log.error("Exception: ", e);
 				throw new CustomException("LOCALIZATION ERROR", "Unable to get message from localization");
 			}
-		}else {
+		} else {
 			log.info("SMS Notifications have been disabled.");
 		}
 	}
@@ -529,27 +531,29 @@ public class PaymentNotificationService {
 	private List<SMSRequest> getSMSRequests(List<String> mobileNumbers, String customizedMessage,
 			Map<String, String> valMap) {
 		List<SMSRequest> smsRequests = new ArrayList<>();
-		mobileNumbers.forEach(mobileNumber -> {
-			String message = customizedMessage;
-			if (null != valMap.get("amountDue")) {
-				if (Double.valueOf(valMap.get("amountDue")) > 0) {
-					String link = propertyConfiguration.getPayLink().replace("$consumerCode", valMap.get("propertyId"))
-							.replace("$tenantId", valMap.get("tenantId")).replace("$mobile", mobileNumber);
-					link = propertyConfiguration.getUiAppHost() + link;
-					link = getShortenedURL(link);
-					message = message.replace("$paylink", "You can pay your Property Tax online here - " + link);
-				} else {
-					message = message.replace("$paylink", "");
+		for (String mobileNumber : mobileNumbers) {
+			log.info("mobNo: " + mobileNumber);
+			if (!StringUtils.isEmpty(mobileNumber)) {
+				String message = customizedMessage;
+				if (null != valMap.get("amountDue")) {
+					if (Double.valueOf(valMap.get("amountDue")) > 0) {
+						String link = propertyConfiguration.getPayLink()
+								.replace("$consumerCode", valMap.get("propertyId"))
+								.replace("$tenantId", valMap.get("tenantId")).replace("$mobile", mobileNumber);
+						link = propertyConfiguration.getUiAppHost() + link;
+						link = getShortenedURL(link);
+						message = message.replace("$paylink", "You can pay your Property Tax online here - " + link);
+					} else {
+						message = message.replace("$paylink", "");
+					}
 				}
-			}
-			log.info("mobNo: "+mobileNumber);
-			if (mobileNumber != null) {
 				SMSRequest smsRequest = new SMSRequest(mobileNumber, message);
+				log.info("smsRequests: " + smsRequests);
+
 				smsRequests.add(smsRequest);
-				log.info("smsRequests: "+smsRequests);
 			}
-		});
-		
+		}
+
 		return smsRequests;
 	}
 
