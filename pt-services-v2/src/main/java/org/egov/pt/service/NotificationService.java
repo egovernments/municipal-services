@@ -328,6 +328,7 @@ public class NotificationService {
      * @param request
      */
     public void sendEventNotification(EventRequest request) {
+    	log.info("Pushing notification to user-events.....");
         producer.push(propertyConfiguration.getSaveUserEventsTopic(), request);
     }
     
