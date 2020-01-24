@@ -87,16 +87,25 @@ public class PaymentNotificationService {
 
 				List<Map<String, String>> valMaps = new LinkedList<>();
 
-				if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
+				if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())) {
+					log.info("Payment Topic....");
 					valMaps.addAll(getValuesFromPayment(record));
-				else
+					log.info("PaymentvalMap: "+valMaps);
+				}
+				else {
+					log.info("PG Topic.....");
 					valMaps.add(getValuesFromTransaction(documentContext));
+					log.info("PGvalMap: "+valMaps);
+				}
 
 				if (!CollectionUtils.isEmpty(valMaps) && null != valMaps.get(0).get("moduleId")) {
 					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
-							&& !valMaps.get(0).get("moduleId").contains("PT"))
+							&& !valMaps.get(0).get("module").equals(BUSINESSSERVICE_CODE)) {
+						log.info("Returning....");
 						return;
+					}
 				} else {
+					log.info("Else Returning....");
 					return;
 				}
 
