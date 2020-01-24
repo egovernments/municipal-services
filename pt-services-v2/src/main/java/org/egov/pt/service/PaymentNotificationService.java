@@ -115,6 +115,12 @@ public class PaymentNotificationService {
 					String messagejson = new JSONObject(responseMap).toString();
 					List<SMSRequest> smsRequests = new ArrayList<>();
 					String customMessage = null;
+					log.info("TOPIC: " + topic);
+					log.info("txnStatus: "+valMap.get("txnStatus"));
+					log.info("Condition 1: " + topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()));
+					log.info("Condition 2: " + (topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())
+							&& "FAILURE".equalsIgnoreCase(valMap.get("txnStatus"))));
+
 					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
 							|| (topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())
 									&& "FAILURE".equalsIgnoreCase(valMap.get("txnStatus")))) {
