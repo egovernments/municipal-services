@@ -32,6 +32,10 @@ public class Connection   {
    * Gets or Sets applicationStatus
    */
   public enum ApplicationStatusEnum {
+	INITIATED("Initiated"),
+	
+	APPLIED("Applied"),
+	
     REJECTED("Rejected"),
     
     APPROVED("Approved"),
@@ -39,6 +43,8 @@ public class Connection   {
     CANCELED("Canceled"),
     
     INPROGRESS("InProgress");
+	  
+	
 
     private String value;
 
@@ -117,6 +123,11 @@ public class Connection   {
 
   @JsonProperty("roadCuttingArea")
   private Float roadCuttingArea = null;
+  
+  @NotNull
+  @Size(max=64)
+  @JsonProperty("action")
+  private String action = null;
 
   public Connection id(String id) {
     this.id = id;
@@ -329,6 +340,20 @@ public class Connection   {
     this.roadCuttingArea = roadCuttingArea;
     return this;
   }
+  
+  
+	public String getAction() {
+		return action;
+	}
+
+	  public void setAction(String action) {
+	    this.action = action;
+	  }
+
+	  public Connection action(String action) {
+	    this.action = action;
+	    return this;
+	  }
 
   /**
    * Capture the road cutting area in sqft.

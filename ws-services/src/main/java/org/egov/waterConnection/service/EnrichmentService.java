@@ -1,5 +1,6 @@
 package org.egov.waterConnection.service;
 
+
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,6 +14,9 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
+import org.egov.waterConnection.constants.WCConstants;
+import org.egov.waterConnection.model.AuditDetails;
+import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -69,20 +73,20 @@ public class EnrichmentService {
 	}
 
 	/**
+	 * Enrich water connection
 	 * 
 	 * @param waterConnectionRequest
-	 * @param true
-	 *            for create and false for update
 	 */
-	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isCreate) {
+	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-		if (isCreate) {
-			waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-			waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(Instant.now().getEpochSecond() * 1000);
-			setWaterConnectionIdgenIds(waterConnectionRequest);
-		}
+		AuditDetails auditDetails = waterServicesUtil
+				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
+		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(Instant.now().getEpochSecond() * 1000);
+		setApplicationIdgenIds(waterConnectionRequest);
+		setStatusForCreate(waterConnectionRequest);
 	}
-
+	
 	/**
 	 * 
 	 * @param waterConnectionRequest
@@ -101,25 +105,21 @@ public class EnrichmentService {
 	 * @param request
 	 *            WaterConnectionRequest which is to be created
 	 */
-	private void setWaterConnectionIdgenIds(WaterConnectionRequest request) {
+	private void setApplicationIdgenIds(WaterConnectionRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
-
 		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getWaterApplicationIdGenName(),
 				config.getWaterApplicationIdGenFormat(), 1);
 		ListIterator<String> itr = applicationNumbers.listIterator();
-
 		Map<String, String> errorMap = new HashMap<>();
 		if (applicationNumbers.size() != 1) {
-			errorMap.put("IDGEN ERROR ",
+			errorMap.put("IDGEN_ERROR",
 					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
 		}
-
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 		waterConnection.setApplicationNo(itr.next());
-
 	}
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
@@ -130,5 +130,29 @@ public class EnrichmentService {
 			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
+	}
+	
+	 /**
+     * Sets status for create request
+     * @param WaterConnectionRequest The create request
+     */
+	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
+		if (waterConnectionRequest.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
+			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
+		}
+		if (waterConnectionRequest.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.ACTION_APPLY)) {
+			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
+		}
+	}
+	
+	/**
+	 * Enrich update water connection
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
+		AuditDetails auditDetails = waterServicesUtil
+				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 	}
 }

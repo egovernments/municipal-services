@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.WaterDao;
-import org.egov.waterConnection.util.WCConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -33,14 +33,10 @@ public class WaterConnectionValidator {
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (isUpdate && (waterConnection.getConnectionNo() == null || waterConnection.getConnectionNo().isEmpty())) {
-			errorMap.put("INVALID WATER CONNECTION NUMBER", "WaterConnection cannot be update without connection no");
-		}
-		
 		if (waterConnection.getProperty().getUsageCategory() == null || waterConnection.getProperty().getUsageCategory().isEmpty()) {
 			errorMap.put("INVALID WATER CONNECTION PROPERTY USAGE TYPE", "WaterConnection cannot be created without property usage type");
 		}
-		if (waterConnection.getConnectionType() == WCConstants.METER_STATUS) {
+		if (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION) {
 			if (waterConnection.getMeterId() == null) {
 				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");
 			}
@@ -50,15 +46,12 @@ public class WaterConnectionValidator {
 			}
 		}
 			
-	 
-	
-
-		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
-			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
-			if (n == 0) {
-				errorMap.put("INVALID WATER CONNECTION NUMBER", "Water Id not present");
-			}
-		}
+//		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
+//			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
+//			if (n == 0) {
+//				errorMap.put("INVALID WATER CONNECTION NUMBER", "Water Id not present");
+//			}
+//		}
 		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
 			errorMap.put("INVALID WATER CONNECTION TYPE", "WaterConnection cannot be created  without connection type");
 		}
