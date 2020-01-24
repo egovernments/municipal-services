@@ -17,6 +17,7 @@ import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.AuditDetails;
 import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
+import org.egov.waterConnection.model.Connection.StatusEnum;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -83,6 +84,7 @@ public class EnrichmentService {
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
 		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(Instant.now().getEpochSecond() * 1000);
+		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
 	}
