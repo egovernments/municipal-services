@@ -46,8 +46,8 @@ public class EstimationService {
 	@Autowired
 	private PayService payService;
 
-	@Autowired
-	private ReceiptService rcptService;
+	/*@Autowired
+	private ReceiptService rcptService;*/
 
 	@Autowired
 	private Configurations configs;
@@ -321,7 +321,7 @@ public class EstimationService {
 
 	 * @param propertyBasedExemptionMasterMap property masters which contains exemption values associated with them
 	 * @param timeBasedExemeptionMasterMap masters with period based exemption values
-	 * @param build
+	 * @param masterMap
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(RequestInfo requestInfo,BigDecimal taxAmt, BigDecimal usageExemption, Property property,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
@@ -333,7 +333,7 @@ public class EstimationService {
 		BigDecimal payableTax = taxAmt;
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 
-		PropertyDetail detail = property.getPropertyDetails().get(0);
+		//PropertyDetail detail = property.getPropertyDetails().get(0);
 		String assessmentYear = detail.getFinancialYear();
 		// taxes
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TAX).estimateAmount(taxAmt.setScale(2, 2)).build());
@@ -741,6 +741,8 @@ public class EstimationService {
 	
 	private BigDecimal getFeeFromSlabs(MutationCalculationCriteria criteria, Calculation calculation) {
 		List<String> slabIds = new ArrayList<>();
+		Property proerty;
+		
 		calculation.setBillingSlabIds(slabIds); 
 		return null;
 	}

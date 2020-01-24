@@ -1,5 +1,6 @@
 package org.egov.pt.calculator.util;
 
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,6 +19,12 @@ public class Configurations {
 	
 	@Value("${kafka.topics.billing-slab.update.service}")
 	public String billingSlabUpdatePersisterTopic;
+
+	@Value("${kafka.topics.mutation-billing-slab.save.service}")
+	public String mutationbillingSlabSavePersisterTopic;
+
+	@Value("${kafka.topics.mutation-billing-slab.update.service}")
+	public String mutationbillingSlabUpdatePersisterTopic;
 	
 	//MDMS
 	@Value("${egov.mdms.host}")

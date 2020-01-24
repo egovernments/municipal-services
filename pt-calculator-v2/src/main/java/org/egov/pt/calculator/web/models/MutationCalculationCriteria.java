@@ -2,8 +2,10 @@ package org.egov.pt.calculator.web.models;
 
 import java.math.BigDecimal;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.egov.pt.calculator.web.models.property.Property;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,4 +46,9 @@ public class MutationCalculationCriteria {
     
     @JsonProperty("marketValue")
     private BigDecimal marketValue;
+
+    @Valid
+    @NotNull
+    @JsonProperty("property")
+    private Property property;
 }
