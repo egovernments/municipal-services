@@ -93,13 +93,20 @@ public class PaymentNotificationService {
 				else {
 					valMaps.add(getValuesFromTransaction(documentContext));
 				}
-
-				if (!CollectionUtils.isEmpty(valMaps) && null != valMaps.get(0).get("module")) {
-					if (topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic())
-							&& !valMaps.get(0).get("module").equals(BUSINESSSERVICE_CODE)) {
+				
+				if(!CollectionUtils.isEmpty(valMaps)) {
+					if(topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()) && null != valMaps.get(0).get("module")) {
+						if(!valMaps.get(0).get("module").equals(BUSINESSSERVICE_CODE)) {
+							return;
+						}
+					}else if(topic.equalsIgnoreCase(propertyConfiguration.getPgTopic()) && null != valMaps.get(0).get("moduleId")) {
+						if(!valMaps.get(0).get("moduleId").contains(BUSINESSSERVICE_CODE)) {
+							return;
+						}
+					}else {
 						return;
 					}
-				} else {
+				}else {
 					return;
 				}
 
@@ -125,13 +132,11 @@ public class PaymentNotificationService {
 						String message = ((ArrayList<String>) messageObj).get(0);
 						customMessage = getCustomizedMessage(valMap, message, path);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
-						log.info("smsRequests: " + smsRequests);
 					}
 					if (valMap.get("oldPropertyId") == null
 							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
 						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
 					if (!CollectionUtils.isEmpty(smsRequests)) {
-						log.info("Sending SMS.....");
 						sendSMS(smsRequests);
 						if (null == propertyConfiguration.getIsUserEventsNotificationEnabled())
 							propertyConfiguration.setIsUserEventsNotificationEnabled(true);
@@ -563,6 +568,7 @@ public class PaymentNotificationService {
 	 *            The list of SMSRequest to be sent
 	 */
 	private void sendSMS(List<SMSRequest> smsRequestList) {
+		log.info("Sending SMS.....");
 		for (SMSRequest smsRequest : smsRequestList) {
 			producer.push(propertyConfiguration.getSmsNotifTopic(), smsRequest);
 			log.info(smsRequest.toString());
