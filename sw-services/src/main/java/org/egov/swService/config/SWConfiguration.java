@@ -26,12 +26,17 @@ public class SWConfiguration {
 	private Integer defaultOffset;
 	
 
-    
     @Value("${egov.idgen.scid.name}")
     private String sewerageIdGenName;
 
     @Value("${egov.idgen.scid.format}")
     private String sewerageIdGenFormat;
+    
+    @Value("${egov.idgen.scapid.name}")
+    private String sewerageApplicationIdGenName;
+
+    @Value("${egov.idgen.scapid.format}")
+    private String sewerageApplicationIdGenFormat;
     
     //Idgen Config
     @Value("${egov.idgen.host}")

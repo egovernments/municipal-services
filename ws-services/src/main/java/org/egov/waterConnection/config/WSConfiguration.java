@@ -34,6 +34,12 @@ public class WSConfiguration {
     @Value("${egov.idgen.wcid.format}")
     private String waterConnectionIdGenFormat;
     
+    @Value("${egov.idgen.wcapid.name}")
+    private String waterApplicationIdGenName;
+
+    @Value("${egov.idgen.wcapid.format}")
+    private String waterApplicationIdGenFormat;
+    
     //Idgen Config
     @Value("${egov.idgen.host}")
     private String idGenHost;
