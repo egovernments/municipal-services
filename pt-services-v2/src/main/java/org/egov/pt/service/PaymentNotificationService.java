@@ -121,9 +121,11 @@ public class PaymentNotificationService {
 						customMessage = getCustomizedMessage(valMap, message, path);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
 					}
+					log.info("mobileNumbers: "+mobileNumbers);
 					if (valMap.get("oldPropertyId") == null
 							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
 						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
+					log.info("smsRequests: "+smsRequests);
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						log.info("Sending SMS.....");
 						sendSMS(smsRequests);
