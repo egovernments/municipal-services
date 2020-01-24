@@ -542,12 +542,14 @@ public class PaymentNotificationService {
 					message = message.replace("$paylink", "");
 				}
 			}
-
+			log.info("mobNo: "+mobileNumber);
 			if (mobileNumber != null) {
 				SMSRequest smsRequest = new SMSRequest(mobileNumber, message);
 				smsRequests.add(smsRequest);
+				log.info("smsRequests: "+smsRequests);
 			}
 		});
+		
 		return smsRequests;
 	}
 
