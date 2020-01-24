@@ -148,16 +148,13 @@ public class BPANotificationService {
 
 
 
-	private void enrichSMSRequest(BPARequest bpaRequest,
-			List<SMSRequest> smsRequests) {
-        String tenantId = bpaRequest.getBPA().getTenantId();
-      String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  //--Localization service changes to be done.
-//        String localizationMessages ="Checking";
-      String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages); //--Localization service changes to be done.
-      if(message == null){  
-       message ="Application creation successfull";}
-           Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
-            smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
+	private void enrichSMSRequest(BPARequest bpaRequest,List<SMSRequest> smsRequests) {
+		
+		String tenantId = bpaRequest.getBPA().getTenantId();
+		String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo()); 
+		String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(),bpaRequest.getBPA(),localizationMessages);
+		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
+		smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
 	}
 
 	private Map<String, String> getUserList (BPARequest bpaRequest){
@@ -165,14 +162,22 @@ public class BPANotificationService {
 		String tenantId = bpaRequest.getBPA().getTenantId();
 
 		String stakeUUID= bpaRequest.getBPA().getAuditDetails().getCreatedBy();
-		List<String> data = new ArrayList<String>();
-		data.add(stakeUUID);
+		List<String> ownerId = new ArrayList<String>();
+		ownerId.add(stakeUUID);
 		BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
-		bpaSearchCriteria.setOwnerIds(data);
+		bpaSearchCriteria.setOwnerIds(ownerId);
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
-		
+		if(bpaRequest.getBPA().getOwners().get(0).getId() == null){
+			BPASearchCriteria bpaOwnerSearchCriteria = new BPASearchCriteria();
+			List<String> ownerIds = new ArrayList<String>();
+			ownerIds.add(bpaRequest.getBPA().getOwners().get(0).getUuid());
+			bpaOwnerSearchCriteria.setOwnerIds(ownerIds);
+			bpaOwnerSearchCriteria.setTenantId(tenantId);
+			UserDetailResponse ownerDetailResponse	 = userService.getUser(bpaOwnerSearchCriteria, bpaRequest.getRequestInfo());
+			mobileNumberToOwner.put(ownerDetailResponse.getUser().get(0).getMobileNumber(), ownerDetailResponse.getUser().get(0).getName());
+		}else{
 		bpaRequest.getBPA().getOwners().forEach(owner -> {
 			if(owner.isPrimaryOwner()){
 				if (owner.getMobileNumber() != null) {
@@ -182,6 +187,7 @@ public class BPANotificationService {
 				}
 			}
 		});
+		}
 		return mobileNumberToOwner;
     }
 }
