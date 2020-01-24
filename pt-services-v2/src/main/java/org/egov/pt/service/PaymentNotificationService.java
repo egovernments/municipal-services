@@ -75,6 +75,9 @@ public class PaymentNotificationService {
 	 */
 	public void process(HashMap<String, Object> record, String topic) {
 
+		if(null == propertyConfiguration.getIsSMSNotificationEnabled())
+			propertyConfiguration.setIsSMSNotificationEnabled(true);
+		
 		if (propertyConfiguration.getIsSMSNotificationEnabled()) {
 
 			try {
