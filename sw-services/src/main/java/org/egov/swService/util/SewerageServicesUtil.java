@@ -13,7 +13,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
-
+import org.egov.swService.model.AuditDetails;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.PropertyCriteria;
 import org.egov.swService.model.PropertyRequest;
@@ -268,6 +268,22 @@ public class SewerageServicesUtil {
 		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyIds);
 		Object result = serviceRequestRepository.fetchResult(propertySearhURL,RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
+	}
+	
+	/**
+	 * Method to return auditDetails for create/update flows
+	 *
+	 * @param by
+	 * @param isCreate
+	 * @return AuditDetails
+	 */
+	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
+		Long time = System.currentTimeMillis();
+		if (isCreate)
+			return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time)
+					.build();
+		else
+			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
 
 }

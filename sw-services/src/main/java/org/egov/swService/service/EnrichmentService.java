@@ -1,6 +1,7 @@
 package org.egov.swService.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,11 +15,15 @@ import java.util.function.Function;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.swService.config.SWConfiguration;
+import org.egov.swService.model.AuditDetails;
+import org.egov.swService.model.Connection.ApplicationStatusEnum;
+import org.egov.swService.model.Connection.StatusEnum;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.Idgen.IdResponse;
 import org.egov.swService.repository.IdGenRepository;
+import org.egov.swService.util.SWConstants;
 import org.egov.swService.util.SewerageServicesUtil;
 import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.validator.ValidateProperty;
@@ -41,7 +46,6 @@ public class EnrichmentService {
 	
 	@Autowired
 	ValidateProperty validateProperty;
-
 	
 
 	/**
@@ -49,7 +53,7 @@ public class EnrichmentService {
 	 * @param sewerageConnectionList
 	 *            List of sewerage connection for enriching the sewerage connection
 	 *            with property.
-	 * @param requestInfo
+	 * @param requestInfo 
 	 *            is RequestInfo from request
 	 */
 
@@ -88,12 +92,30 @@ public class EnrichmentService {
 	 * @param propertyList
 	 */
 
-	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isCreate) {
+	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		if (isCreate) {
-			sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
-			sewerageConnectionRequest.getSewerageConnection().setConnectionExecutionDate(new BigDecimal(System.currentTimeMillis()));
-			setSewarageConnectionIdgenIds(sewerageConnectionRequest);
+		AuditDetails auditDetails = sewerageServicesUtil
+				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
+		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
+		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
+		setStatusForCreate(sewerageConnectionRequest);
+	}
+	
+	
+	/**
+	 * Sets status for create request
+	 * 
+	 * @param ConnectionRequest
+	 *            The create request
+	 */
+	private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest) {
+		if (sewerageConnectionRequest.getSewerageConnection().getAction()
+				.equalsIgnoreCase(SWConstants.ACTION_INITIATE)) {
+			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
+		}
+		if (sewerageConnectionRequest.getSewerageConnection().getAction().equalsIgnoreCase(SWConstants.ACTION_APPLY)) {
+			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
 		}
 	}
 	
@@ -104,7 +126,7 @@ public class EnrichmentService {
 	 *
 	 * @param request SewerageConnectionRequest which is to be created
 	 */
-	private void setSewarageConnectionIdgenIds(SewerageConnectionRequest request) {
+	private void setSewarageApplicationIdgenIds(SewerageConnectionRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		SewerageConnection sewerageConnection = request.getSewerageConnection();
@@ -133,4 +155,29 @@ public class EnrichmentService {
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
+	
+	/**
+	 * Enrich update sewarage connection
+	 * 
+	 * @param sewarageConnectionRequest
+	 */
+	public void enrichUpdateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
+		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
+		AuditDetails auditDetails = sewerageServicesUtil
+				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+	}
+	
+	  /**
+     * Sets status for create request
+     * @param tradeLicenseRequest The create request
+     */
+	
+//    private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest){
+//    	sewerageConnectionRequest.getSewerageConnection(){
+//            if(.equalsIgnoreCase(ACTION_INITIATE))
+//                license.setStatus(STATUS_INITIATED);
+//            if(license.getAction().equalsIgnoreCase(ACTION_APPLY))
+//                license.setStatus(STATUS_APPLIED);
+//        });
+//    }
 }
