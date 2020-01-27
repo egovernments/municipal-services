@@ -723,10 +723,7 @@ public class DemandService {
 						.requestInfo(requestInfo).build();
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 			//	log.info("Prepared Statement" + calculationRes.toString());
-				
-			
 			}
-		
 	}
 
 	/**

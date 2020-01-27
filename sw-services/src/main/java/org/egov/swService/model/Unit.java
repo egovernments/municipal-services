@@ -1,5 +1,6 @@
 package org.egov.swService.model;
 
+
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,304 +16,290 @@ import javax.validation.constraints.*;
  * Unit
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-10-24T10:29:25.253+05:30[Asia/Kolkata]")
-public class Unit {
-	@JsonProperty("id")
-	private String id = null;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-01-22T12:39:45.543+05:30[Asia/Kolkata]")
+public class Unit   {
+  @JsonProperty("id")
+  private String id = null;
 
-	@JsonProperty("tenantId")
-	private String tenantId = null;
+  @JsonProperty("tenantId")
+  private String tenantId = null;
 
-	@JsonProperty("floorNo")
-	private String floorNo = null;
+  @JsonProperty("floorNo")
+  private String floorNo = null;
 
-	@JsonProperty("unitType")
-	private String unitType = null;
+  @JsonProperty("unitType")
+  private String unitType = null;
 
-	@JsonProperty("usageCategory")
-	private String usageCategory = null;
+  @JsonProperty("usageCategory")
+  private String usageCategory = null;
 
-	/**
-	 * Value denoting if the unit is rented or occupied by owner
-	 */
-	public enum OccupancyTypeEnum {
-		OWNER("OWNER"),
+  /**
+   * Value denoting if the unit is rented or occupied by owner
+   */
+  public enum OccupancyTypeEnum {
+    OWNER("OWNER"),
+    
+    TENANT("TENANT");
 
-		TENANT("TENANT");
+    private String value;
 
-		private String value;
+    OccupancyTypeEnum(String value) {
+      this.value = value;
+    }
 
-		OccupancyTypeEnum(String value) {
-			this.value = value;
-		}
+    @Override
+    @JsonValue
+    public String toString() {
+      return String.valueOf(value);
+    }
 
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
+    @JsonCreator
+    public static OccupancyTypeEnum fromValue(String text) {
+      for (OccupancyTypeEnum b : OccupancyTypeEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+  }
+  @JsonProperty("occupancyType")
+  private OccupancyTypeEnum occupancyType = null;
 
-		@JsonCreator
-		public static OccupancyTypeEnum fromValue(String text) {
-			for (OccupancyTypeEnum b : OccupancyTypeEnum.values()) {
-				if (String.valueOf(b.value).equals(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
+  @JsonProperty("occupancyDate")
+  private BigDecimal occupancyDate = null;
 
-	@JsonProperty("occupancyType")
-	private OccupancyTypeEnum occupancyType = null;
+  @JsonProperty("constructionDetail")
+  private ConstructionDetail constructionDetail = null;
 
-	@JsonProperty("occupancyDate")
-	private BigDecimal occupancyDate = null;
+  @JsonProperty("additionalDetails")
+  private Object additionalDetails = null;
 
-	@JsonProperty("constructionDetail")
-	private ConstructionDetail constructionDetail = null;
+  public Unit id(String id) {
+    this.id = id;
+    return this;
+  }
 
-	@JsonProperty("additionalDetails")
-	private Object additionalDetails = null;
+  /**
+   * Unique Identifier of the Unit(UUID).
+   * @return id
+  **/
+  @ApiModelProperty(value = "Unique Identifier of the Unit(UUID).")
 
-	public Unit id(String id) {
-		this.id = id;
-		return this;
-	}
+  public String getId() {
+    return id;
+  }
 
-	/**
-	 * Unique Identifier of the Unit(UUID).
-	 * 
-	 * @return id
-	 **/
-	@ApiModelProperty(value = "Unique Identifier of the Unit(UUID).")
+  public void setId(String id) {
+    this.id = id;
+  }
 
-	public String getId() {
-		return id;
-	}
+  public Unit tenantId(String tenantId) {
+    this.tenantId = tenantId;
+    return this;
+  }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+  /**
+   * tenant id of the Property
+   * @return tenantId
+  **/
+  @ApiModelProperty(value = "tenant id of the Property")
 
-	public Unit tenantId(String tenantId) {
-		this.tenantId = tenantId;
-		return this;
-	}
+@Size(min=2,max=256)   public String getTenantId() {
+    return tenantId;
+  }
 
-	/**
-	 * tenant id of the Property
-	 * 
-	 * @return tenantId
-	 **/
-	@ApiModelProperty(value = "tenant id of the Property")
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
 
-	@Size(min = 2, max = 256)
-	public String getTenantId() {
-		return tenantId;
-	}
+  public Unit floorNo(String floorNo) {
+    this.floorNo = floorNo;
+    return this;
+  }
 
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
-	}
+  /**
+   * floor number of the Unit
+   * @return floorNo
+  **/
+  @ApiModelProperty(value = "floor number of the Unit")
 
-	public Unit floorNo(String floorNo) {
-		this.floorNo = floorNo;
-		return this;
-	}
+@Size(min=1,max=64)   public String getFloorNo() {
+    return floorNo;
+  }
 
-	/**
-	 * floor number of the Unit
-	 * 
-	 * @return floorNo
-	 **/
-	@ApiModelProperty(value = "floor number of the Unit")
+  public void setFloorNo(String floorNo) {
+    this.floorNo = floorNo;
+  }
 
-	@Size(min = 1, max = 64)
-	public String getFloorNo() {
-		return floorNo;
-	}
+  public Unit unitType(String unitType) {
+    this.unitType = unitType;
+    return this;
+  }
 
-	public void setFloorNo(String floorNo) {
-		this.floorNo = floorNo;
-	}
+  /**
+   * Unit type is master data. 
+   * @return unitType
+  **/
+  @ApiModelProperty(example = "Building, Room, Kitchen etc.", value = "Unit type is master data. ")
 
-	public Unit unitType(String unitType) {
-		this.unitType = unitType;
-		return this;
-	}
+  public String getUnitType() {
+    return unitType;
+  }
 
-	/**
-	 * Unit type is master data.
-	 * 
-	 * @return unitType
-	 **/
-	@ApiModelProperty(example = "Building, Room, Kitchen etc.", value = "Unit type is master data. ")
+  public void setUnitType(String unitType) {
+    this.unitType = unitType;
+  }
 
-	public String getUnitType() {
-		return unitType;
-	}
+  public Unit usageCategory(String usageCategory) {
+    this.usageCategory = usageCategory;
+    return this;
+  }
 
-	public void setUnitType(String unitType) {
-		this.unitType = unitType;
-	}
+  /**
+   * This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)
+   * @return usageCategory
+  **/
+  @ApiModelProperty(value = "This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)")
 
-	public Unit usageCategory(String usageCategory) {
-		this.usageCategory = usageCategory;
-		return this;
-	}
+@Size(min=1,max=64)   public String getUsageCategory() {
+    return usageCategory;
+  }
 
-	/**
-	 * This is about the usage of the property like Residential,
-	 * Non-residential, Mixed(Property witch is gettiong used for Residential,
-	 * Non-residential purpose)
-	 * 
-	 * @return usageCategory
-	 **/
-	@ApiModelProperty(value = "This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)")
+  public void setUsageCategory(String usageCategory) {
+    this.usageCategory = usageCategory;
+  }
 
-	@Size(min = 1, max = 64)
-	public String getUsageCategory() {
-		return usageCategory;
-	}
+  public Unit occupancyType(OccupancyTypeEnum occupancyType) {
+    this.occupancyType = occupancyType;
+    return this;
+  }
 
-	public void setUsageCategory(String usageCategory) {
-		this.usageCategory = usageCategory;
-	}
+  /**
+   * Value denoting if the unit is rented or occupied by owner
+   * @return occupancyType
+  **/
+  @ApiModelProperty(value = "Value denoting if the unit is rented or occupied by owner")
 
-	public Unit occupancyType(OccupancyTypeEnum occupancyType) {
-		this.occupancyType = occupancyType;
-		return this;
-	}
+@Size(min=1,max=64)   public OccupancyTypeEnum getOccupancyType() {
+    return occupancyType;
+  }
 
-	/**
-	 * Value denoting if the unit is rented or occupied by owner
-	 * 
-	 * @return occupancyType
-	 **/
-	@ApiModelProperty(value = "Value denoting if the unit is rented or occupied by owner")
+  public void setOccupancyType(OccupancyTypeEnum occupancyType) {
+    this.occupancyType = occupancyType;
+  }
 
-	public OccupancyTypeEnum getOccupancyType() {
-		return occupancyType;
-	}
+  public Unit occupancyDate(BigDecimal occupancyDate) {
+    this.occupancyDate = occupancyDate;
+    return this;
+  }
 
-	public void setOccupancyType(OccupancyTypeEnum occupancyType) {
-		this.occupancyType = occupancyType;
-	}
+  /**
+   * Date on which unit is occupied.
+   * @return occupancyDate
+  **/
+  @ApiModelProperty(value = "Date on which unit is occupied.")
 
-	public Unit occupancyDate(BigDecimal occupancyDate) {
-		this.occupancyDate = occupancyDate;
-		return this;
-	}
+  @Valid
+  public BigDecimal getOccupancyDate() {
+    return occupancyDate;
+  }
 
-	/**
-	 * Date on which unit is occupied.
-	 * 
-	 * @return occupancyDate
-	 **/
-	@ApiModelProperty(value = "Date on which unit is occupied.")
+  public void setOccupancyDate(BigDecimal occupancyDate) {
+    this.occupancyDate = occupancyDate;
+  }
 
-	@Valid
-	public BigDecimal getOccupancyDate() {
-		return occupancyDate;
-	}
+  public Unit constructionDetail(ConstructionDetail constructionDetail) {
+    this.constructionDetail = constructionDetail;
+    return this;
+  }
 
-	public void setOccupancyDate(BigDecimal occupancyDate) {
-		this.occupancyDate = occupancyDate;
-	}
+  /**
+   * Get constructionDetail
+   * @return constructionDetail
+  **/
+  @ApiModelProperty(value = "")
 
-	public Unit constructionDetail(ConstructionDetail constructionDetail) {
-		this.constructionDetail = constructionDetail;
-		return this;
-	}
+  @Valid
+  public ConstructionDetail getConstructionDetail() {
+    return constructionDetail;
+  }
 
-	/**
-	 * Get constructionDetail
-	 * 
-	 * @return constructionDetail
-	 **/
-	@ApiModelProperty(value = "")
+  public void setConstructionDetail(ConstructionDetail constructionDetail) {
+    this.constructionDetail = constructionDetail;
+  }
 
-	@Valid
-	public ConstructionDetail getConstructionDetail() {
-		return constructionDetail;
-	}
+  public Unit additionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
+    return this;
+  }
 
-	public void setConstructionDetail(ConstructionDetail constructionDetail) {
-		this.constructionDetail = constructionDetail;
-	}
+  /**
+   * Json object to capture any extra information which is not accommodated by model
+   * @return additionalDetails
+  **/
+  @ApiModelProperty(value = "Json object to capture any extra information which is not accommodated by model")
 
-	public Unit additionalDetails(Object additionalDetails) {
-		this.additionalDetails = additionalDetails;
-		return this;
-	}
+  public Object getAdditionalDetails() {
+    return additionalDetails;
+  }
 
-	/**
-	 * Json object to capture any extra information which is not accommodated by
-	 * model
-	 * 
-	 * @return additionalDetails
-	 **/
-	@ApiModelProperty(value = "Json object to capture any extra information which is not accommodated by model")
+  public void setAdditionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
+  }
 
-	public Object getAdditionalDetails() {
-		return additionalDetails;
-	}
 
-	public void setAdditionalDetails(Object additionalDetails) {
-		this.additionalDetails = additionalDetails;
-	}
+  @Override
+  public boolean equals(java.lang.Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Unit unit = (Unit) o;
+    return Objects.equals(this.id, unit.id) &&
+        Objects.equals(this.tenantId, unit.tenantId) &&
+        Objects.equals(this.floorNo, unit.floorNo) &&
+        Objects.equals(this.unitType, unit.unitType) &&
+        Objects.equals(this.usageCategory, unit.usageCategory) &&
+        Objects.equals(this.occupancyType, unit.occupancyType) &&
+        Objects.equals(this.occupancyDate, unit.occupancyDate) &&
+        Objects.equals(this.constructionDetail, unit.constructionDetail) &&
+        Objects.equals(this.additionalDetails, unit.additionalDetails);
+  }
 
-	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		Unit unit = (Unit) o;
-		return Objects.equals(this.id, unit.id) && Objects.equals(this.tenantId, unit.tenantId)
-				&& Objects.equals(this.floorNo, unit.floorNo) && Objects.equals(this.unitType, unit.unitType)
-				&& Objects.equals(this.usageCategory, unit.usageCategory)
-				&& Objects.equals(this.occupancyType, unit.occupancyType)
-				&& Objects.equals(this.occupancyDate, unit.occupancyDate)
-				&& Objects.equals(this.constructionDetail, unit.constructionDetail)
-				&& Objects.equals(this.additionalDetails, unit.additionalDetails);
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, tenantId, floorNo, unitType, usageCategory, occupancyType, occupancyDate, constructionDetail, additionalDetails);
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(id, tenantId, floorNo, unitType, usageCategory, occupancyType, occupancyDate,
-				constructionDetail, additionalDetails);
-	}
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class Unit {\n");
+    
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
+    sb.append("    floorNo: ").append(toIndentedString(floorNo)).append("\n");
+    sb.append("    unitType: ").append(toIndentedString(unitType)).append("\n");
+    sb.append("    usageCategory: ").append(toIndentedString(usageCategory)).append("\n");
+    sb.append("    occupancyType: ").append(toIndentedString(occupancyType)).append("\n");
+    sb.append("    occupancyDate: ").append(toIndentedString(occupancyDate)).append("\n");
+    sb.append("    constructionDetail: ").append(toIndentedString(constructionDetail)).append("\n");
+    sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
+    sb.append("}");
+    return sb.toString();
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class Unit {\n");
-
-		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
-		sb.append("    floorNo: ").append(toIndentedString(floorNo)).append("\n");
-		sb.append("    unitType: ").append(toIndentedString(unitType)).append("\n");
-		sb.append("    usageCategory: ").append(toIndentedString(usageCategory)).append("\n");
-		sb.append("    occupancyType: ").append(toIndentedString(occupancyType)).append("\n");
-		sb.append("    occupancyDate: ").append(toIndentedString(occupancyDate)).append("\n");
-		sb.append("    constructionDetail: ").append(toIndentedString(constructionDetail)).append("\n");
-		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
-		sb.append("}");
-		return sb.toString();
-	}
-
-	/**
-	 * Convert the given object to string with each line indented by 4 spaces
-	 * (except the first line).
-	 */
-	private String toIndentedString(java.lang.Object o) {
-		if (o == null) {
-			return "null";
-		}
-		return o.toString().replace("\n", "\n    ");
-	}
+  /**
+   * Convert the given object to string with each line indented by 4 spaces
+   * (except the first line).
+   */
+  private String toIndentedString(java.lang.Object o) {
+    if (o == null) {
+      return "null";
+    }
+    return o.toString().replace("\n", "\n    ");
+  }
 }

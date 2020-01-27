@@ -1,4 +1,4 @@
-package org.egov.swService.model;
+package org.egov.wsCalculation.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
