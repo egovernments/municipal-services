@@ -1,6 +1,8 @@
 package org.egov.pt.calculator.web.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 
@@ -60,6 +62,41 @@ public class MutationBillingSlab   {
     @NotNull
     @JsonProperty("fixedAmount")
     private Double fixedAmount;
+
+    @NotNull
+    @JsonProperty("rate")
+    private Double rate;
+
+    @JsonProperty("type")
+    private TypeEnum type = null;
+
+    public enum TypeEnum {
+        RATE("RATE"),
+
+        FLAT("FLAT");
+
+        private String value;
+
+        TypeEnum(String value) {
+            this.value = value;
+        }
+
+        @Override
+        @JsonValue
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static TypeEnum fromValue(String text) {
+            for (TypeEnum b : TypeEnum.values()) {
+                if (String.valueOf(b.value).equals(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+    }
 
 }
 

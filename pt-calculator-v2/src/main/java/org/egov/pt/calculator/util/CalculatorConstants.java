@@ -190,6 +190,8 @@ public class CalculatorConstants {
 
 	public static final String SERVICE_FIELD_VALUE_PT = "PT";
 
+	public static final String SERVICE_FIELD_VALUE_PT_MUTATION = "PT.MUTATION";
+
 	public static final String URL_PARAMS_SEPARATER = "?";
 
 	public static final String SEPARATER = "&";

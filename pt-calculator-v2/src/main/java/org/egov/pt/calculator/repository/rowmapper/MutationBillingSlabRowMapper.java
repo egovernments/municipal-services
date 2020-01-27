@@ -28,7 +28,7 @@ public class MutationBillingSlabRowMapper implements ResultSetExtractor<List<Mut
                         .usageCategorySubMinor(rs.getString("usageCategorySubMinor")).usageCategoryDetail(rs.getString("usageCategoryDetail"))
                         .ownerShipCategory(rs.getString("ownerShipCategory")).subOwnerShipCategory(rs.getString("subOwnerShipCategory"))
                         .minMarketValue(rs.getDouble("minMarketValue")).maxMarketValue(rs.getDouble("maxMarketValue"))
-                        .fixedAmount(rs.getDouble("fixedAmount")).build();
+                        .fixedAmount(rs.getDouble("fixedAmount")).rate(rs.getDouble("rate")).type(MutationBillingSlab.TypeEnum.fromValue(rs.getString("type"))).build();
 
                 billingSlabMap.put(currentId, currentBillingSlab);
             }

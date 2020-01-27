@@ -34,4 +34,7 @@ public class MutationBillingSlabSearchCriteria {
 
     @JsonProperty("usageCategoryMinor")
     public String usageCategoryMinor;
+
+    @JsonProperty("marketValue")
+    private Double marketValue;
 }

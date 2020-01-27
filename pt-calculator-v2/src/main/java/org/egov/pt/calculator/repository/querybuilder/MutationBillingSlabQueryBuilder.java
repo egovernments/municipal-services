@@ -3,6 +3,7 @@ package org.egov.pt.calculator.repository.querybuilder;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.pt.calculator.web.models.MutationBillingSlabSearchCriteria;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -57,6 +58,13 @@ public class MutationBillingSlabQueryBuilder {
 
             queryBuilder.append(" AND usageCategoryMinor = ?");
             preparedStmtList.add(billingSlabSearcCriteria.getUsageCategoryMinor());
+        }
+        if (billingSlabSearcCriteria.getMarketValue() != null) {
+
+            queryBuilder.append(" AND minMarketValue <= ?");
+            preparedStmtList.add(billingSlabSearcCriteria.getMarketValue());
+            queryBuilder.append(" AND maxMarketValue >= ?");
+            preparedStmtList.add(billingSlabSearcCriteria.getMarketValue());
         }
     }
 

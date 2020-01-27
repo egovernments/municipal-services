@@ -4,10 +4,12 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pt.calculator.repository.Repository;
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
@@ -44,6 +46,9 @@ public class EstimationService {
 	private BillingSlabService billingSlabService;
 
 	@Autowired
+	private MutationBillingSlabService mutationService;
+
+	@Autowired
 	private PayService payService;
 
 	/*@Autowired
@@ -78,6 +83,12 @@ public class EstimationService {
 
 	@Autowired
 	private PaymentService paymentService;
+
+	@Autowired
+	private Repository repository;
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	@Value("${customization.pbfirecesslogic:false}")
 	Boolean usePBFirecessLogic;
@@ -729,28 +740,110 @@ public class EstimationService {
 		Map<String, Calculation> feeStructure = new HashMap<>();
 		for(MutationCalculationCriteria mutation: criteria) {
 			Calculation calculation = new Calculation();
-			BigDecimal fee = getFeeFromSlabs(mutation, calculation);
+			calculation.setTenantId(mutation.getTenantId());
+			setTaxperiodForCalculation(requestInfo,mutation.getTenantId(),calculation);
+			BigDecimal fee = getFeeFromSlabs(mutation, calculation, requestInfo);
 			calculation.setTaxAmount(fee);
-			postProcessTheFee(calculation);
-			feeStructure.put(mutation.getMutationApplicationNo(), calculation);
+			postProcessTheFee(requestInfo,mutation,calculation);
+			feeStructure.put(mutation.getApplicationNumber(), calculation);
+			log.info("TIME--->");
+			System.out.println(calculation.getFromDate());
+			System.out.println(calculation.getToDate());
 			generateDemandsFroMutationFee(feeStructure, requestInfo);
 		}
 		
 		return feeStructure;
 	}
-	
-	private BigDecimal getFeeFromSlabs(MutationCalculationCriteria criteria, Calculation calculation) {
-		List<String> slabIds = new ArrayList<>();
-		Property proerty;
-		
-		calculation.setBillingSlabIds(slabIds); 
-		return null;
+
+	private void setTaxperiodForCalculation(RequestInfo requestInfo, String tenantId,Calculation calculation){
+		List<TaxPeriod> taxPeriodList = getTaxPeriodList(requestInfo,tenantId);
+		long currentTime = System.currentTimeMillis();
+		for(TaxPeriod taxPeriod : taxPeriodList ){
+			if(currentTime >= taxPeriod.getFromDate() && currentTime <=taxPeriod.getToDate()){
+				calculation.setFromDate(taxPeriod.getFromDate());
+				calculation.setToDate(taxPeriod.getToDate());
+			}
+		}
+
+	}
+	/**
+	 * Fetch Tax Head Masters From billing service
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return
+	 */
+	public List<TaxPeriod> getTaxPeriodList(RequestInfo requestInfo, String tenantId) {
+
+		StringBuilder uri = getTaxPeriodSearchUrl(tenantId);
+		TaxPeriodResponse res = mapper.convertValue(
+				repository.fetchResult(uri, RequestInfoWrapper.builder().requestInfo(requestInfo).build()),
+				TaxPeriodResponse.class);
+		return res.getTaxPeriods();
 	}
 	
-	private void postProcessTheFee(Calculation calculation) {
-		calculation.setRebate(BigDecimal.ZERO);
+	private BigDecimal getFeeFromSlabs(MutationCalculationCriteria criteria, Calculation calculation, RequestInfo requestInfo) {
+		List<String> slabIds = new ArrayList<>();
+		BigDecimal fees=null;
+
+		List<Property> property;
+		if (criteria.getProperty()==null && criteria.getApplicationNumber() != null) {
+			property = utils.getProperty(requestInfo, criteria.getApplicationNumber(), criteria.getTenantId());
+			criteria.setProperty(property);
+		}
+		MutationBillingSlabSearchCriteria billingSlabSearchCriteria = new MutationBillingSlabSearchCriteria();
+
+		billingSlabSearchCriteria.setTenantId(criteria.getProperty().get(0).getTenantId());
+		billingSlabSearchCriteria.setMarketValue(criteria.getMarketValue());
+		billingSlabSearchCriteria.setUsageCategoryMajor(criteria.getUsageType());
+		//billingSlabSearchCriteria=enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,criteria);
+		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearchCriteria);
+
+		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.FLAT)){
+			fees = BigDecimal.valueOf(billingSlabRes.getBillingSlab().get(0).getFixedAmount());
+		}
+		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.RATE)){
+			BigDecimal rate = BigDecimal.valueOf(billingSlabRes.getBillingSlab().get(0).getRate());
+			BigDecimal marketValue = BigDecimal.valueOf(criteria.getMarketValue());
+			fees= marketValue.multiply(rate.divide(CalculatorConstants.HUNDRED));
+		}
+		log.info("fees--->",fees);
+		System.out.println(fees);
+		slabIds.add(billingSlabRes.getBillingSlab().get(0).getId());
+		calculation.setBillingSlabIds(slabIds); 
+		return fees;
+	}
+
+	private MutationBillingSlabSearchCriteria enrichBillingsalbSearchCriteria(MutationBillingSlabSearchCriteria billingSlabSearchCriteria, MutationCalculationCriteria criteria ){
+		billingSlabSearchCriteria.setTenantId(criteria.getProperty().get(0).getTenantId());
+		billingSlabSearchCriteria.setMarketValue(criteria.getMarketValue());
+		//billingSlabSearchCriteria.setPropertyType(criteria.getProperty().get(0).getPropertyDetails().get(0).getPropertyType());
+		//billingSlabSearchCriteria.setPropertySubType(criteria.getProperty().get(0).getPropertyDetails().get(0).getPropertySubType());
+		billingSlabSearchCriteria.setUsageCategoryMajor(criteria.getProperty().get(0).getPropertyDetails().get(0).getUsageCategoryMajor());
+		//billingSlabSearchCriteria.setUsageCategoryMinor(criteria.getProperty().get(0).getPropertyDetails().get(0).getUsageCategoryMinor());
+		return billingSlabSearchCriteria;
+	}
+	
+	private void postProcessTheFee(RequestInfo requestInfo,MutationCalculationCriteria mutation, Calculation calculation) {
+		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
+		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
+		log.info("fees--->",requestInfo);
+		System.out.println(requestInfo);
+		mDataService.setPropertyMasterValues(requestInfo, mutation.getTenantId(), propertyBasedExemptionMasterMap,
+				timeBasedExemptionMasterMap);
+		String assessmentYear = mutation.getProperty().get(0).getPropertyDetails().get(0).getFinancialYear();
+		BigDecimal taxAmt = calculation.getTaxAmount();
+		BigDecimal rebate = payService.getRebate(taxAmt, assessmentYear,
+				timeBasedExemptionMasterMap.get(CalculatorConstants.REBATE_MASTER));
+		BigDecimal penalty = BigDecimal.ZERO;
+
+		if (rebate.equals(BigDecimal.ZERO)) {
+			penalty = payService.getPenalty(taxAmt, assessmentYear, timeBasedExemptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER));
+		}
+
+		calculation.setRebate(rebate);
+		calculation.setPenalty(penalty);
 		calculation.setExemption(BigDecimal.ZERO);
-		calculation.setPenalty(BigDecimal.ZERO);
+
 		
 		BigDecimal totalAmount = calculation.getTaxAmount()
 				.subtract(calculation.getRebate().add(calculation.getExemption())).add(calculation.getPenalty());
@@ -762,33 +855,39 @@ public class EstimationService {
 		for(String key: feeStructure.keySet()) {
 			List<DemandDetail> details = new ArrayList<>();
 			Calculation calculation = feeStructure.get(key);
-			DemandDetail detail = DemandDetail.builder().collectionAmount(null).demandId(null).id(null).taxAmount(calculation.getTaxAmount()).auditDetails(null)
+			log.info("getTenantId--->");
+			System.out.println(feeStructure.get(key).getTenantId());
+			//String demandId = UUID.randomUUID().toString();
+			DemandDetail detail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getTaxAmount()).auditDetails(null)
 					.taxHeadMasterCode(configs.getPtMutationFeeTaxHead()).tenantId(calculation.getTenantId()).build();
 			details.add(detail);
 			if(null != calculation.getPenalty() && BigDecimal.ZERO != calculation.getPenalty()){
-				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(null).demandId(null).id(null).taxAmount(calculation.getPenalty()).auditDetails(null)
+				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getPenalty()).auditDetails(null)
 						.taxHeadMasterCode(configs.getPtMutationPenaltyTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
 			}
 			if(null != feeStructure.get(key).getRebate() && BigDecimal.ZERO != feeStructure.get(key).getRebate()){
-				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(null).demandId(null).id(null).taxAmount(calculation.getRebate()).auditDetails(null)
-						.taxHeadMasterCode(configs.getPtMutationRebateTaxHead()).tenantId(feeStructure.get(key).getTenantId()).build();
+				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getRebate()).auditDetails(null)
+						.taxHeadMasterCode(configs.getPtMutationRebateTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
 			}
 			if(null != feeStructure.get(key).getExemption() && BigDecimal.ZERO != feeStructure.get(key).getExemption()){
-				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(null).demandId(null).id(null).taxAmount(calculation.getExemption()).auditDetails(null)
-						.taxHeadMasterCode(configs.getPtMutationExemptionTaxHead()).tenantId(feeStructure.get(key).getTenantId()).build();
+				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getExemption()).auditDetails(null)
+						.taxHeadMasterCode(configs.getPtMutationExemptionTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
 			}
 			
 			Demand demand = Demand.builder().auditDetails(null).additionalDetails(null).businessService(configs.getPtMutationBusinessCode())
-					.consumerCode(key).consumerType("").demandDetails(details).id("").minimumAmountPayable(configs.getPtMutationMinPayable()).payer(null).status(null)
-					.taxPeriodFrom(null).taxPeriodTo(null).tenantId(feeStructure.get(key).getTenantId()).build();
+					.consumerCode(key).consumerType(" ").demandDetails(details).id(null).minimumAmountPayable(configs.getPtMutationMinPayable()).payer(null).status(null)
+					.taxPeriodFrom(calculation.getFromDate()).taxPeriodTo(calculation.getToDate()).tenantId(calculation.getTenantId()).build();
 			demands.add(demand);
 			
 		}
 		
 		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(requestInfo).build();
+		log.info("dmReq--->",dmReq);
+		System.out.println(dmReq);
+		DemandResponse res = new DemandResponse();
 		String url = new StringBuilder().append(configs.getBillingServiceHost())
 				.append(configs.getDemandCreateEndPoint()).toString();
 		try {
@@ -800,5 +899,21 @@ public class EstimationService {
 		
 		
 		
+	}
+
+	/**
+	 * Returns the tax head search Url with tenantId and PropertyTax service name
+	 * parameters
+	 *
+	 * @param tenantId
+	 * @return
+	 */
+	public StringBuilder getTaxPeriodSearchUrl(String tenantId) {
+
+		return new StringBuilder().append(configs.getBillingServiceHost())
+				.append(configs.getTaxPeriodSearchEndpoint()).append(URL_PARAMS_SEPARATER)
+				.append(TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
+				.append(SEPARATER).append(SERVICE_FIELD_FOR_SEARCH_URL)
+				.append(SERVICE_FIELD_VALUE_PT_MUTATION);
 	}
 }

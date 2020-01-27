@@ -18,9 +18,8 @@ import org.egov.pt.calculator.web.models.*;
 import org.egov.pt.calculator.web.models.collections.Payment;
 import org.egov.pt.calculator.web.models.collections.PaymentSearchCriteria;
 import org.egov.pt.calculator.web.models.demand.*;
-import org.egov.pt.calculator.web.models.property.AuditDetails;
-import org.egov.pt.calculator.web.models.property.PropertyRequest;
-import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
+import org.egov.pt.calculator.web.models.property.*;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -680,6 +679,51 @@ public class CalculatorUtils {
         calculationReq.setCalculationCriteria(calculationCriterias);
 
         return calculationReq;
+    }
+
+
+    /**
+     * Call PT-services to get Property object for the given applicationNumber and tenantID
+     * @param requestInfo The RequestInfo of the incoming request
+     * @param applicationNumber The applicationNumber whose Property details has to be fetched
+     * @param tenantId The tenantId of the property
+     * @return The property details for the particular applicationNumber
+     */
+    public List<Property> getProperty(RequestInfo requestInfo, String applicationNumber, String tenantId){
+        String url = getPropertySearchURL();
+        url = url.replace("{1}",tenantId).replace("{2}",applicationNumber);
+
+        Object result =repository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
+                requestInfo(requestInfo).build());
+
+        PropertyResponse response =null;
+        try {
+            response = mapper.convertValue(result,PropertyResponse.class);
+        }
+        catch (IllegalArgumentException e){
+            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
+        }
+
+        if(response==null || CollectionUtils.isEmpty(response.getProperties()))
+            return null;
+
+        return response.getProperties();
+    }
+
+    /**
+     * Creates PT search url based on tenantId and applicationNumber
+     * @return PT search url
+     */
+    private String getPropertySearchURL(){
+        StringBuilder url = new StringBuilder(configurations.getPtHost());
+        url.append(configurations.getPtSearchEndpoint());
+        url.append("?");
+        url.append("tenantId=");
+        url.append("{1}");
+        url.append("&");
+        url.append("applicationNumber=");
+        url.append("{2}");
+        return url.toString();
     }
 
 

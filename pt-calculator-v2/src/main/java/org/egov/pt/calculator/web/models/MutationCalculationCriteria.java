@@ -1,6 +1,7 @@
 package org.egov.pt.calculator.web.models;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -32,8 +33,8 @@ public class MutationCalculationCriteria {
     private String tenantId;
     
     @NotNull
-    @JsonProperty("mutationApplicationNo")
-    private String mutationApplicationNo;
+    @JsonProperty("applicationNumber")
+    private String applicationNumber;
     
     @JsonProperty("usageType")
     private String usageType;
@@ -45,10 +46,9 @@ public class MutationCalculationCriteria {
     private String areaType;
     
     @JsonProperty("marketValue")
-    private BigDecimal marketValue;
+    private Double marketValue;
 
     @Valid
-    @NotNull
-    @JsonProperty("property")
-    private Property property;
+    @JsonProperty("Properties")
+    private List<Property> property;
 }
