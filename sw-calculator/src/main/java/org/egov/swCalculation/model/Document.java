@@ -2,43 +2,40 @@ package org.egov.swCalculation.model;
 
 import javax.validation.constraints.NotNull;
 
-
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(of= {"fileStoreId","documentUid","id"})
 public class Document {
-	
-        @JsonProperty("id")
-        private String id ;
-        
-        @JsonProperty("tenantId")
-        private String tenantId ;
-        
-        @JsonProperty("documentType")
-        @NotNull
-        private String documentType ;
 
-        @JsonProperty("fileStore")
-        @NotNull
-        private String fileStore ;
-        
-        @JsonProperty("documentUid")
-        @NotNull
-        private String documentUid ;
-        
-        @JsonProperty("auditDetails")
-        private AuditDetails auditDetails;
+  @JsonProperty("id")
+  private String id ;
 
-        @JsonProperty("status")
-    	private Status status;
+  @JsonProperty("documentType")
+  @NotNull
+  private String documentType ;
+
+  @JsonProperty("fileStoreId")
+  @NotNull
+  private String fileStoreId ;
+
+  @JsonProperty("documentUid")
+  @NotNull
+  private String documentUid ;
+
+  @JsonProperty("auditDetails")
+  private AuditDetails auditDetails;
+
+  @JsonProperty("status")
+  private Status status;
 }
 

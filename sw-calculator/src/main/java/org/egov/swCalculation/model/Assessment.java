@@ -1,11 +1,14 @@
 package org.egov.swCalculation.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.egov.swCalculation.model.workflow.ProcessInstance;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,99 +25,99 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Assessment {
-	
-        @JsonProperty("financialYear")
-        @NotNull
-        private String financialYear ;
 
-        @JsonProperty("assessmentNumber")
-        private String assessmentNumber ;
 
-        @JsonProperty("id")
-        private String id ;
-        
-        @JsonProperty("tenantId")
-        @NotNull
-        private String tenantId ;
-        
-        @JsonProperty("propertyID")
-        @NotNull
-        private String propertyID;
+	@JsonProperty("id")
+	private String id ;
 
-        @JsonProperty("assessmentDate")
-        @NotNull
-        private Long assessmentDate ;
+	@JsonProperty("tenantId")
+	@NotNull
+	private String tenantId ;
 
-        @JsonProperty("status")
-        private Status status ;
+	@JsonProperty("assessmentNumber")
+	private String assessmentNumber ;
 
-        @JsonProperty("source")
-        private Source source ;
+	@JsonProperty("financialYear")
+	@NotNull
+	private String financialYear ;
 
-        @JsonProperty("buildUpArea")
-        private Double buildUpArea ;
+	@JsonProperty("propertyId")
+	@NotNull
+	private String propertyId;
 
-        @JsonProperty("auditDetails")
-        private AuditDetails auditDetails ;
+	@JsonProperty("assessmentDate")
+	@NotNull
+	private Long assessmentDate ;
 
-        @JsonProperty("units")
-        @Valid
-        private List<Unit> units ;
+	@JsonProperty("status")
+	private Status status ;
 
-        @JsonProperty("documents")
-        @Valid
-        private List<Document> documents ;
+	@JsonProperty("source")
+	@NotNull
+	private Source source ;
 
-        @JsonProperty("additionalDetails")
-        private JsonNode additionalDetails ;
+	@JsonProperty("unitUsageList")
+	@Valid
+	private List<UnitUsage> unitUsageList ;
 
-        @JsonProperty("channel")
-        private Channel channel ;
-        
-        public enum Source {
-        	  
-        	  MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
-        	  
-        	  FIELD_SURVEY("FIELD_SURVEY");
+	@JsonProperty("documents")
+	@Valid
+	private Set<Document> documents ;
 
-        	  private String value;
+	@JsonProperty("additionalDetails")
+	private JsonNode additionalDetails ;
 
-        	  Source(String value) {
-        	    this.value = value;
-        	  }
+	@JsonProperty("channel")
+	private Channel channel ;
 
-        	  @Override
-        	  @JsonValue
-        	  public String toString() {
-        	    return String.valueOf(value);
-        	  }
 
-        	  @JsonCreator
-        	  public static Source fromValue(String text) {
-        	    for (Source b : Source.values()) {
-        	      if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-        	        return b;
-        	      }
-        	    }
-        	    return null;
-        	  }
-        	}
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails ;
 
-        public Assessment addUnitsItem(Unit unitsItem) {
-            if (this.units == null) {
-            this.units = new ArrayList<>();
-            }
-        this.units.add(unitsItem);
-        return this;
-        }
+	@JsonProperty("workflow")
+	private ProcessInstance workflow;
 
-        public Assessment addDocumentsItem(Document documentsItem) {
-            if (this.documents == null) {
-            this.documents = new ArrayList<>();
-            }
-        this.documents.add(documentsItem);
-        return this;
-        }
+
+	public enum Source {
+
+		MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
+
+		WEBAPP("WEBAPP"),
+
+		MOBILEAPP("MOBILEAPP"),
+
+		FIELD_SURVEY("FIELD_SURVEY");
+
+		private String value;
+
+		Source(String value) {
+			this.value = value;
+		}
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		@JsonCreator
+		public static Source fromValue(String text) {
+			for (Source b : Source.values()) {
+				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
+
+	public Assessment addDocumentsItem(Document documentsItem) {
+		if (this.documents == null) {
+			this.documents = new HashSet<>();
+		}
+		this.documents.add(documentsItem);
+		return this;
+	}
 
 }
 
