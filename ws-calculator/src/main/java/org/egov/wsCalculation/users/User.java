@@ -1,4 +1,4 @@
-package org.egov.wsCalculation.model;
+package org.egov.wsCalculation.users;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,9 +160,6 @@ public class User   {
 
         @JsonProperty("lastModifiedDate")
         private Long lastModifiedDate;
-
-        @JsonProperty("otpReference")
-        private String otpReference;
 
         @Size(max=256)
         @JsonProperty("tenantId")

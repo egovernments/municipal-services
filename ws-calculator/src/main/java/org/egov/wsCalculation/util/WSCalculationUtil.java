@@ -149,22 +149,6 @@ public class WSCalculationUtil {
 				.append(configurations.getDemandUpdateEndPoint());
 	}
 
-	/**
-	 * method to create demand search url with demand criteria
-	 *
-	 * @param assessment
-	 * @return
-	 */
-	public StringBuilder getDemandSearchUrl(Assessment assessment) {
-
-		return new StringBuilder().append(configurations.getBillingServiceHost())
-				.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
-				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(assessment.getTenantId())
-				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
-				.append(assessment.getConnectionId() + WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR
-						+ assessment.getAssessmentNumber());
-	}
-
 	public AuditDetails getAuditDetails(String by, boolean isCreate) {
 		Long time = new Date().getTime();
 
