@@ -1,22 +1,20 @@
-package org.egov.waterConnection.model;
+package org.egov.waterConnection.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * status of the Property
+ * Gets or Sets Type
  */
-public enum Status {
+public enum Type {
   
-  ACTIVE("ACTIVE"),
+  PERMANENT("PERMANENT"),
   
-  INACTIVE("INACTIVE"),
-
-  INWORKFLOW("INWORKFLOW");
+  CORRESPONDENCE("CORRESPONDENCE");
 
   private String value;
 
-  Status(String value) {
+  Type(String value) {
     this.value = value;
   }
 
@@ -27,8 +25,8 @@ public enum Status {
   }
 
   @JsonCreator
-  public static Status fromValue(String text) {
-    for (Status b : Status.values()) {
+  public static Type fromValue(String text) {
+    for (Type b : Type.values()) {
       if (String.valueOf(b.value).equalsIgnoreCase(text)) {
         return b;
       }

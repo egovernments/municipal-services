@@ -1,68 +1,72 @@
 package org.egov.waterConnection.model;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.math.BigDecimal;
 
 /**
  * Unit
  */
 
-@Data
-@AllArgsConstructor
+@ToString
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@EqualsAndHashCode(of= {"id"})
 public class Unit   {
 	
-        @JsonProperty("id")
-        private String id;
-        
-        @JsonProperty("assessmentId")
-        private String assessmentId;
+  @JsonProperty("id")
+  private String id;
 
-        @JsonProperty("tenantId")
-        @NotNull
-        private String tenantId;
+  @JsonProperty("tenantId")
+  private String tenantId;
 
-        @JsonProperty("floorNo")
-        private String floorNo;
+  @JsonProperty("floorNo")
+  private Integer floorNo;
 
-        @JsonProperty("unitArea")
-        @NotNull
-        private Double unitArea;
+  @JsonProperty("unitType")
+  private String unitType;
 
-        @JsonProperty("usageCategory")
-        @NotNull
-        private String usageCategory;
+  @JsonProperty("usageCategory")
+  @NotNull
+  private String usageCategory;
 
-        @JsonProperty("occupancyType")
-        @NotNull
-        private OccupancyType occupancyType;
+  @JsonProperty("occupancyType")
+  private OccupancyType occupancyType;
 
-        @JsonProperty("occupancyDate")
-        @NotNull
-        private Long occupancyDate;
+  @JsonProperty("active")
+  private Boolean active;
 
-        @JsonProperty("constructionType")
-        @NotNull
-        private String constructionType;
-        
-        @JsonProperty("active")
-        private Boolean active;
+  @JsonProperty("occupancyDate")
+  private Long occupancyDate;
 
-        @JsonProperty("arv")
-        private Double arv;
-        
-        @JsonProperty("auditDetails")
-        private AuditDetails auditDetails;
+  @Valid
+  @NotNull
+  @JsonProperty("constructionDetail")
+  private ConstructionDetail constructionDetail;
 
+  @JsonProperty("additionalDetails")
+  private Object additionalDetails;
+  
+  @JsonProperty("auditDetails")
+  private AuditDetails auditDetails;
+
+
+  @JsonProperty("arv")
+  private BigDecimal arv;
 
 }
-

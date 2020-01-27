@@ -1,22 +1,20 @@
-package org.egov.waterConnection.model;
+package org.egov.waterConnection.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * status of the Property
+ * The relationship of guardian.
  */
-public enum Status {
-  
-  ACTIVE("ACTIVE"),
-  
-  INACTIVE("INACTIVE"),
 
-  INWORKFLOW("INWORKFLOW");
+public enum Relationship {
+	
+	FATHER("FATHER"),
+    HUSBAND("HUSBAND");
 
   private String value;
 
-  Status(String value) {
+  Relationship(String value) {
     this.value = value;
   }
 
@@ -27,8 +25,8 @@ public enum Status {
   }
 
   @JsonCreator
-  public static Status fromValue(String text) {
-    for (Status b : Status.values()) {
+  public static Relationship fromValue(String text) {
+    for (Relationship b : Relationship.values()) {
       if (String.valueOf(b.value).equalsIgnoreCase(text)) {
         return b;
       }
@@ -36,4 +34,3 @@ public enum Status {
     return null;
   }
 }
-
