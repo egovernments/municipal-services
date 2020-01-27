@@ -12,6 +12,8 @@ import org.javers.core.diff.changetype.ValueChange;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import ch.qos.logback.classic.Logger;
+
 import java.util.*;
 
 import static org.egov.tl.util.TLConstants.*;
@@ -63,7 +65,8 @@ public class DiffService {
     private List<String> getUpdatedFields(TradeLicense licenseFromUpdate, TradeLicense licenseFromSearch) {
 
         Javers javers = JaversBuilder.javers().build();
-
+        System.out.println("Request TL"+licenseFromUpdate);
+        System.out.println("Search TL"+licenseFromSearch);
         Diff diff = javers.compare(licenseFromUpdate, licenseFromSearch);
         List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
 
