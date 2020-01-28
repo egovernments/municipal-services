@@ -241,7 +241,12 @@ public class NotificationUtil {
 	private String getRejectedMsg(TradeLicense license, String message) {
 		// message = message.replace("<1>",);
 		message = message.replace("<2>", license.getTradeName());
-
+		if(!license.getComment().isEmpty()) {
+			message = message.replace("<3>", license.getComment());
+		}else {
+			message = message.replace("<3>", "Not Known");
+		}
+			
 		return message;
 	}
 
