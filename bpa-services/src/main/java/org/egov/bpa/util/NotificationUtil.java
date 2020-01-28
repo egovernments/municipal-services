@@ -76,7 +76,7 @@ public class NotificationUtil {
 		
 		
 		String message = null, messageTemplate;
-		if(bpa.getStatus().toUpperCase().equals(BPAConstants.ACTION_REJECT)) {
+		if(bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(
 					BPAConstants.APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
@@ -163,7 +163,7 @@ public class NotificationUtil {
 		path = path.replace("{}", notificationCode);
 		String message = null;
 		try {
-			LinkedList data  = JsonPath.parse(localizationMessage).read(path);
+			ArrayList<String> data  = JsonPath.parse(localizationMessage).read(path);
 			message = data.get(0).toString();
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
@@ -182,7 +182,7 @@ public class NotificationUtil {
 	 */
 	private BigDecimal getAmountToBePaid(RequestInfo requestInfo, BPA bpa) {
 
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
+		LinkedHashMap<?, ?> responseMap = (LinkedHashMap<?, ?>) serviceRequestRepository
 				.fetchResult(getBillUri(bpa), new RequestInfoWrapper(
 						requestInfo));
 		String jsonString = new JSONObject(responseMap).toString();
@@ -264,7 +264,7 @@ public class NotificationUtil {
 	public String getLocalizationMessages(String tenantId,
 			RequestInfo requestInfo) {
 
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
+		LinkedHashMap<?, ?> responseMap = (LinkedHashMap<?, ?>) serviceRequestRepository
 				.fetchResult(getUri(tenantId, requestInfo), requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
 		return jsonString;

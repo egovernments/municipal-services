@@ -60,8 +60,8 @@ public class BPAValidator {
 		
 
 		if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
-				|| !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
-				|| !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
+				&& !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
+				&& !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
 			
 			String filterExp = "$.[?(@.applicationType=='" + bpa.getApplicationType() + "' && @.ServiceType=='"
 					+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='" + currentState
