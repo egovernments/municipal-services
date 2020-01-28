@@ -44,5 +44,21 @@ public class SWConfiguration {
 
     @Value("${egov.idgen.path}")
     private String idGenPath;
+    
+    // Workflow
+    @Value("${create.sw.workflow.name}")
+    private String businessServiceValue;
+
+    @Value("${workflow.context.path}")
+    private String wfHost;
+
+    @Value("${workflow.transition.path}")
+    private String wfTransitionPath;
+
+    @Value("${workflow.businessservice.search.path}")
+    private String wfBusinessServiceSearchPath;
+
+    @Value("${is.external.workflow.enabled}")
+    private Boolean isExternalWorkFlowEnabled;
 
 }
