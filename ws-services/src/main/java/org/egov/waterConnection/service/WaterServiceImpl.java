@@ -15,7 +15,7 @@ import org.egov.waterConnection.model.workflow.BusinessService;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
-import org.egov.waterConnection.util.WaterServicesUtil;
+import org.egov.waterConnection.validator.ActionValidator;
 import org.egov.waterConnection.validator.MDMSValidator;
 import org.egov.waterConnection.validator.ValidateProperty;
 import org.egov.waterConnection.validator.WaterConnectionValidator;
@@ -55,6 +55,11 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private ActionValidator actionValidator;
+	
+	
 	
 	
 	
@@ -112,6 +117,7 @@ public class WaterServiceImpl implements WaterService {
 				waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(
 				waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
+		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);

@@ -71,19 +71,5 @@ public class WaterController {
 
 	}
 
-	// @RequestMapping(value = "/_cancel", method = RequestMethod.POST)
-	// public ResponseEntity<WaterConnectionResponse> cancel(@Valid @RequestBody
-	// RequestInfoWrapper requestInfoWrapper,
-	// @Valid @ModelAttribute WaterConnectionCancelCriteria
-	// waterConnectionCancelCriteria) {
-	// List<WaterConnection> waterConnectionList =
-	// waterService.cancelWaterConnection(waterConnectionCancelCriteria,requestInfoWrapper.getRequestInfo());
-	// WaterConnectionResponse response =
-	// WaterConnectionResponse.builder().waterConnection(waterConnectionList)
-	// .responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(),
-	// true))
-	// .build();
-	// return new ResponseEntity<>(response, HttpStatus.OK);
-	// }
 
 }
