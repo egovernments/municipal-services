@@ -294,7 +294,39 @@ public class BPAValidator {
 			errorMap.put("INVALID UPDATE", "The id " + bpa.getAddress().getId() + " does not exist");
 
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
-		compareIdList(getOwnerIds(searchedBpa), getOwnerIds(bpa), errorMap);
+		
+		// verify the existing owner from the bpa missing, If yes then mark the missing user active false.
+		Boolean allowOwnerChange =( bpa.getAction() != null 
+				&& ( bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY) 
+						|| bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_INITIATE)));
+		
+		List<String> searchIds = getOwnerIds(searchedBpa);
+		List<String> updateIds = getOwnerIds(bpa);
+		List<OwnerInfo> missingOwners= new ArrayList<OwnerInfo>();
+		if (searchIds != null) {
+			searchIds.forEach(searchId -> {
+				if (!((List<String>) updateIds).contains(searchId) )
+					if(allowOwnerChange) {
+						searchedBpa.getOwners().forEach(owner->{
+							if(owner.getUuid().equalsIgnoreCase(searchId)) {
+								owner.setActive(false);
+								missingOwners.add(owner);
+							}
+						});
+					}else {
+						errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
+					}
+					
+			});
+		}
+		if(missingOwners.size() > 0) {
+			List<OwnerInfo> existingOwners= bpa.getOwners();
+			existingOwners.addAll(missingOwners);
+			bpa.setOwners(existingOwners);
+			
+		}
+			
+	
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
 		// compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
 
@@ -354,8 +386,11 @@ public class BPAValidator {
 	private void compareIdList(List<String> searchIds, Object updateIds, Map<String, String> errorMap) {
 		if (searchIds != null)
 			searchIds.forEach(searchId -> {
-				if (!((List<String>) updateIds).contains(searchId))
-					errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
+				if (!((List<String>) updateIds).contains(searchId) )
+					
+						errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
+					
+					
 			});
 	}
 

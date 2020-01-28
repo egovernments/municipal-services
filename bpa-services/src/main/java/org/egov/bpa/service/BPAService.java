@@ -202,6 +202,8 @@ public class BPAService {
 		}
 		Difference diffMap = diffService
 				.getDifference(bpaRequest, searchResult);
+
+		userService.createUser(bpaRequest);
 		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 				workflowService.getCurrentState(bpa.getStatus(),
 						businessService));
