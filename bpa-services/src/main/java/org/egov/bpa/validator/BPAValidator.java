@@ -43,12 +43,12 @@ public class BPAValidator {
 		validateApplicationDocuments(bpaRequest, mdmsData, null);
 		validateUser(bpaRequest);
 	}
+
 	private void validateUser(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
-		bpa.getOwners().forEach(user->{
-			if(org.springframework.util.StringUtils.isEmpty(user.getRelationship())) {
-				throw new CustomException("BPA.CREATE.USER",
-						" Owner relation ship is mandatory " + user.toString());
+		bpa.getOwners().forEach(user -> {
+			if (org.springframework.util.StringUtils.isEmpty(user.getRelationship())) {
+				throw new CustomException("BPA.CREATE.USER", " Owner relation ship is mandatory " + user.toString());
 			}
 		});
 	}
@@ -57,78 +57,78 @@ public class BPAValidator {
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData, String currentState) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		BPA bpa = request.getBPA();
-		String filterExp = "$.[?(@.applicationType=='" + bpa.getApplicationType() + "' && @.ServiceType=='"
-				+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='" + currentState
-				+ "')].docTypes";
-
-		List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
-		
-		List<Document> allDocuments = new ArrayList<Document>();
-		if (bpa.getDocuments() != null) {
-			allDocuments.addAll(bpa.getDocuments());
-		}
-		
-		
-		if(CollectionUtils.isEmpty(docTypeMappings)) {
-			return ;
-		}
-		
-		filterExp = "$.[?(@.required==true)].code";
-		List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
-
-		List<String> validDocumentTypes = masterData.get(BPAConstants.DOCUMENT_TYPE);
-
 		
 
-		if (!CollectionUtils.isEmpty(allDocuments)) {
-
-			allDocuments.forEach(document -> {
-
-				if (!validDocumentTypes.contains(document.getDocumentType())) {
-					throw new CustomException("Unkonwn Document Type ERROR", document.getDocumentType() + " is Unkown");
-				}
-			});
+		if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
+				|| !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
+				|| !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
 			
+			String filterExp = "$.[?(@.applicationType=='" + bpa.getApplicationType() + "' && @.ServiceType=='"
+					+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='" + currentState
+					+ "')].docTypes";
 
-			
-			
-			if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
+			List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
 
-				throw new CustomException("Mandatory Documents missing ERROR",
-						requiredDocTypes.size() + " Documents are requied ");
-			} else if (requiredDocTypes.size() > 0) {
-
-				List<String> addedDocTypes = new ArrayList<String>();
-				allDocuments.forEach(document -> {
-					
-					
-					String docType = document.getDocumentType();
-					int lastIndex = docType.lastIndexOf(".");
-					String documentNs = "";
-					if (lastIndex > 1) {
-						documentNs = docType.substring(0, lastIndex);
-					} else if (lastIndex == 1) {
-						throw new CustomException("Invlaid Document Type ERROR",
-								document.getDocumentType() + " is Invalid");
-					} else {
-						documentNs = docType;
-					}
-
-					addedDocTypes.add(documentNs);
-				});
-				requiredDocTypes.forEach(docType -> {
-					String docType1 = docType.toString();
-					if (!addedDocTypes.contains(docType1)) {
-						throw new CustomException("Mandatory Documents missing ERROR",
-								"Document Type " + docType1 + " is Missing");
-					}
-				});
+			List<Document> allDocuments = new ArrayList<Document>();
+			if (bpa.getDocuments() != null) {
+				allDocuments.addAll(bpa.getDocuments());
 			}
-		} else if (requiredDocTypes.size() > 0) {
-			throw new CustomException("Mandatory Documents missing ERROR",
-					requiredDocTypes.size() + " Documents are requied ");
+
+			if (CollectionUtils.isEmpty(docTypeMappings)) {
+				return;
+			}
+
+			filterExp = "$.[?(@.required==true)].code";
+			List<String> requiredDocTypes = JsonPath.read(docTypeMappings.get(0), filterExp);
+
+			List<String> validDocumentTypes = masterData.get(BPAConstants.DOCUMENT_TYPE);
+
+			if (!CollectionUtils.isEmpty(allDocuments)) {
+
+				allDocuments.forEach(document -> {
+
+					if (!validDocumentTypes.contains(document.getDocumentType())) {
+						throw new CustomException("BPA_UNKNOWN_DOCUMENTTYPE", document.getDocumentType() + " is Unkown");
+					}
+				});
+
+				if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
+
+					throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+							requiredDocTypes.size() + " Documents are requied ");
+				} else if (requiredDocTypes.size() > 0) {
+
+					List<String> addedDocTypes = new ArrayList<String>();
+					allDocuments.forEach(document -> {
+
+						String docType = document.getDocumentType();
+						int lastIndex = docType.lastIndexOf(".");
+						String documentNs = "";
+						if (lastIndex > 1) {
+							documentNs = docType.substring(0, lastIndex);
+						} else if (lastIndex == 1) {
+							throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+									document.getDocumentType() + " is Invalid");
+						} else {
+							documentNs = docType;
+						}
+
+						addedDocTypes.add(documentNs);
+					});
+					requiredDocTypes.forEach(docType -> {
+						String docType1 = docType.toString();
+						if (!addedDocTypes.contains(docType1)) {
+							throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+									"Document Type " + docType1 + " is Missing");
+						}
+					});
+				}
+			} else if (requiredDocTypes.size() > 0) {
+				throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+						"Atleast " + requiredDocTypes.size() + " Documents are requied ");
+			}
+			bpa.setDocuments(allDocuments);
 		}
-		bpa.setDocuments(allDocuments);
 
 	}
 
@@ -137,7 +137,7 @@ public class BPAValidator {
 			List<String> documentFileStoreIds = new LinkedList();
 			request.getBPA().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
-					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+					throw new CustomException("BPA_DUPLICATE_DOCUMENT",
 							"Same document cannot be used multiple times");
 				else
 					documentFileStoreIds.add(document.getFileStoreId());
@@ -213,14 +213,13 @@ public class BPAValidator {
 
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException("INVALID SEARCH", "Search on limit is not allowed");
-		
-		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
-			throw new CustomException("INVALID SEARCH",
-					"From date cannot be a future date");
 
-		if (criteria.getToDate() != null && criteria.getFromDate() != null && (criteria.getFromDate() > criteria.getToDate()))
-			throw new CustomException("INVALID SEARCH",
-					"To date cannot be prior to from date");
+		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
+			throw new CustomException("INVALID SEARCH", "From date cannot be a future date");
+
+		if (criteria.getToDate() != null && criteria.getFromDate() != null
+				&& (criteria.getFromDate() > criteria.getToDate()))
+			throw new CustomException("INVALID SEARCH", "To date cannot be prior to from date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
@@ -234,7 +233,6 @@ public class BPAValidator {
 		setFieldsFromSearch(bpaRequest, searchResult, mdmsData);
 
 	}
-
 
 	private void setFieldsFromSearch(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData) {
 		Map<String, BPA> idToBPAFromSearch = new HashMap<>();
@@ -267,7 +265,7 @@ public class BPAValidator {
 			}
 
 			if (!flag) {
-				errorMap.put("INVALID UPDATE", "All Units are inactive in the bpa: " + bpa.getApplicationNo());
+				errorMap.put("INVALID_UPDATE", "All Units are inactive in the bpa: " + bpa.getApplicationNo());
 			}
 
 		}
@@ -298,7 +296,7 @@ public class BPAValidator {
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
 		compareIdList(getOwnerIds(searchedBpa), getOwnerIds(bpa), errorMap);
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
-//		compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
+		// compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
@@ -311,7 +309,7 @@ public class BPAValidator {
 				applicationDocIds.add(document.getId());
 			});
 		}
-//		}
+		// }
 		return applicationDocIds;
 	}
 
