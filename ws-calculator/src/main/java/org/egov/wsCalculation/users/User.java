@@ -1,4 +1,4 @@
-package org.egov.swService.model;
+package org.egov.wsCalculation.users;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,9 +161,6 @@ public class User   {
         @JsonProperty("lastModifiedDate")
         private Long lastModifiedDate;
 
-        @JsonProperty("otpReference")
-        private String otpReference;
-
         @Size(max=256)
         @JsonProperty("tenantId")
         private String tenantId;
@@ -192,5 +189,19 @@ public class User   {
 
                 return Objects.hash(uuid, name, mobileNumber);
         }
+        
+        public org.egov.common.contract.request.User toCommonUser(){
+            org.egov.common.contract.request.User commonUser = new org.egov.common.contract.request.User();
+            commonUser.setId(this.getId());
+            commonUser.setUserName(this.getUserName());
+            commonUser.setName(this.getName());
+            commonUser.setType(this.getType());
+            commonUser.setMobileNumber(this.getMobileNumber());
+            commonUser.setEmailId(this.getEmailId());
+            commonUser.setRoles(this.getRoles());
+            commonUser.setTenantId(this.getTenantId());
+            commonUser.setUuid(this.getUuid());
+            return commonUser;
+    }
 }
 

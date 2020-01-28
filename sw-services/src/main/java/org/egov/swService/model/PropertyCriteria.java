@@ -2,27 +2,26 @@ package org.egov.swService.model;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-
-
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PropertyCriteria {
 
-	@NotNull
 	private String tenantId;
 
 	private Set<String> propertyIds;
+	
+	private Set<String> acknowledgementIds;
 	
 	private Set<String> uuids;
 

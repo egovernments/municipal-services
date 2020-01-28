@@ -7,7 +7,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.Role;
-
+import org.egov.swCalculation.model.users.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,6 +25,9 @@ import lombok.ToString;
 @NoArgsConstructor
 public class OwnerInfo extends User {
 
+	@JsonProperty("ownerInfoUuid")
+	private String ownerInfoUuid;
+	
 	@NotNull
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
@@ -44,6 +47,7 @@ public class OwnerInfo extends User {
 	@JsonProperty("ownerShipPercentage")
 	private Double ownerShipPercentage;
 
+	@NotNull
 	@JsonProperty("ownerType")
 	private String ownerType;
 
@@ -57,7 +61,6 @@ public class OwnerInfo extends User {
 	@Valid
 	private List<Document> documents;
 
-	@NotNull
 	@JsonProperty("relationship")
 	private Relationship relationship;
 
@@ -116,15 +119,16 @@ public class OwnerInfo extends User {
 			String correspondenceCity, String correspondencePincode, String correspondenceAddress, Boolean active,
 			Long dob, Long pwdExpiryDate, String locale, String type, String signature, Boolean accountLocked,
 			List<Role> roles, String fatherOrHusbandName, String bloodGroup, String identificationMark, String photo,
-			String createdBy, Long createdDate, String lastModifiedBy, Long lastModifiedDate, String otpReference,
-			String tenantId, String mobileNumber2, String gender2, String fatherOrHusbandName2,
+			String createdBy, Long createdDate, String lastModifiedBy, Long lastModifiedDate, String tenantId,
+			String ownerInfoUuid, String mobileNumber2, String gender2, String fatherOrHusbandName2,
 			String correspondenceAddress2, Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType,
 			String institutionId, Status status, List<Document> documents, Relationship relationship) {
 		super(id, uuid, userName, password, salutation, name, gender, mobileNumber, emailId, altContactNumber, pan,
 				aadhaarNumber, permanentAddress, permanentCity, permanentPincode, correspondenceCity,
 				correspondencePincode, correspondenceAddress, active, dob, pwdExpiryDate, locale, type, signature,
 				accountLocked, roles, fatherOrHusbandName, bloodGroup, identificationMark, photo, createdBy,
-				createdDate, lastModifiedBy, lastModifiedDate, otpReference, tenantId);
+				createdDate, lastModifiedBy, lastModifiedDate, tenantId);
+		this.ownerInfoUuid = ownerInfoUuid;
 		mobileNumber = mobileNumber2;
 		gender = gender2;
 		fatherOrHusbandName = fatherOrHusbandName2;
@@ -137,5 +141,5 @@ public class OwnerInfo extends User {
 		this.documents = documents;
 		this.relationship = relationship;
 	}
-	
+
 }
