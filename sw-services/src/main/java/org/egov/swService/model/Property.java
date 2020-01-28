@@ -1,26 +1,32 @@
 package org.egov.swService.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import org.egov.swService.model.enums.Source;
+import org.egov.swService.model.workflow.ProcessInstance;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
+/**
+ * Property
+ */
+
+@ToString
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Property extends PropertyInfo {
 
 	@JsonProperty("acknowldgementNumber")
@@ -29,81 +35,78 @@ public class Property extends PropertyInfo {
 	@JsonProperty("propertyType")
 	private String propertyType;
 
-	@JsonProperty("usageCategory")
-	private String usageCategory;
-
 	@JsonProperty("ownershipCategory")
 	private String ownershipCategory;
 
 	@JsonProperty("owners")
 	@Valid
-	@NotNull
 	private List<OwnerInfo> owners;
 
 	@JsonProperty("institution")
-	@Valid
-	private List<Institution> institution;
+	private Institution institution;
 
 	@JsonProperty("creationReason")
 	private CreationReason creationReason;
-
-	@JsonProperty("occupancyDate")
-	private Long occupancyDate;
-
-	@JsonProperty("constructionDate")
-	private Long constructionDate;
+	
+	@JsonProperty("usageCategory")
+	private String usageCategory;
 
 	@JsonProperty("noOfFloors")
 	private Long noOfFloors;
 
 	@JsonProperty("landArea")
-	@Min(1)
 	private Double landArea;
+
+	@JsonProperty("superBuiltUpArea")
+	private BigDecimal superBuiltUpArea;
 
 	@JsonProperty("source")
 	private Source source;
+
+	@JsonProperty("channel")
+	private Channel channel;
 
 	@JsonProperty("documents")
 	@Valid
 	private List<Document> documents;
 
+	@JsonProperty("units")
+	private List<Unit> units;
+
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
-
+	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
-	public enum Source {
+	@JsonProperty("workflow")
+	private ProcessInstance workflow;
 
-		PT("PT"),
-
-		TL("TL"),
-
-		WAS("WAS"),
-
-		DATA_MIGRATION("DATA_MIGRATION");
-
-		private String value;
-
-		Source(String value) {
-			this.value = value;
-		}
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		@JsonCreator
-		public static Source fromValue(String text) {
-			for (Source b : Source.values()) {
-				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
+	@Builder
+	public Property(String id, String propertyId, String surveyId, List<String> linkedProperties, String tenantId,
+			String accountId, String oldPropertyId, Status status, Address address, String acknowldgementNumber,
+			String propertyType, String ownershipCategory, List<OwnerInfo> owners, Institution institution,
+			CreationReason creationReason, String usageCategory, Long noOfFloors, Double landArea,
+			BigDecimal superBuiltUpArea, Source source, Channel channel, List<Document> documents, List<Unit> units,
+			Object additionalDetails, AuditDetails auditDetails, ProcessInstance workflow) {
+		super(id, propertyId, surveyId, linkedProperties, tenantId, accountId, oldPropertyId, status, address);
+		this.acknowldgementNumber = acknowldgementNumber;
+		this.propertyType = propertyType;
+		this.ownershipCategory = ownershipCategory;
+		this.owners = owners;
+		this.institution = institution;
+		this.creationReason = creationReason;
+		this.usageCategory = usageCategory;
+		this.noOfFloors = noOfFloors;
+		this.landArea = landArea;
+		this.superBuiltUpArea = superBuiltUpArea;
+		this.source = source;
+		this.channel = channel;
+		this.documents = documents;
+		this.units = units;
+		this.additionalDetails = additionalDetails;
+		this.auditDetails = auditDetails;
+		this.workflow = workflow;
 	}
 
 	public Property addOwnersItem(OwnerInfo ownersItem) {
@@ -115,15 +118,14 @@ public class Property extends PropertyInfo {
 			this.owners.add(ownersItem);
 		return this;
 	}
-
-	public Property addInstitutionItem(Institution institutionItem) {
-
-		if (this.institution == null) {
-			this.institution = new ArrayList<>();
+	
+	public Property addUnitsItem(Unit unit) {
+		if (this.units == null) {
+			this.units = new ArrayList<>();
 		}
 
-		if (null != institutionItem)
-			this.institution.add(institutionItem);
+		if (null != unit)
+			this.units.add(unit);
 		return this;
 	}
 
@@ -136,30 +138,4 @@ public class Property extends PropertyInfo {
 			this.documents.add(documentsItem);
 		return this;
 	}
-
-	@Builder
-	public Property(String id, String propertyId, String tenantId, String accountId, String oldPropertyId,
-			Status status, Address address, List<String> parentProperties, String acknowldgementNumber,
-			String propertyType, String usageCategory, String ownershipCategory, List<OwnerInfo> owners,
-			List<Institution> institution, CreationReason creationReason, Long occupancyDate, Long constructionDate,
-			Long noOfFloors, Double landArea, Source source, List<Document> documents, Object additionalDetails,
-			AuditDetails auditDetails) {
-		super(id, propertyId, tenantId, accountId, oldPropertyId, status, address, parentProperties);
-		this.acknowldgementNumber = acknowldgementNumber;
-		this.propertyType = propertyType;
-		this.usageCategory = usageCategory;
-		this.ownershipCategory = ownershipCategory;
-		this.owners = owners;
-		this.institution = institution;
-		this.creationReason = creationReason;
-		this.occupancyDate = occupancyDate;
-		this.constructionDate = constructionDate;
-		this.noOfFloors = noOfFloors;
-		this.landArea = landArea;
-		this.source = source;
-		this.documents = documents;
-		this.additionalDetails = additionalDetails;
-		this.auditDetails = auditDetails;
-	}
-
 }

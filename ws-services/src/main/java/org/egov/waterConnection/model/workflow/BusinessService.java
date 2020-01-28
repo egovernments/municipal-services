@@ -1,18 +1,26 @@
 package org.egov.waterConnection.model.workflow;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import lombok.*;
-
-import org.egov.waterConnection.model.AuditDetails;
-import org.springframework.validation.annotation.Validated;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.egov.waterConnection.model.AuditDetails;
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * A Object holds the
@@ -33,38 +41,38 @@ public class BusinessService   {
 
         @Size(max=256)
         @JsonProperty("tenantId")
-        private String tenantId = null;
+        private String tenantId;
 
         @Size(max=256)
         @JsonProperty("uuid")
-        private String uuid = null;
+        private String uuid;
 
         @Size(max=256)
         @JsonProperty("businessService")
-        private String businessService = null;
+        private String businessService;
 
         @Size(max=256)
         @JsonProperty("business")
-        private String business = null;
+        private String business;
 
         @Size(max=1024)
         @JsonProperty("getUri")
-        private String getUri = null;
+        private String getUri;
 
         @Size(max=1024)
         @JsonProperty("postUri")
-        private String postUri = null;
+        private String postUri;
 
         @JsonProperty("businessServiceSla")
-        private Long businessServiceSla = null;
+        private Long businessServiceSla;
 
         @NotNull
         @Valid
         @JsonProperty("states")
-        private List<State> states = null;
+        private List<State> states;
 
         @JsonProperty("auditDetails")
-        private AuditDetails auditDetails = null;
+        private AuditDetails auditDetails;
 
 
         public BusinessService addStatesItem(State statesItem) {

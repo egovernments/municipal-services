@@ -1,14 +1,22 @@
 package org.egov.waterConnection.model.workflow;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
-import lombok.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.egov.waterConnection.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,11 +79,11 @@ public class State   {
 
 
         public State addActionsItem(Action actionsItem) {
-            if (this.actions == null) {
-            this.actions = new ArrayList<>();
-            }
-        this.actions.add(actionsItem);
-        return this;
+                if (this.actions == null) {
+                        this.actions = new ArrayList<>();
+                }
+                this.actions.add(actionsItem);
+                return this;
         }
 
 }

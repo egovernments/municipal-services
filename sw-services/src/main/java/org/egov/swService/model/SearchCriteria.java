@@ -66,7 +66,7 @@ public class SearchCriteria {
 	public boolean isEmpty() {
 		return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNumber == null
 				&& this.connectionNumber == null && this.oldConnectionNumber == null && this.mobileNumber == null
-				&& this.fromDate == null && this.toDate == null && this.ownerIds == null && this.propertyId == null );
+				&& this.fromDate == null && this.toDate == null && this.ownerIds == null && this.propertyId == null);
 	}
 
 	public boolean tenantIdOnly() {
