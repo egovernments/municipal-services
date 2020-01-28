@@ -12,5 +12,7 @@ CREATE TABLE eg_pt_mutation_billingslab
     subOwnershipCategory character varying(64),
     minMarketValue float,
     maxMarketValue float,
-    fixedAmount float
+    fixedAmount float,
+    rate float,
+    method character varying(64)
 );
