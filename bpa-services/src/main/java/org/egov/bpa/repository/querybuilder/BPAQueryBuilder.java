@@ -115,7 +115,8 @@ public class BPAQueryBuilder {
 					.append(criteria.getFromDate());
 		}
 		
-		
+		addClauseIfRequired(preparedStmtList, builder);
+		builder.append(" bpaowner.active = 't'"); //To get the active owners
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList,
 				criteria);

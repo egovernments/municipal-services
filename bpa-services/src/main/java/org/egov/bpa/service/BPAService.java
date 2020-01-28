@@ -220,7 +220,7 @@ public class BPAService {
 		wfIntegrator.callWorkFlow(bpaRequest);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
-		userService.createUser(bpaRequest);
+//		userService.createUser(bpaRequest);
 		repository.update(bpaRequest, workflowService.isStateUpdatable(
 				bpa.getStatus(), businessService));
 

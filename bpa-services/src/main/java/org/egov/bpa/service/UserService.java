@@ -156,7 +156,7 @@ public class UserService {
 		owner.setCreatedDate(System.currentTimeMillis());
 		owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
 		owner.setLastModifiedDate(System.currentTimeMillis());
-		owner.setActive(userDetailResponse.getUser().get(0).getActive());
+		//owner.setActive(userDetailResponse.getUser().get(0).getActive());
 	}
 
 	/**
