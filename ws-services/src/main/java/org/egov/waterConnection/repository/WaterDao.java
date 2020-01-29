@@ -12,7 +12,7 @@ public interface WaterDao {
 
 	public List<WaterConnection> getWaterConnectionList(SearchCriteria criteria,RequestInfo requestInfo);
 	
-	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest);
+	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isStateUpdatable);
 	
 	public int isWaterConnectionExist(List<String> ids);
 

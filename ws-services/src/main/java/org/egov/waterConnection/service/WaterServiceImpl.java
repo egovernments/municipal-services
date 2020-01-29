@@ -17,6 +17,7 @@ import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.Difference;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
+import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.ActionValidator;
 import org.egov.waterConnection.validator.MDMSValidator;
 import org.egov.waterConnection.validator.ValidateProperty;
@@ -63,6 +64,9 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private DiffService diffService;
+	
+	@Autowired
+	private WaterServicesUtil waterServiceUtil;
 	
 	
 	
@@ -125,8 +129,12 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
-		 Map<String, Difference> diffMap = diffService.getDifference(waterConnectionRequest, searchResult);
-		waterDao.updateWaterConnection(waterConnectionRequest);
+		Map<String, Difference> diffMap = diffService.getDifference(waterConnectionRequest, searchResult);
+		//Call workflow
+		wfIntegrator.callWorkFlow(waterConnectionRequest);
+		enrichmentService.postStatusEnrichment(waterConnectionRequest);
+		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, searchResult);
+		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 	

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
+import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
 import org.egov.waterConnection.repository.builder.WsQueryBuilder;
@@ -23,23 +24,26 @@ import lombok.extern.slf4j.Slf4j;
 public class WaterDaoImpl implements WaterDao {
 
 	@Autowired
-	WaterConnectionProducer waterConnectionProducer;
+	private WaterConnectionProducer waterConnectionProducer;
 
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	WsQueryBuilder wCQueryBuilder;
+	private WsQueryBuilder wCQueryBuilder;
 
 	@Autowired
-	WaterRowMapper waterRowMapper;
+	private WaterRowMapper waterRowMapper;
+	
+	@Autowired
+	private WSConfiguration wsConfiguration;
 
 	@Value("${egov.waterservice.createwaterconnection}")
 	private String createWaterConnection;
 
 	@Value("${egov.waterservice.updatewaterconnection}")
 	private String updateWaterConnection;
-
+	
 	@Override
 	public void saveWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionProducer.push(createWaterConnection, waterConnectionRequest);
@@ -59,8 +63,11 @@ public class WaterDaoImpl implements WaterDao {
 	}
 
 	@Override
-	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		waterConnectionProducer.push(updateWaterConnection, waterConnectionRequest);
+	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isStateUpdatable) {
+		if (isStateUpdatable)
+			waterConnectionProducer.push(updateWaterConnection, waterConnectionRequest);
+		if (!isStateUpdatable)
+			waterConnectionProducer.push(wsConfiguration.getWorkFlowUpdateTopic(), waterConnectionRequest);
 	}
 
 	@Override
