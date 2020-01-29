@@ -223,6 +223,7 @@ public class NotificationService {
 		}
 	}
 	
+	
 	/**
 	 * Fetches phone number for notification based on the recepient of the notif.
 	 * 
@@ -233,8 +234,9 @@ public class NotificationService {
 	 * @param role
 	 * @return
 	 */
-	public String getPhoneNumberForNotificationService(RequestInfo requestInfo, String userId, String tenantId, String assignee, String role) {
+	public String getMobileAndIdForNotificationService(RequestInfo requestInfo, String userId, String tenantId, String assignee, String role) {
 		String phoneNumber = null;
+		String uuid = "uuid";
 		Object response = null;
 		ObjectMapper mapper = pGRUtils.getObjectMapper();
 		StringBuilder uri = new StringBuilder();
@@ -246,19 +248,22 @@ public class NotificationService {
 				if(null != response) {
 					UserResponse res = mapper.convertValue(response, UserResponse.class);
 					phoneNumber = res.getUser().get(0).getMobileNumber();
+					uuid = res.getUser().get(0).getUuid();
 				}
 			}catch(Exception e) {
 				log.error("Couldn't fetch user for id: "+userId+" error: " + e);
 			}
-			return phoneNumber;
+			return phoneNumber + "|" + uuid;
 		}else if(role.equals(PGRConstants.ROLE_EMPLOYEE)) {
 			Map<String, String> employeeDetails = getEmployeeDetails(tenantId, assignee, requestInfo);
 			if(!StringUtils.isEmpty(employeeDetails.get("phone"))) {
 				phoneNumber = employeeDetails.get("phone");
 			}
 		}
-		return phoneNumber;
+		return phoneNumber + "|" + uuid;
 	}
+	
+	
 	
 	/**
 	 * Returns current assignee for a complaint

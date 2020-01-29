@@ -141,21 +141,26 @@ public class PGRNotificationConsumer {
 		}
 	}
 
-	public List<SMSRequest> prepareSMSRequest(Service serviceReq, ActionInfo actionInfo, RequestInfo requestInfo) {
-		List<SMSRequest> smsRequestsTobeSent = new ArrayList<>();
-		if(StringUtils.isEmpty(actionInfo.getAssignee())) {
-			actionInfo.setAssignee(notificationService.getCurrentAssigneeForTheServiceRequest(serviceReq, requestInfo));
-		}
-		for(String role: pGRUtils.getReceptorsOfNotification(actionInfo.getStatus(), actionInfo.getAction())) {
-			String phoneNumberRetrived = notificationService.getPhoneNumberForNotificationService(requestInfo, serviceReq.getAccountId(), serviceReq.getTenantId(), actionInfo.getAssignee(), role);
-			String phone = StringUtils.isEmpty(phoneNumberRetrived) ? serviceReq.getPhone() : phoneNumberRetrived;
-			String message = getMessageForSMS(serviceReq, actionInfo, requestInfo, role);
-			if (StringUtils.isEmpty(message))
-				continue;
-			smsRequestsTobeSent.add(SMSRequest.builder().mobileNumber(phone).message(message).build());
-		}
-		return smsRequestsTobeSent;
-	}
+    public List<SMSRequest> prepareSMSRequest(Service serviceReq, ActionInfo actionInfo, RequestInfo requestInfo) {
+        List<SMSRequest> smsRequestsTobeSent = new ArrayList<>();
+        if (StringUtils.isEmpty(actionInfo.getAssignee()) && !actionInfo.getAction().equals(WorkFlowConfigs.ACTION_OPEN)) {
+            try {
+                actionInfo.setAssignee(notificationService.getCurrentAssigneeForTheServiceRequest(serviceReq, requestInfo));
+            } catch (Exception e) {
+                log.error("Exception while explicitly setting assignee!");
+            }
+        }
+        for (String role : pGRUtils.getReceptorsOfNotification(actionInfo.getStatus(), actionInfo.getAction())) {
+            String phoneNumberRetrived = notificationService.getMobileAndIdForNotificationService(requestInfo, serviceReq.getAccountId(), serviceReq.getTenantId(), actionInfo.getAssignee(), role);
+            phoneNumberRetrived = phoneNumberRetrived.split("[|]")[0];
+            String phone = StringUtils.isEmpty(phoneNumberRetrived) ? serviceReq.getPhone() : phoneNumberRetrived;
+            String message = getMessageForSMS(serviceReq, actionInfo, requestInfo, role);
+            if (StringUtils.isEmpty(message))
+                continue;
+            smsRequestsTobeSent.add(SMSRequest.builder().mobileNumber(phone).message(message).build());
+        }
+        return smsRequestsTobeSent;
+    }
 
 	public String getMessageForSMS(Service serviceReq, ActionInfo actionInfo, RequestInfo requestInfo, String role) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(notificationDateFormat);
