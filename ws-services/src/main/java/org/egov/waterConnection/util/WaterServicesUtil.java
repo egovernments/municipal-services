@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,11 @@ import org.egov.waterConnection.model.PropertyRequest;
 import org.egov.waterConnection.model.PropertyResponse;
 import org.egov.waterConnection.model.RequestInfoWrapper;
 import org.egov.waterConnection.model.WaterConnectionRequest;
+import org.egov.waterConnection.model.workflow.BusinessService;
 import org.egov.waterConnection.model.SearchCriteria;
+import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
+import org.egov.waterConnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,6 +57,8 @@ public class WaterServicesUtil {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
+	@Autowired
+	private WorkflowService workflowService;
 
 	/**
      * Method to return auditDetails for create/update flows
@@ -296,5 +302,15 @@ public class WaterServicesUtil {
 		if (url.indexOf("{2}") > 0)
 			url = url.replace("{2}", propertyIds);
 		return new StringBuilder(url);
+	}
+	
+	/**
+	 *
+	 * @param businessService
+	 * @param searchresult
+	 * @return true if state updatable is true else false
+	 */
+	public boolean getStatusForUpdate(BusinessService businessService, WaterConnection searchresult) {
+		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
 	}
 }

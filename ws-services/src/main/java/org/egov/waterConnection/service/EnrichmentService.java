@@ -167,4 +167,39 @@ public class EnrichmentService {
 			});
 		}
 	}
+	
+	/**
+	 * Enrich water connection request and add connection no if status is approved
+	 * 
+	 * @param waterConnectionrequest 
+	 */
+    public void postStatusEnrichment(WaterConnectionRequest waterConnectionrequest){
+    	String applicationStatus = waterConnectionrequest.getWaterConnection().getApplicationStatus().name();
+        if(applicationStatus.equalsIgnoreCase(WCConstants.STATUS_APPROVED)) {
+        	setConnectionNO(waterConnectionrequest);
+        }
+    }
+    
+    
+    /**
+     * Enrich water connection request and set water connection no
+     * @param request
+     */
+	private void setConnectionNO(WaterConnectionRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+		WaterConnection waterConnection = request.getWaterConnection();
+		List<String> connectionNumbers = getIdList(requestInfo, tenantId, config.getWaterConnectionIdGenName(),
+				config.getWaterConnectionIdGenFormat(), 1);
+		ListIterator<String> itr = connectionNumbers.listIterator();
+		Map<String, String> errorMap = new HashMap<>();
+		if (connectionNumbers.size() != 1) {
+			errorMap.put("IDGEN_ERROR",
+					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+		}
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		waterConnection.setConnectionNo(itr.next());
+		;
+	}
 }
