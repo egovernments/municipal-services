@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.constants.WCConstants;
-import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.workflow.BusinessService;

@@ -1,26 +1,20 @@
 package org.egov.waterConnection.validator;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.constants.WCConstants;
-import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.repository.WaterDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class WaterConnectionValidator {
-	@Autowired
-	WaterDao waterDao;
 
 	/**
 	 * 
@@ -74,5 +68,61 @@ public class WaterConnectionValidator {
 						"PROPERTY ID NOT FOUND FOR " + waterConnection.getConnectionNo() + " WATER CONNECTION NO");
 			}
 		});
+	}
+	
+	/**
+	 * Validate for previous data to current data
+	 * 
+	 * @param request water connection request
+	 * @param searchResult water connection search result
+	 */
+	public void validateUpdate(WaterConnectionRequest request, WaterConnection searchResult) {
+		validateAllIds(request.getWaterConnection(), searchResult);
+		validateDuplicateDocuments(request);
+		setFieldsFromSearch(request,searchResult);
+		
+	}
+   
+	/**
+	 * Validates if all ids are same as obtained from search result
+	 * 
+	 * @param updateWaterConnection The water connection request from update request 
+	 * @param searchResult The water connection from search result
+	 */
+	private void validateAllIds(WaterConnection updateWaterConnection, WaterConnection searchResult) {
+		Map<String, String> errorMap = new HashMap<>();
+		if (!searchResult.getApplicationNo().equals(updateWaterConnection.getApplicationNo()))
+			errorMap.put("INVALID UPDATE", "The application number from search: " + searchResult.getApplicationNo()
+					+ " and from update: " + updateWaterConnection.getApplicationNo() + " does not match");
+		if (!CollectionUtils.isEmpty(errorMap))
+			throw new CustomException(errorMap);
+	}
+    
+    /**
+     * Validates application documents for duplicates
+     * 
+     * @param request The waterConnection Request
+     */
+	private void validateDuplicateDocuments(WaterConnectionRequest request) {
+		List<String> documentFileStoreIds = new LinkedList<>();
+		if (request.getWaterConnection().getDocuments() != null) {
+			request.getWaterConnection().getDocuments().forEach(document -> {
+				if (documentFileStoreIds.contains(document.getFileStoreId()))
+					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+							"Same document cannot be used multiple times");
+				else
+					documentFileStoreIds.add(document.getFileStoreId());
+			});
+		}
+	}
+	/**
+	 * Enrich Immutable fields
+	 * 
+	 * @param request Water connection request
+	 * @param searchResult water connection search result
+	 */
+	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult) {
+		request.getWaterConnection().setApplicationStatus(searchResult.getApplicationStatus());
+		request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
 	}
 }

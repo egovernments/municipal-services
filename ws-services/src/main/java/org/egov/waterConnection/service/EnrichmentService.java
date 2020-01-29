@@ -22,6 +22,7 @@ import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.Idgen.IdResponse;
+import org.egov.waterConnection.model.Status;
 import org.egov.waterConnection.repository.IdGenRepository;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.util.WaterServicesUtil;
@@ -156,5 +157,14 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+		WaterConnection connection = waterConnectionRequest.getWaterConnection();
+		if (!CollectionUtils.isEmpty(connection.getDocuments())) {
+			connection.getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+					document.setStatus(Status.ACTIVE);
+				}
+			});
+		}
 	}
 }

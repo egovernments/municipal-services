@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -13,6 +14,7 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.workflow.BusinessService;
 import org.egov.waterConnection.config.WSConfiguration;
+import org.egov.waterConnection.model.Difference;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.validator.ActionValidator;
@@ -58,6 +60,9 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private ActionValidator actionValidator;
+	
+	@Autowired
+	private DiffService diffService;
 	
 	
 	
@@ -112,16 +117,15 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		BusinessService businessService = workflowService.getBusinessService(
-				waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
-				waterConnectionRequest.getRequestInfo());
-		WaterConnection searchResult = getConnectionForUpdateRequest(
-				waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
-		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
-		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
-		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
+		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
+		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
+		validateProperty.validatePropertyCriteria(waterConnectionRequest);
+		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		 Map<String, Difference> diffMap = diffService.getDifference(waterConnectionRequest, searchResult);
 		waterDao.updateWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
