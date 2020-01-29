@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
@@ -16,6 +17,7 @@ import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
+import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.web.models.workflow.ProcessInstance;
@@ -237,6 +239,10 @@ public class BPAService {
 
 		}
 
+		List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive()).collect(Collectors.toList());
+		bpaRequest.getBPA().getOwners().clear();
+		bpaRequest.getBPA().setOwners(activeOwners);
+		
 		return bpaRequest.getBPA();
 
 	}
