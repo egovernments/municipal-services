@@ -43,6 +43,7 @@ import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -91,6 +92,9 @@ public class DemandService {
     
     @Autowired
     private WSCalculationProducer wsCalculationProducer;
+    
+    @Autowired
+    KafkaTemplate kafkaTemplate;
 
 
 	/**
@@ -721,7 +725,7 @@ public class DemandService {
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
 						.requestInfo(requestInfo).build();
-				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 			//	log.info("Prepared Statement" + calculationRes.toString());
 				
 			
