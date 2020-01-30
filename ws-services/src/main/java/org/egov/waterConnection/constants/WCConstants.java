@@ -58,5 +58,20 @@ public class WCConstants {
     public static final String STATUS_CANCELLED  = "CANCELLED";
 
     public static final String STATUS_PAID  = "PAID";
+    
+    public static final String NOTIFICATION_LOCALE = "en_IN";
+
+	public static final String MODULE = "rainmaker-ws";
+
+	public static final String SMS_RECIEVER_MASTER = "SMSReceiver";
+
+	public static final String WATER_SAVED_SUCCESS_MESSAGE_SMS = "WATER_APPLICATION_SAVED_SUCCESSFUL_SMS_MESSAGE";
+    
+	public static final String WATER_UPDATE_SUCCESS_MESSAGE_SMS = "WATER_APPLICATION_UPDATED_SUCCESSFUL_SMS_MESSAGE";
+	
+	public static final String WATER_CONNECTION_BILL_GENERATION_SMS_MESSAGE = "WATER_CONNECTION_BILL_GENERATION_SMS_MESSAGE";
+	
+	public static final String WATER_SAVED_SUCCESS_APP_MESSAGE = "WATER_APPLICATION_SAVED_SUCCESSFUL_APP_MESSAGE";
+	
 
 }
