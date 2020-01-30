@@ -85,16 +85,19 @@ public class PayService {
 
 		BigDecimal rebateAmt = BigDecimal.ZERO;
 		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
-
+		System.out.println("Rebate Object---->"+rebate);
 		if (null == rebate) return rebateAmt;
 
 		String[] time = ((String) rebate.get(CalculatorConstants.ENDING_DATE_APPLICABLES)).split("/");
 		Calendar cal = Calendar.getInstance();
 		setDateToCalendar(assessmentYear, time, cal);
 
+		System.out.println("cal.getTimeInMillis--->"+cal.getTimeInMillis());
+		System.out.println("System.currentTimeMillis--->"+System.currentTimeMillis());
+
 		if (cal.getTimeInMillis() > System.currentTimeMillis())
 			rebateAmt = mDService.calculateApplicables(taxAmt, rebate);
-		
+		System.out.println("rebateAmt rate--->"+rebateAmt);
 		return rebateAmt;
 	}
 

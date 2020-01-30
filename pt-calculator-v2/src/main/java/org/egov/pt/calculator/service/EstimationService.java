@@ -746,9 +746,6 @@ public class EstimationService {
 			calculation.setTaxAmount(fee);
 			postProcessTheFee(requestInfo,mutation,calculation);
 			feeStructure.put(mutation.getApplicationNumber(), calculation);
-			log.info("TIME--->");
-			System.out.println(calculation.getFromDate());
-			System.out.println(calculation.getToDate());
 			generateDemandsFroMutationFee(feeStructure, requestInfo);
 		}
 		
@@ -797,7 +794,7 @@ public class EstimationService {
 		billingSlabSearchCriteria.setUsageCategoryMajor(criteria.getUsageType());
 		//billingSlabSearchCriteria=enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,criteria);
 		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearchCriteria);
-
+		System.out.println(billingSlabRes);
 		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.FLAT)){
 			fees = BigDecimal.valueOf(billingSlabRes.getBillingSlab().get(0).getFixedAmount());
 		}
@@ -806,8 +803,6 @@ public class EstimationService {
 			BigDecimal marketValue = BigDecimal.valueOf(criteria.getMarketValue());
 			fees= marketValue.multiply(rate.divide(CalculatorConstants.HUNDRED));
 		}
-		log.info("fees--->",fees);
-		System.out.println(fees);
 		slabIds.add(billingSlabRes.getBillingSlab().get(0).getId());
 		calculation.setBillingSlabIds(slabIds); 
 		return fees;
@@ -826,8 +821,6 @@ public class EstimationService {
 	private void postProcessTheFee(RequestInfo requestInfo,MutationCalculationCriteria mutation, Calculation calculation) {
 		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		log.info("fees--->",requestInfo);
-		System.out.println(requestInfo);
 		mDataService.setPropertyMasterValues(requestInfo, mutation.getTenantId(), propertyBasedExemptionMasterMap,
 				timeBasedExemptionMasterMap);
 		String assessmentYear = mutation.getProperty().get(0).getPropertyDetails().get(0).getFinancialYear();
@@ -855,8 +848,6 @@ public class EstimationService {
 		for(String key: feeStructure.keySet()) {
 			List<DemandDetail> details = new ArrayList<>();
 			Calculation calculation = feeStructure.get(key);
-			log.info("getTenantId--->");
-			System.out.println(feeStructure.get(key).getTenantId());
 			//String demandId = UUID.randomUUID().toString();
 			DemandDetail detail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getTaxAmount()).auditDetails(null)
 					.taxHeadMasterCode(configs.getPtMutationFeeTaxHead()).tenantId(calculation.getTenantId()).build();
@@ -885,8 +876,6 @@ public class EstimationService {
 		}
 		
 		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(requestInfo).build();
-		log.info("dmReq--->",dmReq);
-		System.out.println(dmReq);
 		DemandResponse res = new DemandResponse();
 		String url = new StringBuilder().append(configs.getBillingServiceHost())
 				.append(configs.getDemandCreateEndPoint()).toString();
