@@ -8,6 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.notification.EditNotificationService;
+import org.egov.tl.util.TLConstants;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.validator.TLValidator;
 import org.egov.tl.web.models.*;
@@ -21,6 +22,8 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.JsonPath;
 
 import static org.egov.tl.util.TLConstants.*;
 
@@ -290,6 +293,17 @@ public class TradeLicenseService {
             case businessService_BPA:
                 endStates = tradeUtil.getBPAEndState(tradeLicenseRequest);
                 wfIntegrator.callWorkFlow(tradeLicenseRequest);
+                
+                tradeLicenseRequest.getLicenses().forEach(license -> {
+                	if(license.getAction().equalsIgnoreCase(TLConstants.ACTION_APPROVE)) {
+                		String jsonPath = TLConstants.validityPeriodMap.replace("{}", license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
+                        List<Integer> res = JsonPath.read(mdmsData, jsonPath);
+                        Calendar calendar = Calendar.getInstance();
+            			calendar.add(Calendar.YEAR, res.get(0));
+            			license.setValidTo(calendar.getTimeInMillis());
+                	}
+                });
+                
                 break;
         }
         enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
