@@ -293,20 +293,9 @@ public class TradeLicenseService {
             case businessService_BPA:
                 endStates = tradeUtil.getBPAEndState(tradeLicenseRequest);
                 wfIntegrator.callWorkFlow(tradeLicenseRequest);
-                
-                tradeLicenseRequest.getLicenses().forEach(license -> {
-                	if(license.getAction().equalsIgnoreCase(TLConstants.ACTION_APPROVE)) {
-                		String jsonPath = TLConstants.validityPeriodMap.replace("{}", license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
-                        List<Integer> res = JsonPath.read(mdmsData, jsonPath);
-                        Calendar calendar = Calendar.getInstance();
-            			calendar.add(Calendar.YEAR, res.get(0));
-            			license.setValidTo(calendar.getTimeInMillis());
-                	}
-                });
-                
                 break;
         }
-        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
+        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates, mdmsData);
         userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
         switch (businessServicefromPath) {
