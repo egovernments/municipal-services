@@ -41,6 +41,7 @@ import org.egov.swCalculation.util.CalculatorUtils;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -94,6 +95,9 @@ public class DemandService {
     
     @Autowired
     SWCalculationProducer producer;
+    
+    @Autowired
+    KafkaTemplate kafkaTemplate;
 
 	/**
 	 * Creates or updates Demand
@@ -721,7 +725,7 @@ public class DemandService {
 				HashMap<String, Object> calculationRes = new HashMap<>();
 				calculationRes.put("masterData", masterMap);
 				calculationRes.put("calculationReq", calculationReq);
-				producer.push(configs.getCreateDemand(), calculationReq);
+				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 			}
 		}
 		
