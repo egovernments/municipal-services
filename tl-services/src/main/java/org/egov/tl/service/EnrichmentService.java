@@ -459,16 +459,15 @@ public class EnrichmentService {
                     Long time = System.currentTimeMillis();
                     license.setIssuedDate(time);
                     license.setValidFrom(time);
+                    if (mdmsData != null && businessService.equalsIgnoreCase(businessService_BPA)) {
+    					String jsonPath = TLConstants.validityPeriodMap.replace("{}",
+    							license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
+    					List<Integer> res = JsonPath.read(mdmsData, jsonPath);
+    					Calendar calendar = Calendar.getInstance();
+    					calendar.add(Calendar.YEAR, res.get(0));
+    					license.setValidTo(calendar.getTimeInMillis());
+    				}
                 }
-                
-				if (mdmsData != null && businessService.equalsIgnoreCase(businessService_BPA)) {
-					String jsonPath = TLConstants.validityPeriodMap.replace("{}",
-							license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType());
-					List<Integer> res = JsonPath.read(mdmsData, jsonPath);
-					Calendar calendar = Calendar.getInstance();
-					calendar.add(Calendar.YEAR, res.get(0));
-					license.setValidTo(calendar.getTimeInMillis());
-				}
             }
         }
     }
