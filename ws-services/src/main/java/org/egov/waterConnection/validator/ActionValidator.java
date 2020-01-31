@@ -61,10 +61,9 @@ public class ActionValidator {
 			if (!CollectionUtils.isEmpty(connection.getDocuments())) {
 				connection.getDocuments().forEach(document -> {
 					if (document.getId() == null)
-						errorMap.put("INVALID UPDATE", "Id of document cannot be null");
+						errorMap.put("INVALID_UPDATE", "Id of document cannot be null");
 				});
 			}
-			errorMap.put("INVALID_UPDATE", "Id of waterConnection cannot be null");
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);

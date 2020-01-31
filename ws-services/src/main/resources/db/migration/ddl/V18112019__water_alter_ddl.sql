@@ -32,6 +32,7 @@ CREATE TABLE public.eg_ws_applicationdocument
   filestoreid character varying(64),
   wsid character varying(64),
   active character varying(64),
+  documentUid character varying(64),
   createdby character varying(64),
   lastmodifiedby character varying(64),
   createdtime bigint,
