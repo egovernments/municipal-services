@@ -81,7 +81,6 @@ public class PlumberInfo {
 
 	/**
 	 * The name of the user.
-	 *
 	 * @return name
 	 **/
 	@ApiModelProperty(value = "The name of the user.")
@@ -102,7 +101,6 @@ public class PlumberInfo {
 
 	/**
 	 * Plumber unique license number.
-	 *
 	 * @return licenseNo
 	 **/
 	@ApiModelProperty(value = "Plumber unique license number.")
@@ -123,7 +121,6 @@ public class PlumberInfo {
 
 	/**
 	 * MobileNumber of the user.
-	 *
 	 * @return mobileNumber
 	 **/
 	@ApiModelProperty(value = "MobileNumber of the user.")
@@ -144,7 +141,6 @@ public class PlumberInfo {
 
 	/**
 	 * Gender of the user.
-	 *
 	 * @return gender
 	 **/
 	@ApiModelProperty(value = "Gender of the user.")
@@ -165,7 +161,6 @@ public class PlumberInfo {
 
 	/**
 	 * Father or Husband name of the user.
-	 *
 	 * @return fatherOrHusbandName
 	 **/
 	@ApiModelProperty(value = "Father or Husband name of the user.")
@@ -186,7 +181,6 @@ public class PlumberInfo {
 
 	/**
 	 * The current address of the owner for correspondence.
-	 *
 	 * @return correspondenceAddress
 	 **/
 	@ApiModelProperty(value = "The current address of the owner for correspondence.")
@@ -207,7 +201,6 @@ public class PlumberInfo {
 
 	/**
 	 * The relationship of gaurdian.
-	 *
 	 * @return relationship
 	 **/
 	@ApiModelProperty(value = "The relationship of gaurdian.")
@@ -228,7 +221,6 @@ public class PlumberInfo {
 	/**
 	 * Json object to capture any extra information which is not accommodated of
 	 * model
-	 *
 	 * @return additionalDetails
 	 **/
 	@ApiModelProperty(value = "Json object to capture any extra information which is not accommodated of model")
@@ -248,7 +240,6 @@ public class PlumberInfo {
 
 	/**
 	 * The id of the user.
-	 *
 	 * @return name
 	 **/
 	@ApiModelProperty(value = "The id of the user.")

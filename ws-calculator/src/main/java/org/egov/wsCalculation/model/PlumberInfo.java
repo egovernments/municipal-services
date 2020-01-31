@@ -16,6 +16,10 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-01-22T12:39:45.543+05:30[Asia/Kolkata]")
 public class PlumberInfo   {
+	
+  @JsonProperty("id")
+  private String id = null;
+  
   @JsonProperty("name")
   private String name = null;
 
@@ -222,6 +226,20 @@ public class PlumberInfo   {
     this.additionalDetails = additionalDetails;
   }
 
+  /**
+	 * The id of the user.
+	 * @return name
+	 **/
+	@ApiModelProperty(value = "The id of the user.")
+
+	@Size(max = 256)
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
   @Override
   public boolean equals(java.lang.Object o) {
