@@ -331,7 +331,8 @@ public class Connection {
 		if (this.plumberInfo == null) {
 			this.plumberInfo = new ArrayList<PlumberInfo>();
 		}
-		this.plumberInfo.add(plumberInfoItem);
+		if(!this.plumberInfo.contains(plumberInfoItem))
+            this.plumberInfo.add(plumberInfoItem);
 		return this;
 	}
 

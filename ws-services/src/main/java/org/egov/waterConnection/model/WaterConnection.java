@@ -315,7 +315,8 @@ public class WaterConnection extends Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		this.documents.add(documentsItem);
+	 if(!this.documents.contains(documentsItem))
+             this.documents.add(documentsItem);
 		return this;
 	}
 

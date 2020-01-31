@@ -6,8 +6,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.egov.wsCalculation.model.Connection.ApplicationStatusEnum;
+import org.egov.wsCalculation.model.Connection.StatusEnum;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -312,7 +319,8 @@ public class WaterConnection extends Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		this.documents.add(documentsItem);
+		if(!this.documents.contains(documentsItem))
+			this.documents.add(documentsItem);
 		return this;
 	}
 

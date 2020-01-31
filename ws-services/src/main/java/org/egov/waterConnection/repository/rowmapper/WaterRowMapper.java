@@ -3,11 +3,16 @@ package org.egov.waterConnection.repository.rowmapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.Connection.StatusEnum;
+import org.egov.waterConnection.model.enums.Status;
+import org.egov.waterConnection.model.Document;
+import org.egov.waterConnection.model.PlumberInfo;
+import org.egov.waterConnection.model.PlumberInfo.RelationshipEnum;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
 import org.springframework.dao.DataAccessException;
@@ -19,35 +24,70 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 
 	@Override
 	public List<WaterConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
-		List<WaterConnection> waterConnectionList = new ArrayList<>();
-		WaterConnection waterConnection = new WaterConnection();
+		Map<String, WaterConnection> connectionListMap = new HashMap<>();
+		WaterConnection currentWaterConnection = new WaterConnection();
 		while (rs.next()) {
-			waterConnection = new WaterConnection();
-			Property property = new Property();
-			waterConnection.setConnectionCategory(rs.getString("connectionCategory"));
-			waterConnection.setRainWaterHarvesting(rs.getBoolean("rainWaterHarvesting"));
-			waterConnection.setConnectionType(rs.getString("connectionType"));
-			waterConnection.setWaterSource(rs.getString("waterSource"));
-			waterConnection.setMeterId(rs.getString("meterId"));
-			waterConnection.setMeterInstallationDate(rs.getLong("meterInstallationDate"));
-			waterConnection.setId(rs.getString("connection_Id"));
-			waterConnection.setApplicationNo(rs.getString("applicationNo"));
-			waterConnection.setApplicationStatus(ApplicationStatusEnum.fromValue(rs.getString("applicationstatus")));
-			waterConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
-			waterConnection.setConnectionNo(rs.getString("connectionNo"));
-			waterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
-			waterConnection.setPipeSize(rs.getDouble("pipeSize"));
-			waterConnection.setNoOfTaps(rs.getInt("noOfTaps"));
-			waterConnection.setUom(rs.getString("uom"));
-			waterConnection.setWaterSubSource(rs.getString("waterSubSource"));
-			waterConnection.setCalculationAttribute(rs.getString("calculationAttribute"));
-			//get property id and get property object 
-			property.setPropertyId(rs.getString("property_id"));
-			waterConnection.setProperty(property);
-			//Add documents id's
-			waterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));;
-			waterConnectionList.add(waterConnection);
+			String Id = rs.getString("connection_Id");
+			if (connectionListMap.getOrDefault(Id, null) == null) {
+				currentWaterConnection = new WaterConnection();
+				Property property = new Property();
+				currentWaterConnection.setConnectionCategory(rs.getString("connectionCategory"));
+				currentWaterConnection.setRainWaterHarvesting(rs.getBoolean("rainWaterHarvesting"));
+				currentWaterConnection.setConnectionType(rs.getString("connectionType"));
+				currentWaterConnection.setWaterSource(rs.getString("waterSource"));
+				currentWaterConnection.setMeterId(rs.getString("meterId"));
+				currentWaterConnection.setMeterInstallationDate(rs.getLong("meterInstallationDate"));
+				currentWaterConnection.setId(rs.getString("connection_Id"));
+				currentWaterConnection.setApplicationNo(rs.getString("applicationNo"));
+				currentWaterConnection
+						.setApplicationStatus(ApplicationStatusEnum.fromValue(rs.getString("applicationstatus")));
+				currentWaterConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
+				currentWaterConnection.setConnectionNo(rs.getString("connectionNo"));
+				currentWaterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
+				currentWaterConnection.setPipeSize(rs.getDouble("pipeSize"));
+				currentWaterConnection.setNoOfTaps(rs.getInt("noOfTaps"));
+				currentWaterConnection.setUom(rs.getString("uom"));
+				currentWaterConnection.setWaterSubSource(rs.getString("waterSubSource"));
+				currentWaterConnection.setCalculationAttribute(rs.getString("calculationAttribute"));
+				// get property id and get property object
+				property.setPropertyId(rs.getString("property_id"));
+				currentWaterConnection.setProperty(property);
+				// Add documents id's
+				currentWaterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
+				connectionListMap.put(Id, currentWaterConnection);
+			}
+			addChildrenToProperty(rs, currentWaterConnection);
 		}
-		return waterConnectionList;
+		return new ArrayList<>(connectionListMap.values());
+	}
+
+	private void addChildrenToProperty(ResultSet rs, WaterConnection waterConnection) throws SQLException {
+		String document_Id = rs.getString("doc_Id");
+		String isActive = rs.getString("doc_active");
+		String activeString = Status.ACTIVE.name();
+		boolean documentActive = false;
+		if(isActive != null)
+		documentActive = isActive.equalsIgnoreCase(activeString) == true ? true : false;
+		if (document_Id != null && documentActive) {
+			Document applicationDocument = new Document();
+			applicationDocument.setId(document_Id);
+			applicationDocument.setDocumentType(rs.getString("documenttype"));
+			applicationDocument.setFileStoreId(rs.getString("filestoreid"));
+			applicationDocument.setStatus(org.egov.waterConnection.model.Status.fromValue(isActive));
+			waterConnection.addDocumentsItem(applicationDocument);
+		}
+		String plumber_id = rs.getString("plumber_id");
+		if (plumber_id != null) {
+			PlumberInfo plumber = new PlumberInfo();
+			plumber.setId(plumber_id);
+			plumber.setName(rs.getString("plumber_name"));
+			plumber.setGender(rs.getString("plumber_gender"));
+			plumber.setLicenseNo(rs.getString("licenseno"));
+			plumber.setMobileNumber(rs.getString("plumber_mobileNumber"));
+			plumber.setRelationship(RelationshipEnum.fromValue(rs.getString("relationship")));
+			plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
+			plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
+			waterConnection.addPlumberInfoItem(plumber);
+		}
 	}
 }

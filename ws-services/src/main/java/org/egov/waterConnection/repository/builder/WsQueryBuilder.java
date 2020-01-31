@@ -23,17 +23,27 @@ public class WsQueryBuilder {
 	WSConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
-	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
-	private final static String WATER_SEARCH_Query = "SELECT wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource, wc.meterId, "
-			+ "wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id,"
-			+ " wc.connectionExecutionDate, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo,"
-			+ " conn.oldConnectionNo, conn.documents_id, conn.property_id FROM water_service_connection wc "
-			+ INNER_JOIN_STRING 
-			+ " connection conn ON wc.connection_id = conn.id";
+    private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
+//	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
+	private final static String WATER_SEARCH_Query = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource,"
+			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.uom, wc.waterSubSource, wc.calculationAttribute, wc.connection_id as connection_Id, wc.connectionExecutionDate,"
+			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action,"
+			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
+			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress, plumber.relationship  FROM connection conn "
+			+  INNER_JOIN_STRING 
+			+" water_service_connection wc ON wc.connection_id = conn.id"
+			+  LEFT_OUTER_JOIN_STRING
+			+ "eg_ws_applicationdocument document ON document.wsid = conn.id" 
+			+  LEFT_OUTER_JOIN_STRING
+			+ "eg_ws_plumberinfo plumber ON plumber.wsid = conn.id";
 	
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
 	
-
+	private final String paginationWrapper = "SELECT * FROM " +
+            "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
+            "({})" +
+            " result) result_offset " +
+            "WHERE offset_ > ? AND offset_ <= ?";
 	/**
 	 * 
 	 * @param criteria
@@ -146,7 +156,8 @@ public class WsQueryBuilder {
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
-		query = query + " " + Offset_Limit_String;
+//		query = query + " " + Offset_Limit_String;
+		 String finalQuery = paginationWrapper.replace("{}",query);
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
@@ -163,7 +174,7 @@ public class WsQueryBuilder {
 
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
-		return query;
+		return finalQuery;
 	}
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
