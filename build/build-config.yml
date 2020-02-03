@@ -8,7 +8,7 @@
 # -
 # -
 config:
-  - name: "municipal-services/egov-user-event"
+  - name: "builds/municipal-services/egov-user-event"
     build:
       - work-dir: "egov-user-event"
         image-name: "egov-user-event"
@@ -16,7 +16,7 @@ config:
       - work-dir: "egov-user-event/src/main/resources/db"
         image-name: "egov-user-event-db"
 
-  - name: "municipal-services/pt-calculator-v2"
+  - name: "builds/municipal-services/pt-calculator-v2"
     build:
       - work-dir: "pt-calculator-v2"
         image-name: "pt-calculator-v2"
@@ -24,7 +24,7 @@ config:
       - work-dir: "pt-calculator-v2/src/main/resources/db"
         image-name: "pt-calculator-v2-db"
 
-  - name: "municipal-services/pt-services-v2"
+  - name: "builds/municipal-services/pt-services-v2"
     build:
       - work-dir: "pt-services-v2"
         image-name: "pt-services-v2"
