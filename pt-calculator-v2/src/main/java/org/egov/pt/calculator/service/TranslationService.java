@@ -11,6 +11,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -47,7 +48,9 @@ public class TranslationService {
 
         PropertyV2 property = getProperty(assessmentRequestV2);
 
-        enrichPropertyFromAssessment(property, assessment);
+        if(!CollectionUtils.isEmpty(assessment.getUnitUsageList()))
+            enrichPropertyFromAssessment(property, assessment);
+
 
         if(property==null)
             throw new CustomException("INVALID_PROPERTYID","No property found for the given assessment");

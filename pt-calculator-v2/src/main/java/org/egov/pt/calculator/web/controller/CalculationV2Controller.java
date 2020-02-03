@@ -38,7 +38,6 @@ public class CalculationV2Controller {
         CalculationReq calculationReq = translationService.translate(assessmentRequestV2);
         return new ResponseEntity<>(estimationService.getTaxCalculation(calculationReq), HttpStatus.OK);
 
-
     }
 
 
