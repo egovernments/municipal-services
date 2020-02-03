@@ -73,5 +73,7 @@ public class WCConstants {
 	
 	public static final String WATER_SAVED_SUCCESS_APP_MESSAGE = "WATER_APPLICATION_SAVED_SUCCESSFUL_APP_MESSAGE";
 	
+	public static final String SERVICE_FIELD_VALUE_WS = "WS";
+	
 
 }
