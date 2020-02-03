@@ -37,7 +37,7 @@ public class PropertyV2 extends PropertyInfoV2 {
 	@Valid
 	private List<OwnerInfo> owners;
 
-	@JsonProperty("institutionV2")
+	@JsonProperty("institution")
 	private InstitutionV2 institutionV2;
 
 	@JsonProperty("creationReason")
@@ -64,7 +64,7 @@ public class PropertyV2 extends PropertyInfoV2 {
 	@JsonProperty("channel")
 	private String channel;
 
-	@JsonProperty("documentV2s")
+	@JsonProperty("documents")
 	@Valid
 	private List<DocumentV2> documentV2s;
 

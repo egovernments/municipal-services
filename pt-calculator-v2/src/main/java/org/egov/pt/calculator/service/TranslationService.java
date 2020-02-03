@@ -60,11 +60,11 @@ public class TranslationService {
 
         Map<String, Object> addressMap = new HashMap();
         Map<String, Object> localityMap = new HashMap();
-        localityMap.put("area",property.getAddressV2().getLocalityV2().getArea());
-        localityMap.put("code",property.getAddressV2().getLocalityV2().getCode());
-        addressMap.put("localityV2",localityMap);
+        localityMap.put("area",property.getAddress().getLocality().getArea());
+        localityMap.put("code",property.getAddress().getLocality().getCode());
+        addressMap.put("locality",localityMap);
 
-        propertyMap.put("addressV2", addressMap);
+        propertyMap.put("address", addressMap);
         propertyMap.put("propertyId",property.getPropertyId());
         propertyMap.put("tenantId", property.getTenantId());
         propertyMap.put("acknowldgementNumber", property.getAcknowldgementNumber());
@@ -182,9 +182,9 @@ public class TranslationService {
         url.append("propertyIds=");
         url.append(assessmentV2.getPropertyId());
 
-        PropertyV2 propertyV2 = mapper.convertValue(repository.fetchResult(url, requestInfoWrapper), PropertyV2.class);
+        PropertyResponseV2 propertyResponseV2 = mapper.convertValue(repository.fetchResult(url, requestInfoWrapper), PropertyResponseV2.class);
 
-        return propertyV2;
+        return propertyResponseV2.getProperties().get(0);
 
     }
 

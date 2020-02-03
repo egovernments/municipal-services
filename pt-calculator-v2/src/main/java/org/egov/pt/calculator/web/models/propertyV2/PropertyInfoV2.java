@@ -44,6 +44,6 @@ public class PropertyInfoV2 {
 	@JsonProperty("status")
 	private String status;
 
-	@JsonProperty("addressV2")
-	private AddressV2 addressV2;
+	@JsonProperty("address")
+	private AddressV2 address;
 }

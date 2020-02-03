@@ -55,8 +55,8 @@ public class AddressV2 {
 	@JsonProperty("street")
 	private String street;
 
-	@JsonProperty("localityV2")
-	private LocalityV2 localityV2;
+	@JsonProperty("locality")
+	private LocalityV2 locality;
 	
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
