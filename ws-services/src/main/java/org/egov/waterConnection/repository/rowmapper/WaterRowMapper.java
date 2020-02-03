@@ -74,6 +74,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
 			applicationDocument.setFileStoreId(rs.getString("filestoreid"));
+			applicationDocument.setDocumentUid(rs.getString("filestoreid"));
 			applicationDocument.setStatus(org.egov.waterConnection.model.Status.fromValue(isActive));
 			waterConnection.addDocumentsItem(applicationDocument);
 		}
