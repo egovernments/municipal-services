@@ -3,6 +3,7 @@ ADD COLUMN roadCuttingArea FLOAT,
 ADD COLUMN action character varying(64),
 ADD COLUMN roadType character varying(32),
 DROP COLUMN documents_id;
+ALTER TABLE eg_sw_connection alter column connectionno drop not null;
 CREATE TABLE public.eg_sw_plumberinfo
 (
   id character varying(256) NOT NULL,
@@ -27,7 +28,8 @@ CREATE TABLE public.eg_sw_applicationdocument
   documenttype character varying(64),
   filestoreid character varying(64),
   swid character varying(64),
-  active boolean,
+  active character varying(64),
+  documentUid character varying(64),
   createdby character varying(64),
   lastmodifiedby character varying(64),
   createdtime bigint,
