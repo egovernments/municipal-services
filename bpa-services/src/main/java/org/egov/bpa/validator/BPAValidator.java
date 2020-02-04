@@ -425,8 +425,11 @@ public class BPAValidator {
 			Object checkListFromReq = ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 			requestCheckList = (List<Map>) ((Map) ((List) checkListFromReq).get(0)).get(BPAConstants.QUESTIONS_TYPE);
 		}
-		for (Map reqQn : requestCheckList) {
-			requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
+		
+		if (requestCheckList != null && requestCheckList.size() > 0) {
+			for (Map reqQn : requestCheckList) {
+				requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
+			}
 		}
 		
 		log.info("Request questions ", requestQns);
