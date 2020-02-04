@@ -85,7 +85,7 @@ public class BPAConstants {
 	
 	public static final String OWNERSHIP_CATEGORY = "OwnerShipCategory";
 	
-	public static final String CHECKLIST_NAME = "Questions";
+	public static final String CHECKLIST_NAME = "CheckList";
 
 	// FINANCIAL YEAR
 
@@ -223,7 +223,7 @@ public class BPAConstants {
 	public static final String INPROGRESS_STATUS="INPROGRESS";
 	
 	//CheckList
-	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.Questions[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].checkList";
+	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].questions";
 	public static final String CHECKLISTFILTER =  "$.[?(@.WFState==\"{}\")]";
 	public static final String CHECKLIST_TYPE = "checkList";
 	public static final String DOCTYPES_TYPE = "docTypes";
