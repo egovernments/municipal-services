@@ -57,14 +57,14 @@ public class ActionValidator {
 		SewerageConnection connection = request.getSewerageConnection();
 		if (!workflowService.isStateUpdatable(connection.getApplicationStatus().name(), businessService)) {
 			if (connection.getId() == null)
-				errorMap.put("INVALID_UPDATE", "Id of waterConnection cannot be null");
+				errorMap.put("INVALID_UPDATE", "Id of sewerageConnection cannot be null");
 			if (!CollectionUtils.isEmpty(connection.getDocuments())) {
 				connection.getDocuments().forEach(document -> {
 					if (document.getId() == null)
 						errorMap.put("INVALID UPDATE", "Id of document cannot be null");
 				});
 			}
-			errorMap.put("INVALID_UPDATE", "Id of waterConnection cannot be null");
+			errorMap.put("INVALID_UPDATE", "Id of sewerageConnection cannot be null");
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);

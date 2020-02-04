@@ -167,6 +167,40 @@ public class EnrichmentService {
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 	}
 	
+	/**
+	 * Enrich sewerage connection request and add connection no if status is approved
+	 * 
+	 * @param sewerageConnectionrequest 
+	 */
+    public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest){
+    	String applicationStatus = sewerageConnectionRequest.getSewerageConnection().getApplicationStatus().name();
+        if(applicationStatus.equalsIgnoreCase(SWConstants.STATUS_APPROVED)) {
+        setConnectionNO(sewerageConnectionRequest);
+        }
+    }
+    
+	/**
+	 * Enrich sewergae connection request and set sewerage connection no
+	 * 
+	 * @param request
+	 */
+	private void setConnectionNO(SewerageConnectionRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+		SewerageConnection sewerageConnection = request.getSewerageConnection();
+		List<String> connectionNumbers = getIdList(requestInfo, tenantId, config.getSewerageIdGenName(),
+				config.getSewerageIdGenFormat(), 1);
+		ListIterator<String> itr = connectionNumbers.listIterator();
+		Map<String, String> errorMap = new HashMap<>();
+		if (connectionNumbers.size() != 1) {
+			errorMap.put("IDGEN_ERROR",
+					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+		}
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		sewerageConnection.setConnectionNo(itr.next());
+	}
+
 	  /**
      * Sets status for create request
      * @param tradeLicenseRequest The create request

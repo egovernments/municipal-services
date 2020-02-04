@@ -11,10 +11,8 @@ import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -64,7 +62,6 @@ public class WorkflowIntegrator {
 
 	private SWConfiguration config;
 
-
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, SWConfiguration config) {
 		this.rest = rest;
@@ -83,45 +80,31 @@ public class WorkflowIntegrator {
 	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest) {
 
 		String wfTenantId = sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId();
-        SewerageConnection sewerageConnection = new SewerageConnection();
-		
+
 		JSONArray array = new JSONArray();
-		
+		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
+		JSONObject obj = new JSONObject();
+		List<Map<String, String>> uuidmaps = new LinkedList<>();
+		// Add assignes to processInsatance
 
-			JSONObject obj = new JSONObject();
-			List<Map<String, String>> uuidmaps = new LinkedList<>();
-
-//			if(!CollectionUtils.isEmpty(license.getAssignee())){
-
-//				// Adding assignes to processInstance
-//				license.getAssignee().forEach(assignee -> {
-//					Map<String, String> uuidMap = new HashMap<>();
-//					uuidMap.put(UUIDKEY, assignee);
-//					uuidmaps.add(uuidMap);
-//				
-//
-//				}
-
-
-			obj.put(BUSINESSIDKEY, sewerageConnection.getApplicationNo());
-			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-			obj.put(ACTIONKEY, sewerageConnection.getAction());
-			
-//			if (!CollectionUtils.isEmpty(license.getAssignee()))
-//				obj.put(ASSIGNEEKEY, uuidmaps);
-			obj.put(DOCUMENTSKEY, sewerageConnection.getDocuments());
-			array.add(obj);
-		
-
-
+		obj.put(BUSINESSIDKEY, connection.getApplicationNo());
+		obj.put(TENANTIDKEY, wfTenantId);
+		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+		obj.put(ACTIONKEY, connection.getAction());
+		// Add comment
+		// obj.put(COMMENTKEY, connection.getComment);
+		if (!CollectionUtils.isEmpty(uuidmaps))
+			obj.put(ASSIGNEEKEY, uuidmaps);
+		obj.put(DOCUMENTSKEY, connection.getDocuments());
+		array.add(obj);
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, sewerageConnectionRequest.getRequestInfo());
 		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
 		String response = null;
 		try {
-			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest, String.class);
+			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
+					String.class);
 		} catch (HttpClientErrorException e) {
 
 			/*
@@ -132,9 +115,9 @@ public class WorkflowIntegrator {
 			try {
 				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND",
 						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_TL_WF_ERROR_KEY_NOT_FOUND",
+				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND",
 						" Unable to read the json path in error object : " + pnfe.getMessage());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());
@@ -144,21 +127,20 @@ public class WorkflowIntegrator {
 		}
 
 		/*
-		 * on success result from work-flow read the data and set the status back to SW
-		 * object
+		 * on success result from work-flow read the data and set the status
+		 * back to WS object
 		 */
 		DocumentContext responseContext = JsonPath.parse(response);
 		List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
 		Map<String, String> idStatusMap = new HashMap<>();
-		responseArray.forEach(
-				object -> {
+		responseArray.forEach(object -> {
 
-					DocumentContext instanceContext = JsonPath.parse(object);
-					idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-				});
-
+			DocumentContext instanceContext = JsonPath.parse(object);
+			idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+		});
 		// setting the status back to SW object from wf response
-		sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.fromValue(idStatusMap.get(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())));
-				
+		sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum
+				.fromValue(idStatusMap.get(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())));
+
 	}
 }

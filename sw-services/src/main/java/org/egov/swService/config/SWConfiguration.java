@@ -60,5 +60,8 @@ public class SWConfiguration {
 
     @Value("${is.external.workflow.enabled}")
     private Boolean isExternalWorkFlowEnabled;
+    
+    @Value("${egov.sewerageservice.updatesewerageconnection.workflow.topic}")
+    private String workFlowUpdateTopic;
 
 }

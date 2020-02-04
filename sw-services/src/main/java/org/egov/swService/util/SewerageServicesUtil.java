@@ -20,8 +20,11 @@ import org.egov.swService.model.PropertyRequest;
 import org.egov.swService.model.PropertyResponse;
 import org.egov.swService.model.RequestInfoWrapper;
 import org.egov.swService.model.SearchCriteria;
+import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.model.workflow.BusinessService;
 import org.egov.swService.repository.ServiceRequestRepository;
+import org.egov.swService.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -47,6 +50,9 @@ public class SewerageServicesUtil {
 	
 	@Autowired
 	ObjectMapper mapper;
+	
+	@Autowired
+	private WorkflowService workflowService;
 
 	@Autowired
 	public SewerageServicesUtil(ServiceRequestRepository serviceRequestRepository) {
@@ -284,6 +290,10 @@ public class SewerageServicesUtil {
 					.build();
 		else
 			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
+	}
+	
+	public boolean getStatusForUpdate(BusinessService businessService, SewerageConnection searchresult) {
+		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
 	}
 
 }

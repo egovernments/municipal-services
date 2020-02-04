@@ -22,7 +22,7 @@ public class SWConstants {
 
     public static final String ACTION_APPLY  = "APPLY";
 
-    public static final String ACTION_APPROVE  = "APPROVE";
+    public static final String ACTION_APPROVE  = "ACTIVATE_CONNECTION";
 
     public static final String ACTION_REJECT  = "REJECT";
 
@@ -37,7 +37,7 @@ public class SWConstants {
 
     public static final String STATUS_APPLIED  = "APPLIED";
 
-    public static final String STATUS_APPROVED  = "APPROVED";
+    public static final String STATUS_APPROVED  = "CONNECTION_ACTIVATED";
 
     public static final String STATUS_REJECTED  = "REJECTED";
 
@@ -46,4 +46,5 @@ public class SWConstants {
     public static final String STATUS_CANCELLED  = "CANCELLED";
 
     public static final String STATUS_PAID  = "PAID";
+    
 }

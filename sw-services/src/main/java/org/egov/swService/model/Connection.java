@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -34,11 +35,25 @@ public class Connection {
 	 * Gets or Sets applicationStatus
 	 */
 	public enum ApplicationStatusEnum {
-		INITIATED("Initiated"),
+		INITIATED("INITIATED"),
+
+		REJECTED("REJECTED"),
+
+		PENDING_FOR_CITIZEN_ACTION("PENDING_FOR_CITIZEN_ACTION"),
+
+		PENDING_FOR_DOCUMENT_VERIFICATION("PENDING_FOR_DOCUMENT_VERIFICATION"),
+
+		PENDING_FOR_FIELD_INSPECTION("PENDING_FOR_FIELD_INSPECTION"),
+
+		PENDING_APPROVAL_FOR_CONNECTION("PENDING_APPROVAL_FOR_CONNECTION"),
+
+		PENDING_FOR_PAYMENT("PENDING_FOR_PAYMENT"),
+
+		PENDING_FOR_CONNECTION_ACTIVATION("PENDING_FOR_CONNECTION_ACTIVATION"),
+
+		CONNECTION_ACTIVATED("CONNECTION_ACTIVATED"),
 
 		APPLIED("Applied"),
-
-		REJECTED("Rejected"),
 
 		APPROVED("Approved"),
 
@@ -317,7 +332,8 @@ public class Connection {
 		if (this.plumberInfo == null) {
 			this.plumberInfo = new ArrayList<PlumberInfo>();
 		}
-		this.plumberInfo.add(plumberInfoItem);
+		if (!this.plumberInfo.contains(plumberInfoItem))
+			this.plumberInfo.add(plumberInfoItem);
 		return this;
 	}
 

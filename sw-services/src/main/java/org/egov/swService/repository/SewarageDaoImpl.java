@@ -7,11 +7,11 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.producer.SewarageConnectionProducer;
 import org.egov.swService.repository.builder.sWQueryBuilder;
 import org.egov.swService.repository.rowmapper.SewerageRowMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,6 +33,9 @@ public class SewarageDaoImpl implements SewarageDao {
 
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
+	
+	@Autowired
+	private SWConfiguration swConfiguration;
 
 	@Value("${egov.sewarageservice.createconnection}")
 	private String createSewarageConnection;
@@ -69,9 +72,12 @@ public class SewarageDaoImpl implements SewarageDao {
 		return n;
 	}
 
-	@Override
-	public void updatSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
+	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isStateUpdatable) {
+		if (isStateUpdatable)
+			sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
+		if (!isStateUpdatable)
+			sewarageConnectionProducer.push(swConfiguration.getWorkFlowUpdateTopic(), sewerageConnectionRequest);
 	}
+
 
 }
