@@ -71,10 +71,6 @@ public class NotificationUtil {
 	 */
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa,
 			String localizationMessage) {
-
-
-		
-		
 		String message = null, messageTemplate;
 		if(bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(
@@ -90,6 +86,29 @@ public class NotificationUtil {
 				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
 
+
+			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
+				log.info(localizationMessage);
+				messageTemplate = getMessageTemplate(
+				 
+						BPAConstants.SEND_TO_CITIZEN, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+
+			case BPAConstants.ACTION_STATUS_SEND_TO_ARCHITECT:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.SEND_TO_ARCHITECT, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+
+			case BPAConstants.ACTION_STATUS_CITIZEN_APPROVE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.CITIZEN_APPROVED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
 			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
 				messageTemplate = getMessageTemplate(
 						BPAConstants.APP_FEE_PENDNG, localizationMessage);
@@ -126,8 +145,8 @@ public class NotificationUtil {
 			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
 				messageTemplate = getMessageTemplate(
 						BPAConstants.PERMIT_FEE_GENERATED, localizationMessage);
+//				message = getPaymentMsg(requestInfo,bpa, messageTemplate);
 				message = getInitiatedMsg(bpa, messageTemplate);
-				
 				break;
 				
 			case BPAConstants.ACTION_STATUS_APPROVED:
@@ -147,7 +166,103 @@ public class NotificationUtil {
 		return message;
 
 	}
+	public String getEventsCustomizedMsg(RequestInfo requestInfo, BPA bpa,
+			String localizationMessage) {
+		String message = null, messageTemplate;
+		if(bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
+			messageTemplate = getMessageTemplate(
+					BPAConstants.M_APP_REJECTED, localizationMessage);
+			message = getInitiatedMsg(bpa, messageTemplate);
+		} else {
+			String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
+			switch (ACTION_STATUS) {
 
+			case BPAConstants.ACTION_STATUS_INITIATED:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_APP_CREATE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+
+
+			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
+				log.info(localizationMessage);
+				messageTemplate = getMessageTemplate(
+				 
+						BPAConstants.M_SEND_TO_CITIZEN, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+
+			case BPAConstants.ACTION_STATUS_SEND_TO_ARCHITECT:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_SEND_TO_ARCHITECT, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+
+			case BPAConstants.ACTION_STATUS_CITIZEN_APPROVE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_CITIZEN_APPROVED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_APP_FEE_PENDNG, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_PAYMENT_RECEIVE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+			case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_DOC_VERIFICATION, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_NOC_VERIFICATION, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+				
+			case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_NOC_APPROVE, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_PERMIT_FEE_GENERATED, localizationMessage);
+//				message = getPaymentMsg(requestInfo,bpa, messageTemplate);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+			case BPAConstants.ACTION_STATUS_APPROVED:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_APPROVE_PERMIT_GENERATED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+
+				break;
+		}
+			
+			if(message.contains("<4>")) {
+				StringBuilder paymentUrl = new StringBuilder();
+				BigDecimal amount= getAmountToBePaid(requestInfo, bpa);
+				message = message.replace("<4>", amount.toString());
+			}
+		}
+		return message;
+
+	}
 	/**
 	 * Extracts message for the specific code
 	 * 
@@ -285,6 +400,15 @@ public class NotificationUtil {
 		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
 	}
+	
+	/*private String getPaymentMsg(RequestInfo requestInfo, BPA bpa, String message) {
+		message = message.replace("<2>", bpa.getServiceType());
+		message = message.replace("<3>", bpa.getApplicationNo());
+		StringBuilder paymentUrl = new StringBuilder();
+		BigDecimal amount= getAmountToBePaid(requestInfo, bpa);
+		message = message.replace("<4>", amount.toString());
+		return message;
+	}*/
 
 	/**
 	 * Send the SMSRequest on the SMSNotification kafka topic

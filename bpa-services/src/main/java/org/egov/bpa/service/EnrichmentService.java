@@ -181,7 +181,8 @@ public class EnrichmentService {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo
 				.getUserInfo().getUuid(), false);
-		bpaRequest.getBPA().getAuditDetails().setLastModifiedBy(auditDetails.getLastModifiedBy());
+		auditDetails.setCreatedBy(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
+		auditDetails.setCreatedTime(bpaRequest.getBPA().getAuditDetails().getCreatedTime());
 		bpaRequest.getBPA().getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
 //		bpaRequest.getBPA().setAuditDetails(auditDetails);
 		if (workflowService.isStateUpdatable(bpaRequest.getBPA().getStatus(),

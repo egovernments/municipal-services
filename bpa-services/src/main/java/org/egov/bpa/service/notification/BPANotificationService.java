@@ -69,7 +69,7 @@ public class BPANotificationService {
 		List<Event> events = new ArrayList<>();
         String tenantId = bpaRequest.getBPA().getTenantId();
         String localizationMessages = util.getLocalizationMessages(tenantId,bpaRequest.getRequestInfo());  //--need localization service changes.
-        String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  //--need localization service changes.
+        String message = util.getEventsCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);  //--need localization service changes.
 		BPA bpaApplication = bpaRequest.getBPA();
 		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 
@@ -128,7 +128,7 @@ public class BPANotificationService {
 		userSearchRequest.put("tenantId", tenantId);
 		userSearchRequest.put("userType", "CITIZEN");
     	for(String mobileNo: mobileNumbers) {
-    		userSearchRequest.put("userName", mobileNo);
+    		userSearchRequest.put("mobileNumber", mobileNo);
     		try {
     			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
     			if(null != user) {
@@ -169,6 +169,7 @@ public class BPANotificationService {
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(), userDetailResponse.getUser().get(0).getName());
+		if(!bpaRequest.getBPA().getAction().equals("SEND_TO_ARCHITECT")  && (!bpaRequest.getBPA().getStatus().equals( "INPROGRESS") || !bpaRequest.getBPA().getAction().equals("APPROVE") ) ){
 		if(bpaRequest.getBPA().getOwners().get(0).getId() == null){
 			BPASearchCriteria bpaOwnerSearchCriteria = new BPASearchCriteria();
 			List<String> ownerIds = new ArrayList<String>();
@@ -187,6 +188,7 @@ public class BPANotificationService {
 				}
 			}
 		});
+		}
 		}
 		return mobileNumberToOwner;
     }

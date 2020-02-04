@@ -156,7 +156,13 @@ public class BPAConstants {
 
 	// ACTION_STATUS combinations for notification
 
-	public static final String ACTION_STATUS_INITIATED = "INITIATE_INPROGRESS";
+	public static final String ACTION_STATUS_INITIATED = "INITIATE_INITIATED";
+	
+	public static final String ACTION_STATUS_SEND_TO_CITIZEN = "SEND_TO_CITIZEN_CITIZEN_APPROVAL_INPROCESS";
+	
+	public static final String ACTION_STATUS_SEND_TO_ARCHITECT = "SEND_TO_ARCHITECT_INITIATED";
+	
+	public static final String ACTION_STATUS_CITIZEN_APPROVE = "APPROVE_INPROGRESS";
 	
 	public static final String ACTION_STATUS_PENDING_APPL_FEE = "APPLY_PENDING_APPL_FEE";
 	
@@ -217,14 +223,56 @@ public class BPAConstants {
 	
 	//SMS Notification messages
 	public static final String APP_CREATE ="APPLICATION_CREATE_MSG";
+	
+	public static final String SEND_TO_CITIZEN ="SEND_TO_CITIZEN_MSG";
+	
+	public static final String CITIZEN_APPROVED ="CITIZEN_APPROVED_MSG";
+	
+	public static final String SEND_TO_ARCHITECT ="SEND_TO_ARCHITECT_MSG";
+	
+	public static final String APP_CLOSED ="APP_CLOSED_MSG";
+	
 	public static final String APP_FEE_PENDNG ="APPLICATION_FEE_PENDING_MSG";
+	
 	public static final String PAYMENT_RECEIVE ="PAYMENT_RECEIVED_MSG";
+	
 	public static final String DOC_VERIFICATION ="DOC_VERIFICATION_DONE_MSG";
+	
 	public static final String NOC_VERIFICATION ="NOC_FIELD_VERIFICATION_DONE_MSG";
+	
 	public static final String NOC_APPROVE ="NOC_APPROVED_MSG";
+	
 	public static final String PERMIT_FEE_GENERATED ="PERMIT_FEE_GENERATED_MSG";
+	
 	public static final String APPROVE_PERMIT_GENERATED ="APPROVED_AND_PERMIT_GENERATED_MSG";
+	
 	public static final String APP_REJECTED ="APPLICATION_REJECTED_MSG";
+	
+	public static final String M_APP_CREATE ="M_APPLICATION_CREATE_MSG";
+	
+	public static final String M_SEND_TO_CITIZEN ="M_SEND_TO_CITIZEN_MSG";
+	
+	public static final String M_CITIZEN_APPROVED ="M_CITIZEN_APPROVED_MSG";
+	
+	public static final String M_SEND_TO_ARCHITECT ="M_SEND_TO_ARCHITECT_MSG";
+	
+	public static final String M_APP_CLOSED ="M_APP_CLOSED_MSG";
+	
+	public static final String M_APP_FEE_PENDNG ="M_APPLICATION_FEE_PENDING_MSG";
+	
+	public static final String M_PAYMENT_RECEIVE ="M_PAYMENT_RECEIVED_MSG";
+	
+	public static final String M_DOC_VERIFICATION ="M_DOC_VERIFICATION_DONE_MSG";
+	
+	public static final String M_NOC_VERIFICATION ="M_NOC_FIELD_VERIFICATION_DONE_MSG";
+	
+	public static final String M_NOC_APPROVE ="M_NOC_APPROVED_MSG";
+	
+	public static final String M_PERMIT_FEE_GENERATED ="M_PERMIT_FEE_GENERATED_MSG";
+	
+	public static final String M_APPROVE_PERMIT_GENERATED ="M_APPROVED_AND_PERMIT_GENERATED_MSG";
+	
+	public static final String M_APP_REJECTED ="M_APPLICATION_REJECTED_MSG";
 
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
 }
