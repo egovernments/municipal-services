@@ -212,6 +212,8 @@ public class BPAService {
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		actionValidator.validateUpdateRequest(bpaRequest, businessService);
+		bpaValidator.validateCheckList(mdmsData, bpaRequest,
+				workflowService.getCurrentState(bpa.getStatus(), businessService));
 
 		//
 		//

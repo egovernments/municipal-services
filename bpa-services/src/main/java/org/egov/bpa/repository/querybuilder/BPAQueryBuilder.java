@@ -23,7 +23,7 @@ public class BPAQueryBuilder {
 	private static final String QUERY = "SELECT bpa.*,bpaunit.*,bpaowner.*,"
 			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-			+ "bpa_createdTime,bpa.validityDate,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
+			+ "bpa_createdTime,bpa.validityDate,bpa.additionalDetails,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
 			+ "bpaowner.id as bpaowner_uuid,"
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
 			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestoreid as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"

@@ -85,6 +85,7 @@ public class BPAConstants {
 	
 	public static final String OWNERSHIP_CATEGORY = "OwnerShipCategory";
 	
+	public static final String CHECKLIST_NAME = "Questions";
 
 	// FINANCIAL YEAR
 
@@ -220,6 +221,16 @@ public class BPAConstants {
 	
 	public static final String SANC_FEE ="BPA.NC_SAN_FEE";
 	public static final String INPROGRESS_STATUS="INPROGRESS";
+	
+	//CheckList
+	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.Questions[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].checkList";
+	public static final String CHECKLISTFILTER =  "$.[?(@.WFState==\"{}\")]";
+	public static final String CHECKLIST_TYPE = "checkList";
+	public static final String DOCTYPES_TYPE = "docTypes";
+	public static final String QUESTIONS_TYPE = "questions";
+	public static final String QUESTION_TYPE = "question";
+	public static final String DOCS = "docs";
+	public static final String QUESTIONS_PATH = "$.[?(@.active==true)].question";
 	
 	//SMS Notification messages
 	public static final String APP_CREATE ="APPLICATION_CREATE_MSG";
