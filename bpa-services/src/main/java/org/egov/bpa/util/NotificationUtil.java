@@ -88,7 +88,6 @@ public class NotificationUtil {
 
 
 			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
-				log.info(localizationMessage);
 				messageTemplate = getMessageTemplate(
 				 
 						BPAConstants.SEND_TO_CITIZEN, localizationMessage);
@@ -112,6 +111,7 @@ public class NotificationUtil {
 			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
 				messageTemplate = getMessageTemplate(
 						BPAConstants.APP_FEE_PENDNG, localizationMessage);
+//				message = getPaymentMsg(requestInfo,bpa, messageTemplate);
 				message = getInitiatedMsg(bpa, messageTemplate);
 
 				break;
@@ -185,7 +185,6 @@ public class NotificationUtil {
 
 
 			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
-				log.info(localizationMessage);
 				messageTemplate = getMessageTemplate(
 				 
 						BPAConstants.M_SEND_TO_CITIZEN, localizationMessage);
@@ -488,6 +487,11 @@ public class NotificationUtil {
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
+		
+		log.info("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
+	/*	if(request.getEvents().get(1) != null){
+			log.info(" USER::  " + request.getEvents().get(1).getDescription());
+		}*/
 	}
 
 	/**

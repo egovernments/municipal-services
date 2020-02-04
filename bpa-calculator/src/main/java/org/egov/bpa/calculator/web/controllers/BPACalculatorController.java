@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.egov.bpa.calculator.services.CalculationService;
 import org.egov.bpa.calculator.services.DemandService;
 import org.egov.bpa.calculator.web.models.Calculation;
@@ -22,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 //@RequestMapping("/v1")
+@Slf4j
 public class BPACalculatorController {
 
 	private ObjectMapper objectMapper;
@@ -48,7 +51,7 @@ public class BPACalculatorController {
 	 */
 	@RequestMapping(value = "/_calculate", method = RequestMethod.POST)
 	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
-
+		log.info("CalculationReaquest:: " + calculationReq);
 		 List<Calculation> calculations = calculationService.calculate(calculationReq);
 		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);

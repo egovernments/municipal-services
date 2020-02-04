@@ -91,9 +91,16 @@ public class BPANotificationService {
 				Action action = null;
 				if(payTriggerList.contains(bpaApplication.getStatus())) {
 					List<ActionItem> items = new ArrayList<>();
+					String busineService = null;
+					if(bpaApplication.getStatus().equalsIgnoreCase("PENDING_APPL_FEE")){
+						busineService= "BPA.NC_APP_FEE";
+					}else{
+						busineService= "BPA.NC_SAN_FEE";
+					}
 					String actionLink = config.getPayLink().replace("$mobile", mobile)
 							.replace("$applicationNo", bpaApplication.getApplicationNo())
-							.replace("$tenantId", bpaApplication.getTenantId());
+							.replace("$tenantId", bpaApplication.getTenantId())
+							.replace("$businessService", busineService);
 					actionLink = config.getUiAppHost() + actionLink;
 					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 					items.add(item);

@@ -91,10 +91,11 @@ public class BPAService {
 		userService.createUser(bpaRequest);
 
 		wfIntegrator.callWorkFlow(bpaRequest);
-		repository.save(bpaRequest);
+	
 
 		calculationService.addCalculation(bpaRequest,
 				BPAConstants.APPLICATION_FEE_KEY);
+		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
 
@@ -225,8 +226,7 @@ public class BPAService {
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
 //		userService.createUser(bpaRequest);
-		repository.update(bpaRequest, workflowService.isStateUpdatable(
-				bpa.getStatus(), businessService));
+	
 
 		// Generate the sanction Demand
 		ProcessInstance processInstance = workflowService.getProcessInstance(
@@ -240,7 +240,9 @@ public class BPAService {
 			}
 
 		}
-
+		repository.update(bpaRequest, workflowService.isStateUpdatable(
+				bpa.getStatus(), businessService));
+		
 		List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive()).collect(Collectors.toList());
 		bpaRequest.getBPA().getOwners().clear();
 		bpaRequest.getBPA().setOwners(activeOwners);
