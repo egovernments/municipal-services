@@ -412,14 +412,14 @@ public class BPAValidator {
 		List<Map> requestCheckList = null;
 		List<String> requestQns = new ArrayList<String>();
 		
-		log.info("Fetching MDMS result for the state ", wfState);
+		log.info("Fetching MDMS result for the state " + wfState);
 		
 		String path = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState).replace("{2}", bpa.getRiskType().toString())
 				.replace("{3}", bpa.getServiceType()).replace("{4}", bpa.getApplicationType());
 		List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, path);
 		List<String> mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
 		
-		log.info("MDMS questions ", mdmsQns);
+		log.info("MDMS questions " + mdmsQns);
 
 		if (bpa.getAdditionalDetails() != null) {
 			Object checkListFromReq = ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
@@ -432,7 +432,7 @@ public class BPAValidator {
 			}
 		}
 		
-		log.info("Request questions ", requestQns);
+		log.info("Request questions " + requestQns);
 		
 		if (requestQns != null && requestQns.size() > 0 && mdmsQns != null && mdmsQns.size() > 0) {
 			requestQns.forEach(qn -> {
