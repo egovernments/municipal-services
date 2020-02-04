@@ -110,19 +110,29 @@ public class NotificationUtil {
 		}
 	}
 	
-	public String getCustomizedMsgForSMS(String topic, String localizationMessage) {
+	/**
+	 * 
+	 * @param applicationStatus
+	 * @param localizationMessage
+	 * @return message template
+	 */
+	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage) {
 		String messageString = null;
-		if (topic.equalsIgnoreCase(config.getOnWaterSaved()) || topic.equalsIgnoreCase(config.getOnWaterUpdated())) {
-			messageString = getMessageTemplate(WCConstants.WATER_SAVED_SUCCESS_MESSAGE_SMS, localizationMessage);
-		}
+		String notificationCode = "WS_" + action.toUpperCase() + "_" + applicationStatus.toUpperCase() + "_SMS_MESSAGE";
+		messageString = getMessageTemplate(notificationCode, localizationMessage);
 		return messageString;
 	}
-	public String getCustomizedMsgForInApp(String topic, String localizationMessage) {
+
+	/**
+	 * 
+	 * @param applicationStatus
+	 * @param localizationMessage
+	 * @return In app message template
+	 */
+	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage) {
 		String messageString = null;
-		if (topic.equalsIgnoreCase(config.getOnWaterSaved()) || topic.equalsIgnoreCase(config.getOnWaterUpdated())) {
-			messageString = getMessageTemplate(WCConstants.WATER_SAVED_SUCCESS_APP_MESSAGE,
-					localizationMessage);
-		}
+		String notificationCode = "WS_" + action.toUpperCase() + "_"+ applicationStatus.toUpperCase() + "_APP_MESSAGE";
+		messageString = getMessageTemplate(notificationCode, localizationMessage);
 		return messageString;
 	}
 	

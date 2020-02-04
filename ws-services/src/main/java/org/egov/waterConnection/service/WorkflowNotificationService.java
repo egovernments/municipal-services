@@ -1,9 +1,6 @@
 package org.egov.waterConnection.service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,29 +8,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.Action;
 import org.egov.waterConnection.model.ActionItem;
 import org.egov.waterConnection.model.Event;
 import org.egov.waterConnection.model.EventRequest;
+import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.Recepient;
 import org.egov.waterConnection.model.SMSRequest;
+import org.egov.waterConnection.model.Source;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.util.NotificationUtil;
-import org.egov.waterConnection.util.WaterServicesUtil;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +37,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class WorkflowNotificationService {
-	
-	@Autowired
-	private WaterServicesUtil waterServicesUtil;
 	
 	@Autowired
 	private NotificationUtil notificationUtil;
@@ -57,12 +50,7 @@ public class WorkflowNotificationService {
 	@Autowired
 	private ObjectMapper mapper;
 	
-	String tenantId = "tenantId";
-	String serviceName = "serviceName";
-	String consumerCode = "consumerCode";
-	String totalBillAmount = "billAmount";
-	String dueDate = "dueDate";
-	
+
 	/**
 	 * 
 	 * @param record record is bill response.
@@ -72,10 +60,14 @@ public class WorkflowNotificationService {
 		try {
 			RequestInfo requestInfo = request.getRequestInfo();
 			WaterConnection waterConnection = request.getWaterConnection();
+			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(waterConnection.getAction()+"_"+waterConnection.getApplicationStatus().name())) {
+				log.info("Notification Disabled For State :" + waterConnection.getApplicationStatus().name());
+				return;
+			}
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 			      EventRequest eventRequest = getEventRequest(waterConnection, topic, requestInfo);
 					if (eventRequest != null) {
-						log.info("In App Notification :: -> " + mapper.writeValueAsString(eventRequest));
+						log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 			}
@@ -83,7 +75,7 @@ public class WorkflowNotificationService {
 					List<SMSRequest> smsRequests = new LinkedList<>();
 				    smsRequests = getSmsRequest(waterConnection, topic, requestInfo);
 					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
+						log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
 			}
@@ -96,17 +88,18 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param mappedRecord
 	 * @param waterConnection
 	 * @param topic
 	 * @param requestInfo
-	 * @return
+	 * @return EventRequest Object
 	 */
 	private EventRequest getEventRequest(WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
 		List<Event> events = new ArrayList<>();
-		String localizationMessage = notificationUtil.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForInApp(topic, localizationMessage);
+		String localizationMessage = notificationUtil
+				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
+		String message = notificationUtil.getCustomizedMsgForInApp(waterConnection.getAction(), waterConnection.getApplicationStatus().name(),
+				localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -116,12 +109,13 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,waterConnection,
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, waterConnection,
 				message);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo,
 				waterConnection.getProperty().getTenantId());
-		
+//		Map<String, String> mapOfPhnoAndUUIDs = waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
+
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
@@ -133,28 +127,61 @@ public class WorkflowNotificationService {
 			List<String> toUsers = new ArrayList<>();
 			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
 			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
-		//	List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
-			Action action = null;
-			List<ActionItem> items = new ArrayList<>();
-//			String actionLink = config.getPayLink().replace("$mobile", mobile)
-//					.replace("$consumerCode", waterConnection.getConnectionNo())
-//					.replace("$tenantId", waterConnection.getProperty().getTenantId());
-//			actionLink = config.getNotificationUrl() + actionLink;
-//			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
-//			items.add(item);
-			action = Action.builder().actionUrls(items).build();
-//			events.add(Event.builder().tenantId(waterConnection.getProperty().getTenantId())
-//					.description(mobileNumberAndMesssage.get(mobile))
-//					.eventType(WSCalculationConstant.USREVENTS_EVENT_TYPE)
-//					.name(WSCalculationConstant.USREVENTS_EVENT_NAME)
-//					.postedBy(WSCalculationConstant.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
-//					.eventDetails(null).actions(action).build());
+			// List<String> payTriggerList =
+			// Arrays.asList(config.getPayTriggers().split("[,]"));
+
+			Action  action = getActionForEventNotification(mobileNumberAndMesssage, mobile, waterConnection);
+			events.add(Event.builder().tenantId(waterConnection.getProperty().getTenantId())
+					.description(mobileNumberAndMesssage.get(mobile)).eventType(WCConstants.USREVENTS_EVENT_TYPE)
+					.name(WCConstants.USREVENTS_EVENT_NAME).postedBy(WCConstants.USREVENTS_EVENT_POSTEDBY)
+					.source(Source.WEBAPP).recepient(recepient).eventDetails(null).actions(action).build());
 		}
 		if (!CollectionUtils.isEmpty(events)) {
 			return EventRequest.builder().requestInfo(requestInfo).events(events).build();
 		} else {
 			return null;
 		}
+	}
+	
+	/**
+	 * 
+	 * @param messageTemplate
+	 * @param connection
+	 * @return return action link
+	 */
+	private Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
+			String mobileNumber, WaterConnection connection) {
+		Action action = null;
+		String code = "";
+		String messageTemplate = mobileNumberAndMesssage.get(mobileNumber);
+		if (messageTemplate.contains("<Action Button>")) {
+			code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
+			messageTemplate = messageTemplate.replace("<Action Button>", "");
+			messageTemplate = messageTemplate.replace("</Action Button>", "");
+			messageTemplate = messageTemplate.replace(code, "");
+			List<ActionItem> items = new ArrayList<>();
+			String actionLink = "";
+			if (code.equalsIgnoreCase("Download Application")) {
+
+				// String actionLink = config.getPayLink().replace("$mobile", mobile)
+				// .replace("$consumerCode", waterConnection.getConnectionNo())
+				// .replace("$tenantId", waterConnection.getProperty().getTenantId());
+				actionLink = config.getNotificationUrl();
+			}
+			if (code.equalsIgnoreCase("PAY NOW")) {
+				actionLink = config.getNotificationUrl();
+			}
+			if (code.equalsIgnoreCase("DOWNLOAD RECEIPT")) {
+				actionLink = config.getNotificationUrl();
+			}
+			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
+			items.add(item);
+			action = Action.builder().actionUrls(items).build();
+			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
+		}
+//		actionLinkAndMsg.put("Action", action);
+//		actionLinkAndMsg.put(key, value);
+		return action;
 	}
 	
 	/**
@@ -168,8 +195,9 @@ public class WorkflowNotificationService {
 	private List<SMSRequest> getSmsRequest(WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		String localizationMessage = notificationUtil.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForSMS(topic, localizationMessage);
+		String localizationMessage = notificationUtil
+				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
+		String message = notificationUtil.getCustomizedMsgForSMS(waterConnection.getAction(), waterConnection.getApplicationStatus().name(), localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -179,16 +207,9 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,waterConnection,
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, waterConnection,
 				message);
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			if (messg.contains("<Link to Bill>")) {
-				String actionLink = config.getSmsNotificationLink()
-						.replace("$consumerCode", waterConnection.getConnectionNo())
-						.replace("$tenantId", waterConnection.getProperty().getTenantId());
-				actionLink = config.getNotificationUrl() + actionLink;
-				messg = messg.replace("<Link to Bill>", actionLink);
-			}
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);
 		});
@@ -205,51 +226,37 @@ public class WorkflowNotificationService {
 				messageToreplace = messageToreplace.replace("<Owner Name>", mobileAndName.getValue());
 			if (messageToreplace.contains("<Service>"))
 				messageToreplace = messageToreplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_WS);
+
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>", waterConnection.getApplicationNo());
-			if (messageToreplace.contains("<Due Date>"))
-				messageToreplace = messageToreplace.replace("<Due Date>", waterConnection.getConnectionNo());
+
+			if (messageToreplace.contains("<Application download link>"))
+				messageToreplace = messageToreplace.replace("<Application download link>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<mseva URL>"))
+				messageToreplace = messageToreplace.replace("<mseva URL>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<mseva app link>"))
+				messageToreplace = messageToreplace.replace("<mseva app link>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<View History Link>"))
+				messageToreplace = messageToreplace.replace("<View History Link>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<payment link>"))
+				messageToreplace = messageToreplace.replace("<payment link>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<receipt download link>"))
+				messageToreplace = messageToreplace.replace("<receipt download link>", config.getNotificationUrl());
+
+			if (messageToreplace.contains("<connection details page>"))
+				messageToreplace = messageToreplace.replace("<connection details page>", config.getNotificationUrl());
 			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
 		}
 		return messagetoreturn;
 	}
 	
 	
-	/**
-	 * 
-	 * @param context
-	 * @return
-	 */
-	public HashMap<String, String> mapRecords(DocumentContext context) {
-		HashMap<String, String> mappedRecord = new HashMap<>();
-		try {
-			DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
-			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
-			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
-			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
-			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
-			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
-		} catch (Exception ex) {
-			ex.printStackTrace();
-	            throw new CustomException("Bill Fetch Error","Unable to fetch values from bill");
-		}
-
-		return mappedRecord;
-	}
 	
-	private String getLatestBillDetails(String billdetails) {
-		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		log.info("Bill Details : -> " + billdetails);
-		JSONArray jsonArray = new JSONArray(billdetails);
-		ArrayList<Long> billDates = new ArrayList<>();
-		for (int i = 0; i < jsonArray.length(); i++) {
-			JSONObject jsonObj = jsonArray.getJSONObject(i);
-			billDates.add((Long) jsonObj.get("expiryDate"));
-		}
-		Collections.sort(billDates, Collections.reverseOrder());
-		
-		return formatter.format(billDates.get(0));
-	}
 	/**
      * Fetches UUIDs of CITIZENs based on the phone number.
      * 

@@ -31,15 +31,15 @@ public class WorkflowNotificationConsumer {
 	 * @param topic
 	 * @throws JsonProcessingException 
 	 */
-	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterapplication}"})
+	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterconnection}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
 	public void listen(final List<Message<?>> records) throws JsonProcessingException {
-		log.info(mapper.writeValueAsString(records));
+		log.info("WaterConnection Obj " + mapper.writeValueAsString(records));
 		records.forEach(record -> {
 			String topic = record.getHeaders().get("kafka_receivedTopic").toString();
 			JSONParser parser = new JSONParser();
 			try {
 				log.info("Consuming record: " + record);
-				Object waterConnectionRequestJson = parser.parse((String) record.getPayload());
+				Object waterConnectionRequestJson = parser.parse((String)record.getPayload());
 				WaterConnectionRequest waterConnectionRequest = mapper.convertValue(waterConnectionRequestJson, WaterConnectionRequest.class);
 				workflowNotificationService.process(waterConnectionRequest, topic);
 			} catch (final Exception e) {
