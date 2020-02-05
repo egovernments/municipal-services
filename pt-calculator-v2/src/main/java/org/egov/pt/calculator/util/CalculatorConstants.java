@@ -299,10 +299,13 @@ public class CalculatorConstants {
     public static final String BILLINGSLAB_KEY = "calculationDescription";
 
 	public static final String PT_MARKETVALUE_NULL = "PT_MARKETVALUE_NULL";
-	public static final String PT_MARKETVALUE_NULL_MSG = "Market Value is not present in additional details";
+	public static final String PT_MARKETVALUE_NULL_MSG = "Market Value is not present in additional details or set as null ";
 
 	public static final String PT_DOCDATE_NULL = "PT_DOCDATE_NULL";
-	public static final String PT_DOCDATE_NULL_MSG = "Document date is not present in additional details";
+	public static final String PT_DOCDATE_NULL_MSG = "Document date is not present in additional details or set as null";
+
+	public static final String PT_ADDITIONALNDETAILS_NULL = "PT_APPLICATIONDETAILS_NULL";
+	public static final String PT_ADDITIONALNDETAILS_NULL_MSG = "Appication Details is null or set as null";
 
 
 

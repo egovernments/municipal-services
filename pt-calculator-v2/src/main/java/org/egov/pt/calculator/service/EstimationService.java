@@ -745,15 +745,7 @@ public class EstimationService {
 	public Map<String, Calculation> mutationCalculator(PropertyV2 property, RequestInfo requestInfo) {
 		Map<String, Calculation> feeStructure = new HashMap<>();
 		Map<String,Object> additionalDetails = mapper.convertValue(property.getAdditionalDetails(),Map.class);
-		Map<String, String> error = new HashMap<>();
-
-		if(!additionalDetails.containsKey("marketValue") || additionalDetails.get("marketValue")== null)
-			error.put(PT_MARKETVALUE_NULL,PT_MARKETVALUE_NULL_MSG);
-		if(!additionalDetails.containsKey("documentDate") || additionalDetails.get("documentDate") == null)
-			error.put(PT_DOCDATE_NULL,PT_DOCDATE_NULL_MSG);
-		if (!CollectionUtils.isEmpty(error))
-			throw new CustomException(error);
-
+		calcValidator.validatePropertyForMutationCalculation(additionalDetails);
 		Calculation calculation = new Calculation();
 		calculation.setTenantId(property.getTenantId());
 		setTaxperiodForCalculation(requestInfo,property.getTenantId(),calculation);
