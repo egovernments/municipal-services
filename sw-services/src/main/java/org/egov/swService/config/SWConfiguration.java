@@ -63,5 +63,48 @@ public class SWConfiguration {
     
     @Value("${egov.sewerageservice.updatesewerageconnection.workflow.topic}")
     private String workFlowUpdateTopic;
+    
+
+	// Localization
+	@Value("${egov.localization.host}")
+	private String localizationHost;
+
+	@Value("${egov.localization.context.path}")
+	private String localizationContextPath;
+
+	@Value("${egov.localization.search.endpoint}")
+	private String localizationSearchEndpoint;
+
+	@Value("${egov.localization.statelevel}")
+	private Boolean isLocalizationStateLevel;
+
+	// SMS
+	@Value("${kafka.topics.notification.sms}")
+	private String smsNotifTopic;
+
+	@Value("${notification.sms.enabled}")
+	private Boolean isSMSEnabled;
+
+	@Value("${notification.sms.link}")
+	private String smsNotificationLink;
+
+	@Value("${notification.url}")
+	private String notificationUrl;
+
+	@Value("${egov.usr.events.create.topic}")
+	private String saveUserEventsTopic;
+	
+	@Value("${egov.user.event.notification.enabled}")
+	private Boolean isUserEventsNotificationEnabled;
+	
+    //User Configuration
+    @Value("${egov.user.host}")
+    private String userHost;
+
+    @Value("${egov.user.context.path}")
+    private String userContextPath;
+
+    @Value("${egov.user.search.path}")
+    private String userSearchEndpoint;
 
 }
