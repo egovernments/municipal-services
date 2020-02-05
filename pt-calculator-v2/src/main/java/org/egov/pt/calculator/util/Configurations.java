@@ -37,6 +37,12 @@ public class Configurations {
 	/*
 	 * Calculator Configs
 	 */
+	//assessment service
+	@Value("${egov.assessmentservice.host}")
+	private String assessmentServiceHost;
+
+	@Value("${egov.assessmentservice.search.endpoint}")
+	private String	assessmentSearchEndpoint;
 	
 	// billing service
 	@Value("${egov.billingservice.host}")

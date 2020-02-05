@@ -54,7 +54,7 @@ public class MutationBillingSlabQueryBuilder {
             preparedStmtList.add(billingSlabSearcCriteria.getUsageCategoryMajor());
         }
 
-        if (!StringUtils.isEmpty(billingSlabSearcCriteria.getPropertyType())) {
+        if (!StringUtils.isEmpty(billingSlabSearcCriteria.getUsageCategoryMinor())) {
 
             queryBuilder.append(" AND usageCategoryMinor = ?");
             preparedStmtList.add(billingSlabSearcCriteria.getUsageCategoryMinor());

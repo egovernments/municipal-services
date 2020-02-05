@@ -1,11 +1,12 @@
 package org.egov.pt.calculator.service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
@@ -27,10 +28,13 @@ import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.demand.Category;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
 import org.egov.pt.calculator.web.models.property.*;
+import org.egov.pt.calculator.web.models.propertyV2.AssessmentResponseV2;
+import org.egov.pt.calculator.web.models.propertyV2.PropertyV2;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +93,8 @@ public class EstimationService {
 
 	@Autowired
 	private ObjectMapper mapper;
+
+
 
 	@Value("${customization.pbfirecesslogic:false}")
 	Boolean usePBFirecessLogic;
@@ -736,18 +742,26 @@ public class EstimationService {
 	}
 	
 	
-	public Map<String, Calculation> mutationCalculator(List<MutationCalculationCriteria> criteria, RequestInfo requestInfo) {
+	public Map<String, Calculation> mutationCalculator(PropertyV2 property, RequestInfo requestInfo) {
 		Map<String, Calculation> feeStructure = new HashMap<>();
-		for(MutationCalculationCriteria mutation: criteria) {
-			Calculation calculation = new Calculation();
-			calculation.setTenantId(mutation.getTenantId());
-			setTaxperiodForCalculation(requestInfo,mutation.getTenantId(),calculation);
-			BigDecimal fee = getFeeFromSlabs(mutation, calculation, requestInfo);
-			calculation.setTaxAmount(fee);
-			postProcessTheFee(requestInfo,mutation,calculation);
-			feeStructure.put(mutation.getApplicationNumber(), calculation);
-			generateDemandsFroMutationFee(feeStructure, requestInfo);
-		}
+		Map<String,Object> additionalDetails = mapper.convertValue(property.getAdditionalDetails(),Map.class);
+		Map<String, String> error = new HashMap<>();
+
+		if(!additionalDetails.containsKey("marketValue") || additionalDetails.get("marketValue")== null)
+			error.put(PT_MARKETVALUE_NULL,PT_MARKETVALUE_NULL_MSG);
+		if(!additionalDetails.containsKey("documentDate") || additionalDetails.get("documentDate") == null)
+			error.put(PT_DOCDATE_NULL,PT_DOCDATE_NULL_MSG);
+		if (!CollectionUtils.isEmpty(error))
+			throw new CustomException(error);
+
+		Calculation calculation = new Calculation();
+		calculation.setTenantId(property.getTenantId());
+		setTaxperiodForCalculation(requestInfo,property.getTenantId(),calculation);
+		BigDecimal fee = getFeeFromSlabs(property, calculation, requestInfo,additionalDetails);
+		calculation.setTaxAmount(fee);
+		postProcessTheFee(requestInfo,property,calculation,additionalDetails);
+		feeStructure.put(property.getPropertyId(), calculation);
+		generateDemandsFroMutationFee(feeStructure, requestInfo);
 		
 		return feeStructure;
 	}
@@ -763,6 +777,7 @@ public class EstimationService {
 		}
 
 	}
+
 	/**
 	 * Fetch Tax Head Masters From billing service
 	 * @param requestInfo
@@ -777,22 +792,28 @@ public class EstimationService {
 				TaxPeriodResponse.class);
 		return res.getTaxPeriods();
 	}
+
 	
-	private BigDecimal getFeeFromSlabs(MutationCalculationCriteria criteria, Calculation calculation, RequestInfo requestInfo) {
+	private BigDecimal getFeeFromSlabs(PropertyV2 property, Calculation calculation, RequestInfo requestInfo,Map<String,Object> additionalDetails) {
 		List<String> slabIds = new ArrayList<>();
 		BigDecimal fees=null;
 
-		List<Property> property;
-		if (criteria.getProperty()==null && criteria.getApplicationNumber() != null) {
-			property = utils.getProperty(requestInfo, criteria.getApplicationNumber(), criteria.getTenantId());
-			criteria.setProperty(property);
-		}
 		MutationBillingSlabSearchCriteria billingSlabSearchCriteria = new MutationBillingSlabSearchCriteria();
 
-		billingSlabSearchCriteria.setTenantId(criteria.getProperty().get(0).getTenantId());
-		billingSlabSearchCriteria.setMarketValue(criteria.getMarketValue());
-		billingSlabSearchCriteria.setUsageCategoryMajor(criteria.getUsageType());
+		billingSlabSearchCriteria.setTenantId(property.getTenantId());
+
+
+		Double marketValue = (Double) additionalDetails.get("marketValue");
+		billingSlabSearchCriteria.setMarketValue(marketValue);
+
+		String[] usageCategoryMasterData = property.getUsageCategory().split("\\.");
+		String usageCategoryMajor = null,usageCategoryMinor = null;
+		usageCategoryMajor = usageCategoryMasterData[0];
+		if(usageCategoryMasterData.length > 1)
+			usageCategoryMinor = usageCategoryMasterData[1];
+		billingSlabSearchCriteria.setUsageCategoryMajor(usageCategoryMajor);
 		//billingSlabSearchCriteria=enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,criteria);
+
 		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearchCriteria);
 		System.out.println(billingSlabRes);
 		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.FLAT)){
@@ -800,11 +821,21 @@ public class EstimationService {
 		}
 		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.RATE)){
 			BigDecimal rate = BigDecimal.valueOf(billingSlabRes.getBillingSlab().get(0).getRate());
-			BigDecimal marketValue = BigDecimal.valueOf(criteria.getMarketValue());
-			fees= marketValue.multiply(rate.divide(CalculatorConstants.HUNDRED));
+			BigDecimal marketValuefess = BigDecimal.valueOf(billingSlabSearchCriteria.getMarketValue());
+			fees= marketValuefess.multiply(rate.divide(CalculatorConstants.HUNDRED));
 		}
 		slabIds.add(billingSlabRes.getBillingSlab().get(0).getId());
-		calculation.setBillingSlabIds(slabIds); 
+		calculation.setBillingSlabIds(slabIds);
+
+
+		if(additionalDetails.get("adhocRebate") != null) {
+			int adhocRebate = (int) additionalDetails.get("adhocRebate");
+			fees = fees.subtract(BigDecimal.valueOf(adhocRebate));
+		}
+		if(additionalDetails.get("adhocPenalty") != null) {
+			int adhocPenalty = (int) additionalDetails.get("adhocPenalty");
+			fees = fees.add(BigDecimal.valueOf(adhocPenalty));
+		}
 		return fees;
 	}
 
@@ -818,19 +849,19 @@ public class EstimationService {
 		return billingSlabSearchCriteria;
 	}
 	
-	private void postProcessTheFee(RequestInfo requestInfo,MutationCalculationCriteria mutation, Calculation calculation) {
+	private void postProcessTheFee(RequestInfo requestInfo,PropertyV2 property, Calculation calculation,Map<String,Object> additionalDetails) {
 		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-		mDataService.setPropertyMasterValues(requestInfo, mutation.getTenantId(), propertyBasedExemptionMasterMap,
+		mDataService.setPropertyMasterValues(requestInfo, property.getTenantId(), propertyBasedExemptionMasterMap,
 				timeBasedExemptionMasterMap);
-		String assessmentYear = mutation.getProperty().get(0).getPropertyDetails().get(0).getFinancialYear();
+
+		Long docDate =  Long.valueOf(String.valueOf(additionalDetails.get("documentDate")));
 		BigDecimal taxAmt = calculation.getTaxAmount();
-		BigDecimal rebate = payService.getRebate(taxAmt, assessmentYear,
-				timeBasedExemptionMasterMap.get(CalculatorConstants.REBATE_MASTER));
+		BigDecimal rebate = getRebate(taxAmt, timeBasedExemptionMasterMap.get(CalculatorConstants.REBATE_MASTER), docDate);
 		BigDecimal penalty = BigDecimal.ZERO;
 
 		if (rebate.equals(BigDecimal.ZERO)) {
-			penalty = payService.getPenalty(taxAmt, assessmentYear, timeBasedExemptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER));
+			penalty = getPenalty(taxAmt,timeBasedExemptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER),docDate);
 		}
 
 		calculation.setRebate(rebate);
@@ -842,6 +873,8 @@ public class EstimationService {
 				.subtract(calculation.getRebate().add(calculation.getExemption())).add(calculation.getPenalty());
 		calculation.setTotalAmount(totalAmount);
 	}
+
+
 	
 	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo) {
 		List<Demand> demands = new ArrayList<>();
@@ -905,4 +938,113 @@ public class EstimationService {
 				.append(SEPARATER).append(SERVICE_FIELD_FOR_SEARCH_URL)
 				.append(SERVICE_FIELD_VALUE_PT_MUTATION);
 	}
+
+	public BigDecimal getRebate(BigDecimal taxAmt, JSONArray rebateMasterList, Long docDate) {
+
+		BigDecimal rebateAmt = BigDecimal.ZERO;
+		Map<String, Object> rebate = getApplicableMaster(docDate, rebateMasterList);
+
+		if (null == rebate) return rebateAmt;
+
+		Long deadlineDate = getDeadlineDate(docDate);
+
+
+		if (deadlineDate > System.currentTimeMillis())
+			rebateAmt = mDataService.calculateApplicables(taxAmt, rebate);
+		return rebateAmt;
+	}
+
+	/**
+	 * Returns the Amount of penalty that has to be applied on the given tax amount for the given period
+	 *
+	 * @param taxAmt
+	 * @param docDate
+	 * @return
+	 */
+	public BigDecimal getPenalty(BigDecimal taxAmt, JSONArray penaltyMasterList, Long docDate) {
+
+		BigDecimal penaltyAmt = BigDecimal.ZERO;
+		Map<String, Object> penalty = getApplicableMaster(docDate, penaltyMasterList);
+		if (null == penalty) return penaltyAmt;
+
+		Long deadlineDate = getDeadlineDate(docDate);
+
+
+		if (deadlineDate < System.currentTimeMillis())
+			penaltyAmt = mDataService.calculateApplicables(taxAmt, penalty);
+
+		return penaltyAmt;
+	}
+
+	public Map<String, Object> getApplicableMaster(Long docdate, List<Object> masterList) {
+
+		Map<String, Object> objToBeReturned = null;
+
+		for (Object object : masterList) {
+
+			Map<String, Object> objMap = (Map<String, Object>) object;
+			String objFinYear = ((String) objMap.get(CalculatorConstants.FROMFY_FIELD_NAME)).split("-")[0];
+			String dateFiledName = null;
+			if(!objMap.containsKey(CalculatorConstants.STARTING_DATE_APPLICABLES)){
+				dateFiledName = CalculatorConstants.ENDING_DATE_APPLICABLES;
+			}
+			else
+				dateFiledName = CalculatorConstants.STARTING_DATE_APPLICABLES;
+
+			String[] time = ((String) objMap.get(dateFiledName)).split("/");
+			Calendar cal = Calendar.getInstance();
+			Long startDate = setDateToCalendar(objFinYear, time, cal,0);
+			Long endDate = setDateToCalendar(objFinYear, time, cal,1);
+
+			if(System.currentTimeMillis()>=startDate && System.currentTimeMillis()<=endDate )
+				objToBeReturned = objMap;
+
+		}
+
+		return objToBeReturned;
+	}
+
+	private Long getDeadlineDate(Long docdate){
+		Long deadlineDate = null;
+		Long timeStamp= docdate / 1000L;
+		java.util.Date time=new java.util.Date((Long)timeStamp*1000);
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(time);
+		Integer day = cal.get(Calendar.DAY_OF_MONTH);
+		Integer month = cal.get(Calendar.MONTH);
+		Integer year = cal.get(Calendar.YEAR);
+
+		month = month+6;
+		if(month>12){
+			month = month - 12;
+			year = year + 1;
+		}
+		cal.clear();
+		cal.set(year, month, day);
+		deadlineDate = cal.getTimeInMillis();
+		return  deadlineDate;
+	}
+
+	/**
+	 * Sets the date in to calendar based on the month and date value present in the time array
+	 *  @param assessmentYear
+	 * @param time
+	 * @param cal
+	 * @return
+	 */
+	private Long setDateToCalendar(String assessmentYear, String[] time, Calendar cal,int flag) {
+
+		cal.clear();
+		Long date = null;
+		Integer day = Integer.valueOf(time[0]);
+		Integer month = Integer.valueOf(time[1])-1;
+		Integer year = Integer.valueOf(assessmentYear);
+		if(flag==1)
+			year=year+1;
+		cal.set(year, month, day);
+		date = cal.getTimeInMillis();
+
+		return date;
+	}
+
 }
