@@ -56,6 +56,7 @@ public class EnrichmentService {
             tradeLicense.setApplicationDate(auditDetails.getCreatedTime());
             tradeLicense.getTradeLicenseDetail().setId(UUID.randomUUID().toString());
             tradeLicense.getTradeLicenseDetail().setAuditDetails(auditDetails);
+
             String businessService = tradeLicense.getBusinessService();
             if (businessService == null)
             {
@@ -75,7 +76,8 @@ public class EnrichmentService {
                         });
                     break;
             }
-            tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
+
+          tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
             tradeLicense.getTradeLicenseDetail().getAddress().setId(UUID.randomUUID().toString());
             tradeLicense.getTradeLicenseDetail().getTradeUnits().forEach(tradeUnit -> {
                 tradeUnit.setTenantId(tradeLicense.getTenantId());

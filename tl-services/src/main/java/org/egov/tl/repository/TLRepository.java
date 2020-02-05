@@ -57,6 +57,7 @@ public class TLRepository {
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getTLSearchQuery(criteria, preparedStmtList);
         log.info("Query: " + query);
+        log.info("PreparedStatementValues: " + preparedStmtList);
         List<TradeLicense> licenses =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
         sortChildObjectsById(licenses);
         return licenses;

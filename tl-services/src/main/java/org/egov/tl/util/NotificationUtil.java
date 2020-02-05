@@ -41,6 +41,10 @@ public class NotificationUtil {
 
 	final String amountPaidKey = "amountPaid";
 
+	final String consumerCodeKey = "consumerCode";
+
+    final String tenantIdKey = "tenantId";
+
 	/**
 	 * Creates customized message based on tradelicense
 	 * 
@@ -230,6 +234,8 @@ public class NotificationUtil {
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
+		message = message.replace("<applicationNumber>", license.getApplicationNumber());
+		message = message.replace("<tenantId>", license.getTenantId());
 		return message;
 	}
 
@@ -325,6 +331,8 @@ public class NotificationUtil {
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", license.getTradeName());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
+		messageTemplate = messageTemplate.replace("<applicationNumber>", valMap.get(consumerCodeKey));
+		messageTemplate = messageTemplate.replace("<tenantId>", valMap.get(tenantIdKey));
 		return messageTemplate;
 	}
 
@@ -396,11 +404,8 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(TradeLicense license) {
-		StringBuilder builder = new StringBuilder();
-
-
-		builder.append(config.getCalculatorHost());
-		builder.append(config.getGetBillEndpoint());
+		StringBuilder builder = new StringBuilder(config.getBillingHost());
+		builder.append(config.getFetchBillEndpoint());
 		builder.append("?tenantId=");
 		builder.append(license.getTenantId());
 		builder.append("&consumerCode=");
