@@ -7,13 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -30,7 +27,6 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
 @Component
-@Slf4j
 public class BPAUtil {
 
 	private BPAConfiguration config;
@@ -38,15 +34,11 @@ public class BPAUtil {
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
-	private WorkflowService workflowService;
-
 	@Autowired
 	public BPAUtil(BPAConfiguration config,
-			ServiceRequestRepository serviceRequestRepository,
-			WorkflowService workflowService) {
+			ServiceRequestRepository serviceRequestRepository) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
-		this.workflowService = workflowService;
 	}
 
 	/**
@@ -74,31 +66,6 @@ public class BPAUtil {
 	public StringBuilder getMdmsSearchUrl() {
 		return new StringBuilder().append(config.getMdmsHost()).append(
 				config.getMdmsEndPoint());
-	}
-
-	/**
-	 * Creates request to search financialYear in mdms
-	 * 
-	 * @return MDMS request for financialYear
-	 */
-	private ModuleDetail getFinancialYearRequest() {
-
-		// master details for BPA module
-		List<MasterDetail> masterDetails = new ArrayList<>();
-
-		// filter to only get code field from master data
-
-		final String filterCodeForUom = "$.[?(@.active==true && @.module=='BPA')]";
-
-		masterDetails.add(MasterDetail.builder()
-				.name(BPAConstants.MDMS_FINANCIALYEAR).filter(filterCodeForUom)
-				.build());
-
-		ModuleDetail masterDetail = ModuleDetail.builder()
-				.masterDetails(masterDetails)
-				.moduleName(BPAConstants.MDMS_EGF_MASTER).build();
-
-		return masterDetail;
 	}
 
 	/**

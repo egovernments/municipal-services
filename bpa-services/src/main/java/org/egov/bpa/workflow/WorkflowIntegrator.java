@@ -42,8 +42,6 @@ public class WorkflowIntegrator {
 
 	private static final String ASSIGNEEKEY = "assignes";
 
-	private static final String UUIDKEY = "uuid";
-
 	private static final String MODULENAMEVALUE = "BPA";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";

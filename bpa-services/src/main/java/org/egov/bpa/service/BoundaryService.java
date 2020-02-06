@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.models.BPARequest;
@@ -22,7 +20,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 @Service
-@Slf4j
 public class BoundaryService {
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -47,6 +44,7 @@ public class BoundaryService {
 	 * @param hierarchyTypeCode
 	 *            HierarchyTypeCode of the boundaries
 	 */
+	@SuppressWarnings("rawtypes")
 	public void getAreaType(BPARequest request, String hierarchyTypeCode) {
 		
 

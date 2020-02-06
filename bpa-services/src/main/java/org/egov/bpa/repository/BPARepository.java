@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.querybuilder.BPAQueryBuilder;
@@ -21,7 +19,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-@Slf4j
 @Repository
 public class BPARepository {
 
@@ -57,7 +54,6 @@ public class BPARepository {
 
         BPA bpaForStatusUpdate =null;
         BPA bpaForUpdate =null;
-        BPA bpaForAdhocChargeUpdate =null;
 
         BPA bpa = bpaRequest.getBPA();
 
@@ -77,10 +73,10 @@ public class BPARepository {
 	
 	
 	 /**
-     * Searhces bpa in databse
+     * BPA search in database
      *
      * @param criteria The bpa Search criteria
-     * @return List of bpa from seach
+     * @return List of bpa from search
      */
     public List<BPA> getBPAData(BPASearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();

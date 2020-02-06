@@ -5,13 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.util.BPAConstants.*;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.workflow.Action;
 import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.web.models.workflow.ProcessInstance;
 import org.egov.bpa.web.models.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -23,13 +20,11 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ActionValidator {
 
-	private WorkflowConfig workflowConfig;
 
 	private WorkflowService workflowService;
 
 	@Autowired
-	public ActionValidator(WorkflowConfig workflowConfig, WorkflowService workflowService) {
-		this.workflowConfig = workflowConfig;
+	public ActionValidator(WorkflowService workflowService) {
 		this.workflowService = workflowService;
 	}
 
@@ -67,16 +62,7 @@ public class ActionValidator {
 	 */
 	private void validateDocumentsForUpdate(BPARequest request) {
 		Map<String, String> errorMap = new HashMap<>();
-		BPA bpa = request.getBPA();
-		/*if (BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())) {
-			if (bpa.getDocuments() != null)
-				errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
-		}
-		if (BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())) {
-			if (bpa.getDocuments() == null)
-				errorMap.put("INVALID STATUS", "Status cannot be APPLY when application document are not provided");
-		}*/
-
+		
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -121,28 +107,6 @@ public class ActionValidator {
 			throw new CustomException(errorMap);
 		}
 			
-	}
-
-	/**
-	 * Validate if the action can be performed on the current status
-	 * 
-	 * @param request
-	 *            The bpa update request
-	 */
-	private void validateAction(BPARequest request) {
-		Map<String, List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
-		Map<String, String> errorMap = new HashMap<>();
-		BPA bpa = request.getBPA();
-
-		if (actionStatusMap.get(bpa.getStatus().toString()) != null) {
-			if (!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
-				errorMap.put("UNAUTHORIZED ACTION",
-						"The action " + bpa.getAction() + " cannot be applied on the status " + bpa.getStatus());
-		}
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
 	}
 
 	/**

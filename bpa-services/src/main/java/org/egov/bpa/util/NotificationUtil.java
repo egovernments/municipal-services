@@ -234,12 +234,6 @@ public class NotificationUtil {
 				break;
 				
 			}
-
-			if (message.contains("<4>")) {
-				StringBuilder paymentUrl = new StringBuilder();
-				BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
-				message = message.replace("<4>", amount.toString());
-			}
 		}
 		return message;
 
@@ -254,6 +248,7 @@ public class NotificationUtil {
 	 *            The localization messages
 	 * @return message for the specific code
 	 */
+	@SuppressWarnings("rawtypes")
 	public String getMessageTemplate(String notificationCode,
 			String localizationMessage) {
 		String path = "$..messages[?(@.code==\"{}\")].message";
@@ -277,6 +272,7 @@ public class NotificationUtil {
 	 *            The TradeLicense object for which
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	private BigDecimal getAmountToBePaid(RequestInfo requestInfo, BPA bpa) {
 
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
@@ -358,6 +354,7 @@ public class NotificationUtil {
 	 *            The requestInfo of the request
 	 * @return Localization messages for the module
 	 */
+	@SuppressWarnings("rawtypes")
 	public String getLocalizationMessages(String tenantId,
 			RequestInfo requestInfo) {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
@@ -394,9 +391,7 @@ public class NotificationUtil {
 	 */
 	private String getPaymentMsg(RequestInfo requestInfo, BPA bpa,
 			String message) {
-		message = message.replace("<2>", bpa.getServiceType());
-		message = message.replace("<3>", bpa.getApplicationNo());
-		StringBuilder paymentUrl = new StringBuilder();
+		message = getEnrichedMessage(bpa, message);
 		BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
 		message = message.replace("<4>", amount.toString());
 		return message;

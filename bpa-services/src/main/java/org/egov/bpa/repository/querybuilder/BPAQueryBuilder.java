@@ -2,15 +2,12 @@ package org.egov.bpa.repository.querybuilder;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-@Slf4j
 @Component
 public class BPAQueryBuilder {
 

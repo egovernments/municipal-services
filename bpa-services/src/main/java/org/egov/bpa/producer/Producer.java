@@ -1,13 +1,10 @@
 package org.egov.bpa.producer;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.tracer.kafka.CustomKafkaTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class Producer {
 
 	@Autowired
