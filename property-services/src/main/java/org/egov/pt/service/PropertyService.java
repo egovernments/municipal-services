@@ -1,17 +1,18 @@
 package org.egov.pt.service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.models.OwnerInfo;
-import org.egov.pt.models.Property;
+import org.egov.pt.models.*;
+import org.egov.pt.models.Address;
 import org.egov.pt.models.PropertyCriteria;
-import org.egov.pt.models.enums.Status;
+import org.egov.pt.models.enums.*;
+import org.egov.pt.models.oldProperty.*;
 import org.egov.pt.models.user.User;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
@@ -21,6 +22,7 @@ import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.PropertyRequest;
+import org.egov.pt.web.contracts.PropertyResponse;
 import org.javers.common.collections.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,8 @@ public class PropertyService {
     
     @Autowired
     private PropertyUtil util;
+
+	private ObjectMapper mapper;
 
 
     
@@ -231,5 +235,282 @@ public class PropertyService {
 		enrichmentService.enrichOwner(userDetailResponse, properties);
 		return properties;
 	}
+
+
+	public List<Property> migrateProperty(RequestInfo requestInfo, List<OldProperty> oldProperties) {
+
+		List<Property> properties = new ArrayList<>();
+		for(OldProperty oldProperty : oldProperties){
+			Property property = new Property();
+			property.setId(UUID.randomUUID().toString());
+			property.setPropertyId(oldProperty.getPropertyId());
+			//property.setSurveyId();
+			property.setLinkedProperties(null);
+			property.setTenantId(oldProperty.getTenantId());
+			property.setAccountId(requestInfo.getUserInfo().getUuid());
+			property.setOldPropertyId(oldProperty.getOldPropertyId());
+			property.setStatus(Status.fromValue(oldProperty.getStatus().toString()));
+
+			if(oldProperty.getAddress() == null)
+				property.setAddress(null);
+			else
+				property.setAddress(migrateAddress(oldProperty.getAddress()));
+
+			property.setAcknowldgementNumber(oldProperty.getAcknowldgementNumber());
+			property.setPropertyType(oldProperty.getPropertyDetails().get(0).getPropertyType());
+			property.setOwnershipCategory(migrateOwnwershipCategory(oldProperty));
+			property.setOwners(migrateOwnerInfo(oldProperty.getPropertyDetails().get(0).getOwners()));
+			if(oldProperty.getPropertyDetails().get(0).getInstitution() == null)
+				property.setInstitution(null);
+			else
+				property.setInstitution(migrateInstitution(oldProperty.getPropertyDetails().get(0).getInstitution()));
+			property.setCreationReason(CreationReason.fromValue(String.valueOf(oldProperty.getCreationReason())));
+			property.setUsageCategory(migrateUsageCategory(oldProperty));
+			property.setNoOfFloors(oldProperty.getPropertyDetails().get(0).getNoOfFloors());
+			property.setLandArea(Double.valueOf(oldProperty.getPropertyDetails().get(0).getLandArea()));
+			property.setSuperBuiltUpArea(BigDecimal.valueOf(oldProperty.getPropertyDetails().get(0).getBuildUpArea()));
+			property.setSource(Source.fromValue(String.valueOf(oldProperty.getPropertyDetails().get(0).getSource())));
+			property.setChannel(Channel.fromValue(String.valueOf(oldProperty.getPropertyDetails().get(0).getChannel())));
+
+			if(oldProperty.getPropertyDetails().get(0).getDocuments() == null)
+				property.setDocuments(null);
+			else
+				property.setDocuments(migrateDocument(oldProperty.getPropertyDetails().get(0).getDocuments()));
+
+			property.setUnits(migrateUnit(oldProperty.getPropertyDetails().get(0).getUnits()));
+			property.setAdditionalDetails(oldProperty.getPropertyDetails().get(0).getAdditionalDetails());
+			property.setAuditDetails(migrateAuditDetails(oldProperty.getOldAuditDetails()));
+			properties.add(property);
+
+			PropertyRequest request = PropertyRequest.builder().requestInfo(requestInfo).property(property).build();
+			//createProperty(request);
+
+			propertyValidator.validateCreateRequest(request);
+			if (config.getIsWorkflowEnabled())
+				updateWorkflow(request, true);
+			producer.push(config.getSavePropertyTopic(), request);
+		}
+
+		return properties;
+	}
+
+	public Address migrateAddress(org.egov.pt.models.oldProperty.Address oldAddress){
+		Address address = new Address();
+		address.setTenantId(oldAddress.getTenantId());
+		address.setDoorNo(oldAddress.getDoorNo());
+		//address.setPlotNo();
+		address.setId(oldAddress.getId());
+		address.setLandmark(oldAddress.getLandmark());
+		address.setCity(oldAddress.getCity());
+		//address.setDistrict();
+		//address.setRegion();
+		//address.setState();
+		//address.setCountry();
+		address.setPincode(oldAddress.getPincode());
+		address.setBuildingName(oldAddress.getBuildingName());
+		address.setStreet(oldAddress.getStreet());
+		address.setLocality(migrateLocality(oldAddress.getLocality()));
+		address.setAdditionalDetails(oldAddress.getAdditionalDetails());
+		address.setGeoLocation(migrateGeoLocation(oldAddress));
+
+
+		return  address;
+	}
+
+	public Locality migrateLocality(Boundary oldLocality){
+		Locality locality = new Locality();
+		locality.setCode(oldLocality.getCode());
+		locality.setName(oldLocality.getName());
+		locality.setLabel(oldLocality.getLabel());
+		locality.setLatitude(oldLocality.getLatitude());
+		locality.setLongitude(oldLocality.getLongitude());
+		locality.setArea(oldLocality.getArea());
+		locality.setMaterializedPath(oldLocality.getMaterializedPath());
+		locality.setChildren(setmigrateLocalityList(oldLocality.getChildren()));
+		return  locality;
+	}
+
+	public List<Locality> setmigrateLocalityList(List<Boundary> oldchildrenList){
+		List<Locality> childrenList = new ArrayList<>();
+		for(Boundary oldChildren : oldchildrenList ){
+			childrenList.add(migrateLocality(oldChildren));
+		}
+		return childrenList;
+	}
+
+	public GeoLocation migrateGeoLocation(org.egov.pt.models.oldProperty.Address oldAddress){
+		GeoLocation geoLocation = new GeoLocation();
+		if(oldAddress.getLatitude() == null)
+			geoLocation.setLongitude(null);
+		else
+			geoLocation.setLatitude(Double.valueOf(oldAddress.getLatitude()));
+
+		if(oldAddress.getLongitude() == null)
+			geoLocation.setLongitude(null);
+		else
+			geoLocation.setLongitude(Double.valueOf(oldAddress.getLongitude()));
+		return  geoLocation;
+	}
+
+	public List<OwnerInfo> migrateOwnerInfo(Set<OldOwnerInfo> oldOwnerInfosSet){
+		List<OwnerInfo> ownerInfolist = new ArrayList<>();
+		for(OldOwnerInfo oldOwnerInfo : oldOwnerInfosSet){
+			OwnerInfo ownerInfo = new OwnerInfo();
+			ownerInfo.setId(oldOwnerInfo.getId());
+			ownerInfo.setUuid(oldOwnerInfo.getUuid());
+			ownerInfo.setUserName(oldOwnerInfo.getUserName());
+			ownerInfo.setPassword(oldOwnerInfo.getPassword());
+			ownerInfo.setSalutation(oldOwnerInfo.getSalutation());
+			ownerInfo.setName(oldOwnerInfo.getName());
+			ownerInfo.setEmailId(oldOwnerInfo.getEmailId());
+			ownerInfo.setAltContactNumber(oldOwnerInfo.getAltContactNumber());
+			ownerInfo.setPan(oldOwnerInfo.getPan());
+			ownerInfo.setAadhaarNumber(oldOwnerInfo.getAadhaarNumber());
+			ownerInfo.setPermanentAddress(oldOwnerInfo.getPermanentAddress());
+			ownerInfo.setPermanentCity(oldOwnerInfo.getPermanentCity());
+			ownerInfo.setPermanentPincode(oldOwnerInfo.getPermanentPincode());
+			ownerInfo.setCorrespondenceAddress(oldOwnerInfo.getCorrespondenceAddress());
+			ownerInfo.setCorrespondenceCity(oldOwnerInfo.getCorrespondenceCity());
+			ownerInfo.setCorrespondencePincode(oldOwnerInfo.getCorrespondencePincode());
+			ownerInfo.setActive(oldOwnerInfo.getActive());
+			ownerInfo.setDob(oldOwnerInfo.getDob());
+			ownerInfo.setPwdExpiryDate(oldOwnerInfo.getPwdExpiryDate());
+			ownerInfo.setLocale(oldOwnerInfo.getLocale());
+			ownerInfo.setType(oldOwnerInfo.getType());
+			ownerInfo.setSignature(oldOwnerInfo.getSignature());
+			ownerInfo.setAccountLocked(oldOwnerInfo.getAccountLocked());
+			ownerInfo.setRoles(oldOwnerInfo.getRoles());
+			ownerInfo.setBloodGroup(oldOwnerInfo.getBloodGroup());
+			ownerInfo.setIdentificationMark(oldOwnerInfo.getIdentificationMark());
+			ownerInfo.setPhoto(oldOwnerInfo.getPhoto());
+			ownerInfo.setCreatedBy(oldOwnerInfo.getCreatedBy());
+			ownerInfo.setCreatedDate(oldOwnerInfo.getCreatedDate());
+			ownerInfo.setLastModifiedBy(oldOwnerInfo.getLastModifiedBy());
+			ownerInfo.setLastModifiedDate(oldOwnerInfo.getLastModifiedDate());
+			ownerInfo.setTenantId(oldOwnerInfo.getTenantId());
+			ownerInfo.setOwnerInfoUuid(UUID.randomUUID().toString());
+			ownerInfo.setMobileNumber(oldOwnerInfo.getMobileNumber());
+			ownerInfo.setGender(oldOwnerInfo.getGender());
+			ownerInfo.setFatherOrHusbandName(oldOwnerInfo.getFatherOrHusbandName());
+			ownerInfo.setCorrespondenceAddress(oldOwnerInfo.getCorrespondenceAddress());
+			ownerInfo.setIsPrimaryOwner(oldOwnerInfo.getIsPrimaryOwner());
+			ownerInfo.setOwnerShipPercentage(oldOwnerInfo.getOwnerShipPercentage());
+			ownerInfo.setOwnerType(oldOwnerInfo.getOwnerType());
+			ownerInfo.setInstitutionId(oldOwnerInfo.getInstitutionId());
+			ownerInfo.setStatus(Status.ACTIVE);
+			if(oldOwnerInfo.getOldDocuments() == null)
+				ownerInfo.setDocuments(null);
+			else
+				ownerInfo.setDocuments(migrateDocument(oldOwnerInfo.getOldDocuments()));
+
+			ownerInfo.setRelationship(Relationship.fromValue(String.valueOf(oldOwnerInfo.getRelationship())));
+
+			ownerInfolist.add(ownerInfo);
+		}
+		return ownerInfolist;
+	}
+
+	public Institution migrateInstitution(OldInstitution oldInstitution){
+		Institution newInstitution = new Institution();
+		newInstitution.setId(oldInstitution.getId());
+		newInstitution.setTenantId(oldInstitution.getTenantId());
+		newInstitution.setName(oldInstitution.getName());
+		newInstitution.setType(oldInstitution.getType());
+		newInstitution.setDesignation(oldInstitution.getDesignation());
+		//newInstitution.setNameOfAuthorizedPerson();
+		newInstitution.setAdditionalDetails(oldInstitution.getAdditionalDetails());
+
+		return newInstitution;
+
+	}
+
+	public String migrateUsageCategory(OldProperty oldProperty){
+		StringBuilder usageCategory = new StringBuilder(oldProperty.getPropertyDetails().get(0).getUsageCategoryMajor());
+		if(oldProperty.getPropertyDetails().get(0).getUsageCategoryMinor() != null)
+			usageCategory.append(".").append(oldProperty.getPropertyDetails().get(0).getUsageCategoryMinor());
+
+		return usageCategory.toString();
+	}
+	public String migrateOwnwershipCategory(OldProperty oldProperty){
+		StringBuilder ownershipCategory = new StringBuilder(oldProperty.getPropertyDetails().get(0).getOwnershipCategory());
+		if(oldProperty.getPropertyDetails().get(0).getSubOwnershipCategory() != null)
+			ownershipCategory.append(".").append(oldProperty.getPropertyDetails().get(0).getSubOwnershipCategory());
+
+		return ownershipCategory.toString();
+	}
+
+	public List<Unit> migrateUnit(List<OldUnit> oldUnits){
+		List<Unit> units = new ArrayList<>();
+		for(OldUnit oldUnit : oldUnits){
+			Unit unit = new Unit();
+			unit.setId(oldUnit.getId());
+			unit.setTenantId(oldUnit.getTenantId());
+			unit.setFloorNo(Integer.valueOf(oldUnit.getFloorNo()));
+			unit.setUnitType(oldUnit.getUnitType());
+			unit.setUsageCategory(migrateUnitUsageCategory(oldUnit));
+			unit.setOccupancyType(OccupancyType.fromValue(oldUnit.getOccupancyType()));
+			unit.setOccupancyDate(oldUnit.getOccupancyDate());
+			unit.setActive(Boolean.TRUE);
+			unit.setConstructionDetail(migrateConstructionDetail(oldUnit));
+			unit.setAdditionalDetails(oldUnit.getAdditionalDetails());
+			//unit.setAuditDetails();
+			unit.setArv(oldUnit.getArv());
+			units.add(unit);
+		}
+
+		return  units;
+	}
+
+	public String migrateUnitUsageCategory(OldUnit oldUnit){
+		StringBuilder usageCategory = new StringBuilder(oldUnit.getUsageCategoryMajor());
+		if(oldUnit.getUsageCategoryMinor() != null)
+			usageCategory.append(".").append(oldUnit.getUsageCategoryMinor());
+		if(oldUnit.getUsageCategorySubMinor() != null)
+			usageCategory.append(".").append(oldUnit.getUsageCategorySubMinor());
+		if(oldUnit.getUsageCategoryDetail() != null)
+			usageCategory.append(".").append(oldUnit.getUsageCategoryDetail());
+
+		return usageCategory.toString();
+	}
+
+	public ConstructionDetail migrateConstructionDetail(OldUnit oldUnit){
+		ConstructionDetail constructionDetail = new ConstructionDetail();
+		constructionDetail.setBuiltUpArea(BigDecimal.valueOf(oldUnit.getUnitArea()));
+
+		if (oldUnit.getConstructionType() == null){
+			constructionDetail.setConstructionType(null);
+			return constructionDetail;
+		}
+
+		StringBuilder constructionType = new StringBuilder(oldUnit.getConstructionType());
+		if(oldUnit.getConstructionSubType() != null)
+			constructionType.append(".").append(oldUnit.getConstructionSubType());
+		constructionDetail.setConstructionType(constructionType.toString());
+
+		return constructionDetail;
+	}
+
+	public List<Document> migrateDocument(Set<OldDocument> oldDocumentList){
+		List<Document> documentList = new ArrayList<>();
+		for(OldDocument oldDocument: oldDocumentList){
+			Document doc = new Document();
+			doc.setId(oldDocument.getId());
+			doc.setDocumentType(oldDocument.getDocumentType());
+			doc.setFileStoreId(oldDocument.getFileStore());
+			doc.setDocumentUid(oldDocument.getDocumentUid());
+			documentList.add(doc);
+		}
+		return  documentList;
+	}
+
+	public AuditDetails migrateAuditDetails(OldAuditDetails oldAuditDetails){
+		AuditDetails details = new AuditDetails();
+		details.setCreatedBy(oldAuditDetails.getCreatedBy());
+		details.setCreatedTime(oldAuditDetails.getCreatedTime());
+		details.setLastModifiedBy(oldAuditDetails.getLastModifiedBy());
+		details.setLastModifiedTime(oldAuditDetails.getLastModifiedTime());
+		return  details;
+	}
+
 
 }

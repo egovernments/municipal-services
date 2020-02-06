@@ -1,13 +1,10 @@
 package org.egov.pt.web.controllers;
 
-import java.util.Arrays;
-import java.util.List;
-
-import javax.validation.Valid;
-
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
+import org.egov.pt.models.oldProperty.OldProperty;
+import org.egov.pt.models.oldProperty.OldPropertyRequest;
 import org.egov.pt.service.PropertyService;
 import org.egov.pt.util.ResponseInfoFactory;
 import org.egov.pt.web.contracts.PropertyRequest;
@@ -21,6 +18,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.List;
+
 
 @Controller
 @RequestMapping("/property")
@@ -67,6 +69,18 @@ public class PropertyController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+	@PostMapping("/_migration")
+	public ResponseEntity<PropertyResponse> propertyMigration(@Valid @RequestBody OldPropertyRequest oldPropertyRequest) {
+
+		List<Property> properties = propertyService.migrateProperty(oldPropertyRequest.getRequestInfo(),oldPropertyRequest.getProperties());
+		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(oldPropertyRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+
 
 //	@RequestMapping(value = "/_cancel", method = RequestMethod.POST)
 //	public ResponseEntity<PropertyResponse> cancel(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
