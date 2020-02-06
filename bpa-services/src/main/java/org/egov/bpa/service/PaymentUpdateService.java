@@ -5,19 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
-import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.collection.PaymentDetail;
 import org.egov.bpa.web.models.collection.PaymentRequest;
-import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
-import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
@@ -27,11 +22,11 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Slf4j
 public class PaymentUpdateService {
-
-	private BPAService bpaService;
 
 	private BPAConfiguration config;
 
@@ -43,22 +38,14 @@ public class PaymentUpdateService {
 
 	private ObjectMapper mapper;
 
-	private WorkflowService workflowService;
-
-	private BPAUtil util;
-
 	@Autowired
-	public PaymentUpdateService(BPAService bpaService, BPAConfiguration config, BPARepository repository,
-			WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService, ObjectMapper mapper,
-			WorkflowService workflowService, BPAUtil util) {
-		this.bpaService = bpaService;
+	public PaymentUpdateService(BPAConfiguration config, BPARepository repository,
+			WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService, ObjectMapper mapper) {
 		this.config = config;
 		this.repository = repository;
 		this.wfIntegrator = wfIntegrator;
 		this.enrichmentService = enrichmentService;
 		this.mapper = mapper;
-		this.workflowService = workflowService;
-		this.util = util;
 	}
 
 	final String tenantId = "tenantId";
@@ -91,8 +78,6 @@ public class PaymentUpdateService {
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
 					List<BPA> bpas = repository.getBPAData(searchCriteria);
-					BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(),
-							requestInfo, codes.get(0));
 
 					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",

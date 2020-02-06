@@ -113,14 +113,14 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void addChildrenToProperty(ResultSet rs, BPA bpa)
 			throws SQLException {
 
 		String tenantId = bpa.getTenantId();
-		String bpaId = rs.getString("bpa_id");
 		
 		if (bpa == null) {
-			PGobject pgObj = (PGobject) rs.getObject("additionaldetail"); //TODO add logic to identify duplicate additionalDetails and avoid duplicates in the search response
+			PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
 			JsonNode additionalDetail = null;
 			try {
 				additionalDetail = mapper.readTree(pgObj.getValue());
@@ -137,10 +137,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
 		}
-
-		
-
-		
 		
 		String ownerId = rs.getString("bpaowner_uuid");
 		if (ownerId != null) {
@@ -177,11 +173,9 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 								.documentUid(rs.getString("ownerdocuid")).build();
 						ownerInfo.addDocumentsItem(ownerDocument);
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-					
 			});
 		}
 
@@ -194,7 +188,5 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					.id(documentId).build();
 			bpa.addDocumentsItem(document);
 		}
-
 	}
-
 }

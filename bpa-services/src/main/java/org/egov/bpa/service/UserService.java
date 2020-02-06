@@ -9,10 +9,9 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
@@ -29,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -54,7 +55,7 @@ public class UserService {
 				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 						.append(config.getUserCreateEndpoint());
 				setUserName(owner);
-				owner.setType("CITIZEN");
+				owner.setType(BPAConstants.CITIZEN);
 				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 				if (userDetailResponse.getUser().get(0).getUuid() == null) {
 					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
@@ -63,7 +64,6 @@ public class UserService {
 				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
 				setOwnerFields(owner, userDetailResponse, requestInfo);
 			} else {
-				log.info("owner Exists ========>");
 				if(owner.getTenantId() ==null) {
 					owner.setTenantId( bpa.getTenantId());
 				}
@@ -108,11 +108,6 @@ public class UserService {
 	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
-//		userSearchRequest.setMobileNumber(owner.getMobileNumber());
-//		userSearchRequest.setName(owner.getName());
-//		userSearchRequest.setRequestInfo(requestInfo);
-//		userSearchRequest.setActive(true);
-//		userSearchRequest.setUserType(owner.getType());
 		
 		if (owner.getId() != null)
 			userSearchRequest.setId(Arrays.asList(owner.getId().toString()));
@@ -131,9 +126,7 @@ public class UserService {
 	 *            The owner to whom the username is to assigned
 	 */
 	private void setUserName(OwnerInfo owner) {
-		// String username = UUID.randomUUID().toString();
-		String username = owner.getMobileNumber();
-		owner.setUserName(username);
+		owner.setUserName(owner.getMobileNumber());
 	}
 
 	/**
@@ -154,7 +147,6 @@ public class UserService {
 		owner.setCreatedDate(System.currentTimeMillis());
 		owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
 		owner.setLastModifiedDate(System.currentTimeMillis());
-		//owner.setActive(userDetailResponse.getUser().get(0).getActive());
 	}
 
 	/**
@@ -171,7 +163,7 @@ public class UserService {
 		owner.setActive(true);
 		owner.setTenantId(tenantId);
 		owner.setRoles(Collections.singletonList(role));
-		owner.setType("CITIZEN");
+		owner.setType(BPAConstants.CITIZEN);
 	}
 
 	/**
@@ -181,7 +173,7 @@ public class UserService {
 	 */
 	private Role getCitizenRole() {
 		Role role = new Role();
-		role.setCode("CITIZEN");
+		role.setCode(BPAConstants.CITIZEN);
 		role.setName("Citizen");
 		return role;
 	}
@@ -212,7 +204,7 @@ public class UserService {
 	 * @param userRequest
 	 *            Request object for user service
 	 * @param uri
-	 *            The address of the endpoint
+	 *            The address of the end point
 	 * @return Response from user service as parsed as userDetailResponse
 	 */
 	UserDetailResponse userCall(Object userRequest, StringBuilder uri) {
@@ -238,6 +230,7 @@ public class UserService {
 	 * @param responeMap
 	 *            LinkedHashMap got from user api response
 	 */
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	private void parseResponse(LinkedHashMap responeMap, String dobFormat) {
 		List<LinkedHashMap> users = (List<LinkedHashMap>) responeMap.get("user");
 		String format1 = "dd-MM-yyyy HH:mm:ss";
@@ -305,20 +298,9 @@ public class UserService {
 		userSearchRequest.setTenantId(criteria.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
-		userSearchRequest.setUserType("CITIZEN");
+		userSearchRequest.setUserType(BPAConstants.CITIZEN);
 		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
 			userSearchRequest.setUuid(criteria.getOwnerIds());
 		return userSearchRequest;
 	}
-
-	/**
-	 * Updates user if present else creates new user
-	 * 
-	 * @param request
-	 *            bpaRequest received from update
-	 */
-	public void updateUser(BPARequest request) {
-		// TO DO update
-	}
-
 }

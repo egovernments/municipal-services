@@ -264,4 +264,12 @@ public class BPAConstants {
 	public static final String M_APP_REJECTED ="M_APPLICATION_REJECTED_MSG";
 
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
+
+	public static final String INVALID_SEARCH = "INVALID SEARCH";
+	
+	public static final String INVALID_UPDATE = "INVALID UPDATE";
+	
+	public static final String EMPLOYEE = "EMPLOYEE";
+
+	public static final String CITIZEN = "CITIZEN";
 }

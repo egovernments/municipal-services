@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -14,7 +13,6 @@ import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Difference;
 import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.web.models.workflow.BusinessService;
@@ -31,9 +29,6 @@ import org.springframework.util.CollectionUtils;
 
 @Service
 public class BPAService {
-
-	@Autowired
-	private BPARepository bpaRequestInfoDao;
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
@@ -60,13 +55,7 @@ public class BPAService {
 	private BPAUtil util;
 
 	@Autowired
-	private DiffService diffService;
-
-	@Autowired
 	private CalculationService calculationService;
-
-	@Autowired
-	private BPAConfiguration config;
 
 	@Autowired
 	private WorkflowService workflowService;
@@ -94,11 +83,11 @@ public class BPAService {
 	}
 
 	/**
-	 * Searches the Bpa for the given criteria if search is on owner paramter
-	 * then first user service is called followed by query to db
+	 * Searches the Bpa for the given criteria if search is on owner parameter
+	 * then first user service is called followed by query to DB
 	 * 
 	 * @param criteria
-	 *            The object containing the paramters on which to search
+	 *            The object containing the parameters on which to search
 	 * @param requestInfo
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
@@ -115,7 +104,7 @@ public class BPAService {
 			}
 
 			if ((criteria.tenantIdOnly() || criteria.isEmpty())
-					&& roles.contains("CITIZEN")) {
+					&& roles.contains(BPAConstants.CITIZEN)) {
 				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			}
 
@@ -125,10 +114,10 @@ public class BPAService {
 	}
 
 	/**
-	 * Returns the bpa with enrivhed owners from user servise
+	 * Returns the bpa with enriched owners from user service
 	 * 
 	 * @param criteria
-	 *            The object containing the paramters on which to search
+	 *            The object containing the parameters on which to search
 	 * @param requestInfo
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
@@ -197,8 +186,6 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR",
 					"Failed to Update the Application");
 		}
-		Difference diffMap = diffService
-				.getDifference(bpaRequest, searchResult);
 
 		userService.createUser(bpaRequest);
 		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
@@ -210,17 +197,9 @@ public class BPAService {
 		bpaValidator.validateCheckList(mdmsData, bpaRequest,
 				workflowService.getCurrentState(bpa.getStatus(), businessService));
 
-		//
-		//
-		//
-		// /*call workflow service if it's enable else uses internal workflow
-		// process*/
-
 		wfIntegrator.callWorkFlow(bpaRequest);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
-//		userService.createUser(bpaRequest);
-	
 
 		// Generate the sanction Demand
 		ProcessInstance processInstance = workflowService.getProcessInstance(

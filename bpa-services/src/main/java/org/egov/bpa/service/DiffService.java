@@ -62,15 +62,8 @@ public class DiffService {
 
 		if (CollectionUtils.isEmpty(changes))
 			return updatedFields;
-
-//		changes.forEach(change -> {
-//			/*
-//			 * if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
-//			 * updatedFields.add(change.getPropertyName()); }
-//			 */
-//		});
+		
 		return updatedFields;
-
 	}
 
 	
@@ -107,13 +100,13 @@ public class DiffService {
      * @param BPAFromSearch License from db on which update is called
      * @return Names of Classes added or removed during update
      */
-    private List<String> getObjectsAdded(BPA BPAFromUpdate, BPA BPAFromSearch) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+	private List<String> getObjectsAdded(BPA BPAFromUpdate, BPA BPAFromSearch) {
 
         Javers javers = JaversBuilder.javers().build();
         Diff diff = javers.compare(BPAFromSearch, BPAFromUpdate);
         List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
-        ;
-
+ 
         List<String> classModified = new LinkedList<>();
 
         if (CollectionUtils.isEmpty(objectsAdded))

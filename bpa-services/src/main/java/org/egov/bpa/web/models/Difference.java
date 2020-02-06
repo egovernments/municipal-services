@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Difference {
 
-	 String id;
+	String id;
 
-	    List<String> fieldsChanged;
+    List<String> fieldsChanged;
 
-	    List<String> classesAdded;
+    List<String> classesAdded;
 
-	    List<String> classesRemoved;
+    List<String> classesRemoved;
 }

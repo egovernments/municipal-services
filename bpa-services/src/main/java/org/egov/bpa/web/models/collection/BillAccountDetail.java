@@ -19,41 +19,41 @@ public class BillAccountDetail {
 
 	@Size(max=64)
 	@JsonProperty("id")
-	private String id = null;
+	private String id;
 
 	@Size(max=64)
 	@JsonProperty("tenantId")
-	private String tenantId = null;
+	private String tenantId;
 
 	@Size(max=64)
 	@JsonProperty("billDetailId")
-	private String billDetailId = null;
+	private String billDetailId;
 
 	@Size(max=64)
 	@JsonProperty("demandDetailId")
-	private String demandDetailId = null;
+	private String demandDetailId;
 
 	@JsonProperty("order")
-	private Integer order = null;
+	private Integer order;
 
 	@JsonProperty("amount")
-	private BigDecimal amount = null;
+	private BigDecimal amount;
 
 	@JsonProperty("adjustedAmount")
-	private BigDecimal adjustedAmount = null;
+	private BigDecimal adjustedAmount;
 
 	@JsonProperty("isActualDemand")
-	private Boolean isActualDemand = null;
+	private Boolean isActualDemand;
 
 	@Size(max=64)
 	@JsonProperty("taxHeadCode")
-	private String taxHeadCode = null;
+	private String taxHeadCode;
 
 	@JsonProperty("additionalDetails")
-	private JsonNode additionalDetails = null;
+	private JsonNode additionalDetails;
 
 	@JsonProperty("purpose")
-	private Purpose purpose = null;
+	private Purpose purpose;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

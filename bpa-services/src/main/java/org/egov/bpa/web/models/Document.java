@@ -22,10 +22,10 @@ public class Document {
 
     @Size(max=64)
     @JsonProperty("tenantId")
-    private String tenantId = null;
+    private String tenantId;
 
     @JsonProperty("auditDetails")
-    private AuditDetails auditDetails = null;
+    private AuditDetails auditDetails;
     
 	@JsonProperty("id")
 	private String id;

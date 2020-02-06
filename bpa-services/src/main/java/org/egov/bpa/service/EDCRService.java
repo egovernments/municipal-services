@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -35,8 +34,6 @@ import com.jayway.jsonpath.TypeRef;
 public class EDCRService {
 
 	private ServiceRequestRepository serviceRequestRepository;
-
-	private ObjectMapper mapper;
 
 	private BPAConfiguration config;
 	
@@ -48,20 +45,18 @@ public class EDCRService {
 	BPARepository bpaRepository;
 
 	@Autowired
-	public EDCRService(ServiceRequestRepository serviceRequestRepository,
-			ObjectMapper mapper, BPAConfiguration config) {
+	public EDCRService(ServiceRequestRepository serviceRequestRepository, BPAConfiguration config) {
 		this.serviceRequestRepository = serviceRequestRepository;
-		this.mapper = mapper;
 		this.config = config;
 	}
 
 	/**
 	 * Validates the EDCR Plan based on the edcr Number and the RiskType
 	 * 
-	 * @param request
-	 *            BPARequest for create
+	 * @param request BPARequest for create
 	 * 
 	 */
+	@SuppressWarnings("rawtypes")
 	public void validateEdcrPlan(BPARequest request, Object mdmsData) {
 
 		String edcrNo = request.getBPA().getEdcrNumber();
@@ -132,9 +127,4 @@ public class EDCRService {
 			}
 		}
 	}
-	
-		
-	
-	
-	
 }

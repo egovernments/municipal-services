@@ -30,11 +30,11 @@ import lombok.Builder;
 @Builder
 public class ProcessInstanceResponse {
         @JsonProperty("ResponseInfo")
-        private ResponseInfo responseInfo = null;
+        private ResponseInfo responseInfo;
 
         @JsonProperty("ProcessInstances")
         @Valid
-        private List<ProcessInstance> processInstances = null;
+        private List<ProcessInstance> processInstances;
 
 
         public ProcessInstanceResponse addProceInstanceItem(ProcessInstance proceInstanceItem) {

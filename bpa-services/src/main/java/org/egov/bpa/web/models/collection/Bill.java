@@ -24,74 +24,74 @@ public class Bill {
     // TODO some of the fields are mandatory in yml, lets discuss billdetail and billaccountdetail also for more clarity
 
 	  @JsonProperty("id")
-	  private String id = null;
+	  private String id;
 
 	  @JsonProperty("mobileNumber")
-	  private String mobileNumber = null;
+	  private String mobileNumber;
 
 	  @JsonProperty("paidBy")
-	  private String paidBy = null;
+	  private String paidBy;
 
 	  @JsonProperty("payerName")
-	  private String payerName = null;
+	  private String payerName;
 
 	  @JsonProperty("payerAddress")
-	  private String payerAddress = null;
+	  private String payerAddress;
 
 	  @JsonProperty("payerEmail")
-	  private String payerEmail = null;
+	  private String payerEmail;
 
 	  @JsonProperty("payerId")
-	  private String payerId = null;
+	  private String payerId;
 
 	  @JsonProperty("status")
-	  private StatusEnum status = null;
+	  private StatusEnum status;
 
 	  @JsonProperty("reasonForCancellation")
- 	  private String reasonForCancellation = null;
+ 	  private String reasonForCancellation;
 
 	  @JsonProperty("isCancelled")
-	  private Boolean isCancelled = null;
+	  private Boolean isCancelled;
 
 	  @JsonProperty("additionalDetails")
-	  private JsonNode additionalDetails = null;
+	  private JsonNode additionalDetails;
 
 	  @JsonProperty("billDetails")
 	  @Valid
-	  private List<BillDetail> billDetails = null;
+	  private List<BillDetail> billDetails;
 
 	  @JsonProperty("tenantId")
-	  private String tenantId = null;
+	  private String tenantId;
 
 	  @JsonProperty("auditDetails")
-	  private AuditDetails auditDetails = null;
+	  private AuditDetails auditDetails;
 
 	  @JsonProperty("collectionModesNotAllowed")
-	  private List<String> collectionModesNotAllowed = null;
+	  private List<String> collectionModesNotAllowed;
 
 	  @JsonProperty("partPaymentAllowed")
-	  private Boolean partPaymentAllowed = null;
+	  private Boolean partPaymentAllowed;
 
 	  @JsonProperty("isAdvanceAllowed")
 	  private Boolean isAdvanceAllowed;
 
 	  @JsonProperty("minimumAmountToBePaid")
-	  private BigDecimal minimumAmountToBePaid = null;
+	  private BigDecimal minimumAmountToBePaid;
 
 	  @JsonProperty("businessService")
-	  private String businessService = null;
+	  private String businessService;
 
 	  @JsonProperty("totalAmount")
-	  private BigDecimal totalAmount = null;
+	  private BigDecimal totalAmount;
 
 	  @JsonProperty("consumerCode")
-	  private String consumerCode = null;
+	  private String consumerCode;
 
 	  @JsonProperty("billNumber")
-	  private String billNumber = null;
+	  private String billNumber;
 
 	  @JsonProperty("billDate")
-	  private Long billDate = null;
+	  private Long billDate;
 
 	  @JsonProperty("amountPaid")
 	  private BigDecimal amountPaid;

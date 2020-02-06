@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/bpa")
@@ -36,7 +35,7 @@ public class BPAController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
-	@PostMapping(value = "/appl/_create")
+	@PostMapping(value = "/_create")
 	public ResponseEntity<BPAResponse> create(
 			@Valid @RequestBody BPARequest bpaRequest) {
 		bpaUtil.defaultJsonPathConfig();
@@ -52,7 +51,7 @@ public class BPAController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/appl/_update")
+	@PostMapping(value = "/_update")
 	public ResponseEntity<BPAResponse> update(
 			@Valid @RequestBody BPARequest bpaRequest) {
 		BPA bpa = bpaService.update(bpaRequest);
@@ -69,7 +68,7 @@ public class BPAController {
 	}
 	
 	
-	@RequestMapping(value="/appl/_search", method = RequestMethod.POST)
+	@PostMapping(value="/_search")
     public ResponseEntity<BPAResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                        @Valid @ModelAttribute BPASearchCriteria criteria){
 

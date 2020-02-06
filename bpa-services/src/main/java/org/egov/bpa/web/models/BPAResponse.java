@@ -18,13 +18,4 @@ public class BPAResponse {
 	@JsonProperty("Bpa")
 	@Valid
 	private List<BPA> BPA;
-
-	/*public BPAResponse addBuildingPlanItem(BPA bpaReq) {
-		if (this.BPA == null) {
-			this.BPA = new ArrayList<>();
-		}
-		this.BPA.add(bpaReq);
-		return this;
-	}*/
-
 }

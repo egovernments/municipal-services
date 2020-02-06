@@ -22,10 +22,10 @@ public class CalculationReq {
 	@JsonProperty("RequestInfo")
 	@NotNull
 	@Valid
-	private RequestInfo requestInfo = null;
+	private RequestInfo requestInfo;
 
 	@JsonProperty("CalulationCriteria")
 	@Valid
-	private List<CalulationCriteria> calulationCriteria = null;
+	private List<CalulationCriteria> calulationCriteria;
 
 }

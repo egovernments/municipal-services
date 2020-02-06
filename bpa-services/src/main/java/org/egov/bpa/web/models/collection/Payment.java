@@ -75,28 +75,28 @@ public class Payment {
     @Size(max=128)
     @NotNull
     @JsonProperty("paidBy")
-    private String paidBy = null;
+    private String paidBy;
 
     @Size(max=64)
     @NotNull
     @JsonProperty("mobileNumber")
-    private String mobileNumber = null;
+    private String mobileNumber;
 
     @Size(max=128)
     @JsonProperty("payerName")
-    private String payerName = null;
+    private String payerName;
 
     @Size(max=1024)
     @JsonProperty("payerAddress")
-    private String payerAddress = null;
+    private String payerAddress;
 
     @Size(max=64)
     @JsonProperty("payerEmail")
-    private String payerEmail = null;
+    private String payerEmail;
 
     @Size(max=64)
     @JsonProperty("payerId")
-    private String payerId = null;
+    private String payerId;
 
     @JsonProperty("paymentStatus")
     private String paymentStatus;

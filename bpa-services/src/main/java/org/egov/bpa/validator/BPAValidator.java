@@ -8,9 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.util.BPAConstants;
@@ -28,6 +25,8 @@ import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -54,7 +53,6 @@ public class BPAValidator {
 		});
 	}
 
-	@SuppressWarnings("static-access")
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData, String currentState) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		BPA bpa = request.getBPA();
@@ -135,7 +133,7 @@ public class BPAValidator {
 
 	private void validateDuplicateDocuments(BPARequest request) {
 		if (request.getBPA().getDocuments() != null) {
-			List<String> documentFileStoreIds = new LinkedList();
+			List<String> documentFileStoreIds = new LinkedList<String>();
 			request.getBPA().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
 					throw new CustomException("BPA_DUPLICATE_DOCUMENT",
@@ -155,29 +153,31 @@ public class BPAValidator {
 	 *            The BPASearch Criteria
 	 */
 	public void validateSearch(RequestInfo requestInfo, BPASearchCriteria criteria) {
-		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.isEmpty())
-			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
-
-		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && !criteria.tenantIdOnly()
-				&& criteria.getTenantId() == null)
-			throw new CustomException("INVALID SEARCH", "TenantId is mandatory in search");
-
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && !criteria.isEmpty()
-				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
-			throw new CustomException("INVALID SEARCH", "TenantId is mandatory in search");
 
 		String allowedParamStr = null;
-
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-			allowedParamStr = config.getAllowedCitizenSearchParameters();
-		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE"))
+		String userType = requestInfo.getUserInfo().getType();
+		
+		if (userType.equalsIgnoreCase(BPAConstants.EMPLOYEE)) {
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
-		else
-			throw new CustomException("INVALID SEARCH",
-					"The userType: " + requestInfo.getUserInfo().getType() + " does not have any search config");
-
+			if(criteria.isEmpty()) {
+				throw new CustomException(BPAConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
+			}
+			else if (!criteria.tenantIdOnly() && criteria.getTenantId() == null) {
+				throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+			}
+		}
+		else if (userType.equalsIgnoreCase(BPAConstants.CITIZEN)) {
+			allowedParamStr = config.getAllowedCitizenSearchParameters();
+			if( !criteria.isEmpty() && !criteria.tenantIdOnly() && criteria.getTenantId() == null)
+				throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");			
+		}			
+		else {
+			throw new CustomException(BPAConstants.INVALID_SEARCH,
+					"The userType: " + userType + " does not have any search config");
+		}
+		
 		if (StringUtils.isEmpty(allowedParamStr) && !criteria.isEmpty())
-			throw new CustomException("INVALID SEARCH", "No search parameters are expected");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "No search parameters are expected");
 		else {
 			List<String> allowedParams = Arrays.asList(allowedParamStr.split(","));
 			validateSearchParams(criteria, allowedParams);
@@ -195,32 +195,32 @@ public class BPAValidator {
 	private void validateSearchParams(BPASearchCriteria criteria, List<String> allowedParams) {
 
 		if (criteria.getApplicationNos() != null && !allowedParams.contains("applicationNo"))
-			throw new CustomException("INVALID SEARCH", "Search on applicationNo is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
 
 		if (criteria.getEdcrNumbers() != null && !allowedParams.contains("edcrNumber"))
-			throw new CustomException("INVALID SEARCH", "Search on edcrNumber is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on edcrNumber is not allowed");
 
 		if (criteria.getStatus() != null && !allowedParams.contains("status"))
-			throw new CustomException("INVALID SEARCH", "Search on Status is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on Status is not allowed");
 
 		if (criteria.getIds() != null && !allowedParams.contains("ids"))
-			throw new CustomException("INVALID SEARCH", "Search on ids is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on ids is not allowed");
 
 		if (criteria.getMobileNumber() != null && !allowedParams.contains("mobileNumber"))
-			throw new CustomException("INVALID SEARCH", "Search on mobileNumber is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on mobileNumber is not allowed");
 
 		if (criteria.getOffset() != null && !allowedParams.contains("offset"))
-			throw new CustomException("INVALID SEARCH", "Search on offset is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on offset is not allowed");
 
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
-			throw new CustomException("INVALID SEARCH", "Search on limit is not allowed");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on limit is not allowed");
 
 		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
-			throw new CustomException("INVALID SEARCH", "From date cannot be a future date");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "From date cannot be a future date");
 
 		if (criteria.getToDate() != null && criteria.getFromDate() != null
 				&& (criteria.getFromDate() > criteria.getToDate()))
-			throw new CustomException("INVALID SEARCH", "To date cannot be prior to from date");
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "To date cannot be prior to from date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
@@ -249,8 +249,7 @@ public class BPAValidator {
 		bpaRequest.getBPA().setStatus(idToBPAFromSearch.get(bpaRequest.getBPA().getId()).getStatus());
 	}
 
-	private void validateBPAUnits(BPARequest bpaRequest) { // completed
-		// TODO Auto-generated method stub
+	private void validateBPAUnits(BPARequest bpaRequest) {
 		Map<String, String> errorMap = new HashMap<>();
 
 		BPA bpa = bpaRequest.getBPA();
@@ -285,14 +284,14 @@ public class BPAValidator {
 		BPA searchedBpa = idToBPAFromSearch.get(bpa.getId());
 
 		if (!searchedBpa.getApplicationNo().equalsIgnoreCase(bpa.getApplicationNo()))
-			errorMap.put("INVALID UPDATE", "The application number from search: " + searchedBpa.getApplicationNo()
+			errorMap.put(BPAConstants.INVALID_UPDATE, "The application number from search: " + searchedBpa.getApplicationNo()
 					+ " and from update: " + bpa.getApplicationNo() + " does not match");
 
 		if (!searchedBpa.getId().equalsIgnoreCase(bpa.getId()))
-			errorMap.put("INVALID UPDATE", "The id " + bpa.getId() + " does not exist");
+			errorMap.put(BPAConstants.INVALID_UPDATE, "The id " + bpa.getId() + " does not exist");
 
 		if (!searchedBpa.getAddress().getId().equalsIgnoreCase(bpa.getAddress().getId()))
-			errorMap.put("INVALID UPDATE", "The id " + bpa.getAddress().getId() + " does not exist");
+			errorMap.put(BPAConstants.INVALID_UPDATE, "The id " + bpa.getAddress().getId() + " does not exist");
 
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
 		
@@ -315,7 +314,7 @@ public class BPAValidator {
 							}
 						});
 					}else {
-						errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
+						errorMap.put(BPAConstants.INVALID_UPDATE, "The id: " + searchIds + " was not present in update request");
 					}
 					
 			});
@@ -323,27 +322,13 @@ public class BPAValidator {
 		if(missingOwners.size() > 0) {
 			List<OwnerInfo> existingOwners= bpa.getOwners();
 			existingOwners.addAll(missingOwners);
-			bpa.setOwners(existingOwners);
-			
-		}
-			
+			bpa.setOwners(existingOwners);		
+		}	
 	
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
-		// compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
-	}
-
-	private List<String> getDocumentIds(BPA searchedBpa) {
-		List<String> applicationDocIds = new LinkedList<>();
-		if (!CollectionUtils.isEmpty(searchedBpa.getDocuments())) {
-			searchedBpa.getDocuments().forEach(document -> {
-				applicationDocIds.add(document.getId());
-			});
-		}
-		// }
-		return applicationDocIds;
 	}
 
 	private List<String> getOwnerDocIds(BPA searchedBpa) {
@@ -384,14 +369,12 @@ public class BPAValidator {
 	 *            The map for collecting errors
 	 */
 
+	@SuppressWarnings("unchecked")
 	private void compareIdList(List<String> searchIds, Object updateIds, Map<String, String> errorMap) {
 		if (searchIds != null)
 			searchIds.forEach(searchId -> {
-				if (!((List<String>) updateIds).contains(searchId) )
-					
-						errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
-					
-					
+				if (!((List<String>) updateIds).contains(searchId))
+					errorMap.put(BPAConstants.INVALID_UPDATE, "The id: " + searchIds + " was not present in update request");
 			});
 	}
 
@@ -409,7 +392,7 @@ public class BPAValidator {
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 
-		BPA bpa = bpaRequest.getBPA();
+		BPA bpa = bpaRequest.getBPA(); 
 		List<Map> requestCheckList = null;
 		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
@@ -422,19 +405,19 @@ public class BPAValidator {
 					.replace("{4}", bpa.getApplicationType());
 			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, path);
 			
-			if(mdmsQuestionsArray.size() > 0)
+			if(!CollectionUtils.isEmpty(mdmsQuestionsArray))
 				mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
 			
 			log.info("MDMS questions " + mdmsQns);
 
 			if (bpa.getAdditionalDetails() != null) {
 				List checkListFromReq = (List)((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if(checkListFromReq != null && checkListFromReq.size() > 0)
+				if(!CollectionUtils.isEmpty(checkListFromReq))
 					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0))
 							.get(BPAConstants.QUESTIONS_TYPE);
 			}
 
-			if (requestCheckList != null && requestCheckList.size() > 0) {
+			if (!CollectionUtils.isEmpty(requestCheckList)) {
 				for (Map reqQn : requestCheckList) {
 					requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
 				}
@@ -442,7 +425,7 @@ public class BPAValidator {
 
 			log.info("Request questions " + requestQns);
 
-			if (requestQns != null && requestQns.size() > 0 && mdmsQns != null && mdmsQns.size() > 0) {
+			if (!CollectionUtils.isEmpty(requestQns) && !CollectionUtils.isEmpty(mdmsQns)) {
 				for (String qn : requestQns) {
 					if (!mdmsQns.contains(qn)) {
 						throw new CustomException("BPA_UNKNOWN_QUESTIONS", qn + " is not exists in MDMS data");
