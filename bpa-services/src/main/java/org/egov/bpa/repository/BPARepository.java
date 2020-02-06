@@ -2,9 +2,7 @@ package org.egov.bpa.repository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,12 +10,10 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.querybuilder.BPAQueryBuilder;
 import org.egov.bpa.repository.rowmapper.BPARowMapper;
-import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Document;
-import org.egov.bpa.web.models.Unit;
 import org.egov.bpa.web.models.User;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +42,7 @@ public class BPARepository {
 	
 	
 	/**
-	 * Pushes the request on save topic
+	 * Pushes the request on save topic through kafka
 	 *
 	 * @param bpaRequest
 	 *            The bpa create request
@@ -54,21 +50,6 @@ public class BPARepository {
 	public void save(BPARequest bpaRequest) {
 		producer.push(config.getSaveTopic(), bpaRequest);
 	}
-
-	/*public void update(BPARequest bpaRequest) {
-			 RequestInfo requestInfo = bpaRequest.getRequestInfo();
-		        BPA bpa = bpaRequest.getBPA();
-
-		        List<BPA> bpaForUpdate = new LinkedList<>();
-
-		        bpaForUpdate.add(bpa);
-		        
-		        if (!CollectionUtils.isEmpty(bpaForUpdate))
-		            producer.push(config.getUpdateTopic(), new BPARequest(requestInfo, bpa));
-	}*/
-	
-	
-	
 	
 	public void update(BPARequest bpaRequest, boolean isStateUpdatable) {
         RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -83,29 +64,16 @@ public class BPARepository {
             if (isStateUpdatable) {
             		bpaForUpdate = bpa;
             }
-//            else if(bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC))
-//                bpaForAdhocChargeUpdate = bpa;
             else {
                 bpaForStatusUpdate = bpa;
             }
-            
-
         if (bpaForUpdate != null)
             producer.push(config.getUpdateTopic(), new BPARequest(requestInfo, bpaForUpdate));
 
         if (bpaForStatusUpdate != null)
             producer.push(config.getUpdateWorkflowTopic(), new BPARequest(requestInfo, bpaForStatusUpdate));
 
-//        if(bpaForAdhocChargeUpdate != null)
-//            producer.push(config.getUpdateAdhocTopic(),new BPARequest(requestInfo,bpaForAdhocChargeUpdate));
-
     }
-	
-	
-	
-	
-	
-	
 	
 	
 	 /**
@@ -116,9 +84,7 @@ public class BPARepository {
      */
     public List<BPA> getBPAData(BPASearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getBPASearchQuery(criteria, preparedStmtList);
-        log.info("Query: " + query);
-        
+        String query = queryBuilder.getBPASearchQuery(criteria, preparedStmtList);        
         List<BPA> BPAData = jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper); 		
         sortChildObjectsById(BPAData);
         return BPAData;
@@ -133,7 +99,6 @@ public class BPARepository {
             return;
         bpaData.forEach(bpa -> {
         	bpa.getOwners().sort(Comparator.comparing(User::getUuid));
-//            bpa.getUnits().sort(Comparator.comparing(Unit::getId));
             if(!CollectionUtils.isEmpty(bpa.getDocuments()))
                 bpa.getDocuments().sort(Comparator.comparing(Document::getId));
         });

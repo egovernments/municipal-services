@@ -17,40 +17,6 @@ public class BPAConstants {
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
-	public static final String NOTIFICATION_INITIATED = "tl.en.counter.initiate";
-	
-	public static final String NOTIFICATION_PANDING_APPL_FEE = "tl.en.counter.appl.fee";
-	
-	public static final String NOTIFICATION_APPLIED = "tl.en.counter.submit";
-
-	public static final String NOTIFICATION_DOCUMENT_VERIFICATION = "bpa.en.document";
-
-	public static final String NOTIFICATION_FIELD_INSPECTION = "bpa.en.field.inspection";
-
-	public static final String NOTIFICATION_NOC_UPDATION = "bpa.en.field.inspection";
-
-	public static final String NOTIFICATION_PAYMENT_OWNER = "tl.en.counter.payment.successful.owner";
-
-	public static final String NOTIFICATION_PAYMENT_PAYER = "bpa.en.counter.payment.successful.payer";
-
-	public static final String NOTIFICATION_PAID = "bpa.en.counter.pending.approval";
-
-	public static final String NOTIFICATION_APPROVED = "bpa.en.counter.approved";
-
-	public static final String NOTIFICATION_REJECTED = "bpa.en.counter.rejected";
-
-	public static final String NOTIFICATION_CANCELLED = "bpa.en.counter.cancelled";
-
-	public static final String NOTIFICATION_FIELD_CHANGED = "bpa.en.edit.field.change";
-
-	public static final String NOTIFICATION_OBJECT_ADDED = "bpa.en.edit.object.added";
-
-	public static final String NOTIFICATION_OBJECT_REMOVED = "bpa.en.edit.object.removed";
-
-	public static final String NOTIFICATION_OBJECT_MODIFIED = "bpa.en.edit.object.modified";
-
-	public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Building Plan with application number <APPLICATION_NUMBER> was modified.";
-
 	// mdms path codes
 
 	public static final String BPA_JSONPATH_CODE = "$.MdmsRes.BPA";
@@ -74,6 +40,8 @@ public class BPAConstants {
 	public static final String SUB_OCCUPANCY_TYPE = "SubOccupancyType";
 	
 	public static final String USAGES = "Usages";
+	
+	public static final String CalculationType  = "CalculationType";
 	
 	public static final String DOCUMENT_TYPE_MAPPING = "DocTypeMapping";
 
@@ -187,8 +155,6 @@ public class BPAConstants {
 
 	public static final String ACTION_STATUS_DOCUMENTVERIFICATION = "FORWARD_DOCUMENTVERIFICATION";
 
-//	public static final String ACTION_CANCEL_CANCELLED = "CANCEL_CANCELLED";
-
 	public static final String ACTION_STATUS_PAID = "PAID";
 
 	public static final String ACTION_STATUS_FIELDINSPECTION = "FORWARD_FIELDINSPECTION";
@@ -201,7 +167,9 @@ public class BPAConstants {
     
 
 	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+	
 	public static final String USREVENTS_EVENT_NAME = "Building Plan";
+	
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPA";
 	
 	
@@ -211,25 +179,35 @@ public class BPAConstants {
 	
 	// CALCULATION FEEe
 	public static final String APPLICATION_FEE_KEY="ApplicationFee";
+	
 	public static final String SANCTION_FEE_KEY="SanctionFee";
 	
 	public static final String SANC_FEE_STATE="PENDING_SANC_FEE_PAYMENT";
+	
 	public static final String APPROVED_STATE ="APPROVED";
 
 
 	public static final String APPL_FEE ="BPA.NC_APP_FEE";
 	
 	public static final String SANC_FEE ="BPA.NC_SAN_FEE";
+	
 	public static final String INPROGRESS_STATUS="INPROGRESS";
 	
 	//CheckList
 	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].questions";
+	
 	public static final String CHECKLISTFILTER =  "$.[?(@.WFState==\"{}\")]";
+	
 	public static final String CHECKLIST_TYPE = "checkList";
+	
 	public static final String DOCTYPES_TYPE = "docTypes";
+	
 	public static final String QUESTIONS_TYPE = "questions";
+	
 	public static final String QUESTION_TYPE = "question";
+	
 	public static final String DOCS = "docs";
+	
 	public static final String QUESTIONS_PATH = "$.[?(@.active==true)].question";
 	
 	//SMS Notification messages

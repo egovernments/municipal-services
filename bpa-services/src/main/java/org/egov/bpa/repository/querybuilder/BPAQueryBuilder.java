@@ -47,6 +47,13 @@ public class BPAQueryBuilder {
 			+ "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
+	/**
+	 * To give the Search query based on the requirements.
+	 * 
+	 * @param criteria BPA search criteria
+	 * @param preparedStmtList values to be replased on the query
+	 * @return Final Search Query
+	 */
 	public String getBPASearchQuery(BPASearchCriteria criteria,
 			List<Object> preparedStmtList) {
 
@@ -123,6 +130,13 @@ public class BPAQueryBuilder {
 
 	}
 
+/**
+ * 
+ * @param query prepared Query
+ * @param preparedStmtList values to be replased on the query
+ * @param criteria bpa search criteria
+ * @return the query by replacing the placeholders with preparedStmtList
+ */
 	private String addPaginationWrapper(String query,
 			List<Object> preparedStmtList, BPASearchCriteria criteria) {
 

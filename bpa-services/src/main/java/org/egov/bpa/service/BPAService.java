@@ -1,11 +1,9 @@
 package org.egov.bpa.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.bpa.config.BPAConfiguration;
@@ -22,7 +20,6 @@ import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.web.models.workflow.ProcessInstance;
 import org.egov.bpa.workflow.ActionValidator;
-import org.egov.bpa.workflow.BPAWorkflowService;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
@@ -73,9 +70,6 @@ public class BPAService {
 
 	@Autowired
 	private WorkflowService workflowService;
-
-	@Autowired
-	private BPAWorkflowService bpaWorkflowService;
 
 	public BPA create(BPARequest bpaRequest) {
 

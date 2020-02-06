@@ -15,17 +15,12 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -82,14 +77,9 @@ public class WorkflowIntegrator {
 	 * @param bpaRequest
 	 */
 	public void callWorkFlow(BPARequest bpaRequest) {
-
 		String wfTenantId = bpaRequest.getBPA().getTenantId();
-
 		JSONArray array = new JSONArray();
-//		for (BPA bpa : bpaRequest.getBPA()) {
-		
 		BPA bpa = bpaRequest.getBPA();
-
 			JSONObject obj = new JSONObject();
 			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
 			obj.put(TENANTIDKEY, wfTenantId);
@@ -102,8 +92,6 @@ public class WorkflowIntegrator {
 			}
 			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
 			array.add(obj);
-//		}
-
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, bpaRequest.getRequestInfo());
 		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);

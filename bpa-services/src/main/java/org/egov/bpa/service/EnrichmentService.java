@@ -1,7 +1,6 @@
 package org.egov.bpa.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +23,6 @@ import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.idgen.IdResponse;
 import org.egov.bpa.web.models.user.UserDetailResponse;
-import org.egov.bpa.web.models.user.UserSearchRequest;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;

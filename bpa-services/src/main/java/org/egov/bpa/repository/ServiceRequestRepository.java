@@ -1,15 +1,16 @@
 package org.egov.bpa.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Repository
 @Slf4j

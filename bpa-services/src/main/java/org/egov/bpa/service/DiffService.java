@@ -1,10 +1,7 @@
 package org.egov.bpa.service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;

@@ -57,17 +57,6 @@ public class WorkflowConfig {
         actionStatusMap = Collections.unmodifiableMap(map);
     }
 
-/*    private  void setRoleActionMap(){
-
-        Map<String, List<String>> map = new HashMap<>();
-
-        map.put(config.getROLE_CITIZEN(), Arrays.asList(ACTION_APPLY, ACTION_INITIATE));
-        map.put(config.getROLE_EMPLOYEE(), Arrays.asList(ACTION_APPLY, ACTION_INITIATE,ACTION_APPROVE, ACTION_REJECT,ACTION_CANCEL));
-
-        roleActionMap = Collections.unmodifiableMap(map);
-    }*/
-
-
     private  void setRoleActionMap(){
 
         Map<String, List<String>> map = new HashMap<>();
@@ -95,7 +84,6 @@ public class WorkflowConfig {
         map.put(STATUS_FIELDINSPECTION, Arrays.asList(ACTION_NOC_FORWARD, ACTION_FORWORD,ACTION_SENDBACK,ACTION_MARK));
         map.put(STATUS_NOCUPDATION, Arrays.asList(ACTION_PENDINGAPPROVAL, ACTION_FORWORD,ACTION_SENDBACK,ACTION_MARK));
         map.put(STATUS_PENDINGAPPROVAL, Arrays.asList(ACTION_APPROVE, ACTION_FORWORD,ACTION_SENDBACK,ACTION_MARK));
-//        map.put(STATUS_APPROVED, Arrays.asList(ACTION_CANCEL));
 
         actionCurrentStatusMap = Collections.unmodifiableMap(map);
     }

@@ -84,7 +84,6 @@ public class WorkflowService {
         }else {
         		url.append(config.getWfProcessPath());
         }
-//        url.append(config.getWfBusinessServiceSearchPath());
         url.append("?tenantId=");
         url.append(tenantId);
         if(businessService) {
@@ -94,8 +93,6 @@ public class WorkflowService {
 	    		url.append("&businessIds=");
 	    		 url.append(applicationNo);
 	    }
-        
-       
         return url;
     }
 
