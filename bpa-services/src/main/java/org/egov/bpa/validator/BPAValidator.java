@@ -412,6 +412,7 @@ public class BPAValidator {
 		BPA bpa = bpaRequest.getBPA();
 		List<Map> requestCheckList = null;
 		List<String> requestQns = new ArrayList<String>();
+		List<String> mdmsQns = null;
 		
 		log.info("Fetching MDMS result for the state " + wfState);
 
@@ -420,14 +421,17 @@ public class BPAValidator {
 					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
 					.replace("{4}", bpa.getApplicationType());
 			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, path);
-			List<String> mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
-
+			
+			if(mdmsQuestionsArray.size() > 0)
+				mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
+			
 			log.info("MDMS questions " + mdmsQns);
 
 			if (bpa.getAdditionalDetails() != null) {
-				Object checkListFromReq = ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				requestCheckList = (List<Map>) ((Map) ((List) checkListFromReq).get(0))
-						.get(BPAConstants.QUESTIONS_TYPE);
+				List checkListFromReq = (List)((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+				if(checkListFromReq != null && checkListFromReq.size() > 0)
+					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0))
+							.get(BPAConstants.QUESTIONS_TYPE);
 			}
 
 			if (requestCheckList != null && requestCheckList.size() > 0) {
@@ -439,11 +443,11 @@ public class BPAValidator {
 			log.info("Request questions " + requestQns);
 
 			if (requestQns != null && requestQns.size() > 0 && mdmsQns != null && mdmsQns.size() > 0) {
-				requestQns.forEach(qn -> {
+				for (String qn : requestQns) {
 					if (!mdmsQns.contains(qn)) {
 						throw new CustomException("BPA_UNKNOWN_QUESTIONS", qn + " is not exists in MDMS data");
 					}
-				});
+				}
 			}
 		} catch (PathNotFoundException ex) {
 			log.error("Exception occured while validating the Checklist " + ex.getMessage());
