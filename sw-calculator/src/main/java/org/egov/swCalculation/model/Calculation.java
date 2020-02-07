@@ -57,4 +57,7 @@ public class Calculation {
 	
 	@JsonProperty("connectionNo")
 	private String connectionNo;
+	
+	@JsonProperty("fee")
+	private BigDecimal fee;
 }

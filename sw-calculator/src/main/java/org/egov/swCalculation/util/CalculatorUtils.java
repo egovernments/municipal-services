@@ -14,6 +14,7 @@ import org.egov.mdms.model.ModuleDetail;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.RequestInfoWrapper;
+import org.egov.swCalculation.model.SearchCriteria;
 import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.SewerageConnectionResponse;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
@@ -172,5 +173,78 @@ public class CalculatorUtils {
 				.append(consumerCode).append(SWCalculationConstant.SEPARATER)
 				.append(SWCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL)
 				.append(SWCalculationConstant.SEWERAGE_TAX_SERVICE_CODE);
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionNo
+	 * @param tenantId
+	 * @return sewerage connection
+	 */
+	public SewerageConnection getSewerageConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
+			String tenantId) {
+		ObjectMapper mapper = new ObjectMapper();
+		String url = getSewerageSearchURL(searchCriteria);
+		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		SewerageConnectionResponse response = null;
+		try {
+			response = mapper.convertValue(result, SewerageConnectionResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Error while parsing response of Water Connection Search");
+		}
+
+		if (response == null || CollectionUtils.isEmpty(response.getSewerageConnections()))
+			return null;
+
+		return response.getSewerageConnections().get(0);
+	}
+
+
+	/**
+	 * Creates sewerageConnection search url based on tenantId and connectionNumber
+	 * 
+	 * @return water search url
+	 */
+	private String getSewerageSearchURL(SearchCriteria searchCriteria) {
+		StringBuilder url = new StringBuilder(configurations.getSewerageConnectionHost());
+		url.append(configurations.getSewerageConnectionSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=" + searchCriteria.getTenantId());
+		if (searchCriteria.getConnectionNumber() != null) {
+			url.append("&");
+			url.append("connectionNumber=" + searchCriteria.getConnectionNumber());
+		}
+		if (searchCriteria.getApplicationNumber() != null) {
+			url.append("&");
+			url.append("applicationNumber=" + searchCriteria.getApplicationNumber());
+		}
+		return url.toString();
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @param roadType
+	 * @param usageType
+	 * @return mdms request for master data
+	 */
+	public MdmsCriteriaReq getEstimationMasterCriteria(RequestInfo requestInfo, String tenantId) {
+		List<MasterDetail> details = new ArrayList<>();
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SC_PLOTSLAB_MASTER)
+				.filter("[?(@.isActive== " + true + ")]").build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SC_PROPERTYUSAGETYPE_MASTER)
+				.filter("[?(@.isActive== " + true + ")]").build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SC_FEESLAB_MASTER)
+				.filter("[?(@.isActive== " + true + ")]").build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.SC_ROADTYPE_MASTER)
+				.filter("[?(@.isActive== " + true + ")]").build());
+		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
+				.moduleName(SWCalculationConstant.SW_TAX_MODULE).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 }

@@ -426,5 +426,27 @@ public class MasterDataService {
 		masterMap.put(SWCalculationConstant.Billing_Period_Master, mdmsResponse);
 		return masterMap;
 	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @param roadType
+	 * @param usageType
+	 * @param masterMap return master data with exception master data
+	 */
+	public Map<String, Object> loadExceptionMaster(RequestInfo requestInfo, String tenantId) {
+		Map<String, Object> master = new HashMap<>();
+		master = getMasterMap(requestInfo, tenantId);
+		MdmsResponse response = mapper.convertValue(
+				repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+						calculatorUtils.getEstimationMasterCriteria(requestInfo, tenantId)),
+				MdmsResponse.class);
+		Map<String, JSONArray> res = response.getMdmsRes().get(SWCalculationConstant.SW_TAX_MODULE);
+		for (Map.Entry<String, JSONArray> resp : res.entrySet()) {
+			master.put(resp.getKey(), resp.getValue());
+		}
+		return master;
+	}
 }
 

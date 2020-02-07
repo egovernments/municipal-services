@@ -40,6 +40,20 @@ public class CalculationCriteria   {
         @NotNull
         @JsonProperty("tenantId")
         private String tenantId;
+        
+
+    	//Fee Estimation
+    	@JsonProperty("roadType")
+    	private String roadType;
+
+    	@JsonProperty("propertyTypeUsage")
+    	private String propertyTypeUsage;
+
+    	@JsonProperty("plotSize")
+    	private Double plotSize;
+
+    	@JsonProperty("applicationNo")
+    	private String applicationNo;
 
 
 }

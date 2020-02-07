@@ -217,5 +217,42 @@ public class SWCalculationConstant {
 	public static final String  Billing_Period_Master = "Billing_Period_Master";
 	
 	public static final String Assesment_Year = "assessmentYear";
+	
+	public static final String SC_PLOTSLAB_MASTER = "PlotSizeSlab";
 
+	public static final String SC_PROPERTYUSAGETYPE_MASTER = "PropertyUsageType";
+
+	public static final String SC_FEESLAB_MASTER = "FeeSlab";
+
+	public static final String SC_ROADTYPE_MASTER = "RoadType";
+
+	/**
+	 * Fee Estimation Configuration
+	 */
+	public static final String SW_FORM_FEE = "SW_FORM_FEE";
+
+	public static final String SW_SCRUTINY_FEE = "SW_SCRUTINY_FEE";
+
+	public static final String SW_ONE_TIME_FEE = "SW_ONE_TIME_FEE";
+
+	public static final String SW_ROAD_CUTTING_CHARGE = "SW_ROAD_CUTTING_CHARGE";
+
+	public static final String SW_METER_CHARGE = "SW_METER_CHARGE";
+
+	public static final String SW_SECURITY_CHARGE = "SW_SECURITY_CHARGE";
+
+	public static final String SW_OTHER_CHARGE = "SW_OTHER_CHARGE";
+
+	public static final String SW_TAX_AND_CESS = "SW_TAX_AND_CESS";
+
+	public static final String FORM_FEE_CONST = "formFee";
+
+	public static final String SCRUTINY_FEE_CONST = "scrutinyFee";
+
+	public static final String METER_COST_CONST = "meterCost";
+
+	public static final String OTHER_CHARGE_CONST = "other";
+
+	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
+	
 }

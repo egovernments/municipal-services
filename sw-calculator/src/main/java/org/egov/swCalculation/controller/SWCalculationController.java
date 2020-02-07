@@ -43,11 +43,22 @@ public class SWCalculationController {
 	@Autowired
 	ResponseInfoFactory responseInfoFactory;
 	
+	
 
 	
 	@PostMapping("/_calculate")
 	public ResponseEntity<CalculationRes> calculate(@RequestBody @Valid CalculationReq calculationReq) {
 		List<Calculation> calculations = sWCalculationService.getCalculation(calculationReq);
+		CalculationRes response = CalculationRes.builder().calculation(calculations)
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/_estimate")
+	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
+		List<Calculation> calculations = sWCalculationService.getEstimation(calculationReq);
 		CalculationRes response = CalculationRes.builder().calculation(calculations)
 				.responseInfo(
 						responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true))

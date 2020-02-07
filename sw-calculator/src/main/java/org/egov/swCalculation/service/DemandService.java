@@ -41,6 +41,7 @@ import org.egov.swCalculation.util.CalculatorUtils;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -94,6 +95,9 @@ public class DemandService {
     
     @Autowired
     SWCalculationProducer producer;
+    
+    @Autowired
+    KafkaTemplate kafkaTemplate;
 
 	/**
 	 * Creates or updates Demand
@@ -102,7 +106,7 @@ public class DemandService {
 	 * @param calculations The Calculation Objects for which demand has to be generated or updated
 	 */
 	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
-			Map<String, Object> masterMap) {
+			Map<String, Object> masterMap, boolean searchResult) {
 		List<Demand> createdDemands = new ArrayList<>();
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
@@ -114,14 +118,24 @@ public class DemandService {
 		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap.get(SWCalculationConstant.BillingPeriod);
 		Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 		Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
-
+		Set<String> consumerCodes= new HashSet<>();
+		List<Demand> demands= new LinkedList<>();
 		if (!CollectionUtils.isEmpty(calculations)) {
 
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
-			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
-					.collect(Collectors.toSet());
-			List<Demand> demands = searchDemand(tenantId, consumerCodes,fromDate, toDate, requestInfo);
+			if (searchResult) {
+				consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
+						.collect(Collectors.toSet());
+				demands = searchDemand(tenantId, consumerCodes, fromDate, toDate, requestInfo);
+			} else {
+				consumerCodes = calculations.stream().map(calculation -> calculation.getApplicationNO())
+						.collect(Collectors.toSet());
+				demands = searchDemandBasedOnConsumerCode(tenantId, consumerCodes, requestInfo);
+			}
+//			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
+//					.collect(Collectors.toSet());
+//			List<Demand> demands = searchDemand(tenantId, consumerCodes,fromDate, toDate, requestInfo);
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -130,7 +144,8 @@ public class DemandService {
 			// If demand already exists add it updateCalculations else
 			// createCalculations
 			for (Calculation calculation : calculations) {
-				if (!connectionNumbersFromDemands.contains(calculation.getConnectionNo()))
+				if (!connectionNumbersFromDemands.contains(calculation.getConnectionNo())
+						|| !connectionNumbersFromDemands.contains(calculation.getApplicationNO()))
 					createCalculations.add(calculation);
 				else
 					updateCalculations.add(calculation);
@@ -138,10 +153,10 @@ public class DemandService {
 		}
 
 		if (!CollectionUtils.isEmpty(createCalculations))
-			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
+			createdDemands = createDemand(requestInfo, createCalculations, masterMap,searchResult);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations ,fromDate, toDate);
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations ,fromDate, toDate,searchResult);
 		return createdDemands;
 	}
 
@@ -155,7 +170,7 @@ public class DemandService {
 	 * @return Demands that are created
 	 */
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
-			Map<String, Object> masterMap) {
+			Map<String, Object> masterMap, boolean searchResult) {
 		List<Demand> demands = new LinkedList<>();
 
 		for (Calculation calculation : calculations) {
@@ -176,10 +191,15 @@ public class DemandService {
 								+ " Sewerage Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
-			String consumerCode = calculation.getConnectionNo();
+			String consumerCode= "";
+			if(searchResult){
+				consumerCode = calculation.getConnectionNo();
+			}
+			else{
+			    consumerCode = calculation.getApplicationNO();
+			}
 			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
 			List<DemandDetail> demandDetails = new LinkedList<>();
-
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
@@ -370,12 +390,20 @@ public class DemandService {
 	 *            List of calculation object
 	 * @return Demands that are updated
 	 */
-	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations, Long fromDate, Long toDate) {
+	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations, Long fromDate, Long toDate,boolean searchRes) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
-
-			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
-					Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), fromDate, toDate, requestInfo);
+			List<Demand> searchResult= new LinkedList<>();
+			if (searchRes) {
+				searchResult = searchDemand(calculation.getTenantId(),
+						Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), fromDate, toDate,
+						requestInfo);
+			} else {
+				searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(),
+						Collections.singleton(calculation.getSewerageConnection().getApplicationNo()), requestInfo);
+			}
+//			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
+//					Collections.singleton(calculation.getSewerageConnection().getConnectionNo()), fromDate, toDate, requestInfo);
 
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
@@ -721,7 +749,7 @@ public class DemandService {
 				HashMap<String, Object> calculationRes = new HashMap<>();
 				calculationRes.put("masterData", masterMap);
 				calculationRes.put("calculationReq", calculationReq);
-				producer.push(configs.getCreateDemand(), calculationReq);
+				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 			}
 		}
 		

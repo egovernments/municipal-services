@@ -16,6 +16,7 @@ import org.egov.swCalculation.model.BillingSlab;
 import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.Property;
 import org.egov.swCalculation.model.RequestInfoWrapper;
+import org.egov.swCalculation.model.SearchCriteria;
 import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.model.Slab;
 import org.egov.swCalculation.model.TaxHeadEstimate;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -270,4 +272,77 @@ public class EstimationService {
 				return false;
 			return true;
 		}
+		
+		
+	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo,
+			Map<String, Object> masterData) {
+		SewerageConnection sewerageConnection = null;
+		String tenantId = requestInfo.getUserInfo().getTenantId();
+		if (criteria.getSewerageConnection() == null && !criteria.getApplicationNo().isEmpty()) {
+			SearchCriteria searchCriteria = new SearchCriteria();
+			searchCriteria.setApplicationNumber(criteria.getApplicationNo());
+			searchCriteria.setTenantId(criteria.getTenantId());
+			sewerageConnection = calculatorUtil.getSewerageConnectionOnApplicationNO(requestInfo, searchCriteria,
+					tenantId);
+			criteria.setSewerageConnection(sewerageConnection);
+		}
+		if (criteria.getSewerageConnection() == null) {
+			throw new CustomException("WATER_CONNECTION_NOT_FOUND",
+					"Water Connection are not present for " + criteria.getApplicationNo() + " Application no");
+		}
+		ArrayList<String> billingSlabIds = new ArrayList<>();
+		billingSlabIds.add("");
+		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData);
+		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
+		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
+		// //Billing slab id
+		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
+		return estimatesAndBillingSlabs;
+	}
+
+	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
+			Map<String, Object> masterData) {
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		BigDecimal meterCost = BigDecimal.ZERO;
+		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(SWCalculationConstant.SC_FEESLAB_MASTER, null);
+		if (feeSlab == null)
+			throw new CustomException("FEE_SLAB_NOT_", "fee salb master data not found!!");
+		JSONObject feeObj = (JSONObject) feeSlab.get(0);
+		if (feeObj.get(SWCalculationConstant.SW_FORM_FEE) != null) {
+			BigDecimal formFee = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.SW_FORM_FEE).toString());
+		}
+		if (feeObj.get(SWCalculationConstant.SW_SCRUTINY_FEE) != null) {
+			BigDecimal scrutinyFee = new BigDecimal(
+					feeObj.getAsNumber(SWCalculationConstant.SW_SCRUTINY_FEE).toString());
+		}
+		if (feeObj.get(SWCalculationConstant.OTHER_CHARGE_CONST) != null) {
+			BigDecimal otherCharges = new BigDecimal(
+					feeObj.getAsNumber(SWCalculationConstant.OTHER_CHARGE_CONST).toString());
+		}
+		if (feeObj.get(SWCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
+			BigDecimal taxAndCessPercentage = new BigDecimal(
+					feeObj.getAsNumber(SWCalculationConstant.TAX_PERCENTAGE_CONST).toString());
+		}
+		if (feeObj.get(SWCalculationConstant.METER_COST_CONST) != null && criteria.getSewerageConnection()
+				.getConnectionType().equalsIgnoreCase(SWCalculationConstant.meteredConnectionType)) {
+			meterCost = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.METER_COST_CONST).toString());
+		}
+		//
+		return estimates;
+	}
+
+	private BigDecimal getChargeForRoadCutting() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
+	}
+
+	private BigDecimal getPlotSizeFee() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
+	}
+
+	private BigDecimal getUsageTypeFee() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
+	}
 }
