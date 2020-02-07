@@ -11,10 +11,10 @@ import org.egov.wsCalculation.model.CalculationRes;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandResponse;
 import org.egov.wsCalculation.model.GetBillCriteria;
-import org.egov.wsCalculation.model.MeterReadingResponse;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
 import org.egov.wsCalculation.service.DemandService;
 import org.egov.wsCalculation.service.WSCalculationService;
+import org.egov.wsCalculation.service.WSCalculationServiceImpl;
 import org.egov.wsCalculation.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,8 +45,20 @@ public class CalculatorController {
 	private WSCalculationService wSCalculationService;
 	
 	@Autowired
+	private WSCalculationServiceImpl wSCalculationServiceImpl;
+	
+	@Autowired
 	private final ResponseInfoFactory responseInfoFactory;
 	
+	@PostMapping("/_estimate")
+	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
+		List<Calculation> calculations = wSCalculationServiceImpl.getEstimation(calculationReq);
+		CalculationRes response = CalculationRes.builder().calculation(calculations)
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(calculationReq.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@PostMapping("/_calculate")
 	public ResponseEntity<CalculationRes> calculate(@RequestBody @Valid CalculationReq calculationReq) {

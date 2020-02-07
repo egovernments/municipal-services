@@ -15,6 +15,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
+import org.egov.wsCalculation.model.SearchCriteria;
 import org.egov.wsCalculation.model.WaterConnection;
 import org.egov.wsCalculation.model.WaterConnectionResponse;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
@@ -144,6 +145,54 @@ public class CalculatorUtil {
 	
 	
 	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionNo
+	 * @param tenantId
+	 * @return water connection
+	 */
+	public WaterConnection getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
+			String tenantId) {
+		ObjectMapper mapper = new ObjectMapper();
+		String url = getWaterSearchURL(searchCriteria);
+		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		WaterConnectionResponse response = null;
+		try {
+			response = mapper.convertValue(result, WaterConnectionResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Error while parsing response of Water Connection Search");
+		}
+
+		if (response == null || CollectionUtils.isEmpty(response.getWaterConnection()))
+			return null;
+
+		return response.getWaterConnection().get(0);
+	}
+    
+    
+    /**
+     * Creates waterConnection search url based on tenantId and connectionNumber
+     * @return water search url
+     */
+	private String getWaterSearchURL(SearchCriteria searchCriteria) {
+		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
+		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=" + searchCriteria.getTenantId());
+		if (searchCriteria.getConnectionNumber() != null) {
+			url.append("&");
+			url.append("connectionNumber=" + searchCriteria.getConnectionNumber());
+		}
+		if (searchCriteria.getApplicationNumber() != null) {
+			url.append("&");
+			url.append("applicationNumber=" + searchCriteria.getApplicationNumber());
+		}
+		return url.toString();
+	}
+	
+	
+	/**
 	 * Methods provides all the usage category master for Water Service module
 	 */
 	public MdmsCriteriaReq getMdmsReqCriteria(RequestInfo requestInfo, String tenantId,
@@ -171,5 +220,26 @@ public class CalculatorUtil {
 				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
 				.append(consumerCode).append(WSCalculationConstant.SEPARATER)
 				.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(WSCalculationConstant.WATER_TAX_SERVICE_CODE);
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @param roadType
+	 * @param usageType
+	 * @return mdms request for master data
+	 */
+	public MdmsCriteriaReq getEstimationMasterCriteria(RequestInfo requestInfo, String tenantId) {
+		List<MasterDetail> details = new ArrayList<>();
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_PLOTSLAB_MASTER).filter("[?(@.isActive== " + true + ")]").build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_PROPERTYUSAGETYPE_MASTER).filter("[?(@.isActive== "+ true +")]").build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_FEESLAB_MASTER).filter("[?(@.isActive== " + true + ")]").build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_ROADTYPE_MASTER).filter("[?(@.isActive== "+ true +")]").build());
+		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
+				.moduleName(WSCalculationConstant.WS_TAX_MODULE).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 }

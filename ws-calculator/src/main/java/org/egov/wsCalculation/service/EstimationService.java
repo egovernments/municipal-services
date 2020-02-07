@@ -2,7 +2,6 @@ package org.egov.wsCalculation.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -14,13 +13,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
 import org.egov.wsCalculation.model.BillingSlab;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.Property;
 import org.egov.wsCalculation.model.RequestInfoWrapper;
+import org.egov.wsCalculation.model.SearchCriteria;
 import org.egov.wsCalculation.model.Slab;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.WaterConnection;
@@ -317,5 +316,47 @@ public class EstimationService {
 	    calendar.set(Calendar.MINUTE, 59);
 	    calendar.set(Calendar.SECOND, 59);
 	    calendar.set(Calendar.MILLISECOND, 999);
+	}
+	
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param requestInfo
+	 * @param masterData
+	 * @return Fee Estimation Map
+	 */
+	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo, Map<String, Object> masterData) {
+		BigDecimal taxAmt = BigDecimal.ZERO;
+		WaterConnection waterConnection = null;
+		String tenantId = requestInfo.getUserInfo().getTenantId();
+		if (criteria.getWaterConnection() == null && !criteria.getApplicationNo().isEmpty()) {
+			SearchCriteria searchCriteria = new SearchCriteria();
+			searchCriteria.setApplicationNumber(criteria.getApplicationNo());
+			searchCriteria.setTenantId(criteria.getTenantId());
+			waterConnection = calculatorUtil.getWaterConnectionOnApplicationNO(requestInfo, searchCriteria, tenantId);
+			criteria.setWaterConnection(waterConnection);
+		}
+		if (criteria.getWaterConnection() == null) {
+			throw new CustomException("WATER_CONNECTION_NOT_FOUND",
+					"Water Connection are not present for " + criteria.getApplicationNo() + " Application no");
+		}
+//		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
+//		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
+//		ArrayList<String> billingSlabIds = new ArrayList<>();
+//		billingSlabMaster.put(WSCalculationConstant.WC_BILLING_SLAB_MASTER,
+//				(JSONArray) masterData.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER));
+//		timeBasedExemptionMasterMap.put(WSCalculationConstant.WC_WATER_CESS_MASTER,
+//				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
+//		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, billingSlabIds, requestInfo);
+//		taxAmt = waterCharge;
+//		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(taxAmt,
+//				criteria.getWaterConnection(), timeBasedExemptionMasterMap,
+//				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
+//		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
+//		//Billing slab id
+//		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
+		return estimatesAndBillingSlabs;
 	}
 }

@@ -215,5 +215,13 @@ public class WSCalculationConstant {
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
 	
 	public static final String  Billing_Period_Master = "Billing_Period_Master";
+	
+	public static final String WC_PLOTSLAB_MASTER = "PlotSizeSlab";
+	
+	public static final String WC_PROPERTYUSAGETYPE_MASTER = "PropertyUsageType";
+	
+	public static final String WC_FEESLAB_MASTER = "FeeSlab";
+	
+	public static final String WC_ROADTYPE_MASTER = "RoadType";
 
 }

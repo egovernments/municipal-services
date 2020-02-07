@@ -86,7 +86,17 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		return calculations;
 	}
 
-	
+	/**
+	 * 
+	 * @param request
+	 * @return list of calculation based on request
+	 */
+	public List<Calculation> getEstimation(CalculationReq request) {
+		Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
+				request.getCalculationCriteria().get(0).getTenantId());
+		List<Calculation> calculations = getFeeCalculation(request, masterData);
+		return calculations;
+	}
 	/**
 	 * It will take calculation and return calculation with tax head code 
 	 * 
@@ -256,4 +266,25 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			demandService.generateDemandForTenantId(tenantId);
 		});
 	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param masterMap
+	 * @return list of calculation based on estimation criteria
+	 */
+	List<Calculation> getFeeCalculation(CalculationReq request, Map<String, Object> masterMap) {
+		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
+		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
+			Map<String, List> estimationMap = estimationService.getFeeEstimation(criteria, request.getRequestInfo(),
+					masterMap);
+			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+					.get(WSCalculationConstant.Billing_Period_Master);
+			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			calculations.add(calculation);
+		}
+		return calculations;
+	}
+	
 }

@@ -39,9 +39,6 @@ public class CalculationCriteria {
 	@JsonProperty("tenantId")
 	private String tenantId;
 
-	@JsonProperty("meterStatus")
-	private Integer meterStatus = null;
-
 	@JsonProperty("lastReading")
 	private Double lastReading = null;
 
@@ -54,5 +51,19 @@ public class CalculationCriteria {
 
 	@JsonProperty("to")
 	private Long to;
+	
+	
+	//Fee Estimation
+	@JsonProperty("roadType")
+	private String roadType;
+
+	@JsonProperty("propertyTypeUsage")
+	private String propertyTypeUsage;
+
+	@JsonProperty("plotSize")
+	private Double plotSize;
+	
+	@JsonProperty("applicationNo")
+	private String applicationNo;
 
 }
