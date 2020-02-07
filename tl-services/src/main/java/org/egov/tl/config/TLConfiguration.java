@@ -156,6 +156,8 @@ public class TLConfiguration {
     @Value("${egov.receipt.businessserviceTL}")
     private String businessServiceTL;
 
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
 
     @Value("${egov.receipt.businessserviceBPA}")
     private String businessServiceBPA;

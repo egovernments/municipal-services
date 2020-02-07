@@ -38,14 +38,12 @@ public class TLCalculatorConstants {
     public static final String MDMS_ROUNDOFF_TAXHEAD= "TL_ROUNDOFF";
 
     public static final String businessService_TL="TL";
-    public static final String BILLINGSLAB_KEY = "calculationDescription";
 
-    //TL types
+    public static final String BILLINGSLAB_KEY = "calculationDescription";
 
     public static final String APPLICATION_TYPE_RENEWAL = "RENEWAL";
 
     public static final String APPLICATION_TYPE_NEW = "NEW";
-
 
     public static final String businessService_BPA="BPAREG";
 }

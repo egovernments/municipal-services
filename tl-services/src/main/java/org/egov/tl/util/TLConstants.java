@@ -200,15 +200,14 @@ public class TLConstants {
     public static final String VARIABLE_LASTMODIFIEDTIME = "lastModifiedTime";
     
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+
 	public static final String  USREVENTS_EVENT_NAME = "Trade License";
+
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-TL";
 
-	public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";
-	
+	public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";	
 	
 	public static final String TL_ACTION_INITIATE = "INITIATE";
-	
-
 
     public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,
             VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME));

@@ -74,10 +74,7 @@ public class EnrichmentService {
                         Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
                         if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
                             tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-                    }
-//                    Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
-//                    if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
-//                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                    }        
                     if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                             accessory.setTenantId(tradeLicense.getTenantId());
@@ -442,8 +439,6 @@ public class EnrichmentService {
         String tenantId = request.getLicenses().get(0).getTenantId();
         List<TradeLicense> licenses = request.getLicenses();
         int count=0;
-        
-        
         if (licenses.get(0).getApplicationType() != null && licenses.get(0).getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)) {
             for(int i=0;i<licenses.size();i++){
                 TradeLicense license = licenses.get(i);

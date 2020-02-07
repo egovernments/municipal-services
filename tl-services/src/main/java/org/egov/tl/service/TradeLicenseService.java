@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static org.egov.tl.util.TLConstants.*;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -111,7 +110,7 @@ public class TradeLicenseService {
                validateMobileNumberUniqueness(tradeLicenseRequest);
                break;
        }
-       //userService.createUser(tradeLicenseRequest, false);
+       userService.createUser(tradeLicenseRequest, false);
        calculationService.addCalculation(tradeLicenseRequest);
 
         /*
@@ -127,7 +126,6 @@ public class TradeLicenseService {
         repository.save(tradeLicenseRequest);
 
        if(tradeLicenseRequest.getLicenses().get(0).getApplicationType() != null && tradeLicenseRequest.getLicenses().get(0).getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
-
             producer.push(config.getUpdateTopic(), tradeLicenseRequest);
         }
 

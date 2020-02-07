@@ -64,11 +64,9 @@ public class TLCalculatorConfigs {
     @Value("${egov.taxhead.basetax}")
     private String baseTaxHead;
 
-    //TaxHeads
     @Value("${egov.taxhead.renewtax}")
     private String renewTaxHead;
-
-    //TaxHeads
+    
     @Value("${egov.taxhead.BPAbasetax}")
     private String bpabaseTaxHead;
 
