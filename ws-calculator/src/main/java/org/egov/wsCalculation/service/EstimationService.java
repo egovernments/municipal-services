@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -326,8 +327,8 @@ public class EstimationService {
 	 * @param masterData
 	 * @return Fee Estimation Map
 	 */
-	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo, Map<String, Object> masterData) {
-		BigDecimal taxAmt = BigDecimal.ZERO;
+	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo,
+			Map<String, Object> masterData) {
 		WaterConnection waterConnection = null;
 		String tenantId = requestInfo.getUserInfo().getTenantId();
 		if (criteria.getWaterConnection() == null && !criteria.getApplicationNo().isEmpty()) {
@@ -341,22 +342,59 @@ public class EstimationService {
 			throw new CustomException("WATER_CONNECTION_NOT_FOUND",
 					"Water Connection are not present for " + criteria.getApplicationNo() + " Application no");
 		}
-//		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
-//		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
-//		ArrayList<String> billingSlabIds = new ArrayList<>();
-//		billingSlabMaster.put(WSCalculationConstant.WC_BILLING_SLAB_MASTER,
-//				(JSONArray) masterData.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER));
-//		timeBasedExemptionMasterMap.put(WSCalculationConstant.WC_WATER_CESS_MASTER,
-//				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
-//		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, billingSlabIds, requestInfo);
-//		taxAmt = waterCharge;
-//		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(taxAmt,
-//				criteria.getWaterConnection(), timeBasedExemptionMasterMap,
-//				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		ArrayList<String> billingSlabIds = new ArrayList<>();
+		billingSlabIds.add("");
+		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData);
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
-//		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
-//		//Billing slab id
-//		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
+		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
+		// //Billing slab id
+		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
 		return estimatesAndBillingSlabs;
+	}
+	
+	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
+			Map<String, Object> masterData) {
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		BigDecimal meterCost = BigDecimal.ZERO;
+		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_FEESLAB_MASTER, null);
+		if (feeSlab == null)
+			throw new CustomException("FEE_SLAB_NOT_", "fee salb master data not found!!");
+		JSONObject feeObj = (JSONObject) feeSlab.get(0);
+		if (feeObj.get(WSCalculationConstant.WS_FORM_FEE) != null) {
+			BigDecimal formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.WS_FORM_FEE).toString());
+		}
+		if (feeObj.get(WSCalculationConstant.WS_SCRUTINY_FEE) != null) {
+			BigDecimal scrutinyFee = new BigDecimal(
+					feeObj.getAsNumber(WSCalculationConstant.WS_SCRUTINY_FEE).toString());
+		}
+		if (feeObj.get(WSCalculationConstant.OTHER_CHARGE_CONST) != null) {
+			BigDecimal otherCharges = new BigDecimal(
+					feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).toString());
+		}
+		if (feeObj.get(WSCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
+			BigDecimal taxAndCessPercentage = new BigDecimal(
+					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
+		}
+		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null && criteria.getWaterConnection()
+				.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
+		}
+		//
+		return estimates;
+	}
+	
+	private BigDecimal getChargeForRoadCutting() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
+	}
+	
+	private BigDecimal getPlotSizeFee() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
+	}
+	
+	private BigDecimal getUsageTypeFee() {
+		BigDecimal charge = BigDecimal.ZERO;
+		return charge;
 	}
 }

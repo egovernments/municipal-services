@@ -223,5 +223,36 @@ public class WSCalculationConstant {
 	public static final String WC_FEESLAB_MASTER = "FeeSlab";
 	
 	public static final String WC_ROADTYPE_MASTER = "RoadType";
+	
+	
+	
+	/**
+	 * Fee Estimation Configuration
+	 */
+	public static final String WS_FORM_FEE = "WS_FORM_FEE";
+
+	public static final String WS_SCRUTINY_FEE = "WS_SCRUTINY_FEE";
+
+	public static final String WS_ONE_TIME_FEE = "WS_ONE_TIME_FEE";
+
+	public static final String WS_ROAD_CUTTING_CHARGE = "WS_ROAD_CUTTING_CHARGE";
+
+	public static final String WS_METER_CHARGE = "WS_METER_CHARGE";
+	
+	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
+	
+	public static final String WS_OTHER_CHARGE = "WS_OTHER_CHARGE";
+	
+	public static final String WS_TAX_AND_CESS = "WS_TAX_AND_CESS";
+	
+	public static final String FORM_FEE_CONST = "formFee";
+
+	public static final String SCRUTINY_FEE_CONST = "scrutinyFee";
+	
+	public static final String METER_COST_CONST = "meterCost";
+	
+	public static final String OTHER_CHARGE_CONST = "other";
+	
+	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
 
 }
