@@ -25,6 +25,9 @@ public class Configurations {
 
 	@Value("${kafka.topics.mutation-billing-slab.update.service}")
 	public String mutationbillingSlabUpdatePersisterTopic;
+
+	@Value("${pt.mutation.deadline.month}")
+	public Integer mutationDeadlineMonth;
 	
 	//MDMS
 	@Value("${egov.mdms.host}")

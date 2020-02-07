@@ -74,13 +74,22 @@ public class CalculationValidator {
 			error.put(PT_ADDITIONALNDETAILS_NULL,PT_ADDITIONALNDETAILS_NULL_MSG);
 			throw new CustomException(error);
 		}
-		if(!additionalDetails.containsKey("marketValue") || additionalDetails.get("marketValue")== null)
+		if(!additionalDetails.containsKey("marketValue") || additionalDetails.get("marketValue")== null){
 			error.put(PT_MARKETVALUE_NULL,PT_MARKETVALUE_NULL_MSG);
+		}
+		else{
+			boolean numeric = true;
+			String marketValue = additionalDetails.get("marketValue").toString();
+			numeric = marketValue.matches("-?\\d+(\\.\\d+)?");
+			if(!numeric)
+				error.put(PT_MARKETVALUE_NULL,PT_MARKETVALUE_NULL_MSG);
+		}
 		if(!additionalDetails.containsKey("documentDate") || additionalDetails.get("documentDate") == null)
 			error.put(PT_DOCDATE_NULL,PT_DOCDATE_NULL_MSG);
 		if (!CollectionUtils.isEmpty(error))
 			throw new CustomException(error);
 	}
+
 
 
 

@@ -795,7 +795,7 @@ public class EstimationService {
 		billingSlabSearchCriteria.setTenantId(property.getTenantId());
 
 
-		Double marketValue = (Double) additionalDetails.get("marketValue");
+		Double marketValue =Double.parseDouble(String.valueOf(additionalDetails.get("marketValue")));
 		billingSlabSearchCriteria.setMarketValue(marketValue);
 
 		String[] usageCategoryMasterData = property.getUsageCategory().split("\\.");
@@ -1006,7 +1006,7 @@ public class EstimationService {
 		Integer month = cal.get(Calendar.MONTH);
 		Integer year = cal.get(Calendar.YEAR);
 
-		month = month+6;
+		month = month + configs.getMutationDeadlineMonth();
 		if(month>12){
 			month = month - 12;
 			year = year + 1;
