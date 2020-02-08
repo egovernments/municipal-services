@@ -69,7 +69,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, true);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return calculations;
 	}
 	
@@ -82,7 +82,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap , true);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap);
 		return calculations;
 	}
 
@@ -95,7 +95,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterData, false);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterData);
 		return calculations;
 	}
 	/**

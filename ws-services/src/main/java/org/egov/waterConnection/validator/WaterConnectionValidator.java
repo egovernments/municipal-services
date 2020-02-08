@@ -30,31 +30,31 @@ public class WaterConnectionValidator {
 		if (waterConnection.getProperty().getUsageCategory() == null || waterConnection.getProperty().getUsageCategory().isEmpty()) {
 			errorMap.put("INVALID WATER CONNECTION PROPERTY USAGE TYPE", "WaterConnection cannot be created without property usage type");
 		}
-		if (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION) {
-			if (waterConnection.getMeterId() == null) {
-				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");
-			}
-			if (waterConnection.getMeterInstallationDate() < 0 || waterConnection.getMeterInstallationDate() == null
-					|| waterConnection.getMeterInstallationDate() == 0) {
-				errorMap.put("INVALID METER INSTALLATION DATE", "Meter Installation date cannot be null or negative !!");
-			}
-		}
-			
-//		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
-//			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
-//			if (n == 0) {
-//				errorMap.put("INVALID WATER CONNECTION NUMBER", "Water Id not present");
+//		if (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION) {
+//			if (waterConnection.getMeterId() == null) {
+//				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");
+//			}
+//			if (waterConnection.getMeterInstallationDate() < 0 || waterConnection.getMeterInstallationDate() == null
+//					|| waterConnection.getMeterInstallationDate() == 0) {
+//				errorMap.put("INVALID METER INSTALLATION DATE", "Meter Installation date cannot be null or negative !!");
 //			}
 //		}
-		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
-			errorMap.put("INVALID WATER CONNECTION TYPE", "WaterConnection cannot be created  without connection type");
-		}
-		if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
-			errorMap.put("INVALID WATER CONNECTION CATEGORY", "WaterConnection cannot be created without connection category");
-		}
-		if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
-			errorMap.put("INVALID WATER SOURCE", "WaterConnection cannot be created without water source");
-		}
+//			
+////		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
+////			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
+////			if (n == 0) {
+////				errorMap.put("INVALID WATER CONNECTION NUMBER", "Water Id not present");
+////			}
+////		}
+//		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
+//			errorMap.put("INVALID WATER CONNECTION TYPE", "WaterConnection cannot be created  without connection type");
+//		}
+//		if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
+//			errorMap.put("INVALID WATER CONNECTION CATEGORY", "WaterConnection cannot be created without connection category");
+//		}
+//		if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
+//			errorMap.put("INVALID WATER SOURCE", "WaterConnection cannot be created without water source");
+//		}
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);

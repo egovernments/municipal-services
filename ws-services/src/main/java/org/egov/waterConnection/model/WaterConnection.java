@@ -85,7 +85,7 @@ public class WaterConnection extends Connection {
 	 * @return connectionCategory
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getConnectionCategory() {
@@ -127,7 +127,7 @@ public class WaterConnection extends Connection {
 	 * @return connectionType
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getConnectionType() {
@@ -149,7 +149,7 @@ public class WaterConnection extends Connection {
 	 * @return waterSource
 	 **/
 	@ApiModelProperty(required = true, value = "It is a namespaced master data, defined in MDMS")
-	@NotNull
+	
 
 	@Size(min = 2, max = 64)
 	public String getWaterSource() {
@@ -273,7 +273,7 @@ public class WaterConnection extends Connection {
 	 * @return uom
 	 **/
 	@ApiModelProperty(required = true, value = "The Unit of measurement for water connection.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getUom() {
@@ -295,7 +295,7 @@ public class WaterConnection extends Connection {
 	 * @return calculationAttribute
 	 **/
 	@ApiModelProperty(required = true, value = "The calculation attribute of water connection.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getCalculationAttribute() {
