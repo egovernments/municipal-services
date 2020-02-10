@@ -406,14 +406,22 @@ public class BPAValidator {
 		return unitIds;
 	}
 
-	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
+	@SuppressWarnings(value = {"rawtypes" })
+	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, List<BPA> searchBPA, String wfState) {
 
-		validateQuestions(mdmsData, bpaRequest, wfState);
-		validateDocTypes(mdmsData, bpaRequest, wfState);
+		BPA bpa = bpaRequest.getBPA();
+		List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+		if (!CollectionUtils.isEmpty(checkListFromReq)) {
+			validateQuestions(mdmsData, bpaRequest, checkListFromReq, wfState);
+			validateDocTypes(mdmsData, bpaRequest, checkListFromReq, wfState);
+		} else {
+			log.info("No Checklist found in request with the key.");
+			bpa.setAdditionalDetails(searchBPA.get(0).getAdditionalDetails());
+		}
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, String wfState) {
+	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, List checkListFromReq, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestQns = new ArrayList<String>();
@@ -434,14 +442,9 @@ public class BPAValidator {
 			log.info("MDMS questions " + mdmsQns);
 
 			if (bpa.getAdditionalDetails() != null) {
-				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if (!CollectionUtils.isEmpty(checkListFromReq)) {
-					for (int i = 0; i < checkListFromReq.size(); i++) {
-						requestCheckList
-								.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
-					}
-				} else {
-					log.info("No Checklist found for given key in additional details");
+				for (int i = 0; i < checkListFromReq.size(); i++) {
+					requestCheckList
+							.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
 				}
 			}
 
@@ -466,7 +469,7 @@ public class BPAValidator {
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, String wfState) {
+	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, List checkListFromReq, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestDocs = new ArrayList<String>();
@@ -487,14 +490,9 @@ public class BPAValidator {
 			log.info("MDMS DocTypes " + mdmsDocs);
 
 			if (bpa.getAdditionalDetails() != null) {
-				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if (!CollectionUtils.isEmpty(checkListFromReq)) {
-					for (int i = 0; i < checkListFromReq.size(); i++) {
-						requestCheckList.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
-					}
-				} else {
-					log.info("No Checklist found for given key in additional details");
-				}			
+				for (int i = 0; i < checkListFromReq.size(); i++) {
+					requestCheckList.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
+				}
 			}
 
 			if (!CollectionUtils.isEmpty(requestCheckList)) {
