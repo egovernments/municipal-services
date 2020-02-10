@@ -73,14 +73,13 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
-		
-		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
 
+		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
 
 		// String assessmentNumber = null != detail.getAssessmentNumber() ?
 		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
 		String tenantId = criteria.getTenantId();
-		
+
 		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(SWCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
@@ -91,6 +90,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal exemption = BigDecimal.ZERO;
 		BigDecimal rebate = BigDecimal.ZERO;
+		BigDecimal fee = BigDecimal.ZERO;
 
 		for (TaxHeadEstimate estimate : estimates) {
 
@@ -115,11 +115,16 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				exemption = exemption.add(estimate.getEstimateAmount());
 				break;
 
+			case FEE:
+				fee = fee.add(estimate.getEstimateAmount());
+				break;
+
 			default:
 				taxAmt = taxAmt.add(estimate.getEstimateAmount());
 				break;
 			}
 		}
+
 		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(sewerageCharge),
 				rebate.add(exemption));
 		if (null != decimalEstimate) {
@@ -131,9 +136,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				rebate = rebate.add(decimalEstimate.getEstimateAmount());
 		}
 
-		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge);
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(sewerageCharge)
-				.sewerageConnection(sewerageConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
+		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge).add(fee);
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+				.charge(sewerageCharge).fee(fee).sewerageConnection(sewerageConnection).rebate(rebate)
+				.tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds)
+				.connectionNo(criteria.getConnectionNo()).build();
 	}
 	
 	
@@ -197,7 +204,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
 		return calculations;
 	}
-
+	
 	/**
 	 * 
 	 * @param request
@@ -209,14 +216,14 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getFeeEstimation(criteria, request.getRequestInfo(),
 					masterMap);
-			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-					.get(SWCalculationConstant.Billing_Period_Master);
-			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+//			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+//					.get(WSCalculationConstant.Billing_Period_Master);
+//			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}
 		return calculations;
 	}
-	
+
 	
 }

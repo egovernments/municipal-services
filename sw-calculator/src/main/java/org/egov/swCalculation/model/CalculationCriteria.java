@@ -24,37 +24,37 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class CalculationCriteria   {
-	
-		@Valid
-        @JsonProperty("sewerageConnection")
-        private SewerageConnection sewerageConnection;
-		
-		@NotNull
-        @JsonProperty("connectionNo")
-        private String connectionNo;
+public class CalculationCriteria {
 
-        @JsonProperty("assessmentYear")
-        private String assessmentYear;
+	@Valid
+	@JsonProperty("sewerageConnection")
+	private SewerageConnection sewerageConnection;
 
-        @NotNull
-        @JsonProperty("tenantId")
-        private String tenantId;
-        
+	@JsonProperty("connectionNo")
+	private String connectionNo;
 
-    	//Fee Estimation
-    	@JsonProperty("roadType")
-    	private String roadType;
+	@JsonProperty("assessmentYear")
+	private String assessmentYear;
 
-    	@JsonProperty("propertyTypeUsage")
-    	private String propertyTypeUsage;
+	@NotNull
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-    	@JsonProperty("plotSize")
-    	private Double plotSize;
+	@JsonProperty("lastReading")
+	private Double lastReading = null;
 
-    	@JsonProperty("applicationNo")
-    	private String applicationNo;
+	@JsonProperty("currentReading")
+	private Double currentReading = null;
 
+	// Demand Generation
+	@JsonProperty("from")
+	private Long from;
+
+	@JsonProperty("to")
+	private Long to;
+
+	// Fee Estimation
+	@JsonProperty("applicationNo")
+	private String applicationNo;
 
 }
-
