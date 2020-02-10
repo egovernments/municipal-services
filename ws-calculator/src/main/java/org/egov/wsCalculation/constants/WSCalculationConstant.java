@@ -254,5 +254,9 @@ public class WSCalculationConstant {
 	public static final String OTHER_CHARGE_CONST = "other";
 	
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
+	
+	public static final String ROAD_NAME_CONST = "name";
+	
+	public static final String UNIT_COST_CONST = "unitCost";
 
 }

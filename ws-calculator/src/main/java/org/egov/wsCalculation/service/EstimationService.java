@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -43,6 +44,10 @@ public class EstimationService {
 	
 	@Autowired
 	private CalculatorUtil calculatorUtil;
+	
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head
@@ -352,49 +357,136 @@ public class EstimationService {
 		return estimatesAndBillingSlabs;
 	}
 	
+	
+	/**
+	 * 
+	 * @param criteria
+	 * @param masterData
+	 * @return return all tax heads
+	 */
 	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
 			Map<String, Object> masterData) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		BigDecimal formFee = BigDecimal.ZERO;
+		BigDecimal scrutinyFee = BigDecimal.ZERO;
 		BigDecimal meterCost = BigDecimal.ZERO;
+		BigDecimal otherCharges = BigDecimal.ZERO;
+		BigDecimal taxAndCessPercentage = BigDecimal.ZERO;
+		BigDecimal roadCuttingCharge = BigDecimal.ZERO;
+		BigDecimal roadPlotCharge = BigDecimal.ZERO;
+		BigDecimal usageTypeCharge = BigDecimal.ZERO;
+		BigDecimal tax = BigDecimal.ZERO;
+		BigDecimal totalCharge = BigDecimal.ZERO;
+
 		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_FEESLAB_MASTER, null);
 		if (feeSlab == null)
 			throw new CustomException("FEE_SLAB_NOT_", "fee salb master data not found!!");
-		JSONObject feeObj = (JSONObject) feeSlab.get(0);
-		if (feeObj.get(WSCalculationConstant.WS_FORM_FEE) != null) {
-			BigDecimal formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.WS_FORM_FEE).toString());
+		JSONObject feeObj = mapper.convertValue(feeSlab.get(0), JSONObject.class);
+		if (feeObj.get(WSCalculationConstant.FORM_FEE_CONST) != null) {
+			formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.FORM_FEE_CONST).toString());
 		}
-		if (feeObj.get(WSCalculationConstant.WS_SCRUTINY_FEE) != null) {
-			BigDecimal scrutinyFee = new BigDecimal(
-					feeObj.getAsNumber(WSCalculationConstant.WS_SCRUTINY_FEE).toString());
+		if (feeObj.get(WSCalculationConstant.SCRUTINY_FEE_CONST) != null) {
+			scrutinyFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.SCRUTINY_FEE_CONST).toString());
 		}
 		if (feeObj.get(WSCalculationConstant.OTHER_CHARGE_CONST) != null) {
-			BigDecimal otherCharges = new BigDecimal(
-					feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).toString());
+			otherCharges = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).toString());
 		}
 		if (feeObj.get(WSCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
-			BigDecimal taxAndCessPercentage = new BigDecimal(
+			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
 		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null && criteria.getWaterConnection()
 				.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
 		}
+		roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
+				criteria.getWaterConnection().getRoadCuttingArea());
+		roadPlotCharge = getPlotSizeFee(masterData, criteria.getWaterConnection().getProperty().getLandArea());
+		usageTypeCharge = getUsageTypeFee(masterData, criteria.getWaterConnection().getProperty().getUsageCategory(),
+				criteria.getWaterConnection().getRoadCuttingArea());
+		totalCharge = formFee.add(scrutinyFee).add(otherCharges).add(meterCost).add(roadCuttingCharge)
+				.add(roadPlotCharge).add(usageTypeCharge);
+		tax = totalCharge.multiply(taxAndCessPercentage.divide(WSCalculationConstant.HUNDRED));
 		//
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_FORM_FEE)
+				.estimateAmount(formFee.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SCRUTINY_FEE)
+				.estimateAmount(scrutinyFee.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_CHARGE)
+				.estimateAmount(meterCost.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_OTHER_CHARGE)
+				.estimateAmount(otherCharges.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ROAD_CUTTING_CHARGE)
+				.estimateAmount(roadCuttingCharge.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ONE_TIME_FEE)
+				.estimateAmount(usageTypeCharge.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
+				.estimateAmount(roadPlotCharge.setScale(2, 2)).build());
+		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TAX_AND_CESS)
+				.estimateAmount(tax.setScale(2, 2)).build());
 		return estimates;
 	}
 	
-	private BigDecimal getChargeForRoadCutting() {
+	/**
+	 * 
+	 * @param masterData
+	 * @param roadType
+	 * @param roadCuttingArea
+	 * @return road cutting charge
+	 */
+	private BigDecimal getChargeForRoadCutting(Map<String, Object> masterData, String roadType, Float roadCuttingArea) {
+		JSONArray roadSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_ROADTYPE_MASTER, null);
 		BigDecimal charge = BigDecimal.ZERO;
+		BigDecimal cuttingArea = new BigDecimal(roadCuttingArea.toString());
+		JSONObject masterSlab = new JSONObject();
+		if(roadSlab != null) {
+			masterSlab.put("RoadType", roadSlab);
+			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='"+roadType+"')]");
+			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
+			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
+			charge = charge.multiply(cuttingArea);
+		}
 		return charge;
 	}
 	
-	private BigDecimal getPlotSizeFee() {
+	/**
+	 * 
+	 * @param masterData
+	 * @param plotSize
+	 * @return get fee based on plot size
+	 */
+	private BigDecimal getPlotSizeFee(Map<String, Object> masterData, Double plotSize) {
 		BigDecimal charge = BigDecimal.ZERO;
+		JSONArray plotSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_PLOTSLAB_MASTER, null);
+		JSONObject masterSlab = new JSONObject();
+		if (plotSlab != null) {
+			masterSlab.put("PlotSizeSlab", plotSlab);
+			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.PlotSizeSlab[?(@.from <="+ plotSize +"&& @.to > " + plotSize +")]");
+			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
+			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
+		}
 		return charge;
 	}
 	
-	private BigDecimal getUsageTypeFee() {
+	/**
+	 * 
+	 * @param masterData
+	 * @param usageType
+	 * @param roadCuttingArea
+	 * @return 
+	 */
+	private BigDecimal getUsageTypeFee(Map<String, Object> masterData, String usageType, Float roadCuttingArea) {
 		BigDecimal charge = BigDecimal.ZERO;
+		JSONArray usageSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_PROPERTYUSAGETYPE_MASTER, null);
+		JSONObject masterSlab = new JSONObject();
+		BigDecimal cuttingArea = new BigDecimal(roadCuttingArea.toString());
+		if(usageSlab != null) {
+			masterSlab.put("PropertyUsageType", usageSlab);
+			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.PropertyUsageType[?(@.code=='"+usageType+"')]");
+			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
+			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
+			charge = charge.multiply(cuttingArea);
+		}
 		return charge;
 	}
 }
