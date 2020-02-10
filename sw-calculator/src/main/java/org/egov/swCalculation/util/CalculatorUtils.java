@@ -192,7 +192,7 @@ public class CalculatorUtils {
 		try {
 			response = mapper.convertValue(result, SewerageConnectionResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Error while parsing response of Water Connection Search");
+			throw new CustomException("PARSING ERROR", "Error while parsing response of Sewerage Connection Search");
 		}
 
 		if (response == null || CollectionUtils.isEmpty(response.getSewerageConnections()))
