@@ -406,35 +406,40 @@ public class BPAValidator {
 		return unitIds;
 	}
 
-	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 
+		validateQuestions(mdmsData, bpaRequest, wfState);
+		validateDocTypes(mdmsData, bpaRequest, wfState);
+	}
+
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
+	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
 		List<Map> requestCheckList = null;
 		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
-		
+
 		log.info("Fetching MDMS result for the state " + wfState);
 
 		try {
-			String path = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
+			String questionsPath = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
 					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
 					.replace("{4}", bpa.getApplicationType());
-			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, path);
-			
-			if(mdmsQuestionsArray.size() > 0)
+
+			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, questionsPath);
+
+			if (!CollectionUtils.isEmpty(mdmsQuestionsArray))
 				mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
-			
+
 			log.info("MDMS questions " + mdmsQns);
 
 			if (bpa.getAdditionalDetails() != null) {
-				List checkListFromReq = (List)((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if(checkListFromReq != null && checkListFromReq.size() > 0)
-					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0))
-							.get(BPAConstants.QUESTIONS_TYPE);
+				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+				if (!CollectionUtils.isEmpty(checkListFromReq))
+					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0)).get(BPAConstants.QUESTIONS_TYPE);
 			}
 
-			if (requestCheckList != null && requestCheckList.size() > 0) {
+			if (!CollectionUtils.isEmpty(requestCheckList)) {
 				for (Map reqQn : requestCheckList) {
 					requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
 				}
@@ -442,7 +447,7 @@ public class BPAValidator {
 
 			log.info("Request questions " + requestQns);
 
-			if (requestQns != null && requestQns.size() > 0 && mdmsQns != null && mdmsQns.size() > 0) {
+			if (!CollectionUtils.isEmpty(requestQns) && !CollectionUtils.isEmpty(mdmsQns)) {
 				for (String qn : requestQns) {
 					if (!mdmsQns.contains(qn)) {
 						throw new CustomException("BPA_UNKNOWN_QUESTIONS", qn + " is not exists in MDMS data");
@@ -450,7 +455,64 @@ public class BPAValidator {
 				}
 			}
 		} catch (PathNotFoundException ex) {
-			log.error("Exception occured while validating the Checklist " + ex.getMessage());
+			log.error("Exception occured while validating the Checklist Questions" + ex.getMessage());
+		}
+	}
+
+	@SuppressWarnings(value = { "unchecked", "rawtypes" })
+	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, String wfState) {
+		BPA bpa = bpaRequest.getBPA();
+		List<Map> requestCheckList = null;
+		List<String> requestDocs = new ArrayList<String>();
+		List<String> mdmsDocs = null;
+
+		log.info("Fetching MDMS result for the state " + wfState);
+
+		try {
+			String docTypesPath = BPAConstants.DOCTYPES_MAP.replace("{1}", wfState)
+					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
+					.replace("{4}", bpa.getApplicationType());
+
+			List<Object> docTypesArray = (List<Object>) JsonPath.read(mdmsData, docTypesPath);
+
+			if (!CollectionUtils.isEmpty(docTypesArray))
+				mdmsDocs = JsonPath.read(docTypesArray.get(0), BPAConstants.DOCTYPESS_PATH);
+
+			log.info("MDMS DocTypes " + mdmsDocs);
+
+			if (bpa.getAdditionalDetails() != null) {
+				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+				if (!CollectionUtils.isEmpty(checkListFromReq))
+					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0)).get(BPAConstants.DOCS);
+			}
+
+			if (!CollectionUtils.isEmpty(requestCheckList)) {
+				for (Map reqDoc : requestCheckList) {
+					requestDocs.add((String) reqDoc.get(BPAConstants.CODE));
+				}
+			}
+
+			log.info("Request Docs " + requestDocs);
+
+			if (!CollectionUtils.isEmpty(requestDocs) && !CollectionUtils.isEmpty(mdmsDocs)) {
+				if (requestDocs.size() < mdmsDocs.size())
+					throw new CustomException("BPA_UNKNOWN_DOCS",
+							"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
+				else {
+					List<String> pendingDocs = new ArrayList<String>();
+					for (String doc : mdmsDocs) {
+						if (!requestDocs.contains(doc)) {
+							pendingDocs.add(doc);
+						}
+					}
+					if (pendingDocs.size() > 0) {
+						throw new CustomException("BPA_UNKNOWN_DOCS",
+								"Please upload " + StringUtils.join(pendingDocs, ","));
+					}
+				}
+			}
+		} catch (PathNotFoundException ex) {
+			log.error("Exception occured while validating the Checklist Documents" + ex.getMessage());
 		}
 	}
 }
