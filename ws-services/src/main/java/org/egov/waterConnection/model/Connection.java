@@ -92,7 +92,9 @@ public class Connection {
 	public enum StatusEnum {
 		ACTIVE("Active"),
 
-		INACTIVE("Inactive");
+		INACTIVE("Inactive"),
+		
+	    INWORKFLOW("INWORKFLOW");
 
 		private String value;
 

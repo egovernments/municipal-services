@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class SewerageConnectionValidator {
 
 	@Autowired
-	SewarageDao sewarageDao;
+	private SewarageDao sewarageDao;
 
 	/**
 	 * 
@@ -34,10 +34,10 @@ public class SewerageConnectionValidator {
 //				errorMap.put("INVALID SEWARAGE CONNECTION NUMBER", "Sewarage connection id not present");
 //			}
 //		}
-		if (sewerageConnection.getConnectionType() == null || sewerageConnection.getConnectionType().isEmpty()) {
-			errorMap.put("INVALID SEWERAGE CONNECTION TYPE",
-					"SewerageConnection cannot be created  without connection type");
-		}
+//		if (sewerageConnection.getConnectionType() == null || sewerageConnection.getConnectionType().isEmpty()) {
+//			errorMap.put("INVALID SEWERAGE CONNECTION TYPE",
+//					"SewerageConnection cannot be created  without connection type");
+//		}
 		
 		if (sewerageConnection.getProperty().getUsageCategory() == null || sewerageConnection.getProperty().getUsageCategory().isEmpty()) {
 			errorMap.put("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE", "SewerageConnection cannot be created without property usage type");

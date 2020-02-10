@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -19,7 +20,7 @@ import javax.validation.constraints.*;
  */
 @ApiModel(description = "This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-10-24T10:29:25.253+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-01-22T12:39:45.543+05:30[Asia/Kolkata]")
 public class Connection {
 	@JsonProperty("id")
 	private String id = null;
@@ -34,7 +35,25 @@ public class Connection {
 	 * Gets or Sets applicationStatus
 	 */
 	public enum ApplicationStatusEnum {
-		REJECTED("Rejected"),
+		INITIATED("INITIATED"),
+
+		REJECTED("REJECTED"),
+
+		PENDING_FOR_CITIZEN_ACTION("PENDING_FOR_CITIZEN_ACTION"),
+
+		PENDING_FOR_DOCUMENT_VERIFICATION("PENDING_FOR_DOCUMENT_VERIFICATION"),
+
+		PENDING_FOR_FIELD_INSPECTION("PENDING_FOR_FIELD_INSPECTION"),
+
+		PENDING_APPROVAL_FOR_CONNECTION("PENDING_APPROVAL_FOR_CONNECTION"),
+
+		PENDING_FOR_PAYMENT("PENDING_FOR_PAYMENT"),
+
+		PENDING_FOR_CONNECTION_ACTIVATION("PENDING_FOR_CONNECTION_ACTIVATION"),
+
+		CONNECTION_ACTIVATED("CONNECTION_ACTIVATED"),
+
+		APPLIED("Applied"),
 
 		APPROVED("Approved"),
 
@@ -109,14 +128,29 @@ public class Connection {
 	private String oldConnectionNo = null;
 
 	@JsonProperty("documents")
+	@Valid
 	private List<Document> documents = null;
+
+	@JsonProperty("plumberInfo")
+	@Valid
+	private List<PlumberInfo> plumberInfo = null;
+
+	@JsonProperty("roadType")
+	private String roadType = null;
+
+	@JsonProperty("roadCuttingArea")
+	private Float roadCuttingArea = null;
+
+	@NotNull
+	@Size(max = 64)
+	@JsonProperty("action")
+	private String action = null;
 
 	public Connection id(String id) {
 		this.id = id;
 		return this;
 	}
-	
-	
+
 	/**
 	 * Unique Identifier of the connection for internal reference.
 	 * 
@@ -270,7 +304,8 @@ public class Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		this.documents.add(documentsItem);
+		if(!this.documents.contains(documentsItem))
+            this.documents.add(documentsItem);
 		return this;
 	}
 
@@ -289,6 +324,91 @@ public class Connection {
 		this.documents = documents;
 	}
 
+	public Connection plumberInfo(List<PlumberInfo> plumberInfo) {
+		this.plumberInfo = plumberInfo;
+		return this;
+	}
+
+	public Connection addPlumberInfoItem(PlumberInfo plumberInfoItem) {
+		if (this.plumberInfo == null) {
+			this.plumberInfo = new ArrayList<PlumberInfo>();
+		}
+		if (!this.plumberInfo.contains(plumberInfoItem))
+			this.plumberInfo.add(plumberInfoItem);
+		return this;
+	}
+
+	/**
+	 * The documents attached by owner for exemption.
+	 * 
+	 * @return plumberInfo
+	 **/
+	@ApiModelProperty(value = "The documents attached by owner for exemption.")
+	@Valid
+	public List<PlumberInfo> getPlumberInfo() {
+		return plumberInfo;
+	}
+
+	public void setPlumberInfo(List<PlumberInfo> plumberInfo) {
+		this.plumberInfo = plumberInfo;
+	}
+
+	public Connection roadType(String roadType) {
+		this.roadType = roadType;
+		return this;
+	}
+
+	/**
+	 * It is a master data, defined in MDMS. If road cutting is required to
+	 * established the connection then we need to capture the details of road
+	 * type.
+	 * 
+	 * @return roadType
+	 **/
+	@ApiModelProperty(value = "It is a master data, defined in MDMS. If road cutting is required to established the connection then we need to capture the details of road type.")
+
+	@Size(min = 2, max = 32)
+	public String getRoadType() {
+		return roadType;
+	}
+
+	public void setRoadType(String roadType) {
+		this.roadType = roadType;
+	}
+
+	public Connection roadCuttingArea(Float roadCuttingArea) {
+		this.roadCuttingArea = roadCuttingArea;
+		return this;
+	}
+
+	public String getAction() {
+		return action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public Connection action(String action) {
+		this.action = action;
+		return this;
+	}
+
+	/**
+	 * Capture the road cutting area in sqft.
+	 * 
+	 * @return roadCuttingArea
+	 **/
+	@ApiModelProperty(value = "Capture the road cutting area in sqft.")
+
+	public Float getRoadCuttingArea() {
+		return roadCuttingArea;
+	}
+
+	public void setRoadCuttingArea(Float roadCuttingArea) {
+		this.roadCuttingArea = roadCuttingArea;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -304,13 +424,16 @@ public class Connection {
 				&& Objects.equals(this.status, connection.status)
 				&& Objects.equals(this.connectionNo, connection.connectionNo)
 				&& Objects.equals(this.oldConnectionNo, connection.oldConnectionNo)
-				&& Objects.equals(this.documents, connection.documents);
+				&& Objects.equals(this.documents, connection.documents)
+				&& Objects.equals(this.plumberInfo, connection.plumberInfo)
+				&& Objects.equals(this.roadType, connection.roadType)
+				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, property, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
-				documents);
+				documents, plumberInfo, roadType, roadCuttingArea);
 	}
 
 	@Override
@@ -326,6 +449,9 @@ public class Connection {
 		sb.append("    connectionNo: ").append(toIndentedString(connectionNo)).append("\n");
 		sb.append("    oldConnectionNo: ").append(toIndentedString(oldConnectionNo)).append("\n");
 		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
+		sb.append("    plumberInfo: ").append(toIndentedString(plumberInfo)).append("\n");
+		sb.append("    roadType: ").append(toIndentedString(roadType)).append("\n");
+		sb.append("    roadCuttingArea: ").append(toIndentedString(roadCuttingArea)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

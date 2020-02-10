@@ -46,8 +46,6 @@ public class SewerageConnection extends Connection  {
    * @return connectionExecutionDate
   **/
   @ApiModelProperty(required = true, readOnly = true, value = "")
-  @NotNull
-
   @Valid
   public BigDecimal getConnectionExecutionDate() {
     return connectionExecutionDate;
@@ -105,8 +103,6 @@ public class SewerageConnection extends Connection  {
    * @return uom
   **/
   @ApiModelProperty(required = true, value = "The Unit of measurement for sewarage connection.")
-  @NotNull
-
 @Size(min=2,max=32)   public String getUom() {
     return uom;
   }
@@ -125,7 +121,6 @@ public class SewerageConnection extends Connection  {
    * @return calculationAttribute
   **/
   @ApiModelProperty(required = true, value = "The calculation attribute of sewarage connection.")
-  @NotNull
 
 @Size(min=2,max=32)   public String getCalculationAttribute() {
     return calculationAttribute;
@@ -145,7 +140,6 @@ public class SewerageConnection extends Connection  {
    * @return connectionType
   **/
   @ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-  @NotNull
 
 @Size(min=2,max=32)   public String getConnectionType() {
     return connectionType;

@@ -28,8 +28,11 @@ public class WaterConnectionValidator {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
 		if (waterConnection.getProperty().getUsageCategory() == null || waterConnection.getProperty().getUsageCategory().isEmpty()) {
-			errorMap.put("INVALID WATER CONNECTION PROPERTY USAGE TYPE", "WaterConnection cannot be created without property usage type");
+			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Water connection cannot be created without property usage type");
 		}
+//		if ((waterConnection.getPipeSize() == null || waterConnection.getPipeSize() == 0.0) && (waterConnection.getNoOfTaps() == null || waterConnection.getNoOfTaps() == 0)) {
+//			errorMap.put("INVALID_WATER_CONNECTION_PIPE_SIZE_OR_TAPS", "Pipe size or no of taps should not be null!!");
+//		}
 //		if (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION) {
 //			if (waterConnection.getMeterId() == null) {
 //				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");

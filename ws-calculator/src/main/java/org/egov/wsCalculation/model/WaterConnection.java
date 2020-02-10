@@ -6,15 +6,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import org.egov.wsCalculation.model.Connection.ApplicationStatusEnum;
-import org.egov.wsCalculation.model.Connection.StatusEnum;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -89,7 +82,7 @@ public class WaterConnection extends Connection {
 	 * @return connectionCategory
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getConnectionCategory() {
@@ -131,7 +124,7 @@ public class WaterConnection extends Connection {
 	 * @return connectionType
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getConnectionType() {
@@ -153,7 +146,7 @@ public class WaterConnection extends Connection {
 	 * @return waterSource
 	 **/
 	@ApiModelProperty(required = true, value = "It is a namespaced master data, defined in MDMS")
-	@NotNull
+	
 
 	@Size(min = 2, max = 64)
 	public String getWaterSource() {
@@ -277,7 +270,7 @@ public class WaterConnection extends Connection {
 	 * @return uom
 	 **/
 	@ApiModelProperty(required = true, value = "The Unit of measurement for water connection.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getUom() {
@@ -299,7 +292,7 @@ public class WaterConnection extends Connection {
 	 * @return calculationAttribute
 	 **/
 	@ApiModelProperty(required = true, value = "The calculation attribute of water connection.")
-	@NotNull
+	
 
 	@Size(min = 2, max = 32)
 	public String getCalculationAttribute() {
@@ -319,8 +312,8 @@ public class WaterConnection extends Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		if(!this.documents.contains(documentsItem))
-			this.documents.add(documentsItem);
+	 if(!this.documents.contains(documentsItem))
+             this.documents.add(documentsItem);
 		return this;
 	}
 

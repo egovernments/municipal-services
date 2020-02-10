@@ -103,7 +103,7 @@ public class DemandService {
 	 *            or updated
 	 */
 	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
-			Map<String, Object> masterMap) {
+			Map<String, Object> masterMap, boolean isForConnectionNo) {
 		List<Demand> createdDemands = new ArrayList<>();
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
@@ -121,9 +121,20 @@ public class DemandService {
 		if (!CollectionUtils.isEmpty(calculations)) {
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
-			Set<String> consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
-					.collect(Collectors.toSet());
-			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDate, toDate, requestInfo);
+			Long fromDateSearch = null;
+			Long toDateSearch = null;
+			Set<String> consumerCodes = new HashSet<>();
+			if (isForConnectionNo) {
+				fromDateSearch = fromDate;
+				toDateSearch = toDate;
+				consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
+						.collect(Collectors.toSet());
+			} else if (!isForConnectionNo) {
+				consumerCodes = calculations.stream().map(calculation -> calculation.getApplicationNO())
+						.collect(Collectors.toSet());
+			}
+			
+			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDateSearch, toDateSearch, requestInfo);
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -132,7 +143,7 @@ public class DemandService {
 			// If demand already exists add it updateCalculations else
 			// createCalculations
 			for (Calculation calculation : calculations) {
-				if (!connectionNumbersFromDemands.contains(calculation.getConnectionNo()))
+				if (!connectionNumbersFromDemands.contains(isForConnectionNo == true ? calculation.getConnectionNo() : calculation.getApplicationNO()))
 					createCalculations.add(calculation);
 				else
 					updateCalculations.add(calculation);
@@ -140,10 +151,10 @@ public class DemandService {
 		}
 
 		if (!CollectionUtils.isEmpty(createCalculations))
-			createdDemands = createDemand(requestInfo, createCalculations, masterMap);
+			createdDemands = createDemand(requestInfo, createCalculations, masterMap, isForConnectionNo);
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate);
+			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate, isForConnectionNo);
 		return createdDemands;
 	}
 	
@@ -156,7 +167,7 @@ public class DemandService {
 	 */
 	
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
-			Map<String, Object> masterMap) {
+			Map<String, Object> masterMap, boolean isForConnectionNO) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = null;
@@ -170,13 +181,13 @@ public class DemandService {
 			// calculation.getTenantId());
 
 			if (connection == null)
-				throw new CustomException("INVALID CONNECTION NUMBER",
-						"Demand cannot be generated for connectionNumber "
-								+ calculation.getConnectionNo()
+				throw new CustomException("INVALID_WATER_CONNECTION",
+						"Demand cannot be generated for "
+								+ (isForConnectionNO == true ? calculation.getConnectionNo() : calculation.getApplicationNO())
 								+ " Water Connection with this number does not exist ");
 
 			String tenantId = calculation.getTenantId();
-			String consumerCode = calculation.getConnectionNo();
+			String consumerCode = isForConnectionNO == true ?  calculation.getConnectionNo() : calculation.getApplicationNO();
 			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
 			
 			List<DemandDetail> demandDetails = new LinkedList<>();
@@ -194,7 +205,7 @@ public class DemandService {
 			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
-			
+			BigDecimal minimumPaybleAmount = isForConnectionNO == true ? configs.getMinimumPayableAmount() : calculation.getTotalAmount();
 		
 //			@SuppressWarnings("unchecked")
 //			Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
@@ -208,16 +219,15 @@ public class DemandService {
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
-					.minimumAmountPayable(configs.getMinimumPayableAmount()).tenantId(tenantId).taxPeriodFrom(fromDate)
+					.minimumAmountPayable(minimumPaybleAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
 					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
 		List<Demand> demandRes = new LinkedList<>();
 		demandRes = demandRepository.saveDemand(requestInfo, demands);
-		demandRes.forEach(demand -> {
-			fetchBill(demand.getTenantId(), demand.getConsumerCode(), requestInfo);
-		});
+		if(isForConnectionNO)
+		fetchBill(demandRes, requestInfo);
 		return demandRes;
 	}
 
@@ -348,13 +358,30 @@ public class DemandService {
 	 *            The RequestInfo of the incoming request
 	 * @return Lis to demands for the given consumerCode
 	 */
-	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes,Long taxPeriodFrom, Long taxPeriodTo, RequestInfo requestInfo) {
-		String uri = getDemandSearchURL();
-		uri = uri.replace("{1}", tenantId);
-		uri = uri.replace("{2}", configs.getBusinessService());
-		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
-		uri = uri.replace("{4}", taxPeriodFrom.toString());
-		uri = uri.replace("{5}", taxPeriodTo.toString());
+	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo,
+			RequestInfo requestInfo) {
+		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
+		url.append(configs.getDemandSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append(tenantId);
+		url.append("&");
+		url.append("businessService=");
+		url.append(configs.getBusinessService());
+		url.append("&");
+		url.append("consumerCode=");
+		url.append(StringUtils.join(consumerCodes, ','));
+		if (taxPeriodFrom != null) {
+			url.append("&");
+			url.append("periodFrom=");
+			url.append(taxPeriodFrom.toString());
+		}
+		if (taxPeriodTo != null) {
+			url.append("&");
+			url.append("periodTo=");
+			url.append(taxPeriodTo.toString());
+		}
+		String uri = url.toString();
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -541,24 +568,30 @@ public class DemandService {
 	 *            List of calculation object
 	 * @return Demands that are updated
 	 */
-	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations, Long fromDate, Long toDate) {
+	private List<Demand> updateDemandForCalculation(RequestInfo requestInfo, List<Calculation> calculations,
+			Long fromDate, Long toDate, boolean isForConnectionNo) {
 		List<Demand> demands = new LinkedList<>();
+		Long fromDateSearch = isForConnectionNo == true ? fromDate : null;
+		Long toDateSearch = isForConnectionNo == true ? toDate : null;
+
 		for (Calculation calculation : calculations) {
-
-			List<Demand> searchResult = searchDemand(calculation.getTenantId(),
-					Collections.singleton(calculation.getWaterConnection().getConnectionNo()), fromDate, toDate, requestInfo);
-
+			Set<String> consumerCodes = new HashSet<>();
+			consumerCodes = isForConnectionNo == true
+					? Collections.singleton(calculation.getWaterConnection().getConnectionNo())
+					: Collections.singleton(calculation.getWaterConnection().getApplicationNo());
+			List<Demand> searchResult = searchDemand(calculation.getTenantId(), consumerCodes, fromDateSearch,
+					toDateSearch, requestInfo);
 			if (CollectionUtils.isEmpty(searchResult))
-				throw new CustomException("INVALID UPDATE", "No demand exists for connection Number: "
-						+ calculation.getWaterConnection().getConnectionNo());
-
+				throw new CustomException("INVALID UPDATE", "No demand exists for Number: "
+						+ consumerCodes.toString());
 			Demand demand = searchResult.get(0);
 			List<DemandDetail> demandDetails = demand.getDemandDetails();
 			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation, demandDetails);
 			demand.setDemandDetails(updatedDemandDetails);
 			demands.add(demand);
 		}
-		log.info("Updated Demand Details " +demands.toString());
+
+		log.info("Updated Demand Details " + demands.toString());
 		return demandRepository.updateDemand(requestInfo, demands);
 	}
 
@@ -745,20 +778,22 @@ public class DemandService {
 		return true;
 	}
 	
-	public boolean fetchBill(String tenantId, String consumerCode, RequestInfo requestInfo) {
+	public boolean fetchBill(List<Demand> demandResponse, RequestInfo requestInfo) {
 		boolean notificationSent = false;
-		try {
-			String uri = calculatorUtils.getFetchBillURL(tenantId, consumerCode).toString();
-			Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
-					RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-			HashMap<String, Object> billResponse = new HashMap<>();
-			billResponse.put("requestInfo", requestInfo);
-			billResponse.put("billResponse", result);
-			wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
-			notificationSent = true;
-		} catch (Exception ex) {
-			log.error("Fetch Bill Error");
-			ex.printStackTrace();
+		for (Demand demand : demandResponse) {
+			try {
+				String uri = calculatorUtils.getFetchBillURL(demand.getTenantId(), demand.getConsumerCode()).toString();
+				Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				HashMap<String, Object> billResponse = new HashMap<>();
+				billResponse.put("requestInfo", requestInfo);
+				billResponse.put("billResponse", result);
+				wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
+				notificationSent = true;
+			} catch (Exception ex) {
+				log.error("Fetch Bill Error");
+				ex.printStackTrace();
+			}
 		}
 		return notificationSent;
 	}
