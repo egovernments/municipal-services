@@ -307,6 +307,12 @@ public class CalculatorConstants {
 	public static final String PT_ADDITIONALNDETAILS_NULL = "PT_APPLICATIONDETAILS_NULL";
 	public static final String PT_ADDITIONALNDETAILS_NULL_MSG = "Appication Details is null or set as null";
 
+	public static final String DEMAND_UPDATE_FAILED = "DEMAND_UPDATE_FAILED";
+	public static final String DEMAND_UPDATE_FAILED_MSG = "Demand Updation Failed";
+
+	public static final String BILLING_SLAB_SEARCH_FAILED = "BILLING_SLAB_SEARCH_FAILED";
+	public static final String BILLING_SLAB_SEARCH_FAILED_MSG = "Billing slab for the provided search criteria is not present. Please add the billing slab";
+
 
 
 }

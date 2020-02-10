@@ -752,9 +752,9 @@ public class EstimationService {
 		BigDecimal fee = getFeeFromSlabs(property, calculation, requestInfo,additionalDetails);
 		calculation.setTaxAmount(fee);
 		postProcessTheFee(requestInfo,property,calculation,additionalDetails);
-		feeStructure.put(property.getPropertyId(), calculation);
-		generateDemandsFroMutationFee(feeStructure, requestInfo);
-		
+		feeStructure.put(property.getAcknowldgementNumber(), calculation);
+		generateDemandsFroMutationFee(feeStructure, requestInfo,calculation,property);
+
 		return feeStructure;
 	}
 
@@ -807,7 +807,10 @@ public class EstimationService {
 		//billingSlabSearchCriteria=enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,criteria);
 
 		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearchCriteria);
-		System.out.println(billingSlabRes);
+		if (CollectionUtils.isEmpty(billingSlabRes.getBillingSlab()) || billingSlabRes.getBillingSlab() == null){
+			throw new CustomException(BILLING_SLAB_SEARCH_FAILED,BILLING_SLAB_SEARCH_FAILED_MSG);
+		}
+
 		if(billingSlabRes.getBillingSlab().get(0).getType().equals(MutationBillingSlab.TypeEnum.FLAT)){
 			fees = BigDecimal.valueOf(billingSlabRes.getBillingSlab().get(0).getFixedAmount());
 		}
@@ -851,7 +854,6 @@ public class EstimationService {
 		BigDecimal taxAmt = calculation.getTaxAmount();
 		BigDecimal rebate = getRebate(taxAmt, timeBasedExemptionMasterMap.get(CalculatorConstants.REBATE_MASTER), docDate);
 		BigDecimal penalty = BigDecimal.ZERO;
-
 		if (rebate.equals(BigDecimal.ZERO)) {
 			penalty = getPenalty(taxAmt,timeBasedExemptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER),docDate);
 		}
@@ -867,22 +869,69 @@ public class EstimationService {
 	}
 
 
-	
-	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo) {
+
+	private DemandResponse searchDemand(RequestInfo requestInfo,PropertyV2 property){
+		String url = new StringBuilder().append(configs.getBillingServiceHost())
+				.append(configs.getDemandSearchEndPoint()).append(URL_PARAMS_SEPARATER)
+				.append(TENANT_ID_FIELD_FOR_SEARCH_URL).append(property.getTenantId())
+				.append(SEPARATER).append(BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(configs.getPtMutationBusinessCode())
+				.append(SEPARATER).append(CONSUMER_CODE_SEARCH_FIELD_NAME).append(property.getAcknowldgementNumber()).toString();
+		DemandResponse res = new DemandResponse();
+		try {
+			return restTemplate.postForObject(url, requestInfo, DemandResponse.class);
+		} catch (Exception e) {
+			log.error("Demand search failed: ", e);
+			throw new CustomException(EMPTY_DEMAND_ERROR_CODE, EMPTY_DEMAND_ERROR_MESSAGE);
+
+		}
+
+
+	}
+
+	private void updateDemand(RequestInfo requestInfo,DemandResponse response,Calculation calculation){
+		List<Demand> demands = response.getDemands();
+		for(int i = 0; i < demands.size(); i++ ){
+			demands.get(i).setTaxPeriodFrom(calculation.getFromDate());
+			demands.get(i).setTaxPeriodTo(calculation.getToDate());
+			List<DemandDetail> demandDetails = demands.get(i).getDemandDetails();
+			for(int j =0;j<demandDetails.size();j++){
+				if(demandDetails.get(j).getTaxHeadMasterCode() == configs.getPtMutationFeeTaxHead())
+					demands.get(i).getDemandDetails().get(j).setTaxAmount(calculation.getTaxAmount());
+
+				if(demandDetails.get(j).getTaxHeadMasterCode() == configs.getPtMutationPenaltyTaxHead())
+					demands.get(i).getDemandDetails().get(j).setTaxAmount(calculation.getPenalty());
+
+				if(demandDetails.get(j).getTaxHeadMasterCode() == configs.getPtMutationRebateTaxHead())
+					demands.get(i).getDemandDetails().get(j).setTaxAmount(calculation.getRebate());
+			}
+		}
+		DemandRequest dmReq = new DemandRequest();
+		dmReq.setRequestInfo(requestInfo);
+		dmReq.setDemands(demands);
+		String url = new StringBuilder().append(configs.getBillingServiceHost())
+				.append(configs.getDemandUpdateEndPoint()).toString();
+		try {
+			restTemplate.postForObject(url, dmReq, Map.class);
+		} catch (Exception e) {
+			log.error("Demand updation failed: ", e);
+			throw new CustomException(DEMAND_UPDATE_FAILED, DEMAND_UPDATE_FAILED_MSG);
+		}
+
+	}
+	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo,Calculation calc, PropertyV2 property) {
 		List<Demand> demands = new ArrayList<>();
 		for(String key: feeStructure.keySet()) {
 			List<DemandDetail> details = new ArrayList<>();
 			Calculation calculation = feeStructure.get(key);
-			//String demandId = UUID.randomUUID().toString();
 			DemandDetail detail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getTaxAmount()).auditDetails(null)
 					.taxHeadMasterCode(configs.getPtMutationFeeTaxHead()).tenantId(calculation.getTenantId()).build();
 			details.add(detail);
-			if(null != calculation.getPenalty() && BigDecimal.ZERO != calculation.getPenalty()){
+			if(null != calculation.getPenalty()){
 				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getPenalty()).auditDetails(null)
 						.taxHeadMasterCode(configs.getPtMutationPenaltyTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
 			}
-			if(null != feeStructure.get(key).getRebate() && BigDecimal.ZERO != feeStructure.get(key).getRebate()){
+			if(null != feeStructure.get(key).getRebate()){
 				DemandDetail demandDetail = DemandDetail.builder().collectionAmount(BigDecimal.ZERO).demandId(null).id(null).taxAmount(calculation.getRebate()).auditDetails(null)
 						.taxHeadMasterCode(configs.getPtMutationRebateTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
@@ -907,8 +956,8 @@ public class EstimationService {
 		try {
 			restTemplate.postForObject(url, dmReq, Map.class);
 		} catch (Exception e) {
-			log.error("Demand creation failed: ", e);
-			throw new CustomException("DEMAND_CREATION_FAILED", "Demand creation failed!");
+			res=searchDemand(requestInfo,property);
+			updateDemand(requestInfo,res,calc);
 		}
 		
 		
@@ -958,9 +1007,7 @@ public class EstimationService {
 		BigDecimal penaltyAmt = BigDecimal.ZERO;
 		Map<String, Object> penalty = getApplicableMaster(docDate, penaltyMasterList);
 		if (null == penalty) return penaltyAmt;
-
 		Long deadlineDate = getDeadlineDate(docDate);
-
 
 		if (deadlineDate < System.currentTimeMillis())
 			penaltyAmt = mDataService.calculateApplicables(taxAmt, penalty);
