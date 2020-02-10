@@ -415,7 +415,7 @@ public class BPAValidator {
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
-		List<Map> requestCheckList = null;
+		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
 
@@ -435,8 +435,14 @@ public class BPAValidator {
 
 			if (bpa.getAdditionalDetails() != null) {
 				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if (!CollectionUtils.isEmpty(checkListFromReq))
-					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0)).get(BPAConstants.QUESTIONS_TYPE);
+				if (!CollectionUtils.isEmpty(checkListFromReq)) {
+					for (int i = 0; i < checkListFromReq.size(); i++) {
+						requestCheckList
+								.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
+					}
+				} else {
+					log.info("No Checklist found for given key in additional details");
+				}
 			}
 
 			if (!CollectionUtils.isEmpty(requestCheckList)) {
@@ -462,7 +468,7 @@ public class BPAValidator {
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
-		List<Map> requestCheckList = null;
+		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestDocs = new ArrayList<String>();
 		List<String> mdmsDocs = null;
 
@@ -482,8 +488,13 @@ public class BPAValidator {
 
 			if (bpa.getAdditionalDetails() != null) {
 				List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-				if (!CollectionUtils.isEmpty(checkListFromReq))
-					requestCheckList = (List<Map>) ((Map) (checkListFromReq).get(0)).get(BPAConstants.DOCS);
+				if (!CollectionUtils.isEmpty(checkListFromReq)) {
+					for (int i = 0; i < checkListFromReq.size(); i++) {
+						requestCheckList.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
+					}
+				} else {
+					log.info("No Checklist found for given key in additional details");
+				}			
 			}
 
 			if (!CollectionUtils.isEmpty(requestCheckList)) {
