@@ -95,6 +95,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterData, false);
 		return calculations;
 	}
 	/**
@@ -173,8 +174,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		}
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(waterCharge).add(fee);
-		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption).charge(waterCharge).fee(fee)
-				.waterConnection(waterConnection).rebate(rebate).tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).build();
+		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
+				.charge(waterCharge).fee(fee).waterConnection(waterConnection).rebate(rebate).tenantId(tenantId)
+				.taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).applicationNO(criteria.getApplicationNo())
+				.build();
 	}
 	
 	/**
@@ -281,9 +284,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getFeeEstimation(criteria, request.getRequestInfo(),
 					masterMap);
-//			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-//					.get(WSCalculationConstant.Billing_Period_Master);
-//			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+			masterDataService.enrichBillingPeriodForFee(masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}

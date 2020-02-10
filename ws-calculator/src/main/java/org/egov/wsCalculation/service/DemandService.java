@@ -206,6 +206,7 @@ public class DemandService {
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
 			BigDecimal minimumPaybleAmount = isForConnectionNO == true ? configs.getMinimumPayableAmount() : calculation.getTotalAmount();
+			String businessService = isForConnectionNO == true ? configs.getBusinessService() : WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
 		
 //			@SuppressWarnings("unchecked")
 //			Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
@@ -220,7 +221,7 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(minimumPaybleAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(configs.getBusinessService())
+					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(businessService)
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
@@ -360,28 +361,7 @@ public class DemandService {
 	 */
 	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo,
 			RequestInfo requestInfo) {
-		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
-		url.append(configs.getDemandSearchEndPoint());
-		url.append("?");
-		url.append("tenantId=");
-		url.append(tenantId);
-		url.append("&");
-		url.append("businessService=");
-		url.append(configs.getBusinessService());
-		url.append("&");
-		url.append("consumerCode=");
-		url.append(StringUtils.join(consumerCodes, ','));
-		if (taxPeriodFrom != null) {
-			url.append("&");
-			url.append("periodFrom=");
-			url.append(taxPeriodFrom.toString());
-		}
-		if (taxPeriodTo != null) {
-			url.append("&");
-			url.append("periodTo=");
-			url.append(taxPeriodTo.toString());
-		}
-		String uri = url.toString();
+		String uri = getDemandSearchURL(tenantId, consumerCodes, taxPeriodFrom, taxPeriodTo);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -458,24 +438,29 @@ public class DemandService {
 	 * 
 	 * @return demand search url
 	 */
-	public String getDemandSearchURL() {
+	public String getDemandSearchURL(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo) {
 		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
+		String businessService = taxPeriodFrom == null  ? WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD : configs.getBusinessService();
 		url.append(configs.getDemandSearchEndPoint());
 		url.append("?");
 		url.append("tenantId=");
-		url.append("{1}");
+		url.append(tenantId);
 		url.append("&");
 		url.append("businessService=");
-		url.append("{2}");
+		url.append(businessService);
 		url.append("&");
 		url.append("consumerCode=");
-		url.append("{3}");
-		url.append("&");
-		url.append("periodFrom=");
-		url.append("{4}");
-		url.append("&");
-		url.append("periodTo=");
-		url.append("{5}");
+		url.append(StringUtils.join(consumerCodes, ','));
+		if (taxPeriodFrom != null) {
+			url.append("&");
+			url.append("periodFrom=");
+			url.append(taxPeriodFrom.toString());
+		}
+		if (taxPeriodTo != null) {
+			url.append("&");
+			url.append("periodTo=");
+			url.append(taxPeriodTo.toString());
+		}
 		return url.toString();
 	}
 
@@ -523,7 +508,7 @@ public class DemandService {
 
 		String tenantId = getBillCriteria.getTenantId();
 
-		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId);
+		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId, WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 		
 		consumerCodeToDemandMap.forEach((id, demand) ->{
 			if (demand.getStatus() != null
@@ -582,7 +567,7 @@ public class DemandService {
 			List<Demand> searchResult = searchDemand(calculation.getTenantId(), consumerCodes, fromDateSearch,
 					toDateSearch, requestInfo);
 			if (CollectionUtils.isEmpty(searchResult))
-				throw new CustomException("INVALID UPDATE", "No demand exists for Number: "
+				throw new CustomException("INVALID_DEMAND_UPDATE", "No demand exists for Number: "
 						+ consumerCodes.toString());
 			Demand demand = searchResult.get(0);
 			List<DemandDetail> demandDetails = demand.getDemandDetails();

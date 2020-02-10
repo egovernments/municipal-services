@@ -38,36 +38,38 @@ public class WSCalculationUtil {
 	@Autowired
 	private WSCalculationConfiguration configurations;
 	
+
 	/**
 	 * Returns the tax head search Url with tenantId and WS service name
 	 * parameters
-	 *
 	 * @param tenantId
+	 * @param serviceFieldValue
 	 * @return
 	 */
-	public StringBuilder getTaxPeriodSearchUrl(String tenantId) {
+	public StringBuilder getTaxPeriodSearchUrl(String tenantId, String serviceFieldValue) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getTaxPeriodSearchEndpoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
+				.append(serviceFieldValue);
 	}
+
 
 	/**
 	 * Returns the tax head search Url with tenantId and WS service name
 	 * parameters
-	 *
 	 * @param tenantId
+	 * @param serviceFieldValue
 	 * @return
 	 */
-	public StringBuilder getTaxHeadSearchUrl(String tenantId) {
+	public StringBuilder getTaxHeadSearchUrl(String tenantId, String serviceFieldValue) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getTaxheadsSearchEndpoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(WSCalculationConstant.SEPARATER).append(WSCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
+				.append(serviceFieldValue);
 	}
 
 	/**

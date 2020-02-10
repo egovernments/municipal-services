@@ -20,6 +20,8 @@ public class WSCalculationConstant {
 	public static final String SERVICE_FIELD_FOR_SEARCH_URL = "service=";
 
 	public static final String SERVICE_FIELD_VALUE_WS = "WS";
+	
+	public static final String ONE_TIME_FEE_SERVICE_FIELD = "WS.ONE_TIME_FEE";
 
 	public static final String WS_TAX = "WS_TAX";
 
@@ -258,5 +260,8 @@ public class WSCalculationConstant {
 	public static final String ROAD_NAME_CONST = "name";
 	
 	public static final String UNIT_COST_CONST = "unitCost";
+	
+	
+	public static final Long expiryDateForOneTimeFee = 347126472000l;
 
 }
