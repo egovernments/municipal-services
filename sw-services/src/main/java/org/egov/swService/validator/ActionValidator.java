@@ -64,7 +64,6 @@ public class ActionValidator {
 						errorMap.put("INVALID UPDATE", "Id of document cannot be null");
 				});
 			}
-			errorMap.put("INVALID_UPDATE", "Id of sewerageConnection cannot be null");
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
