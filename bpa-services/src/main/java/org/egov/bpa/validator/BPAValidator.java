@@ -459,9 +459,19 @@ public class BPAValidator {
 			log.info("Request questions " + requestQns);
 
 			if (!CollectionUtils.isEmpty(requestQns) && !CollectionUtils.isEmpty(mdmsQns)) {
-				for (String qn : requestQns) {
-					if (!mdmsQns.contains(qn)) {
-						throw new CustomException("BPA_UNKNOWN_QUESTIONS", qn + " is not exists in MDMS data");
+				if (requestQns.size() < mdmsQns.size())
+					throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+							"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
+				else {
+					List<String> pendingQns = new ArrayList<String>();
+					for (String qn : mdmsQns) {
+						if (!requestQns.contains(qn)) {
+							pendingQns.add(qn);
+						}
+					}
+					if (pendingQns.size() > 0) {
+						throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+								"Please answer " + StringUtils.join(pendingQns, ","));
 					}
 				}
 			}
