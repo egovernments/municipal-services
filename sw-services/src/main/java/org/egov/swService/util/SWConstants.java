@@ -97,7 +97,7 @@ public class SWConstants {
 	
 	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	
-	public static final String  USREVENTS_EVENT_NAME = "WATER CONNECTION";
+	public static final String  USREVENTS_EVENT_NAME = "SEWERAGE CONNECTION";
 	
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
     

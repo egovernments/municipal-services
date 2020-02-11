@@ -185,7 +185,7 @@ public class DemandService {
 			// calculation.getTenantId());
 
 			if (connection == null)
-				throw new CustomException("INVALID_WATER_CONNECTION",
+				throw new CustomException("INVALID_SEWERAGE_CONNECTION",
 						"Demand cannot be generated for "
 								+ (isForConnectionNO == true ? calculation.getConnectionNo() : calculation.getApplicationNO())
 								+ " Water Connection with this number does not exist ");
@@ -225,7 +225,7 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(minimumPaybleAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(businessService)
+					.taxPeriodTo(toDate).consumerType("sewerageConnection").businessService(businessService)
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
