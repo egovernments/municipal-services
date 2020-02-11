@@ -167,7 +167,7 @@ public class BPAService {
 		}
 
 		// Add bpaId of all bpa's owned by the user
-		criteria = enrichmentService.getBPACriteriaFromIds(bpa);
+		criteria = enrichmentService.getBPACriteriaFromIds(bpa,criteria.getLimit());
 		// Get all bpa with ownerInfo enriched from user service
 		bpa = getBPAWithOwnerInfo(criteria, requestInfo);
 		return bpa;
