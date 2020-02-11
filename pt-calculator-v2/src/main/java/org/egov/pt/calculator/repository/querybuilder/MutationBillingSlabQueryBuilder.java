@@ -59,6 +59,18 @@ public class MutationBillingSlabQueryBuilder {
             queryBuilder.append(" AND usageCategoryMinor = ?");
             preparedStmtList.add(billingSlabSearcCriteria.getUsageCategoryMinor());
         }
+
+        if (!StringUtils.isEmpty(billingSlabSearcCriteria.getOwnerShipCategory())) {
+
+            queryBuilder.append(" AND ownerShipCategory = ?");
+            preparedStmtList.add(billingSlabSearcCriteria.getOwnerShipCategory());
+        }
+
+        if (!StringUtils.isEmpty(billingSlabSearcCriteria.getSubOwnerShipCategory())) {
+
+            queryBuilder.append(" AND subOwnerShipCategory = ?");
+            preparedStmtList.add(billingSlabSearcCriteria.getSubOwnerShipCategory());
+        }
         if (billingSlabSearcCriteria.getMarketValue() != null) {
 
             queryBuilder.append(" AND minMarketValue <= ?");

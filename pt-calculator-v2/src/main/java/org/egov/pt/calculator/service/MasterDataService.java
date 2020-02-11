@@ -308,7 +308,6 @@ public class MasterDataService {
 			else if (null != minAmt && currentApplicable.compareTo(minAmt) < 0)
 				currentApplicable = minAmt;
 		}
-		System.out.println("currentApplicable rate--->"+currentApplicable);
 		return currentApplicable;
 	}
 

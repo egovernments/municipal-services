@@ -753,7 +753,7 @@ public class EstimationService {
 		calculation.setTaxAmount(fee);
 		postProcessTheFee(requestInfo,property,calculation,additionalDetails);
 		feeStructure.put(property.getAcknowldgementNumber(), calculation);
-		generateDemandsFroMutationFee(feeStructure, requestInfo,calculation,property);
+		searchDemand(requestInfo,property,calculation,feeStructure);
 
 		return feeStructure;
 	}
@@ -785,27 +785,21 @@ public class EstimationService {
 		return res.getTaxPeriods();
 	}
 
-	
+	/**
+	 * Fetch Billing Slab for mutation and calculate the mutation fees
+	 * @param property
+	 * @param calculation
+	 * @param requestInfo
+	 * @param additionalDetails
+	 * @return
+	 */
 	private BigDecimal getFeeFromSlabs(PropertyV2 property, Calculation calculation, RequestInfo requestInfo,Map<String,Object> additionalDetails) {
 		List<String> slabIds = new ArrayList<>();
 		BigDecimal fees=null;
 
 		MutationBillingSlabSearchCriteria billingSlabSearchCriteria = new MutationBillingSlabSearchCriteria();
-
-		billingSlabSearchCriteria.setTenantId(property.getTenantId());
-
-
-		Double marketValue =Double.parseDouble(String.valueOf(additionalDetails.get("marketValue")));
-		billingSlabSearchCriteria.setMarketValue(marketValue);
-
-		String[] usageCategoryMasterData = property.getUsageCategory().split("\\.");
-		String usageCategoryMajor = null,usageCategoryMinor = null;
-		usageCategoryMajor = usageCategoryMasterData[0];
-		if(usageCategoryMasterData.length > 1)
-			usageCategoryMinor = usageCategoryMasterData[1];
-		billingSlabSearchCriteria.setUsageCategoryMajor(usageCategoryMajor);
-		//billingSlabSearchCriteria=enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,criteria);
-
+		Double marketValue =Double.parseDouble(String.valueOf(additionalDetails.get(MARKET_VALUE)));
+		enrichBillingsalbSearchCriteria(billingSlabSearchCriteria,property,marketValue);
 		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearchCriteria);
 		if (CollectionUtils.isEmpty(billingSlabRes.getBillingSlab()) || billingSlabRes.getBillingSlab() == null){
 			throw new CustomException(BILLING_SLAB_SEARCH_FAILED,BILLING_SLAB_SEARCH_FAILED_MSG);
@@ -823,34 +817,31 @@ public class EstimationService {
 		calculation.setBillingSlabIds(slabIds);
 
 
-		if(additionalDetails.get("adhocRebate") != null) {
-			int adhocRebate = (int) additionalDetails.get("adhocRebate");
+		if(additionalDetails.get(ADHOC_REBATE) != null) {
+			int adhocRebate = (int) additionalDetails.get(ADHOC_REBATE);
 			fees = fees.subtract(BigDecimal.valueOf(adhocRebate));
 		}
-		if(additionalDetails.get("adhocPenalty") != null) {
-			int adhocPenalty = (int) additionalDetails.get("adhocPenalty");
+		if(additionalDetails.get(ADHOC_PENALTY) != null) {
+			int adhocPenalty = (int) additionalDetails.get(ADHOC_PENALTY);
 			fees = fees.add(BigDecimal.valueOf(adhocPenalty));
 		}
 		return fees;
 	}
 
-	private MutationBillingSlabSearchCriteria enrichBillingsalbSearchCriteria(MutationBillingSlabSearchCriteria billingSlabSearchCriteria, MutationCalculationCriteria criteria ){
-		billingSlabSearchCriteria.setTenantId(criteria.getProperty().get(0).getTenantId());
-		billingSlabSearchCriteria.setMarketValue(criteria.getMarketValue());
-		//billingSlabSearchCriteria.setPropertyType(criteria.getProperty().get(0).getPropertyDetails().get(0).getPropertyType());
-		//billingSlabSearchCriteria.setPropertySubType(criteria.getProperty().get(0).getPropertyDetails().get(0).getPropertySubType());
-		billingSlabSearchCriteria.setUsageCategoryMajor(criteria.getProperty().get(0).getPropertyDetails().get(0).getUsageCategoryMajor());
-		//billingSlabSearchCriteria.setUsageCategoryMinor(criteria.getProperty().get(0).getPropertyDetails().get(0).getUsageCategoryMinor());
-		return billingSlabSearchCriteria;
-	}
-	
+	/**
+	 * Calculate the rebate and penalty for mutation
+	 * @param requestInfo
+	 * @param property
+	 * @param calculation
+	 * @param additionalDetails
+	 */
 	private void postProcessTheFee(RequestInfo requestInfo,PropertyV2 property, Calculation calculation,Map<String,Object> additionalDetails) {
 		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
 		mDataService.setPropertyMasterValues(requestInfo, property.getTenantId(), propertyBasedExemptionMasterMap,
 				timeBasedExemptionMasterMap);
 
-		Long docDate =  Long.valueOf(String.valueOf(additionalDetails.get("documentDate")));
+		Long docDate =  Long.valueOf(String.valueOf(additionalDetails.get(DOCUMENT_DATE)));
 		BigDecimal taxAmt = calculation.getTaxAmount();
 		BigDecimal rebate = getRebate(taxAmt, timeBasedExemptionMasterMap.get(CalculatorConstants.REBATE_MASTER), docDate);
 		BigDecimal penalty = BigDecimal.ZERO;
@@ -869,25 +860,34 @@ public class EstimationService {
 	}
 
 
-
-	private DemandResponse searchDemand(RequestInfo requestInfo,PropertyV2 property){
+	/**
+	 * Search Demand for the property mutation based on acknowledgeNumber
+	 * @param requestInfo
+	 * @param property
+	 * @param calculation
+	 * @param feeStructure
+	 */
+	private void searchDemand(RequestInfo requestInfo,PropertyV2 property,Calculation calculation,Map<String, Calculation> feeStructure){
 		String url = new StringBuilder().append(configs.getBillingServiceHost())
 				.append(configs.getDemandSearchEndPoint()).append(URL_PARAMS_SEPARATER)
 				.append(TENANT_ID_FIELD_FOR_SEARCH_URL).append(property.getTenantId())
 				.append(SEPARATER).append(BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(configs.getPtMutationBusinessCode())
 				.append(SEPARATER).append(CONSUMER_CODE_SEARCH_FIELD_NAME).append(property.getAcknowldgementNumber()).toString();
 		DemandResponse res = new DemandResponse();
-		try {
-			return restTemplate.postForObject(url, requestInfo, DemandResponse.class);
-		} catch (Exception e) {
-			log.error("Demand search failed: ", e);
-			throw new CustomException(EMPTY_DEMAND_ERROR_CODE, EMPTY_DEMAND_ERROR_MESSAGE);
-
-		}
-
+		res = restTemplate.postForObject(url, requestInfo, DemandResponse.class);
+		if(CollectionUtils.isEmpty(res.getDemands()) || res.getDemands() == null)
+			generateDemandsFroMutationFee(feeStructure, requestInfo);
+		else
+			updateDemand(requestInfo,res,calculation);
 
 	}
 
+	/**
+	 * Update Demand for the property mutation
+	 * @param requestInfo
+	 * @param response
+	 * @param calculation
+	 */
 	private void updateDemand(RequestInfo requestInfo,DemandResponse response,Calculation calculation){
 		List<Demand> demands = response.getDemands();
 		for(int i = 0; i < demands.size(); i++ ){
@@ -918,7 +918,13 @@ public class EstimationService {
 		}
 
 	}
-	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo,Calculation calc, PropertyV2 property) {
+
+	/**
+	 * Generate Demand for the property mutation
+	 * @param feeStructure
+	 * @param requestInfo
+	 */
+	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo) {
 		List<Demand> demands = new ArrayList<>();
 		for(String key: feeStructure.keySet()) {
 			List<DemandDetail> details = new ArrayList<>();
@@ -956,8 +962,9 @@ public class EstimationService {
 		try {
 			restTemplate.postForObject(url, dmReq, Map.class);
 		} catch (Exception e) {
-			res=searchDemand(requestInfo,property);
-			updateDemand(requestInfo,res,calc);
+			log.error("Demand creation failed: ", e);
+			throw new CustomException(DEMAND_CREATE_FAILED, DEMAND_CREATE_FAILED_MSG);
+
 		}
 		
 		
@@ -980,15 +987,23 @@ public class EstimationService {
 				.append(SERVICE_FIELD_VALUE_PT_MUTATION);
 	}
 
+	/**
+	 * Returns the Amount of rebate that has to be applied on the given tax amount for the given period
+	 * @param taxAmt
+	 * @param rebateMasterList
+	 * @param docDate
+	 *
+	 * @return
+	 */
+
 	public BigDecimal getRebate(BigDecimal taxAmt, JSONArray rebateMasterList, Long docDate) {
 
 		BigDecimal rebateAmt = BigDecimal.ZERO;
-		Map<String, Object> rebate = getApplicableMaster(docDate, rebateMasterList);
+		Map<String, Object> rebate = getApplicableMaster(rebateMasterList);
 
 		if (null == rebate) return rebateAmt;
-
-		Long deadlineDate = getDeadlineDate(docDate);
-
+		Integer mutationPaymentPeriodInMonth = Integer.parseInt(String.valueOf(rebate.get(MUTATION_PAYMENT_PERIOD_IN_MONTH)));
+		Long deadlineDate = getDeadlineDate(docDate,mutationPaymentPeriodInMonth);
 
 		if (deadlineDate > System.currentTimeMillis())
 			rebateAmt = mDataService.calculateApplicables(taxAmt, rebate);
@@ -999,23 +1014,32 @@ public class EstimationService {
 	 * Returns the Amount of penalty that has to be applied on the given tax amount for the given period
 	 *
 	 * @param taxAmt
+	 * @param penaltyMasterList
 	 * @param docDate
 	 * @return
 	 */
 	public BigDecimal getPenalty(BigDecimal taxAmt, JSONArray penaltyMasterList, Long docDate) {
 
 		BigDecimal penaltyAmt = BigDecimal.ZERO;
-		Map<String, Object> penalty = getApplicableMaster(docDate, penaltyMasterList);
+		Map<String, Object> penalty = getApplicableMaster(penaltyMasterList);
+
 		if (null == penalty) return penaltyAmt;
-		Long deadlineDate = getDeadlineDate(docDate);
+		Integer mutationPaymentPeriodInMonth = Integer.parseInt(String.valueOf(penalty.get(MUTATION_PAYMENT_PERIOD_IN_MONTH)));
+		Long deadlineDate = getDeadlineDate(docDate,mutationPaymentPeriodInMonth);
 
 		if (deadlineDate < System.currentTimeMillis())
 			penaltyAmt = mDataService.calculateApplicables(taxAmt, penalty);
 
 		return penaltyAmt;
 	}
+	/**
+	 * Returns the rebate/penalty object from mdms that has to be applied on the given tax amount for the given period
+	 *
+	 * @param masterList
+	 * @return
+	 */
 
-	public Map<String, Object> getApplicableMaster(Long docdate, List<Object> masterList) {
+	public Map<String, Object> getApplicableMaster(List<Object> masterList) {
 
 		Map<String, Object> objToBeReturned = null;
 
@@ -1043,7 +1067,15 @@ public class EstimationService {
 		return objToBeReturned;
 	}
 
-	private Long getDeadlineDate(Long docdate){
+	/**
+	 * Returns the payment deadline date for the property mutation
+	 *
+	 * @param docdate
+	 * @param mutationPaymentPeriodInMonth
+	 *
+	 * @return
+	 */
+	private Long getDeadlineDate(Long docdate,Integer mutationPaymentPeriodInMonth){
 		Long deadlineDate = null;
 		Long timeStamp= docdate / 1000L;
 		java.util.Date time=new java.util.Date((Long)timeStamp*1000);
@@ -1053,7 +1085,7 @@ public class EstimationService {
 		Integer month = cal.get(Calendar.MONTH);
 		Integer year = cal.get(Calendar.YEAR);
 
-		month = month + configs.getMutationDeadlineMonth();
+		month = month + mutationPaymentPeriodInMonth;
 		if(month>12){
 			month = month - 12;
 			year = year + 1;
@@ -1085,5 +1117,54 @@ public class EstimationService {
 
 		return date;
 	}
+
+	/**
+	 * Sets the search criteria for mutation billing slab
+	 *  @param billingSlabSearchCriteria
+	 * @param property
+	 * @param marketValue
+	 * @return
+	 */
+
+	private void enrichBillingsalbSearchCriteria(MutationBillingSlabSearchCriteria billingSlabSearchCriteria, PropertyV2 property,Double marketValue ){
+
+		billingSlabSearchCriteria.setTenantId(property.getTenantId());
+		billingSlabSearchCriteria.setMarketValue(marketValue);
+
+		String[] usageCategoryMasterData = property.getUsageCategory().split("\\.");
+		String usageCategoryMajor = null,usageCategoryMinor = null;
+		usageCategoryMajor = usageCategoryMasterData[0];
+		if(usageCategoryMasterData.length > 1)
+			usageCategoryMinor = usageCategoryMasterData[1];
+
+		if(usageCategoryMajor != null)
+			billingSlabSearchCriteria.setUsageCategoryMajor(usageCategoryMajor);
+		if(usageCategoryMinor != null)
+			billingSlabSearchCriteria.setUsageCategoryMinor(usageCategoryMinor);
+
+		String[] propertyTypeCollection = property.getPropertyType().split("\\.");
+		String propertyType = null,propertySubType = null;
+		propertyType = propertyTypeCollection[0];
+		if(propertyTypeCollection.length > 1)
+			propertySubType = propertyTypeCollection[1];
+
+		if(propertyType != null)
+			billingSlabSearchCriteria.setPropertyType(propertyType);
+		if(propertySubType != null)
+			billingSlabSearchCriteria.setPropertySubType(propertySubType);
+
+		String[] ownership = property.getOwnershipCategory().split("\\.");
+		String ownershipCategory = null,subownershipCategory = null;
+		ownershipCategory = ownership[0];
+		if(ownership.length > 1)
+			subownershipCategory = ownership[1];
+
+		if(ownershipCategory != null)
+			billingSlabSearchCriteria.setOwnerShipCategory(ownershipCategory);
+		if(subownershipCategory != null)
+			billingSlabSearchCriteria.setSubOwnerShipCategory(subownershipCategory);
+
+	}
+
 
 }

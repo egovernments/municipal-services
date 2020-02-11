@@ -313,6 +313,14 @@ public class CalculatorConstants {
 	public static final String BILLING_SLAB_SEARCH_FAILED = "BILLING_SLAB_SEARCH_FAILED";
 	public static final String BILLING_SLAB_SEARCH_FAILED_MSG = "Billing slab for the provided search criteria is not present. Please add the billing slab";
 
+	public static final String DEMAND_CREATE_FAILED = "DEMAND_CREATE_FAILED";
+	public static final String DEMAND_CREATE_FAILED_MSG = "Demand Creation Failed";
 
+	public static final String MARKET_VALUE = "marketValue";
+	public static final String DOCUMENT_DATE = "documentDate";
+	public static final String NUMERIC_REGEX = "-?\\d+(\\.\\d+)?";
+	public static final String ADHOC_REBATE = "adhocRebate";
+	public static final String ADHOC_PENALTY = "adhocPenalty";
 
+	public static final String MUTATION_PAYMENT_PERIOD_IN_MONTH = "mutationPaymentPeriodInMonth";
 }
