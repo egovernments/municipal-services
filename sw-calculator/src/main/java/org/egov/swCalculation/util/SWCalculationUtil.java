@@ -66,13 +66,13 @@ public class SWCalculationUtil {
 	 * @param tenantId
 	 * @return
 	 */
-	public StringBuilder getTaxPeriodSearchUrl(String tenantId) {
+	public StringBuilder getTaxPeriodSearchUrl(String tenantId, String serviceFieldValue) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getTaxPeriodSearchEndpoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+				.append(serviceFieldValue);
 	}
 
 	/**
@@ -82,13 +82,13 @@ public class SWCalculationUtil {
 	 * @param tenantId
 	 * @return
 	 */
-	public StringBuilder getTaxHeadSearchUrl(String tenantId) {
+	public StringBuilder getTaxHeadSearchUrl(String tenantId, String serviceFieldValue) {
 
 		return new StringBuilder().append(configurations.getBillingServiceHost())
 				.append(configurations.getTaxheadsSearchEndpoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 				.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(tenantId)
 				.append(SWCalculationConstant.SEPARATER).append(SWCalculationConstant.SERVICE_FIELD_FOR_SEARCH_URL)
-				.append(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+				.append(serviceFieldValue);
 	}
 
 	/**

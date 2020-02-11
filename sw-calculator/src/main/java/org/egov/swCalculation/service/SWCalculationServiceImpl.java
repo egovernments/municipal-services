@@ -140,10 +140,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
 				.charge(sewerageCharge).fee(fee).sewerageConnection(sewerageConnection).rebate(rebate)
 				.tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds)
-				.connectionNo(criteria.getConnectionNo()).build();
+				.connectionNo(criteria.getConnectionNo()).applicationNO(criteria.getApplicationNo()).build();
 	}
-	
-	
+
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
@@ -202,6 +201,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		Map<String, Object> masterData = mDataService.loadExceptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterData, false);
 		return calculations;
 	}
 	
@@ -219,6 +219,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 //			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
 //					.get(WSCalculationConstant.Billing_Period_Master);
 //			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+			mDataService.enrichBillingPeriodForFee(masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
 			calculations.add(calculation);
 		}

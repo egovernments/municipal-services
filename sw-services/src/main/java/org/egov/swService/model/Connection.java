@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -93,7 +92,9 @@ public class Connection {
 	public enum StatusEnum {
 		ACTIVE("Active"),
 
-		INACTIVE("Inactive");
+		INACTIVE("Inactive"),
+		
+	    INWORKFLOW("INWORKFLOW");
 
 		private String value;
 
@@ -333,8 +334,8 @@ public class Connection {
 		if (this.plumberInfo == null) {
 			this.plumberInfo = new ArrayList<PlumberInfo>();
 		}
-		if (!this.plumberInfo.contains(plumberInfoItem))
-			this.plumberInfo.add(plumberInfoItem);
+		if(!this.plumberInfo.contains(plumberInfoItem))
+            this.plumberInfo.add(plumberInfoItem);
 		return this;
 	}
 

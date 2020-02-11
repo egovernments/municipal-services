@@ -166,5 +166,8 @@ public class SWCalculationConfiguration {
     @Value("${notification.url}")
     private String notificationUrl;
     
+	@Value("${egov.demand.minimum.payable.amount}")
+	 private BigDecimal minimumPayableAmount;
+    
 	
 }

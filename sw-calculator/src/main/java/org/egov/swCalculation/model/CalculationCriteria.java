@@ -39,12 +39,7 @@ public class CalculationCriteria {
 	@NotNull
 	@JsonProperty("tenantId")
 	private String tenantId;
-
-	@JsonProperty("lastReading")
-	private Double lastReading = null;
-
-	@JsonProperty("currentReading")
-	private Double currentReading = null;
+	
 
 	// Demand Generation
 	@JsonProperty("from")

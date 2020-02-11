@@ -99,6 +99,6 @@ public class SWConstants {
 	
 	public static final String  USREVENTS_EVENT_NAME = "WATER CONNECTION";
 	
-	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
+	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
     
 }

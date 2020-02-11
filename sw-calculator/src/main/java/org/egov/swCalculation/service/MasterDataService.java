@@ -14,14 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.MdmsResponse;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.CalculationCriteria;
-import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.model.RequestInfoWrapper;
 import org.egov.swCalculation.model.TaxHeadMaster;
 import org.egov.swCalculation.model.TaxHeadMasterResponse;
@@ -66,10 +64,10 @@ public class MasterDataService {
 	 *            The calculation request
 	 * @return
 	 */
-	public Map<String, Object> getMasterMap(RequestInfo requestInfo, String tenantId) {
+	public Map<String, Object> getMasterMap(RequestInfo requestInfo, String tenantId,String serviceFieldValue) {
 		Map<String, Object> masterMap = new HashMap<>();
-		List<TaxPeriod> taxPeriods = getTaxPeriodList(requestInfo, tenantId);
-		List<TaxHeadMaster> taxHeadMasters = getTaxHeadMasterMap(requestInfo, tenantId);
+		List<TaxPeriod> taxPeriods = getTaxPeriodList(requestInfo, tenantId,serviceFieldValue);
+		List<TaxHeadMaster> taxHeadMasters = getTaxHeadMasterMap(requestInfo, tenantId,serviceFieldValue);
 		Map<String, Map<String, Object>> financialYearMaster = getFinancialYear(requestInfo, tenantId);
 		masterMap.put(SWCalculationConstant.TAXPERIOD_MASTER_KEY, taxPeriods);
 		masterMap.put(SWCalculationConstant.TAXHEADMASTER_MASTER_KEY, taxHeadMasters);
@@ -84,9 +82,9 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
-	public List<TaxPeriod> getTaxPeriodList(RequestInfo requestInfo, String tenantId) {
+	public List<TaxPeriod> getTaxPeriodList(RequestInfo requestInfo, String tenantId,String serviceFieldValue) {
 
-		StringBuilder uri = swCalculationUtil.getTaxPeriodSearchUrl(tenantId);
+		StringBuilder uri = swCalculationUtil.getTaxPeriodSearchUrl(tenantId,serviceFieldValue);
 		TaxPeriodResponse res = mapper.convertValue(
 				repository.fetchResult(uri, RequestInfoWrapper.builder().requestInfo(requestInfo).build()),
 				TaxPeriodResponse.class);
@@ -100,9 +98,9 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
-	public List<TaxHeadMaster> getTaxHeadMasterMap(RequestInfo requestInfo, String tenantId) {
+	public List<TaxHeadMaster> getTaxHeadMasterMap(RequestInfo requestInfo, String tenantId,String serviceFieldValue) {
 
-		StringBuilder uri = swCalculationUtil.getTaxHeadSearchUrl(tenantId);
+		StringBuilder uri = swCalculationUtil.getTaxHeadSearchUrl(tenantId,serviceFieldValue);
 		TaxHeadMasterResponse res = mapper.convertValue(
 				repository.fetchResult(uri, RequestInfoWrapper.builder().requestInfo(requestInfo).build()),
 				TaxHeadMasterResponse.class);
@@ -399,7 +397,7 @@ public class MasterDataService {
 	 */
 	public Map<String, Object> loadMasterData(RequestInfo requestInfo, String tenantId) {
 		Map<String, Object> master = new HashMap<>();
-		master = getMasterMap(requestInfo, tenantId);
+		master = getMasterMap(requestInfo, tenantId,SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 		loadBillingSlabsAndTimeBasedExemptions(requestInfo, tenantId, master);
 		loadBillingFrequencyMasterData(requestInfo, tenantId, master);
 		return master;
@@ -433,20 +431,33 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @param roadType
 	 * @param usageType
-	 * @param masterMap return master data with exception master data
+	 * @param masterMap
+	 *            return master data with exception master data
 	 */
 	public Map<String, Object> loadExceptionMaster(RequestInfo requestInfo, String tenantId) {
 		Map<String, Object> master = new HashMap<>();
-		master = getMasterMap(requestInfo, tenantId);
-		MdmsResponse response = mapper.convertValue(
-				repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-						calculatorUtils.getEstimationMasterCriteria(requestInfo, tenantId)),
-				MdmsResponse.class);
+		master = getMasterMap(requestInfo, tenantId, SWCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD);
+		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+				calculatorUtils.getEstimationMasterCriteria(requestInfo, tenantId)), MdmsResponse.class);
 		Map<String, JSONArray> res = response.getMdmsRes().get(SWCalculationConstant.SW_TAX_MODULE);
 		for (Map.Entry<String, JSONArray> resp : res.entrySet()) {
 			master.put(resp.getKey(), resp.getValue());
 		}
 		return master;
+	}
+	
+	/**
+	 * 
+	 * @param masterMap
+	 * @return master map contains demand start date, end date and expiry date
+	 */
+	public Map<String, Object> enrichBillingPeriodForFee(Map<String, Object> masterMap) {
+		Map<String, Object> billingPeriod = new HashMap<>();
+		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, 1554057000000l);
+		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, 1869676199000l);
+		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String, 0l);
+		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
+		return masterMap;
 	}
 }
 

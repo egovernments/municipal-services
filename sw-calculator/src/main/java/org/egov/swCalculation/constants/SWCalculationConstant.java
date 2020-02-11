@@ -259,4 +259,8 @@ public class SWCalculationConstant {
 
 	public static final String UNIT_COST_CONST = "unitCost";
 	
+	public static final String ONE_TIME_FEE_SERVICE_FIELD = "SW.ONE_TIME_FEE";
+	
+	public static final Long expiryDateForOneTimeFee = 347126472000l;
+	
 }
