@@ -291,4 +291,6 @@ public class BPAConstants {
 	public static final String M_APP_REJECTED ="M_APPLICATION_REJECTED_MSG";
 
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
+
+	public static final String FILESTOREID = "fileStoreId";
 }

@@ -410,13 +410,15 @@ public class BPAValidator {
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, List<BPA> searchBPA, String wfState) {
 
 		BPA bpa = bpaRequest.getBPA();
-		List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-		if (!CollectionUtils.isEmpty(checkListFromReq)) {
-			validateQuestions(mdmsData, bpaRequest, checkListFromReq, wfState);
-			validateDocTypes(mdmsData, bpaRequest, checkListFromReq, wfState);
-		} else {
-			log.info("No Checklist found in request with the key.");
-			bpa.setAdditionalDetails(searchBPA.get(0).getAdditionalDetails());
+		if (bpa.getAdditionalDetails() != null) {
+			List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+			if (!CollectionUtils.isEmpty(checkListFromReq)) {
+				validateQuestions(mdmsData, bpaRequest, checkListFromReq, wfState);
+				validateDocTypes(mdmsData, bpaRequest, checkListFromReq, wfState);
+			} else {
+				log.info("No Checklist found in request with the key.");
+				bpa.setAdditionalDetails(searchBPA.get(0).getAdditionalDetails());
+			}
 		}
 	}
 
@@ -441,7 +443,7 @@ public class BPAValidator {
 
 			log.info("MDMS questions " + mdmsQns);
 
-			if (bpa.getAdditionalDetails() != null) {
+			if (CollectionUtils.isEmpty(checkListFromReq)) {
 				for (int i = 0; i < checkListFromReq.size(); i++) {
 					requestCheckList
 							.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
@@ -489,7 +491,7 @@ public class BPAValidator {
 
 			log.info("MDMS DocTypes " + mdmsDocs);
 
-			if (bpa.getAdditionalDetails() != null) {
+			if (!CollectionUtils.isEmpty(checkListFromReq)) {
 				for (int i = 0; i < checkListFromReq.size(); i++) {
 					requestCheckList.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
 				}
@@ -497,7 +499,12 @@ public class BPAValidator {
 
 			if (!CollectionUtils.isEmpty(requestCheckList)) {
 				for (Map reqDoc : requestCheckList) {
-					requestDocs.add((String) reqDoc.get(BPAConstants.CODE));
+					String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
+					if (!StringUtils.isEmpty(fileStoreId)) {
+						requestDocs.add((String) reqDoc.get(BPAConstants.CODE));
+					} else {
+						throw new CustomException("BPA_UNKNOWN_DOCS", "fileStoreId is not exists for the documents");
+					}
 				}
 			}
 
