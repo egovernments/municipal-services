@@ -32,7 +32,7 @@ public class WorkflowNotificationConsumer {
 	 * @param topic
 	 * @throws JsonProcessingException
 	 */
-	@KafkaListener(topics = { "${egov.sewarageservice.createconnection}", "${egov.sewarageservice.updateconnection}","${egov.waterservice.updatewaterconnection.workflow.topic}" })
+	@KafkaListener(topics = { "${egov.sewarageservice.createconnection}", "${egov.sewarageservice.updateconnection}","${egov.sewerageservice.updatesewerageconnection.workflow.topic}" })
 	public void listen(final List<Message<?>> records) throws JsonProcessingException {
 		log.info("SewerageConnection Obj " + mapper.writeValueAsString(records));
 		records.forEach(record -> {
