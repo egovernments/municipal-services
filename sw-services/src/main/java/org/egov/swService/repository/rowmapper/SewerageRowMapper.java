@@ -45,6 +45,8 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setConnectionType(rs.getString("connectionType"));
 				sewarageConnection.setCalculationAttribute(rs.getString("calculationAttribute"));
 				sewarageConnection.setAction(rs.getString("action"));
+				sewarageConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
+				sewarageConnection.setRoadType(rs.getString("roadtype"));
 				// get property id and get property object
 				property.setPropertyId(rs.getString("property_id"));
 				sewarageConnection.setProperty(property);
