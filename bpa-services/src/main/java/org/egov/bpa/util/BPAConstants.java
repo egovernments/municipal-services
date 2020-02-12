@@ -195,7 +195,9 @@ public class BPAConstants {
 	
 	//CheckList
 	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].questions";
-	
+
+	public static final String DOCTYPES_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].docTypes";
+
 	public static final String CHECKLISTFILTER =  "$.[?(@.WFState==\"{}\")]";
 	
 	public static final String CHECKLIST_TYPE = "checkList";
@@ -207,8 +209,12 @@ public class BPAConstants {
 	public static final String QUESTION_TYPE = "question";
 	
 	public static final String DOCS = "docs";
-	
+  
+	public static final String CODE = "code";
+  
 	public static final String QUESTIONS_PATH = "$.[?(@.active==true)].question";
+  
+	public static final String DOCTYPESS_PATH = "$.[?(@.required==true)].code";
 	
 	//SMS Notification messages
 	public static final String APP_CREATE ="APPLICATION_CREATE_MSG";
@@ -272,4 +278,6 @@ public class BPAConstants {
 	public static final String EMPLOYEE = "EMPLOYEE";
 
 	public static final String CITIZEN = "CITIZEN";
+  
+	public static final String FILESTOREID = "fileStoreId";
 }

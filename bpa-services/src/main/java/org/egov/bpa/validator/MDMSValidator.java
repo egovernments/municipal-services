@@ -114,8 +114,6 @@ public class MDMSValidator {
                 throw new CustomException(BPAConstants.INVALID_TENANT_ID_MDMS_KEY, BPAConstants.INVALID_TENANT_ID_MDMS_MSG);
             }
         });
-
-        System.err.println(" the mdms response is : " + mdmsResMap);
         return mdmsResMap;
     }
 	

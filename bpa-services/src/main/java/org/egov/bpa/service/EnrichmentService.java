@@ -302,12 +302,13 @@ public class EnrichmentService {
 	 *            's list The bpa whose id's are added to search
 	 * @return bpaSearch criteria on basis of bpa id
 	 */
-	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa) {
+	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa, Integer limit) {
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		Set<String> bpaIds = new HashSet<>();
 		bpa.forEach(data -> bpaIds.add(data.getId()));
 		criteria.setIds(new LinkedList<>(bpaIds));
 		criteria.setTenantId(bpa.get(0).getTenantId());
+		criteria.setLimit(limit);
 		return criteria;
 	}
 
