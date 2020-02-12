@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -20,6 +21,12 @@ import javax.validation.constraints.*;
 public class SewerageConnection extends Connection  {
   @JsonProperty("connectionExecutionDate")
   private BigDecimal connectionExecutionDate = null;
+  
+  @JsonProperty("proposedWaterClosets")
+  private Integer proposedWaterClosets = null;
+
+  @JsonProperty("proposedToilets")
+  private Integer proposedToilets = null;
 
   @JsonProperty("noOfWaterClosets")
   private Integer noOfWaterClosets = null;
@@ -95,6 +102,38 @@ public class SewerageConnection extends Connection  {
 
   public SewerageConnection uom(String uom) {
     this.uom = uom;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "No of proposed water closets")
+
+  public Integer getProposedWaterClosets() {
+    return proposedWaterClosets;
+  }
+
+  public void setProposedWaterClosets(Integer proposedWaterClosets) {
+    this.proposedWaterClosets = proposedWaterClosets;
+  }
+
+  public SewerageConnection proposedWaterClosets(Integer proposedWaterClosets) {
+    this.proposedWaterClosets = proposedWaterClosets;
+    return this;
+  }
+
+  
+  @ApiModelProperty(value = "No of proposed toilets")
+
+  public Integer getProposedToilets() {
+    return proposedToilets;
+  }
+
+  public void setProposedToilets(Integer proposedToilets) {
+    this.proposedToilets = proposedToilets;
+  }
+
+  public SewerageConnection proposedToilets(Integer proposedToilets) {
+    this.proposedToilets = proposedToilets;
     return this;
   }
 

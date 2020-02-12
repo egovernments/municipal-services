@@ -38,6 +38,13 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("meterInstallationDate")
 	private Long meterInstallationDate = null;
+	
+	@JsonProperty("proposedPipeSize")
+	private Double proposedPipeSize = null;
+
+	@JsonProperty("proposedTaps")
+	private Integer proposedTaps = null;
+
 
 	@JsonProperty("pipeSize")
 	private Double pipeSize = null;
@@ -317,6 +324,49 @@ public class WaterConnection extends Connection {
 		}
 	 if(!this.documents.contains(documentsItem))
              this.documents.add(documentsItem);
+		return this;
+	}
+
+	
+	/**
+	 * Proposed taps for non-metered calculation attribute.
+	 * 
+	 * @return pipeSize
+	 **/
+	@ApiModelProperty(value = "No of proposed taps no is citizen input")
+
+	public Integer getProposedTaps() {
+		return proposedTaps;
+	}
+
+	public void setProposedTaps(Integer proposedTaps) {
+		this.proposedTaps = proposedTaps;
+	}
+	
+	
+	public WaterConnection proposedProposedTaps(Integer proposedTaps) {
+		this.proposedTaps = proposedTaps;
+		return this;
+	}
+	
+	/**
+	 * Proposed Pipe size for non-metered calculation attribute.
+	 * 
+	 * @return pipeSize
+	 **/
+	@ApiModelProperty(value = "No of proposed Pipe size is citizen input")
+
+	public Double getProposedPipeSize() {
+		return proposedPipeSize;
+	}
+
+	public void setProposedPipeSize(Double proposedPipeSize) {
+		this.proposedPipeSize = proposedPipeSize;
+	}
+	
+	
+	public WaterConnection proposedPipeSize(Double proposedPipeSize) {
+		this.proposedPipeSize = proposedPipeSize;
 		return this;
 	}
 
