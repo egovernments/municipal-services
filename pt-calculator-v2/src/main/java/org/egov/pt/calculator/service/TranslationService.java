@@ -186,6 +186,9 @@ public class TranslationService {
 
         PropertyResponseV2 propertyResponseV2 = mapper.convertValue(repository.fetchResult(url, requestInfoWrapper), PropertyResponseV2.class);
 
+        if(CollectionUtils.isEmpty(propertyResponseV2.getProperties()))
+            throw new CustomException("INVALID_REQUEST", "The propertyId: "+assessmentRequestV2.getAssessment().getPropertyId()+" is not found in the system");
+
         return propertyResponseV2.getProperties().get(0);
 
     }
