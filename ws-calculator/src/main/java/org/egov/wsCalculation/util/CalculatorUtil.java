@@ -47,7 +47,7 @@ public class CalculatorUtil {
 		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_PENANLTY_MASTER).build());
 		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_INTEREST_MASTER).build());
 		details.add(MasterDetail.builder().name(WSCalculationConstant.WC_BILLING_SLAB_MASTER).build());
-		details.add(MasterDetail.builder().name(WSCalculationConstant.Calculation_Attribute_Const).filter("[?(@.isActive== "+ true +")]").build());
+		details.add(MasterDetail.builder().name(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST).filter("[?(@.active== "+ true +")]").build());
 		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
 				.moduleName(WSCalculationConstant.WS_TAX_MODULE).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)

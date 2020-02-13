@@ -75,6 +75,8 @@ public class EstimationService {
 		ArrayList<String> billingSlabIds = new ArrayList<>();
 		billingSlabMaster.put(WSCalculationConstant.WC_BILLING_SLAB_MASTER,
 				(JSONArray) masterData.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER));
+		billingSlabMaster.put(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST,
+				(JSONArray) masterData.get(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
 		timeBasedExemptionMasterMap.put(WSCalculationConstant.WC_WATER_CESS_MASTER,
 				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
 //		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
@@ -155,7 +157,9 @@ public class EstimationService {
 		} catch (IOException e) {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
 		}
-        String calculationAttribute = "Pipe Size";
+		JSONObject calculationAttributeMaster = new JSONObject();
+		calculationAttributeMaster.put(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST, billingSlabMaster.get(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
+        String calculationAttribute = getCalculationAttribute(calculationAttributeMaster, waterConnection.getConnectionType());
 		List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, calculationAttribute, requestInfo);
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
@@ -226,11 +230,13 @@ public class EstimationService {
 	}
 	
 	private String getCalculationAttribute(Map<String, Object> calculationAttributeMap, String connectionType) {
-		String calculationAttribute = null;
 		if (calculationAttributeMap == null)
 			throw new CustomException("CALCULATION_ATTRIBUTE_MASTER_NOT_FOUND",
 					"Calculation attribute master not found!!");
-		return calculationAttribute;
+		JSONArray filteredMasters = JsonPath.read(calculationAttributeMap,
+				"$.CalculationAttribute[?(@.name=='" + connectionType + "')]");
+		JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
+		return master.getAsString(WSCalculationConstant.ATTRIBUTE);
 	}
 	
 	/**
