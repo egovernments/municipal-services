@@ -304,8 +304,8 @@ public class CalculatorConstants {
 	public static final String PT_DOCDATE_NULL = "PT_DOCDATE_NULL";
 	public static final String PT_DOCDATE_NULL_MSG = "Document date is not present in additional details or set as null";
 
-	public static final String PT_ADDITIONALNDETAILS_NULL = "PT_APPLICATIONDETAILS_NULL";
-	public static final String PT_ADDITIONALNDETAILS_NULL_MSG = "Appication Details is null or set as null";
+	public static final String PT_ADDITIONALNDETAILS_NULL = "PT_ADDITIONALNDETAILS_NULL";
+	public static final String PT_ADDITIONALNDETAILS_NULL_MSG = "Additional Details should not be null. Please add field like marketValue, documentDate, adhocRebate and adhocPenalty with their proper value in additionalDetails object";
 
 	public static final String DEMAND_UPDATE_FAILED = "DEMAND_UPDATE_FAILED";
 	public static final String DEMAND_UPDATE_FAILED_MSG = "Demand Updation Failed";
