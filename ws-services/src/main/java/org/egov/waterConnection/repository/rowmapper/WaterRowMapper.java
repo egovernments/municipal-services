@@ -50,7 +50,6 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setNoOfTaps(rs.getInt("proposedTaps"));
 				currentWaterConnection.setUom(rs.getString("uom"));
 				currentWaterConnection.setWaterSubSource(rs.getString("waterSubSource"));
-				currentWaterConnection.setCalculationAttribute(rs.getString("calculationAttribute"));
 				currentWaterConnection.setAction(rs.getString("action"));
 				currentWaterConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
@@ -78,7 +77,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
 			applicationDocument.setFileStoreId(rs.getString("filestoreid"));
-			applicationDocument.setDocumentUid(rs.getString("filestoreid"));
+			applicationDocument.setDocumentUid(rs.getString("doc_Id"));
 			applicationDocument.setStatus(org.egov.waterConnection.model.Status.fromValue(isActive));
 			waterConnection.addDocumentsItem(applicationDocument);
 		}

@@ -263,5 +263,7 @@ public class WSCalculationConstant {
 	
 	
 	public static final Long expiryDateForOneTimeFee = 347126472000l;
+	
+	public static final String Calculation_Attribute_Const = "CalculationAttribute";
 
 }

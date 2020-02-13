@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -35,6 +36,12 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("meterInstallationDate")
 	private Long meterInstallationDate = null;
+	
+	@JsonProperty("proposedPipeSize")
+	private Double proposedPipeSize = null;
+
+	@JsonProperty("proposedTaps")
+	private Integer proposedTaps = null;
 
 	@JsonProperty("pipeSize")
 	private Double pipeSize = null;
@@ -47,9 +54,6 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("uom")
 	private String uom = null;
-
-	@JsonProperty("calculationAttribute")
-	private String calculationAttribute = null;
 
 	@JsonProperty("documents")
 	@Valid
@@ -281,27 +285,6 @@ public class WaterConnection extends Connection {
 		this.uom = uom;
 	}
 
-	public WaterConnection calculationAttribute(String calculationAttribute) {
-		this.calculationAttribute = calculationAttribute;
-		return this;
-	}
-
-	/**
-	 * The calculation attribute of water connection.
-	 * 
-	 * @return calculationAttribute
-	 **/
-	@ApiModelProperty(required = true, value = "The calculation attribute of water connection.")
-	
-
-	@Size(min = 2, max = 32)
-	public String getCalculationAttribute() {
-		return calculationAttribute;
-	}
-
-	public void setCalculationAttribute(String calculationAttribute) {
-		this.calculationAttribute = calculationAttribute;
-	}
 
 	public WaterConnection documents(List<Document> documents) {
 		this.documents = documents;
@@ -316,6 +299,50 @@ public class WaterConnection extends Connection {
              this.documents.add(documentsItem);
 		return this;
 	}
+	
+	
+	/**
+	 * Proposed taps for non-metered calculation attribute.
+	 * 
+	 * @return proposedTaps
+	 **/
+	@ApiModelProperty(value = "No of proposed taps no is citizen input")
+
+	public Integer getProposedTaps() {
+		return proposedTaps;
+	}
+
+	public void setProposedTaps(Integer proposedTaps) {
+		this.proposedTaps = proposedTaps;
+	}
+	
+	
+	public WaterConnection proposedProposedTaps(Integer proposedTaps) {
+		this.proposedTaps = proposedTaps;
+		return this;
+	}
+	
+	/**
+	 * Proposed Pipe size for non-metered calculation attribute.
+	 * 
+	 * @return proposedPipeSize
+	 **/
+	@ApiModelProperty(value = "No of proposed Pipe size is citizen input")
+
+	public Double getProposedPipeSize() {
+		return proposedPipeSize;
+	}
+
+	public void setProposedPipeSize(Double proposedPipeSize) {
+		this.proposedPipeSize = proposedPipeSize;
+	}
+	
+	
+	public WaterConnection proposedPipeSize(Double proposedPipeSize) {
+		this.proposedPipeSize = proposedPipeSize;
+		return this;
+	}
+
 
 	/**
 	 * The documents attached by owner for exemption.
@@ -351,14 +378,13 @@ public class WaterConnection extends Connection {
 				&& Objects.equals(this.noOfTaps, waterConnection.noOfTaps)
 				&& Objects.equals(this.waterSubSource, waterConnection.waterSubSource)
 				&& Objects.equals(this.uom, waterConnection.uom)
-				&& Objects.equals(this.calculationAttribute, waterConnection.calculationAttribute)
 				&& Objects.equals(this.documents, waterConnection.documents) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(connectionCategory, rainWaterHarvesting, connectionType, waterSource, meterId,
-				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, calculationAttribute, documents,
+				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, documents,
 				super.hashCode());
 	}
 
@@ -377,7 +403,6 @@ public class WaterConnection extends Connection {
 		sb.append("    noOfTaps: ").append(toIndentedString(noOfTaps)).append("\n");
 		sb.append("    waterSubSource: ").append(toIndentedString(waterSubSource)).append("\n");
 		sb.append("    uom: ").append(toIndentedString(uom)).append("\n");
-		sb.append("    calculationAttribute: ").append(toIndentedString(calculationAttribute)).append("\n");
 		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
 		sb.append("}");
 		return sb.toString();

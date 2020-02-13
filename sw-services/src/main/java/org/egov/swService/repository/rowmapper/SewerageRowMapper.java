@@ -73,7 +73,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
 			applicationDocument.setFileStoreId(rs.getString("filestoreid"));
-			applicationDocument.setDocumentUid(rs.getString("filestoreid"));
+			applicationDocument.setDocumentUid(rs.getString("doc_Id"));
 			applicationDocument.setStatus(Status.fromValue(isActive));
 			sewerageConnection.addDocumentsItem(applicationDocument);
 		}

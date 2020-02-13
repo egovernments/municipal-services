@@ -58,9 +58,6 @@ public class WaterConnection extends Connection {
 	@JsonProperty("uom")
 	private String uom = null;
 
-	@JsonProperty("calculationAttribute")
-	private String calculationAttribute = null;
-
 	@JsonProperty("documents")
 	@Valid
 	private List<Document> documents = null;
@@ -291,28 +288,12 @@ public class WaterConnection extends Connection {
 		this.uom = uom;
 	}
 
-	public WaterConnection calculationAttribute(String calculationAttribute) {
-		this.calculationAttribute = calculationAttribute;
-		return this;
-	}
-
 	/**
 	 * The calculation attribute of water connection.
 	 * 
 	 * @return calculationAttribute
 	 **/
 	@ApiModelProperty(required = true, value = "The calculation attribute of water connection.")
-	
-
-	@Size(min = 2, max = 32)
-	public String getCalculationAttribute() {
-		return calculationAttribute;
-	}
-
-	public void setCalculationAttribute(String calculationAttribute) {
-		this.calculationAttribute = calculationAttribute;
-	}
-
 	public WaterConnection documents(List<Document> documents) {
 		this.documents = documents;
 		return this;
@@ -404,14 +385,13 @@ public class WaterConnection extends Connection {
 				&& Objects.equals(this.noOfTaps, waterConnection.noOfTaps)
 				&& Objects.equals(this.waterSubSource, waterConnection.waterSubSource)
 				&& Objects.equals(this.uom, waterConnection.uom)
-				&& Objects.equals(this.calculationAttribute, waterConnection.calculationAttribute)
 				&& Objects.equals(this.documents, waterConnection.documents) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(connectionCategory, rainWaterHarvesting, connectionType, waterSource, meterId,
-				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, calculationAttribute, documents,
+				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, documents,
 				super.hashCode());
 	}
 
@@ -430,7 +410,6 @@ public class WaterConnection extends Connection {
 		sb.append("    noOfTaps: ").append(toIndentedString(noOfTaps)).append("\n");
 		sb.append("    waterSubSource: ").append(toIndentedString(waterSubSource)).append("\n");
 		sb.append("    uom: ").append(toIndentedString(uom)).append("\n");
-		sb.append("    calculationAttribute: ").append(toIndentedString(calculationAttribute)).append("\n");
 		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
 		sb.append("}");
 		return sb.toString();
