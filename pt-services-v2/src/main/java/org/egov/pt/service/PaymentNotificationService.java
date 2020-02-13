@@ -133,9 +133,9 @@ public class PaymentNotificationService {
 						customMessage = getCustomizedMessage(valMap, message, path);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
 					}
-					if (valMap.get("oldPropertyId") == null
+					/*if (valMap.get("oldPropertyId") == null
 							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
-						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
+						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));*/
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						sendSMS(smsRequests);
 						if (null == propertyConfiguration.getIsUserEventsNotificationEnabled())
