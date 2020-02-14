@@ -65,7 +65,7 @@ public class PlumberInfo   {
     }
   }
   @JsonProperty("relationship")
-  private RelationshipEnum relationship = null;
+  private String relationship = null;
 
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
@@ -184,7 +184,7 @@ public class PlumberInfo   {
     this.correspondenceAddress = correspondenceAddress;
   }
 
-  public PlumberInfo relationship(RelationshipEnum relationship) {
+  public PlumberInfo relationship(String relationship) {
     this.relationship = relationship;
     return this;
   }
@@ -195,11 +195,11 @@ public class PlumberInfo   {
   **/
   @ApiModelProperty(value = "The relationship of gaurdian.")
 
-  public RelationshipEnum getRelationship() {
+  public String getRelationship() {
     return relationship;
   }
 
-  public void setRelationship(RelationshipEnum relationship) {
+  public void setRelationship(String relationship) {
     this.relationship = relationship;
   }
 

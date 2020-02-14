@@ -30,7 +30,6 @@ public class Document {
   private String fileStoreId ;
 
   @JsonProperty("documentUid")
-  @NotNull
   private String documentUid ;
 
   @JsonProperty("auditDetails")
