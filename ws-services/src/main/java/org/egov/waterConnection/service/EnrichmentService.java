@@ -162,10 +162,20 @@ public class EnrichmentService {
 			connection.getDocuments().forEach(document -> {
 				if (document.getId() == null) {
 					document.setId(UUID.randomUUID().toString());
+					document.setDocumentUid(UUID.randomUUID().toString());
 					document.setStatus(Status.ACTIVE);
+					document.setAuditDetails(auditDetails);
 				}
 			});
 		}
+		if (!CollectionUtils.isEmpty(connection.getPlumberInfo())) {
+			connection.getPlumberInfo().forEach(plumberInfo -> {
+				if (plumberInfo.getId() == null) {
+					plumberInfo.setId(UUID.randomUUID().toString());
+				}
+			});
+		}
+		
 	}
 	
 	/**

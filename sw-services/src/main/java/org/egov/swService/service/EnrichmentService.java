@@ -21,6 +21,7 @@ import org.egov.swService.model.Connection.StatusEnum;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.model.Status;
 import org.egov.swService.model.Idgen.IdResponse;
 import org.egov.swService.repository.IdGenRepository;
 import org.egov.swService.util.SWConstants;
@@ -165,6 +166,24 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
+		if (!CollectionUtils.isEmpty(connection.getDocuments())) {
+			connection.getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+					document.setDocumentUid(UUID.randomUUID().toString());
+					document.setStatus(Status.ACTIVE);
+					document.setAuditDetails(auditDetails);
+				}
+			});
+		}
+		if (!CollectionUtils.isEmpty(connection.getPlumberInfo())) {
+			connection.getPlumberInfo().forEach(plumberInfo -> {
+				if (plumberInfo.getId() == null) {
+					plumberInfo.setId(UUID.randomUUID().toString());
+				}
+			});
+		}
 	}
 	
 	/**
