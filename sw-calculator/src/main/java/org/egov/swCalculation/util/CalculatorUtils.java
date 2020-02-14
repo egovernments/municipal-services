@@ -127,6 +127,8 @@ public class CalculatorUtils {
 		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_PENANLTY_MASTER).build());
 		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_INTEREST_MASTER).build());
 		details.add(MasterDetail.builder().name(SWCalculationConstant.SW_BILLING_SLAB_MASTER).build());
+		details.add(MasterDetail.builder().name(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST)
+				.filter("[?(@.active== " + true + ")]").build());
 		ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
 				.moduleName(SWCalculationConstant.SW_TAX_MODULE).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)

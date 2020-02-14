@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BillingSlab {
 	public String id;
-	public String BuildingType = null;
-	public String ConnectionType = null;
-	public String CalculationAttribute = null;
-	public String UOM = null;
+	public String buildingType = null;
+	public String connectionType = null;
+	public String calculationAttribute = null;
+	public double minimumCharge;
 	public List<Slab> slabs = new ArrayList<>();
 }

@@ -263,4 +263,8 @@ public class SWCalculationConstant {
 	
 	public static final Long expiryDateForOneTimeFee = 347126472000l;
 	
+	public static final String CALCULATION_ATTRIBUTE_CONST = "CalculationAttribute";
+	
+	public static final String ATTRIBUTE = "attribute";
+	
 }
