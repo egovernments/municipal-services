@@ -111,5 +111,11 @@ public class WCConstants {
 	public static final String  USREVENTS_EVENT_NAME = "WATER CONNECTION";
 	
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-WS";
+	
+	public static final String VARIABLE_WFDOCUMENTS = "documents";
+
+    public static final String VARIABLE_PLUMBER = "plumberInfo";
+	
+	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
 
 }

@@ -1,12 +1,14 @@
 package org.egov.waterConnection.service;
 
 
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.Difference;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
@@ -57,7 +59,9 @@ public class DiffService {
 		if (CollectionUtils.isEmpty(changes))
 			return updatedValues;
 		changes.forEach(change -> {
-			updatedValues.add(change.getPropertyName());
+			if (!WCConstants.FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
+				updatedValues.add(change.getPropertyName());
+            }
 		});
 		log.info("Updated Fields :----->  "+ updatedValues.toString());
 		return updatedValues;

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.egov.swService.model.Difference;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -57,7 +58,9 @@ public class DiffService {
 		if (CollectionUtils.isEmpty(changes))
 			return updatedValues;
 		changes.forEach(change -> {
-			updatedValues.add(change.getPropertyName());
+			if (!SWConstants.FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
+				updatedValues.add(change.getPropertyName());
+            }
 		});
 		log.info("Updated Fields :----->  "+ updatedValues.toString());
 		return updatedValues;

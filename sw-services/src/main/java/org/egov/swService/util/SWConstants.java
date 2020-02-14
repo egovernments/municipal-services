@@ -100,5 +100,11 @@ public class SWConstants {
 	public static final String  USREVENTS_EVENT_NAME = "SEWERAGE CONNECTION";
 	
 	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-SW";
-    
+   
+	public static final String VARIABLE_WFDOCUMENTS = "documents";
+
+    public static final String VARIABLE_PLUMBER = "plumberInfo";
+	
+	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
+
 }
