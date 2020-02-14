@@ -305,8 +305,8 @@ public class Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		 if(!this.documents.contains(documentsItem))
-             this.documents.add(documentsItem);
+		if(!this.documents.contains(documentsItem))
+            this.documents.add(documentsItem);
 		return this;
 	}
 
