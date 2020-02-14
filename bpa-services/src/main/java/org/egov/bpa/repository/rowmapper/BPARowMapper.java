@@ -155,10 +155,18 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					.getObject("ownershippercentage");
 			
 			OwnerInfo owner = OwnerInfo.builder()
+					.tenantId(tenantId)
+					.name(rs.getString("name"))
 					.uuid(rs.getString("bpaowner_uuid"))
+					.tenantId(tenantId)
+					.mobileNumber(rs.getString("mobilenumber"))
+					.gender(rs.getString("gender"))
+					.fatherOrHusbandName(rs.getString("fatherorhusbandname"))
+					.correspondenceAddress(rs.getString("correspondenceAddress"))
 					.isPrimaryOwner(isPrimaryOwner)
 					.ownerType(rs.getString("ownerType"))
 					.ownerShipPercentage(ownerShipPercentage)
+					.active(rs.getBoolean("active"))
 					.relationship(
 							OwnerInfo.RelationshipEnum.fromValue(rs
 									.getString("relationship")))
