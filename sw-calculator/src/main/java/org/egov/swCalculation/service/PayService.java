@@ -128,7 +128,7 @@ public class PayService {
 	 * @param debitAmount
 	 * @return TaxHead for SW round off
 	 */
-	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount) {
+	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount, boolean isConnectionFee) {
 
 		BigDecimal result = creditAmount.add(debitAmount);
 		
@@ -138,6 +138,7 @@ public class PayService {
 		
 		BigDecimal roundOff = BigDecimal.ZERO;
 		
+		String taxHead = isConnectionFee == true ? SWCalculationConstant.SW_Round_Off : SWCalculationConstant.SW_ONE_TIME_FEE_ROUND_OFF;
 		/*
 		 * If the decimal amount is greater than 0.5 we subtract it from 1 and
 		 * put it as roundOff taxHead so as to nullify the decimal eg: If the
@@ -157,7 +158,7 @@ public class PayService {
 			roundOff = remainder.negate();
 		
 		if(roundOff.compareTo(BigDecimal.ZERO) != 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOff).taxHeadCode(SWCalculationConstant.SW_Round_Off)
+			return TaxHeadEstimate.builder().estimateAmount(roundOff).taxHeadCode(taxHead)
 					.build();
 		else
 			return null;

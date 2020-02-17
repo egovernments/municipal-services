@@ -67,7 +67,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 * 
 	 */
 	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
-			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap) {
+			Map<String, List> estimatesAndBillingSlabs, Map<String, Object> masterMap, boolean isConnectionFee) {
 
 		@SuppressWarnings("unchecked")
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
@@ -125,8 +125,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			}
 		}
 
-		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(sewerageCharge),
-				rebate.add(exemption));
+		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(fee).add(sewerageCharge),
+				rebate.add(exemption), isConnectionFee);
 		if (null != decimalEstimate) {
 			decimalEstimate.setCategory(taxHeadCategoryMap.get(decimalEstimate.getTaxHeadCode()));
 			estimates.add(decimalEstimate);
@@ -173,7 +173,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
 					.get(SWCalculationConstant.Billing_Period_Master);
 			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
-			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap, true);
 			calculations.add(calculation);
 		}
 		return calculations;
@@ -220,7 +220,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 //					.get(WSCalculationConstant.Billing_Period_Master);
 //			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
 			mDataService.enrichBillingPeriodForFee(masterMap);
-			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap);
+			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap, false);
 			calculations.add(calculation);
 		}
 		return calculations;

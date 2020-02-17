@@ -104,9 +104,10 @@ public class SWCalculationConstant {
 
 	public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
-;
 
 	public static final String SW_Round_Off = "SW_Round_Off";
+	
+	public static final String SW_ONE_TIME_FEE_ROUND_OFF = "SW_FEE_ROUND_OFF";
 
 	public static final String flatRateCalculationAttribute = "Flat";
 

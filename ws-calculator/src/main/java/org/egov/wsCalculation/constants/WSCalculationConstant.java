@@ -141,6 +141,8 @@ public class WSCalculationConstant {
 	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
 
 	public static final String WS_Round_Off = "WS_Round_Off";
+	
+	public static final String WS_ONE_TIME_FEE_ROUND_OFF = "WS_FEE_ROUND_OFF";
 
 	public static final String WS_TAX_MODULE = "ws-services-calculation";
 

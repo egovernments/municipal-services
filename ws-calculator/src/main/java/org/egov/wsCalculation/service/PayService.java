@@ -38,10 +38,10 @@ public class PayService {
 	 * 
 	 */
 
-	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount) {
+	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount, boolean isConnectionFee) {
 		BigDecimal roundOffPos = BigDecimal.ZERO;
 		BigDecimal roundOffNeg = BigDecimal.ZERO;
-
+        String taxHead = isConnectionFee == true ? WSCalculationConstant.WS_Round_Off : WSCalculationConstant.WS_ONE_TIME_FEE_ROUND_OFF;
 		BigDecimal result = creditAmount.add(debitAmount);
 		BigDecimal roundOffAmount = result.setScale(2, 2);
 		BigDecimal reminder = roundOffAmount.remainder(BigDecimal.ONE);
@@ -52,10 +52,10 @@ public class PayService {
 			roundOffNeg = roundOffNeg.add(reminder).negate();
 
 		if (roundOffPos.doubleValue() > 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOffPos).taxHeadCode(WSCalculationConstant.WS_Round_Off)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffPos).taxHeadCode(taxHead)
 					.build();
 		else if (roundOffNeg.doubleValue() < 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg).taxHeadCode(WSCalculationConstant.WS_Round_Off)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg).taxHeadCode(taxHead)
 					.build();
 		else
 			return null;
