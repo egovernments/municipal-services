@@ -118,11 +118,9 @@ public class  TradeLicense   {
         private String financialYear = null;
 
         @JsonProperty("validFrom")
-        @NotNull
         private Long validFrom = null;
 
         @JsonProperty("validTo")
-        @NotNull
         private Long validTo = null;
 
               /**
