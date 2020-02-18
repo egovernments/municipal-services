@@ -14,7 +14,10 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class CalculationUtils {
 
 	
@@ -107,7 +110,7 @@ public class CalculationUtils {
     public BPA getBuildingPlan(RequestInfo requestInfo, String applicationNumber, String tenantId){
         String url = getBPASearchURL();
         url = url.replace("{1}",tenantId).replace("{2}",applicationNumber);
-
+        log.info("Bpa search URL is " + url);
         Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
                 requestInfo(requestInfo).build());
 
@@ -122,6 +125,7 @@ public class CalculationUtils {
         if(response==null || CollectionUtils.isEmpty(response.getBpa()))
             return null;
 
+        log.info("Bpa search response exists ? " + (response==null || CollectionUtils.isEmpty(response.getBpa())));
         return response.getBpa().get(0);
     }
 }

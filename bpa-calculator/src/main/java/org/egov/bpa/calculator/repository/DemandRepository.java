@@ -12,9 +12,12 @@ import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.egov.bpa.calculator.config.BPACalculatorConfig;
 
 @Repository
+@Slf4j
 public class DemandRepository {
 
 
@@ -46,6 +49,7 @@ public class DemandRepository {
         catch(IllegalArgumentException e){
             throw new CustomException("PARSING ERROR","Failed to parse response of create demand");
         }
+        log.info("Demands data : " + response.getDemands());
         return response.getDemands();
     }
 
@@ -68,6 +72,7 @@ public class DemandRepository {
         catch(IllegalArgumentException e){
             throw new CustomException("PARSING ERROR","Failed to parse response of update demand");
         }
+        log.info("Demands data : " + response.getDemands());
         return response.getDemands();
 
     }

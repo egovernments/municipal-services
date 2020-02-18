@@ -35,7 +35,10 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class DemandService {
 
 	
@@ -100,11 +103,15 @@ public class DemandService {
             }
         }
 
-        if(!CollectionUtils.isEmpty(createCalculations))
+        if(!CollectionUtils.isEmpty(createCalculations)) {
+        	log.info("Creating Demand..");
             createDemand(requestInfo,createCalculations,mdmsData);
+        }
 
-        if(!CollectionUtils.isEmpty(updateCalculations))
-            updateDemand(requestInfo,updateCalculations);
+        if(!CollectionUtils.isEmpty(updateCalculations)){
+        	log.info("Updating Demand..");
+        	updateDemand(requestInfo,updateCalculations);
+        }
     }
 
     /**

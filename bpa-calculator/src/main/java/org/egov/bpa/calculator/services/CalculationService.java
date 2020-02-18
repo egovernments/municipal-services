@@ -113,6 +113,7 @@ public class CalculationService {
 			calculations.add(calculation);
 
 		}
+		log.info("Calculations are : " + calculations);
 		return calculations;
 	}
 
