@@ -12,7 +12,8 @@ public class WCConstants {
 	
 	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
 	
-
+	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.ws-services-calculation";
+	
 	public static final String JSONPATH_CODE_CONNECTION_CATEGORY = "connectionCategory.code";
 	
 	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
@@ -20,6 +21,8 @@ public class WCConstants {
 	public static final String JSONPATH_CODE_WATER_SOURCE= "waterSource.code";
 
 	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
+	
+	public static final String WS_TAX_MODULE = "ws-services-calculation";
 
 	public static final String MDMS_WC_Connection_Category = "connectionCategory";
 
@@ -117,6 +120,8 @@ public class WCConstants {
 	public static final String VARIABLE_WFDOCUMENTS = "documents";
 
     public static final String VARIABLE_PLUMBER = "plumberInfo";
+    
+    public static final String WC_ROADTYPE_MASTER = "RoadType";
 	
 	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
 
