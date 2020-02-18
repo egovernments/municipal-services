@@ -367,8 +367,6 @@ public class Connection {
 	 * @return roadType
 	 **/
 	@ApiModelProperty(value = "It is a master data, defined in MDMS. If road cutting is required to established the connection then we need to capture the details of road type.")
-
-	@Size(min = 2, max = 32)
 	public String getRoadType() {
 		return roadType;
 	}
