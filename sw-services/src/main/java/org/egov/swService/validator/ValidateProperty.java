@@ -60,7 +60,9 @@ public class ValidateProperty {
 		if (isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
 			propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
 		} else {
-			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);
+//			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);
+			throw new CustomException("PROPERTY_NOT_FOUND",
+					"No property found for sewerage connection");
 		}
 		if (propertyList != null && !propertyList.isEmpty()) {
            if (propertyList.get(0).getUsageCategory() == null || propertyList.get(0).getUsageCategory().isEmpty()) {

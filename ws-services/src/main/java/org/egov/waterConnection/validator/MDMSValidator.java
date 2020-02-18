@@ -37,20 +37,22 @@ public class MDMSValidator {
 	private String mdmsEndpoint;
 
 	public void validateMasterData(WaterConnectionRequest request) {
-		Map<String, String> errorMap = new HashMap<>();
+		if (request.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
+			Map<String, String> errorMap = new HashMap<>();
 
-		String jsonPath = WCConstants.JSONPATH_ROOT;
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+			String jsonPath = WCConstants.JSONPATH_ROOT;
+			String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 
-		String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
-				WCConstants.MDMS_WC_Water_Source};
-		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-		Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names, "$.*.code",
-				jsonPath, request.getRequestInfo());
-		validateMDMSData(masterNames, codes);
-		validateCodes(request.getWaterConnection(),codes,errorMap);
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
+			String[] masterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
+					WCConstants.MDMS_WC_Water_Source };
+			List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+			Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names,
+					"$.*.code", jsonPath, request.getRequestInfo());
+			validateMDMSData(masterNames, codes);
+			validateCodes(request.getWaterConnection(), codes, errorMap);
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		}
 	}
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
@@ -89,16 +91,16 @@ public class MDMSValidator {
 	
 	private static Map<String, String> validateCodes(WaterConnection waterConnection, Map<String, List<String>> codes,
 			Map<String, String> errorMap) {
-		if(!codes.get(WCConstants.MDMS_WC_Connection_Type).contains(waterConnection.getConnectionType()) && waterConnection.getConnectionType() != null) {
-			errorMap.put("INVALID WATER CONNECTION TYPE",
+		if(waterConnection.getConnectionType() != null && !codes.get(WCConstants.MDMS_WC_Connection_Type).contains(waterConnection.getConnectionType())) {
+			errorMap.put("INVALID_WATER_CONNECTION_TYPE",
 					"The WaterConnection connection type '" + waterConnection.getConnectionType() + "' does not exists");
 		}
-		if(!codes.get(WCConstants.MDMS_WC_Connection_Category).contains(waterConnection.getConnectionCategory()) && waterConnection.getConnectionCategory() != null) {
-			errorMap.put("INVALID WATER CONNECTION CATEGORY",
+		if(waterConnection.getConnectionCategory() != null && !codes.get(WCConstants.MDMS_WC_Connection_Category).contains(waterConnection.getConnectionCategory())) {
+			errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
 					"The WaterConnection connection category'" + waterConnection.getConnectionCategory() + "' does not exists");
 		}
-		if(!codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource()) && waterConnection.getWaterSource() != null) {
-			errorMap.put("INVALID WATER CONNECTION SOURCE",
+		if(waterConnection.getWaterSource() != null && !codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource())) {
+			errorMap.put("INVALID_WATER_CONNECTION_SOURCE",
 					"The WaterConnection connection source'" + waterConnection.getWaterSource() + "' does not exists");
 		}
 		return errorMap;

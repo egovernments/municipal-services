@@ -27,37 +27,42 @@ public class WaterConnectionValidator {
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (waterConnection.getProperty().getUsageCategory() == null || waterConnection.getProperty().getUsageCategory().isEmpty()) {
-			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Water connection cannot be created without property usage type");
+		if (waterConnectionRequest.getWaterConnection().getProperty() == null) {
+			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
 		}
-//		if ((waterConnection.getPipeSize() == null || waterConnection.getPipeSize() == 0.0) && (waterConnection.getNoOfTaps() == null || waterConnection.getNoOfTaps() == 0)) {
-//			errorMap.put("INVALID_WATER_CONNECTION_PIPE_SIZE_OR_TAPS", "Pipe size or no of taps should not be null!!");
-//		}
-//		if (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION) {
-//			if (waterConnection.getMeterId() == null) {
-//				errorMap.put("INVALID WATER CONNECTION TYPE", "Meter Id cannot be null !!");
-//			}
-//			if (waterConnection.getMeterInstallationDate() < 0 || waterConnection.getMeterInstallationDate() == null
-//					|| waterConnection.getMeterInstallationDate() == 0) {
-//				errorMap.put("INVALID METER INSTALLATION DATE", "Meter Installation date cannot be null or negative !!");
-//			}
-//		}
-//			
-////		if (isUpdate && waterConnection.getConnectionNo() != null && !waterConnection.getConnectionNo().isEmpty()) {
-////			int n = waterDao.isWaterConnectionExist(Arrays.asList(waterConnection.getConnectionNo()));
-////			if (n == 0) {
-////				errorMap.put("INVALID WATER CONNECTION NUMBER", "Water Id not present");
-////			}
-////		}
-//		if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
-//			errorMap.put("INVALID WATER CONNECTION TYPE", "WaterConnection cannot be created  without connection type");
-//		}
-//		if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
-//			errorMap.put("INVALID WATER CONNECTION CATEGORY", "WaterConnection cannot be created without connection category");
-//		}
-//		if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
-//			errorMap.put("INVALID WATER SOURCE", "WaterConnection cannot be created without water source");
-//		}
+		if (waterConnectionRequest.getWaterConnection().getProperty() != null
+				&& (waterConnection.getProperty().getUsageCategory() == null
+						|| waterConnection.getProperty().getUsageCategory().isEmpty())) {
+			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Property usage type should not be empty");
+		}
+		if (isUpdate && waterConnectionRequest.getWaterConnection().getAction()
+				.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
+			if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
+				errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
+			}
+			if (waterConnection.getConnectionType() != null
+					&& (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION)) {
+				if (waterConnection.getMeterId() == null) {
+					errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
+				}
+				if (waterConnection.getMeterInstallationDate() < 0 || waterConnection.getMeterInstallationDate() == null
+						|| waterConnection.getMeterInstallationDate() == 0) {
+					errorMap.put("INVALID_METER_INSTALLATION_DATE",
+							"Meter Installation date cannot be null or negative");
+				}
+			}
+			if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
+				errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
+						"WaterConnection cannot be created without connection category");
+			}
+			if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
+				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
+			}
+			if (waterConnection.getRoadType() == null || waterConnection.getRoadType().isEmpty()) {
+				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
+			}
+
+		}
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);

@@ -60,7 +60,9 @@ public class ValidateProperty {
 		if (isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
 		} else {
-			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);
+//			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);
+			throw new CustomException("PROPERTY_NOT_FOUND",
+					"No property found for water connection");
 		}
 	
 		if (propertyList != null && !propertyList.isEmpty()) {
