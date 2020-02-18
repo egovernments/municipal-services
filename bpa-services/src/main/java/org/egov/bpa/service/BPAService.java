@@ -230,19 +230,11 @@ public class BPAService {
 		enrichmentService.postStatusEnrichment(bpaRequest);
 //		userService.createUser(bpaRequest);
 	
-
+		log.info("Bpa status is : " + bpa.getStatus());
 		// Generate the sanction Demand
-		ProcessInstance processInstance = workflowService.getProcessInstance(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
-				bpa.getApplicationNo());
-		if (processInstance != null) {
-			log.info("Workflow state is : " + processInstance.getState().getState());
-			if (processInstance.getState().getState()
-					.equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
-				calculationService.addCalculation(bpaRequest,
-						BPAConstants.SANCTION_FEE_KEY);
-			}
-
+		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.SANCTION_FEE_KEY);
 		}
 		repository.update(bpaRequest, workflowService.isStateUpdatable(
 				bpa.getStatus(), businessService));
