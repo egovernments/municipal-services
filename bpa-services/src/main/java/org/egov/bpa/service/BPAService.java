@@ -32,7 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class BPAService {
 
 	@Autowired
@@ -233,6 +236,7 @@ public class BPAService {
 				bpa.getTenantId(), bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 		if (processInstance != null) {
+			log.info("Workflow state is : " + processInstance.getState().getState());
 			if (processInstance.getState().getState()
 					.equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 				calculationService.addCalculation(bpaRequest,
