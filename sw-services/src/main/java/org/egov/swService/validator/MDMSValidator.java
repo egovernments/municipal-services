@@ -2,9 +2,13 @@ package org.egov.swService.validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
@@ -35,19 +39,25 @@ public class MDMSValidator {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
 
-
 	public void validateMasterData(SewerageConnectionRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
 
 		String jsonPath = SWConstants.JSONPATH_ROOT;
+		String taxjsonPath = SWConstants.TAX_JSONPATH_ROOT;
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-
-		String[] masterNames = { SWConstants.MDMS_SW_Connection_Type };
+		String[] masterNames = {SWConstants.MDMS_SW_Connection_Type };
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
 		Map<String, List<String>> codes = getAttributeValues(tenantId, SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
 				jsonPath, request.getRequestInfo());
-		validateMDMSData(masterNames, codes);
-		validateCodes(request.getSewerageConnection(), codes, errorMap);
+		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(tenantId, SWConstants.SW_TAX_MODULE,
+				taxModelnames, "$.*.code", taxjsonPath, request.getRequestInfo());
+		// merge codes
+		String[] finalmasterNames = { SWConstants.MDMS_SW_Connection_Type, SWConstants.SC_ROADTYPE_MASTER };
+		Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+				.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		validateMDMSData(finalmasterNames, finalcodes);
+		validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -55,15 +65,8 @@ public class MDMSValidator {
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
 			String filter, String jsonpath, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
-		// String module=moduleName;
-		// String master=names.get(0);
-		// String tenantId_new=requestInfo.getUserInfo().getTenantId();
-		//
 		MdmsCriteriaReq criteriaReq = sewerageServicesUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
 				requestInfo);
-		// Object
-		// abc=criteriaReq.getMdmsCriteria().getModuleDetails().get(0).getMasterDetails().get(0).getClass();
-
 		try {
 
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
@@ -87,10 +90,21 @@ public class MDMSValidator {
 
 	private static Map<String, String> validateCodes(SewerageConnection sewerageConnection,
 			Map<String, List<String>> codes, Map<String, String> errorMap) {
+		StringBuilder messageBuilder = new StringBuilder();
 		if (!codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())
 				&& sewerageConnection.getConnectionType() != null) {
+			messageBuilder = new StringBuilder();
+			messageBuilder.append("The SewerageConnection connection type ")
+					.append(sewerageConnection.getConnectionType()).append(" does not exists");
 			errorMap.put("INVALID SEWERAGE CONNECTION TYPE", "The SewerageConnection connection type '"
 					+ sewerageConnection.getConnectionType() + "' does not exists");
+		}
+		if (sewerageConnection.getRoadType() != null
+				&& !codes.get(SWConstants.SC_ROADTYPE_MASTER).contains(sewerageConnection.getRoadType())) {
+			messageBuilder = new StringBuilder();
+			messageBuilder.append("The SewerageConnection road type ").append(sewerageConnection.getRoadType())
+					.append(" does not exists");
+			errorMap.put("INVALID_WATER_ROAD_TYPE", messageBuilder.toString());
 		}
 		return errorMap;
 	}

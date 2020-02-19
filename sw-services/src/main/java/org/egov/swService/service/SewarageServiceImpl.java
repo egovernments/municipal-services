@@ -77,7 +77,7 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
-		//mDMSValidator.validateMasterData(sewarageConnectionRequest);
+		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		//call work-flow
@@ -123,6 +123,8 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Override
 	public List<SewerageConnection> updateSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
+		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
+		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		BusinessService businessService = workflowService.getBusinessService(
 				sewarageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
 				sewarageConnectionRequest.getRequestInfo());
@@ -130,7 +132,7 @@ public class SewarageServiceImpl implements SewarageService {
 				sewarageConnectionRequest.getSewerageConnection().getId(), sewarageConnectionRequest.getRequestInfo());
 
 		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
-		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
+
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
 		Map<String, Difference> diffMap = diffService.getDifference(sewarageConnectionRequest, searchResult);

@@ -11,6 +11,8 @@ public class SWConstants {
 	}
 
 	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
+	
+	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.sw-services-calculation";
 
 	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
 
@@ -106,5 +108,11 @@ public class SWConstants {
     public static final String VARIABLE_PLUMBER = "plumberInfo";
 	
 	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
+	
+	public static final String APPROVE_CONNECTION_CONST = "APPROVE_FOR_CONNECTION";
+	
+	 public static final String SC_ROADTYPE_MASTER = "RoadType";
+	 
+	 public static final String SW_TAX_MODULE = "sw-services-calculation";
 
 }
