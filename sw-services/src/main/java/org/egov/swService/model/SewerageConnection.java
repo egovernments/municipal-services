@@ -141,7 +141,6 @@ public class SewerageConnection extends Connection {
 	 * @return uom
 	 **/
 	@ApiModelProperty(required = true, value = "The Unit of measurement for sewarage connection.")
-	@Size(min = 2, max = 32)
 	public String getUom() {
 		return uom;
 	}
@@ -161,8 +160,6 @@ public class SewerageConnection extends Connection {
 	 * @return connectionType
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-
-	@Size(min = 2, max = 32)
 	public String getConnectionType() {
 		return connectionType;
 	}

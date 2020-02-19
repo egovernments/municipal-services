@@ -159,7 +159,6 @@ public class Connection {
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Unique Identifier of the connection for internal reference.")
 
-	@Size(min = 1, max = 64)
 	public String getId() {
 		return id;
 	}
@@ -201,8 +200,6 @@ public class Connection {
 	 * @return applicationNo
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Formatted application number, which will be generated using ID-Gen at the time .")
-
-	@Size(min = 1, max = 64)
 	public String getApplicationNo() {
 		return applicationNo;
 	}
@@ -266,7 +263,6 @@ public class Connection {
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Formatted connection number, which will be generated using ID-Gen service after aproval of connection application in case of new application. If the source of data is \"DATA_ENTRY\" then application status will be considered as \"APROVED\" application.")
 
-	@Size(min = 1, max = 64)
 	public String getConnectionNo() {
 		return connectionNo;
 	}
@@ -286,8 +282,6 @@ public class Connection {
 	 * @return oldConnectionNo
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Mandatory if source is \"DATA_ENTRY\".")
-
-	@Size(min = 1, max = 64)
 	public String getOldConnectionNo() {
 		return oldConnectionNo;
 	}
@@ -367,8 +361,6 @@ public class Connection {
 	 * @return roadType
 	 **/
 	@ApiModelProperty(value = "It is a master data, defined in MDMS. If road cutting is required to established the connection then we need to capture the details of road type.")
-
-	@Size(min = 2, max = 32)
 	public String getRoadType() {
 		return roadType;
 	}
