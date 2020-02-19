@@ -124,5 +124,12 @@ public class WCConstants {
     public static final String WC_ROADTYPE_MASTER = "RoadType";
 	
 	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
+	
+	public static final String WS_EDIT_SMS = "WS_EDIT_SMS_MESSAGE";
+	
+	public static final String WS_EDIT_IN_APP = "WS_EDIT_IN_APP_MESSAGE";
+	
+   public static final String DEFAULT_OBJECT_MODIFIED_SMS_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>.";
 
+   public static final String DEFAULT_OBJECT_MODIFIED_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
 }

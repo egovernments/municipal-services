@@ -27,6 +27,7 @@ import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.util.NotificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +35,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Service
 @Slf4j
 public class WorkflowNotificationService {
 	
@@ -149,7 +150,7 @@ public class WorkflowNotificationService {
 	 * @param connection
 	 * @return return action link
 	 */
-	private Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
+	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
 			String mobileNumber, WaterConnection connection) {
 		Action action = null;
 		String code = "";
@@ -265,7 +266,7 @@ public class WorkflowNotificationService {
      * @param tenantId
      * @return
      */
-    private Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
+    public Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
     	Map<String, String> mapOfPhnoAndUUIDs = new HashMap<>();
     	StringBuilder uri = new StringBuilder();
     	uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());

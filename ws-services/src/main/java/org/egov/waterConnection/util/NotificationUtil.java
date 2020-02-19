@@ -137,6 +137,17 @@ public class NotificationUtil {
 	}
 	
 	/**
+	 * 
+	 * @param applicationStatus
+	 * @param localizationMessage
+	 * @return In app message template
+	 */
+	public String getCustomizedMsg(String code, String localizationMessage) {
+		String messageString = getMessageTemplate(code, localizationMessage);
+		return messageString;
+	}
+	
+	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
 	 * @param request
