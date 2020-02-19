@@ -2,11 +2,8 @@ package org.egov.waterConnection.service;
 
 
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.Difference;
@@ -17,6 +14,7 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class DiffService {
 	
+	@Autowired
+	private EditNotificationService editNotificationService;
 	/**
 	 * Creates a list of Difference object between the update and search
 	 * 
@@ -32,16 +32,22 @@ public class DiffService {
 	 * @param searchResult The searched result 
 	 * @return List of Difference object
 	 */
-	public Map<String, Difference> getDifference(WaterConnectionRequest request, WaterConnection searchResult) {
-		WaterConnection updateConnection = request.getWaterConnection();
-		Map<String, Difference> diffMap = new LinkedHashMap<>();
-		Difference diff = new Difference();
-		diff.setId(updateConnection.getId());
-		diff.setFieldsChanged(getUpdateFields(updateConnection, searchResult));
-		diff.setClassesAdded(getObjectsAdded(updateConnection, searchResult));
-		diff.setClassesRemoved(getObjectsRemoved(updateConnection, searchResult));
-		diffMap.put(updateConnection.getId(), diff);
-		return diffMap;
+	public void checkDifferenceAndSendEditNotification(WaterConnectionRequest request, WaterConnection searchResult) {
+		try {
+			WaterConnection updateConnection = request.getWaterConnection();
+			Difference diff = new Difference();
+			diff.setId(updateConnection.getId());
+			diff.setFieldsChanged(getUpdateFields(updateConnection, searchResult));
+			diff.setClassesAdded(getObjectsAdded(updateConnection, searchResult));
+			diff.setClassesRemoved(getObjectsRemoved(updateConnection, searchResult));
+			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || CollectionUtils.isEmpty(diff.getClassesAdded())
+					|| CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+				editNotificationService.sendEditNotification(request);
+			}
+		} catch (Exception ex) {
+			StringBuilder builder = new StringBuilder("Edit Notification Error!!");
+			log.error(builder.toString(), ex);
+		}
 	}
 	
 	/**
@@ -63,7 +69,7 @@ public class DiffService {
 				updatedValues.add(change.getPropertyName());
             }
 		});
-		log.info("Updated Fields :----->  "+ updatedValues.toString());
+		log.debug("Updated Fields :----->  "+ updatedValues.toString());
 		return updatedValues;
 	}
 	/**
@@ -81,12 +87,13 @@ public class DiffService {
 		List<String> classModified = new LinkedList<>();
 		if (CollectionUtils.isEmpty(objectsAdded))
 			return classModified;
-		objectsAdded.forEach(object -> {
+		for(Object object: objectsAdded) {
 			String className = object.getClass().toString()
 					.substring(object.getClass().toString().lastIndexOf('.') + 1);
 			if (!classModified.contains(className))
 					classModified.add(className);
-		});
+		}
+		log.debug("Class Modified :----->  "+ classModified.toString());
 		return classModified;
 	}
 	

@@ -129,7 +129,8 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
-		Map<String, Difference> diffMap = diffService.getDifference(waterConnectionRequest, searchResult);
+		//check for edit and send edit notification
+		diffService.checkDifferenceAndSendEditNotification(waterConnectionRequest, searchResult);
 		//Call workflow
 		wfIntegrator.callWorkFlow(waterConnectionRequest);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
