@@ -77,7 +77,7 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
-		mDMSValidator.validateMasterData(sewarageConnectionRequest);
+	//	mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		//call work-flow
