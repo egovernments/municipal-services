@@ -40,8 +40,8 @@ public class DiffService {
 			diff.setFieldsChanged(getUpdateFields(updateConnection, searchResult));
 			diff.setClassesAdded(getObjectsAdded(updateConnection, searchResult));
 			diff.setClassesRemoved(getObjectsRemoved(updateConnection, searchResult));
-			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || CollectionUtils.isEmpty(diff.getClassesAdded())
-					|| CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
+					|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
 				editNotificationService.sendEditNotification(request);
 			}
 		} catch (Exception ex) {
