@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import org.springframework.util.CollectionUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swCalculation.constants.SWCalculationConstant;
 import org.egov.swCalculation.model.BillingSlab;
@@ -156,9 +156,12 @@ public class EstimationService {
 			throw new CustomException("Parsing Exception", " Billing Slab can not be parsed!");
 		}
 		JSONObject calculationAttributeMaster = new JSONObject();
-		calculationAttributeMaster.put(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST, billingSlabMaster.get(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
-		 String calculationAttribute = getCalculationAttribute(calculationAttributeMaster, sewerageConnection.getConnectionType());
-			List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnection, mappingBillingSlab, calculationAttribute, requestInfo);
+		calculationAttributeMaster.put(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST,
+				billingSlabMaster.get(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
+		String calculationAttribute = getCalculationAttribute(calculationAttributeMaster,
+				sewerageConnection.getConnectionType());
+		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnection, mappingBillingSlab, calculationAttribute,
+				requestInfo);
 
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("No Billing Slab are found on criteria ", "Billing Slab are Empty");
@@ -170,21 +173,21 @@ public class EstimationService {
 
 		// Sewerage Charge Calculation
 		Double totalUnite = 0.0;
-		totalUnite = getCalculationUnit(sewerageConnection, calculationAttribute,criteria);
+		totalUnite = getCalculationUnit(sewerageConnection, calculationAttribute, criteria);
 		if (totalUnite == 0.0)
 			return sewerageCharge;
 		BillingSlab billSlab = billingSlabs.get(0);
 		if (isRangeCalculation(calculationAttribute)) {
-				for (Slab slab : billSlab.slabs) {
-					if (totalUnite >= slab.from && totalUnite < slab.to) {
-						sewerageCharge = BigDecimal.valueOf((totalUnite * slab.charge));
-						if (billSlab.minimumCharge > sewerageCharge.doubleValue()) {
-							sewerageCharge = BigDecimal.valueOf(billSlab.minimumCharge);
-						}
-						break;
+			for (Slab slab : billSlab.slabs) {
+				if (totalUnite >= slab.from && totalUnite < slab.to) {
+					sewerageCharge = BigDecimal.valueOf((totalUnite * slab.charge));
+					if (billSlab.minimumCharge > sewerageCharge.doubleValue()) {
+						sewerageCharge = BigDecimal.valueOf(billSlab.minimumCharge);
 					}
+					break;
 				}
-			
+			}
+
 		} else {
 			for (BillingSlab billingSlab : billingSlabs) {
 				sewerageCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
@@ -193,7 +196,7 @@ public class EstimationService {
 		}
 		return sewerageCharge;
 	}
-	
+
 	private String getCalculationAttribute(Map<String, Object> calculationAttributeMap, String connectionType) {
 		if (calculationAttributeMap == null)
 			throw new CustomException("CALCULATION_ATTRIBUTE_MASTER_NOT_FOUND",
@@ -203,7 +206,6 @@ public class EstimationService {
 		JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 		return master.getAsString(SWCalculationConstant.ATTRIBUTE);
 	}
-	
 
 	public String getAssessmentYear() {
 		LocalDateTime localDateTime = LocalDateTime.now();
@@ -250,7 +252,7 @@ public class EstimationService {
 	 * @return List of billing slab based on matching criteria
 	 */
 	private List<BillingSlab> getSlabsFiltered(SewerageConnection sewerageConnection, List<BillingSlab> billingSlabs,
-			String calculationAttribue,RequestInfo requestInfo) {
+			String calculationAttribue, RequestInfo requestInfo) {
 		Property property = sewerageConnection.getProperty();
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
@@ -266,7 +268,8 @@ public class EstimationService {
 		}).collect(Collectors.toList());
 	}
 
-	private Double getCalculationUnit(SewerageConnection sewerageConnection,String calculationAttribute, CalculationCriteria criteria) {
+	private Double getCalculationUnit(SewerageConnection sewerageConnection, String calculationAttribute,
+			CalculationCriteria criteria) {
 		Double totalUnite = 0.0;
 		if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.meteredConnectionType)) {
 			return totalUnite;
@@ -276,8 +279,7 @@ public class EstimationService {
 				return totalUnite;
 			return totalUnite = new Double(sewerageConnection.getNoOfToilets());
 		} else if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.nonMeterdConnection)
-				&& calculationAttribute
-						.equalsIgnoreCase(SWCalculationConstant.noOfWaterClosets)) {
+				&& calculationAttribute.equalsIgnoreCase(SWCalculationConstant.noOfWaterClosets)) {
 			if (sewerageConnection.getNoOfWaterClosets() == null)
 				return totalUnite;
 			return totalUnite = new Double(sewerageConnection.getNoOfWaterClosets());
@@ -361,15 +363,23 @@ public class EstimationService {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(SWCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
-		if (feeObj.get(SWCalculationConstant.METER_COST_CONST) != null && criteria.getSewerageConnection()
-				.getConnectionType().equalsIgnoreCase(SWCalculationConstant.meteredConnectionType)) {
+		if (feeObj.get(SWCalculationConstant.METER_COST_CONST) != null
+				&& criteria.getSewerageConnection().getConnectionType() != null && criteria.getSewerageConnection()
+						.getConnectionType().equalsIgnoreCase(SWCalculationConstant.meteredConnectionType)) {
 			meterCost = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.METER_COST_CONST).toString());
 		}
-		roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getSewerageConnection().getRoadType(),
-				criteria.getSewerageConnection().getRoadCuttingArea());
-		roadPlotCharge = getPlotSizeFee(masterData, criteria.getSewerageConnection().getProperty().getLandArea());
-		usageTypeCharge = getUsageTypeFee(masterData, criteria.getSewerageConnection().getProperty().getUsageCategory(),
-				criteria.getSewerageConnection().getRoadCuttingArea());
+		if (criteria.getSewerageConnection().getRoadType() != null) {
+			roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getSewerageConnection().getRoadType(),
+					criteria.getSewerageConnection().getRoadCuttingArea());
+		}
+		if (criteria.getSewerageConnection().getProperty().getLandArea() != null) {
+			roadPlotCharge = getPlotSizeFee(masterData, criteria.getSewerageConnection().getProperty().getLandArea());
+		}
+		if (criteria.getSewerageConnection().getRoadCuttingArea() != null) {
+			usageTypeCharge = getUsageTypeFee(masterData,
+					criteria.getSewerageConnection().getProperty().getUsageCategory(),
+					criteria.getSewerageConnection().getRoadCuttingArea());
+		}
 		totalCharge = formFee.add(scrutinyFee).add(otherCharges).add(meterCost).add(roadCuttingCharge)
 				.add(roadPlotCharge).add(usageTypeCharge);
 		tax = totalCharge.multiply(taxAndCessPercentage.divide(SWCalculationConstant.HUNDRED));
@@ -413,6 +423,8 @@ public class EstimationService {
 		if (roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='" + roadType + "')]");
+			if (CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(SWCalculationConstant.UNIT_COST_CONST).toString());
 			charge = charge.multiply(cuttingArea);
@@ -434,6 +446,8 @@ public class EstimationService {
 			masterSlab.put("PlotSizeSlab", plotSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab,
 					"$.PlotSizeSlab[?(@.from <=" + plotSize + "&& @.to > " + plotSize + ")]");
+			if (CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(SWCalculationConstant.UNIT_COST_CONST).toString());
 		}
@@ -457,6 +471,8 @@ public class EstimationService {
 			masterSlab.put("PropertyUsageType", usageSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab,
 					"$.PropertyUsageType[?(@.code=='" + usageType + "')]");
+			if (CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(SWCalculationConstant.UNIT_COST_CONST).toString());
 			charge = charge.multiply(cuttingArea);
