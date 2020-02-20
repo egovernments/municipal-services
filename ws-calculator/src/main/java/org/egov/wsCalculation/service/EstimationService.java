@@ -27,6 +27,7 @@ import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -405,13 +406,17 @@ public class EstimationService {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
-		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null && criteria.getWaterConnection()
-				.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null
+				&& criteria.getWaterConnection().getConnectionType() != null && criteria.getWaterConnection()
+						.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
 		}
+		if(criteria.getWaterConnection().getRoadType() != null)
 		roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
 				criteria.getWaterConnection().getRoadCuttingArea());
+		if(criteria.getWaterConnection().getProperty().getLandArea() != null)
 		roadPlotCharge = getPlotSizeFee(masterData, criteria.getWaterConnection().getProperty().getLandArea());
+		if(criteria.getWaterConnection().getRoadCuttingArea() != null)
 		usageTypeCharge = getUsageTypeFee(masterData, criteria.getWaterConnection().getProperty().getUsageCategory(),
 				criteria.getWaterConnection().getRoadCuttingArea());
 		totalCharge = formFee.add(scrutinyFee).add(otherCharges).add(meterCost).add(roadCuttingCharge)
@@ -460,6 +465,8 @@ public class EstimationService {
 		if(roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='"+roadType+"')]");
+			if(CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
 			charge = charge.multiply(cuttingArea);
@@ -480,6 +487,8 @@ public class EstimationService {
 		if (plotSlab != null) {
 			masterSlab.put("PlotSizeSlab", plotSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.PlotSizeSlab[?(@.from <="+ plotSize +"&& @.to > " + plotSize +")]");
+			if(CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
 		}
@@ -501,6 +510,8 @@ public class EstimationService {
 		if(usageSlab != null) {
 			masterSlab.put("PropertyUsageType", usageSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.PropertyUsageType[?(@.code=='"+usageType+"')]");
+			if(CollectionUtils.isEmpty(filteredMasters))
+				return charge;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
 			charge = charge.multiply(cuttingArea);
