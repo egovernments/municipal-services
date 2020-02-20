@@ -1,6 +1,7 @@
 package org.egov.swService.repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,12 +54,19 @@ public class SewarageDaoImpl implements SewarageDao {
 			RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
-		
+
 		String query = sWQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
-		if(query == null)
-			return sewarageConnectionList;
-		log.info("Sewarage Search Query: " +query);
+		if (query == null)
+			return Collections.emptyList();
+		// if (log.isDebugEnabled()) {
+		StringBuilder str = new StringBuilder("Constructed query is:: ");
+		str.append(query);
+		log.debug(str.toString());
+		// }
 		sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
+		if (sewarageConnectionList == null) {
+			return Collections.emptyList();
+		}
 		return sewarageConnectionList;
 	}
 

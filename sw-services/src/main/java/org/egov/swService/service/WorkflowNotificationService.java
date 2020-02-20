@@ -26,13 +26,14 @@ import org.egov.swService.util.SWConstants;
 import org.egov.swService.util.SewerageServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Service
 @Slf4j
 public class WorkflowNotificationService {
 
@@ -96,26 +97,26 @@ public class WorkflowNotificationService {
 	 * @param requestInfo
 	 * @return EventRequest Object
 	 */
-	private EventRequest getEventRequest(SewerageConnection waterConnection, String topic, RequestInfo requestInfo) {
+	private EventRequest getEventRequest(SewerageConnection sewerageConnection, String topic, RequestInfo requestInfo) {
 		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil
-				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForInApp(waterConnection.getAction(),
-				waterConnection.getApplicationStatus().name(), localizationMessage);
+				.getLocalizationMessages(sewerageConnection.getProperty().getTenantId(), requestInfo);
+		String message = notificationUtil.getCustomizedMsgForInApp(sewerageConnection.getAction(),
+				sewerageConnection.getApplicationStatus().name(), localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
-		waterConnection.getProperty().getOwners().forEach(owner -> {
+		sewerageConnection.getProperty().getOwners().forEach(owner -> {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, waterConnection,
-				message);
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
+				sewerageConnection, message);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo,
-				waterConnection.getProperty().getTenantId());
+				sewerageConnection.getProperty().getTenantId());
 		// Map<String, String> mapOfPhnoAndUUIDs =
 		// waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber,
 		// OwnerInfo::getUuid));
@@ -134,8 +135,8 @@ public class WorkflowNotificationService {
 			// List<String> payTriggerList =
 			// Arrays.asList(config.getPayTriggers().split("[,]"));
 
-			Action action = getActionForEventNotification(mobileNumberAndMesssage, mobile, waterConnection);
-			events.add(Event.builder().tenantId(waterConnection.getProperty().getTenantId())
+			Action action = getActionForEventNotification(mobileNumberAndMesssage, mobile, sewerageConnection);
+			events.add(Event.builder().tenantId(sewerageConnection.getProperty().getTenantId())
 					.description(mobileNumberAndMesssage.get(mobile)).eventType(SWConstants.USREVENTS_EVENT_TYPE)
 					.name(SWConstants.USREVENTS_EVENT_NAME).postedBy(SWConstants.USREVENTS_EVENT_POSTEDBY)
 					.source(Source.WEBAPP).recepient(recepient).eventDetails(null).actions(action).build());
@@ -153,7 +154,7 @@ public class WorkflowNotificationService {
 	 * @param connection
 	 * @return return action link
 	 */
-	private Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage, String mobileNumber,
+	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage, String mobileNumber,
 			SewerageConnection connection) {
 		Action action = null;
 		String code = "";
@@ -271,7 +272,7 @@ public class WorkflowNotificationService {
 	 * @param tenantId
 	 * @return
 	 */
-	private Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
+	public Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
 		Map<String, String> mapOfPhnoAndUUIDs = new HashMap<>();
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());

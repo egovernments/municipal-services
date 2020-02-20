@@ -135,7 +135,7 @@ public class SewarageServiceImpl implements SewarageService {
 
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
-		Map<String, Difference> diffMap = diffService.getDifference(sewarageConnectionRequest, searchResult);
+		diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);

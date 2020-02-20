@@ -144,5 +144,17 @@ public class NotificationUtil {
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
 	}
+	
+	/**
+	 * 
+	 * @param applicationStatus
+	 * @param localizationMessage
+	 * @return In app message template
+	 */
+	public String getCustomizedMsg(String code, String localizationMessage) {
+		String messageString = getMessageTemplate(code, localizationMessage);
+		return messageString;
+	}
+
 
 }
