@@ -738,7 +738,7 @@ public class DemandService {
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).build();
+						.requestInfo(requestInfo).isconnectionCalculation(true).build();
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 			//	log.info("Prepared Statement" + calculationRes.toString());
 				

@@ -391,7 +391,7 @@ public class EstimationService {
 
 		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_FEESLAB_MASTER, null);
 		if (feeSlab == null)
-			throw new CustomException("FEE_SLAB_NOT_FOUND", "fee salb master data not found!!");
+			throw new CustomException("FEE_SLAB_NOT_FOUND", "fee slab master data not found!!");
 		JSONObject feeObj = mapper.convertValue(feeSlab.get(0), JSONObject.class);
 		if (feeObj.get(WSCalculationConstant.FORM_FEE_CONST) != null) {
 			formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.FORM_FEE_CONST).toString());

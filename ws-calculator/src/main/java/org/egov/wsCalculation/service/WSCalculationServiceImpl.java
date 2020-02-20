@@ -250,7 +250,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 				calculationReq.setRequestInfo(requestInfo);
 				calculationReq.setCalculationCriteria(calculationCriteriaList);
-
+				calculationReq.setIsconnectionCalculation(true);
 				getCalculation(calculationReq);
 
 			}

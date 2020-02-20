@@ -29,11 +29,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class CalculationReq   {
+public class CalculationReq  {
 	
 		@JsonProperty("RequestInfo")
 		@NotNull
         private RequestInfo requestInfo;
+		
+		@JsonProperty("isconnectionCalculation")
+		@NotNull
+        private boolean isconnectionCalculation;
 
         @Valid
         @NotNull
