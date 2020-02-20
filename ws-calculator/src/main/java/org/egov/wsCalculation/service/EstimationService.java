@@ -406,8 +406,9 @@ public class EstimationService {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
-		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null && criteria.getWaterConnection()
-				.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null
+				&& criteria.getWaterConnection().getConnectionType() != null && criteria.getWaterConnection()
+						.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
 		}
 		if(criteria.getWaterConnection().getRoadType() != null)
