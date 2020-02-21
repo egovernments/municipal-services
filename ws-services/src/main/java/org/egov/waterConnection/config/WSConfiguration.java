@@ -119,7 +119,7 @@ public class WSConfiguration {
     @Value("${egov.ws.calculation.host}")
     private String calculatorHost;
 
-    @Value("${egov.wc.calculation.endpoint}")
+    @Value("${egov.ws.calculation.endpoint}")
     private String calculateEndpoint;
 
 }
