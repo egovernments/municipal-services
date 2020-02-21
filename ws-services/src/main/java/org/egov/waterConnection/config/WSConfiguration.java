@@ -114,5 +114,12 @@ public class WSConfiguration {
 
     @Value("${egov.user.search.path}")
     private String userSearchEndpoint;
+    
+    // water connection Calculator
+    @Value("${egov.ws.calculation.host}")
+    private String calculatorHost;
+
+    @Value("${egov.wc.calculation.endpoint}")
+    private String calculateEndpoint;
 
 }

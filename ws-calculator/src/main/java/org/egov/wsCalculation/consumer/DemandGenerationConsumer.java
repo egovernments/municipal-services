@@ -63,7 +63,7 @@ public class DemandGenerationConsumer {
 			}
 		});
 		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(requestInfo).build();
+				.requestInfo(requestInfo).isconnectionCalculation(true).build();
 		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
 		log.info("Number of batch records:  " + records.size());
 	}

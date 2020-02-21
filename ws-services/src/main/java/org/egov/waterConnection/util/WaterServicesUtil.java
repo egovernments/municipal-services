@@ -15,6 +15,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.AuditDetails;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.PropertyCriteria;
@@ -40,6 +41,9 @@ public class WaterServicesUtil {
 
 	@Autowired
 	ObjectMapper objectMapper;
+	
+	@Autowired
+	private WSConfiguration config;
 
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -312,5 +316,13 @@ public class WaterServicesUtil {
 	 */
 	public boolean getStatusForUpdate(BusinessService businessService, WaterConnection searchresult) {
 		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
+	}
+	/**
+	 * 
+	 * @return URL of calculator service
+	 */
+	public StringBuilder getCalculatorURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCalculatorHost()).append(config.getCalculateEndpoint());
 	}
 }

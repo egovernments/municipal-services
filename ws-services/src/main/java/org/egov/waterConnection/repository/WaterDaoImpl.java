@@ -71,10 +71,11 @@ public class WaterDaoImpl implements WaterDao {
 
 	@Override
 	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isStateUpdatable) {
-		if (isStateUpdatable)
+		if (isStateUpdatable) {
 			waterConnectionProducer.push(updateWaterConnection, waterConnectionRequest);
-		if (!isStateUpdatable)
+		} else {
 			waterConnectionProducer.push(wsConfiguration.getWorkFlowUpdateTopic(), waterConnectionRequest);
+		}
 	}
 
 	@Override

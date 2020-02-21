@@ -1,4 +1,4 @@
-package org.egov.wsCalculation.model;
+package org.egov.waterConnection.model;
 
 import java.util.List;
 

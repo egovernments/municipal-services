@@ -68,6 +68,9 @@ public class WaterServiceImpl implements WaterService {
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
 	
+	@Autowired
+	private CalculationService calculationService;
+	
 	
 	
 	
@@ -129,6 +132,8 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest);
+		
 		//check for edit and send edit notification
 		diffService.checkDifferenceAndSendEditNotification(waterConnectionRequest, searchResult);
 		//Call workflow

@@ -63,13 +63,26 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	private ServiceRequestRepository repository;
 
 	/**
-	 * Get CalculationReq and Calculate the Tax Head on Water Charge
+	 * Get CalculationReq and Calculate the Tax Head on Water Charge And Estimation Charge
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
-		Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
-				request.getCalculationCriteria().get(0).getTenantId());
-		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, true);
+		List<Calculation> calculations = new ArrayList<>();
+		
+		if (request.getIsconnectionCalculation()) {
+			//Calculate and create demand for connection
+			Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
+					request.getCalculationCriteria().get(0).getTenantId());
+			calculations = getCalculations(request, masterMap);
+			demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, request.getIsconnectionCalculation());
+			unsetWaterConnection(calculations);
+		} else {
+			//Calculate and create demand for application
+			Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
+					request.getCalculationCriteria().get(0).getTenantId());
+			calculations = getFeeCalculation(request, masterData);
+			demandService.generateDemand(request.getRequestInfo(), calculations, masterData, request.getIsconnectionCalculation());
+			unsetWaterConnection(calculations);
+		}
 		return calculations;
 	}
 	
@@ -95,7 +108,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterData, false);
+		unsetWaterConnection(calculations);
 		return calculations;
 	}
 	/**
@@ -289,6 +302,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			calculations.add(calculation);
 		}
 		return calculations;
+	}
+	
+	public void unsetWaterConnection(List<Calculation> calculation) {
+		calculation.forEach(cal -> cal.setWaterConnection(null));
 	}
 	
 }

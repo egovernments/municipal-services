@@ -4,9 +4,9 @@ package org.egov.waterConnection.service;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.constants.WCConstants;
-import org.egov.waterConnection.model.Difference;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.javers.core.Javers;
@@ -35,13 +35,9 @@ public class DiffService {
 	public void checkDifferenceAndSendEditNotification(WaterConnectionRequest request, WaterConnection searchResult) {
 		try {
 			WaterConnection updateConnection = request.getWaterConnection();
-			Difference diff = new Difference();
-			diff.setId(updateConnection.getId());
-			diff.setFieldsChanged(getUpdateFields(updateConnection, searchResult));
-			diff.setClassesAdded(getObjectsAdded(updateConnection, searchResult));
-			diff.setClassesRemoved(getObjectsRemoved(updateConnection, searchResult));
-			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
-					|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+			if (!CollectionUtils.isEmpty(getUpdateFields(updateConnection, searchResult))
+					|| !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
+					|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
 				editNotificationService.sendEditNotification(request);
 			}
 		} catch (Exception ex) {
