@@ -188,7 +188,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 								.id(rs.getString("ownerdocid"))
 								.documentType(rs.getString("ownerdocType"))
 								.fileStoreId(rs.getString("ownerfileStore"))
-								.documentUid(rs.getString("ownerdocuid")).build();
+								.documentUid(rs.getString("ownerdocuid"))
+								.wfState("wfstate").build();
 						ownerInfo.addDocumentsItem(ownerDocument);
 					} catch (SQLException e) {
 						// TODO Auto-generated catch block

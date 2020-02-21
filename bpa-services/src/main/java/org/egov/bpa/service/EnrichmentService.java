@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
 import org.egov.bpa.util.BPAConstants;
@@ -258,6 +259,13 @@ public class EnrichmentService {
 		
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
+		
+		bpa.getDocuments().forEach(doc -> {
+			if(StringUtils.isEmpty(doc.getId())) {
+				doc.setWfState(state);
+			}
+		});
+		
 		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
