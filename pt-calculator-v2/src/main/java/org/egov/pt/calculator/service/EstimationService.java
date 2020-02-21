@@ -849,8 +849,8 @@ public class EstimationService {
 			penalty = getPenalty(taxAmt,timeBasedExemptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER),docDate);
 		}
 
-		calculation.setRebate(rebate);
-		calculation.setPenalty(penalty);
+		calculation.setRebate(rebate.setScale(2, 2).negate());
+		calculation.setPenalty(penalty.setScale(2, 2));
 		calculation.setExemption(BigDecimal.ZERO);
 
 		
