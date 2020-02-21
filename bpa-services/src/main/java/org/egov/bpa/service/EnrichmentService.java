@@ -231,9 +231,11 @@ public class EnrichmentService {
 			
 		}
 		// BPA Documents
+		String state = workflowService.getCurrentState(bpaRequest.getBPA().getStatus(), businessService);
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
 				if (document.getId() == null) {
+					document.setWfState(state);
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
@@ -255,17 +257,8 @@ public class EnrichmentService {
 		BusinessService businessService = workflowService.getBusinessService(
 				bpa.getTenantId(), bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
-		
-		
 
-		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
-		
-		bpa.getDocuments().forEach(doc -> {
-			if(StringUtils.isEmpty(doc.getId())) {
-				doc.setWfState(state);
-			}
-		});
-		
+		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);		
 		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
