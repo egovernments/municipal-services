@@ -42,13 +42,9 @@ public class DiffService {
 			SewerageConnection searchResult) {
 		try {
 			SewerageConnection updateConnection = request.getSewerageConnection();
-			Difference diff = new Difference();
-			diff.setId(updateConnection.getId());
-			diff.setFieldsChanged(getUpdateFields(updateConnection, searchResult));
-			diff.setClassesAdded(getObjectsAdded(updateConnection, searchResult));
-			diff.setClassesRemoved(getObjectsRemoved(updateConnection, searchResult));
-			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
-					|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+			if (!CollectionUtils.isEmpty(getUpdateFields(updateConnection, searchResult))
+					|| !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
+					|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
 				editNotificationService.sendEditNotification(request);
 			}
 		} catch (Exception ex) {

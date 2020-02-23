@@ -1,4 +1,4 @@
-package org.egov.swCalculation.model;
+package org.egov.swService.model;
 
 import java.util.List;
 

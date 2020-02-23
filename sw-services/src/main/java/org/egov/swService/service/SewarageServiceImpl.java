@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-
 @Component
 public class SewarageServiceImpl implements SewarageService {
 
@@ -46,41 +45,45 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Autowired
 	MDMSValidator mDMSValidator;
-	
+
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
-	
+
 	@Autowired
 	private SWConfiguration config;
-	
 
 	@Autowired
 	EnrichmentService enrichmentService;
 
 	@Autowired
 	SewarageDao sewarageDao;
-	
+
 	@Autowired
 	private ActionValidator actionValidator;
-	
+
 	@Autowired
 	private WorkflowService workflowService;
-	
+
 	@Autowired
 	private DiffService diffService;
 
+	@Autowired
+	private CalculationService calculationService;
+
 	/**
-	 * @param sewarageConnectionRequest SewarageConnectionRequest contains sewarage connection to be created
+	 * @param sewarageConnectionRequest
+	 *            SewarageConnectionRequest contains sewarage connection to be
+	 *            created
 	 * @return List of WaterConnection after create
 	 */
 
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
-	//	mDMSValidator.validateMasterData(sewarageConnectionRequest);
+		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
-		//call work-flow
+		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
 			wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
@@ -88,7 +91,9 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param criteria SewarageConnectionSearchCriteria contains search criteria on sewarage connection
+	 * @param criteria
+	 *            SewarageConnectionSearchCriteria contains search criteria on
+	 *            sewarage connection
 	 * @param requestInfo
 	 * @return List of matching sewarage connection
 	 */
@@ -96,19 +101,20 @@ public class SewarageServiceImpl implements SewarageService {
 		List<SewerageConnection> sewarageConnectionList;
 		sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
 		validateProperty.validatePropertyForConnection(sewarageConnectionList);
-		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo,criteria);
+		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo, criteria);
 		return sewarageConnectionList;
 	}
 
 	/**
 	 * 
-	 * @param criteria SewarageConnectionSearchCriteria contains search criteria on sewarage connection
+	 * @param criteria
+	 *            SewarageConnectionSearchCriteria contains search criteria on
+	 *            sewarage connection
 	 * @param requestInfo
 	 * @return List of matching water connection
 	 */
-	
-	public List<SewerageConnection> getSewerageConnectionsList(SearchCriteria criteria,
-			RequestInfo requestInfo) {
+
+	public List<SewerageConnection> getSewerageConnectionsList(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewerageConnectionList = sewarageDao.getSewerageConnectionList(criteria, requestInfo);
 		if (sewerageConnectionList.isEmpty())
 			return Collections.emptyList();
@@ -117,7 +123,9 @@ public class SewarageServiceImpl implements SewarageService {
 
 	/**
 	 * 
-	 * @param sewarageConnectionRequest SewarageConnectionRequest contains sewarage connection to be updated
+	 * @param sewarageConnectionRequest
+	 *            SewarageConnectionRequest contains sewarage connection to be
+	 *            updated
 	 * @return List of SewarageConnection after update
 	 */
 
@@ -130,11 +138,11 @@ public class SewarageServiceImpl implements SewarageService {
 				sewarageConnectionRequest.getRequestInfo());
 		SewerageConnection searchResult = getConnectionForUpdateRequest(
 				sewarageConnectionRequest.getSewerageConnection().getId(), sewarageConnectionRequest.getRequestInfo());
-
 		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
-
-		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
+		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
+		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
+		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
 		diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
@@ -143,7 +151,7 @@ public class SewarageServiceImpl implements SewarageService {
 		sewarageDao.updateSewerageConnection(sewarageConnectionRequest, isStateUpdatable);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
 	}
-	
+
 	/**
 	 * Search Sewerage connection to be update
 	 * 

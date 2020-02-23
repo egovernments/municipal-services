@@ -106,5 +106,12 @@ public class SWConfiguration {
 
     @Value("${egov.user.search.path}")
     private String userSearchEndpoint;
+    
+    // sewerage connection Calculator
+    @Value("${egov.sw.calculation.host}")
+    private String calculatorHost;
+
+    @Value("${egov.sw.calculation.endpoint}")
+    private String calculateEndpoint;
 
 }

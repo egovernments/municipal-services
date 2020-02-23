@@ -1,4 +1,4 @@
-package org.egov.swCalculation.model;
+package org.egov.swService.model;
 
 import java.math.BigDecimal;
 import java.util.List;

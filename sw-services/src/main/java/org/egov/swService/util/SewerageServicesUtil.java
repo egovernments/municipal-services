@@ -13,6 +13,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.AuditDetails;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.PropertyCriteria;
@@ -38,6 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 public class SewerageServicesUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
+	
+	@Autowired
+	private SWConfiguration config;
 
 	@Value("${egov.property.service.host}")
 	private String propertyHost;
@@ -294,6 +298,15 @@ public class SewerageServicesUtil {
 	
 	public boolean getStatusForUpdate(BusinessService businessService, SewerageConnection searchresult) {
 		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
+	}
+	
+	/**
+	 * 
+	 * @return URL of calculator service
+	 */
+	public StringBuilder getCalculatorURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCalculatorHost()).append(config.getCalculateEndpoint());
 	}
 
 }

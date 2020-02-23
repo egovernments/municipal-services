@@ -34,7 +34,7 @@ public class SewarageDaoImpl implements SewarageDao {
 
 	@Autowired
 	SewerageRowMapper sewarageRowMapper;
-	
+
 	@Autowired
 	private SWConfiguration swConfiguration;
 
@@ -50,8 +50,7 @@ public class SewarageDaoImpl implements SewarageDao {
 	}
 
 	@Override
-	public List<SewerageConnection> getSewerageConnectionList(SearchCriteria criteria,
-			RequestInfo requestInfo) {
+	public List<SewerageConnection> getSewerageConnectionList(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 
@@ -80,12 +79,13 @@ public class SewarageDaoImpl implements SewarageDao {
 		return n;
 	}
 
-	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isStateUpdatable) {
-		if (isStateUpdatable)
+	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,
+			boolean isStateUpdatable) {
+		if (isStateUpdatable) {
 			sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
-		if (!isStateUpdatable)
+		} else {
 			sewarageConnectionProducer.push(swConfiguration.getWorkFlowUpdateTopic(), sewerageConnectionRequest);
+		}
 	}
-
 
 }
