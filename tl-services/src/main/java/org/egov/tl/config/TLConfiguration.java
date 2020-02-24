@@ -91,6 +91,7 @@ public class TLConfiguration {
     @Value("${egov.idgen.bpa.licensenumber.format}")
     private String licenseNumberIdgenFormatBPA;
 
+// changes in the stakeholder license number format
     @Value("${egov.idgen.bpa.englicensenumber.format}")
     private String engLicenseNumberIdgenFormatBPA;
 

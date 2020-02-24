@@ -437,9 +437,7 @@ public class EnrichmentService {
                     break;
 
                 case businessService_BPA:
-                	String licenseType = request.getLicenses().get(0)
-					.getTradeLicenseDetail().getTradeUnits().get(0)
-					.getTradeType().split("\\.")[0];
+                	String licenseType = request.getLicenses().get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType().split("\\.")[0];
 			if (licenseType.equalsIgnoreCase("ENGINEER")) {
 				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getEngLicenseNumberIdgenFormatBPA(), count);
 			}
