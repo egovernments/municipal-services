@@ -437,8 +437,28 @@ public class EnrichmentService {
                     break;
 
                 case businessService_BPA:
-                    licenseNumbers=getIdList(requestInfo, tenantId, config.getLicenseNumberIdgenNameBPA(), config.getLicenseNumberIdgenFormatBPA(), count);
-                    break;
+                	String licenseType = request.getLicenses().get(0)
+					.getTradeLicenseDetail().getTradeUnits().get(0)
+					.getTradeType().split("\\.")[0];
+			if (licenseType.equalsIgnoreCase("ENGINEER")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getEngLicenseNumberIdgenFormatBPA(), count);
+			}
+			else if (licenseType.equalsIgnoreCase("STRUCTURALENGINEER")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getStrLicenseNumberIdgenFormatBPA(), count);
+			}
+			else if (licenseType.equalsIgnoreCase("BUILDER")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getBldLicenseNumberIdgenFormatBPA(), count);
+			}
+			else if (licenseType.equalsIgnoreCase("SUPERVISOR")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getSupLicenseNumberIdgenFormatBPA(), count);
+			}
+			else if (licenseType.equalsIgnoreCase("TOWNPLANNER")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getTpLicenseNumberIdgenFormatBPA(), count);
+			}
+			else if (licenseType.equalsIgnoreCase("ARCHITECT")) {
+				licenseNumbers = getIdList(requestInfo, tenantId,config.getLicenseNumberIdgenNameBPA(),config.getArctLicenseNumberIdgenFormatBPA(), count);
+			}
+               
             }
             ListIterator<String> itr = licenseNumbers.listIterator();
 
