@@ -3,7 +3,6 @@ package org.egov.wsCalculation.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,8 +18,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.constants.WSCalculationConstant;
-import org.egov.wsCalculation.model.Assessment;
 import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
@@ -41,7 +40,6 @@ import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
 import org.egov.wsCalculation.util.WSCalculationUtil;
-import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -104,20 +102,16 @@ public class DemandService {
 	 */
 	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNo) {
-		List<Demand> createdDemands = new ArrayList<>();
-		// List that will contain Calculation for new demands
-		List<Calculation> createCalculations = new LinkedList<>();
-
-		
 		@SuppressWarnings("unchecked")
 		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
 				.get(WSCalculationConstant.BillingPeriod);
 		Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
 		Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 		
+		// List that will contain Calculation for new demands
+				List<Calculation> createCalculations = new LinkedList<>();
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
-
 		if (!CollectionUtils.isEmpty(calculations)) {
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
@@ -149,7 +143,7 @@ public class DemandService {
 					updateCalculations.add(calculation);
 			}
 		}
-
+		List<Demand> createdDemands = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(createCalculations))
 			createdDemands = createDemand(requestInfo, createCalculations, masterMap, isForConnectionNo);
 
@@ -361,22 +355,14 @@ public class DemandService {
 	 */
 	private List<Demand> searchDemand(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo,
 			RequestInfo requestInfo) {
-		String uri = getDemandSearchURL(tenantId, consumerCodes, taxPeriodFrom, taxPeriodTo);
-		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+		Object result = serviceRequestRepository.fetchResult(
+				getDemandSearchURL(tenantId, consumerCodes, taxPeriodFrom, taxPeriodTo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-
-		DemandResponse response;
 		try {
-			response = mapper.convertValue(result, DemandResponse.class);
+			return mapper.convertValue(result, DemandResponse.class).getDemands();
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
 		}
-
-		if (CollectionUtils.isEmpty(response.getDemands()))
-			return null;
-
-		else
-			return response.getDemands();
 
 	}
 	
@@ -389,27 +375,19 @@ public class DemandService {
 	 * @param requestInfo
 	 * @return List of Demand
 	 */
-	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCodes,RequestInfo requestInfo) {
-		String uri = getDemandSearchURLForUpdate();
+	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCodes,
+			RequestInfo requestInfo) {
+		String uri = getDemandSearchURLForUpdate().toString();
 		uri = uri.replace("{1}", tenantId);
 		uri = uri.replace("{2}", configs.getBusinessService());
 		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-
-		DemandResponse response;
 		try {
-			response = mapper.convertValue(result, DemandResponse.class);
+			return mapper.convertValue(result, DemandResponse.class).getDemands();
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
 		}
-
-		if (CollectionUtils.isEmpty(response.getDemands()))
-			return null;
-
-		else
-			return response.getDemands();
-
 	}
 
 	
@@ -418,7 +396,7 @@ public class DemandService {
 	 * 
 	 * @return demand search url
 	 */
-	public String getDemandSearchURLForUpdate() {
+	public StringBuilder getDemandSearchURLForUpdate() {
 		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
 		url.append(configs.getDemandSearchEndPoint());
 		url.append("?");
@@ -430,7 +408,7 @@ public class DemandService {
 		url.append("&");
 		url.append("consumerCode=");
 		url.append("{3}");
-		return url.toString();
+		return url;
 	}
 	/**
 	 * Creates demand Search url based on tenanatId,businessService, period from, period to and
@@ -438,7 +416,7 @@ public class DemandService {
 	 * 
 	 * @return demand search url
 	 */
-	public String getDemandSearchURL(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo) {
+	public StringBuilder getDemandSearchURL(String tenantId, Set<String> consumerCodes, Long taxPeriodFrom, Long taxPeriodTo) {
 		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
 		String businessService = taxPeriodFrom == null  ? WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD : configs.getBusinessService();
 		url.append(configs.getDemandSearchEndPoint());
@@ -461,7 +439,7 @@ public class DemandService {
 			url.append("periodTo=");
 			url.append(taxPeriodTo.toString());
 		}
-		return url.toString();
+		return url;
 	}
 
 	/**
@@ -538,8 +516,7 @@ public class DemandService {
 		 * Call demand update in bulk to update the interest or penalty
 		 */
 		DemandRequest request = DemandRequest.builder().demands(demandsToBeUpdated).requestInfo(requestInfo).build();
-		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
-		repository.fetchResult(updateDemandUrl, request);
+		repository.fetchResult(utils.getUpdateDemandUrl(), request);
 		return res.getDemands();
 
 	}
@@ -570,9 +547,7 @@ public class DemandService {
 				throw new CustomException("INVALID_DEMAND_UPDATE", "No demand exists for Number: "
 						+ consumerCodes.toString());
 			Demand demand = searchResult.get(0);
-			List<DemandDetail> demandDetails = demand.getDemandDetails();
-			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation, demandDetails);
-			demand.setDemandDetails(updatedDemandDetails);
+			demand.setDemandDetails(getUpdatedDemandDetails(calculation, demand.getDemandDetails()));
 			demands.add(demand);
 		}
 
@@ -704,13 +679,11 @@ public class DemandService {
 		user.setTenantId(tenantId);
 		requestInfo.setUserInfo(user);
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
-		String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
-		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
-		Object res = repository.fetchResult(url, mdmsCriteriaReq);
-		ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
+		Object res = repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), mdmsCriteriaReq);
 		if (res == null) {
 			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
 		}
+		ArrayList<?> mdmsResponse = JsonPath.read(res, WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
 		generateDemandForULB(mdmsResponse, requestInfo, tenantId);
 	}
 
@@ -724,27 +697,24 @@ public class DemandService {
 	public void generateDemandForULB(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenantId) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
-		String connectionType = WSCalculationConstant.nonMeterdConnection;
-		int demandGenerateDateMillis = (int) master.get(WSCalculationConstant.Demand_Generate_Date_String);
-		String billingFrequency = (String) master.get(WSCalculationConstant.Billing_Cycle_String);
-		long startDay = ((demandGenerateDateMillis) / 86400000);
-		boolean isTriggerEnable = isCurrentDateIsMatching(billingFrequency, startDay);
-		
-			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId, connectionType);
-			String assessmentYear = estimationService.getAssessmentYear();
-			for (String connectionNo : connectionNos) {
-				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId).assessmentYear(assessmentYear)
-						.connectionNo(connectionNo).build();
-				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-				calculationCriteriaList.add(calculationCriteria);
-				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).isconnectionCalculation(true).build();
-				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-			//	log.info("Prepared Statement" + calculationRes.toString());
-				
-			
-			}
-		
+		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
+		boolean isTriggerEnable = isCurrentDateIsMatching(
+				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay);
+		List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
+				WSCalculationConstant.nonMeterdConnection);
+		String assessmentYear = estimationService.getAssessmentYear();
+		for (String connectionNo : connectionNos) {
+			CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+					.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
+			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+			calculationCriteriaList.add(calculationCriteria);
+			CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+					.requestInfo(requestInfo).isconnectionCalculation(true).build();
+			wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+			// log.info("Prepared Statement" + calculationRes.toString());
+
+		}
+
 	}
 
 	/**
@@ -760,15 +730,15 @@ public class DemandService {
 		} else if (billingFrequency.equalsIgnoreCase(WSCalculationConstant.Quaterly_Billing_Period)) {
 			return false;
 		}
-		return true;
+		return false;
 	}
 	
 	public boolean fetchBill(List<Demand> demandResponse, RequestInfo requestInfo) {
 		boolean notificationSent = false;
 		for (Demand demand : demandResponse) {
 			try {
-				String uri = calculatorUtils.getFetchBillURL(demand.getTenantId(), demand.getConsumerCode()).toString();
-				Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+				Object result = serviceRequestRepository.fetchResult(
+						calculatorUtils.getFetchBillURL(demand.getTenantId(), demand.getConsumerCode()),
 						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 				HashMap<String, Object> billResponse = new HashMap<>();
 				billResponse.put("requestInfo", requestInfo);
@@ -776,8 +746,7 @@ public class DemandService {
 				wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
 				notificationSent = true;
 			} catch (Exception ex) {
-				log.error("Fetch Bill Error");
-				ex.printStackTrace();
+				log.error("Fetch Bill Error", ex);
 			}
 		}
 		return notificationSent;

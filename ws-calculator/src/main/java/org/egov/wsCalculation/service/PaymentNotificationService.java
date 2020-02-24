@@ -3,17 +3,13 @@ package org.egov.wsCalculation.service;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -23,7 +19,6 @@ import org.egov.wsCalculation.model.Action;
 import org.egov.wsCalculation.model.ActionItem;
 import org.egov.wsCalculation.model.Event;
 import org.egov.wsCalculation.model.EventRequest;
-import org.egov.wsCalculation.model.OwnerInfo;
 import org.egov.wsCalculation.model.Recepient;
 import org.egov.wsCalculation.model.SMSRequest;
 import org.egov.wsCalculation.model.Source;
@@ -106,9 +101,9 @@ public class PaymentNotificationService {
 								"Water Connection are not present for " + mappedRecord.get(consumerCode)
 										+ " connection no");
 					}
-					List<SMSRequest> smsRequests = new LinkedList<>();
+					List<SMSRequest> smsRequests = null;
 					smsRequests = getSmsRequest(mappedRecord, waterConnection, topic, requestInfo);
-					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+					if (!CollectionUtils.isEmpty(smsRequests)) {
 						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
@@ -116,7 +111,7 @@ public class PaymentNotificationService {
 			}
 
 		} catch (Exception ex) {
-			log.error(ex.toString());
+			log.error("", ex);
 			log.error("Error occured while processing the record from topic : " + topic);
 		}
 	}
@@ -131,7 +126,6 @@ public class PaymentNotificationService {
 	 */
 	private EventRequest getEventRequest(HashMap<String, String> mappedRecord, WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
-		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForInApp(topic, localizationMessage);
 		if (message == null) {
@@ -154,6 +148,7 @@ public class PaymentNotificationService {
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
+		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
 			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
@@ -196,7 +191,6 @@ public class PaymentNotificationService {
 	 */
 	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
-		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = notificationUtil.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForSMS(topic, localizationMessage);
 		if (message == null) {
@@ -210,6 +204,7 @@ public class PaymentNotificationService {
 		});
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
+		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			if (messg.contains("<Link to Bill>")) {
 				String actionLink = config.getSmsNotificationLink()
@@ -250,20 +245,18 @@ public class PaymentNotificationService {
 	 * @return
 	 */
 	public HashMap<String, String> mapRecords(DocumentContext context) {
-		HashMap<String, String> mappedRecord = new HashMap<>();
 		try {
-			DateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			HashMap<String, String> mappedRecord = new HashMap<>();
 			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
 			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
 			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
 			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
+			return mappedRecord;
 		} catch (Exception ex) {
-			ex.printStackTrace();
-	            throw new CustomException("Bill Fetch Error","Unable to fetch values from bill");
+			log.error("", ex);
+			throw new CustomException("Bill Fetch Error","Unable to fetch values from bill");
 		}
-
-		return mappedRecord;
 	}
 	
 	private String getLatestBillDetails(String billdetails) {

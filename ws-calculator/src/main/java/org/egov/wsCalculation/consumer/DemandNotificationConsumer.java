@@ -31,17 +31,21 @@ public class DemandNotificationConsumer {
 	 */
 	@KafkaListener(topics = { "${ws.calculator.demand.successful}", "${ws.calculator.demand.failed}" })
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-		DemandNotificationObj notificationObj = new DemandNotificationObj();
+		DemandNotificationObj notificationObj = null;
 		try {
 			log.info("Consuming record: " + request);
 			notificationObj = mapper.convertValue(request, DemandNotificationObj.class);
+			StringBuilder builder = new StringBuilder();
+			builder.append("Demand Notification Object Received: Billing Cycle ")
+					.append((notificationObj.getBillingCycle() == null ? "" : notificationObj.getBillingCycle()))
+					.append(" Demand Generated Successfully :  ")
+					.append(notificationObj.isSuccess() + " Water Connection List :")
+					.append((notificationObj.getWaterConnectionIds() == null ? ""
+							: notificationObj.getWaterConnectionIds().toString()));
+			log.info(builder.toString());
+			notificationService.process(notificationObj, topic);
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + request + " on topic: " + topic + ": " + e);
 		}
-		log.info("Demand Notification Object Received: Billing Cycle " + (notificationObj.getBillingCycle() == null ? ""
-				: notificationObj.getBillingCycle()) + " Demand Generated Successfully :  " + notificationObj.isSuccess()
-						+ " Water Connection List :" + (notificationObj.getWaterConnectionIds() == null ? ""
-								: notificationObj.getWaterConnectionIds().toString()));
-		notificationService.process(notificationObj, topic);
 	}
 }

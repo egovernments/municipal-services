@@ -108,9 +108,7 @@ public class CalculatorUtil {
 	 */
     public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId){
         ObjectMapper mapper = new ObjectMapper();
-    	String url = getWaterSearchURL();
-        url = url.replace("{1}",tenantId).replace("{2}",connectionNo);
-        Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
+        Object result =serviceRequestRepository.fetchResult(getWaterSearchURL(tenantId, connectionNo) ,RequestInfoWrapper.builder().
                 requestInfo(requestInfo).build());
 
         WaterConnectionResponse response =null;
@@ -132,16 +130,16 @@ public class CalculatorUtil {
      * Creates waterConnection search url based on tenantId and connectionNumber
      * @return water search url
      */
-	private String getWaterSearchURL() {
+	private StringBuilder getWaterSearchURL(String tenantId, String connectionNo) {
 		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
 		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
 		url.append("?");
 		url.append("tenantId=");
-		url.append("{1}");
+		url.append(tenantId);
 		url.append("&");
 		url.append("connectionNumber=");
-		url.append("{2}");
-		return url.toString();
+		url.append(connectionNo);
+		return url;
 	}
 	
 	
@@ -155,20 +153,18 @@ public class CalculatorUtil {
 	public WaterConnection getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
 			String tenantId) {
 		ObjectMapper mapper = new ObjectMapper();
-		String url = getWaterSearchURL(searchCriteria);
-		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
+		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(searchCriteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		WaterConnectionResponse response = null;
+
 		try {
+			WaterConnectionResponse response = null;
 			response = mapper.convertValue(result, WaterConnectionResponse.class);
+			if (CollectionUtils.isEmpty(response.getWaterConnection()))
+				return null;
+			return response.getWaterConnection().get(0);
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Error while parsing response of Water Connection Search");
 		}
-
-		if (response == null || CollectionUtils.isEmpty(response.getWaterConnection()))
-			return null;
-
-		return response.getWaterConnection().get(0);
 	}
     
     
@@ -176,7 +172,7 @@ public class CalculatorUtil {
      * Creates waterConnection search url based on tenantId and connectionNumber
      * @return water search url
      */
-	private String getWaterSearchURL(SearchCriteria searchCriteria) {
+	private StringBuilder getWaterSearchURL(SearchCriteria searchCriteria) {
 		StringBuilder url = new StringBuilder(calculationConfig.getWaterConnectionHost());
 		url.append(calculationConfig.getWaterConnectionSearchEndPoint());
 		url.append("?");
@@ -189,7 +185,7 @@ public class CalculatorUtil {
 			url.append("&");
 			url.append("applicationNumber=" + searchCriteria.getApplicationNumber());
 		}
-		return url.toString();
+		return url;
 	}
 	
 	

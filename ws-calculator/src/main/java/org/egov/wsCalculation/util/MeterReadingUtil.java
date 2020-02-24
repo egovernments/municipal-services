@@ -13,9 +13,7 @@ import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingResponse;
-import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,25 +21,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 public class MeterReadingUtil {
 
-	private ServiceRequestRepository serviceRequestRepository;
 	
 	@Autowired
 	private WSCalculationConfiguration config;
 
-
-	@Autowired
-	public MeterReadingUtil(ServiceRequestRepository serviceRequestRepository) {
-		this.serviceRequestRepository = serviceRequestRepository;
-
-	}
-
 	public MeterConnectionRequest getMeterReadingRequest(RequestInfo requestInfo, MeterReading meterReading) {
-		MeterConnectionRequest meterConnectionRequest = MeterConnectionRequest.builder().requestInfo(requestInfo)
-				.meterReading(meterReading).build();
-		return meterConnectionRequest;
+		return MeterConnectionRequest.builder().requestInfo(requestInfo).meterReading(meterReading).build();
 	}
 
 	public StringBuilder getDemandGenerationCreateURL() {

@@ -23,7 +23,6 @@ import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
 
 @Slf4j
 @Component
@@ -42,8 +41,6 @@ public class MDMSValidator {
 	private String mdmsEndpoint;
 
 	public void validateMasterData(MeterConnectionRequest request) {
-		Map<String, String> errorMap = new HashMap<>();
-
 		String jsonPath = MRConstants.JSONPATH_ROOT;
 		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 
@@ -52,29 +49,19 @@ public class MDMSValidator {
 		Map<String, List<String>> codes = getAttributeValues(tenantId, MRConstants.MDMS_WC_MOD_NAME, names,
 				"$.*.billingCycle", jsonPath, request.getRequestInfo());
 		validateMDMSData(masterNames, codes);
-		validateCodes(request.getMeterReading(), codes, errorMap);
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
+		validateCodes(request.getMeterReading(), codes);
+		
 	}
 	
 	public Object validateMasterDataWithoutFilter(String tenentId) {
-		Map<String, String> errorMap = new HashMap<>();
-		
 		RequestInfo requestInfo = new RequestInfo();
-		User user= new User();
+		User user = new User();
 		user.setTenantId(tenentId);
 		requestInfo.setUserInfo(user);
-		String jsonPath = MRConstants.JSONPATH_ROOT;
-
 		String[] masterNames = { MRConstants.MDMS_MS_BILLING_PERIOD };
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-
-		
-		Object mdmsJsonForBillingPeriod = getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",jsonPath, requestInfo);
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		
-		return mdmsJsonForBillingPeriod;
+		return getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",
+				MRConstants.JSONPATH_ROOT, requestInfo);
 	}
 	
 
@@ -104,14 +91,15 @@ public class MDMSValidator {
 			throw new CustomException(errorMap);
 	}
 
-	private static Map<String, String> validateCodes(MeterReading meterReading, Map<String, List<String>> codes,
-			Map<String, String> errorMap) {
+	private  void validateCodes(MeterReading meterReading, Map<String, List<String>> codes) {
+		Map<String, String> errorMap = new HashMap<>();
 		if (!codes.get(MRConstants.MDMS_MS_BILLING_PERIOD).contains(meterReading.getBillingPeriod())
 				&& meterReading.getBillingPeriod() != null) {
 			errorMap.put("INVALID BILLING PERIOD",
 					"The Billing period" + meterReading.getBillingPeriod() + " does not exist");
 		}
-		return errorMap;
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
 	}
 	
 	private Object getAttributeValuesWithoutFilter(String tenantId, String moduleName, List<String> names,

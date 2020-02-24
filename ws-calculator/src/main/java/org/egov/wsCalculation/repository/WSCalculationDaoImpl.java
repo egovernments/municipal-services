@@ -1,15 +1,16 @@
 package org.egov.wsCalculation.repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.egov.wsCalculation.builder.WSCalculatorQueryBuilder;
 import org.egov.wsCalculation.model.MeterConnectionRequest;
 import org.egov.wsCalculation.model.MeterReading;
 import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.producer.WSCalculationProducer;
-import org.egov.wsCalculation.builder.WSCalculatorQueryBuilder;
 import org.egov.wsCalculation.rowmapper.DemandSchedulerRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingCurrentReadingRowMapper;
 import org.egov.wsCalculation.rowmapper.MeterReadingRowMapper;
@@ -25,23 +26,22 @@ import lombok.extern.slf4j.Slf4j;
 public class WSCalculationDaoImpl implements WSCalculationDao {
 
 	@Autowired
-	WSCalculationProducer wSCalculationProducer;
+	private WSCalculationProducer wSCalculationProducer;
 
 	@Autowired
-	WSCalculatorQueryBuilder queryBuilder;
+	private WSCalculatorQueryBuilder queryBuilder;
 
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	MeterReadingRowMapper meterReadingRowMapper;
+	private MeterReadingRowMapper meterReadingRowMapper;
 	
 	@Autowired
-	MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
-	
+	private MeterReadingCurrentReadingRowMapper currentMeterReadingRowMapper;
 	
 	@Autowired
-	DemandSchedulerRowMapper demandSchedulerRowMapper;
+	private DemandSchedulerRowMapper demandSchedulerRowMapper;
 	
 
 	@Value("${egov.meterservice.createmeterconnection}")
@@ -67,27 +67,23 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria) {
 		List<Object> preparedStatement = new ArrayList<>();
-		List<MeterReading> listOfMeterReadings = new ArrayList<>();
 		String query = queryBuilder.getSearchQueryString(criteria, preparedStatement);
 		if(query == null)
-			return listOfMeterReadings;
+			Collections.emptyList();
 		log.info("Query: " + query);
 		log.info("Prepared Statement" + preparedStatement.toString());
-		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
-		return listOfMeterReadings;
+		return jdbcTemplate.query(query, preparedStatement.toArray(), meterReadingRowMapper);
 	}
 	
 	@Override
 	public List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria) {
 		List<Object> preparedStatement = new ArrayList<>();
-		List<MeterReading> listOfMeterReadings = new ArrayList<>();
 		String query = queryBuilder.getCurrentReadingConnectionQuery(criteria, preparedStatement);
 		if (query == null)
-			return listOfMeterReadings;
+			return Collections.emptyList();
 		log.info("Query: " + query);
 		log.info("Prepared Statement" + preparedStatement.toString());
-		listOfMeterReadings = jdbcTemplate.query(query, preparedStatement.toArray(), currentMeterReadingRowMapper);
-		return listOfMeterReadings;
+		return jdbcTemplate.query(query, preparedStatement.toArray(), currentMeterReadingRowMapper);
 	}
 
 	/**
@@ -100,13 +96,11 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 
 	@Override
 	public int isMeterReadingConnectionExist(List<String> ids) {
-		int n = 0;
 		Set<String> connectionIds = new HashSet<>(ids);
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getNoOfMeterReadingConnectionQuery(connectionIds, preparedStatement);
 		log.info("Query: " + query);
-		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
-		return n;
+		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 	}
 	
 	@Override
@@ -135,31 +129,25 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	
 	@Override
 	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
-		List<String> connectionNosList = new ArrayList<>();
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
 		log.info("water " + connectionType + " connection list : " + query);
-		connectionNosList = jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
-		return connectionNosList;
+		return jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 	}
 
 	@Override
 	public List<String> getTenantId() {
-		ArrayList<String> tenentIds = new ArrayList<>();
 		String query = queryBuilder.getDistinctTenantIds();
 		log.info("Tenant Id's List Query : " + query);
-		tenentIds = (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
-		return tenentIds;
+		return (ArrayList<String>) jdbcTemplate.queryForList(query, String.class);
 	}
 	
 	@Override
 	public int isBillingPeriodExists(String connectionNo, String billingPeriod) {
-		int n = 0;
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.isBillingPeriodExists(connectionNo, billingPeriod, preparedStatement);
 		log.info("Is BillingPeriod Exits Query: " + query);
-		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
-		return n;
+		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 	}
 
 }

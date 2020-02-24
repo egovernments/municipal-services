@@ -1,16 +1,17 @@
 package org.egov.wsCalculation.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.Demand;
 import org.egov.wsCalculation.model.DemandRequest;
 import org.egov.wsCalculation.model.DemandResponse;
-import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Repository
@@ -38,14 +39,12 @@ public class DemandRepository {
         url.append(config.getDemandCreateEndPoint());
         DemandRequest request = new DemandRequest(requestInfo,demands);
         Object result = serviceRequestRepository.fetchResult(url,request);
-        DemandResponse response = null;
         try{
-            response = mapper.convertValue(result,DemandResponse.class);
+           return  mapper.convertValue(result,DemandResponse.class).getDemands();
         }
         catch(IllegalArgumentException e){
             throw new CustomException("PARSING ERROR","Failed to parse response of create demand");
         }
-        return response.getDemands();
     }
 
 
@@ -60,15 +59,12 @@ public class DemandRepository {
         url.append(config.getDemandUpdateEndPoint());
         DemandRequest request = new DemandRequest(requestInfo,demands);
         Object result = serviceRequestRepository.fetchResult(url,request);
-        DemandResponse response = null;
         try{
-            response = mapper.convertValue(result,DemandResponse.class);
+            return mapper.convertValue(result,DemandResponse.class).getDemands();
         }
         catch(IllegalArgumentException e){
             throw new CustomException("PARSING ERROR","Failed to parse response of update demand");
         }
-        return response.getDemands();
-
     }
 
 

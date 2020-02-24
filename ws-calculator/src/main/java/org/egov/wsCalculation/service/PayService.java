@@ -150,7 +150,7 @@ public class PayService {
 
 		if (rate == null)
 			applicablePenalty = flatAmt.compareTo(waterCharge) > 0 ? BigDecimal.ZERO : flatAmt;
-		else if (rate != null) {
+		else {
 			// rate of penalty
 			applicablePenalty = waterCharge.multiply(rate.divide(WSCalculationConstant.HUNDRED));
 		}
@@ -189,7 +189,7 @@ public class PayService {
 
 		if (rate == null)
 			applicableInterest = flatAmt.compareTo(waterCharge) > 0 ? BigDecimal.ZERO : flatAmt;
-		else if (rate != null) {
+		else{
 			// rate of interest
 			applicableInterest = waterCharge.multiply(rate.divide(WSCalculationConstant.HUNDRED));
 		}

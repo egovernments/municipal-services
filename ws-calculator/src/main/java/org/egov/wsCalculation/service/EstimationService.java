@@ -3,6 +3,7 @@ package org.egov.wsCalculation.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +29,7 @@ import org.egov.wsCalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -82,8 +84,7 @@ public class EstimationService {
 				(JSONArray) (masterData.getOrDefault(WSCalculationConstant.WC_WATER_CESS_MASTER, null)));
 //		mDataService.setWaterConnectionMasterValues(requestInfo, tenantId, billingSlabMaster,
 //				timeBasedExemptionMasterMap);
-		BigDecimal waterCharge = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, billingSlabIds, requestInfo);
-		taxAmt = waterCharge;
+		taxAmt = getWaterEstimationCharge(waterConnection, criteria, billingSlabMaster, billingSlabIds, requestInfo);
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(taxAmt,
 				criteria.getWaterConnection(), timeBasedExemptionMasterMap,
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -107,7 +108,6 @@ public class EstimationService {
 			WaterConnection connection,
 			Map<String, JSONArray> timeBasedExemeptionMasterMap, RequestInfoWrapper requestInfoWrapper) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
-		String assesmentYear = WSCalculationConstant.Assesment_Year;
 		// water_charge
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CHARGE)
 				.estimateAmount(waterCharge.setScale(2, 2)).build());
@@ -117,7 +117,7 @@ public class EstimationService {
 			List<Object> waterCessMasterList = timeBasedExemeptionMasterMap
 					.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
 			BigDecimal waterCess;
-			waterCess = waterCessUtil.getWaterCess(waterCharge, assesmentYear, waterCessMasterList);
+			waterCess = waterCessUtil.getWaterCess(waterCharge, WSCalculationConstant.Assesment_Year, waterCessMasterList);
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
 					.estimateAmount(waterCess).build());
 		}
@@ -255,7 +255,7 @@ public class EstimationService {
 		LocalDateTime localDateTime = LocalDateTime.now();
 		int currentMonth = localDateTime.getMonthValue();
 		String assesmentYear = "";
-		if (currentMonth >= 4) {
+		if (currentMonth >= Month.APRIL.getValue()) {
 			assesmentYear = Integer.toString(YearMonth.now().getYear()) + "-";
 			assesmentYear = assesmentYear
 					+ (Integer.toString(YearMonth.now().getYear() + 1).substring(2, assesmentYear.length() - 1));
@@ -346,15 +346,14 @@ public class EstimationService {
 	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo,
 			Map<String, Object> masterData) {
 		WaterConnection waterConnection = null;
-		String tenantId = requestInfo.getUserInfo().getTenantId();
-		if (criteria.getWaterConnection() == null && !criteria.getApplicationNo().isEmpty()) {
+		if (StringUtils.isEmpty(criteria.getWaterConnection()) && !StringUtils.isEmpty(criteria.getApplicationNo())) {
 			SearchCriteria searchCriteria = new SearchCriteria();
 			searchCriteria.setApplicationNumber(criteria.getApplicationNo());
 			searchCriteria.setTenantId(criteria.getTenantId());
-			waterConnection = calculatorUtil.getWaterConnectionOnApplicationNO(requestInfo, searchCriteria, tenantId);
+			waterConnection = calculatorUtil.getWaterConnectionOnApplicationNO(requestInfo, searchCriteria, requestInfo.getUserInfo().getTenantId());
 			criteria.setWaterConnection(waterConnection);
 		}
-		if (criteria.getWaterConnection() == null) {
+		if (StringUtils.isEmpty(criteria.getWaterConnection())) {
 			throw new CustomException("WATER_CONNECTION_NOT_FOUND",
 					"Water Connection are not present for " + criteria.getApplicationNo() + " Application no");
 		}
@@ -460,16 +459,15 @@ public class EstimationService {
 	private BigDecimal getChargeForRoadCutting(Map<String, Object> masterData, String roadType, Float roadCuttingArea) {
 		JSONArray roadSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_ROADTYPE_MASTER, null);
 		BigDecimal charge = BigDecimal.ZERO;
-		BigDecimal cuttingArea = new BigDecimal(roadCuttingArea.toString());
 		JSONObject masterSlab = new JSONObject();
 		if(roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);
 			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='"+roadType+"')]");
 			if(CollectionUtils.isEmpty(filteredMasters))
-				return charge;
+				return BigDecimal.ZERO;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
-			charge = charge.multiply(cuttingArea);
+			charge = charge.multiply(new BigDecimal(roadCuttingArea.toString()));
 		}
 		return charge;
 	}

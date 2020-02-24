@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.text.StrBuilder;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
 import org.egov.wsCalculation.model.CalculationCriteria;
@@ -59,7 +60,9 @@ public class DemandGenerationConsumer {
 				calculationCriteria.addAll(calcReq.getCalculationCriteria());
 				log.info("Consuming record: " + record);
 			} catch (final Exception e) {
-				log.error("Error while listening to value: " + record + " on topic: " + ": " + e);
+				StringBuilder builder = new StringBuilder();
+				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(": ").append(e);
+				log.error(builder.toString());
 			}
 		});
 		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)

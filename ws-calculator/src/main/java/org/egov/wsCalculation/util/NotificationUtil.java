@@ -75,8 +75,7 @@ public class NotificationUtil {
 	
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
-		String jsonString = new JSONObject(responseMap).toString();
-		return jsonString;
+		return new JSONObject(responseMap).toString();
 	}
 	
 	/**
@@ -158,7 +157,7 @@ public class NotificationUtil {
 	public void sendSMS(List<SMSRequest> smsRequestList) {
 		if (config.getIsSMSEnabled()) {
 			if (CollectionUtils.isEmpty(smsRequestList))
-				log.info("Messages from localization couldn't be fetched!");
+				 log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,29 +12,23 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.wsCalculation.constants.WSCalculationConstant;
+import org.egov.wsCalculation.model.Calculation;
 import org.egov.wsCalculation.model.CalculationCriteria;
 import org.egov.wsCalculation.model.CalculationReq;
 import org.egov.wsCalculation.model.Category;
-import org.egov.wsCalculation.model.DemandNotificationObj;
 import org.egov.wsCalculation.model.TaxHeadEstimate;
 import org.egov.wsCalculation.model.TaxHeadMaster;
 import org.egov.wsCalculation.model.WaterConnection;
-import org.egov.wsCalculation.producer.WSCalculationProducer;
 import org.egov.wsCalculation.repository.ServiceRequestRepository;
 import org.egov.wsCalculation.repository.WSCalculationDao;
 import org.egov.wsCalculation.util.CalculatorUtil;
-import org.egov.wsCalculation.validator.MDMSValidator;
-import org.egov.wsCalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.egov.wsCalculation.config.WSCalculationConfiguration;
-import org.egov.wsCalculation.constants.WSCalculationConstant;
-import org.egov.wsCalculation.model.Calculation;
 
 @Service
 @Slf4j
@@ -77,7 +70,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			unsetWaterConnection(calculations);
 		} else {
 			//Calculate and create demand for application
-			Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
+			Map<String, Object> masterData = masterDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getFeeCalculation(request, masterData);
 			demandService.generateDemand(request.getRequestInfo(), calculations, masterData, request.getIsconnectionCalculation());
@@ -105,7 +98,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @return list of calculation based on request
 	 */
 	public List<Calculation> getEstimation(CalculationReq request) {
-		Map<String, Object> masterData = masterDataService.loadExceptionMaster(request.getRequestInfo(),
+		Map<String, Object> masterData = masterDataService.loadExemptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
 		unsetWaterConnection(calculations);
@@ -228,13 +221,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, tenentId);
 			StringBuilder url = calculatorUtil.getMdmsSearchUrl();
 			Object res = repository.fetchResult(url, mdmsCriteriaReq);
-			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
 			if (res == null) {
 				throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY",
 						"ERROR IN FETCHING THE BILLING FREQUENCY");
 			}
+			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
 			getBillingPeriod(mdmsResponse, requestInfo, tenentId);
-
 		}
 	}
 	

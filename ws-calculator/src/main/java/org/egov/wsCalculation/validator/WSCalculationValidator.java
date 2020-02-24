@@ -20,11 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.jayway.jsonpath.Criteria;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Component
 public class WSCalculationValidator {
 
@@ -140,12 +135,8 @@ public class WSCalculationValidator {
 	}
 
 	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
-		Map<String, String> errorMap = new HashMap<>();
 		if (criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
-			errorMap.put("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
-		}
-		if (!errorMap.isEmpty()) {
-			throw new CustomException(errorMap);
+			throw new CustomException("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
 		}
 	}
 
