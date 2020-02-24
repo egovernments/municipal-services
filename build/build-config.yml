@@ -40,7 +40,7 @@ config:
       - work-dir: "rainmaker-pgr/src/main/resources/db"
         image-name: "rainmaker-pgr-db"
 
-  - name: "municipal-services/tl-calculator"
+  - name: "builds/municipal-services/tl-calculator"
     build:
       - work-dir: "tl-calculator"
         image-name: "tl-calculator"
