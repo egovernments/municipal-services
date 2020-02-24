@@ -4,15 +4,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.egov.wsCalculation.model.MeterReading;
-import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.egov.wsCalculation.config.WSCalculationConfiguration;
+import org.egov.wsCalculation.model.MeterReadingSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Component
 public class WSCalculatorQueryBuilder {
 
@@ -37,9 +34,7 @@ public class WSCalculatorQueryBuilder {
 
 
 	public String getDistinctTenantIds() {
-		StringBuilder query = new StringBuilder(distinctTenantIdsCriteria);
-		log.info("Query : " + query);
-		return query.toString();
+		return distinctTenantIdsCriteria;
 	}
 	/**
 	 * 
@@ -50,21 +45,14 @@ public class WSCalculatorQueryBuilder {
 	 */
 	public String getSearchQueryString(MeterReadingSearchCriteria criteria, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(Query);
-		String resultantQuery = Query;
-		boolean isAnyCriteriaMatch = false;
-		if (!criteria.getConnectionNos().isEmpty()) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
-			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
-			isAnyCriteriaMatch = true;
-		}
-		if(isAnyCriteriaMatch == false)
+		if (CollectionUtils.isEmpty(criteria.getConnectionNos())) {
 			return null;
-		resultantQuery = query.toString();
-		resultantQuery = addOrderBy(resultantQuery);
-		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(resultantQuery, preparedStatement, criteria);
-		return resultantQuery;
+		}
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
+		addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
+		addOrderBy(query);
+		return addPaginationWrapper(query, preparedStatement, criteria);
 	}
 
 	private String createQuery(Set<String> ids) {
@@ -92,9 +80,9 @@ public class WSCalculatorQueryBuilder {
 		}
 	}
 
-	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
+	private String addPaginationWrapper(StringBuilder query, List<Object> preparedStmtList,
 			MeterReadingSearchCriteria criteria) {
-		query = query + " " + Offset_Limit_String;
+		query.append(" ").append(Offset_Limit_String);
 		Integer limit = config.getMeterReadingDefaultLimit();
 		Integer offset = config.getMeterReadingDefaultOffset();
 
@@ -109,7 +97,7 @@ public class WSCalculatorQueryBuilder {
 
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
-		return query;
+		return query.toString();
 	}
 
 	public String getNoOfMeterReadingConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
@@ -124,19 +112,17 @@ public class WSCalculatorQueryBuilder {
 	public String getCurrentReadingConnectionQuery(MeterReadingSearchCriteria criteria,
 			List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQueryForCurrentMeterReading);
-		String resultantQuery = noOfConnectionSearchQueryForCurrentMeterReading;
 		boolean isAnyCriteriaMatch = false;
-		if (!criteria.getConnectionNos().isEmpty()) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
-			addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
-			isAnyCriteriaMatch = true;
-			query.append(" ORDER BY mr.currentReadingDate DESC LIMIT 1");
-		}
+		if (CollectionUtils.isEmpty(criteria.getConnectionNos()))
+			return null;
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
+		addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
+		isAnyCriteriaMatch = true;
+		query.append(" ORDER BY mr.currentReadingDate DESC LIMIT 1");
 		if (isAnyCriteriaMatch == false)
 			return null;
-		resultantQuery = query.toString();
-		return resultantQuery;
+		return query.toString();
 	}
 
 	private void addIntegerListToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
@@ -150,9 +136,8 @@ public class WSCalculatorQueryBuilder {
 		return query.toString();
 	}
 	
-	private String addOrderBy(String query) {
-		query = query + " ORDER BY mr.currentReadingDate DESC";
-		return query;
+	private void addOrderBy(StringBuilder query) {
+		query.append(" ORDER BY mr.currentReadingDate DESC");
 	}
 	
 	public String getConnectionNumberFromWaterServicesQuery(List<Object> preparedStatement, String connectionType,

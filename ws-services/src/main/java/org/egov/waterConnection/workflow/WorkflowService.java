@@ -32,9 +32,8 @@ public class WorkflowService {
      * @return BusinessService for the the given tenantId
      */
     public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo) {
-        StringBuilder url = getSearchURLWithParams(tenantId);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-        Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
+        Object result = serviceRequestRepository.fetchResult(getSearchURLWithParams(tenantId), requestInfoWrapper);
         BusinessServiceResponse response = null;
         try {
             response = mapper.convertValue(result,BusinessServiceResponse.class);

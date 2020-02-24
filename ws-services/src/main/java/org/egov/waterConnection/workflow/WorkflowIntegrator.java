@@ -5,12 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
+import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -78,8 +77,6 @@ public class WorkflowIntegrator {
 	 */
 	public void callWorkFlow(WaterConnectionRequest waterConnectionRequest) {
 
-		String wfTenantId = waterConnectionRequest.getWaterConnection().getProperty().getTenantId();
-
 		JSONArray array = new JSONArray();
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
 		JSONObject obj = new JSONObject();
@@ -87,7 +84,7 @@ public class WorkflowIntegrator {
 		// Add assignes to processInsatance
 
 		obj.put(BUSINESSIDKEY, connection.getApplicationNo());
-		obj.put(TENANTIDKEY, wfTenantId);
+		obj.put(TENANTIDKEY, waterConnectionRequest.getWaterConnection().getProperty().getTenantId());
 		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 		obj.put(ACTIONKEY, connection.getAction());

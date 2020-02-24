@@ -5,17 +5,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.waterConnection.config.WSConfiguration;
+import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.workflow.BusinessService;
-import org.egov.waterConnection.config.WSConfiguration;
-import org.egov.waterConnection.model.Difference;
-import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.util.WaterServicesUtil;
 import org.egov.waterConnection.validator.ActionValidator;
@@ -24,16 +22,12 @@ import org.egov.waterConnection.validator.ValidateProperty;
 import org.egov.waterConnection.validator.WaterConnectionValidator;
 import org.egov.waterConnection.workflow.WorkflowIntegrator;
 import org.egov.waterConnection.workflow.WorkflowService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 @Component
 public class WaterServiceImpl implements WaterService {
-
-	Logger logger = LoggerFactory.getLogger(WaterServiceImpl.class);
 
 	@Autowired
 	private WaterDao waterDao;
@@ -112,10 +106,7 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	public List<WaterConnection> getWaterConnectionsList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
-		List<WaterConnection> waterConnectionList = waterDao.getWaterConnectionList(criteria, requestInfo);
-		if (waterConnectionList.isEmpty())
-			return Collections.emptyList();
-		return waterConnectionList;
+		return waterDao.getWaterConnectionList(criteria, requestInfo);
 	}
 	/**
 	 * 
@@ -152,13 +143,16 @@ public class WaterServiceImpl implements WaterService {
 	 * @return water connection
 	 */
 	private WaterConnection getConnectionForUpdateRequest(String id, RequestInfo requestInfo) {
-		SearchCriteria criteria = new SearchCriteria();
 		Set<String> ids = new HashSet<>(Arrays.asList(id));
+		SearchCriteria criteria = new SearchCriteria();
 		criteria.setIds(ids);
 		List<WaterConnection> connections = getWaterConnectionsList(criteria, requestInfo);
-		if (CollectionUtils.isEmpty(connections))
-			throw new CustomException("INVALID_WATERCONNECTION_SEARCH",
-					"WATER CONNECTION NOT FOUND FOR: " + id + " :ID");
+		if (CollectionUtils.isEmpty(connections)) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("WATER CONNECTION NOT FOUND FOR: ").append(id).append(" :ID");
+			throw new CustomException("INVALID_WATERCONNECTION_SEARCH", builder.toString());
+		}
+			
 		return connections.get(0);
 	}
 }

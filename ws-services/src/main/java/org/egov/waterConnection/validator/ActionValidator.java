@@ -37,13 +37,11 @@ public class ActionValidator {
 	 * @param request water connection request
 	 */
 	private void validateDocumentsForUpdate(WaterConnectionRequest request) {
-		Map<String, String> errorMap = new HashMap<>();
-		WaterConnection connection = request.getWaterConnection();
-		if (connection.getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE) && connection.getDocuments() != null) {
-			errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
+		if (request.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)
+				&& request.getWaterConnection().getDocuments() != null) {
+			throw new CustomException("INVALID STATUS",
+					"Status cannot be INITIATE when application document are provided");
 		}
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
 	}
 	
 	/**
@@ -53,8 +51,8 @@ public class ActionValidator {
 	 * @param businessService
 	 */
 	private void validateIds(WaterConnectionRequest request, BusinessService businessService) {
-		Map<String, String> errorMap = new HashMap<>();
 		WaterConnection connection = request.getWaterConnection();
+		Map<String, String> errorMap = new HashMap<>();
 		if (!workflowService.isStateUpdatable(connection.getApplicationStatus().name(), businessService)) {
 			if (connection.getId() == null)
 				errorMap.put("INVALID_UPDATE", "Id of waterConnection cannot be null");

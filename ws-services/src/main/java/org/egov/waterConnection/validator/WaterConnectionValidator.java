@@ -11,6 +11,7 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 
 @Component
@@ -27,21 +28,20 @@ public class WaterConnectionValidator {
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (waterConnectionRequest.getWaterConnection().getProperty() == null) {
+		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())) {
 			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
 		}
-		if (waterConnectionRequest.getWaterConnection().getProperty() != null
-				&& (waterConnection.getProperty().getUsageCategory() == null
-						|| waterConnection.getProperty().getUsageCategory().isEmpty())) {
+		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())
+				&& (StringUtils.isEmpty(waterConnection.getProperty().getUsageCategory()))) {
 			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Property usage type should not be empty");
 		}
-		if (isUpdate && waterConnectionRequest.getWaterConnection().getAction()
-				.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
-			if (waterConnection.getConnectionType() == null || waterConnection.getConnectionType().isEmpty()) {
+		if (isUpdate && WCConstants.APPROVE_CONNECTION_CONST
+				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getAction())) {
+			if (StringUtils.isEmpty(waterConnection.getConnectionType())) {
 				errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
 			}
-			if (waterConnection.getConnectionType() != null
-					&& (waterConnection.getConnectionType() == WCConstants.METERED_CONNECTION)) {
+			if (!StringUtils.isEmpty(waterConnection.getConnectionType())
+					&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())) {
 				if (waterConnection.getMeterId() == null) {
 					errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
 				}
@@ -51,27 +51,25 @@ public class WaterConnectionValidator {
 							"Meter Installation date cannot be null or negative");
 				}
 			}
-			if (waterConnection.getConnectionCategory() == null || waterConnection.getConnectionCategory().isEmpty()) {
+			if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
 				errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
 						"WaterConnection cannot be created without connection category");
 			}
-			if (waterConnection.getWaterSource() == null || waterConnection.getWaterSource().isEmpty()) {
+			if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
 				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
 			}
-			if (waterConnection.getRoadType() == null || waterConnection.getRoadType().isEmpty()) {
+			if (StringUtils.isEmpty(waterConnection.getRoadType())) {
 				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 			}
 
 		}
-
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
 	
 	public void validatePropertyForConnection(List<WaterConnection> waterConnectionList) {
 		waterConnectionList.forEach(waterConnection -> {
-			if (waterConnection.getProperty().getPropertyId() == null
-					|| waterConnection.getProperty().getPropertyId().isEmpty()) {
+			if (StringUtils.isEmpty(waterConnection.getProperty().getPropertyId())) {
 				throw new CustomException("INVALID SEARCH",
 						"PROPERTY ID NOT FOUND FOR " + waterConnection.getConnectionNo() + " WATER CONNECTION NO");
 			}
@@ -112,8 +110,8 @@ public class WaterConnectionValidator {
      * @param request The waterConnection Request
      */
 	private void validateDuplicateDocuments(WaterConnectionRequest request) {
-		List<String> documentFileStoreIds = new LinkedList<>();
 		if (request.getWaterConnection().getDocuments() != null) {
+			List<String> documentFileStoreIds = new LinkedList<>();
 			request.getWaterConnection().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
 					throw new CustomException("DUPLICATE_DOCUMENT ERROR",

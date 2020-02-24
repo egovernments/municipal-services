@@ -2,20 +2,17 @@ package org.egov.waterConnection.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.constants.WCConstants;
 import org.egov.waterConnection.model.Action;
 import org.egov.waterConnection.model.Event;
 import org.egov.waterConnection.model.EventRequest;
-import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.Recepient;
 import org.egov.waterConnection.model.SMSRequest;
 import org.egov.waterConnection.model.Source;
@@ -57,9 +54,8 @@ public class EditNotificationService {
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-				List<SMSRequest> smsRequests = new LinkedList<>();
-				smsRequests = getSmsRequest(request.getWaterConnection(), request.getRequestInfo());
-				if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+				List<SMSRequest> smsRequests = getSmsRequest(request.getWaterConnection(), request.getRequestInfo());
+				if (!CollectionUtils.isEmpty(smsRequests)) {
 					log.debug("SMS NOTIFICATION FOR EDIT APPLICATION :: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
 				}
@@ -70,7 +66,6 @@ public class EditNotificationService {
 	}
 
 	private EventRequest getEventRequest(WaterConnection waterConnection, RequestInfo requestInfo) {
-		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsg(WCConstants.WS_EDIT_IN_APP, localizationMessage);
@@ -94,6 +89,7 @@ public class EditNotificationService {
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
+		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
 			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
@@ -118,7 +114,6 @@ public class EditNotificationService {
 	}
 
 	private List<SMSRequest> getSmsRequest(WaterConnection waterConnection, RequestInfo requestInfo) {
-		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsg(WCConstants.WS_EDIT_SMS, localizationMessage);
@@ -133,6 +128,7 @@ public class EditNotificationService {
 		});
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnection, message);
+		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);

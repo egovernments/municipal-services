@@ -5,9 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -22,21 +20,21 @@ import org.egov.waterConnection.model.PropertyCriteria;
 import org.egov.waterConnection.model.PropertyRequest;
 import org.egov.waterConnection.model.PropertyResponse;
 import org.egov.waterConnection.model.RequestInfoWrapper;
-import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.workflow.BusinessService;
 import org.egov.waterConnection.model.SearchCriteria;
 import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.WaterConnectionRequest;
+import org.egov.waterConnection.model.workflow.BusinessService;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class WaterServicesUtil {
 
 	@Autowired
@@ -63,6 +61,11 @@ public class WaterServicesUtil {
 	}
 	@Autowired
 	private WorkflowService workflowService;
+	
+	private String tenantId = "tenantId=";
+	private String mobileNumber = "mobileNumber=";
+	private String propertyIds = "propertyIds=";
+	
 
 	/**
      * Method to return auditDetails for create/update flows
@@ -87,7 +90,6 @@ public class WaterServicesUtil {
 	 */
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
 		Set<String> propertyIds = new HashSet<>();
-		List<Property> propertyList = new ArrayList<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
 		propertyIds.add(waterConnectionRequest.getWaterConnection().getProperty().getPropertyId());
@@ -99,30 +101,13 @@ public class WaterServicesUtil {
 				getPropURLForCreate(waterConnectionRequest.getWaterConnection().getProperty().getTenantId(),
 						waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()),
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());
-		propertyList = getPropertyDetails(result);
-		if (propertyList == null || propertyList.isEmpty()) {
+		List<Property> propertyList = getPropertyDetails(result);
+		if (CollectionUtils.isEmpty(propertyList)) {
 			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
 	}
 	
-	public List<Property> propertySearchForCitizen(RequestInfo requestInfo) {
-		Set<String> propertyIds = new HashSet<>();
-		List<Property> propertyList = new ArrayList<>();
-		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		propertyCriteria.setPropertyIds(propertyIds);
-//		Object result = serviceRequestRepository.fetchResult(
-//				getPropURLForCreate(waterConnectionRequest.getWaterConnection().getProperty().getTenantId(),
-//						waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()),
-//				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-//		propertyList = getPropertyDetails(result);
-		if (propertyList == null || propertyList.isEmpty()) {
-			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
-		}
-		return propertyList;
-	}
-
 	/**
 	 * 
 	 * @param waterConnectionRequest
@@ -133,8 +118,7 @@ public class WaterServicesUtil {
 		propertyList.add(waterConnectionRequest.getWaterConnection().getProperty());
 		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(),
 				waterConnectionRequest.getWaterConnection().getProperty());
-		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
-		return getPropertyDetails(result);
+		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq));
 	}
 
 	/**
@@ -147,28 +131,24 @@ public class WaterServicesUtil {
 	 */
 	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-//		if ((waterConnectionSearchCriteria.getTenantId() == null
-//				|| waterConnectionSearchCriteria.getTenantId().isEmpty())) {
-//			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-//		}
-		if ((waterConnectionSearchCriteria.getMobileNumber() == null
-				|| waterConnectionSearchCriteria.getMobileNumber().isEmpty())) {
+		// if ((waterConnectionSearchCriteria.getTenantId() == null
+		// || waterConnectionSearchCriteria.getTenantId().isEmpty())) {
+		// throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
+		// }
+		if (StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		if (waterConnectionSearchCriteria.getTenantId() != null
-				&& !waterConnectionSearchCriteria.getTenantId().isEmpty()) {
+		if (!StringUtils.isEmpty(waterConnectionSearchCriteria.getTenantId())) {
 			propertyCriteria.setTenantId(waterConnectionSearchCriteria.getTenantId());
 		}
-		if (waterConnectionSearchCriteria.getMobileNumber() != null
-				&& !waterConnectionSearchCriteria.getMobileNumber().isEmpty()) {
+		if (!StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())) {
 			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
 		}
-		Object result = serviceRequestRepository.fetchResult(
+		return getPropertyDetails(serviceRequestRepository.fetchResult(
 				getPropURL(waterConnectionSearchCriteria.getTenantId(),
 						waterConnectionSearchCriteria.getMobileNumber()),
-				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		return getPropertyDetails(result);
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 	}
 	
 	/**
@@ -178,15 +158,14 @@ public class WaterServicesUtil {
 	 * @param requestInfo
 	 * @return List of Property
 	 */
-	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo){
-		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyIds);
-		Object result = serviceRequestRepository.fetchResult(propertySearhURL,RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		return getPropertyDetails(result);
+	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo) {
+		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropURLForCreate(tenantId, propertyIds),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 	}
+	
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
-		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		return requestInfoWrapper_new;
+		return RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 	}
 
 	/**
@@ -206,8 +185,7 @@ public class WaterServicesUtil {
 	}
 
 	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
-		PropertyRequest propertyReq = PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
-		return propertyReq;
+		return PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
 	}
 
 	public StringBuilder getPropertyCreateURL() {
@@ -238,10 +216,10 @@ public class WaterServicesUtil {
 	private String getpropertySearchURLForMobileSearch() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
-		url.append("tenantId=");
+		url.append(tenantId);
 		url.append("{1}");
 		url.append("&");
-		url.append("mobileNumber=");
+		url.append(mobileNumber);
 		url.append("{2}");
 		return url.toString();
 	}
@@ -253,7 +231,7 @@ public class WaterServicesUtil {
 	private String getpropertySearchURLForMobileSearchCitizen() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
-		url.append("mobileNumber=");
+		url.append(mobileNumber);
 		url.append("{2}");
 		return url.toString();
 	}
@@ -276,10 +254,10 @@ public class WaterServicesUtil {
 	private String getPropertySearchURLForEmployee() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
-		url.append("tenantId=");
+		url.append(tenantId);
 		url.append("{1}");
 		url.append("&");
-		url.append("propertyIds=");
+		url.append(propertyIds);
 		url.append("{2}");
 		return url.toString();
 	}
@@ -291,7 +269,7 @@ public class WaterServicesUtil {
 	private String getPropertySearchURLForCitizen() {
 		StringBuilder url = new StringBuilder(getPropertyURL());
 		url.append("?");
-		url.append("propertyIds=");
+		url.append(propertyIds);
 		url.append("{2}");
 		return url.toString();
 	}

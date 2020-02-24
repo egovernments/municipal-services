@@ -2,11 +2,10 @@ package org.egov.waterConnection.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,7 +16,6 @@ import org.egov.waterConnection.model.Action;
 import org.egov.waterConnection.model.ActionItem;
 import org.egov.waterConnection.model.Event;
 import org.egov.waterConnection.model.EventRequest;
-import org.egov.waterConnection.model.OwnerInfo;
 import org.egov.waterConnection.model.Recepient;
 import org.egov.waterConnection.model.SMSRequest;
 import org.egov.waterConnection.model.Source;
@@ -26,7 +24,6 @@ import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.util.NotificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -59,23 +56,20 @@ public class WorkflowNotificationService {
 	 */
 	public void process(WaterConnectionRequest request, String topic) {
 		try {
-			RequestInfo requestInfo = request.getRequestInfo();
-			WaterConnection waterConnection = request.getWaterConnection();
-			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(waterConnection.getAction()+"_"+waterConnection.getApplicationStatus().name())) {
-				log.info("Notification Disabled For State :" + waterConnection.getApplicationStatus().name());
+			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getAction()+"_"+request.getWaterConnection().getApplicationStatus().name())) {
+				log.info("Notification Disabled For State :" + request.getWaterConnection().getApplicationStatus().name());
 				return;
 			}
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
-			      EventRequest eventRequest = getEventRequest(waterConnection, topic, requestInfo);
+			      EventRequest eventRequest = getEventRequest(request.getWaterConnection(), topic, request.getRequestInfo());
 					if (eventRequest != null) {
 						log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-					List<SMSRequest> smsRequests = new LinkedList<>();
-				    smsRequests = getSmsRequest(waterConnection, topic, requestInfo);
-					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+					List<SMSRequest> smsRequests = getSmsRequest(request.getWaterConnection(), topic, request.getRequestInfo());
+					if (!CollectionUtils.isEmpty(smsRequests)) {
 						log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
@@ -96,7 +90,6 @@ public class WorkflowNotificationService {
 	 */
 	private EventRequest getEventRequest(WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
-		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForInApp(waterConnection.getAction(), waterConnection.getApplicationStatus().name(),
@@ -120,6 +113,7 @@ public class WorkflowNotificationService {
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
+		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
 			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
@@ -152,15 +146,13 @@ public class WorkflowNotificationService {
 	 */
 	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
 			String mobileNumber, WaterConnection connection) {
-		Action action = null;
-		String code = "";
 		String messageTemplate = mobileNumberAndMesssage.get(mobileNumber);
+		List<ActionItem> items = new ArrayList<>();
 		if (messageTemplate.contains("<Action Button>")) {
-			code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
+			String code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
 			messageTemplate = messageTemplate.replace("<Action Button>", "");
 			messageTemplate = messageTemplate.replace("</Action Button>", "");
 			messageTemplate = messageTemplate.replace(code, "");
-			List<ActionItem> items = new ArrayList<>();
 			String actionLink = "";
 			if (code.equalsIgnoreCase("Download Application")) {
 
@@ -177,12 +169,9 @@ public class WorkflowNotificationService {
 			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
-			action = Action.builder().actionUrls(items).build();
 			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
 		}
-//		actionLinkAndMsg.put("Action", action);
-//		actionLinkAndMsg.put(key, value);
-		return action;
+		return Action.builder().actionUrls(items).build();
 	}
 	
 	/**
@@ -195,7 +184,6 @@ public class WorkflowNotificationService {
 	 */
 	private List<SMSRequest> getSmsRequest(WaterConnection waterConnection, String topic,
 			RequestInfo requestInfo) {
-		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForSMS(waterConnection.getAction(), waterConnection.getApplicationStatus().name(), localizationMessage);
@@ -210,6 +198,7 @@ public class WorkflowNotificationService {
 		});
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, waterConnection,
 				message);
+		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);

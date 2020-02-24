@@ -2,15 +2,13 @@ package org.egov.waterConnection.repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.SearchCriteria;
+import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.producer.WaterConnectionProducer;
 import org.egov.waterConnection.repository.builder.WsQueryBuilder;
 import org.egov.waterConnection.repository.rowmapper.WaterRowMapper;
@@ -18,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -78,15 +77,5 @@ public class WaterDaoImpl implements WaterDao {
 		}
 	}
 
-	@Override
-	public int isWaterConnectionExist(List<String> ids) {
-		int n = 0;
-		Set<String> connectionIds = new HashSet<>(ids);
-		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getNoOfWaterConnectionQuery(connectionIds, preparedStatement);
-		log.info("Query: " + query);
-		n = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
-		return n;
-	}
 
 }

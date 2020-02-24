@@ -3,6 +3,7 @@ package org.egov.waterConnection.util;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.WSConfiguration;
@@ -70,8 +71,7 @@ public class NotificationUtil {
 		@SuppressWarnings("rawtypes")
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
-		String jsonString = new JSONObject(responseMap).toString();
-		return jsonString;
+		return new JSONObject(responseMap).toString();
 	}
 	
 	/**
@@ -101,8 +101,10 @@ public class NotificationUtil {
 	 */
 	public void sendSMS(List<SMSRequest> smsRequestList) {
 		if (config.getIsSMSEnabled()) {
-			if (CollectionUtils.isEmpty(smsRequestList))
+			if (CollectionUtils.isEmpty(smsRequestList)) {
 				log.info("Messages from localization couldn't be fetched!");
+				return;
+			}
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
@@ -117,10 +119,9 @@ public class NotificationUtil {
 	 * @return message template
 	 */
 	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage) {
-		String messageString = null;
-		String notificationCode = "WS_" + action.toUpperCase() + "_" + applicationStatus.toUpperCase() + "_SMS_MESSAGE";
-		messageString = getMessageTemplate(notificationCode, localizationMessage);
-		return messageString;
+		StringBuilder builder = new StringBuilder();
+		builder.append("WS_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_SMS_MESSAGE");
+		return getMessageTemplate(builder.toString(), localizationMessage);
 	}
 
 	/**
@@ -130,10 +131,9 @@ public class NotificationUtil {
 	 * @return In app message template
 	 */
 	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage) {
-		String messageString = null;
-		String notificationCode = "WS_" + action.toUpperCase() + "_"+ applicationStatus.toUpperCase() + "_APP_MESSAGE";
-		messageString = getMessageTemplate(notificationCode, localizationMessage);
-		return messageString;
+		StringBuilder builder = new StringBuilder();
+		builder.append("WS_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_APP_MESSAGE");
+		return getMessageTemplate(builder.toString(), localizationMessage);
 	}
 	
 	/**

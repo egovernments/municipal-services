@@ -3,6 +3,7 @@ package org.egov.waterConnection.repository.builder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.model.Property;
@@ -44,6 +45,8 @@ public class WsQueryBuilder {
             "({})" +
             " result) result_offset " +
             "WHERE offset_ > ? AND offset_ <= ?";
+	
+	private final String ORDER_BY_CLAUSE= " ORDER BY wc.connectionExecutionDate DESC";
 	/**
 	 * 
 	 * @param criteria
@@ -56,7 +59,6 @@ public class WsQueryBuilder {
 	 */
 	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement, RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(WATER_SEARCH_Query);
-		String resultantQuery = query.toString();
 		boolean isAnyCriteriaMatch = false;
 		if ((criteria.getMobileNumber() != null && !criteria.getMobileNumber().isEmpty())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -107,20 +109,13 @@ public class WsQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
-		if (isAnyCriteriaMatch == false)
+		if (isAnyCriteriaMatch == false) {
 			return null;
-		resultantQuery = query.toString();
-		resultantQuery = addOrderBy(resultantQuery);
-		if (query.toString().indexOf("WHERE") > -1)
-			resultantQuery = addPaginationWrapper(query.toString(), preparedStatement, criteria);
-		return resultantQuery;
+			}
+		query.append(ORDER_BY_CLAUSE);
+		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 	}
 	
-	private String addOrderBy(String query) {
-		query = query + " ORDER BY wc.connectionExecutionDate DESC";
-		return query;
-	}
-
 	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
@@ -156,8 +151,6 @@ public class WsQueryBuilder {
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
-//		query = query + " " + Offset_Limit_String;
-		 String finalQuery = paginationWrapper.replace("{}",query);
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
@@ -174,15 +167,13 @@ public class WsQueryBuilder {
 
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
-		return finalQuery;
+		return paginationWrapper.replace("{}",query);
 	}
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<String> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(id));
 		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
-		addToPreparedStatement(preparedStatement, listOfIds);
+		addToPreparedStatement(preparedStatement, connectionIds);
 		return query.toString();
 	}
 	
