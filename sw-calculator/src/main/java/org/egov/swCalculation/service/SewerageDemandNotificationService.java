@@ -2,19 +2,14 @@ package org.egov.swCalculation.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
 import org.egov.swCalculation.config.SWCalculationConfiguration;
-import org.egov.swCalculation.constants.SWCalculationConstant;
-import org.egov.swCalculation.model.BillingSlab;
 import org.egov.swCalculation.model.DemandNotificationObj;
 import org.egov.swCalculation.model.EmailRequest;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
-import org.egov.swCalculation.model.SewerageConnectionRequest;
-import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.egov.swCalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;

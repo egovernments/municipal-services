@@ -4,11 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Controller;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Controller
-public class sWCalculatorQueryBuilder {
+public class SWCalculatorQueryBuilder {
 	
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	
@@ -17,9 +14,7 @@ public class sWCalculatorQueryBuilder {
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
 	public String getDistinctTenantIds() {
-		StringBuilder query = new StringBuilder(distinctTenantIdsCriteria);
-		log.info("Query : " + query);
-		return query.toString();
+		return distinctTenantIdsCriteria;
 	}
 
 	public String getConnectionNumberList(String tenantId, String connectionType, List<Object> preparedStatement) {

@@ -1,6 +1,7 @@
 package org.egov.swCalculation.consumer;
 
 import java.util.HashMap;
+
 import org.egov.swCalculation.service.PaymentNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,13 +22,14 @@ public class BillingNotificationConsumer {
 	
 	@KafkaListener(topics = { "${kafka.topics.billgen.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-	   
 		try {
 			log.info("Consuming record: " + record);
+			service.process(record, topic);
 		} catch (final Exception e) {
-			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
+			StringBuilder builder = new StringBuilder();
+			builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(topic).append(": ").append(e);
+			log.error(builder.toString());
 		}
-		service.process(record, topic);
 
 	}
 

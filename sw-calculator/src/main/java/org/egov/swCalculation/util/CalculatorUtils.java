@@ -82,9 +82,7 @@ public class CalculatorUtils {
 	 */
 	public SewerageConnection getSewerageConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
 		ObjectMapper mapper = new ObjectMapper();
-		String url = getSewerageSearchURL();
-		url = url.replace("{1}", tenantId).replace("{2}", connectionNo);
-		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
+		Object result = serviceRequestRepository.fetchResult(getSewerageSearchURL(tenantId, connectionNo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
 		SewerageConnectionResponse response = null;
@@ -105,16 +103,16 @@ public class CalculatorUtils {
 	 * 
 	 * @return water search url
 	 */
-	private String getSewerageSearchURL() {
+	private StringBuilder getSewerageSearchURL(String tenantId, String connectionNo) {
 		StringBuilder url = new StringBuilder(configurations.getSewerageConnectionHost());
 		url.append(configurations.getSewerageConnectionSearchEndPoint());
 		url.append("?");
 		url.append("tenantId=");
-		url.append("{1}");
+		url.append(tenantId);
 		url.append("&");
 		url.append("connectionNumber=");
-		url.append("{2}");
-		return url.toString();
+		url.append(connectionNo);
+		return url;
 	}
 
 	/**

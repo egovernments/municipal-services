@@ -84,7 +84,7 @@ public class PaymentNotificationService {
 			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
 			if (null != config.getIsUserEventsNotificationEnabled()) {
 				if (config.getIsUserEventsNotificationEnabled()) {
-					if (mappedRecord.get(serviceName).equalsIgnoreCase(SWCalculationConstant.SERVICE_FIELD_VALUE_SW)) {
+					if (SWCalculationConstant.SERVICE_FIELD_VALUE_SW.equalsIgnoreCase(mappedRecord.get(serviceName))) {
 						SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
 								mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
 						if (sewerageConnection == null) {
@@ -128,7 +128,6 @@ public class PaymentNotificationService {
 
 	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, SewerageConnection sewerageConnection,
 			String topic, RequestInfo requestInfo) {
-		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
 		String message = util.getCustomizedMsgForSMS(topic, localizationMessage);
 		if (message == null) {
@@ -142,6 +141,7 @@ public class PaymentNotificationService {
 		});
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
+		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			if (messg.contains("<Link to Bill>")) {
 				String actionLink = config.getSmsNotificationLink()
@@ -192,7 +192,6 @@ public class PaymentNotificationService {
 
 	private EventRequest getEventRequest(HashMap<String, String> mappedRecord, SewerageConnection sewerageConnection,
 			String topic, RequestInfo requestInfo) {
-		List<Event> events = new ArrayList<>();
 
 		String localizationMessages = util.getLocalizationMessages(mappedRecord.get(tenantId), requestInfo);
 		String message = util.getCustomizedMsgForInApp(topic, localizationMessages);
@@ -216,6 +215,7 @@ public class PaymentNotificationService {
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
+		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
 			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);

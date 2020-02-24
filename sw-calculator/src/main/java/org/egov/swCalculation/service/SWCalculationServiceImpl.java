@@ -58,7 +58,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			unsetSewerageConnection(calculations);
 		} else {
 			// Calculate and create demand for application
-			Map<String, Object> masterData = mDataService.loadExceptionMaster(request.getRequestInfo(),
+			Map<String, Object> masterData = mDataService.loadExcemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getFeeCalculation(request, masterData);
 			demandService.generateDemand(request.getRequestInfo(), calculations, masterData,
@@ -212,7 +212,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 * @return list of calculation based on request
 	 */
 	public List<Calculation> getEstimation(CalculationReq request) {
-		Map<String, Object> masterData = mDataService.loadExceptionMaster(request.getRequestInfo(),
+		Map<String, Object> masterData = mDataService.loadExcemptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
 		unsetSewerageConnection(calculations);

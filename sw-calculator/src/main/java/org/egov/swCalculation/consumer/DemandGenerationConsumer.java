@@ -1,17 +1,14 @@
 package org.egov.swCalculation.consumer;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.swCalculation.config.SWCalculationConfiguration;
 import org.egov.swCalculation.model.CalculationCriteria;
 import org.egov.swCalculation.model.CalculationReq;
 import org.egov.swCalculation.producer.SWCalculationProducer;
 import org.egov.swCalculation.service.MasterDataService;
-import org.egov.swCalculation.service.SWCalculationService;
 import org.egov.swCalculation.service.SWCalculationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -51,22 +48,23 @@ public class DemandGenerationConsumer {
 			"${egov.seweragecalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	@SuppressWarnings("unchecked")
 	public void listen(final List<Message<?>> records) {
-		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
-		RequestInfo requestInfo = calculationReq.getRequestInfo();
-		Map<String, Object> masterMap = mDataService.loadMasterData(requestInfo,
+		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
 				calculationReq.getCalculationCriteria().get(0).getTenantId());
+		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
 		records.forEach(record -> {
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
 				calculationCriteria.addAll(calcReq.getCalculationCriteria());
 				log.info("Consuming record: " + record);
 			} catch (final Exception e) {
-				log.error("Error while listening to value: " + record + " on topic: " + ": " + e);
+				StringBuilder builder = new StringBuilder();
+				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(e);
+				log.error(builder.toString());
 			}
 		});
 		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(requestInfo).isconnectionCalculation(true).build();
+				.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
 		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
 		log.info("Number of batch records:  " + records.size());
 	}
@@ -89,12 +87,10 @@ public class DemandGenerationConsumer {
 			"${persister.demand.based.dead.letter.topic.batch}" }, containerFactory = "kafkaListenerContainerFactory")
 	@SuppressWarnings("unchecked")
 	public void listenDeadLetterTopic(final List<Message<?>> records) {
-
-		List<CalculationReq> CalculationReqList = new ArrayList<>();
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
-		RequestInfo requestInfo = calculationReq.getRequestInfo();
-		Map<String, Object> masterMap = mDataService.loadMasterData(requestInfo,
+		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
 				calculationReq.getCalculationCriteria().get(0).getTenantId());
+		List<CalculationReq> CalculationReqList = new ArrayList<>();
 		records.forEach(record -> {
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);

@@ -48,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SWCalculationUtil {
 
 	@Autowired
-	SWCalculationConfiguration configurations;
+	private SWCalculationConfiguration configurations;
 
 	@Autowired
 	private SWCalculationConfiguration config;
@@ -229,10 +229,9 @@ public class SWCalculationUtil {
 	 * @return Localization messages for the module
 	 */
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
-				requestInfo);
-		String jsonString = new JSONObject(responseMap).toString();
-		return jsonString;
+		return new JSONObject(
+				(LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo), requestInfo))
+						.toString();
 	}
 
 	/**
@@ -322,7 +321,7 @@ public class SWCalculationUtil {
 	public void sendSMS(List<SMSRequest> smsRequestList) {
 		if (config.getIsSMSEnabled()) {
 			if (CollectionUtils.isEmpty(smsRequestList))
-				log.info("Messages from localization couldn't be fetched!");
+				 log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
