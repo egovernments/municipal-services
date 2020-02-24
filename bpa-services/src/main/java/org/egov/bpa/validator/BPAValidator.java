@@ -409,13 +409,12 @@ public class BPAValidator {
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 
 		BPA bpa = bpaRequest.getBPA();
-		validateQuestions(mdmsData, bpaRequest, bpa.getAdditionalDetails(), wfState);
-		validateDocTypes(mdmsData, bpaRequest, bpa.getAdditionalDetails(), wfState);
+		validateQuestions(mdmsData, bpa, wfState);
+		validateDocTypes(mdmsData, bpa, wfState);
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, Object additionalDetails, String wfState) {
-		BPA bpa = bpaRequest.getBPA();
+	private void validateQuestions(Object mdmsData, BPA bpa, String wfState) {
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
@@ -434,7 +433,7 @@ public class BPAValidator {
 
 			log.info("MDMS questions " + mdmsQns);
 			if (!CollectionUtils.isEmpty(mdmsQns)) {
-				if (additionalDetails != null) {
+				if (bpa.getAdditionalDetails() != null) {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 					if (!CollectionUtils.isEmpty(checkListFromReq)) {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
@@ -478,8 +477,7 @@ public class BPAValidator {
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, Object additionalDetails, String wfState) {
-		BPA bpa = bpaRequest.getBPA();
+	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState) {
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestDocs = new ArrayList<String>();
 		List<String> mdmsDocs = null;
@@ -498,7 +496,7 @@ public class BPAValidator {
 
 			log.info("MDMS DocTypes " + mdmsDocs);
 			if (!CollectionUtils.isEmpty(mdmsDocs)) {
-				if (additionalDetails != null) {
+				if (bpa.getAdditionalDetails() != null) {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 					if (!CollectionUtils.isEmpty(checkListFromReq)) {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
