@@ -1,17 +1,12 @@
 package org.egov.swService.service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.egov.swService.model.Difference;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.util.SWConstants;
-import org.egov.tracer.model.CustomException;
-import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
@@ -61,12 +56,13 @@ public class DiffService {
 	 * @return List of updated fields
 	 */
 	private List<String> getUpdateFields(SewerageConnection updateConnection, SewerageConnection searchResult) {
-		Javers javers = JaversBuilder.javers().build();
-		Diff diff = javers.compare(updateConnection, searchResult);
-		List<String> updatedValues = new LinkedList<>();
+		Diff diff = JaversBuilder.javers().build().compare(updateConnection, searchResult);
+		
 		List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
 		if (CollectionUtils.isEmpty(changes))
-			return updatedValues;
+			return Collections.emptyList();
+		
+		List<String> updatedValues = new LinkedList<>();
 		changes.forEach(change -> {
 			if (!SWConstants.FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
 				updatedValues.add(change.getPropertyName());
@@ -85,12 +81,13 @@ public class DiffService {
 	 */
 	@SuppressWarnings("unchecked")
 	private List<String> getObjectsAdded(SewerageConnection updateConnection, SewerageConnection searchResult) {
-		Javers javers = JaversBuilder.javers().build();
-		Diff diff = javers.compare(updateConnection, searchResult);
+		Diff diff = JaversBuilder.javers().build().compare(updateConnection, searchResult);
 		List<NewObject> objectsAdded = diff.getObjectsByChangeType(NewObject.class);
-		List<String> classModified = new LinkedList<>();
+		
 		if (CollectionUtils.isEmpty(objectsAdded))
-			return classModified;
+			return Collections.emptyList();
+		
+		List<String> classModified = new LinkedList<>();
 		for (Object object : objectsAdded) {
 			String className = object.getClass().toString()
 					.substring(object.getClass().toString().lastIndexOf('.') + 1);
@@ -109,12 +106,12 @@ public class DiffService {
 	 */
 	private List<String> getObjectsRemoved(SewerageConnection updateConnection, SewerageConnection searchResult) {
 
-		Javers javers = JaversBuilder.javers().build();
-		Diff diff = javers.compare(updateConnection, searchResult);
+		Diff diff = JaversBuilder.javers().build().compare(updateConnection, searchResult);
 		List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
-		List<String> classRemoved = new LinkedList<>();
+		
 		if (CollectionUtils.isEmpty(changes))
-			return classRemoved;
+			return Collections.emptyList();
+		List<String> classRemoved = new LinkedList<>();
 		// changes.forEach(change -> {
 		// if (change.getPropertyName().equalsIgnoreCase(VARIABLE_ACTIVE)
 		// || change.getPropertyName().equalsIgnoreCase(VARIABLE_USERACTIVE)) {
@@ -122,23 +119,5 @@ public class DiffService {
 		// }
 		// });
 		return classRemoved;
-	}
-
-	/**
-	 * Extracts the class name from the affectedObject string representation
-	 * 
-	 * @param affectedObject
-	 *            The object which is removed
-	 * @return Name of the class of object removed
-	 */
-	private String getObjectClassName(String affectedObject) {
-		String className = null;
-		try {
-			String firstSplit = affectedObject.substring(affectedObject.lastIndexOf('.') + 1);
-			className = firstSplit.split("@")[0];
-		} catch (Exception e) {
-			throw new CustomException("OBJECT CLASS NAME PARSE ERROR", "Failed to fetch notification");
-		}
-		return className;
 	}
 }

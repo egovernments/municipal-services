@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
-import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,24 +78,22 @@ public class WorkflowIntegrator {
 	 */
 	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest) {
 
-		String wfTenantId = sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId();
 
 		JSONArray array = new JSONArray();
-		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
 		JSONObject obj = new JSONObject();
 		List<Map<String, String>> uuidmaps = new LinkedList<>();
 		// Add assignes to processInsatance
 
-		obj.put(BUSINESSIDKEY, connection.getApplicationNo());
-		obj.put(TENANTIDKEY, wfTenantId);
+		obj.put(BUSINESSIDKEY, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+		obj.put(TENANTIDKEY, sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId());
 		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-		obj.put(ACTIONKEY, connection.getAction());
+		obj.put(ACTIONKEY, sewerageConnectionRequest.getSewerageConnection().getAction());
 		// Add comment
 		// obj.put(COMMENTKEY, connection.getComment);
 		if (!CollectionUtils.isEmpty(uuidmaps))
 			obj.put(ASSIGNEEKEY, uuidmaps);
-		obj.put(DOCUMENTSKEY, connection.getDocuments());
+		obj.put(DOCUMENTSKEY, sewerageConnectionRequest.getSewerageConnection().getDocuments());
 		array.add(obj);
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, sewerageConnectionRequest.getRequestInfo());
@@ -110,10 +107,9 @@ public class WorkflowIntegrator {
 			/*
 			 * extracting message from client error exception
 			 */
-			DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
 			List<Object> errros = null;
 			try {
-				errros = responseContext.read("$.Errors");
+				errros = JsonPath.parse(e.getResponseBodyAsString()).read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
 				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND",
 						" Unable to read the json path in error object : " + pnfe.getMessage());

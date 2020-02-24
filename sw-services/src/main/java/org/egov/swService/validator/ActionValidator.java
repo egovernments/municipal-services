@@ -3,7 +3,6 @@ package org.egov.swService.validator;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.workflow.BusinessService;
 import org.egov.swService.util.SWConstants;
@@ -37,13 +36,11 @@ public class ActionValidator {
 	 *            water connection request
 	 */
 	private void validateDocumentsForUpdate(SewerageConnectionRequest request) {
-		Map<String, String> errorMap = new HashMap<>();
-		SewerageConnection connection = request.getSewerageConnection();
-		if (connection.getAction().equalsIgnoreCase(SWConstants.ACTION_INITIATE) && connection.getDocuments() != null) {
-			errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
+		if (SWConstants.ACTION_INITIATE.equalsIgnoreCase(request.getSewerageConnection().getAction())
+				&& request.getSewerageConnection().getDocuments() != null) {
+			throw new CustomException("INVALID STATUS",
+					"Status cannot be INITIATE when application document are provided");
 		}
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
 	}
 
 	/**
@@ -54,12 +51,11 @@ public class ActionValidator {
 	 */
 	private void validateIds(SewerageConnectionRequest request, BusinessService businessService) {
 		Map<String, String> errorMap = new HashMap<>();
-		SewerageConnection connection = request.getSewerageConnection();
-		if (!workflowService.isStateUpdatable(connection.getApplicationStatus().name(), businessService)) {
-			if (connection.getId() == null)
+		if (!workflowService.isStateUpdatable(request.getSewerageConnection().getApplicationStatus().name(), businessService)) {
+			if (request.getSewerageConnection().getId() == null)
 				errorMap.put("INVALID_UPDATE", "Id of sewerageConnection cannot be null");
-			if (!CollectionUtils.isEmpty(connection.getDocuments())) {
-				connection.getDocuments().forEach(document -> {
+			if (!CollectionUtils.isEmpty(request.getSewerageConnection().getDocuments())) {
+				request.getSewerageConnection().getDocuments().forEach(document -> {
 					if (document.getId() == null)
 						errorMap.put("INVALID UPDATE", "Id of document cannot be null");
 				});

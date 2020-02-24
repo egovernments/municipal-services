@@ -41,8 +41,7 @@ public class CalculationService {
 	 * 
 	 */
 	public void calculateFeeAndGenerateDemand(SewerageConnectionRequest request) {
-		if (request.getSewerageConnection().getAction().equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)) {
-			StringBuilder uri = sewerageServicesUtil.getCalculatorURL();
+		if (SWConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getSewerageConnection().getAction())) {
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getSewerageConnection().getApplicationNo())
 					.sewerageConnection(request.getSewerageConnection())
@@ -51,7 +50,7 @@ public class CalculationService {
 			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(calculationCriterias)
 					.requestInfo(request.getRequestInfo()).isconnectionCalculation(false).build();
 			try {
-				Object response = serviceRequestRepository.fetchResult(uri, calRequest);
+				Object response = serviceRequestRepository.fetchResult(sewerageServicesUtil.getCalculatorURL(), calRequest);
 				CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
 				log.info(mapper.writeValueAsString(calResponse));
 			} catch (Exception ex) {

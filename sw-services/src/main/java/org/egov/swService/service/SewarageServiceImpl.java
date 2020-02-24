@@ -4,16 +4,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.swService.config.SWConfiguration;
+import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.workflow.BusinessService;
-import org.egov.swService.config.SWConfiguration;
-import org.egov.swService.model.Difference;
-import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.repository.SewarageDao;
 import org.egov.swService.util.SewerageServicesUtil;
 import org.egov.swService.validator.ActionValidator;
@@ -98,8 +96,7 @@ public class SewarageServiceImpl implements SewarageService {
 	 * @return List of matching sewarage connection
 	 */
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
-		List<SewerageConnection> sewarageConnectionList;
-		sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
+		List<SewerageConnection> sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
 		validateProperty.validatePropertyForConnection(sewarageConnectionList);
 		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo, criteria);
 		return sewarageConnectionList;
@@ -115,10 +112,7 @@ public class SewarageServiceImpl implements SewarageService {
 	 */
 
 	public List<SewerageConnection> getSewerageConnectionsList(SearchCriteria criteria, RequestInfo requestInfo) {
-		List<SewerageConnection> sewerageConnectionList = sewarageDao.getSewerageConnectionList(criteria, requestInfo);
-		if (sewerageConnectionList.isEmpty())
-			return Collections.emptyList();
-		return sewerageConnectionList;
+		return sewarageDao.getSewerageConnectionList(criteria, requestInfo);
 	}
 
 	/**
@@ -147,8 +141,8 @@ public class SewarageServiceImpl implements SewarageService {
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
-		boolean isStateUpdatable = sewerageServicesUtil.getStatusForUpdate(businessService, searchResult);
-		sewarageDao.updateSewerageConnection(sewarageConnectionRequest, isStateUpdatable);
+		sewarageDao.updateSewerageConnection(sewarageConnectionRequest, 
+				sewerageServicesUtil.getStatusForUpdate(businessService, searchResult));
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
 	}
 

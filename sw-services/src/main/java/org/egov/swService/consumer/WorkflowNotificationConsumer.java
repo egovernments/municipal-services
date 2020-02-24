@@ -40,8 +40,8 @@ public class WorkflowNotificationConsumer {
 			workflowNotificationService.process(sewerageConnectionRequest, topic);
 		} catch (Exception ex) {
 			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
-					.append("on topic: ").append(topic).append(" :").append(ex);
-			log.error(builder.toString());
+					.append("on topic: ").append(topic).append(". Exception :").append(ex.getMessage());
+			log.error(builder.toString(), ex);
 		}
 	}
 

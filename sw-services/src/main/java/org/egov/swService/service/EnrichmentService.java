@@ -95,8 +95,10 @@ public class EnrichmentService {
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		AuditDetails auditDetails = sewerageServicesUtil
-				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		
+		//TODO - Models need to be updated with AuditDetails
+		//AuditDetails auditDetails = sewerageServicesUtil
+		//		.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
@@ -128,23 +130,18 @@ public class EnrichmentService {
 	 * @param request SewerageConnectionRequest which is to be created
 	 */
 	private void setSewarageApplicationIdgenIds(SewerageConnectionRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		SewerageConnection sewerageConnection = request.getSewerageConnection();
-
-		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getSewerageApplicationIdGenName(),
+		List<String> applicationNumbers = getIdList(request.getRequestInfo(), 
+				request.getRequestInfo().getUserInfo().getTenantId(), 
+				config.getSewerageApplicationIdGenName(),
 				config.getSewerageApplicationIdGenFormat(), 1);
-		ListIterator<String> itr = applicationNumbers.listIterator();
 
-		Map<String, String> errorMap = new HashMap<>();
-		if (applicationNumbers.size() != 1) {
+		if (CollectionUtils.isEmpty(applicationNumbers) || applicationNumbers.size() != 1) {
+			Map<String, String> errorMap = new HashMap<>();
 			errorMap.put("IDGEN ERROR ",
 					"The Id of SewerageConnection returned by idgen is not equal to number of SewerageConnection");
-		}
-
-		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		sewerageConnection.setApplicationNo(itr.next());
+		}
+		request.getSewerageConnection().setApplicationNo(applicationNumbers.listIterator().next());
 	}
 
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
@@ -191,12 +188,12 @@ public class EnrichmentService {
 	 * 
 	 * @param sewerageConnectionrequest 
 	 */
-    public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest){
-    	String applicationStatus = sewerageConnectionRequest.getSewerageConnection().getApplicationStatus().name();
-        if(applicationStatus.equalsIgnoreCase(SWConstants.STATUS_APPROVED)) {
-        setConnectionNO(sewerageConnectionRequest);
-        }
-    }
+	public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest) {
+		if (SWConstants.STATUS_APPROVED
+				.equalsIgnoreCase(sewerageConnectionRequest.getSewerageConnection().getApplicationStatus().name())) {
+			setConnectionNO(sewerageConnectionRequest);
+		}
+	}
     
 	/**
 	 * Enrich sewergae connection request and set sewerage connection no
@@ -204,20 +201,19 @@ public class EnrichmentService {
 	 * @param request
 	 */
 	private void setConnectionNO(SewerageConnectionRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		SewerageConnection sewerageConnection = request.getSewerageConnection();
-		List<String> connectionNumbers = getIdList(requestInfo, tenantId, config.getSewerageIdGenName(),
+		List<String> connectionNumbers = getIdList(request.getRequestInfo(), 
+				request.getRequestInfo().getUserInfo().getTenantId(), 
+				config.getSewerageIdGenName(),
 				config.getSewerageIdGenFormat(), 1);
-		ListIterator<String> itr = connectionNumbers.listIterator();
-		Map<String, String> errorMap = new HashMap<>();
-		if (connectionNumbers.size() != 1) {
+		
+		if (CollectionUtils.isEmpty(connectionNumbers) || connectionNumbers.size() != 1) {
+			Map<String, String> errorMap = new HashMap<>();
 			errorMap.put("IDGEN_ERROR",
 					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
-		}
-		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
-		sewerageConnection.setConnectionNo(itr.next());
+		}
+			
+		request.getSewerageConnection().setConnectionNo(connectionNumbers.listIterator().next());
 	}
 
 	  /**

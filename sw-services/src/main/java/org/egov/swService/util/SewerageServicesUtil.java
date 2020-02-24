@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.tracer.model.CustomException;
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.AuditDetails;
 import org.egov.swService.model.Property;
@@ -26,16 +26,15 @@ import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.workflow.BusinessService;
 import org.egov.swService.repository.ServiceRequestRepository;
 import org.egov.swService.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class SewerageServicesUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -73,7 +72,6 @@ public class SewerageServicesUtil {
 	
 	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
 		Set<String> propertyIds = new HashSet<>();
-		List<Property> propertyList = new ArrayList<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
 		propertyIds.add(sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId());
@@ -85,8 +83,8 @@ public class SewerageServicesUtil {
 				getPropURLForCreate(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId(),
 						sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId()),
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
-		propertyList = getPropertyDetails(result);
-		if (propertyList == null || propertyList.isEmpty()) {
+		List<Property> propertyList = getPropertyDetails(result);
+		if (CollectionUtils.isEmpty(propertyList)) {
 			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
@@ -94,8 +92,7 @@ public class SewerageServicesUtil {
 
 	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
 			RequestInfo requestInfo) {
-		RequestInfoWrapper requestInfoWrapper_new = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		return requestInfoWrapper_new;
+		return RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 	}
 
 
@@ -107,8 +104,7 @@ public class SewerageServicesUtil {
 	 */
 	private List<Property> getPropertyDetails(Object result) {
 		try {
-			PropertyResponse propertyResponse = mapper.convertValue(result, PropertyResponse.class);
-			return propertyResponse.getProperties();
+			return mapper.convertValue(result, PropertyResponse.class).getProperties();
 		} catch (Exception ex) {
 			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
 		}
@@ -124,13 +120,11 @@ public class SewerageServicesUtil {
 		propertyList.add(sewerageConnectionRequest.getSewerageConnection().getProperty());
 		PropertyRequest propertyReq = getPropertyRequest(sewerageConnectionRequest.getRequestInfo(),
 				sewerageConnectionRequest.getSewerageConnection().getProperty());
-		Object result = serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq);
-		return getPropertyDetails(result);
+		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq));
 	}
 	
 	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
-		PropertyRequest propertyReq = PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
-		return propertyReq;
+		return PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
 	}
 
 
@@ -147,19 +141,16 @@ public class SewerageServicesUtil {
 //				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
 //			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
 //		}
-		if ((sewerageConnectionSearchCriteria.getMobileNumber() == null
-				|| sewerageConnectionSearchCriteria.getMobileNumber().isEmpty())) {
+		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		if (sewerageConnectionSearchCriteria.getTenantId() != null
-				&& !sewerageConnectionSearchCriteria.getTenantId().isEmpty()) {
+		propertyCriteria.setMobileNumber(sewerageConnectionSearchCriteria.getMobileNumber());
+		
+		if (!StringUtils.isEmpty(sewerageConnectionSearchCriteria.getTenantId())) {
 			propertyCriteria.setTenantId(sewerageConnectionSearchCriteria.getTenantId());
 		}
-		if (sewerageConnectionSearchCriteria.getMobileNumber() != null
-				&& !sewerageConnectionSearchCriteria.getMobileNumber().isEmpty()) {
-			propertyCriteria.setMobileNumber(sewerageConnectionSearchCriteria.getMobileNumber());
-		}
+		
 		Object result = serviceRequestRepository.fetchResult(
 				getPropURL(sewerageConnectionSearchCriteria.getTenantId(),
 						sewerageConnectionSearchCriteria.getMobileNumber()),
@@ -173,11 +164,11 @@ public class SewerageServicesUtil {
 		names.forEach(name -> {
 			masterDetails.add(MasterDetail.builder().name(name).filter(filter).build());
 		});
-		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(moduleName).masterDetails(masterDetails).build();
 		List<ModuleDetail> moduleDetails = new ArrayList<>();
-		moduleDetails.add(moduleDetail);
-		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build();
-		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+		moduleDetails.add(ModuleDetail.builder().moduleName(moduleName).masterDetails(masterDetails).build());
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).
+				mdmsCriteria(
+						MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build()).build();
 	}
 	
 
@@ -275,8 +266,8 @@ public class SewerageServicesUtil {
 	 */
 	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo){
 		
-		StringBuilder propertySearhURL = getPropURLForCreate(tenantId, propertyIds);
-		Object result = serviceRequestRepository.fetchResult(propertySearhURL,RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		Object result = serviceRequestRepository.fetchResult(getPropURLForCreate(tenantId, propertyIds),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
 	
@@ -305,8 +296,7 @@ public class SewerageServicesUtil {
 	 * @return URL of calculator service
 	 */
 	public StringBuilder getCalculatorURL() {
-		StringBuilder builder = new StringBuilder();
-		return builder.append(config.getCalculatorHost()).append(config.getCalculateEndpoint());
+		return new StringBuilder(config.getCalculatorHost()).append(config.getCalculateEndpoint());
 	}
 
 }

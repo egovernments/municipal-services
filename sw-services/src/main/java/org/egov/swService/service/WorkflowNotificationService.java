@@ -5,9 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.config.SWConfiguration;
@@ -25,9 +26,9 @@ import org.egov.swService.util.NotificationUtil;
 import org.egov.swService.util.SWConstants;
 import org.egov.swService.util.SewerageServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
@@ -61,32 +62,28 @@ public class WorkflowNotificationService {
 	 */
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
-			RequestInfo requestInfo = request.getRequestInfo();
-			SewerageConnection sewerageConnection = request.getSewerageConnection();
 			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(
-					sewerageConnection.getAction() + "_" + sewerageConnection.getApplicationStatus().name())) {
-				log.info("Notification Disabled For State :" + sewerageConnection.getApplicationStatus().name());
+					request.getSewerageConnection().getAction() + "_" + request.getSewerageConnection().getApplicationStatus().name())) {
+				log.info("Notification Disabled For State :" + request.getSewerageConnection().getApplicationStatus().name());
 				return;
 			}
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
-				EventRequest eventRequest = getEventRequest(sewerageConnection, topic, requestInfo);
+				EventRequest eventRequest = getEventRequest(request.getSewerageConnection(), topic, request.getRequestInfo());
 				if (eventRequest != null) {
 					log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 					notificationUtil.sendEventNotification(eventRequest);
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-				List<SMSRequest> smsRequests = new LinkedList<>();
-				smsRequests = getSmsRequest(sewerageConnection, topic, requestInfo);
-				if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
+				List<SMSRequest> smsRequests = getSmsRequest(request.getSewerageConnection(), topic, request.getRequestInfo());
+				if (!CollectionUtils.isEmpty(smsRequests)) {
 					log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
 				}
 			}
 
 		} catch (Exception ex) {
-			log.error(ex.toString());
-			log.error("Error occured while processing the record from topic : " + topic);
+			log.error("Error occured while processing the record from topic : " + topic, ex);
 		}
 	}
 
@@ -98,7 +95,6 @@ public class WorkflowNotificationService {
 	 * @return EventRequest Object
 	 */
 	private EventRequest getEventRequest(SewerageConnection sewerageConnection, String topic, RequestInfo requestInfo) {
-		List<Event> events = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(sewerageConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForInApp(sewerageConnection.getAction(),
@@ -124,6 +120,7 @@ public class WorkflowNotificationService {
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
+		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
 			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
@@ -156,7 +153,6 @@ public class WorkflowNotificationService {
 	 */
 	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage, String mobileNumber,
 			SewerageConnection connection) {
-		Action action = null;
 		String code = "";
 		String messageTemplate = mobileNumberAndMesssage.get(mobileNumber);
 		if (messageTemplate.contains("<Action Button>")) {
@@ -183,12 +179,12 @@ public class WorkflowNotificationService {
 			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
-			action = Action.builder().actionUrls(items).build();
 			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
+			return Action.builder().actionUrls(items).build();
 		}
 		// actionLinkAndMsg.put("Action", action);
 		// actionLinkAndMsg.put(key, value);
-		return action;
+		return null;
 	}
 
 	/**
@@ -201,7 +197,6 @@ public class WorkflowNotificationService {
 	 */
 	private List<SMSRequest> getSmsRequest(SewerageConnection sewerageConnection, String topic,
 			RequestInfo requestInfo) {
-		List<SMSRequest> smsRequest = new ArrayList<>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(sewerageConnection.getProperty().getTenantId(), requestInfo);
 		String message = notificationUtil.getCustomizedMsgForSMS(sewerageConnection.getAction(),
@@ -215,6 +210,7 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		List<SMSRequest> smsRequest = new ArrayList<>();
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnection, message);
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {

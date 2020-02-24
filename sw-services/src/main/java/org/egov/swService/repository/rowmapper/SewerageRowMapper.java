@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
 import org.egov.swService.model.Connection.StatusEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.Document;
 import org.egov.swService.model.PlumberInfo;
-import org.egov.swService.model.PlumberInfo.RelationshipEnum;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.Status;
@@ -24,8 +25,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 	@Override
 	public List<SewerageConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		Map<String, SewerageConnection> connectionListMap = new HashMap<>();
-		List<SewerageConnection> sewarageConnectionList = new ArrayList<>();
-		SewerageConnection sewarageConnection = new SewerageConnection();
+		SewerageConnection sewarageConnection = null;
 		while (rs.next()) {
 			String Id = rs.getString("connection_Id");
 			if (connectionListMap.getOrDefault(Id, null) == null) {
@@ -52,22 +52,20 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				property.setPropertyId(rs.getString("property_id"));
 				sewarageConnection.setProperty(property);
 				// Add documents id's
-				sewarageConnectionList.add(sewarageConnection);
+				connectionListMap.put(Id, sewarageConnection);
 			}
 			addChildrenToProperty(rs, sewarageConnection);
 		}
-		return sewarageConnectionList;
-
+		return new ArrayList<>(connectionListMap.values());
 	}
 
 	private void addChildrenToProperty(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
 		String document_Id = rs.getString("doc_Id");
 		String isActive = rs.getString("doc_active");
-		String activeString = Status.ACTIVE.name();
 		boolean documentActive = false;
-		if (isActive != null)
-			documentActive = isActive.equalsIgnoreCase(activeString) == true ? true : false;
-		if (document_Id != null && documentActive) {
+		if (!StringUtils.isEmpty(isActive))
+			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive) == true ? true : false;
+		if (!StringUtils.isEmpty(document_Id) && documentActive) {
 			Document applicationDocument = new Document();
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
@@ -77,7 +75,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			sewerageConnection.addDocumentsItem(applicationDocument);
 		}
 		String plumber_id = rs.getString("plumber_id");
-		if (plumber_id != null) {
+		if (!StringUtils.isEmpty(plumber_id)) {
 			PlumberInfo plumber = new PlumberInfo();
 			plumber.setId(plumber_id);
 			plumber.setName(rs.getString("plumber_name"));

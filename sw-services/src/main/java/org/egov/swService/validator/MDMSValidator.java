@@ -42,21 +42,19 @@ public class MDMSValidator {
 	public void validateMasterData(SewerageConnectionRequest request) {
 		Map<String, String> errorMap = new HashMap<>();
 
-		String jsonPath = SWConstants.JSONPATH_ROOT;
-		String taxjsonPath = SWConstants.TAX_JSONPATH_ROOT;
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		String[] masterNames = {SWConstants.MDMS_SW_Connection_Type };
-		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
+		List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_Connection_Type));
 		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
-		Map<String, List<String>> codes = getAttributeValues(tenantId, SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
-				jsonPath, request.getRequestInfo());
-		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(tenantId, SWConstants.SW_TAX_MODULE,
-				taxModelnames, "$.*.code", taxjsonPath, request.getRequestInfo());
+		Map<String, List<String>> codes = getAttributeValues(request.getRequestInfo().getUserInfo().getTenantId(), 
+				SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
+				SWConstants.JSONPATH_ROOT, request.getRequestInfo());
+		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getRequestInfo().getUserInfo().getTenantId(), 
+				SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code", 
+				SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
 		// merge codes
-		String[] finalmasterNames = { SWConstants.MDMS_SW_Connection_Type, SWConstants.SC_ROADTYPE_MASTER };
+		
 		Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
 				.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-		validateMDMSData(finalmasterNames, finalcodes);
+		validateMDMSData(finalcodes);
 		validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -77,7 +75,8 @@ public class MDMSValidator {
 		}
 	}
 
-	private void validateMDMSData(String[] masterNames, Map<String, List<String>> codes) {
+	private void validateMDMSData(Map<String, List<String>> codes) {
+		String[] masterNames = { SWConstants.MDMS_SW_Connection_Type, SWConstants.SC_ROADTYPE_MASTER };
 		Map<String, String> errorMap = new HashMap<>();
 		for (String masterName : masterNames) {
 			if (CollectionUtils.isEmpty(codes.get(masterName))) {
@@ -90,9 +89,9 @@ public class MDMSValidator {
 
 	private static Map<String, String> validateCodes(SewerageConnection sewerageConnection,
 			Map<String, List<String>> codes, Map<String, String> errorMap) {
-		StringBuilder messageBuilder = new StringBuilder();
-		if (!codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())
-				&& sewerageConnection.getConnectionType() != null) {
+		StringBuilder messageBuilder = null;
+		if (sewerageConnection.getConnectionType() != null 
+				&& !codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())) {
 			messageBuilder = new StringBuilder();
 			messageBuilder.append("The SewerageConnection connection type ")
 					.append(sewerageConnection.getConnectionType()).append(" does not exists");

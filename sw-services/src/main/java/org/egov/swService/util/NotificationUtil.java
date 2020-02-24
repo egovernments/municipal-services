@@ -3,6 +3,7 @@ package org.egov.swService.util;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.config.SWConfiguration;
@@ -68,8 +69,7 @@ public class NotificationUtil {
 		@SuppressWarnings("rawtypes")
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
-		String jsonString = new JSONObject(responseMap).toString();
-		return jsonString;
+		return new JSONObject(responseMap).toString();
 	}
 
 	/**
@@ -84,14 +84,13 @@ public class NotificationUtil {
 	private String getMessageTemplate(String notificationCode, String localizationMessage) {
 		String path = "$..messages[?(@.code==\"{}\")].message";
 		path = path.replace("{}", notificationCode);
-		String message = null;
 		try {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
-			message = ((ArrayList<String>) messageObj).get(0);
+			return ((ArrayList<String>) messageObj).get(0);
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
 		}
-		return message;
+		return null;
 	}
 
 	/**
@@ -118,10 +117,8 @@ public class NotificationUtil {
 	 * @return message template
 	 */
 	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage) {
-		String messageString = null;
-		String notificationCode = "SW_" + action.toUpperCase() + "_" + applicationStatus.toUpperCase() + "_SMS_MESSAGE";
-		messageString = getMessageTemplate(notificationCode, localizationMessage);
-		return messageString;
+		StringBuilder notificationCode = new StringBuilder("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_SMS_MESSAGE");
+		return getMessageTemplate(notificationCode.toString(), localizationMessage);
 	}
 
 	/**
@@ -131,10 +128,9 @@ public class NotificationUtil {
 	 * @return In app message template
 	 */
 	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage) {
-		String messageString = null;
-		String notificationCode = "SW_" + action.toUpperCase() + "_"+ applicationStatus.toUpperCase() + "_APP_MESSAGE";
-		messageString = getMessageTemplate(notificationCode, localizationMessage);
-		return messageString;
+		
+		StringBuilder notificationCode = new StringBuilder("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_APP_MESSAGE");
+		return getMessageTemplate(notificationCode.toString(), localizationMessage);
 	}
 	/**
 	 * Pushes the event request to Kafka Queue.
@@ -152,8 +148,7 @@ public class NotificationUtil {
 	 * @return In app message template
 	 */
 	public String getCustomizedMsg(String code, String localizationMessage) {
-		String messageString = getMessageTemplate(code, localizationMessage);
-		return messageString;
+		return getMessageTemplate(code, localizationMessage);
 	}
 
 

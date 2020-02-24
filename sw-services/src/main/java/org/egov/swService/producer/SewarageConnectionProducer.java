@@ -1,10 +1,8 @@
 package org.egov.swService.producer;
 
+import org.egov.tracer.kafka.CustomKafkaTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.egov.tracer.kafka.CustomKafkaTemplate;
-
-import lombok.extern.slf4j.Slf4j;
 
 
 @Service
