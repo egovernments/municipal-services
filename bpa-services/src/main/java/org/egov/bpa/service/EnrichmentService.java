@@ -258,16 +258,18 @@ public class EnrichmentService {
 				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
-		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);	
-		state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE);
-		if((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE) || (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE) && bpa.getRiskType().toString().equalsIgnoreCase("LOW") ))) {
+		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
+		if ((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)
+				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
+						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
 
-			// Adding 5years (60 months) to Current Date
+			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
 			bpa.setValidityDate(calendar.getTimeInMillis());
-			List<IdResponse> idResponses =  idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(), config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
+			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
+					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setPermitOrderNo(idResponses.get(0).getId());
 		}
 

@@ -294,4 +294,6 @@ public class BPAConstants {
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
 
 	public static final String FILESTOREID = "fileStoreId";
+
+	public static final String LOW_RISKTYPE = "LOW";
 }
