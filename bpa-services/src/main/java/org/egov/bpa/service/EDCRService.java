@@ -122,10 +122,10 @@ public class EDCRService {
 					OccupancyType.equals(BPAConstants.RESIDENTIAL_OCCUPANCY) ) {
 				expectedRiskType = RiskTypeEnum.fromValue( riskTypes.get(0));
 				
-				/*if(expectedRiskType == null || !expectedRiskType.equals(riskType) ) {
+				if(expectedRiskType == null || !expectedRiskType.equals(riskType) ) {
 					throw new CustomException("INVALID RISK TYPE",
 							"The Risk Type is not valid " + riskType);
-				}*/
+				}
 			}else {
 				throw new CustomException("INVALID OccupancyType",
 						"The OccupancyType " + OccupancyType + " is not supported! " );
