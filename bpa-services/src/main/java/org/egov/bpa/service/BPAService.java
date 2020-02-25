@@ -198,7 +198,7 @@ public class BPAService {
 			}
 		});
 		BusinessService businessService = workflowService.getBusinessService(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
 		List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest);

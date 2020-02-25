@@ -94,7 +94,7 @@ public class PaymentUpdateService {
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
 					List<BPA> bpas = repository.getBPAData(searchCriteria);
-					BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(),
+					BusinessService businessService = workflowService.getBusinessService(bpas.get(0),
 							requestInfo, codes.get(0));
 
 					if (CollectionUtils.isEmpty(bpas)) {

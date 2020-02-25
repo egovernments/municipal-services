@@ -93,7 +93,11 @@ public class WorkflowIntegrator {
 			JSONObject obj = new JSONObject();
 			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
 			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+			if(bpa.getRiskType().toString().equalsIgnoreCase("LOW")){			
+				obj.put(BUSINESSSERVICEKEY, config.getLowBusinessServiceValue());
+			}else{
+				obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+			}
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(ACTIONKEY, bpa.getAction());
 			obj.put(COMMENTKEY, bpa.getComment());

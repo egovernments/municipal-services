@@ -192,6 +192,9 @@ public class BPAConfiguration {
     // Workflow
     @Value("${create.bpa.workflow.name}")
     private String businessServiceValue;
+    
+    @Value("${create.bpa.low.workflow.name}")
+    private String lowBusinessServiceValue;
 
     @Value("${workflow.context.path}")
     private String wfHost;

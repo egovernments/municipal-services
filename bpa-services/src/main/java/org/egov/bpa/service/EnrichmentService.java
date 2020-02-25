@@ -255,11 +255,12 @@ public class EnrichmentService {
 		BPA bpa = bpaRequest.getBPA();
 		
 		BusinessService businessService = workflowService.getBusinessService(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
-		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);		
-		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
+		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);	
+		state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE);
+		if((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE) || (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE) && bpa.getRiskType().toString().equalsIgnoreCase("LOW") ))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
 
