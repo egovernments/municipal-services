@@ -65,7 +65,7 @@ public class ValidateProperty {
 					"No property found for water connection");
 		}
 	
-		if (CollectionUtils.isEmpty(propertyList)) {
+		if (!CollectionUtils.isEmpty(propertyList)) {
 			if (StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
 				throw new CustomException("INVALID WATER CONNECTION PROPERTY USAGE TYPE",
 						"Water connection cannot be enriched without property usage type");
