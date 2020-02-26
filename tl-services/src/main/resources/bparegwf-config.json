@@ -13,15 +13,13 @@
     "BusinessServices": [
         {
             "tenantId": "pb",
-            "uuid": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
             "businessService": "ARCHITECT",
             "business": "BPAREG",
             "businessServiceSla": 0,
             "states": [
                 {
-                    "uuid": "cd82fd18-93a7-47a2-b2a9-553b7ab3e1b6",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
@@ -31,34 +29,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "6330c037-7f20-441d-9347-3e6b5781f0d2",
                             "tenantId": "pb",
-                            "currentState": "cd82fd18-93a7-47a2-b2a9-553b7ab3e1b6",
+                            "currentState": null,
                             "action": "APPLY",
-                            "nextState": "d1161575-5b75-4898-a3a0-5dd067c5a92a",
+                            "nextState": "PENDINGPAYMENT",
                             "roles": [
                                 "CITIZEN",
                                 "ANONYMOUS"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "d1161575-5b75-4898-a3a0-5dd067c5a92a",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGPAYMENT",
                     "applicationStatus": "PENDINGPAYMENT",
@@ -68,34 +52,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "28af792c-9df2-4780-b3d6-8ce437bc5982",
                             "tenantId": "pb",
-                            "currentState": "d1161575-5b75-4898-a3a0-5dd067c5a92a",
+                            "currentState": "PENDINGPAYMENT",
                             "action": "PAY",
-                            "nextState": "09fda505-14c8-4e27-ae9a-c181fd837d59",
+                            "nextState": "PENDINGDOCVERIFICATION",
                             "roles": [
                                 "CITIZEN",
                                 "SYSTEM_PAYMENT"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "09fda505-14c8-4e27-ae9a-c181fd837d59",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGDOCVERIFICATION",
                     "applicationStatus": "PENDINGDOCVERIFICATION",
@@ -105,49 +75,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "057acbd4-f758-4f6c-b7f4-6555a0e56269",
                             "tenantId": "pb",
-                            "currentState": "09fda505-14c8-4e27-ae9a-c181fd837d59",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "REJECT",
-                            "nextState": "883ebcff-e870-4587-8ed2-0bc4671c2412",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "9e4e8227-0b24-4ffd-ba0c-e528f06de665",
                             "tenantId": "pb",
-                            "currentState": "09fda505-14c8-4e27-ae9a-c181fd837d59",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "FORWARD",
-                            "nextState": "4c1aa25c-4aa9-4ed3-8713-ed0d3e6921d4",
+                            "nextState": "PENDINGAPPROVAL",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "883ebcff-e870-4587-8ed2-0bc4671c2412",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "REJECTED",
                     "applicationStatus": "REJECTED",
@@ -155,18 +104,11 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 },
                 {
-                    "uuid": "4c1aa25c-4aa9-4ed3-8713-ed0d3e6921d4",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": 43200000,
                     "state": "PENDINGAPPROVAL",
                     "applicationStatus": "PENDINGAPPROVAL",
@@ -176,49 +118,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "64bf29df-77af-405f-be9e-35b78be0a431",
                             "tenantId": "pb",
-                            "currentState": "4c1aa25c-4aa9-4ed3-8713-ed0d3e6921d4",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "REJECT",
-                            "nextState": "883ebcff-e870-4587-8ed2-0bc4671c2412",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "0d67dcfb-3ff9-41dd-8b9a-374cf0d38fb4",
                             "tenantId": "pb",
-                            "currentState": "4c1aa25c-4aa9-4ed3-8713-ed0d3e6921d4",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "APPROVE",
-                            "nextState": "64d0a25f-69f5-45be-ac07-dc05b52cba53",
+                            "nextState": "APPROVED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "64d0a25f-69f5-45be-ac07-dc05b52cba53",
                     "tenantId": "pb",
-                    "businessServiceId": "b75f10ab-99f7-4c4d-9cb2-5eab16eb12d2",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "APPROVED",
                     "applicationStatus": "APPROVED",
@@ -226,33 +147,19 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 }
-            ],
-            "auditDetails": {
-                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "createdTime": 1574667978973,
-                "lastModifiedTime": 1578380480486
-            }
+            ]
         },
         {
             "tenantId": "pb",
-            "uuid": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
             "businessService": "BUILDER",
             "business": "BPAREG",
             "businessServiceSla": 0,
             "states": [
                 {
-                    "uuid": "7f34600c-60cb-4d39-908e-b0b45550c17c",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
@@ -262,34 +169,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "4a4a8b06-c889-43b8-afb9-4a85be7019e3",
                             "tenantId": "pb",
-                            "currentState": "7f34600c-60cb-4d39-908e-b0b45550c17c",
+                            "currentState": null,
                             "action": "APPLY",
-                            "nextState": "f2ec303e-7c0b-42c7-834a-5f13a3a2b4e9",
+                            "nextState": "PENDINGPAYMENT",
                             "roles": [
                                 "CITIZEN",
                                 "ANONYMOUS"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ] 
                 },
                 {
-                    "uuid": "f2ec303e-7c0b-42c7-834a-5f13a3a2b4e9",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGPAYMENT",
                     "applicationStatus": "PENDINGPAYMENT",
@@ -299,34 +192,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "44332c76-b17d-4c0a-8f94-53cc28d7edbf",
                             "tenantId": "pb",
-                            "currentState": "f2ec303e-7c0b-42c7-834a-5f13a3a2b4e9",
+                            "currentState": "PENDINGPAYMENT",
                             "action": "PAY",
-                            "nextState": "b0a11240-6076-458d-b6bf-be2aeac926a9",
+                            "nextState": "PENDINGDOCVERIFICATION",
                             "roles": [
                                 "CITIZEN",
                                 "SYSTEM_PAYMENT"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "b0a11240-6076-458d-b6bf-be2aeac926a9",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGDOCVERIFICATION",
                     "applicationStatus": "PENDINGDOCVERIFICATION",
@@ -336,49 +215,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "5af88d18-76b5-4a8a-bf03-0cfaf8e34566",
                             "tenantId": "pb",
-                            "currentState": "b0a11240-6076-458d-b6bf-be2aeac926a9",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "FORWARD",
-                            "nextState": "114d7ded-05df-4de5-a8b0-e3390cf39bfa",
+                            "nextState": "PENDINGAPPROVAL",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "c11eb372-f817-427a-ae02-ab7a74bb773d",
                             "tenantId": "pb",
-                            "currentState": "b0a11240-6076-458d-b6bf-be2aeac926a9",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "REJECT",
-                            "nextState": "52860c51-0323-47ec-bbed-8f7dbba412d6",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "52860c51-0323-47ec-bbed-8f7dbba412d6",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "REJECTED",
                     "applicationStatus": "REJECTED",
@@ -386,18 +244,11 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 },
                 {
-                    "uuid": "114d7ded-05df-4de5-a8b0-e3390cf39bfa",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": 43200000,
                     "state": "PENDINGAPPROVAL",
                     "applicationStatus": "PENDINGAPPROVAL",
@@ -407,49 +258,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "57b054f3-b621-48ef-b302-1e1b96ca8764",
                             "tenantId": "pb",
-                            "currentState": "114d7ded-05df-4de5-a8b0-e3390cf39bfa",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "REJECT",
-                            "nextState": "52860c51-0323-47ec-bbed-8f7dbba412d6",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "4f39787d-2005-4321-b2c1-2dd11708c8aa",
                             "tenantId": "pb",
-                            "currentState": "114d7ded-05df-4de5-a8b0-e3390cf39bfa",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "APPROVE",
-                            "nextState": "e87ac2cf-2690-4d4a-9aac-79e65d1fadc4",
+                            "nextState": "APPROVED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "e87ac2cf-2690-4d4a-9aac-79e65d1fadc4",
                     "tenantId": "pb",
-                    "businessServiceId": "a00cb265-dabf-4846-aff2-2ae27369e4ad",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "APPROVED",
                     "applicationStatus": "APPROVED",
@@ -457,33 +287,19 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 }
-            ],
-            "auditDetails": {
-                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "createdTime": 1574667978973,
-                "lastModifiedTime": 1578380480486
-            }
+            ]
         },
         {
             "tenantId": "pb",
-            "uuid": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
             "businessService": "ENGINEER",
             "business": "BPAREG",
             "businessServiceSla": 0,
             "states": [
                 {
-                    "uuid": "9e123901-f56c-4aed-b589-132bfbb06137",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
@@ -493,34 +309,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "4fe90b93-3352-47b4-91f7-520b1545d17b",
                             "tenantId": "pb",
-                            "currentState": "9e123901-f56c-4aed-b589-132bfbb06137",
+                            "currentState": null,
                             "action": "APPLY",
-                            "nextState": "03703a25-a7fb-45a0-ae7f-d8a05e13c10d",
+                            "nextState": "PENDINGPAYMENT",
                             "roles": [
                                 "CITIZEN",
                                 "ANONYMOUS"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "03703a25-a7fb-45a0-ae7f-d8a05e13c10d",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": null,
                     "state": "PENDINGPAYMENT",
                     "applicationStatus": "PENDINGPAYMENT",
@@ -530,34 +332,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "6be457f3-b691-43b6-bfc2-d54f5d21e043",
                             "tenantId": "pb",
-                            "currentState": "03703a25-a7fb-45a0-ae7f-d8a05e13c10d",
+                            "currentState": "PENDINGPAYMENT",
                             "action": "PAY",
-                            "nextState": "1a658c4c-a8d3-42e7-a1d3-53b602ddd28d",
+                            "nextState": "PENDINGDOCVERIFICATION",
                             "roles": [
                                 "CITIZEN",
                                 "SYSTEM_PAYMENT"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "1a658c4c-a8d3-42e7-a1d3-53b602ddd28d",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": null,
                     "state": "PENDINGDOCVERIFICATION",
                     "applicationStatus": "PENDINGDOCVERIFICATION",
@@ -567,49 +355,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "f6c84197-ca58-4d3c-a3e9-9f961d09b015",
                             "tenantId": "pb",
-                            "currentState": "1a658c4c-a8d3-42e7-a1d3-53b602ddd28d",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "FORWARD",
-                            "nextState": "0db9941a-d3b3-4109-b9c5-b1e32cc13b18",
+                            "nextState": "PENDINGAPPROVAL",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "9bfa26c2-d578-48af-a8af-950fa3185aa8",
                             "tenantId": "pb",
-                            "currentState": "1a658c4c-a8d3-42e7-a1d3-53b602ddd28d",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "REJECT",
-                            "nextState": "bc0a5b39-34f9-48dd-bae0-53ba3942ea45",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "bc0a5b39-34f9-48dd-bae0-53ba3942ea45",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": null,
                     "state": "REJECTED",
                     "applicationStatus": "REJECTED",
@@ -617,18 +384,11 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 },
                 {
-                    "uuid": "0db9941a-d3b3-4109-b9c5-b1e32cc13b18",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": 43200000,
                     "state": "PENDINGAPPROVAL",
                     "applicationStatus": "PENDINGAPPROVAL",
@@ -638,49 +398,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "ceb57ad7-fe6a-4970-b64c-94ac550ee642",
                             "tenantId": "pb",
-                            "currentState": "0db9941a-d3b3-4109-b9c5-b1e32cc13b18",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "APPROVE",
-                            "nextState": "7d5e4459-907d-4015-91d2-5c8829cd8549",
+                            "nextState": "APPROVED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "d2b6f1a4-3d8b-4e6b-b351-879d7576144f",
                             "tenantId": "pb",
-                            "currentState": "0db9941a-d3b3-4109-b9c5-b1e32cc13b18",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "REJECT",
-                            "nextState": "bc0a5b39-34f9-48dd-bae0-53ba3942ea45",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "7d5e4459-907d-4015-91d2-5c8829cd8549",
                     "tenantId": "pb",
-                    "businessServiceId": "4da9762a-47c5-41d7-8ce1-1a3c7ea021b8",
+                    "businessServiceId": "null",
                     "sla": null,
                     "state": "APPROVED",
                     "applicationStatus": "APPROVED",
@@ -688,33 +427,19 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 }
-            ],
-            "auditDetails": {
-                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "createdTime": 1574667978973,
-                "lastModifiedTime": 1578380480486
-            }
+            ]
         },
         {
             "tenantId": "pb",
-            "uuid": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
             "businessService": "STRUCTURALENGINEER",
             "business": "BPAREG",
             "businessServiceSla": 0,
             "states": [
                 {
-                    "uuid": "a67bc2b6-29e1-4493-8d7e-74c627065296",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
@@ -724,34 +449,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "e01aca53-c921-4402-94a0-c6bfff0453c5",
                             "tenantId": "pb",
-                            "currentState": "a67bc2b6-29e1-4493-8d7e-74c627065296",
+                            "currentState": null,
                             "action": "APPLY",
-                            "nextState": "1c658b01-f8db-4a94-8c65-70c6aac914ed",
+                            "nextState": "PENDINGPAYMENT",
                             "roles": [
                                 "CITIZEN",
                                 "ANONYMOUS"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "1c658b01-f8db-4a94-8c65-70c6aac914ed",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGPAYMENT",
                     "applicationStatus": "PENDINGPAYMENT",
@@ -761,34 +472,20 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "6aec8a33-4b68-411d-b2cb-56036f291baa",
                             "tenantId": "pb",
-                            "currentState": "1c658b01-f8db-4a94-8c65-70c6aac914ed",
+                            "currentState": "PENDINGPAYMENT",
                             "action": "PAY",
-                            "nextState": "6c14e8cb-b3d0-4f0b-b8b9-6da60b58d851",
+                            "nextState": "PENDINGDOCVERIFICATION",
                             "roles": [
                                 "CITIZEN",
                                 "SYSTEM_PAYMENT"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "6c14e8cb-b3d0-4f0b-b8b9-6da60b58d851",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "PENDINGDOCVERIFICATION",
                     "applicationStatus": "PENDINGDOCVERIFICATION",
@@ -798,49 +495,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "c6dd285c-0cbf-4552-aec7-b76d47388d4f",
                             "tenantId": "pb",
-                            "currentState": "6c14e8cb-b3d0-4f0b-b8b9-6da60b58d851",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "FORWARD",
-                            "nextState": "83c57d92-8f92-418e-80dd-e03318be32a3",
+                            "nextState": "PENDINGAPPROVAL",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "755d3d65-2b8a-4ced-ad53-cdf47de58afd",
                             "tenantId": "pb",
-                            "currentState": "6c14e8cb-b3d0-4f0b-b8b9-6da60b58d851",
+                            "currentState": "PENDINGDOCVERIFICATION",
                             "action": "REJECT",
-                            "nextState": "2a341697-ae4f-48b5-b417-56f66bafd612",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_DOC_VERIFIER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "2a341697-ae4f-48b5-b417-56f66bafd612",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "REJECTED",
                     "applicationStatus": "REJECTED",
@@ -848,18 +524,11 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 },
                 {
-                    "uuid": "83c57d92-8f92-418e-80dd-e03318be32a3",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": 43200000,
                     "state": "PENDINGAPPROVAL",
                     "applicationStatus": "PENDINGAPPROVAL",
@@ -869,49 +538,28 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "uuid": "09e2298b-f803-4e22-a7b2-c3f00080cf66",
                             "tenantId": "pb",
-                            "currentState": "83c57d92-8f92-418e-80dd-e03318be32a3",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "APPROVE",
-                            "nextState": "6561c40c-6fc0-4ca1-9e4e-cd0593ffec8c",
+                            "nextState": "APPROVED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         },
                         {
-                            "uuid": "d96b5244-62a3-49bd-8711-ee2f268efd07",
                             "tenantId": "pb",
-                            "currentState": "83c57d92-8f92-418e-80dd-e03318be32a3",
+                            "currentState": "PENDINGAPPROVAL",
                             "action": "REJECT",
-                            "nextState": "2a341697-ae4f-48b5-b417-56f66bafd612",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPAREG_APPROVER"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                                "createdTime": 1574667978973,
-                                "lastModifiedTime": 1578380480486
-                            }
+                            ]
                         }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    ]
                 },
                 {
-                    "uuid": "6561c40c-6fc0-4ca1-9e4e-cd0593ffec8c",
                     "tenantId": "pb",
-                    "businessServiceId": "4b6cb826-1cd2-4086-ae5a-2759c186c6db",
+                    "businessServiceId": null,
                     "sla": null,
                     "state": "APPROVED",
                     "applicationStatus": "APPROVED",
@@ -919,21 +567,9 @@
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                        "createdTime": 1574667978973,
-                        "lastModifiedTime": 1578380480486
-                    }
+                    "actions": null
                 }
-            ],
-            "auditDetails": {
-                "createdBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "lastModifiedBy": "11b0e02b-0145-4de2-bc42-c97b96264807",
-                "createdTime": 1574667978973,
-                "lastModifiedTime": 1578380480486
-            }
+            ]
         }
     ]
 }
