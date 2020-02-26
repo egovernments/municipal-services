@@ -95,10 +95,12 @@ public class WorkflowIntegrator {
 			try {
 				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
+				StringBuilder builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
+				builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());
 		} catch (Exception e) {
