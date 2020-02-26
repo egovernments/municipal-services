@@ -191,6 +191,13 @@ public class TLConstants {
 
 	public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";
 
+	//License format changes
+	public static final String ENGINEER = "ENGINEER";
+	public static final String STRUCTURALENGINEER = "STRUCTURALENGINEER";
+	public static final String BUILDER = "BUILDER";
+	public static final String SUPERVISOR = "SUPERVISOR";
+	public static final String TOWNPLANNER = "TOWNPLANNER";
+	public static final String ARCHITECT = "ARCHITECT";
 
     public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,
             VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME));
