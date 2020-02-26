@@ -8,41 +8,17 @@
     "requesterId": "",
     "ts": 1513579888683,
     "ver": ".01",
-    "authToken": "{AUTH}",
-    "userInfo": {
-      "id": 26397,
-      "uuid": "b5655467-f24f-452d-a2f8-2177014b00f3",
-      "userName": "9449880531",
-      "name": "Sushama Manohar",
-      "mobileNumber": "9449880531",
-      "emailId": "sus.man@gmail.com",
-      "locale": null,
-      "type": "CITIZEN",
-      "roles": [
-        {
-          "name": "Citizen",
-          "code": "CITIZEN",
-          "tenantId": "pb"
-        },
-        {
-          "name": "BPA Architect",
-          "code": "BPA_ARCHITECT",
-          "tenantId": "pb"
-        }
-      ],
-      "active": true,
-      "tenantId": "pb"
-    }
+    "authToken": "{AUTH}"
   },
   "BusinessServices": [
     {
-      "tenantId": "pb.amritsar",
+      "tenantId": "bh",
       "businessService": "BPA",
       "business": "bpa-services",
       "businessServiceSla": 0,
       "states": [
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": null,
           "applicationStatus": null,
@@ -52,7 +28,7 @@
           "isStateUpdatable": true,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "action": "INITIATE",
               "nextState": "SEND_TO_CITIZEN",
               "roles": [
@@ -62,7 +38,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "SEND_TO_CITIZEN",
           "applicationStatus": "INITIATED",
@@ -72,7 +48,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "SEND_TO_CITIZEN",
               "action": "SEND_TO_CITIZEN",
               "nextState": "CITIZEN_APPROVAL_PENDING",
@@ -81,7 +57,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "SEND_TO_CITIZEN",
               "action": "INITIATE",
               "nextState": "SEND_TO_CITIZEN",
@@ -92,7 +68,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "CITIZEN_APPROVAL_PENDING",
           "applicationStatus": "CITIZEN_APPROVAL_INPROCESS",
@@ -102,7 +78,7 @@
           "isStateUpdatable": true,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "CITIZEN_APPROVAL_PENDING",
               "action": "APPROVE",
               "nextState": "INITIATED",
@@ -111,7 +87,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "CITIZEN_APPROVAL_PENDING",
               "action": "SEND_TO_ARCHITECT",
               "nextState": "SEND_TO_CITIZEN",
@@ -122,7 +98,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "INITIATED",
           "applicationStatus": "INPROGRESS",
@@ -132,7 +108,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "INITIATED",
               "action": "INITIATE",
               "nextState": "INITIATED",
@@ -141,7 +117,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "INITIATED",
               "action": "APPLY",
               "nextState": "PENDING_APPL_FEE_PAYMENT",
@@ -152,7 +128,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "PENDING_APPL_FEE_PAYMENT",
           "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
@@ -162,7 +138,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDING_APPL_FEE_PAYMENT",
               "action": "PAY",
               "nextState": "DOC_VERIFICATION_PENDING",
@@ -174,7 +150,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDING_APPL_FEE_PAYMENT",
               "action": "ADHOC",
               "nextState": "PENDING_APPL_FEE_PAYMENT",
@@ -188,7 +164,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "DOC_VERIFICATION_PENDING",
           "applicationStatus": "DOC_VERIFICATION_INPROGRESS",
@@ -198,7 +174,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "DOC_VERIFICATION_PENDING",
               "action": "FORWARD",
               "nextState": "FIELDINSPECTION_PENDING",
@@ -207,7 +183,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "DOC_VERIFICATION_PENDING",
               "action": "REJECT",
               "nextState": "REJECTED",
@@ -218,7 +194,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "FIELDINSPECTION_PENDING",
           "applicationStatus": "FIELDINSPECTION_INPROGRESS",
@@ -228,7 +204,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "FIELDINSPECTION_PENDING",
               "action": "REJECT",
               "nextState": "REJECTED",
@@ -237,7 +213,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "FIELDINSPECTION_PENDING",
               "action": "FORWARD",
               "nextState": "NOC_VERIFICATION_PENDING",
@@ -248,7 +224,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "NOC_VERIFICATION_PENDING",
           "applicationStatus": "NOC_VERIFICATION_INPROGRESS",
@@ -258,7 +234,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "NOC_VERIFICATION_PENDING",
               "action": "REJECT",
               "nextState": "REJECTED",
@@ -267,7 +243,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "NOC_VERIFICATION_PENDING",
               "action": "FORWARD",
               "nextState": "PENDINGAPPROVAL",
@@ -278,7 +254,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "PENDINGAPPROVAL",
           "applicationStatus": "APPROVAL_INPROGRESS",
@@ -288,7 +264,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDINGAPPROVAL",
               "action": "REJECT",
               "nextState": "REJECTED",
@@ -297,7 +273,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDING_SANC_FEE_PAYMENT",
               "action": "APPROVE",
               "nextState": "APPROVED",
@@ -308,7 +284,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "PENDING_SANC_FEE_PAYMENT",
           "applicationStatus": "PENDING_SANC_FEE_PAYMENT",
@@ -318,7 +294,7 @@
           "isStateUpdatable": false,
           "actions": [
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDING_SANC_FEE_PAYMENT",
               "action": "ADHOC",
               "nextState": "PENDING_SANC_FEE_PAYMENT",
@@ -330,7 +306,7 @@
               ]
             },
             {
-              "tenantId": "pb.amritsar",
+              "tenantId": "bh",
               "currentState": "PENDING_SANC_FEE_PAYMENT",
               "action": "PAY",
               "nextState": "APPROVED",
@@ -344,7 +320,7 @@
           ]
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "APPROVED",
           "applicationStatus": "APPROVED",
@@ -355,7 +331,7 @@
           "actions": null
         },
         {
-          "tenantId": "pb.amritsar",
+          "tenantId": "bh",
           "sla": null,
           "state": "REJECTED",
           "applicationStatus": "REJECTED",
