@@ -1,3 +1,4 @@
+
 package org.egov.waterConnection.model;
 
 import java.util.Objects;
@@ -8,6 +9,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.egov.waterConnection.model.workflow.ProcessInstance;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -26,7 +29,7 @@ public class Connection {
 
 	@JsonProperty("property")
 	private Property property = null;
-
+	
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
@@ -146,6 +149,9 @@ public class Connection {
 	@Size(max = 64)
 	@JsonProperty("action")
 	private String action = null;
+	
+	@JsonProperty("processInstance")
+	private ProcessInstance processInstance = null;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -172,6 +178,11 @@ public class Connection {
 		this.property = property;
 		return this;
 	}
+	
+	public Connection processInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+		return this;
+	}
 
 	/**
 	 * Get property
@@ -187,6 +198,21 @@ public class Connection {
 
 	public void setProperty(Property property) {
 		this.property = property;
+	}
+	
+	/**
+	 * Get property
+	 * 
+	 * @return property
+	 **/
+	@ApiModelProperty(value = "")
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
 	}
 
 	public Connection applicationNo(String applicationNo) {
