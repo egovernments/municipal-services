@@ -1,3 +1,4 @@
+
 package org.egov.swService.model;
 
 import java.util.Objects;
@@ -8,6 +9,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.egov.swService.model.workflow.ProcessInstance;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -26,7 +29,7 @@ public class Connection {
 
 	@JsonProperty("property")
 	private Property property = null;
-
+	
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
@@ -146,6 +149,9 @@ public class Connection {
 	@Size(max = 64)
 	@JsonProperty("action")
 	private String action = null;
+	
+	@JsonProperty("processInstance")
+	private ProcessInstance processInstance = null;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -159,6 +165,7 @@ public class Connection {
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Unique Identifier of the connection for internal reference.")
 
+	@Size(min = 1, max = 64)
 	public String getId() {
 		return id;
 	}
@@ -169,6 +176,11 @@ public class Connection {
 
 	public Connection property(Property property) {
 		this.property = property;
+		return this;
+	}
+	
+	public Connection processInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
 		return this;
 	}
 
@@ -187,6 +199,21 @@ public class Connection {
 	public void setProperty(Property property) {
 		this.property = property;
 	}
+	
+	/**
+	 * Get property
+	 * 
+	 * @return property
+	 **/
+	@ApiModelProperty(value = "")
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+	}
 
 	public Connection applicationNo(String applicationNo) {
 		this.applicationNo = applicationNo;
@@ -200,6 +227,8 @@ public class Connection {
 	 * @return applicationNo
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Formatted application number, which will be generated using ID-Gen at the time .")
+
+	@Size(min = 1, max = 64)
 	public String getApplicationNo() {
 		return applicationNo;
 	}
@@ -263,6 +292,7 @@ public class Connection {
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Formatted connection number, which will be generated using ID-Gen service after aproval of connection application in case of new application. If the source of data is \"DATA_ENTRY\" then application status will be considered as \"APROVED\" application.")
 
+	@Size(min = 1, max = 64)
 	public String getConnectionNo() {
 		return connectionNo;
 	}
@@ -282,6 +312,8 @@ public class Connection {
 	 * @return oldConnectionNo
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Mandatory if source is \"DATA_ENTRY\".")
+
+	@Size(min = 1, max = 64)
 	public String getOldConnectionNo() {
 		return oldConnectionNo;
 	}
