@@ -1,8 +1,6 @@
 package org.egov.swService.workflow;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +118,7 @@ public class WorkflowIntegrator {
 
 		/*
 		 * on success result from work-flow read the data and set the status
-		 * back to WS object
+		 * back to SW object
 		 */
 		processInstanceResponse.getProcessInstances().forEach(pInstance -> {
 			if (sewerageConnectionRequest.getSewerageConnection().getApplicationNo()
