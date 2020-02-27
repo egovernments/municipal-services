@@ -77,7 +77,7 @@ public class SWCalculationConstant {
 
 	public static final String SW_TIME_PENALTY = "SW_TIME_PENALTY";
 
-	public static final String SW_WATER_CESS = "SW_WATER_CESS";
+	public static final String SW_WATER_CESS = "SW_SEWERAGE_CESS";
 
 	public static final String SW_CHARGE = "SW_CHARGE";
 
