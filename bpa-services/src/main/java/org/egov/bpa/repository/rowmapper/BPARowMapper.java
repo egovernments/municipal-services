@@ -63,9 +63,12 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 				Boundary locality = Boundary.builder()
 						.code(rs.getString("locality")).build();
 
-				GeoLocation geoLocation = GeoLocation.builder()
-						.latitude(latitude)
-						.longitude(longitude).build();
+				GeoLocation location = GeoLocation.builder().latitude(latitude)
+						.build();
+
+				GeoLocation location2 = GeoLocation.builder().longitude(longitude)
+						.build();
+				
 				
 				Address address = Address
 						.builder()
@@ -77,7 +80,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.country(rs.getString("country"))
 						.id(rs.getString("bpa_ad_id"))
 						.landmark(rs.getString("landmark")).locality(locality)
-						.geoLocation(geoLocation)
+//						.geoLocation(location).geoLocation(location2)
 						.pincode(rs.getString("pincode"))
 						.doorNo(rs.getString("doorno"))
 						.street(rs.getString("street")).tenantId(tenantId).build();
@@ -93,9 +96,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.riskType(BPA.RiskTypeEnum.fromValue(rs.getString("riskType")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
 						.holdingNo(rs.getString("holdingNo"))
-						.occupancyType(rs.getString("occupancyType"))
-						.subOccupancyType(rs.getString("subOccupancyType"))
-						.usages(rs.getString("usages"))
 						.govtOrQuasi(rs.getString("govtOrQuasi"))
 						.registrationDetails(rs.getString("registrationDetails"))
 						.remarks(rs.getString("remarks"))
@@ -138,7 +138,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		Document ownerDocument = Document.builder()
 				.id(rs.getString("ownerdocid"))
 				.documentType(rs.getString("ownerdocType"))
-				.fileStoreId(rs.getString("ownerfileStore"))
+				.fileStore(rs.getString("ownerfileStore"))
 				.documentUid(rs.getString("ownerdocuid")).build();
 
 		Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
@@ -172,7 +172,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		if (rs.getString("bpa_doc_id") != null) {
 			Document document = Document.builder()
 					.documentType(rs.getString("bpa_doc_documenttype"))
-					.fileStoreId(rs.getString("bpa_doc_filestore"))
+					.fileStore(rs.getString("bpa_doc_filestore"))
 					.id(rs.getString("bpa_doc_id")).build();
 			bpa.addDocumentsItem(document);
 		}

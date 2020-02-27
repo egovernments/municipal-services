@@ -130,6 +130,18 @@ public class BPAConfiguration {
     @Value("${egov.receipt.businessservice}")
     private String businessService;
 
+
+    //Property Service
+    @Value("${egov.property.service.host}")
+    private String propertyHost;
+
+    @Value("${egov.property.service.context.path}")
+    private String propertyContextPath;
+
+    @Value("${egov.property.endpoint}")
+    private String propertySearchEndpoint;
+
+
     //SMS
     @Value("${kafka.topics.notification.sms}")
     private String smsNotifTopic;
@@ -159,11 +171,6 @@ public class BPAConfiguration {
     @Value("${egov.bpa.calculator.calculate.endpoint}")
     private String calulatorEndPoint;
 
-    @Value("${egov.billingservice.host}")
-    private String billingHost;
-
-    @Value("${egov.demand.search.endpoint}")
-    private String demandSearchEndpoint;
 
     //MDMS
     @Value("${egov.mdms.host}")
@@ -226,14 +233,6 @@ public class BPAConfiguration {
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;
-	
-	@Value("${egov.collection.service.host}")
-	private String collectionServiceHost;
-
-	
-	@Value("${egov.collection.service.search.endpoint}")
-	private String collectionServiceSearchEndPoint;
-	
 
 
 }
