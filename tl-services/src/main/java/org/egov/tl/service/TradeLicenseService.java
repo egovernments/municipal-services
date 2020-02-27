@@ -8,6 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.notification.EditNotificationService;
+import org.egov.tl.util.TLConstants;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.validator.TLValidator;
 import org.egov.tl.web.models.*;
@@ -21,6 +22,8 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.JsonPath;
 
 import static org.egov.tl.util.TLConstants.*;
 
@@ -292,7 +295,7 @@ public class TradeLicenseService {
                 wfIntegrator.callWorkFlow(tradeLicenseRequest);
                 break;
         }
-        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
+        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates, mdmsData);
         userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
         switch (businessServicefromPath) {
