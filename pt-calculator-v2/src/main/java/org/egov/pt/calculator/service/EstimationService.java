@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.pt.calculator.repository.Repository;
 import org.egov.pt.calculator.util.CalculatorConstants;
@@ -874,11 +875,12 @@ public class EstimationService {
 				.append(SEPARATER).append(BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(configs.getPtMutationBusinessCode())
 				.append(SEPARATER).append(CONSUMER_CODE_SEARCH_FIELD_NAME).append(property.getAcknowldgementNumber()).toString();
 		DemandResponse res = new DemandResponse();
-		res = restTemplate.postForObject(url, requestInfo, DemandResponse.class);
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		res = restTemplate.postForObject(url, requestInfoWrapper, DemandResponse.class);
 		if(CollectionUtils.isEmpty(res.getDemands()) || res.getDemands() == null)
-			generateDemandsFroMutationFee(feeStructure, requestInfo);
+			generateDemandsFroMutationFee(property, feeStructure, requestInfo);
 		else
-			updateDemand(requestInfo,res,calculation);
+			updateDemand(property,requestInfo,res,calculation);
 
 	}
 
@@ -888,11 +890,18 @@ public class EstimationService {
 	 * @param response
 	 * @param calculation
 	 */
-	private void updateDemand(RequestInfo requestInfo,DemandResponse response,Calculation calculation){
+	private void updateDemand(PropertyV2 property,RequestInfo requestInfo,DemandResponse response,Calculation calculation){
 		List<Demand> demands = response.getDemands();
+		User payer=null;
 		for(int i = 0; i < demands.size(); i++ ){
 			demands.get(i).setTaxPeriodFrom(calculation.getFromDate());
 			demands.get(i).setTaxPeriodTo(calculation.getToDate());
+			if(demands.get(i).getPayer() == null){
+				OwnerInfo owner = getActiveOwner(property.getOwners());
+				payer = utils.getCommonContractUser(owner);
+				demands.get(i).setPayer(payer);
+			}
+
 			List<DemandDetail> demandDetails = demands.get(i).getDemandDetails();
 			for(int j =0;j<demandDetails.size();j++){
 				if(demandDetails.get(j).getTaxHeadMasterCode() == configs.getPtMutationFeeTaxHead())
@@ -924,7 +933,7 @@ public class EstimationService {
 	 * @param feeStructure
 	 * @param requestInfo
 	 */
-	private void generateDemandsFroMutationFee(Map<String, Calculation> feeStructure, RequestInfo requestInfo) {
+	private void generateDemandsFroMutationFee(PropertyV2 property, Map<String, Calculation> feeStructure, RequestInfo requestInfo) {
 		List<Demand> demands = new ArrayList<>();
 		for(String key: feeStructure.keySet()) {
 			List<DemandDetail> details = new ArrayList<>();
@@ -947,9 +956,11 @@ public class EstimationService {
 						.taxHeadMasterCode(configs.getPtMutationExemptionTaxHead()).tenantId(calculation.getTenantId()).build();
 				details.add(demandDetail);
 			}
-			
+			OwnerInfo owner = getActiveOwner(property.getOwners());
+			User payer = utils.getCommonContractUser(owner);
+
 			Demand demand = Demand.builder().auditDetails(null).additionalDetails(null).businessService(configs.getPtMutationBusinessCode())
-					.consumerCode(key).consumerType(" ").demandDetails(details).id(null).minimumAmountPayable(configs.getPtMutationMinPayable()).payer(null).status(null)
+					.consumerCode(key).consumerType(" ").demandDetails(details).id(null).minimumAmountPayable(configs.getPtMutationMinPayable()).payer(payer).status(null)
 					.taxPeriodFrom(calculation.getFromDate()).taxPeriodTo(calculation.getToDate()).tenantId(calculation.getTenantId()).build();
 			demands.add(demand);
 			
@@ -1164,6 +1175,17 @@ public class EstimationService {
 		if(subownershipCategory != null)
 			billingSlabSearchCriteria.setSubOwnerShipCategory(subownershipCategory);
 
+	}
+
+	private OwnerInfo getActiveOwner(List<OwnerInfo> ownerlist){
+		OwnerInfo ownerInfo = new OwnerInfo();
+		for(OwnerInfo owner : ownerlist){
+			if(owner.getActive() == true){
+				ownerInfo=owner;
+				return ownerInfo;
+			}
+		}
+		return ownerInfo;
 	}
 
 
