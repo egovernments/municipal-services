@@ -1,5 +1,6 @@
 package org.egov.swService.workflow;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,59 +8,40 @@ import java.util.Map;
 
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
+import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.model.workflow.ProcessInstance;
+import org.egov.swService.model.workflow.ProcessInstanceRequest;
+import org.egov.swService.model.workflow.ProcessInstanceResponse;
+import org.egov.swService.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
 public class WorkflowIntegrator {
 
-	private static final String TENANTIDKEY = "tenantId";
-
-	private static final String BUSINESSSERVICEKEY = "businessService";
-
-	private static final String ACTIONKEY = "action";
-
-	private static final String COMMENTKEY = "comment";
-
-	private static final String MODULENAMEKEY = "moduleName";
-
-	private static final String BUSINESSIDKEY = "businessId";
-
-	private static final String DOCUMENTSKEY = "documents";
-
-	private static final String ASSIGNEEKEY = "assignes";
-
-	private static final String UUIDKEY = "uuid";
-
 	private static final String MODULENAMEVALUE = "SW";
-
-	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
-
-	private static final String REQUESTINFOKEY = "RequestInfo";
-
-	private static final String PROCESSINSTANCESJOSNKEY = "$.ProcessInstances";
-
-	private static final String BUSINESSIDJOSNKEY = "$.businessId";
-
-	private static final String STATUSJSONKEY = "$.state.applicationStatus";
 
 	private RestTemplate rest;
 
 	private SWConfiguration config;
+
+	@Autowired
+	private ObjectMapper mapper;
+
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, SWConfiguration config) {
@@ -78,43 +60,57 @@ public class WorkflowIntegrator {
 	 */
 	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest) {
 
+		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
+		ProcessInstance processInstance = ProcessInstance.builder()
+				.businessId(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
+				.tenantId(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId())
+				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
+				.action(connection.getAction()).build();
 
-		JSONArray array = new JSONArray();
-		JSONObject obj = new JSONObject();
-		List<Map<String, String>> uuidmaps = new LinkedList<>();
-		// Add assignes to processInsatance
+		if (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())) {
+			if (!CollectionUtils
+					.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAssignes())) {
+				processInstance.setAssignes(
+						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAssignes());
+			}
+			if (!CollectionUtils
+					.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getDocuments())) {
+				processInstance.setDocuments(
+						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getDocuments());
+			}
+			if (!StringUtils
+					.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getComment())) {
+				processInstance.setComment(
+						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getComment());
+			}
 
-		obj.put(BUSINESSIDKEY, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
-		obj.put(TENANTIDKEY, sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId());
-		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-		obj.put(ACTIONKEY, sewerageConnectionRequest.getSewerageConnection().getAction());
-		// Add comment
-		// obj.put(COMMENTKEY, connection.getComment);
-		if (!CollectionUtils.isEmpty(uuidmaps))
-			obj.put(ASSIGNEEKEY, uuidmaps);
-		obj.put(DOCUMENTSKEY, sewerageConnectionRequest.getSewerageConnection().getDocuments());
-		array.add(obj);
-		JSONObject workFlowRequest = new JSONObject();
-		workFlowRequest.put(REQUESTINFOKEY, sewerageConnectionRequest.getRequestInfo());
-		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-		String response = null;
+		}
+		List<ProcessInstance> processInstances = new ArrayList<>();
+		processInstances.add(processInstance);
+		ProcessInstanceResponse processInstanceResponse = null;
+
 		try {
-			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
-					String.class);
+			processInstanceResponse = mapper.convertValue(
+					rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()),
+							ProcessInstanceRequest.builder().requestInfo(sewerageConnectionRequest.getRequestInfo())
+									.processInstances(processInstances).build(),
+							Map.class),
+					ProcessInstanceResponse.class);
 		} catch (HttpClientErrorException e) {
-
 			/*
 			 * extracting message from client error exception
 			 */
+			DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
 			List<Object> errros = null;
 			try {
-				errros = JsonPath.parse(e.getResponseBodyAsString()).read("$.Errors");
+				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
+				StringBuilder builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				log.error("EG_SW_WF_ERROR_KEY_NOT_FOUND", builder.toString());
+				builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				throw new CustomException("EG_SW_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());
 		} catch (Exception e) {
@@ -126,17 +122,13 @@ public class WorkflowIntegrator {
 		 * on success result from work-flow read the data and set the status
 		 * back to WS object
 		 */
-		DocumentContext responseContext = JsonPath.parse(response);
-		List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-		Map<String, String> idStatusMap = new HashMap<>();
-		responseArray.forEach(object -> {
-
-			DocumentContext instanceContext = JsonPath.parse(object);
-			idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+		processInstanceResponse.getProcessInstances().forEach(pInstance -> {
+			if (sewerageConnectionRequest.getSewerageConnection().getApplicationNo()
+					.equals(pInstance.getBusinessId())) {
+				sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(
+						ApplicationStatusEnum.fromValue(pInstance.getState().getApplicationStatus()));
+			}
 		});
-		// setting the status back to SW object from wf response
-		sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum
-				.fromValue(idStatusMap.get(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())));
 
 	}
 }
