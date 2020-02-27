@@ -39,6 +39,7 @@ public class BPAValidator {
 	private BPAConfiguration config;
 
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData) {
+//		validateDuplicateDocuments(bpaRequest);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateApplicationDocuments(bpaRequest, mdmsData, null);
 		validateUser(bpaRequest);
@@ -61,13 +62,30 @@ public class BPAValidator {
 				+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='" + currentState
 				+ "')].docTypes";
 
+		// String filterExp = "$.[?(@.applicationType=='"+bpa.getApplicationType()+"' &&
+		// @.ServiceType=='"+bpa.getServiceType()+"' &&
+		// @.RiskType=='"+bpa.getRiskType()+"')].docTypes";
 		List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
 		
 		List<Document> allDocuments = new ArrayList<Document>();
 		if (bpa.getDocuments() != null) {
 			allDocuments.addAll(bpa.getDocuments());
 		}
+		if (bpa.getWfDocuments() != null) {
+			allDocuments.addAll(bpa.getWfDocuments());
+		}
 		
+		allDocuments.forEach(document -> {
+			
+			if(document.getFileStore() == null && document.getFileStoreId() == null) {
+				throw new CustomException("Invlaid Document",
+						"filestore cannot be null"+document.toString() );
+			}else if(document.getFileStoreId() == null){
+				document.setFileStoreId(document.getFileStore());
+			}else if(document.getFileStore() == null){
+				document.setFileStore(document.getFileStoreId());
+			}
+		});
 		
 		if(CollectionUtils.isEmpty(docTypeMappings)) {
 			return ;
@@ -82,12 +100,12 @@ public class BPAValidator {
 
 		if (!CollectionUtils.isEmpty(allDocuments)) {
 
-			allDocuments.forEach(document -> {
+			/*allDocuments.forEach(document -> {
 
 				if (!validDocumentTypes.contains(document.getDocumentType())) {
 					throw new CustomException("Unkonwn Document Type ERROR", document.getDocumentType() + " is Unkown");
 				}
-			});
+			});*/
 			
 
 			
@@ -137,11 +155,11 @@ public class BPAValidator {
 		if (request.getBPA().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList();
 			request.getBPA().getDocuments().forEach(document -> {
-				if (documentFileStoreIds.contains(document.getFileStoreId()))
+				if (documentFileStoreIds.contains(document.getFileStore()))
 					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
 							"Same document cannot be used multiple times");
 				else
-					documentFileStoreIds.add(document.getFileStoreId());
+					documentFileStoreIds.add(document.getFileStore());
 			});
 		}
 	}
@@ -158,6 +176,9 @@ public class BPAValidator {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.isEmpty())
 			throw new CustomException("INVALID SEARCH", "Search without any paramters is not allowed");
 
+//		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
+//			throw new CustomException("INVALID SEARCH", "Search based only on tenantId is not allowed");
+
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && !criteria.tenantIdOnly()
 				&& criteria.getTenantId() == null)
 			throw new CustomException("INVALID SEARCH", "TenantId is mandatory in search");
@@ -165,6 +186,9 @@ public class BPAValidator {
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && !criteria.isEmpty()
 				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
 			throw new CustomException("INVALID SEARCH", "TenantId is mandatory in search");
+
+//		if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN") && criteria.tenantIdOnly())
+//			throw new CustomException("INVALID SEARCH", "Search only on tenantId is not allowed");
 
 		String allowedParamStr = null;
 
@@ -236,6 +260,22 @@ public class BPAValidator {
 
 	}
 
+	// private void validateOwnerActiveStatus(BPARequest bpaRequest) {
+	// Map<String, String> errorMap = new HashMap<>();
+	// Boolean flag = false;
+	// for (OwnerInfo ownerInfo : bpaRequest.getBPA().getOwners()) {
+	// if (ownerInfo.getUserActive()) {
+	// flag = true;
+	// break;
+	// }
+	// }
+	// if (!flag)
+	// errorMap.put("INVALID OWNER",
+	// "All owners are inactive for application: "
+	// + bpaRequest.getBPA().getApplicationNo());
+	// if (!errorMap.isEmpty())
+	// throw new CustomException(errorMap);
+	// }
 
 	private void setFieldsFromSearch(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData) {
 		Map<String, BPA> idToBPAFromSearch = new HashMap<>();
@@ -299,7 +339,7 @@ public class BPAValidator {
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
 		compareIdList(getOwnerIds(searchedBpa), getOwnerIds(bpa), errorMap);
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
-//		compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
+		compareIdList(getDocumentIds(searchedBpa), getDocumentIds(bpa), errorMap);
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
@@ -312,6 +352,10 @@ public class BPAValidator {
 				applicationDocIds.add(document.getId());
 			});
 		}
+//		if (!CollectionUtils.isEmpty(searchedBpa.getWfDocuments())) {
+//			searchedBpa.getWfDocuments().forEach(document -> {
+//				applicationDocIds.add(document.getId());
+//			});
 //		}
 		return applicationDocIds;
 	}
