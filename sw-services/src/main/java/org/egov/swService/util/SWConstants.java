@@ -22,7 +22,6 @@ public class SWConstants {
 
 	public static final String INVALID_CONNECTION_TYPE = "Invalid Connection Type";
 
-	// TL actions
 
 	public static final String ACTION_INITIATE = "INITIATE";
 
