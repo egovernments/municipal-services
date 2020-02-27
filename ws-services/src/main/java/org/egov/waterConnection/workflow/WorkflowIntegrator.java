@@ -2,6 +2,7 @@ package org.egov.waterConnection.workflow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
@@ -11,12 +12,12 @@ import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.workflow.ProcessInstance;
 import org.egov.waterConnection.model.workflow.ProcessInstanceRequest;
 import org.egov.waterConnection.model.workflow.ProcessInstanceResponse;
-import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
@@ -36,9 +37,9 @@ public class WorkflowIntegrator {
 
 	@Autowired
 	private ObjectMapper mapper;
-
+	
 	@Autowired
-	private ServiceRequestRepository serviceRequestRepository;
+	private RestTemplate rest;
 
 	/**
 	 * Method to integrate with workflow
@@ -77,13 +78,13 @@ public class WorkflowIntegrator {
 		}
 		List<ProcessInstance> processInstances = new ArrayList<>();
 		processInstances.add(processInstance);
-		ProcessInstanceRequest request = ProcessInstanceRequest.builder()
-				.requestInfo(waterConnectionRequest.getRequestInfo()).processInstances(processInstances).build();
 		ProcessInstanceResponse processInstanceResponse = null;
 		try {
 			processInstanceResponse = mapper.convertValue(
-					serviceRequestRepository.fetchResult(
-							new StringBuilder(config.getWfHost().concat(config.getWfTransitionPath())), request),
+					rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()),
+							ProcessInstanceRequest.builder().requestInfo(waterConnectionRequest.getRequestInfo())
+									.processInstances(processInstances).build(),
+							Map.class),
 					ProcessInstanceResponse.class);
 		} catch (HttpClientErrorException e) {
 			/*
@@ -94,10 +95,12 @@ public class WorkflowIntegrator {
 			try {
 				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
+				StringBuilder builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
+				builder = new StringBuilder();
+				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());
 		} catch (Exception e) {

@@ -8,6 +8,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.egov.wsCalculation.model.workflow.ProcessInstance;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -151,6 +153,9 @@ public class Connection {
 		this.id = id;
 		return this;
 	}
+	
+	@JsonProperty("processInstance")
+	private ProcessInstance processInstance = null;
 
 	/**
 	 * Unique Identifier of the connection for internal reference.
@@ -172,7 +177,27 @@ public class Connection {
 		this.property = property;
 		return this;
 	}
+	
+	public Connection processInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+		return this;
+	}
 
+	
+	/**
+	 * Get property
+	 * 
+	 * @return property
+	 **/
+	@ApiModelProperty(value = "")
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+	}
 	/**
 	 * Get property
 	 * 
