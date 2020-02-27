@@ -37,11 +37,13 @@ public class CalculationService {
 	 * 
 	 *            If action would be APPROVE_FOR_CONNECTION then
 	 * 
-	 *            Estimate the fee for sewerage application and generate the demand
+	 *            Estimate the fee for sewerage application and generate the
+	 *            demand
 	 * 
 	 */
 	public void calculateFeeAndGenerateDemand(SewerageConnectionRequest request) {
 		if (SWConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getSewerageConnection().getAction())) {
+			StringBuilder uri = sewerageServicesUtil.getCalculatorURL();
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getSewerageConnection().getApplicationNo())
 					.sewerageConnection(request.getSewerageConnection())
@@ -50,7 +52,7 @@ public class CalculationService {
 			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(calculationCriterias)
 					.requestInfo(request.getRequestInfo()).isconnectionCalculation(false).build();
 			try {
-				Object response = serviceRequestRepository.fetchResult(sewerageServicesUtil.getCalculatorURL(), calRequest);
+				Object response = serviceRequestRepository.fetchResult(uri, calRequest);
 				CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
 				log.info(mapper.writeValueAsString(calResponse));
 			} catch (Exception ex) {
