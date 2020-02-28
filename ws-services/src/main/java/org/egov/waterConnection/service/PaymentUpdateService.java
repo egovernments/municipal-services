@@ -14,6 +14,7 @@ import org.egov.waterConnection.model.collection.PaymentRequest;
 import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Service
 public class PaymentUpdateService {
 
 	@Autowired
