@@ -28,22 +28,22 @@ import lombok.extern.slf4j.Slf4j;
 public class SWCalculationServiceImpl implements SWCalculationService {
 
 	@Autowired
-	MasterDataService mDataService;
+	private MasterDataService mDataService;
 
 	@Autowired
-	EstimationService estimationService;
+	private EstimationService estimationService;
 
 	@Autowired
-	PayService payService;
+	private PayService payService;
 
 	@Autowired
-	DemandService demandService;
+	private DemandService demandService;
 
 	@Autowired
-	SewerageCalculatorDao sewerageCalculatorDao;
+	private SewerageCalculatorDao sewerageCalculatorDao;
 
 	/**
-	 * Get CalculationReq and Calculate the Tax Head on Water Charge
+	 * Get CalculationReq and Calculate the Tax Head on Sewerage Charge
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
 		List<Calculation> calculations = new ArrayList<>();
@@ -230,10 +230,6 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getFeeEstimation(criteria, request.getRequestInfo(),
 					masterMap);
-			// ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-			// .get(WSCalculationConstant.Billing_Period_Master);
-			// masterDataService.enrichBillingPeriod(criteria,
-			// billingFrequencyMap, masterMap);
 			mDataService.enrichBillingPeriodForFee(masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap,
 					false);

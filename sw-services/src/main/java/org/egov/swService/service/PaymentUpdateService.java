@@ -1,18 +1,18 @@
-package org.egov.waterConnection.service;
+package org.egov.swService.service;
 
 import java.util.HashMap;
 import java.util.List;
 
+import org.egov.swService.config.SWConfiguration;
+import org.egov.swService.model.SearchCriteria;
+import org.egov.swService.model.SewerageConnection;
+import org.egov.swService.model.SewerageConnectionRequest;
+import org.egov.swService.model.collection.PaymentDetail;
+import org.egov.swService.model.collection.PaymentRequest;
+import org.egov.swService.repository.SewarageDao;
+import org.egov.swService.util.SWConstants;
+import org.egov.swService.workflow.WorkflowIntegrator;
 import org.egov.tracer.model.CustomException;
-import org.egov.waterConnection.config.WSConfiguration;
-import org.egov.waterConnection.constants.WCConstants;
-import org.egov.waterConnection.model.SearchCriteria;
-import org.egov.waterConnection.model.WaterConnection;
-import org.egov.waterConnection.model.WaterConnectionRequest;
-import org.egov.waterConnection.model.collection.PaymentDetail;
-import org.egov.waterConnection.model.collection.PaymentRequest;
-import org.egov.waterConnection.repository.WaterDao;
-import org.egov.waterConnection.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -29,16 +29,16 @@ public class PaymentUpdateService {
 	private ObjectMapper mapper;
 
 	@Autowired
-	private WSConfiguration config;
+	private SWConfiguration config;
 
 	@Autowired
-	private WaterServiceImpl waterService;
+	private SewarageServiceImpl sewerageService;
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
 
 	@Autowired
-	private WaterDao repo;
+	private SewarageDao repo;
 
 	/**
 	 * After payment change the application status
@@ -55,24 +55,25 @@ public class PaymentUpdateService {
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
 							.applicationNumber(paymentDetail.getBill().getConsumerCode()).build();
-					List<WaterConnection> waterConnections = waterService.search(criteria,
+					List<SewerageConnection> sewerageConnections = sewerageService.search(criteria,
 							paymentRequest.getRequestInfo());
-					if (CollectionUtils.isEmpty(waterConnections)) {
+					if (CollectionUtils.isEmpty(sewerageConnections)) {
 						throw new CustomException("INVALID_RECEIPT",
-								"No waterConnection found for the consumerCode " + criteria.getApplicationNumber());
+								"No sewerageConnection found for the consumerCode " + criteria.getApplicationNumber());
 					}
-					if (waterConnections.size() > 1) {
+					if (sewerageConnections.size() > 1) {
 						throw new CustomException("INVALID_RECEIPT",
 								"More than one application found on consumerCode " + criteria.getApplicationNumber());
 					}
-					waterConnections.forEach(waterConnection -> waterConnection.setAction(WCConstants.ACTION_PAY));
-					WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
-							.waterConnection(waterConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
+					sewerageConnections
+							.forEach(sewerageConnection -> sewerageConnection.setAction(SWConstants.ACTION_PAY));
+					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
+							.sewerageConnection(sewerageConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
-					wfIntegrator.callWorkFlow(waterConnectionRequest);
-					log.info("Water connection application status: "
-							+ waterConnectionRequest.getWaterConnection().getApplicationStatus());
-					repo.updateWaterConnection(waterConnectionRequest, false);
+					wfIntegrator.callWorkFlow(sewerageConnectionRequest);
+					log.info("Sewerage connection application status: "
+							+ sewerageConnectionRequest.getSewerageConnection().getApplicationStatus());
+					repo.updateSewerageConnection(sewerageConnectionRequest, false);
 				}
 			}
 		} catch (Exception ex) {

@@ -113,5 +113,8 @@ public class SWConfiguration {
 
     @Value("${egov.sw.calculation.endpoint}")
     private String calculateEndpoint;
+    
+    @Value("${egov.receipt.businessservice}")
+    private String receiptBusinessservice;
 
 }
