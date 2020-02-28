@@ -121,5 +121,8 @@ public class WSConfiguration {
 
     @Value("${egov.ws.calculation.endpoint}")
     private String calculateEndpoint;
+    
+    @Value("${egov.receipt.businessservice}")
+    private String receiptBusinessservice;
 
 }
