@@ -1,19 +1,16 @@
 package org.egov.waterConnection.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
-import org.egov.waterConnection.model.Connection;
-import org.egov.waterConnection.model.Document;
-import org.egov.waterConnection.model.Property;
-import org.springframework.validation.annotation.Validated;
+import java.util.Objects;
+
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * WaterConnection
@@ -54,9 +51,6 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("waterSubSource")
 	private String waterSubSource = null;
-
-	@JsonProperty("uom")
-	private String uom = null;
 
 	@JsonProperty("documents")
 	@Valid
@@ -253,25 +247,6 @@ public class WaterConnection extends Connection {
 		this.waterSubSource = waterSubSource;
 	}
 
-	public WaterConnection uom(String uom) {
-		this.uom = uom;
-		return this;
-	}
-
-	/**
-	 * The Unit of measurement for water connection.
-	 * 
-	 * @return uom
-	 **/
-	@ApiModelProperty(required = true, value = "The Unit of measurement for water connection.")
-	public String getUom() {
-		return uom;
-	}
-
-	public void setUom(String uom) {
-		this.uom = uom;
-	}
-
 	/**
 	 * The calculation attribute of water connection.
 	 * 
@@ -368,14 +343,13 @@ public class WaterConnection extends Connection {
 				&& Objects.equals(this.pipeSize, waterConnection.pipeSize)
 				&& Objects.equals(this.noOfTaps, waterConnection.noOfTaps)
 				&& Objects.equals(this.waterSubSource, waterConnection.waterSubSource)
-				&& Objects.equals(this.uom, waterConnection.uom)
 				&& Objects.equals(this.documents, waterConnection.documents) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(connectionCategory, rainWaterHarvesting, connectionType, waterSource, meterId,
-				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, documents,
+				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, documents,
 				super.hashCode());
 	}
 
@@ -393,7 +367,6 @@ public class WaterConnection extends Connection {
 		sb.append("    pipeSize: ").append(toIndentedString(pipeSize)).append("\n");
 		sb.append("    noOfTaps: ").append(toIndentedString(noOfTaps)).append("\n");
 		sb.append("    waterSubSource: ").append(toIndentedString(waterSubSource)).append("\n");
-		sb.append("    uom: ").append(toIndentedString(uom)).append("\n");
 		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
 		sb.append("}");
 		return sb.toString();

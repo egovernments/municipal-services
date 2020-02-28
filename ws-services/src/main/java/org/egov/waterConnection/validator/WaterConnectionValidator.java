@@ -51,10 +51,10 @@ public class WaterConnectionValidator {
 							"Meter Installation date cannot be null or negative");
 				}
 			}
-			if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
-				errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
-						"WaterConnection cannot be created without connection category");
-			}
+//			if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
+//				errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
+//						"WaterConnection cannot be created without connection category");
+//			}
 			if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
 				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
 			}

@@ -1,17 +1,17 @@
-package org.egov.wsCalculation.model;
+package org.egov.waterConnection.model.collection;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum Purpose {
 
-	ARREAR_AMOUNT("ARREAR_AMOUNT"),
+	ARREAR("ARREAR"),
 
-	CURRENT_AMOUNT("CURRENT_AMOUNT"),
+	CURRENT("CURRENT"),
 
-	ADVANCE_AMOUNT("ADVANCE_AMOUNT"),
+	ADVANCE("ADVANCE"),
 
-	EXEMPTION("EXEMPTION"),
+    EXEMPTION("EXEMPTION"),
 
 	ARREAR_LATEPAYMENT_CHARGES("ARREAR_LATEPAYMENT_CHARGES"),
 
@@ -29,6 +29,7 @@ public enum Purpose {
 		this.value = value;
 	}
 
+	
 	@Override
 	@JsonValue
 	public String toString() {

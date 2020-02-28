@@ -116,14 +116,14 @@ public class MDMSValidator {
 					.append(" does not exists");
 			errorMap.put("INVALID_WATER_CONNECTION_TYPE", messageBuilder.toString());
 		}
-		if (!StringUtils.isEmpty(waterConnection.getConnectionCategory()) && !codes
-				.get(WCConstants.MDMS_WC_Connection_Category).contains(waterConnection.getConnectionCategory())) {
-			messageBuilder = new StringBuilder();
-			messageBuilder.append("The WaterConnection connection category ")
-					.append(waterConnection.getConnectionCategory()).append(" does not exists");
-			errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
-					"The WaterConnection connection category" + messageBuilder.toString());
-		}
+//		if (!StringUtils.isEmpty(waterConnection.getConnectionCategory()) && !codes
+//				.get(WCConstants.MDMS_WC_Connection_Category).contains(waterConnection.getConnectionCategory())) {
+//			messageBuilder = new StringBuilder();
+//			messageBuilder.append("The WaterConnection connection category ")
+//					.append(waterConnection.getConnectionCategory()).append(" does not exists");
+//			errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
+//					"The WaterConnection connection category" + messageBuilder.toString());
+//		}
 		if (!StringUtils.isEmpty(waterConnection.getWaterSource())
 				&& !codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource())) {
 			messageBuilder = new StringBuilder();
