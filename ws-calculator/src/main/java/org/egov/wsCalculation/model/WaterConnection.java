@@ -52,9 +52,6 @@ public class WaterConnection extends Connection {
 	@JsonProperty("waterSubSource")
 	private String waterSubSource = null;
 
-	@JsonProperty("uom")
-	private String uom = null;
-
 	@JsonProperty("documents")
 	@Valid
 	private List<Document> documents = null;
@@ -263,29 +260,6 @@ public class WaterConnection extends Connection {
 		this.waterSubSource = waterSubSource;
 	}
 
-	public WaterConnection uom(String uom) {
-		this.uom = uom;
-		return this;
-	}
-
-	/**
-	 * The Unit of measurement for water connection.
-	 * 
-	 * @return uom
-	 **/
-	@ApiModelProperty(required = true, value = "The Unit of measurement for water connection.")
-	
-
-	@Size(min = 2, max = 32)
-	public String getUom() {
-		return uom;
-	}
-
-	public void setUom(String uom) {
-		this.uom = uom;
-	}
-
-
 	public WaterConnection documents(List<Document> documents) {
 		this.documents = documents;
 		return this;
@@ -377,14 +351,13 @@ public class WaterConnection extends Connection {
 				&& Objects.equals(this.pipeSize, waterConnection.pipeSize)
 				&& Objects.equals(this.noOfTaps, waterConnection.noOfTaps)
 				&& Objects.equals(this.waterSubSource, waterConnection.waterSubSource)
-				&& Objects.equals(this.uom, waterConnection.uom)
 				&& Objects.equals(this.documents, waterConnection.documents) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(connectionCategory, rainWaterHarvesting, connectionType, waterSource, meterId,
-				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, uom, documents,
+				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, documents,
 				super.hashCode());
 	}
 
@@ -402,7 +375,6 @@ public class WaterConnection extends Connection {
 		sb.append("    pipeSize: ").append(toIndentedString(pipeSize)).append("\n");
 		sb.append("    noOfTaps: ").append(toIndentedString(noOfTaps)).append("\n");
 		sb.append("    waterSubSource: ").append(toIndentedString(waterSubSource)).append("\n");
-		sb.append("    uom: ").append(toIndentedString(uom)).append("\n");
 		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
 		sb.append("}");
 		return sb.toString();

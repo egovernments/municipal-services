@@ -34,8 +34,6 @@ public class SewerageConnection extends Connection {
 	@JsonProperty("noOfToilets")
 	private Integer noOfToilets = null;
 
-	@JsonProperty("uom")
-	private String uom = null;
 
 	@JsonProperty("connectionType")
 	private String connectionType = null;
@@ -100,11 +98,7 @@ public class SewerageConnection extends Connection {
 		this.noOfToilets = noOfToilets;
 	}
 
-	public SewerageConnection uom(String uom) {
-		this.uom = uom;
-		return this;
-	}
-
+	
 	@ApiModelProperty(value = "No of proposed water closets")
 
 	public Integer getProposedWaterClosets() {
@@ -135,21 +129,7 @@ public class SewerageConnection extends Connection {
 		return this;
 	}
 
-	/**
-	 * The Unit of measurement for sewarage connection.
-	 * 
-	 * @return uom
-	 **/
-	@ApiModelProperty(required = true, value = "The Unit of measurement for sewarage connection.")
-	@Size(min = 2, max = 32)
-	public String getUom() {
-		return uom;
-	}
-
-	public void setUom(String uom) {
-		this.uom = uom;
-	}
-
+	
 	public SewerageConnection connectionType(String connectionType) {
 		this.connectionType = connectionType;
 		return this;
@@ -183,13 +163,12 @@ public class SewerageConnection extends Connection {
 		return Objects.equals(this.connectionExecutionDate, sewerageConnection.connectionExecutionDate)
 				&& Objects.equals(this.noOfWaterClosets, sewerageConnection.noOfWaterClosets)
 				&& Objects.equals(this.noOfToilets, sewerageConnection.noOfToilets)
-				&& Objects.equals(this.uom, sewerageConnection.uom)
 				&& Objects.equals(this.connectionType, sewerageConnection.connectionType) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(connectionExecutionDate, noOfWaterClosets, noOfToilets, uom, connectionType,
+		return Objects.hash(connectionExecutionDate, noOfWaterClosets, noOfToilets, connectionType,
 				super.hashCode());
 	}
 
@@ -201,7 +180,6 @@ public class SewerageConnection extends Connection {
 		sb.append("    connectionExecutionDate: ").append(toIndentedString(connectionExecutionDate)).append("\n");
 		sb.append("    noOfWaterClosets: ").append(toIndentedString(noOfWaterClosets)).append("\n");
 		sb.append("    noOfToilets: ").append(toIndentedString(noOfToilets)).append("\n");
-		sb.append("    uom: ").append(toIndentedString(uom)).append("\n");
 		sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
 		sb.append("}");
 		return sb.toString();
