@@ -149,6 +149,8 @@ public class CalculatorConstants {
 
 	public static final String DEMAND_STATUS_ACTIVE = DemandStatus.ACTIVE.toString();
 
+	public static final String OWNER_STATUS_ACTIVE = "ACTIVE";
+
 	/*
 	 * special characters
 	 */

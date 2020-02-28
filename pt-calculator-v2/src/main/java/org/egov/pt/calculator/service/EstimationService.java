@@ -856,7 +856,7 @@ public class EstimationService {
 
 		
 		BigDecimal totalAmount = calculation.getTaxAmount()
-				.subtract(calculation.getRebate().add(calculation.getExemption())).add(calculation.getPenalty());
+				.add(calculation.getRebate().add(calculation.getExemption())).add(calculation.getPenalty());
 		calculation.setTotalAmount(totalAmount);
 	}
 
@@ -1069,7 +1069,6 @@ public class EstimationService {
 			Calendar cal = Calendar.getInstance();
 			Long startDate = setDateToCalendar(objFinYear, time, cal,0);
 			Long endDate = setDateToCalendar(objFinYear, time, cal,1);
-
 			if(System.currentTimeMillis()>=startDate && System.currentTimeMillis()<=endDate )
 				objToBeReturned = objMap;
 
@@ -1179,8 +1178,10 @@ public class EstimationService {
 
 	private OwnerInfo getActiveOwner(List<OwnerInfo> ownerlist){
 		OwnerInfo ownerInfo = new OwnerInfo();
+		String status ;
 		for(OwnerInfo owner : ownerlist){
-			if(owner.getActive() == true){
+			status = String.valueOf(owner.getStatus());
+			if(status.equals(OWNER_STATUS_ACTIVE)){
 				ownerInfo=owner;
 				return ownerInfo;
 			}
