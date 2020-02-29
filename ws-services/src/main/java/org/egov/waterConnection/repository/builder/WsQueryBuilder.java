@@ -12,6 +12,7 @@ import org.egov.waterConnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 
 @Component
@@ -72,7 +73,7 @@ public class WsQueryBuilder {
 			}
 
 		}
-		if (criteria.getPropertyId() != null && !criteria.getPropertyId().isEmpty()) {
+		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.property_id = ? ");
 			preparedStatement.add(criteria.getPropertyId());
@@ -84,29 +85,53 @@ public class WsQueryBuilder {
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 			isAnyCriteriaMatch = true;
 		}
-		if (criteria.getOldConnectionNumber() != null && !criteria.getOldConnectionNumber().isEmpty()) {
+		if (!StringUtils.isEmpty(criteria.getOldConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");
 			preparedStatement.add(criteria.getOldConnectionNumber());
 			isAnyCriteriaMatch = true;
 		}
 
-		if (criteria.getConnectionNumber() != null && !criteria.getConnectionNumber().isEmpty()) {
+		if (!StringUtils.isEmpty(criteria.getConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
 			isAnyCriteriaMatch = true;
 		}
-		if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+		if (!StringUtils.isEmpty(criteria.getStatus())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
 			isAnyCriteriaMatch = true;
 		}
-		if (criteria.getApplicationNumber() != null && !criteria.getApplicationNumber().isEmpty()) {
+		if (!StringUtils.isEmpty(criteria.getApplicationNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationno = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
+			isAnyCriteriaMatch = true;
+		}
+		if (!StringUtils.isEmpty(criteria.getApplicationType())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" wc.connectionType = ? ");
+			preparedStatement.add(criteria.getApplicationType());
+			isAnyCriteriaMatch = true;
+		}
+		if (!StringUtils.isEmpty(criteria.getApplicationStatus())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationStatus = ? ");
+			preparedStatement.add(criteria.getApplicationStatus());
+			isAnyCriteriaMatch = true;
+		}
+		if (criteria.getFromDate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append("  wc.connectionExecutionDate >= ? ");
+			preparedStatement.add(criteria.getFromDate());
+			isAnyCriteriaMatch = true;
+		}
+		if (criteria.getToDate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append("  wc.connectionExecutionDate <= ? ");
+			preparedStatement.add(criteria.getToDate());
 			isAnyCriteriaMatch = true;
 		}
 		if (isAnyCriteriaMatch == false) {
