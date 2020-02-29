@@ -110,6 +110,24 @@ public class SWQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
+		if (!StringUtils.isEmpty(criteria.getApplicationStatus())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationStatus = ? ");
+			preparedStatement.add(criteria.getApplicationStatus());
+			isAnyCriteriaMatch = true;
+		}
+		if (criteria.getFromDate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append("  sc.connectionExecutionDate >= ? ");
+			preparedStatement.add(criteria.getFromDate());
+			isAnyCriteriaMatch = true;
+		}
+		if (criteria.getToDate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append("  sc.connectionExecutionDate <= ? ");
+			preparedStatement.add(criteria.getToDate());
+			isAnyCriteriaMatch = true;
+		}
 		if (isAnyCriteriaMatch == false)
 			return null;
 		

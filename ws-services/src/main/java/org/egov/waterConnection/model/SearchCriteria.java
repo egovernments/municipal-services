@@ -32,10 +32,7 @@ public class SearchCriteria {
 
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
-	
-	@JsonProperty("applicationType")
-	private String applicationType;
-	
+		
 	@JsonProperty("applicationStatus")
 	private String applicationStatus;
 

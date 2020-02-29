@@ -110,12 +110,6 @@ public class WsQueryBuilder {
 			preparedStatement.add(criteria.getApplicationNumber());
 			isAnyCriteriaMatch = true;
 		}
-		if (!StringUtils.isEmpty(criteria.getApplicationType())) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" wc.connectionType = ? ");
-			preparedStatement.add(criteria.getApplicationType());
-			isAnyCriteriaMatch = true;
-		}
 		if (!StringUtils.isEmpty(criteria.getApplicationStatus())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationStatus = ? ");

@@ -38,6 +38,9 @@ public class SearchCriteria {
 
 	@JsonProperty("oldConnectionNumber")
 	private String oldConnectionNumber;
+	
+	@JsonProperty("applicationStatus")
+	private String applicationStatus;
 
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
