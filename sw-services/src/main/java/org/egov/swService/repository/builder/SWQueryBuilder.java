@@ -61,7 +61,7 @@ public class SWQueryBuilder {
 			RequestInfo requestInfo) {
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		boolean isAnyCriteriaMatch = false;
-		if (StringUtils.isEmpty(criteria.getMobileNumber())) {
+		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
