@@ -440,6 +440,8 @@ public class BPAValidator {
 							requestCheckList.addAll(
 									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
 						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
 					}
 
 					if (!CollectionUtils.isEmpty(requestCheckList)) {
@@ -503,6 +505,8 @@ public class BPAValidator {
 							requestCheckList
 									.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
 						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 					}
 
 					if (!CollectionUtils.isEmpty(requestCheckList)) {
