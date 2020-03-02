@@ -509,7 +509,19 @@ public class BPAValidator {
 						for (Map reqDoc : requestCheckList) {
 							String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
 							if (!StringUtils.isEmpty(fileStoreId)) {
-								requestDocs.add((String) reqDoc.get(BPAConstants.CODE));
+									String docType = (String)reqDoc.get(BPAConstants.CODE);
+									int lastIndex = docType.lastIndexOf(".");
+									String documentNs = "";
+									if (lastIndex > 1) {
+										documentNs = docType.substring(0, lastIndex);
+									} else if (lastIndex == 1) {
+										throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+												(String)reqDoc.get(BPAConstants.CODE) + " is Invalid");
+									} else {
+										documentNs = docType;
+									}
+
+									requestDocs.add(documentNs);
 							} else {
 								throw new CustomException("BPA_UNKNOWN_DOCS",
 										"fileStoreId is not exists for the documents");
