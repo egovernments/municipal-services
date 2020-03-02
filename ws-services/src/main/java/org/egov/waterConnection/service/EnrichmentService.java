@@ -92,7 +92,6 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-		enrichingAdditionalDetails(waterConnectionRequest);
 //		AuditDetails auditDetails = waterServicesUtil
 //				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
@@ -103,17 +102,15 @@ public class EnrichmentService {
 	}
 	
 	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
-		List<String> listOfKeys = Arrays.asList("adhocRebate", "adhocPenalty");
 		HashMap<String, BigDecimal> additionalDetail = new HashMap<>();
 		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
-			listOfKeys.forEach(key -> {
+			WCConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
-			ObjectMapper mapper1 = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-			HashMap<String, Object> addDetail = mapper1
-					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-			for (String constKey : listOfKeys) {
+			ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+			HashMap<String, Object> addDetail = mapper.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			for (String constKey : WCConstants.ADHOC_PENALTY_REBATE) {
 				if (addDetail.getOrDefault(constKey, null) != null) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);
@@ -196,7 +193,7 @@ public class EnrichmentService {
 				}
 			});
 		}
-		
+		enrichingAdditionalDetails(waterConnectionRequest);
 	}
 	
 	/**

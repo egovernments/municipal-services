@@ -1,3 +1,4 @@
+
 package org.egov.wsCalculation.constants;
 
 import java.math.BigDecimal;
@@ -249,6 +250,10 @@ public class WSCalculationConstant {
 	
 	public static final String WS_TAX_AND_CESS = "WS_TAX_AND_CESS";
 	
+	public static final String WS_ADHOC_PENALTY = "WS_ADHOC_PENALTY";
+
+	public static final String WS_ADHOC_REBATE = "WS_ADHOC_REBATE";
+	
 	public static final String FORM_FEE_CONST = "formFee";
 
 	public static final String SCRUTINY_FEE_CONST = "scrutinyFee";
@@ -269,4 +274,9 @@ public class WSCalculationConstant {
 	public static final String CALCULATION_ATTRIBUTE_CONST = "CalculationAttribute";
    
 	public static final String ATTRIBUTE = "attribute";
+	
+	public static final String ADHOC_PENALTY = "adhocPenalty";
+	
+	public static final String ADHOC_REBATE = "adhocRebate";
+	
 }

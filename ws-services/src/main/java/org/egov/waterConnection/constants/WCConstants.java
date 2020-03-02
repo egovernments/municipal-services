@@ -133,5 +133,11 @@ public class WCConstants {
 
     public static final String DEFAULT_OBJECT_MODIFIED_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
    
-    public static final String IDGEN_ERROR_CONST = "IDGEN ERROR";  
+    public static final String IDGEN_ERROR_CONST = "IDGEN ERROR";
+    
+    public static final String ADHOC_PENALTY = "adhocPenalty";
+	
+	public static final String ADHOC_REBATE = "adhocRebate";
+	
+    public static final List<String>  ADHOC_PENALTY_REBATE = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY, ADHOC_REBATE));
 }

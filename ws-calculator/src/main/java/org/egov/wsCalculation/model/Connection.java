@@ -143,6 +143,11 @@ public class Connection {
 
 	@JsonProperty("roadCuttingArea")
 	private Float roadCuttingArea = null;
+	
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
+	
+	
 
 	@NotNull
 	@Size(max = 64)
@@ -419,6 +424,11 @@ public class Connection {
 		this.action = action;
 		return this;
 	}
+	
+	public Connection additionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
+		return this;
+	}
 
 	/**
 	 * Capture the road cutting area in sqft.
@@ -433,6 +443,14 @@ public class Connection {
 
 	public void setRoadCuttingArea(Float roadCuttingArea) {
 		this.roadCuttingArea = roadCuttingArea;
+	}
+	
+	public Object getAdditionalDetails() {
+		return additionalDetails;
+	}
+
+	public void setAdditionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
 	}
 
 	@Override

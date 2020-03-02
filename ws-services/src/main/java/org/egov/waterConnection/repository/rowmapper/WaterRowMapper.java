@@ -10,12 +10,11 @@ import java.util.Map;
 
 import org.egov.waterConnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterConnection.model.Connection.StatusEnum;
-import org.egov.waterConnection.model.enums.Status;
 import org.egov.waterConnection.model.Document;
 import org.egov.waterConnection.model.PlumberInfo;
-import org.egov.waterConnection.model.PlumberInfo.RelationshipEnum;
 import org.egov.waterConnection.model.Property;
 import org.egov.waterConnection.model.WaterConnection;
+import org.egov.waterConnection.model.enums.Status;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
