@@ -468,6 +468,8 @@ public class BPAValidator {
 										"Please answer " + StringUtils.join(pendingQns, ","));
 							}
 						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
 					}
 				} else {
 					throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
@@ -551,6 +553,8 @@ public class BPAValidator {
 										"Please upload " + StringUtils.join(pendingDocs, ","));
 							}
 						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 					}
 				} else {
 					throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
