@@ -92,7 +92,6 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-		enrichingAdditionalDetails(waterConnectionRequest);
 //		AuditDetails auditDetails = waterServicesUtil
 //				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
@@ -176,6 +175,7 @@ public class EnrichmentService {
 	 */
 	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
+		enrichingAdditionalDetails(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
