@@ -1,7 +1,9 @@
 package org.egov.waterConnection.service;
 
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,20 +33,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Service
 public class EnrichmentService {
 
 	@Autowired
-	WaterServicesUtil waterServicesUtil;
+	private WaterServicesUtil waterServicesUtil;
 
 	@Autowired
-	IdGenRepository idGenRepository;
+	private IdGenRepository idGenRepository;
 
 	@Autowired
-	WSConfiguration config;
+	private WSConfiguration config;
 
 	@Autowired
-	ValidateProperty validateProperty;
+	private ValidateProperty validateProperty;
+	
+	@Autowired
+	private ObjectMapper mapper;
+	
+	
 
 	/**
 	 * 
@@ -82,6 +92,7 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
+		enrichingAdditionalDetails(waterConnectionRequest);
 //		AuditDetails auditDetails = waterServicesUtil
 //				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
@@ -89,6 +100,29 @@ public class EnrichmentService {
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+	}
+	
+	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
+		List<String> listOfKeys = Arrays.asList("adhocRebate", "adhocPenalty");
+		HashMap<String, BigDecimal> additionalDetail = new HashMap<>();
+		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
+			listOfKeys.forEach(key -> {
+				additionalDetail.put(key, null);
+			});
+		} else {
+			ObjectMapper mapper1 = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+			HashMap<String, Object> addDetail = mapper1
+					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			for (String constKey : listOfKeys) {
+				if (addDetail.getOrDefault(constKey, null) != null) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+					additionalDetail.put(constKey, big);
+				} else {
+					additionalDetail.put(constKey, null);
+				}
+			}
+		}
+		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 	}
 	
 

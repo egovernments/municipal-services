@@ -1,5 +1,6 @@
 package org.egov.waterConnection.repository.rowmapper;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -54,6 +55,10 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
 				// get property id and get property object
 				property.setPropertyId(rs.getString("property_id"));
+				HashMap<String, BigDecimal> penalties = new HashMap<>();
+				penalties.put("adhocRebate", rs.getBigDecimal("adhocrebate"));
+				penalties.put("adhocPenalty", rs.getBigDecimal("adhocpenalty"));
+				currentWaterConnection.setAdditionalDetails(penalties);
 				currentWaterConnection.setProperty(property);
 				// Add documents id's
 				currentWaterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
