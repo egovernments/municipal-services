@@ -152,6 +152,22 @@ public class Connection {
 	
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
+	
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
+
+	public Connection additionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
+		return this;
+	}
+
+	public Object getAdditionalDetails() {
+		return additionalDetails;
+	}
+
+	public void setAdditionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
+	}
 
 	public Connection id(String id) {
 		this.id = id;
@@ -452,13 +468,14 @@ public class Connection {
 				&& Objects.equals(this.documents, connection.documents)
 				&& Objects.equals(this.plumberInfo, connection.plumberInfo)
 				&& Objects.equals(this.roadType, connection.roadType)
-				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea);
+				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea)
+				&& Objects.equals(this.additionalDetails, connection.additionalDetails);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, property, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
-				documents, plumberInfo, roadType, roadCuttingArea);
+				documents, plumberInfo, roadType, roadCuttingArea, additionalDetails);
 	}
 
 	@Override
@@ -477,6 +494,7 @@ public class Connection {
 		sb.append("    plumberInfo: ").append(toIndentedString(plumberInfo)).append("\n");
 		sb.append("    roadType: ").append(toIndentedString(roadType)).append("\n");
 		sb.append("    roadCuttingArea: ").append(toIndentedString(roadCuttingArea)).append("\n");
+		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -173,6 +173,7 @@ public class EnrichmentService {
 	 */
 	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
+		enrichingAdditionalDetails(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
