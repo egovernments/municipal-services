@@ -43,10 +43,10 @@ public class ActionValidator {
         Map<String,String> errorMap = new HashMap<>();
 
         request.getLicenses().forEach(license -> {
-            if(ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
+            /*if(ACTION_INITIATE.equalsIgnoreCase(license.getAction())){
                 if(license.getTradeLicenseDetail().getApplicationDocuments()!=null)
                     errorMap.put("INVALID ACTION","Action should be APPLY when application document are provided");
-            }
+            }*/
             if(ACTION_APPLY.equalsIgnoreCase(license.getAction())){
                 if(license.getTradeLicenseDetail().getApplicationDocuments()==null)
                     errorMap.put("INVALID ACTION","Action cannot be changed to APPLY. Application document are not provided");

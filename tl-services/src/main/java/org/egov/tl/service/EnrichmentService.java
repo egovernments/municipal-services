@@ -78,13 +78,12 @@ public class EnrichmentService {
                 tradeUnit.setActive(true);
             });
 
-            if(tradeLicense.getAction().equalsIgnoreCase(ACTION_APPLY))
-            {
-                tradeLicense.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
-                    document.setId(UUID.randomUUID().toString());
-                    document.setActive(true);
-                });
-            }
+
+            tradeLicense.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
+                document.setId(UUID.randomUUID().toString());
+                document.setActive(true);
+            });
+
 
             tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner -> {
                 owner.setUserActive(true);
