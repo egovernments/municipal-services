@@ -118,8 +118,8 @@ public class WaterServiceImpl implements WaterService {
 		mDMSValidator.validateMasterData(waterConnectionRequest);
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
-		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
+		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
 		validateProperty.validatePropertyCriteria(waterConnectionRequest);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest);
