@@ -132,12 +132,12 @@ public class SewarageServiceImpl implements SewarageService {
 				sewarageConnectionRequest.getRequestInfo());
 		SewerageConnection searchResult = getConnectionForUpdateRequest(
 				sewarageConnectionRequest.getSewerageConnection().getId(), sewarageConnectionRequest.getRequestInfo());
-		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
+		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
-		diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
+		//diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
