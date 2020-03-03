@@ -157,22 +157,6 @@ public class Connection {
 	
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
-	
-	@JsonProperty("additionalDetails")
-	private Object additionalDetails;
-
-	public Connection additionalDetails(Object additionalDetails) {
-		this.additionalDetails = additionalDetails;
-		return this;
-	}
-
-	public Object getAdditionalDetails() {
-		return additionalDetails;
-	}
-
-	public void setAdditionalDetails(Object additionalDetails) {
-		this.additionalDetails = additionalDetails;
-	}
 
 	public Connection id(String id) {
 		this.id = id;
