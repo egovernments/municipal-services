@@ -212,6 +212,7 @@ public class BPAConstants {
 	// CALCULATION FEEe
 	public static final String APPLICATION_FEE_KEY="ApplicationFee";
 	public static final String SANCTION_FEE_KEY="SanctionFee";
+	public static final String LOW_RISK_PERMIT_FEE_KEY="LOW_RISK_PERMIT_FEE";
 	
 	public static final String SANC_FEE_STATE="PENDING_SANC_FEE_PAYMENT";
 	public static final String APPROVED_STATE ="APPROVED";

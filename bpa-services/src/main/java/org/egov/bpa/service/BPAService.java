@@ -14,6 +14,7 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.models.BPA;
+import org.egov.bpa.web.models.BPA.RiskTypeEnum;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
@@ -96,8 +97,15 @@ public class BPAService {
 		wfIntegrator.callWorkFlow(bpaRequest);
 	
 
-		calculationService.addCalculation(bpaRequest,
-				BPAConstants.APPLICATION_FEE_KEY);
+		
+		// generate sanction fee demand as well for the low risk application
+		if(bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
+		}else {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.APPLICATION_FEE_KEY);
+		}
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}

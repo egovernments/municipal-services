@@ -41,6 +41,10 @@ public class BPACalculatorConfig {
 
     @Value("${egov.demand.sanc.businessservice}")
     private String sanclFeeBusinessService;
+
+    
+    @Value("${egov.demand.lowriskpermit.businessservice}")
+    private String lowRiskPermitFeeBusinessService;
   
 
     //tradelicense Registry
@@ -66,6 +70,12 @@ public class BPACalculatorConfig {
 
     @Value("${egov.sanc.fee}")
     private String baseSancFeeHead;
+    
+    @Value("${egov.low.appl.fee}")
+    private String baseLowApplFeeHead;
+
+    @Value("${egov.low.sanc.fee}")
+    private String baseLowSancFeeHead;
     
     @Value("${egov.appl.fee.defaultAmount}")
     private String applFeeDefaultAmount;
@@ -93,9 +103,8 @@ public class BPACalculatorConfig {
     private String saveTopic;
 
 
-    //CalculaterType Default Values
-//    @Value("${egov.tl.calculationtype.tradetype.default}")
-//    private String defaultTradeUnitCalculationType;
+  
+    
 //
 //    @Value("${egov.tl.calculationtype.accessory.default}")
 //    private String defaultAccessoryCalculationType;
