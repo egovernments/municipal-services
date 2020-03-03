@@ -189,6 +189,7 @@ public class CalculationService {
 		Map calculationTypeMap = mdmsService.getCalculationType(requestInfo,
 				bpa, mdmsData,calulationCriteria.getFeeType());
 		
+		log.info(calculationTypeMap.toString());
 		int amountCalculationType =  (int) calculationTypeMap
 				.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT);
 		
