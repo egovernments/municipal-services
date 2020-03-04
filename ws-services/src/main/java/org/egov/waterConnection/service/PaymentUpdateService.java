@@ -1,8 +1,12 @@
 package org.egov.waterConnection.service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.config.WSConfiguration;
 import org.egov.waterConnection.constants.WCConstants;
@@ -11,12 +15,14 @@ import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.egov.waterConnection.model.collection.PaymentDetail;
 import org.egov.waterConnection.model.collection.PaymentRequest;
+import org.egov.waterConnection.repository.ServiceRequestRepository;
 import org.egov.waterConnection.repository.WaterDao;
 import org.egov.waterConnection.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +45,9 @@ public class PaymentUpdateService {
 
 	@Autowired
 	private WaterDao repo;
+	
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
 
 	/**
 	 * After payment change the application status
@@ -52,6 +61,7 @@ public class PaymentUpdateService {
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service" + paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+					paymentRequest.getRequestInfo().setUserInfo(fetchUser(paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
 							.applicationNumber(paymentDetail.getBill().getConsumerCode()).build();
@@ -83,6 +93,28 @@ public class PaymentUpdateService {
 		} catch (Exception ex) {
 			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
+	}
+	
+	 /**
+	    * 
+	    * @param uuid
+	    * @param requestInfo
+	    * @return User
+	    */
+	private User fetchUser(String uuid, RequestInfo requestInfo) {
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
+		Map<String, Object> userSearchRequest = new HashMap<>();
+		List<String> uuids = Arrays.asList(uuid);
+		userSearchRequest.put("RequestInfo", requestInfo);
+		userSearchRequest.put("uuid", uuids);
+		Object response = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+		try {
+			log.info("user info response" + mapper.writeValueAsString(response));
+		} catch (JsonProcessingException e) {
+			log.error("error occured while parsing user info", e);
+		}
+		return mapper.convertValue(response, User.class);
 	}
 
 }
