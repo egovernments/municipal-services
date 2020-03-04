@@ -129,7 +129,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
-						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory));
+						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory, (OldValue, NewValue) -> NewValue));
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal waterCharge = BigDecimal.ZERO;

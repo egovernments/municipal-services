@@ -115,14 +115,14 @@ public class EnrichmentService {
 		List<String> listOfKeys = Arrays.asList("adhocRebate", "adhocPenalty");
 		HashMap<String, BigDecimal> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
-			listOfKeys.forEach(key -> {
+			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
 			ObjectMapper mapper1 = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
 			HashMap<String, Object> addDetail = mapper1.convertValue(
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
-			for (String constKey : listOfKeys) {
+			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
 				if (addDetail.getOrDefault(constKey, null) != null) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);
@@ -190,7 +190,6 @@ public class EnrichmentService {
 	 */
 	public void enrichUpdateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		enrichingAdditionalDetails(sewerageConnectionRequest);
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
@@ -211,6 +210,7 @@ public class EnrichmentService {
 				}
 			});
 		}
+		enrichingAdditionalDetails(sewerageConnectionRequest);
 	}
 	
 	/**
