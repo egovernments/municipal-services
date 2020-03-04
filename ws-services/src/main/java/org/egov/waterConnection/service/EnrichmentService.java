@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -31,7 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -56,7 +58,7 @@ public class EnrichmentService {
 		
 		if(!CollectionUtils.isEmpty(waterConnectionList)) {
 			String propertyIdsString = waterConnectionList.stream()
-					.map(waterConnection -> waterConnection.getProperty().getPropertyId()).collect(Collectors.toList())
+					.map(waterConnection -> waterConnection.getProperty().getPropertyId()).collect(Collectors.toSet())
 					.stream().collect(Collectors.joining(","));
 			List<Property> propertyList = waterServicesUtil.searchPropertyOnId(waterConnectionSearchCriteria.getTenantId(),
 					propertyIdsString, requestInfo);
@@ -68,8 +70,8 @@ public class EnrichmentService {
 					waterConnection.setProperty(propertyMap.get(propertyId));
 				} else {
 					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
-					builder.append(waterConnection.getConnectionNo()).append(" WATER CONNECTION No");
-					throw new CustomException("INVALID SEARCH ", builder.toString());
+					builder.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo() : waterConnection.getConnectionNo());
+					log.error("", builder.toString());
 				}
 			});
 		}
