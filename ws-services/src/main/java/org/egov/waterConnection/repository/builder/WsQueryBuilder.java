@@ -19,10 +19,10 @@ import org.springframework.util.StringUtils;
 public class WsQueryBuilder {
 
 	@Autowired
-	WaterServicesUtil waterServicesUtil;
+	private WaterServicesUtil waterServicesUtil;
 
 	@Autowired
-	WSConfiguration config;
+	private WSConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
