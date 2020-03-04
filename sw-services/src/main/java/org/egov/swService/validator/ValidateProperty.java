@@ -12,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class ValidateProperty {
 
 	@Autowired
-	SewerageServicesUtil sewerageServiceUtil;
+	private SewerageServicesUtil sewerageServiceUtil;
 
 	/**
 	 * 
@@ -69,8 +72,11 @@ public class ValidateProperty {
 	public void validatePropertyForConnection(List<SewerageConnection> sewerageConnectionList) {
 		sewerageConnectionList.forEach(sewerageConnection -> {
 			if (StringUtils.isEmpty(sewerageConnection.getProperty().getPropertyId())) {
-				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION ID");
+				StringBuilder builder = new StringBuilder();
+				builder.append("PROPERTY ID NOT FOUND FOR ")
+						.append(sewerageConnection.getConnectionNo() == null ? sewerageConnection.getApplicationNo()
+								: sewerageConnection.getConnectionNo());
+				log.error("", builder.toString());
 			}
 		});
 	}
