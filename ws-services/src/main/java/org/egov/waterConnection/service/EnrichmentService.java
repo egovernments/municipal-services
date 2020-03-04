@@ -1,7 +1,10 @@
 package org.egov.waterConnection.service;
 
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,23 +33,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+
 
 @Service
 @Slf4j
 public class EnrichmentService {
 
 	@Autowired
-	WaterServicesUtil waterServicesUtil;
+	private WaterServicesUtil waterServicesUtil;
 
 	@Autowired
-	IdGenRepository idGenRepository;
+	private IdGenRepository idGenRepository;
 
 	@Autowired
-	WSConfiguration config;
+	private WSConfiguration config;
 
 	@Autowired
-	ValidateProperty validateProperty;
+	private ValidateProperty validateProperty;
+	
+	@Autowired
+	private ObjectMapper mapper;
+	
+	
 
 	/**
 	 * 
@@ -91,6 +102,29 @@ public class EnrichmentService {
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+	}
+	@SuppressWarnings("unchecked")
+	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
+			WCConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
+				additionalDetail.put(key, null);
+			});
+		} else {
+			HashMap<String, Object> addDetail = mapper
+					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			List<String> adhocPenalityAndRebateConst = Arrays.asList(WCConstants.ADHOC_PENALTY,
+					WCConstants.ADHOC_REBATE);
+			for (String constKey : WCConstants.ADHOC_PENALTY_REBATE) {
+				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+					additionalDetail.put(constKey, big);
+				} else {
+					additionalDetail.put(constKey, addDetail.get(constKey));
+				}
+			}
+		}
+		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 	}
 	
 
@@ -164,7 +198,7 @@ public class EnrichmentService {
 				}
 			});
 		}
-		
+		enrichingAdditionalDetails(waterConnectionRequest);
 	}
 	
 	/**

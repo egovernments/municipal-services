@@ -1,5 +1,9 @@
 package org.egov.swService.service;
 
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,7 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
+
 
 @Service
 @Slf4j
@@ -37,15 +46,20 @@ public class EnrichmentService {
 	
 	@Autowired
 	private SewerageServicesUtil sewerageServicesUtil;
-	
+
+
 	@Autowired
 	private IdGenRepository idGenRepository;
-	
+
 	@Autowired
 	private SWConfiguration config;
-	
+
 	@Autowired
 	private ValidateProperty validateProperty;
+
+	@Autowired
+	private ObjectMapper mapper;
+
 	
 
 	/**
@@ -95,7 +109,6 @@ public class EnrichmentService {
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		
 		//TODO - Models need to be updated with AuditDetails
 		//AuditDetails auditDetails = sewerageServicesUtil
 		//		.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
@@ -103,6 +116,29 @@ public class EnrichmentService {
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
+	}
+	
+	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
+			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
+				additionalDetail.put(key, null);
+			});
+		} else {
+			HashMap<String, Object> addDetail = mapper.convertValue(
+					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
+			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
+					SWConstants.ADHOC_REBATE);
+			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
+				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+					additionalDetail.put(constKey, big);
+				} else {
+					additionalDetail.put(constKey, addDetail.get(constKey));
+				}
+			}
+		}
+		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 	}
 	
 	
@@ -181,6 +217,7 @@ public class EnrichmentService {
 				}
 			});
 		}
+		enrichingAdditionalDetails(sewerageConnectionRequest);
 	}
 	
 	/**

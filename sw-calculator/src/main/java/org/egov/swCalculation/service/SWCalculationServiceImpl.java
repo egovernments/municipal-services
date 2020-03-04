@@ -85,17 +85,15 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
-
 		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
-
-		// String assessmentNumber = null != detail.getAssessmentNumber() ?
-		// detail.getAssessmentNumber() : criteria.getAssesmentNumber();
-		String tenantId = criteria.getTenantId();
+		String tenantId = null != sewerageConnection.getProperty().getTenantId()
+				? sewerageConnection.getProperty().getTenantId()
+				: criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(SWCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
-						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory));
+						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory, (OldValue, NewValue) -> NewValue));
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
@@ -135,6 +133,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				taxAmt = taxAmt.add(estimate.getEstimateAmount());
 				break;
 			}
+			
 		}
 
 		TaxHeadEstimate decimalEstimate = payService.roundOfDecimals(taxAmt.add(penalty).add(fee).add(sewerageCharge),

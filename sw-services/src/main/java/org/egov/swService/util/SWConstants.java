@@ -118,5 +118,20 @@ public class SWConstants {
 	public static final String DEFAULT_OBJECT_MODIFIED_SMS_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>.";
 
 	public static final String DEFAULT_OBJECT_MODIFIED_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
+	
+	public static final String ADHOC_PENALTY = "adhocPenalty";
+
+	public static final String ADHOC_REBATE = "adhocRebate";
+	
+	public static final String ADHOC_PENALTY_REASON = "adhocPenaltyReason";
+
+	public static final String ADHOC_PENALTY_COMMENT = "adhocPenaltyComment";
+
+	public static final String ADHOC_REBATE_REASON = "adhocRebateReason";
+
+	public static final String ADHOC_REBATE_COMMENT = "adhocRebateComment";
+
+	public static final List<String> ADHOC_PENALTY_REBATE = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY,
+			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT));
 
 }
