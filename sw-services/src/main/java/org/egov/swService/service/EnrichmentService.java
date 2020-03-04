@@ -112,22 +112,22 @@ public class EnrichmentService {
 	}
 	
 	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
-		List<String> listOfKeys = Arrays.asList("adhocRebate", "adhocPenalty");
-		HashMap<String, BigDecimal> additionalDetail = new HashMap<>();
+		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
 			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
-			ObjectMapper mapper1 = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-			HashMap<String, Object> addDetail = mapper1.convertValue(
+			HashMap<String, Object> addDetail = mapper.convertValue(
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
+			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
+					SWConstants.ADHOC_REBATE);
 			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
-				if (addDetail.getOrDefault(constKey, null) != null) {
+				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);
 				} else {
-					additionalDetail.put(constKey, null);
+					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
 		}

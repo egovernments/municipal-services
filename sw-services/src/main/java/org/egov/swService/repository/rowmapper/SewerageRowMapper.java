@@ -16,6 +16,7 @@ import org.egov.swService.model.PlumberInfo;
 import org.egov.swService.model.Property;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.Status;
+import org.egov.swService.util.SWConstants;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,6 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			String Id = rs.getString("connection_Id");
 			if (connectionListMap.getOrDefault(Id, null) == null) {
 				sewarageConnection = new SewerageConnection();
-				Property property = new Property();
 				sewarageConnection.setId(rs.getString("connection_Id"));
 				sewarageConnection.setApplicationNo(rs.getString("applicationNo"));
 				sewarageConnection
@@ -49,10 +49,15 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				sewarageConnection.setRoadType(rs.getString("roadtype"));
 				// get property id and get property object
+				Property property = new Property();
 				property.setPropertyId(rs.getString("property_id"));
-				HashMap<String, BigDecimal> penalties = new HashMap<>();
-				penalties.put("adhocRebate", rs.getBigDecimal("adhocrebate"));
-				penalties.put("adhocPenalty", rs.getBigDecimal("adhocpenalty"));
+				HashMap<String, Object> penalties = new HashMap<>();
+				penalties.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocrebate"));
+				penalties.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocpenalty"));
+				penalties.put(SWConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
+				penalties.put(SWConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
+				penalties.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
+				penalties.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
 				sewarageConnection.setAdditionalDetails(penalties);
 				sewarageConnection.setProperty(property);
 				// Add documents id's

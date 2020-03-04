@@ -3,6 +3,7 @@ package org.egov.waterConnection.service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -100,22 +101,24 @@ public class EnrichmentService {
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
 	}
-	
+	@SuppressWarnings("unchecked")
 	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
-		HashMap<String, BigDecimal> additionalDetail = new HashMap<>();
+		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
 			WCConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
-			ObjectMapper mapper = new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
-			HashMap<String, Object> addDetail = mapper.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			HashMap<String, Object> addDetail = mapper
+					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			List<String> adhocPenalityAndRebateConst = Arrays.asList(WCConstants.ADHOC_PENALTY,
+					WCConstants.ADHOC_REBATE);
 			for (String constKey : WCConstants.ADHOC_PENALTY_REBATE) {
-				if (addDetail.getOrDefault(constKey, null) != null) {
+				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);
 				} else {
-					additionalDetail.put(constKey, null);
+					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
 		}
@@ -173,7 +176,6 @@ public class EnrichmentService {
 	 */
 	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-		enrichingAdditionalDetails(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
