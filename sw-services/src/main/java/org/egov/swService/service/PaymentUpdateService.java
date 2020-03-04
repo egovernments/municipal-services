@@ -70,6 +70,11 @@ public class PaymentUpdateService {
 					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
 							.sewerageConnection(sewerageConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
+					try {
+						log.info("", "Sewerage Request " + mapper.writeValueAsString(sewerageConnectionRequest));
+					} catch (Exception ex) {
+						log.error("", ex);
+					}
 					wfIntegrator.callWorkFlow(sewerageConnectionRequest);
 					log.info("Sewerage connection application status: "
 							+ sewerageConnectionRequest.getSewerageConnection().getApplicationStatus());

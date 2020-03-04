@@ -50,7 +50,7 @@ public class PaymentUpdateService {
 		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				log.info("Consuming Business Service", paymentDetail.getBusinessService());
+				log.info("", "Consuming Business Service" + paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
@@ -69,6 +69,11 @@ public class PaymentUpdateService {
 					WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
 							.waterConnection(waterConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
+					try {
+						log.info("", "WaterConnection Request " + mapper.writeValueAsString(waterConnectionRequest));
+					} catch (Exception ex) {
+						log.error("", ex);
+					}
 					wfIntegrator.callWorkFlow(waterConnectionRequest);
 					log.info("Water connection application status: "
 							+ waterConnectionRequest.getWaterConnection().getApplicationStatus());
