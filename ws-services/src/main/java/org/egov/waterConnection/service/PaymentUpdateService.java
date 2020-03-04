@@ -50,7 +50,7 @@ public class PaymentUpdateService {
 		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				log.info("", "Consuming Business Service" + paymentDetail.getBusinessService());
+				log.info("Consuming Business Service" + paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
@@ -70,9 +70,9 @@ public class PaymentUpdateService {
 							.waterConnection(waterConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
 					try {
-						log.info("", "WaterConnection Request " + mapper.writeValueAsString(waterConnectionRequest));
+						log.info("WaterConnection Request " + mapper.writeValueAsString(waterConnectionRequest));
 					} catch (Exception ex) {
-						log.error("", ex);
+						log.error("Temp Catch Excption:", ex);
 					}
 					wfIntegrator.callWorkFlow(waterConnectionRequest);
 					log.info("Water connection application status: "
@@ -81,7 +81,7 @@ public class PaymentUpdateService {
 				}
 			}
 		} catch (Exception ex) {
-			log.error("", ex);
+			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
 	}
 

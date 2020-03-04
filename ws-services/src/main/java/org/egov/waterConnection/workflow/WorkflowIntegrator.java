@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -76,6 +77,11 @@ public class WorkflowIntegrator {
 			}
 
 		}
+		try {
+			log.info("Process Instance request is : " + mapper.writeValueAsString(processInstance));
+		} catch (JsonProcessingException e1) {
+			log.error("Failed to log ProcessInstance : " , e1);
+		}
 		List<ProcessInstance> processInstances = new ArrayList<>();
 		processInstances.add(processInstance);
 		ProcessInstanceResponse processInstanceResponse = null;
@@ -86,6 +92,7 @@ public class WorkflowIntegrator {
 									.processInstances(processInstances).build(),
 							Map.class),
 					ProcessInstanceResponse.class);
+			
 		} catch (HttpClientErrorException e) {
 			/*
 			 * extracting message from client error exception
