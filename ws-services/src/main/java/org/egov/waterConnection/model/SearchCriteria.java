@@ -3,6 +3,9 @@ package org.egov.waterConnection.model;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -67,9 +70,12 @@ public class SearchCriteria {
 	private List<String> ownerIds;
 
 	public boolean isEmpty() {
-		return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNumber == null
-				&& this.connectionNumber == null && this.oldConnectionNumber == null && this.mobileNumber == null
-				&& this.fromDate == null && this.toDate == null && this.ownerIds == null && this.propertyId == null);
+		return (StringUtils.isEmpty(this.tenantId) && StringUtils.isEmpty(this.mobileNumber)
+				&& StringUtils.isEmpty(this.propertyId) && CollectionUtils.isEmpty(this.ids)
+				&& StringUtils.isEmpty(this.oldConnectionNumber) && StringUtils.isEmpty(this.connectionNumber)
+				&& StringUtils.isEmpty(this.status) && StringUtils.isEmpty(this.applicationNumber)
+				&& StringUtils.isEmpty(this.applicationStatus) && StringUtils.isEmpty(this.fromDate)
+				&& StringUtils.isEmpty(this.toDate));
 	}
 
 	public boolean tenantIdOnly() {

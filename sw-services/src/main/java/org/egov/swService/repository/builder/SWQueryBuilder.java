@@ -59,8 +59,9 @@ public class SWQueryBuilder {
 	
 	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
+		if(criteria.isEmpty())
+			return null;
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
-		boolean isAnyCriteriaMatch = false;
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
@@ -69,68 +70,60 @@ public class SWQueryBuilder {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 				addToPreparedStatement(preparedStatement, propertyIds);
-				isAnyCriteriaMatch = true;
 			}
+		}
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.tenantid = ? ");
+			preparedStatement.add(criteria.getTenantId());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
 			addToPreparedStatement(preparedStatement, criteria.getIds());
-			isAnyCriteriaMatch = true;
 		}
 
 		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.property_id = ? ");
 			preparedStatement.add(criteria.getPropertyId());
-			isAnyCriteriaMatch = true;
 		}
 		if (!StringUtils.isEmpty(criteria.getOldConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");
 			preparedStatement.add(criteria.getOldConnectionNumber());
-			isAnyCriteriaMatch = true;
 		}
 
 		if (!StringUtils.isEmpty(criteria.getConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.connectionno = ? ");
 			preparedStatement.add(criteria.getConnectionNumber());
-			isAnyCriteriaMatch = true;
 		}
 		if (!StringUtils.isEmpty(criteria.getStatus())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
-			isAnyCriteriaMatch = true;
 		}
 		if (!StringUtils.isEmpty(criteria.getApplicationNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationno = ? ");
 			preparedStatement.add(criteria.getApplicationNumber());
-			isAnyCriteriaMatch = true;
 		}
 		if (!StringUtils.isEmpty(criteria.getApplicationStatus())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationStatus = ? ");
 			preparedStatement.add(criteria.getApplicationStatus());
-			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getFromDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append("  sc.connectionExecutionDate >= ? ");
 			preparedStatement.add(criteria.getFromDate());
-			isAnyCriteriaMatch = true;
 		}
 		if (criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append("  sc.connectionExecutionDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
-			isAnyCriteriaMatch = true;
 		}
-		if (isAnyCriteriaMatch == false)
-			return null;
-		
 		//Add OrderBy clause
 		query.append(" ORDER BY sc.connectionExecutionDate DESC");
 		

@@ -1,25 +1,24 @@
 package org.egov.swService.service;
 
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.LinkedHashMap;
-import java.util.ListIterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.AuditDetails;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
 import org.egov.swService.model.Connection.StatusEnum;
 import org.egov.swService.model.Property;
+import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.Status;
@@ -27,21 +26,27 @@ import org.egov.swService.model.Idgen.IdResponse;
 import org.egov.swService.repository.IdGenRepository;
 import org.egov.swService.util.SWConstants;
 import org.egov.swService.util.SewerageServicesUtil;
-import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.validator.ValidateProperty;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 	
 	@Autowired
 	private SewerageServicesUtil sewerageServicesUtil;
+
 
 	@Autowired
 	private IdGenRepository idGenRepository;
@@ -54,6 +59,7 @@ public class EnrichmentService {
 
 	@Autowired
 	private ObjectMapper mapper;
+
 	
 
 	/**
@@ -71,7 +77,7 @@ public class EnrichmentService {
 		if (!sewerageConnectionList.isEmpty()) {
 			String propertyIdsString = sewerageConnectionList.stream()
 					.map(sewerageConnection -> sewerageConnection.getProperty().getPropertyId())
-					.collect(Collectors.toList()).stream().collect(Collectors.joining(","));
+					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
 			List<Property> propertyList = sewerageServicesUtil
 					.searchPropertyOnId(sewerageConnectionSearchCriteria.getTenantId(), propertyIdsString, requestInfo);
 			HashMap<String, Property> propertyMap = propertyList.stream()
@@ -83,9 +89,10 @@ public class EnrichmentService {
 				if (propertyMap.containsKey(propertyId)) {
 					sewerageConnection.setProperty(propertyMap.get(propertyId));
 				} else {
-
-					throw new CustomException("INVALID SEARCH", "NO PROPERTY FOUND FOR "
-							+ sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION No");
+					StringBuilder builder = new StringBuilder();
+					builder.append(sewerageConnection.getConnectionNo() == null ? sewerageConnection.getApplicationNo()
+							: sewerageConnection.getConnectionNo());
+					log.error("", builder.toString());
 				}
 			});
 

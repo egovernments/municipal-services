@@ -1,5 +1,6 @@
 package org.egov.waterConnection.validator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,14 +8,18 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterConnection.constants.WCConstants;
+import org.egov.waterConnection.model.Status;
 import org.egov.waterConnection.model.WaterConnection;
 import org.egov.waterConnection.model.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Component
+@Slf4j
 public class WaterConnectionValidator {
 
 	/**
@@ -70,8 +75,11 @@ public class WaterConnectionValidator {
 	public void validatePropertyForConnection(List<WaterConnection> waterConnectionList) {
 		waterConnectionList.forEach(waterConnection -> {
 			if (StringUtils.isEmpty(waterConnection.getProperty().getPropertyId())) {
-				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + waterConnection.getConnectionNo() + " WATER CONNECTION NO");
+				StringBuilder builder = new StringBuilder();
+				builder.append("PROPERTY ID NOT FOUND FOR ")
+						.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo()
+								: waterConnection.getConnectionNo());
+				log.error("", builder.toString());
 			}
 		});
 	}
@@ -86,6 +94,7 @@ public class WaterConnectionValidator {
 		validateAllIds(request.getWaterConnection(), searchResult);
 		validateDuplicateDocuments(request);
 		setFieldsFromSearch(request,searchResult);
+		setStatusForDocuments(request, searchResult);
 		
 	}
    
@@ -130,5 +139,27 @@ public class WaterConnectionValidator {
 	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult) {
 		request.getWaterConnection().setApplicationStatus(searchResult.getApplicationStatus());
 		request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
+	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param searchResult
+	 */
+	private void setStatusForDocuments(WaterConnectionRequest request, WaterConnection searchResult) {
+		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
+			ArrayList<String> fileStoreIds = new ArrayList<>();
+			if (!CollectionUtils.isEmpty(request.getWaterConnection().getDocuments())) {
+				request.getWaterConnection().getDocuments().forEach(document -> {
+					fileStoreIds.add(document.getFileStoreId());
+				});
+			}
+			searchResult.getDocuments().forEach(document -> {
+				if (!fileStoreIds.contains(document.getFileStoreId())) {
+					document.setStatus(Status.INACTIVE);
+					request.getWaterConnection().getDocuments().add(document);
+				}
+			});
+		}
 	}
 }

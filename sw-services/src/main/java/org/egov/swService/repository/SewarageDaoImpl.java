@@ -2,9 +2,7 @@ package org.egov.swService.repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.config.SWConfiguration;

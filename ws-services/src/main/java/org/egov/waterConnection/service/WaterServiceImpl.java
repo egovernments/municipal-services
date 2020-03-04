@@ -125,7 +125,7 @@ public class WaterServiceImpl implements WaterService {
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest);
 		
 		//check for edit and send edit notification
-		diffService.checkDifferenceAndSendEditNotification(waterConnectionRequest, searchResult);
+		//diffService.checkDifferenceAndSendEditNotification(waterConnectionRequest, searchResult);
 		//Call workflow
 		wfIntegrator.callWorkFlow(waterConnectionRequest);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);

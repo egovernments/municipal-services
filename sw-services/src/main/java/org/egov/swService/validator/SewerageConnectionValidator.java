@@ -1,5 +1,6 @@
 package org.egov.swService.validator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,18 +9,14 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
-import org.egov.swService.repository.SewarageDao;
+import org.egov.swService.model.Status;
 import org.egov.swService.util.SWConstants;
 import org.egov.tracer.model.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 @Component
 public class SewerageConnectionValidator {
-
-	@Autowired
-	private SewarageDao sewarageDao;
 
 	/**
 	 * 
@@ -67,6 +64,7 @@ public class SewerageConnectionValidator {
 		validateAllIds(request.getSewerageConnection(), searchResult);
 		validateDuplicateDocuments(request);
 		setFieldsFromSearch(request,searchResult);
+		setStatusForDocuments(request, searchResult);
 		
 	}
    
@@ -121,6 +119,28 @@ public class SewerageConnectionValidator {
 						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION NO");
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 * @param request
+	 * @param searchResult
+	 */
+	private void setStatusForDocuments(SewerageConnectionRequest request, SewerageConnection searchResult) {
+		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
+			ArrayList<String> fileStoreIds = new ArrayList<>();
+			if (!CollectionUtils.isEmpty(request.getSewerageConnection().getDocuments())) {
+				request.getSewerageConnection().getDocuments().forEach(document -> {
+					fileStoreIds.add(document.getFileStoreId());
+				});
+			}
+			searchResult.getDocuments().forEach(document -> {
+				if (!fileStoreIds.contains(document.getFileStoreId())) {
+					document.setStatus(Status.INACTIVE);
+					request.getSewerageConnection().getDocuments().add(document);
+				}
+			});
+		}
 	}
 
 }

@@ -137,7 +137,7 @@ public class SewarageServiceImpl implements SewarageService {
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
-		diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
+		//diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
