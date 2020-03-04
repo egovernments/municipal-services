@@ -130,10 +130,30 @@ public class CalculationService {
 			CalulationCriteria calulationCriteria, RequestInfo requestInfo,
 			Object mdmsData) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		EstimatesAndSlabs estimatesAndSlabs = getBaseTax(calulationCriteria,
-				requestInfo, mdmsData);
+		EstimatesAndSlabs estimatesAndSlabs;
+		if(calulationCriteria.getFeeType().equalsIgnoreCase(BPACalculatorConstants.LOW_RISK_PERMIT_FEE_TYPE)) {
+			
+			calulationCriteria.setFeeType(BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE);
+			 estimatesAndSlabs = getBaseTax(calulationCriteria,
+					requestInfo, mdmsData);
+			 
+			 estimates.addAll(estimatesAndSlabs.getEstimates());
+			 
+			 calulationCriteria.setFeeType(BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE);
+			 estimatesAndSlabs = getBaseTax(calulationCriteria,
+					requestInfo, mdmsData);
+			 
+			 estimates.addAll(estimatesAndSlabs.getEstimates());
+			 
+			 calulationCriteria.setFeeType(BPACalculatorConstants.LOW_RISK_PERMIT_FEE_TYPE);
 
-		estimates.addAll(estimatesAndSlabs.getEstimates());
+		}else {
+			 estimatesAndSlabs = getBaseTax(calulationCriteria,
+					requestInfo, mdmsData);
+			 estimates.addAll(estimatesAndSlabs.getEstimates());
+		}
+		
+		
 
 		/*
 		 * if(calulationCriteria.getBpa().getAdhocPenalty()!=null)
@@ -180,7 +200,7 @@ public class CalculationService {
 	      estimate.setEstimateAmount(totalTax);
 	      estimate.setCategory(Category.FEE);
 	      
-	      String taxHeadCode = ( calulationCriteria.getFeeType().equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE ) ? config.getBaseApplFeeHead() : config.getBaseSancFeeHead());
+	      String taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType());
 	      estimate.setTaxHeadCode(taxHeadCode);
 
 	      estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));

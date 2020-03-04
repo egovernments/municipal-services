@@ -14,6 +14,7 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -44,7 +45,7 @@ public class WorkflowIntegrator {
 
 	private static final String DOCUMENTSKEY = "documents";
 
-	private static final String ASSIGNEEKEY = "assignees";
+	private static final String ASSIGNEEKEY = "assignes";
 
 	private static final String UUIDKEY = "uuid";
 
@@ -90,16 +91,19 @@ public class WorkflowIntegrator {
 		BPA bpa = bpaRequest.getBPA();
 
 			JSONObject obj = new JSONObject();
-			Map<String, List<String>> uuidmap = new HashMap<>();
-			uuidmap.put(UUIDKEY, bpa.getAssignees());
 			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
 			obj.put(TENANTIDKEY, wfTenantId);
-			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+			if(bpa.getRiskType().toString().equalsIgnoreCase("LOW")){			
+				obj.put(BUSINESSSERVICEKEY, config.getLowBusinessServiceValue());
+			}else{
+				obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+			}
 			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
 			obj.put(ACTIONKEY, bpa.getAction());
 			obj.put(COMMENTKEY, bpa.getComment());
-			if (!StringUtils.isEmpty(bpa.getAssignees()))
-				obj.put(ASSIGNEEKEY, uuidmap);
+			if (!CollectionUtils.isEmpty(bpa.getAssignees())) {
+				obj.put(ASSIGNEEKEY,  bpa.getAssignees());
+			}
 			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
 			array.add(obj);
 //		}

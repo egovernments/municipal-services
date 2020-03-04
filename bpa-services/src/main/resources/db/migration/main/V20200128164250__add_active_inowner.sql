@@ -1,0 +1,2 @@
+ALTER TABLE eg_bpa_owner 
+ADD COLUMN active BOOLEAN DEFAULT TRUE;

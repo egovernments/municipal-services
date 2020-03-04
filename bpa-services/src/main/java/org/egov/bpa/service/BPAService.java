@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
@@ -13,9 +14,11 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.models.BPA;
+import org.egov.bpa.web.models.BPA.RiskTypeEnum;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.BPASearchCriteria;
 import org.egov.bpa.web.models.Difference;
+import org.egov.bpa.web.models.OwnerInfo;
 import org.egov.bpa.web.models.user.UserDetailResponse;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.web.models.workflow.ProcessInstance;
@@ -30,7 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class BPAService {
 
 	@Autowired
@@ -89,10 +95,18 @@ public class BPAService {
 		userService.createUser(bpaRequest);
 
 		wfIntegrator.callWorkFlow(bpaRequest);
-		repository.save(bpaRequest);
+	
 
-		calculationService.addCalculation(bpaRequest,
-				BPAConstants.APPLICATION_FEE_KEY);
+		
+		// generate sanction fee demand as well for the low risk application
+		if(bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
+		}else {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.APPLICATION_FEE_KEY);
+		}
+		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
 
@@ -164,7 +178,7 @@ public class BPAService {
 		}
 
 		// Add bpaId of all bpa's owned by the user
-		criteria = enrichmentService.getBPACriteriaFromIds(bpa);
+		criteria = enrichmentService.getBPACriteriaFromIds(bpa,criteria.getLimit());
 		// Get all bpa with ownerInfo enriched from user service
 		bpa = getBPAWithOwnerInfo(criteria, requestInfo);
 		return bpa;
@@ -185,8 +199,14 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR",
 					"Application Not found in the System" + bpa);
 		}
+		
+		bpa.getOwners().forEach(owner -> {
+			if(owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
 		BusinessService businessService = workflowService.getBusinessService(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
 		List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest);
@@ -196,11 +216,16 @@ public class BPAService {
 		}
 		Difference diffMap = diffService
 				.getDifference(bpaRequest, searchResult);
+
+		userService.createUser(bpaRequest);
 		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 				workflowService.getCurrentState(bpa.getStatus(),
 						businessService));
+		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		actionValidator.validateUpdateRequest(bpaRequest, businessService);
+		bpaValidator.validateCheckList(mdmsData, bpaRequest,
+				workflowService.getCurrentState(bpa.getStatus(), businessService));
 
 		//
 		//
@@ -211,23 +236,21 @@ public class BPAService {
 		wfIntegrator.callWorkFlow(bpaRequest);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
-		userService.createUser(bpaRequest);
+//		userService.createUser(bpaRequest);
+	
+		log.info("Bpa status is : " + bpa.getStatus());
+		// Generate the sanction Demand
+		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.SANCTION_FEE_KEY);
+		}
 		repository.update(bpaRequest, workflowService.isStateUpdatable(
 				bpa.getStatus(), businessService));
-
-		// Generate the sanction Demand
-		ProcessInstance processInstance = workflowService.getProcessInstance(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
-				bpa.getApplicationNo());
-		if (processInstance != null) {
-			if (processInstance.getState().getState()
-					.equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
-				calculationService.addCalculation(bpaRequest,
-						BPAConstants.SANCTION_FEE_KEY);
-			}
-
-		}
-
+		
+		List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive()).collect(Collectors.toList());
+		bpaRequest.getBPA().getOwners().clear();
+		bpaRequest.getBPA().setOwners(activeOwners);
+		
 		return bpaRequest.getBPA();
 
 	}

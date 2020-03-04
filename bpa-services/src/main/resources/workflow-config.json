@@ -1,0 +1,304 @@
+{
+  "RequestInfo": {
+    "apiId": "Rainmaker",
+    "action": "",
+    "did": 1,
+    "key": "",
+    "msgId": "20170310130900|en_IN",
+    "requesterId": "",
+    "ts": 1513579888683,
+    "ver": ".01",
+    "authToken": "{AUTH}",
+        "userInfo":{
+        "id": 26397,
+        "uuid": "b5655467-f24f-452d-a2f8-2177014b00f3",
+        "userName": "9449880531",
+        "name": "Sushama Manohar",
+        "mobileNumber": "9449880531",
+        "emailId": "sus.man@gmail.com",
+        "locale": null,
+        "type": "CITIZEN",
+        "roles": [
+            {
+                "name": "Citizen",
+                "code": "CITIZEN",
+                "tenantId": "pb"
+            },
+            {
+                "name": "BPA Architect",
+                "code": "BPA_ARCHITECT",
+                "tenantId": "pb"
+            }
+        ],
+        "active": true,
+        "tenantId": "pb"
+    }
+  },
+  "BusinessServices": [
+    {
+      "tenantId": "pb",
+      "businessService": "BPA",
+      "business": "bpa-services",
+      "businessServiceSla": null,
+      "states": [
+        {
+          "sla": null,
+          "state": null,
+          "applicationStatus": null,
+          "docUploadRequired": false,
+          "isStartState": true,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "action": "INITIATE",
+              "nextState": "INITIATED",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "INITIATED",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": false,
+          "isStartState": true,
+          "isTerminateState": false,
+          "actions": [
+            {
+              "action": "APPLY",
+              "nextState": "PENDING_APPL_FEE_PAYMENT",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            },
+            {
+              "action": "INITIATE",
+              "nextState": "INITIATED",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            }
+          ]
+        },
+         {
+          "sla": null,
+          "state": "PENDING_APPL_FEE_PAYMENT",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": false,
+          "actions": [
+            {
+              "action": "PAY",
+              "nextState": "DOC_VERIFICATION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "SYSTEM_PAYMENT"
+              ]
+            },
+            {
+              "action": "ADHOC",
+              "nextState": "PENDING_APPL_FEE_PAYMENT",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "SYSTEM_PAYMENT"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "DOC_VERIFICATION_PENDING",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": true,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": false,
+          "actions": [
+            {
+              "action": "FORWARD",
+              "nextState": "FIELDINSPECTION_PENDING",
+              "roles": [
+                "BPA_VERIFIER"
+              ]
+            },
+            {
+                "action": "MARK",
+                "nextState": "DOC_VERIFICATION_PENDING",
+                "roles": [
+                  "BPA_VERIFIER"
+                ]
+            },
+            {
+                "action": "SENDBACK",
+                "nextState": "INITIATED",
+                "roles": [
+                    "BPA_VERIFIER"
+                ]
+            }
+          ]
+        },        
+        {
+          "sla": null,
+          "state": "FIELDINSPECTION_PENDING",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isStateUpdatable": false,
+          "isTerminateState": false,
+          "actions": [
+            {
+              "action": "FORWARD",
+              "nextState": "NOC_VERIFICATION_PENDING",
+              "roles": [
+                "BPA_VERIFIER"
+              ]
+            },
+            {
+              "action": "MARK",
+              "nextState": "FIELDINSPECTION_PENDING",
+              "roles": [
+                "BPA_VERIFIER"
+              ]
+            },
+            {
+              "action": "SENDBACK",
+              "nextState": "DOC_VERIFICATION_PENDING",
+              "roles": [
+                "BPA_VERIFIER"
+              ]
+            }
+          ]
+        },
+        {
+            "sla": null,
+            "state": "NOC_VERIFICATION_PENDING",
+            "applicationStatus": "INPROGRESS",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isStateUpdatable": false,
+            "isTerminateState": false,
+            "actions": [
+              {
+                "action": "FORWARD",
+                "nextState": "PENDINGAPPROVAL",
+                "roles": [
+                  "BPA_VERIFIER"
+                ]
+              },
+              {
+                "action": "MARK",
+                "nextState": "NOC_VERIFICATION_PENDING",
+                "roles": [
+                  "BPA_VERIFIER"
+                ]
+              },
+              {
+                "action": "SENDBACK",
+                "nextState": "FIELDINSPECTION_PENDING",
+                "roles": [
+                  "BPA_VERIFIER"
+                ]
+              }
+            ]
+          },
+        {
+          "sla": null,
+          "state": "PENDINGAPPROVAL",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isStateUpdatable": false,
+          "isTerminateState": false,
+          "actions": [
+            {
+              "action": "APPROVE",
+              "nextState": "PENDING_SANC_FEE_PAYMENT",
+              "roles": [
+                "BPA_APPROVER"
+               
+              ]
+            },
+            {
+              "action": "MARK",
+              "nextState": "PENDING_SANC_FEE_PAYMENT",
+              "roles": [
+                "BPA_APPROVER"
+              ]
+            },
+            {
+              "action": "SENDBACK",
+              "nextState": "NOC_VERIFICATION_PENDING",
+              "roles": [
+                "BPA_APPROVER"
+              ]
+            },
+            {
+              "action": "REJECT",
+              "nextState": "REJECTED",
+              "roles": [
+                "BPA_APPROVER"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "PENDING_SANC_FEE_PAYMENT",
+          "applicationStatus": "INPROGRESS",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": false,
+          "actions": [
+            {
+              "action": "PAY",
+              "nextState": "APPROVED",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "SYSTEM_PAYMENT"
+              ]
+            },
+            {
+              "action": "ADHOC",
+              "nextState": "PENDING_SANC_FEE_PAYMENT",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "SYSTEM_PAYMENT"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "APPROVED",
+          "applicationStatus": "APPROVED",
+          "isStateUpdatable": false,
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": true
+        },
+        {
+            "sla": null,
+            "state": "REJECTED",
+            "applicationStatus": "REJECTED",
+            "isStateUpdatable": false,
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": true
+          }
+      ]
+    }
+  ]
+}

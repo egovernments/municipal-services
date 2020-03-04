@@ -1,8 +1,4 @@
 package org.egov.bpa.web.models.edcr;
-
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPARequest.BPARequestBuilder;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

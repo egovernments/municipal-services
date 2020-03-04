@@ -23,11 +23,11 @@ public class BPAQueryBuilder {
 	private static final String QUERY = "SELECT bpa.*,bpaunit.*,bpaowner.*,"
 			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-			+ "bpa_createdTime,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
+			+ "bpa_createdTime,bpa.validityDate,bpa.additionalDetails,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
 			+ "bpaowner.id as bpaowner_uuid,"
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
-			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestore as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
-			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestore as bpa_doc_filestore"
+			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestoreid as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
+			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestoreid as bpa_doc_filestore"
 			+ " FROM eg_bpa_buildingplan bpa"
 			+ INNER_JOIN_STRING
 			+ "eg_bpa_address bpaaddress ON bpaaddress.buildingplanid = bpa.id"
@@ -43,7 +43,7 @@ public class BPAQueryBuilder {
 			+ "eg_bpa_geolocation bpageolocation ON bpageolocation.addressid = bpaaddress.id";;
 
 	private final String paginationWrapper = "SELECT * FROM "
-			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_id) offset_ FROM "
+			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_lastModifiedTime DESC) offset_ FROM "
 			+ "({})" + " result) result_offset "
 			+ "WHERE offset_ > ? AND offset_ <= ?";
 
@@ -109,9 +109,14 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.createdtime BETWEEN ")
 					.append(criteria.getFromDate()).append(" AND ")
 					.append(criteria.getToDate());
+		}else if(criteria.getFromDate() != null && criteria.getToDate() == null){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdtime >= ")
+					.append(criteria.getFromDate());
 		}
 		
-		
+		addClauseIfRequired(preparedStmtList, builder);
+		builder.append(" bpaowner.active = TRUE"); //To get the active owners
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList,
 				criteria);
@@ -130,16 +135,21 @@ public class BPAQueryBuilder {
 			limit = criteria.getLimit();
 
 		if (criteria.getLimit() != null
-				&& criteria.getLimit() > config.getMaxSearchLimit())
+				&& criteria.getLimit() > config.getMaxSearchLimit()){
 			limit = config.getMaxSearchLimit();
+		}
 
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
-		preparedStmtList.add(offset);
-		preparedStmtList.add(limit + offset);
+	
+		if(limit == -1) {
+			finalQuery = finalQuery.replace("WHERE offset_ > ? AND offset_ <= ?", "");
+		}else {
+			preparedStmtList.add(offset);
+			preparedStmtList.add(limit + offset);
+		}
 
-		System.out.println("========>>>>> "+finalQuery);
 		return finalQuery;
 
 	}
