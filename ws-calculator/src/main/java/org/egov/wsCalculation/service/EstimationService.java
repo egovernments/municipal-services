@@ -376,76 +376,77 @@ public class EstimationService {
 	 */
 	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
 			Map<String, Object> masterData) {
-		List<TaxHeadEstimate> estimates = new ArrayList<>();
-		BigDecimal formFee = BigDecimal.ZERO;
-		BigDecimal scrutinyFee = BigDecimal.ZERO;
-		BigDecimal meterCost = BigDecimal.ZERO;
-		BigDecimal otherCharges = BigDecimal.ZERO;
-		BigDecimal taxAndCessPercentage = BigDecimal.ZERO;
-		BigDecimal roadCuttingCharge = BigDecimal.ZERO;
-		BigDecimal roadPlotCharge = BigDecimal.ZERO;
-		BigDecimal usageTypeCharge = BigDecimal.ZERO;
-		BigDecimal tax = BigDecimal.ZERO;
-		BigDecimal totalCharge = BigDecimal.ZERO;
-
 		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_FEESLAB_MASTER, null);
 		if (feeSlab == null)
 			throw new CustomException("FEE_SLAB_NOT_FOUND", "fee slab master data not found!!");
 		JSONObject feeObj = mapper.convertValue(feeSlab.get(0), JSONObject.class);
+		BigDecimal formFee = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.FORM_FEE_CONST) != null) {
 			formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.FORM_FEE_CONST).toString());
 		}
+		BigDecimal scrutinyFee = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.SCRUTINY_FEE_CONST) != null) {
 			scrutinyFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.SCRUTINY_FEE_CONST).toString());
 		}
+		BigDecimal otherCharges = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.OTHER_CHARGE_CONST) != null) {
 			otherCharges = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).toString());
 		}
+		BigDecimal taxAndCessPercentage = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
+		BigDecimal meterCost = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null
 				&& criteria.getWaterConnection().getConnectionType() != null && criteria.getWaterConnection()
 						.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
 		}
-		if(criteria.getWaterConnection().getRoadType() != null)
-		roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
-				criteria.getWaterConnection().getRoadCuttingArea());
-		if(criteria.getWaterConnection().getProperty().getLandArea() != null)
-		roadPlotCharge = getPlotSizeFee(masterData, criteria.getWaterConnection().getProperty().getLandArea());
-		if(criteria.getWaterConnection().getRoadCuttingArea() != null)
-		usageTypeCharge = getUsageTypeFee(masterData, criteria.getWaterConnection().getProperty().getUsageCategory(),
-				criteria.getWaterConnection().getRoadCuttingArea());
+		BigDecimal roadCuttingCharge = BigDecimal.ZERO;
+		if (criteria.getWaterConnection().getRoadType() != null)
+			roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
+					criteria.getWaterConnection().getRoadCuttingArea());
+		BigDecimal roadPlotCharge = BigDecimal.ZERO;
+		if (criteria.getWaterConnection().getProperty().getLandArea() != null)
+			roadPlotCharge = getPlotSizeFee(masterData, criteria.getWaterConnection().getProperty().getLandArea());
+		BigDecimal usageTypeCharge = BigDecimal.ZERO;
+		if (criteria.getWaterConnection().getRoadCuttingArea() != null)
+			usageTypeCharge = getUsageTypeFee(masterData,
+					criteria.getWaterConnection().getProperty().getUsageCategory(),
+					criteria.getWaterConnection().getRoadCuttingArea());
+		BigDecimal tax = BigDecimal.ZERO;
+		BigDecimal totalCharge = BigDecimal.ZERO;
 		totalCharge = formFee.add(scrutinyFee).add(otherCharges).add(meterCost).add(roadCuttingCharge)
 				.add(roadPlotCharge).add(usageTypeCharge);
 		tax = totalCharge.multiply(taxAndCessPercentage.divide(WSCalculationConstant.HUNDRED));
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		//
-		if(!(formFee.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_FORM_FEE)
-				.estimateAmount(formFee.setScale(2, 2)).build());
-		if(!(scrutinyFee.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SCRUTINY_FEE)
-				.estimateAmount(scrutinyFee.setScale(2, 2)).build());
-		if(!(meterCost.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_CHARGE)
-				.estimateAmount(meterCost.setScale(2, 2)).build());
-		if(!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_OTHER_CHARGE)
-				.estimateAmount(otherCharges.setScale(2, 2)).build());
-		if(!(roadCuttingCharge.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ROAD_CUTTING_CHARGE)
-				.estimateAmount(roadCuttingCharge.setScale(2, 2)).build());
-		if(!(usageTypeCharge.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ONE_TIME_FEE)
-				.estimateAmount(usageTypeCharge.setScale(2, 2)).build());
-		if(!(roadPlotCharge.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
-				.estimateAmount(roadPlotCharge.setScale(2, 2)).build());
-		if(!(tax.compareTo(BigDecimal.ZERO) == 0))
-		estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TAX_AND_CESS)
-				.estimateAmount(tax.setScale(2, 2)).build());
+		if (!(formFee.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_FORM_FEE)
+					.estimateAmount(formFee.setScale(2, 2)).build());
+		if (!(scrutinyFee.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SCRUTINY_FEE)
+					.estimateAmount(scrutinyFee.setScale(2, 2)).build());
+		if (!(meterCost.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_CHARGE)
+					.estimateAmount(meterCost.setScale(2, 2)).build());
+		if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_OTHER_CHARGE)
+					.estimateAmount(otherCharges.setScale(2, 2)).build());
+		if (!(roadCuttingCharge.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ROAD_CUTTING_CHARGE)
+					.estimateAmount(roadCuttingCharge.setScale(2, 2)).build());
+		if (!(usageTypeCharge.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ONE_TIME_FEE)
+					.estimateAmount(usageTypeCharge.setScale(2, 2)).build());
+		if (!(roadPlotCharge.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
+					.estimateAmount(roadPlotCharge.setScale(2, 2)).build());
+		if (!(tax.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TAX_AND_CESS)
+					.estimateAmount(tax.setScale(2, 2)).build());
+		addAdhocPenalityAndRebate(estimates, criteria.getWaterConnection());
 		return estimates;
 	}
 	
@@ -515,5 +516,31 @@ public class EstimationService {
 			charge = charge.multiply(cuttingArea);
 		}
 		return charge;
+	}
+	
+	/**
+	 * Enrich the adhoc penality and adhoc rebate
+	 * @param estimates tax head estimate
+	 * @param connection water connection object
+	 */
+	@SuppressWarnings({ "unchecked"})
+	private void addAdhocPenalityAndRebate(List<TaxHeadEstimate> estimates, WaterConnection connection) {
+		if (connection.getAdditionalDetails() != null) {
+			HashMap<String, Object> additionalDetails = mapper.convertValue(connection.getAdditionalDetails(),
+					HashMap.class);
+			if (additionalDetails.getOrDefault(WSCalculationConstant.ADHOC_PENALTY, null) != null) {
+				estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ADHOC_PENALTY)
+						.estimateAmount(
+								new BigDecimal(additionalDetails.get(WSCalculationConstant.ADHOC_PENALTY).toString()))
+						.build());
+			}
+			if (additionalDetails.getOrDefault(WSCalculationConstant.ADHOC_REBATE, null) != null) {
+				estimates
+						.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ADHOC_REBATE)
+								.estimateAmount(new BigDecimal(
+										additionalDetails.get(WSCalculationConstant.ADHOC_REBATE).toString()).negate())
+								.build());
+			}
+		}
 	}
 }

@@ -1,3 +1,4 @@
+
 package org.egov.wsCalculation.model;
 
 import java.util.Objects;
@@ -28,7 +29,7 @@ public class Connection {
 
 	@JsonProperty("property")
 	private Property property = null;
-
+	
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
@@ -143,19 +144,24 @@ public class Connection {
 
 	@JsonProperty("roadCuttingArea")
 	private Float roadCuttingArea = null;
+	
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
+	
+	
 
 	@NotNull
 	@Size(max = 64)
 	@JsonProperty("action")
 	private String action = null;
+	
+	@JsonProperty("processInstance")
+	private ProcessInstance processInstance = null;
 
 	public Connection id(String id) {
 		this.id = id;
 		return this;
 	}
-	
-	@JsonProperty("processInstance")
-	private ProcessInstance processInstance = null;
 
 	/**
 	 * Unique Identifier of the connection for internal reference.
@@ -183,21 +189,6 @@ public class Connection {
 		return this;
 	}
 
-	
-	/**
-	 * Get property
-	 * 
-	 * @return property
-	 **/
-	@ApiModelProperty(value = "")
-
-	public ProcessInstance getProcessInstance() {
-		return processInstance;
-	}
-
-	public void setProcessInstance(ProcessInstance processInstance) {
-		this.processInstance = processInstance;
-	}
 	/**
 	 * Get property
 	 * 
@@ -212,6 +203,21 @@ public class Connection {
 
 	public void setProperty(Property property) {
 		this.property = property;
+	}
+	
+	/**
+	 * Get property
+	 * 
+	 * @return property
+	 **/
+	@ApiModelProperty(value = "")
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
 	}
 
 	public Connection applicationNo(String applicationNo) {
@@ -392,8 +398,6 @@ public class Connection {
 	 * @return roadType
 	 **/
 	@ApiModelProperty(value = "It is a master data, defined in MDMS. If road cutting is required to established the connection then we need to capture the details of road type.")
-
-	@Size(min = 2, max = 32)
 	public String getRoadType() {
 		return roadType;
 	}
@@ -419,6 +423,11 @@ public class Connection {
 		this.action = action;
 		return this;
 	}
+	
+	public Connection additionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
+		return this;
+	}
 
 	/**
 	 * Capture the road cutting area in sqft.
@@ -433,6 +442,14 @@ public class Connection {
 
 	public void setRoadCuttingArea(Float roadCuttingArea) {
 		this.roadCuttingArea = roadCuttingArea;
+	}
+	
+	public Object getAdditionalDetails() {
+		return additionalDetails;
+	}
+
+	public void setAdditionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
 	}
 
 	@Override
@@ -453,13 +470,14 @@ public class Connection {
 				&& Objects.equals(this.documents, connection.documents)
 				&& Objects.equals(this.plumberInfo, connection.plumberInfo)
 				&& Objects.equals(this.roadType, connection.roadType)
-				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea);
+				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea)
+				&& Objects.equals(this.additionalDetails, connection.additionalDetails);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, property, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
-				documents, plumberInfo, roadType, roadCuttingArea);
+				documents, plumberInfo, roadType, roadCuttingArea, additionalDetails);
 	}
 
 	@Override
@@ -478,6 +496,7 @@ public class Connection {
 		sb.append("    plumberInfo: ").append(toIndentedString(plumberInfo)).append("\n");
 		sb.append("    roadType: ").append(toIndentedString(roadType)).append("\n");
 		sb.append("    roadCuttingArea: ").append(toIndentedString(roadCuttingArea)).append("\n");
+		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -268,4 +268,12 @@ public class SWCalculationConstant {
 	
 	public static final String ATTRIBUTE = "attribute";
 	
+	public static final String SW_ADHOC_PENALTY = "SW_ADHOC_PENALTY";
+
+	public static final String SW_ADHOC_REBATE = "SW_ADHOC_REBATE";
+
+	public static final String ADHOC_PENALTY = "adhocPenalty";
+
+	public static final String ADHOC_REBATE = "adhocRebate";
+
 }
