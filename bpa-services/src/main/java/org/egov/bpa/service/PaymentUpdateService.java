@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
@@ -50,9 +51,8 @@ public class PaymentUpdateService {
 	private BPAUtil util;
 
 	@Autowired
-	public PaymentUpdateService(BPAService bpaService, BPAConfiguration config,
-			BPARepository repository, WorkflowIntegrator wfIntegrator,
-			EnrichmentService enrichmentService, ObjectMapper mapper,
+	public PaymentUpdateService(BPAService bpaService, BPAConfiguration config, BPARepository repository,
+			WorkflowIntegrator wfIntegrator, EnrichmentService enrichmentService, ObjectMapper mapper,
 			WorkflowService workflowService, BPAUtil util) {
 		this.bpaService = bpaService;
 		this.config = config;
@@ -73,33 +73,35 @@ public class PaymentUpdateService {
 	/**
 	 * Process the message from kafka and updates the status to paid
 	 * 
-	 * @param record The incoming message from receipt create consumer
+	 * @param record
+	 *            The incoming message from receipt create consumer
 	 */
 	public void process(HashMap<String, Object> record) {
 
 		try {
-			PaymentRequest paymentRequest = mapper.convertValue(record,PaymentRequest.class);
+			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
 			String tenantId = paymentRequest.getPayment().getTenantId();
 
-			for(PaymentDetail paymentDetail : paymentDetails){
-				
-				List<String> businessServices = new ArrayList<String>(Arrays.asList(config.getBusinessService().split(",")));
+			for (PaymentDetail paymentDetail : paymentDetails) {
+
+				List<String> businessServices = new ArrayList<String>(
+						Arrays.asList(config.getBusinessService().split(",")));
 				if (businessServices.contains(paymentDetail.getBusinessService())) {
 					BPASearchCriteria searchCriteria = new BPASearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
-					List<BPA> bpas = repository.getBPAData(searchCriteria); //bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
+					List<BPA> bpas = repository.getBPAData(searchCriteria);
+					BusinessService businessService = workflowService.getBusinessService(bpas.get(0),
+							requestInfo, codes.get(0));
 
-					BusinessService businessService = workflowService.getBusinessService(bpas.get(0).getTenantId(), requestInfo,codes.get(0));
-
-
-					if (CollectionUtils.isEmpty(bpas))
+					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
-								"No tradeLicense found for the comsumerCode " + searchCriteria.getApplicationNos());
-
+								"No Building Plan Application found for the comsumerCode "
+										+ searchCriteria.getApplicationNos());
+					}
 					bpas.forEach(bpa -> bpa.setAction("PAY"));
 
 					// FIXME check if the update call to repository can be avoided
@@ -108,9 +110,7 @@ public class PaymentUpdateService {
 
 					Role role = Role.builder().code("SYSTEM_PAYMENT").tenantId(bpas.get(0).getTenantId()).build();
 					requestInfo.getUserInfo().getRoles().add(role);
-					BPARequest updateRequest = BPARequest.builder().requestInfo(requestInfo)
-							.BPA(bpas.get(0)).build();
-					
+					BPARequest updateRequest = BPARequest.builder().requestInfo(requestInfo).BPA(bpas.get(0)).build();
 
 					/*
 					 * calling workflow to update status
@@ -119,17 +119,19 @@ public class PaymentUpdateService {
 
 					log.info(" the status of the application is : " + updateRequest.getBPA().getStatus());
 
+					/*
+					 * calling repository to update the object in eg_bpa_buildingpaln tables
+					 */
 					enrichmentService.postStatusEnrichment(updateRequest);
 
-					
-					repository.update(updateRequest,false);
+					repository.update(updateRequest, false);
+
+				}
 			}
-		 }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
 
-	
 }

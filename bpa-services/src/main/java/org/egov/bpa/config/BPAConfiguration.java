@@ -171,6 +171,11 @@ public class BPAConfiguration {
     @Value("${egov.bpa.calculator.calculate.endpoint}")
     private String calulatorEndPoint;
 
+    @Value("${egov.billingservice.host}")
+    private String billingHost;
+
+    @Value("${egov.demand.search.endpoint}")
+    private String demandSearchEndpoint;
 
     //MDMS
     @Value("${egov.mdms.host}")
@@ -199,6 +204,9 @@ public class BPAConfiguration {
     // Workflow
     @Value("${create.bpa.workflow.name}")
     private String businessServiceValue;
+    
+    @Value("${create.bpa.low.workflow.name}")
+    private String lowBusinessServiceValue;
 
     @Value("${workflow.context.path}")
     private String wfHost;
@@ -233,6 +241,16 @@ public class BPAConfiguration {
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;
+	
+	@Value("${egov.collection.service.host}")
+	private String collectionServiceHost;
+
+	
+	@Value("${egov.collection.service.search.endpoint}")
+	private String collectionServiceSearchEndPoint;
+	
+	@Value("${egov.bpa.validity.date.in.months}")
+	private Integer validityInMonths;
 
 
 }

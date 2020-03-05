@@ -33,10 +33,6 @@ public class Document {
 	@JsonProperty("documentType")
 	private String documentType;
 	
-	
-	@JsonProperty("fileStore")
-	private String fileStore;
-	
 	@JsonProperty("fileStoreId")
 	private String fileStoreId;
 	
@@ -46,14 +42,8 @@ public class Document {
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
 	
-	
-		
-	public String getFileStoreId() {
-		return this.fileStoreId == null ? this.fileStore : this.fileStoreId;
-	}
-	
-	public void setFileStoreId(String fileStoreId) {
-		this.fileStore = (this.fileStore == null ? this.fileStoreId : this.fileStore );
-	}
+	@JsonProperty("wfState")
+	private String wfState;
+
 
 }

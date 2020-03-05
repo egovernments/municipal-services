@@ -2,6 +2,7 @@ package org.egov.bpa.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
 import org.egov.bpa.util.BPAConstants;
@@ -180,7 +182,9 @@ public class EnrichmentService {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo
 				.getUserInfo().getUuid(), false);
-		bpaRequest.getBPA().setAuditDetails(auditDetails);
+		auditDetails.setCreatedBy(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
+		auditDetails.setCreatedTime(bpaRequest.getBPA().getAuditDetails().getCreatedTime());
+		bpaRequest.getBPA().getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
 		if (workflowService.isStateUpdatable(bpaRequest.getBPA().getStatus(),
 				businessService)) {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
@@ -226,9 +230,11 @@ public class EnrichmentService {
 			
 		}
 		// BPA Documents
+		String state = workflowService.getCurrentState(bpaRequest.getBPA().getStatus(), businessService);
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
 				if (document.getId() == null) {
+					document.setWfState(state);
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
@@ -248,12 +254,21 @@ public class EnrichmentService {
 		BPA bpa = bpaRequest.getBPA();
 		
 		BusinessService businessService = workflowService.getBusinessService(
-				bpa.getTenantId(), bpaRequest.getRequestInfo(),
+				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
-		
+
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
-		if(state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
-			List<IdResponse> idResponses =  idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(), config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
+		if ((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)
+				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
+						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)))) {
+			int vailidityInMonths = config.getValidityInMonths();
+			Calendar calendar = Calendar.getInstance();
+
+			// Adding 3years (36 months) to Current Date
+			calendar.add(Calendar.MONTH, vailidityInMonths);
+			bpa.setValidityDate(calendar.getTimeInMillis());
+			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
+					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setPermitOrderNo(idResponses.get(0).getId());
 		}
 
@@ -262,14 +277,13 @@ public class EnrichmentService {
 	public List<BPA> enrichBPASearch(List<BPA> bpas, BPASearchCriteria criteria,
 			RequestInfo requestInfo) {
 
-		BPASearchCriteria searchCriteria = enrichBPASearchCriteriaWithOwnerids(
-				criteria, bpas);
 		List<BPARequest> bprs = new ArrayList<BPARequest>();
 		bpas.forEach(bpa -> {
 			bprs.add(new BPARequest( requestInfo,bpa));
 		});
-		
-		 enrichBoundary(bprs); // some
+		if(criteria.getLimit() == null || !criteria.getLimit().equals(-1)){			
+			enrichBoundary(bprs); 
+		}
 	
 		UserDetailResponse userDetailResponse  = userService.getUsersForBpas(bpas);
 		enrichOwner(userDetailResponse, bpas); // completed
@@ -368,12 +382,13 @@ public class EnrichmentService {
 	 *            's list The bpa whose id's are added to search
 	 * @return bpaSearch criteria on basis of bpa id
 	 */
-	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa) {
+	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa, Integer limit) {
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		Set<String> bpaIds = new HashSet<>();
 		bpa.forEach(data -> bpaIds.add(data.getId()));
 		criteria.setIds(new LinkedList<>(bpaIds));
 		criteria.setTenantId(bpa.get(0).getTenantId());
+		criteria.setLimit(limit);
 		return criteria;
 	}
 

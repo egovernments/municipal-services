@@ -12,6 +12,7 @@ import org.egov.bpa.web.models.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -29,12 +30,16 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		  Map<String, List<String>> masterData = getAttributeValues(mdmsData);
-	        
 	        String[] masterArray = { BPAConstants.SERVICE_TYPE, BPAConstants.APPLICATION_TYPE,
-	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE};
+	                                 BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE,BPAConstants.SUB_OCCUPANCY_TYPE,BPAConstants.USAGES};
 
 	        validateIfMasterPresent(masterArray, masterData);
-
+		
+		bpaRequest.getBPA().getOwners().forEach(owner -> {
+			if (owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
 	            if(!masterData.get(BPAConstants.OWNERSHIP_CATEGORY)
 	                    .contains(bpaRequest.getBPA().getOwnershipCategory()))
 	                errorMap.put("INVALID OWNERSHIPCATEGORY", "The OwnerShipCategory '"
@@ -59,8 +64,25 @@ public class MDMSValidator {
 	 	                        + owner + "' does not exists");
 	 	            
 	                });
+	            
+	            if( !StringUtils.isEmpty(bpaRequest.getBPA().getOccupancyType()) &&
+	            		!masterData.get(BPAConstants.OCCUPANCY_TYPE).
+	                    contains(bpaRequest.getBPA().getOccupancyType()))
+	                errorMap.put("INVALID OCCUPANCYTYPE", "The OccupancyType '"
+	                        + bpaRequest.getBPA().getOccupancyType() + "' does not exists");
 
+	            if( !StringUtils.isEmpty(bpaRequest.getBPA().getSubOccupancyType()) && 
+	            		!masterData.get(BPAConstants.SUB_OCCUPANCY_TYPE).
+	                    contains(bpaRequest.getBPA().getSubOccupancyType()))
+	                errorMap.put("INVALID SUBOCCUPANCYTYPE", "The SubOccupancyType '"
+	                        + bpaRequest.getBPA().getSubOccupancyType() + "' does not exists");
 
+	            if(!StringUtils.isEmpty(bpaRequest.getBPA().getUsages()) && 
+	            		!masterData.get(BPAConstants.USAGES).
+	                    contains(bpaRequest.getBPA().getUsages()))
+	                errorMap.put("INVALID USAGES", "The Usages '"
+	                        + bpaRequest.getBPA().getUsages() + "' does not exists");
+	            
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
 	}
@@ -83,7 +105,6 @@ public class MDMSValidator {
 
         List<String> modulepaths = Arrays.asList(BPAConstants.BPA_JSONPATH_CODE,
         		BPAConstants.COMMON_MASTER_JSONPATH_CODE);
-
         final Map<String, List<String>> mdmsResMap = new HashMap<>();
         modulepaths.forEach( modulepath -> {
             try {
@@ -93,8 +114,6 @@ public class MDMSValidator {
                 throw new CustomException(BPAConstants.INVALID_TENANT_ID_MDMS_KEY, BPAConstants.INVALID_TENANT_ID_MDMS_MSG);
             }
         });
-
-        System.err.println(" the mdms response is : " + mdmsResMap);
         return mdmsResMap;
     }
 	

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +15,6 @@ import org.egov.bpa.web.models.Boundary;
 import org.egov.bpa.web.models.Document;
 import org.egov.bpa.web.models.GeoLocation;
 import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.Status;
 import org.egov.bpa.web.models.Unit;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 @Component
 public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
@@ -36,7 +36,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 	public List<BPA> extractData(ResultSet rs) throws SQLException,
 			DataAccessException {
 
-		Map<String, BPA> buildingMap = new HashMap<>();
+		Map<String, BPA> buildingMap = new LinkedHashMap<String, BPA>();
 
 		while (rs.next()) {
 			String id = rs.getString("bpa_id");
@@ -49,6 +49,10 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 				if (rs.wasNull()) {
 					lastModifiedTime = null;
 				}
+				
+				Object additionalDetails = new Gson().fromJson(rs.getString("additionalDetails").equals("{}")
+						|| rs.getString("additionalDetails").equals("null") ? null
+								: rs.getString("additionalDetails"), Object.class);				
 
 				AuditDetails auditdetails = AuditDetails.builder()
 						.createdBy(rs.getString("bpa_createdBy"))
@@ -63,12 +67,9 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 				Boundary locality = Boundary.builder()
 						.code(rs.getString("locality")).build();
 
-				GeoLocation location = GeoLocation.builder().latitude(latitude)
-						.build();
-
-				GeoLocation location2 = GeoLocation.builder().longitude(longitude)
-						.build();
-				
+				GeoLocation geoLocation = GeoLocation.builder()
+						.latitude(latitude)
+						.longitude(longitude).build();
 				
 				Address address = Address
 						.builder()
@@ -80,7 +81,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.country(rs.getString("country"))
 						.id(rs.getString("bpa_ad_id"))
 						.landmark(rs.getString("landmark")).locality(locality)
-//						.geoLocation(location).geoLocation(location2)
+						.geoLocation(geoLocation)
 						.pincode(rs.getString("pincode"))
 						.doorNo(rs.getString("doorno"))
 						.street(rs.getString("street")).tenantId(tenantId).build();
@@ -96,11 +97,17 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.riskType(BPA.RiskTypeEnum.fromValue(rs.getString("riskType")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
 						.holdingNo(rs.getString("holdingNo"))
+						.occupancyType(rs.getString("occupancyType"))
+						.subOccupancyType(rs.getString("subOccupancyType"))
+						.usages(rs.getString("usages"))
 						.govtOrQuasi(rs.getString("govtOrQuasi"))
 						.registrationDetails(rs.getString("registrationDetails"))
 						.remarks(rs.getString("remarks"))
 						.address(address)
-						.id(id).build();
+						.id(id)
+						.validityDate(rs.getLong("validityDate"))
+						.additionalDetails(additionalDetails)
+						.build();
 
 				buildingMap.put(id, currentbpa);
 			}
@@ -119,7 +126,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		String bpaId = rs.getString("bpa_id");
 		
 		if (bpa == null) {
-			PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
+			PGobject pgObj = (PGobject) rs.getObject("additionaldetail"); //TODO add logic to identify duplicate additionalDetails and avoid duplicates in the search response
 			JsonNode additionalDetail = null;
 			try {
 				additionalDetail = mapper.readTree(pgObj.getValue());
@@ -129,54 +136,81 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
             bpa.setAdditionalDetails(additionalDetail);
 		}
 
-		if (rs.getString("bpa_un_id") != null) {
+		
+		String unitId = rs.getString("bpa_un_id");
+		if (unitId != null ) {
 			Unit unit = Unit.builder().id(rs.getString("bpa_un_id"))
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
 		}
 
-		Document ownerDocument = Document.builder()
-				.id(rs.getString("ownerdocid"))
-				.documentType(rs.getString("ownerdocType"))
-				.fileStore(rs.getString("ownerfileStore"))
-				.documentUid(rs.getString("ownerdocuid")).build();
+		
 
-		Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
-		Double ownerShipPercentage = (Double) rs
-				.getObject("ownershippercentage");
-
-		if (rs.getString("bpaowner_uuid") != null) {
+		
+		
+		String ownerId = rs.getString("bpaowner_uuid");
+		if (ownerId != null) {
+			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
+			Double ownerShipPercentage = (Double) rs
+					.getObject("ownershippercentage");
+			
 			OwnerInfo owner = OwnerInfo.builder()
+					.tenantId(tenantId)
+					.name(rs.getString("name"))
 					.uuid(rs.getString("bpaowner_uuid"))
+					.tenantId(tenantId)
+					.mobileNumber(rs.getString("mobilenumber"))
+					.gender(rs.getString("gender"))
+					.fatherOrHusbandName(rs.getString("fatherorhusbandname"))
+					.correspondenceAddress(rs.getString("correspondenceAddress"))
 					.isPrimaryOwner(isPrimaryOwner)
 					.ownerType(rs.getString("ownerType"))
 					.ownerShipPercentage(ownerShipPercentage)
+					.active(rs.getBoolean("active"))
 					.relationship(
 							OwnerInfo.RelationshipEnum.fromValue(rs
 									.getString("relationship")))
 					.institutionId(rs.getString("institutionid")).build();
 			bpa.addOwnersItem(owner);
 		}
-
+		
 		// Add owner document to the specific bpa for which it was used
 		String docowner = rs.getString("docuserid");
-		String docId = rs.getString("docdetailid");
-		if (bpaId.equalsIgnoreCase(docId) && docowner != null
-				&& rs.getBoolean("ownerdocactive")) {
+		String ownerDocId = rs.getString("ownerdocid");
+		
+		if ( ownerDocId != null) {
+			
 			bpa.getOwners().forEach(ownerInfo -> {
-				if (docowner.equalsIgnoreCase(ownerInfo.getUuid()))
-					ownerInfo.addDocumentsItem(ownerDocument);
+				if (docowner.equalsIgnoreCase(ownerInfo.getUuid())) {
+					Document ownerDocument;
+					try {
+						ownerDocument = Document.builder()
+								.id(rs.getString("ownerdocid"))
+								.documentType(rs.getString("ownerdocType"))
+								.fileStoreId(rs.getString("ownerfileStore"))
+								.documentUid(rs.getString("ownerdocuid")).build();
+						ownerInfo.addDocumentsItem(ownerDocument);
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+					
 			});
 		}
 
-		if (rs.getString("bpa_doc_id") != null) {
+		
+		String documentId = rs.getString("bpa_doc_id");
+		if (documentId != null ) {
 			Document document = Document.builder()
 					.documentType(rs.getString("bpa_doc_documenttype"))
-					.fileStore(rs.getString("bpa_doc_filestore"))
-					.id(rs.getString("bpa_doc_id")).build();
+					.fileStoreId(rs.getString("bpa_doc_filestore"))
+					.id(documentId)
+					.wfState(rs.getString("wfstate")).build();
 			bpa.addDocumentsItem(document);
 		}
 
 	}
 
 }
+

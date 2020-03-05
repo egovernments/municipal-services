@@ -2,6 +2,7 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.RequestInfoWrapper;
 import org.egov.bpa.web.models.workflow.BusinessService;
 import org.egov.bpa.web.models.workflow.BusinessServiceResponse;
@@ -38,8 +39,8 @@ public class WorkflowService {
      * @param requestInfo The RequestInfo object of the request
      * @return BusinessService for the the given tenantId
      */
-    public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo,String applicationNo) {
-        StringBuilder url = getSearchURLWithParams(tenantId,true,null);
+    public BusinessService getBusinessService(BPA bpa, RequestInfo requestInfo,String applicationNo) {
+        StringBuilder url = getSearchURLWithParams(bpa,true,null);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
         Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
         BusinessServiceResponse response = null;
@@ -58,8 +59,8 @@ public class WorkflowService {
      * @param requestInfo The RequestInfo object of the request
      * @return BusinessService for the the given tenantId
      */
-    public ProcessInstance getProcessInstance(String tenantId, RequestInfo requestInfo,String applicationNo) {
-        StringBuilder url = getSearchURLWithParams(tenantId,false,applicationNo);
+    public ProcessInstance getProcessInstance(BPA bpa, RequestInfo requestInfo,String applicationNo) {
+        StringBuilder url = getSearchURLWithParams(bpa,false,applicationNo);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
         Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
         ProcessInstanceResponse response = null;
@@ -77,7 +78,7 @@ public class WorkflowService {
      * @param tenantId The tenantId for which url is generated
      * @return The search url
      */
-    private StringBuilder getSearchURLWithParams(String tenantId, boolean businessService,String applicationNo) {
+    private StringBuilder getSearchURLWithParams(BPA bpa, boolean businessService,String applicationNo) {
         StringBuilder url = new StringBuilder(config.getWfHost());
         if(businessService) {
         		url.append(config.getWfBusinessServiceSearchPath());
@@ -86,10 +87,16 @@ public class WorkflowService {
         }
 //        url.append(config.getWfBusinessServiceSearchPath());
         url.append("?tenantId=");
-        url.append(tenantId);
+        url.append(bpa.getTenantId());
         if(businessService) {
+        	if(bpa.getRiskType().toString().equalsIgnoreCase("LOW")){
+        		url.append("&businessServices=");
+       		 url.append(config.getLowBusinessServiceValue());
+        	}else{
+        		
         		url.append("&businessServices=");
         		 url.append(config.getBusinessServiceValue());
+        	}
 	    }else {
 	    		url.append("&businessIds=");
 	    		 url.append(applicationNo);
