@@ -147,19 +147,19 @@ public class WaterConnectionValidator {
 	 * @param searchResult
 	 */
 	private void setStatusForDocuments(WaterConnectionRequest request, WaterConnection searchResult) {
-		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
-			ArrayList<String> fileStoreIds = new ArrayList<>();
-			if (!CollectionUtils.isEmpty(request.getWaterConnection().getDocuments())) {
-				request.getWaterConnection().getDocuments().forEach(document -> {
-					fileStoreIds.add(document.getFileStoreId());
-				});
-			}
-			searchResult.getDocuments().forEach(document -> {
-				if (!fileStoreIds.contains(document.getFileStoreId())) {
-					document.setStatus(Status.INACTIVE);
-					request.getWaterConnection().getDocuments().add(document);
-				}
-			});
-		}
+//		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
+//			ArrayList<String> fileStoreIds = new ArrayList<>();
+//			if (!CollectionUtils.isEmpty(request.getWaterConnection().getDocuments())) {
+//				request.getWaterConnection().getDocuments().forEach(document -> {
+//					fileStoreIds.add(document.getFileStoreId());
+//				});
+//			}
+//			searchResult.getDocuments().forEach(document -> {
+//				if (!fileStoreIds.contains(document.getFileStoreId())) {
+//					document.setStatus(Status.INACTIVE);
+//					request.getWaterConnection().getDocuments().add(document);
+//				}
+//			});
+//		}
 	}
 }
