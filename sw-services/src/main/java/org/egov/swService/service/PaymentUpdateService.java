@@ -24,6 +24,8 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +47,7 @@ public class PaymentUpdateService {
 
 	@Autowired
 	private SewarageDao repo;
-	
+
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -58,8 +60,13 @@ public class PaymentUpdateService {
 	public void process(HashMap<String, Object> record) {
 		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
-//			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
-//					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
+			try {
+				log.info("payment Request " + mapper.writeValueAsString(paymentRequest));
+			} catch (Exception ex) {
+				log.error("Temp Catch Excption:", ex);
+			}
+			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
+					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service", paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
@@ -96,13 +103,13 @@ public class PaymentUpdateService {
 			log.error("", ex);
 		}
 	}
-	
-	 /**
-	    * 
-	    * @param uuid
-	    * @param requestInfo
-	    * @return User
-	    */
+
+	/**
+	 * 
+	 * @param uuid
+	 * @param requestInfo
+	 * @return User
+	 */
 	private User fetchUser(String uuid, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
@@ -111,12 +118,15 @@ public class PaymentUpdateService {
 		userSearchRequest.put("RequestInfo", requestInfo);
 		userSearchRequest.put("uuid", uuids);
 		Object response = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+		List<Object> users = null;
 		try {
 			log.info("user info response" + mapper.writeValueAsString(response));
+			DocumentContext context = JsonPath.parse(mapper.writeValueAsString(response));
+			users = context.read("$.user");
 		} catch (JsonProcessingException e) {
 			log.error("error occured while parsing user info", e);
 		}
-		return mapper.convertValue(response, User.class);
+		return mapper.convertValue(users.get(0), User.class);
 	}
 
 }
