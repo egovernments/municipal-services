@@ -292,7 +292,7 @@ public class TradeLicenseService {
                 wfIntegrator.callWorkFlow(tradeLicenseRequest);
                 break;
         }
-        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates);
+        enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates, mdmsData);
         userService.createUser(tradeLicenseRequest, false);
         calculationService.addCalculation(tradeLicenseRequest);
         switch (businessServicefromPath) {
