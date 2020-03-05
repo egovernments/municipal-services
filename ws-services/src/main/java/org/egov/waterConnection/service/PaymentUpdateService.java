@@ -60,6 +60,8 @@ public class PaymentUpdateService {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			try {
 				log.info("payment Request " + mapper.writeValueAsString(paymentRequest));
+				User user = fetchUser(paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo());
+				log.info("user info Request " + mapper.writeValueAsString(user));
 			} catch (Exception ex) {
 				log.error("Temp Catch Excption:", ex);
 			}
