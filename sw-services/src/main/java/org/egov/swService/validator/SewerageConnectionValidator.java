@@ -127,20 +127,20 @@ public class SewerageConnectionValidator {
 	 * @param searchResult
 	 */
 	private void setStatusForDocuments(SewerageConnectionRequest request, SewerageConnection searchResult) {
-		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
-			ArrayList<String> fileStoreIds = new ArrayList<>();
-			if (!CollectionUtils.isEmpty(request.getSewerageConnection().getDocuments())) {
-				request.getSewerageConnection().getDocuments().forEach(document -> {
-					fileStoreIds.add(document.getFileStoreId());
-				});
-			}
-			searchResult.getDocuments().forEach(document -> {
-				if (!fileStoreIds.contains(document.getFileStoreId())) {
-					document.setStatus(Status.INACTIVE);
-					request.getSewerageConnection().getDocuments().add(document);
-				}
-			});
-		}
+//		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
+//			ArrayList<String> fileStoreIds = new ArrayList<>();
+//			if (!CollectionUtils.isEmpty(request.getSewerageConnection().getDocuments())) {
+//				request.getSewerageConnection().getDocuments().forEach(document -> {
+//					fileStoreIds.add(document.getFileStoreId());
+//				});
+//			}
+//			searchResult.getDocuments().forEach(document -> {
+//				if (!fileStoreIds.contains(document.getFileStoreId())) {
+//					document.setStatus(Status.INACTIVE);
+//					request.getSewerageConnection().getDocuments().add(document);
+//				}
+//			});
+//		}
 	}
 
 }
