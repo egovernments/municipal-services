@@ -732,8 +732,7 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		boolean isTriggerEnable = isCurrentDateIsMatching((String) master.get(SWCalculationConstant.Billing_Cycle_String), startDay);
-		if (isTriggerEnable) {
+		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (String connectionNo : connectionNos) {

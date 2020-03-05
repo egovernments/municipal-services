@@ -698,23 +698,23 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		boolean isTriggerEnable = isCurrentDateIsMatching(
-				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay);
-		List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
-				WSCalculationConstant.nonMeterdConnection);
-		String assessmentYear = estimationService.getAssessmentYear();
-		for (String connectionNo : connectionNos) {
-			CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-					.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
-			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-			calculationCriteriaList.add(calculationCriteria);
-			CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-					.requestInfo(requestInfo).isconnectionCalculation(true).build();
-			wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-			// log.info("Prepared Statement" + calculationRes.toString());
+		if(isCurrentDateIsMatching(
+				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
+			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
+					WSCalculationConstant.nonMeterdConnection);
+			String assessmentYear = estimationService.getAssessmentYear();
+			for (String connectionNo : connectionNos) {
+				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
+				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+				calculationCriteriaList.add(calculationCriteria);
+				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+						.requestInfo(requestInfo).isconnectionCalculation(true).build();
+				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+				// log.info("Prepared Statement" + calculationRes.toString());
 
+			}
 		}
-
 	}
 
 	/**

@@ -58,10 +58,16 @@ public class PaymentUpdateService {
 	public void process(HashMap<String, Object> record) {
 		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
+			try {
+				log.info("payment Request " + mapper.writeValueAsString(paymentRequest));
+			} catch (Exception ex) {
+				log.error("Temp Catch Excption:", ex);
+			}
+//			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
+//					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service" + paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
-					paymentRequest.getRequestInfo().setUserInfo(fetchUser(paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
 							.applicationNumber(paymentDetail.getBill().getConsumerCode()).build();
