@@ -2,11 +2,7 @@ package org.egov.swCalculation.model;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

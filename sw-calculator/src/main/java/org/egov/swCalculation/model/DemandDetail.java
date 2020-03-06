@@ -42,6 +42,7 @@ package org.egov.swCalculation.model;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.NotNull;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

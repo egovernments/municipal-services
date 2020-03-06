@@ -1,8 +1,5 @@
 package org.egov.swService.model;
 
-import org.egov.swService.model.GeoLocation;
-import org.egov.swService.model.Locality;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

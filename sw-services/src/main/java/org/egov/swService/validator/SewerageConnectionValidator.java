@@ -1,6 +1,5 @@
 package org.egov.swService.validator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
-import org.egov.swService.model.Status;
 import org.egov.swService.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
@@ -76,9 +74,13 @@ public class SewerageConnectionValidator {
 	 */
 	private void validateAllIds(SewerageConnection updateSewerageConnection, SewerageConnection searchResult) {
 		Map<String, String> errorMap = new HashMap<>();
-		if (!searchResult.getApplicationNo().equals(updateSewerageConnection.getApplicationNo()))
-			errorMap.put("INVALID UPDATE", "The application number from search: " + searchResult.getApplicationNo()
-					+ " and from update: " + updateSewerageConnection.getApplicationNo() + " does not match");
+		if (!searchResult.getApplicationNo().equals(updateSewerageConnection.getApplicationNo())) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("The application number from search: ").append(searchResult.getApplicationNo())
+					.append(" and from update: ").append(updateSewerageConnection.getApplicationNo())
+					.append(" does not match");
+			errorMap.put("INVALID UPDATE", builder.toString());
+		}
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
 	}

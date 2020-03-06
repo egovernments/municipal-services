@@ -1,7 +1,6 @@
 package org.egov.swService.service;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -158,9 +157,11 @@ public class SewarageServiceImpl implements SewarageService {
 		Set<String> ids = new HashSet<>(Arrays.asList(id));
 		criteria.setIds(ids);
 		List<SewerageConnection> connections = getSewerageConnectionsList(criteria, requestInfo);
-		if (CollectionUtils.isEmpty(connections))
-			throw new CustomException("INVALID_SEWERAGECONNECTION_SEARCH",
-					"SEWERAGE CONNECTION NOT FOUND FOR: " + id + " :ID");
+		if (CollectionUtils.isEmpty(connections)) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("SEWERAGE CONNECTION NOT FOUND FOR: ").append(id).append(" :ID");
+			throw new CustomException("INVALID_SEWERAGECONNECTION_SEARCH", builder.toString());
+		}
 		return connections.get(0);
 	}
 

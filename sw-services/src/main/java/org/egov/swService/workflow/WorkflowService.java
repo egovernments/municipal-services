@@ -1,6 +1,5 @@
 package org.egov.swService.workflow;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.RequestInfoWrapper;
@@ -11,6 +10,8 @@ import org.egov.swService.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class WorkflowService {

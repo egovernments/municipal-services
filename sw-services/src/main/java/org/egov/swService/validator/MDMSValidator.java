@@ -11,17 +11,19 @@ import java.util.stream.Stream;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
-import org.egov.tracer.model.CustomException;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.repository.ServiceRequestRepository;
-import org.egov.swService.util.SewerageServicesUtil;
 import org.egov.swService.util.SWConstants;
+import org.egov.swService.util.SewerageServicesUtil;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
 import com.jayway.jsonpath.JsonPath;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

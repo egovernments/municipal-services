@@ -1,6 +1,5 @@
 package org.egov.waterConnection.repository.rowmapper;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

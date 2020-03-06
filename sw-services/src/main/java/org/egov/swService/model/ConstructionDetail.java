@@ -2,8 +2,6 @@ package org.egov.swService.model;
 
 import java.math.BigDecimal;
 
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

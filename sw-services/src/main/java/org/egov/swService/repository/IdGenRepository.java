@@ -1,22 +1,23 @@
 package org.egov.swService.repository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
-import lombok.extern.slf4j.Slf4j;
-import org.egov.tracer.model.ServiceCallException;
 import org.egov.swService.config.SWConfiguration;
 import org.egov.swService.model.Idgen.IdGenerationRequest;
 import org.egov.swService.model.Idgen.IdGenerationResponse;
 import org.egov.swService.model.Idgen.IdRequest;
+import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j

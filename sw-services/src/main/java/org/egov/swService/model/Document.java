@@ -2,7 +2,6 @@ package org.egov.swService.model;
 
 import javax.validation.constraints.NotNull;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

@@ -67,8 +67,10 @@ public class EstimationService {
 					calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), criteria.getTenantId()));
 		}
 		if (criteria.getSewerageConnection() == null) {
-			throw new CustomException("Sewerage Connection not found for given criteria ",
-					"Sewerage Connection are not present for " + criteria.getConnectionNo() + " connection no");
+			StringBuilder builder = new StringBuilder();
+			builder.append("Sewerage Connection are not present for ").append(criteria.getConnectionNo())
+					.append(" connection no");
+			throw new CustomException("Sewerage Connection not found for given criteria ", builder.toString());
 		}
 		Map<String, JSONArray> billingSlabMaster = new HashMap<>();
 		Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();

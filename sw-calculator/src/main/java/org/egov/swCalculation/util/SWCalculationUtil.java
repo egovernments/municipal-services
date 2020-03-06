@@ -2,7 +2,6 @@ package org.egov.swCalculation.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.egov.swCalculation.model.EventRequest;
 import org.egov.swCalculation.model.GetBillCriteria;
 import org.egov.swCalculation.model.NotificationReceiver;
 import org.egov.swCalculation.model.SMSRequest;
-import org.egov.swCalculation.model.SewerageConnection;
 import org.egov.swCalculation.producer.SWCalculationProducer;
 import org.egov.swCalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;

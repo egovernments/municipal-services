@@ -97,7 +97,10 @@ public class DemandGenerationConsumer {
 				CalculationReqList.add(calcReq);
 				log.info("Consuming record: " + record);
 			} catch (final Exception e) {
-				log.error("Error while listening to value: " + record + " on topic: " + ": " + e);
+				StringBuilder builder = new StringBuilder();
+				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(": ")
+						.append(e);
+				log.error(builder.toString());
 			}
 			// processing single
 			CalculationReqList.forEach(calcReq -> {

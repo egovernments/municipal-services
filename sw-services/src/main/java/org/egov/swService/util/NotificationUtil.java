@@ -105,7 +105,10 @@ public class NotificationUtil {
 				log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				StringBuilder builder = new StringBuilder();
+				builder.append("MobileNumber: ").append(smsRequest.getMobileNumber()).append(" Messages: ")
+						.append(smsRequest.getMessage());
+				log.info(builder.toString());
 			}
 		}
 	}

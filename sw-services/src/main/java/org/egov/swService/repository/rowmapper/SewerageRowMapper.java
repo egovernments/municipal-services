@@ -1,6 +1,5 @@
 package org.egov.swService.repository.rowmapper;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
 import org.egov.swService.model.Connection.StatusEnum;
-import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.Document;
 import org.egov.swService.model.PlumberInfo;
 import org.egov.swService.model.Property;

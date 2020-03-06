@@ -1,12 +1,13 @@
 package org.egov.swService.model.Idgen;
 
+import java.util.List;
+
+import org.egov.common.contract.response.ResponseInfo;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.common.contract.response.ResponseInfo;
-
-import java.util.List;
 
 /**
  * <h1>IdGenerationResponse</h1>

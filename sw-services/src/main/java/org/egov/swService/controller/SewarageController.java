@@ -4,13 +4,12 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.swService.service.SewarageService;
 import org.egov.swService.model.RequestInfoWrapper;
+import org.egov.swService.model.SearchCriteria;
 import org.egov.swService.model.SewerageConnection;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.model.SewerageConnectionResponse;
-import org.egov.swService.model.SearchCriteria;
-
+import org.egov.swService.service.SewarageService;
 import org.egov.swService.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +30,6 @@ import lombok.Setter;
 @RestController
 @RequestMapping("/swc")
 public class SewarageController {
-
-
 
 	@Autowired
 	SewarageService sewarageService;

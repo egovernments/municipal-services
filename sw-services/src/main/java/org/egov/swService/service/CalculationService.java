@@ -8,7 +8,6 @@ import org.egov.swService.model.CalculationReq;
 import org.egov.swService.model.CalculationRes;
 import org.egov.swService.model.SewerageConnectionRequest;
 import org.egov.swService.repository.ServiceRequestRepository;
-import org.egov.swService.util.SWConstants;
 import org.egov.swService.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;

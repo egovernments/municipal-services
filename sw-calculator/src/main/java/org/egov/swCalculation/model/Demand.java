@@ -44,10 +44,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+
+import org.egov.common.contract.request.User;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.egov.common.contract.request.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
