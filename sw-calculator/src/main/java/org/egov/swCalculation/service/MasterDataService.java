@@ -434,9 +434,9 @@ public class MasterDataService {
 	 */
 	public Map<String, Object> enrichBillingPeriodForFee(Map<String, Object> masterMap) {
 		Map<String, Object> billingPeriod = new HashMap<>();
-		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, 1554057000000l);
-		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, 1869676199000l);
-		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String, 0l);
+		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, System.currentTimeMillis());
+		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, System.currentTimeMillis() + SWCalculationConstant.APPLICATION_FEE_DEMAND_END_DATE);
+		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String, SWCalculationConstant.APPLICATION_FEE_DEMAND_EXP_DATE);
 		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
 		return masterMap;
 	}
