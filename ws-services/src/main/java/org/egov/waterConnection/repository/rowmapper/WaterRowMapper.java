@@ -56,8 +56,8 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				Property property = new Property();
 				property.setPropertyId(rs.getString("property_id"));
 				HashMap<String, Object> penalties = new HashMap<>();
-				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocrebate"));
-				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocpenalty"));
+				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
+				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
 				penalties.put(WCConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
 				penalties.put(WCConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
 				penalties.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
@@ -78,8 +78,8 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 		String isActive = rs.getString("doc_active");
 		String activeString = Status.ACTIVE.name();
 		boolean documentActive = false;
-		if(isActive != null)
-		documentActive = isActive.equalsIgnoreCase(activeString) == true ? true : false;
+		if (isActive != null)
+			documentActive = isActive.equalsIgnoreCase(activeString) == true ? true : false;
 		if (document_Id != null && documentActive) {
 			Document applicationDocument = new Document();
 			applicationDocument.setId(document_Id);

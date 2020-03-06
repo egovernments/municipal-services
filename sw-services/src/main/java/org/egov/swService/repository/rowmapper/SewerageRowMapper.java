@@ -52,8 +52,8 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				Property property = new Property();
 				property.setPropertyId(rs.getString("property_id"));
 				HashMap<String, Object> penalties = new HashMap<>();
-				penalties.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocrebate"));
-				penalties.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocpenalty"));
+				penalties.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
+				penalties.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
 				penalties.put(SWConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
 				penalties.put(SWConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
 				penalties.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
