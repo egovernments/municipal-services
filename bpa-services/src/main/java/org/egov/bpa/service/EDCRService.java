@@ -133,8 +133,29 @@ public class EDCRService {
 		}
 	}
 	
-		
-	
-	
+
+	public String getEDCRPdfUrl(BPARequest bpaRequest) {
+
+		BPA bpa = bpaRequest.getBPA();
+		StringBuilder uri = new StringBuilder(config.getEdcrHost());
+		uri.append(config.getGetPlanEndPoint());
+		uri.append("?").append("tenantId=").append(bpa.getTenantId());
+		uri.append("&").append("edcrNumber=").append(bpaRequest.getBPA().getEdcrNumber());
+		RequestInfo edcrRequestInfo = new RequestInfo();
+		BeanUtils.copyProperties(bpaRequest.getRequestInfo(), edcrRequestInfo);
+		LinkedHashMap responseMap = null;
+		try {
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new RequestInfoWrapper(edcrRequestInfo));
+		} catch (ServiceCallException se) {
+			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+		}
+
+		String jsonString = new JSONObject(responseMap).toString();
+		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+		List<String> planReports = context.read("edcrDetail.*.planReport");
+
+		return CollectionUtils.isEmpty(planReports) ? null : planReports.get(0);
+	}
 	
 }

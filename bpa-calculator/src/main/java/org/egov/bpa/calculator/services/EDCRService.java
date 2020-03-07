@@ -67,34 +67,47 @@ public class EDCRService {
 		uri.append("&").append("edcrNumber=").append(bpa.getEdcrNumber());
 		RequestInfo edcrRequestInfo = new RequestInfo();
 		
-		LinkedHashMap responseMap = null;
+		Object responseMap = null;
 		Object bpaAdditionalDetails = bpa.getAdditionalDetails();
 		
 		
 		
 		try {
-			 responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+			 responseMap = serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		}catch( ServiceCallException se) {
 			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
 		}
-		
-		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+//		
+//		if (CollectionUtils.isEmpty(responseMap))
+//			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
 
-		String jsonString = new JSONObject(responseMap).toString();
-		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+//		String jsonString = new JSONObject(responseMap).toString();
+//		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
 //		List<String> edcrStatus = context.read("edcrDetail.*.status");
 //		List<String> OccupancyTypes = context.read("edcrDetail.*.planDetail.virtualBuilding.occupancyTypes.*.type.code");
 		TypeRef<List<Double>> typeRef = new TypeRef<List<Double>>() {};
 		TypeRef<List<List>> blockstypeRef = new TypeRef<List<List>>() {};
-		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area",typeRef);
-		List<List> blocks = context.read("edcrDetail.*.planDetail.blocks",blockstypeRef);
-		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",typeRef);
-		List<Double> totalBuiltUpArea = context.read("edcrDetail.*.planDetail.virtualBuilding.totalBuitUpArea",typeRef);
-		calculationData.put(BPACalculatorConstants.BUILT_UP_AREA, totalBuiltUpArea.get(0));
+		
+		
+//		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area",typeRef);
+		List<Double> plotAreas =JsonPath.read(responseMap, "$.edcrDetail.*.planDetail.plot.area");
+		
+//		List<List> blocks = context.read("edcrDetail.*.planDetail.blocks",blockstypeRef);
+		
+		List<List> blocks =JsonPath.read(responseMap, "$.edcrDetail.*.planDetail.blocks");
+		
+//		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",typeRef);
+		
+		List<Double> buildingHeights =JsonPath.read(responseMap, "$.edcrDetail.*.planDetail.blocks.*.building.buildingHeight");
+		
+//		List<Double> totalBuiltUpArea = context.read("edcrDetail.*.planDetail.virtualBuilding.totalBuitUpArea",typeRef);
+		
+		List<Double> totalBuiltupAreas =JsonPath.read(responseMap, "$.edcrDetail.*.planDetail.virtualBuilding.totalBuitUpArea");
+		
+		calculationData.put(BPACalculatorConstants.BUILT_UP_AREA, totalBuiltupAreas.get(0));
 		calculationData.put(BPACalculatorConstants.BUILDING_HEIGHT, buildingHeights.get(0));
-		calculationData.put("BLOCKS", blocks);
+		calculationData.put("BLOCKS", blocks.get(0));
 		return calculationData;
 		
 		

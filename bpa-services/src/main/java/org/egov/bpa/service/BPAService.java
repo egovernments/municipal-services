@@ -1,13 +1,30 @@
 package org.egov.bpa.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
@@ -33,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import io.jaegertracing.thriftjava.Log;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -275,5 +293,87 @@ public class BPAService {
 		bpa = enrichmentService.enrichBPASearch(bpa, criteria,
 				request.getRequestInfo());
 		return bpa;
+	}
+
+	public void getEdcrPdf(BPARequest bpaRequest) {
+
+		byte[] ba1 = new byte[1024];
+		int baLength;
+		String fileName = BPAConstants.EDCR_PDF;
+		;
+		PDDocument doc = null;
+		BPA bpa = bpaRequest.getBPA();
+
+		try {
+			String pdfUrl = edcrService.getEDCRPdfUrl(bpaRequest);
+			URL url1 = new URL(pdfUrl);
+			FileOutputStream fos1 = new FileOutputStream(fileName);
+			System.out.print("Connecting to " + url1.toString() + " ... ");
+			URLConnection urlConn = url1.openConnection();
+
+			// Checking whether the URL contains a PDF
+			if (!urlConn.getContentType().equalsIgnoreCase("application/pdf")) {
+				throw new CustomException("INVALID_CONTENT", "Unable to get pdf from the EDCR");
+			} else {
+
+				// Read the PDF from the URL and save to a local file
+				InputStream is1 = url1.openStream();
+				while ((baLength = is1.read(ba1)) != -1) {
+					fos1.write(ba1, 0, baLength);
+				}
+				fos1.flush();
+				fos1.close();
+				is1.close();
+
+				doc = PDDocument.load(new File(fileName));
+
+				PDPageTree allPages = doc.getDocumentCatalog().getPages();
+
+				for (int i = 0; i < allPages.getCount(); i++) {
+					PDPage page = (PDPage) allPages.get(i);
+					PDRectangle pageSize = page.getMediaBox();
+					PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true);
+					PDFont font = PDType1Font.TIMES_ROMAN;
+					float fontSize = 12.0f;
+					contentStream.beginText();
+					// set font and font size
+					contentStream.setFont(font, fontSize);
+
+					PDRectangle mediabox = page.getMediaBox();
+					float margin = 20;
+					float startX = mediabox.getLowerLeftX() + margin;
+					float startY = mediabox.getUpperRightY() - margin;
+					contentStream.newLineAtOffset(startX, startY);
+					contentStream.showText("PERMIT_ORDER_NO : " + bpaRequest.getBPA().getPermitOrderNo());
+					if (bpa.getOrderGeneratedDate() != null) {
+						Date date = new Date(bpa.getOrderGeneratedDate());
+						DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+						String formattedDate = format.format(date);
+						contentStream.newLineAtOffset(400, 4.5f);
+						contentStream.showText("GENERATED_ON : " + formattedDate);
+					} else {
+						contentStream.newLineAtOffset(400, 4.5f);
+						contentStream.showText("GENERATED_ON : " + "NA");
+					}
+
+					contentStream.endText();
+
+					contentStream.close();
+				}
+
+				doc.save(fileName);
+			}
+		} catch (Exception ex) {
+			log.info("Exception occured while downloading pdf", ex.getMessage());
+			throw new CustomException("UNABLE_TO_DOWNLOAD", "Unable to download the file");
+		} finally {
+			try {
+				if (doc != null) {
+					doc.close();
+				}
+			} catch (Exception ex) {
+				throw new CustomException("INVALID_FILE", "UNABLE CLOSE THE FILE");
+			}
+		}
 	}
 }

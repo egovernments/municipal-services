@@ -70,7 +70,7 @@ public class MDMSService {
 
         List<MasterDetail> tenantMasterDetails = new ArrayList<>();
         
-        bpaMasterDetails.add(MasterDetail.builder().name(BPACalculatorConstants.MDMS_MASTER_TENANT)
+        tenantMasterDetails.add(MasterDetail.builder().name(BPACalculatorConstants.MDMS_MASTER_TENANT)
         		.build());
         ModuleDetail tenantModuleDetails = ModuleDetail.builder().masterDetails(tenantMasterDetails)
                 .moduleName(BPACalculatorConstants.MDMS_MODULE_TENANT).build();
@@ -147,7 +147,8 @@ public class MDMSService {
     public Map defaultMap(String feeType){
         Map defaultMap = new HashMap();
         String feeAmount = ( feeType.equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ) ? config.getApplFeeDefaultAmount() : config.getSancFeeDefaultAmount();
-        defaultMap.put( BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT,feeAmount);
+//        log.warn(" ")
+        defaultMap.put( BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT,Integer.valueOf(feeAmount));
         return defaultMap;
     }
 

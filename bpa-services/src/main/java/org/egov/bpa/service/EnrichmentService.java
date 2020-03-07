@@ -263,6 +263,7 @@ public class EnrichmentService {
 						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
+			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
 
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);

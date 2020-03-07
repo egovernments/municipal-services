@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,6 +96,9 @@ public class CalculationService {
 			BPA bpa;
 			if (criteria.getBpa() == null && criteria.getApplicationNo() != null) {
 				bpa = utils.getBuildingPlan(requestInfo, criteria.getApplicationNo(), criteria.getTenantId());
+				if(bpa.getAdditionalDetails() == null) {
+					bpa.setAdditionalDetails(new Object());
+				}
 				criteria.setBpa(bpa);
 			}
 
@@ -179,25 +183,35 @@ public class CalculationService {
 
 		Map calculationTypeMap = mdmsService.getCalculationType(requestInfo, bpa, mdmsData,
 				calulationCriteria.getFeeType());
+		Object additionalDetails = bpa.getAdditionalDetails();
 
 		log.info(calculationTypeMap.toString());
 
 		if (calculationTypeMap.get("BHRSPSQMT") != null) {
 			try {
 				Map buildingheightCostyPrSqmt = (Map) calculationTypeMap.get("BHRSPSQMT");
-				String ulbGrade = mdmsService.getUlbGrade(mdmsData, requestInfo.getUserInfo().getTenantId());
-				double costPerSqmt = (double) buildingheightCostyPrSqmt.get(ulbGrade);
+				String ulbGrade = mdmsService.getUlbGrade(mdmsData, bpa.getTenantId());
+				if(buildingheightCostyPrSqmt.get(ulbGrade) == null) {
+					
+					throw new CustomException("INVALID ULB ", "Cost for SqMtr is not configured for ULB " +ulbGrade);
+				}
+				if(additionalDetails == null) {
+					additionalDetails = new HashMap();
+				}
+				double costPerSqmt = Double.valueOf(buildingheightCostyPrSqmt.get(ulbGrade).toString());
 				Map areaData = edcrService.getEDCRPlanData(bpa);
 				List<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
 
 				// PERMIT FEE
 				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal permitFee = BigDecimal
-						.valueOf(costPerSqmt * ((double) areaData.get(BPACalculatorConstants.BUILDING_HEIGHT)));
+						.valueOf(costPerSqmt * (Double.valueOf( areaData.get(BPACalculatorConstants.BUILDING_HEIGHT).toString())));
 				if (permitFee.compareTo(BigDecimal.ZERO) == -1)
 					throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
 
-				if ((boolean) ((Map) bpa.getAdditionalDetails()).get("isCharitableTrustBuilding")) {
+				Object charitableTrustBuilding = ((Map) additionalDetails).get("isCharitableTrustBuilding");
+				
+				if ( charitableTrustBuilding != null && ((boolean) charitableTrustBuilding)) {
 					permitFee = permitFee.divide(BigDecimal.valueOf(2));
 				}
 				estimate.setEstimateAmount(permitFee);
@@ -209,42 +223,45 @@ public class CalculationService {
 				// estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));
 
 				// DEVELOPMENT CHARGES
-				if (areaData.get("BLOCKS") != null && ((List) areaData).size() > 1) {
+				if (areaData.get("BLOCKS") != null && ((List) areaData.get("BLOCKS")).size() > 1) {
 					estimate = new TaxHeadEstimate();
 
 					estimate.setCategory(Category.CHARGES);
 					estimate.setEstimateAmount(
-							BigDecimal.valueOf((double) calculationTypeMap.get("developmentCharges")));
+							BigDecimal.valueOf(Double.valueOf( calculationTypeMap.get("developmentCharges").toString())));
 					taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.DEVELOPENT_CHARGE);
 					estimate.setTaxHeadCode(taxHeadCode);
 					estimates.add(estimate);
 				}
 
+				Object affordableHousingScheme = ((Map) additionalDetails).get("isAffordableHousingScheme");
 				// SHULTER FUND
-				if (!(Boolean) ((Map) bpa.getAdditionalDetails()).get("isAffordableHousingScheme")
+				if (  (affordableHousingScheme == null || !(Boolean) affordableHousingScheme )
 						&& areaData.get(BPACalculatorConstants.BUILT_UP_AREA) != null
 						&& calculationTypeMap.get("shelterFund") != null) {
 					Map shelterFundMap = (Map) calculationTypeMap.get("shelterFund");
-					Double shelterFundLeast = (Double) shelterFundMap.get("from");
-					Double shelterFundMax = (Double) shelterFundMap.get("to");
-					Double totalBuiltupArea = (Double) areaData.get(BPACalculatorConstants.BUILT_UP_AREA);
+					Double shelterFundLeast = Double.valueOf( shelterFundMap.get("from").toString());
+					Double shelterFundMax = Double.valueOf(shelterFundMap.get("to").toString());
+					Double totalBuiltupArea = Double.valueOf(areaData.get(BPACalculatorConstants.BUILT_UP_AREA).toString());
 					if (totalBuiltupArea.compareTo(shelterFundLeast) >= 0
 							&& totalBuiltupArea.compareTo(shelterFundMax) <= 0) {
 						estimate = new TaxHeadEstimate();
 
 						estimate.setCategory(Category.CHARGES);
-						estimate.setEstimateAmount(BigDecimal.valueOf((double) shelterFundMap.get(ulbGrade))
+						estimate.setEstimateAmount(BigDecimal.valueOf(Double.valueOf(shelterFundMap.get(ulbGrade).toString()))
 								.multiply(BigDecimal.valueOf(totalBuiltupArea
-										* ((double) shelterFundMap.get("percentageOfBuiltUpArea") / 100))));
+										* (Double.valueOf(shelterFundMap.get("percentageOfBuiltUpArea").toString()) / 100))));
 						taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.SHELTER_FUND);
 						estimate.setTaxHeadCode(taxHeadCode);
 						estimates.add(estimate);
 					}
+				}else {
+					log.warn("Shelter Fund is configured in the calculation type");
 				}
 
 				// SCRUTINY FEE
 				if (calculationTypeMap.get("scrutinyFee") != null) {
-					Double scrutinyFee = (Double) calculationTypeMap.get("scrutinyFee");
+					Double scrutinyFee = Double.valueOf(calculationTypeMap.get("scrutinyFee").toString());
 					estimate = new TaxHeadEstimate();
 
 					estimate.setCategory(Category.FEE);
@@ -253,14 +270,17 @@ public class CalculationService {
 					estimate.setTaxHeadCode(taxHeadCode);
 					
 					estimates.add(estimate);
+				}else {
+					log.warn("scrutiny fee is configured in the calculation type");
 				}
 				
+				Object annualExpenditure = ((Map) additionalDetails).get("annualExpectedExpenditure");
 				// LABOUR CESS
 				if (calculationTypeMap.get("labourCess") != null && 
-						((Map) bpa.getAdditionalDetails()).get("annualExpectedExpenditure") !=null) {
+						annualExpenditure !=null) {
 					
-					Double labourCessPercent = (Double) calculationTypeMap.get("labourCess");
-					Double anuualExp = (Double) ((Map) bpa.getAdditionalDetails()).get("annualExpectedExpenditure");
+					Double labourCessPercent = Double.valueOf(calculationTypeMap.get("labourCess").toString());
+					Double anuualExp = Double.valueOf(annualExpenditure.toString());
 					estimate = new TaxHeadEstimate();
 
 					estimate.setCategory(Category.TAX);
@@ -269,7 +289,10 @@ public class CalculationService {
 					estimate.setTaxHeadCode(taxHeadCode);
 					
 					estimates.add(estimate);
+				}else {
+					log.warn("Labour cess is not conifured in the calculation type or annual expenditure is updated in BPA");
 				}
+					
 				estimatesAndSlabs.setEstimates(estimates);
 				return estimatesAndSlabs;
 			} catch (Exception e) {
