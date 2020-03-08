@@ -224,12 +224,6 @@ public class BPAService {
 			}
 		});
 		
-		if( bpa.getAction() !=null && (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT) || 
-				bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE)) &&
-				( bpa.getComment() == null || bpa.getComment().isEmpty() )) {
-			throw new CustomException("UPDATE_ERROR_COMMENT_REQUIRED",
-					"Comment is mandaotory " + bpa);
-		}
 		
 		BusinessService businessService = workflowService.getBusinessService(
 				bpa, bpaRequest.getRequestInfo(),
@@ -243,21 +237,26 @@ public class BPAService {
 		Difference diffMap = diffService
 				.getDifference(bpaRequest, searchResult);
 
-		userService.createUser(bpaRequest);
-		bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
-				workflowService.getCurrentState(bpa.getStatus(),
-						businessService));
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-		actionValidator.validateUpdateRequest(bpaRequest, businessService);
-		bpaValidator.validateCheckList(mdmsData, bpaRequest,
-				workflowService.getCurrentState(bpa.getStatus(), businessService));
-
-		//
-		//
-		//
-		// /*call workflow service if it's enable else uses internal workflow
-		// process*/
+		
+		if( bpa.getAction() !=null && (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT) || 
+				bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE)) ) {
+			
+			if( bpa.getComment() == null || bpa.getComment().isEmpty() ) {
+				throw new CustomException("BPA_UPDATE_ERROR_COMMENT_REQUIRED",
+						"Comment is mandaotory, please provide the comments " );
+			}
+			
+		}else {
+			userService.createUser(bpaRequest);
+			bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
+					workflowService.getCurrentState(bpa.getStatus(),
+							businessService));
+			actionValidator.validateUpdateRequest(bpaRequest, businessService);
+			bpaValidator.validateCheckList(mdmsData, bpaRequest,
+					workflowService.getCurrentState(bpa.getStatus(), businessService));
+		}
 
 		wfIntegrator.callWorkFlow(bpaRequest);
 

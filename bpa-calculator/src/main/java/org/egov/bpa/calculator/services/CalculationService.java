@@ -1,6 +1,7 @@
 package org.egov.bpa.calculator.services;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -214,7 +215,7 @@ public class CalculationService {
 				if ( charitableTrustBuilding != null && ((boolean) charitableTrustBuilding)) {
 					permitFee = permitFee.divide(BigDecimal.valueOf(2));
 				}
-				estimate.setEstimateAmount(permitFee);
+				estimate.setEstimateAmount(permitFee.setScale(0, RoundingMode.UP));
 				estimate.setCategory(Category.FEE);
 
 				String taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType());
@@ -228,7 +229,7 @@ public class CalculationService {
 
 					estimate.setCategory(Category.CHARGES);
 					estimate.setEstimateAmount(
-							BigDecimal.valueOf(Double.valueOf( calculationTypeMap.get("developmentCharges").toString())));
+							BigDecimal.valueOf(Double.valueOf( calculationTypeMap.get("developmentCharges").toString())).setScale(0, RoundingMode.UP));
 					taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.DEVELOPENT_CHARGE);
 					estimate.setTaxHeadCode(taxHeadCode);
 					estimates.add(estimate);
@@ -250,7 +251,7 @@ public class CalculationService {
 						estimate.setCategory(Category.CHARGES);
 						estimate.setEstimateAmount(BigDecimal.valueOf(Double.valueOf(shelterFundMap.get(ulbGrade).toString()))
 								.multiply(BigDecimal.valueOf(totalBuiltupArea
-										* (Double.valueOf(shelterFundMap.get("percentageOfBuiltUpArea").toString()) / 100))));
+										* (Double.valueOf(shelterFundMap.get("percentageOfBuiltUpArea").toString()) / 100))).setScale(0, RoundingMode.UP));
 						taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.SHELTER_FUND);
 						estimate.setTaxHeadCode(taxHeadCode);
 						estimates.add(estimate);
@@ -265,7 +266,7 @@ public class CalculationService {
 					estimate = new TaxHeadEstimate();
 
 					estimate.setCategory(Category.FEE);
-					estimate.setEstimateAmount(BigDecimal.valueOf(scrutinyFee));
+					estimate.setEstimateAmount(BigDecimal.valueOf(scrutinyFee).setScale(0, RoundingMode.UP));
 					taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.SCRUTINY_FEE);
 					estimate.setTaxHeadCode(taxHeadCode);
 					
@@ -284,7 +285,7 @@ public class CalculationService {
 					estimate = new TaxHeadEstimate();
 
 					estimate.setCategory(Category.TAX);
-					estimate.setEstimateAmount(BigDecimal.valueOf( anuualExp* (labourCessPercent/100)));
+					estimate.setEstimateAmount(BigDecimal.valueOf( anuualExp* (labourCessPercent/100)).setScale(0, RoundingMode.UP));
 					taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType()+'_'+BPACalculatorConstants.LABOUR_CESS);
 					estimate.setTaxHeadCode(taxHeadCode);
 					
@@ -309,7 +310,7 @@ public class CalculationService {
 		if (totalTax.compareTo(BigDecimal.ZERO) == -1)
 			throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
 
-		estimate.setEstimateAmount(totalTax);
+		estimate.setEstimateAmount(totalTax.setScale(0, RoundingMode.UP));
 		estimate.setCategory(Category.FEE);
 
 		String taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType());
