@@ -223,6 +223,14 @@ public class BPAService {
 				owner.setOwnerType("NONE");
 			}
 		});
+		
+		if( bpa.getAction() !=null && (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT) || 
+				bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE)) &&
+				( bpa.getComment() == null || bpa.getComment().isEmpty() )) {
+			throw new CustomException("UPDATE_ERROR_COMMENT_REQUIRED",
+					"Comment is mandaotory " + bpa);
+		}
+		
 		BusinessService businessService = workflowService.getBusinessService(
 				bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());

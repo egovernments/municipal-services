@@ -123,6 +123,7 @@ public class BPAConstants {
 	public static final String ACTION_PENDINGAPPROVAL = "PENDINGAPPROVAL";
 
 	public static final String ACTION_REJECT = "REJECT";
+	public static final String ACTION_REVOCATE = "REVOCATE";
 
 	public static final String ACTION_CANCEL = "CANCEL";
 
