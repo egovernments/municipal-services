@@ -1,4 +1,3 @@
-
 package org.egov.swcalculation.model;
 
 import java.util.ArrayList;

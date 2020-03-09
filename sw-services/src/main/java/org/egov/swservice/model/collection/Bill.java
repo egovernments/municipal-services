@@ -30,125 +30,123 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class Bill {
-    // TODO some of the fields are mandatory in yml, lets discuss billdetail and billaccountdetail also for more clarity
+	// TODO some of the fields are mandatory in yml, lets discuss billdetail and
+	// billaccountdetail also for more clarity
 
-	  @JsonProperty("id")
-	  private String id = null;
+	@JsonProperty("id")
+	private String id = null;
 
-	  @JsonProperty("mobileNumber")
-	  private String mobileNumber = null;
+	@JsonProperty("mobileNumber")
+	private String mobileNumber = null;
 
-	  @JsonProperty("paidBy")
-	  private String paidBy = null;
+	@JsonProperty("paidBy")
+	private String paidBy = null;
 
-	  @JsonProperty("payerName")
-	  private String payerName = null;
+	@JsonProperty("payerName")
+	private String payerName = null;
 
-	  @JsonProperty("payerAddress")
-	  private String payerAddress = null;
+	@JsonProperty("payerAddress")
+	private String payerAddress = null;
 
-	  @JsonProperty("payerEmail")
-	  private String payerEmail = null;
+	@JsonProperty("payerEmail")
+	private String payerEmail = null;
 
-	  @JsonProperty("payerId")
-	  private String payerId = null;
+	@JsonProperty("payerId")
+	private String payerId = null;
 
-	  @JsonProperty("status")
-	  private StatusEnum status = null;
+	@JsonProperty("status")
+	private StatusEnum status = null;
 
-	  @JsonProperty("reasonForCancellation")
- 	  private String reasonForCancellation = null;
+	@JsonProperty("reasonForCancellation")
+	private String reasonForCancellation = null;
 
-	  @JsonProperty("isCancelled")
-	  private Boolean isCancelled = null;
+	@JsonProperty("isCancelled")
+	private Boolean isCancelled = null;
 
-	  @JsonProperty("additionalDetails")
-	  private JsonNode additionalDetails = null;
+	@JsonProperty("additionalDetails")
+	private JsonNode additionalDetails = null;
 
-	  @JsonProperty("billDetails")
-	  @Valid
-	  private List<BillDetail> billDetails = null;
+	@JsonProperty("billDetails")
+	@Valid
+	private List<BillDetail> billDetails = null;
 
-	  @JsonProperty("tenantId")
-	  private String tenantId = null;
+	@JsonProperty("tenantId")
+	private String tenantId = null;
 
-	  @JsonProperty("auditDetails")
-	  private AuditDetails auditDetails = null;
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
-	  @JsonProperty("collectionModesNotAllowed")
-	  private List<String> collectionModesNotAllowed = null;
+	@JsonProperty("collectionModesNotAllowed")
+	private List<String> collectionModesNotAllowed = null;
 
-	  @JsonProperty("partPaymentAllowed")
-	  private Boolean partPaymentAllowed = null;
+	@JsonProperty("partPaymentAllowed")
+	private Boolean partPaymentAllowed = null;
 
-	  @JsonProperty("isAdvanceAllowed")
-	  private Boolean isAdvanceAllowed;
+	@JsonProperty("isAdvanceAllowed")
+	private Boolean isAdvanceAllowed;
 
-	  @JsonProperty("minimumAmountToBePaid")
-	  private BigDecimal minimumAmountToBePaid = null;
+	@JsonProperty("minimumAmountToBePaid")
+	private BigDecimal minimumAmountToBePaid = null;
 
-	  @JsonProperty("businessService")
-	  private String businessService = null;
+	@JsonProperty("businessService")
+	private String businessService = null;
 
-	  @JsonProperty("totalAmount")
-	  private BigDecimal totalAmount = null;
+	@JsonProperty("totalAmount")
+	private BigDecimal totalAmount = null;
 
-	  @JsonProperty("consumerCode")
-	  private String consumerCode = null;
+	@JsonProperty("consumerCode")
+	private String consumerCode = null;
 
-	  @JsonProperty("billNumber")
-	  private String billNumber = null;
+	@JsonProperty("billNumber")
+	private String billNumber = null;
 
-	  @JsonProperty("billDate")
-	  private Long billDate = null;
+	@JsonProperty("billDate")
+	private Long billDate = null;
 
-	  @JsonProperty("amountPaid")
-	  private BigDecimal amountPaid;
-
-
+	@JsonProperty("amountPaid")
+	private BigDecimal amountPaid;
 
 	public enum StatusEnum {
-	  ACTIVE("ACTIVE"),
+		ACTIVE("ACTIVE"),
 
-	  CANCELLED("CANCELLED"),
+		CANCELLED("CANCELLED"),
 
-	  PAID("PAID"),
+		PAID("PAID"),
 
-	  EXPIRED("EXPIRED");
+		EXPIRED("EXPIRED");
 
-	  private String value;
+		private String value;
 
-	  StatusEnum(String value) {
-	  this.value = value;
-	}
-
-
-	@Override
-	@JsonValue
-	public String toString() {
-		return String.valueOf(value);
-	}
-
-	public static boolean contains(String test) {
-		for (StatusEnum val : StatusEnum.values()) {
-			if (val.name().equalsIgnoreCase(test)) {
-				return true;
-			}
+		StatusEnum(String value) {
+			this.value = value;
 		}
-		return false;
-	}
 
-	@JsonCreator
-	public static StatusEnum fromValue(String text) {
-		for (StatusEnum b : StatusEnum.values()) {
-			if (String.valueOf(b.value).equals(text)) {
-				return b;
-			}
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
 		}
-		return null;
-	}
 
-  }
+		public static boolean contains(String test) {
+			for (StatusEnum val : StatusEnum.values()) {
+				if (val.name().equalsIgnoreCase(test)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@JsonCreator
+		public static StatusEnum fromValue(String text) {
+			for (StatusEnum b : StatusEnum.values()) {
+				if (String.valueOf(b.value).equals(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+
+	}
 
 	public Boolean addBillDetail(BillDetail billDetail) {
 
@@ -164,6 +162,5 @@ public class Bill {
 				return false;
 		}
 	}
-
 
 }

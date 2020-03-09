@@ -18,14 +18,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.egov.common.contract.response.ResponseInfo;
-import org.egov.swservice.model.SewerageConnection;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Contains the ResponseHeader and the created/updated property

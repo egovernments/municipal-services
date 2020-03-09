@@ -3,6 +3,7 @@ package org.egov.swcalculation.model.Idgen;
 import java.util.List;
 
 import org.egov.common.contract.response.ResponseInfo;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

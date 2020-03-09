@@ -3,9 +3,6 @@ package org.egov.swcalculation.model;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
-import org.egov.swcalculation.model.Demand.DemandBuilder;
-import org.egov.swcalculation.model.Demand.StatusEnum;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

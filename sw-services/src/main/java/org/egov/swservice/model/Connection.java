@@ -1,4 +1,3 @@
-
 package org.egov.swservice.model;
 
 import java.util.ArrayList;
