@@ -322,7 +322,7 @@
                     "tenantId": "pb",
                     "sla": null,
                     "state": "REVOCATED",
-                    "applicationStatus": "PERMIT REVOCATION",
+                    "applicationStatus": "REVOCATED",
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": true,

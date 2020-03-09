@@ -131,7 +131,7 @@
           "tenantId": "bh",
           "sla": null,
           "state": "PENDING_APPL_FEE_PAYMENT",
-          "applicationStatus": "PENDING_APPL_FEE",
+          "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
           "docUploadRequired": false,
           "isStartState": false,
           "isTerminateState": false,
