@@ -568,7 +568,290 @@
                     "isTerminateState": true,
                     "isStateUpdatable": false,
                     "actions": null
-                }
+                },
+                
+            ]
+        },
+        {
+            "tenantId": "bh",
+            "businessService": "TOWNPLANNER",
+            "business": "BPAREG",
+            "businessServiceSla": 0,
+            "states": [
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": null,
+                    "applicationStatus": null,
+                    "docUploadRequired": false,
+                    "isStartState": true,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": null,
+                            "action": "APPLY",
+                            "nextState": "PENDINGPAYMENT",
+                            "roles": [
+                                "CITIZEN",
+                                "ANONYMOUS"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "PENDINGPAYMENT",
+                    "applicationStatus": "PENDINGPAYMENT",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGPAYMENT",
+                            "action": "PAY",
+                            "nextState": "PENDINGDOCVERIFICATION",
+                            "roles": [
+                                "CITIZEN",
+                                "SYSTEM_PAYMENT"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "PENDINGDOCVERIFICATION",
+                    "applicationStatus": "PENDINGDOCVERIFICATION",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGDOCVERIFICATION",
+                            "action": "FORWARD",
+                            "nextState": "PENDINGAPPROVAL",
+                            "roles": [
+                                "BPAREG_DOC_VERIFIER"
+                            ]
+                        },
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGDOCVERIFICATION",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "BPAREG_DOC_VERIFIER"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "REJECTED",
+                    "applicationStatus": "REJECTED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": null
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": 43200000,
+                    "state": "PENDINGAPPROVAL",
+                    "applicationStatus": "PENDINGAPPROVAL",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGAPPROVAL",
+                            "action": "APPROVE",
+                            "nextState": "APPROVED",
+                            "roles": [
+                                "BPAREG_APPROVER"
+                            ]
+                        },
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGAPPROVAL",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "BPAREG_APPROVER"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "APPROVED",
+                    "applicationStatus": "APPROVED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": null
+                },
+                
+            ]
+        },
+        {
+            "tenantId": "bh",
+            "businessService": "SUPERVISOR",
+            "business": "BPAREG",
+            "businessServiceSla": 0,
+            "states": [
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": null,
+                    "applicationStatus": null,
+                    "docUploadRequired": false,
+                    "isStartState": true,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": null,
+                            "action": "APPLY",
+                            "nextState": "PENDINGPAYMENT",
+                            "roles": [
+                                "CITIZEN",
+                                "ANONYMOUS"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "PENDINGPAYMENT",
+                    "applicationStatus": "PENDINGPAYMENT",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGPAYMENT",
+                            "action": "PAY",
+                            "nextState": "PENDINGDOCVERIFICATION",
+                            "roles": [
+                                "CITIZEN",
+                                "SYSTEM_PAYMENT"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "PENDINGDOCVERIFICATION",
+                    "applicationStatus": "PENDINGDOCVERIFICATION",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGDOCVERIFICATION",
+                            "action": "FORWARD",
+                            "nextState": "PENDINGAPPROVAL",
+                            "roles": [
+                                "BPAREG_DOC_VERIFIER"
+                            ]
+                        },
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGDOCVERIFICATION",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "BPAREG_DOC_VERIFIER"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "REJECTED",
+                    "applicationStatus": "REJECTED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": null
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": 43200000,
+                    "state": "PENDINGAPPROVAL",
+                    "applicationStatus": "PENDINGAPPROVAL",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGAPPROVAL",
+                            "action": "APPROVE",
+                            "nextState": "APPROVED",
+                            "roles": [
+                                "BPAREG_APPROVER"
+                            ]
+                        },
+                        {
+                            "tenantId": "bh",
+                            "currentState": "PENDINGAPPROVAL",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "BPAREG_APPROVER"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "bh",
+                    "businessServiceId": null,
+                    "sla": null,
+                    "state": "APPROVED",
+                    "applicationStatus": "APPROVED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": null
+                },
+                
             ]
         }
     ]

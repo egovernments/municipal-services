@@ -8,36 +8,12 @@
         "requesterId": "",
         "ts": 1513579888683,
         "ver": ".01",
-        "authToken": "{AUTH}",
-        "userInfo": {
-            "id": 26397,
-            "uuid": "b5655467-f24f-452d-a2f8-2177014b00f3",
-            "userName": "9449880531",
-            "name": "Sushama Manohar",
-            "mobileNumber": "9449880531",
-            "emailId": "sus.man@gmail.com",
-            "locale": null,
-            "type": "CITIZEN",
-            "roles": [
-                {
-                    "name": "Citizen",
-                    "code": "CITIZEN",
-                    "tenantId": "pb.amritsar"
-                },
-                {
-                    "name": "BPA Architect",
-                    "code": "BPA_ARCHITECT",
-                    "tenantId": "pb.amritsar"
-                }
-            ],
-            "active": true,
-            "tenantId": "pb.amritsar"
-        }
+        "authToken": "{AUTH}"
     },
     "BusinessServices": [
         {
             "tenantId": "pb.amritsar",
-            "businessService": "BPA_LOW",
+            "businessService": "BPA",
             "business": "bpa-services",
             "businessServiceSla": 0,
             "states": [
@@ -144,7 +120,7 @@
                             "tenantId": "pb.amritsar",
                             "currentState": "INITIATED",
                             "action": "APPLY",
-                            "nextState": "PENDING_FEE_PAYMENT",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
                             "roles": [
                                 "BPA_ARCHITECT"
                             ]
@@ -154,8 +130,8 @@
                 {
                     "tenantId": "pb.amritsar",
                     "sla": null,
-                    "state": "PENDING_FEE_PAYMENT",
-                    "applicationStatus": "PENDING_FEE",
+                    "state": "PENDING_APPL_FEE_PAYMENT",
+                    "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": false,
@@ -163,7 +139,7 @@
                     "actions": [
                         {
                             "tenantId": "pb.amritsar",
-                            "currentState": "PENDING_FEE_PAYMENT",
+                            "currentState": "PENDING_APPL_FEE_PAYMENT",
                             "action": "PAY",
                             "nextState": "DOC_VERIFICATION_PENDING",
                             "roles": [
@@ -175,9 +151,9 @@
                         },
                         {
                             "tenantId": "pb.amritsar",
-                            "currentState": "PENDING_FEE_PAYMENT",
+                            "currentState": "PENDING_APPL_FEE_PAYMENT",
                             "action": "ADHOC",
-                            "nextState": "PENDING_FEE_PAYMENT",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
                             "roles": [
                                 "CITIZEN",
                                 "BPA_ARCHITECT",
@@ -209,8 +185,17 @@
                         {
                             "tenantId": "pb.amritsar",
                             "currentState": "DOC_VERIFICATION_PENDING",
-                            "action": "REVOCATE",
-                            "nextState": "REVOCATED",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "BPA_VERIFIER"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "DOC_VERIFICATION_PENDING",
+                            "action": "SENDBACK_TO_CITIZEN",
+                            "nextState": "BACK_FROM_DOC_VERIFICATION",
                             "roles": [
                                 "BPA_VERIFIER"
                             ]
@@ -230,8 +215,8 @@
                         {
                             "tenantId": "pb.amritsar",
                             "currentState": "FIELDINSPECTION_PENDING",
-                            "action": "REVOCATE",
-                            "nextState": "REVOCATED",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPA_VERIFIER"
                             ]
@@ -241,6 +226,15 @@
                             "currentState": "FIELDINSPECTION_PENDING",
                             "action": "FORWARD",
                             "nextState": "NOC_VERIFICATION_PENDING",
+                            "roles": [
+                                "BPA_VERIFIER"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "FIELDINSPECTION_PENDING",
+                            "action": "SENDBACK_TO_CITIZEN",
+                            "nextState": "BACK_FROM_FI_VERIFICATION",
                             "roles": [
                                 "BPA_VERIFIER"
                             ]
@@ -260,8 +254,8 @@
                         {
                             "tenantId": "pb.amritsar",
                             "currentState": "NOC_VERIFICATION_PENDING",
-                            "action": "REVOCATE",
-                            "nextState": "REVOCATED",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPA_VERIFIER"
                             ]
@@ -271,6 +265,15 @@
                             "currentState": "NOC_VERIFICATION_PENDING",
                             "action": "FORWARD",
                             "nextState": "PENDINGAPPROVAL",
+                            "roles": [
+                                "BPA_VERIFIER"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "NOC_VERIFICATION_PENDING",
+                            "action": "SENDBACK_TO_CITIZEN",
+                            "nextState": "BACK_FROM_NOC_VERIFICATION",
                             "roles": [
                                 "BPA_VERIFIER"
                             ]
@@ -285,24 +288,60 @@
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": false,
-                    "isStateUpdatable": false,
+                    "isStateUpdatable": true,
                     "actions": [
                         {
                             "tenantId": "pb.amritsar",
                             "currentState": "PENDINGAPPROVAL",
-                            "action": "REVOCATE",
-                            "nextState": "REVOCATED",
+                            "action": "REJECT",
+                            "nextState": "REJECTED",
                             "roles": [
                                 "BPA_APPROVER"
                             ]
                         },
                         {
                             "tenantId": "pb.amritsar",
-                            "currentState": "PENDINGAPPROVAL",
+                            "currentState": "PENDING_SANC_FEE_PAYMENT",
                             "action": "APPROVE",
-                            "nextState": "APPROVED",
+                            "nextState": "PENDING_SANC_FEE_PAYMENT",
                             "roles": [
                                 "BPA_APPROVER"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "sla": null,
+                    "state": "PENDING_SANC_FEE_PAYMENT",
+                    "applicationStatus": "PENDING_SANC_FEE_PAYMENT",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": false,
+                    "actions": [
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "PENDING_SANC_FEE_PAYMENT",
+                            "action": "ADHOC",
+                            "nextState": "PENDING_SANC_FEE_PAYMENT",
+                            "roles": [
+                                "CITIZEN",
+                                "BPA_ARCHITECT",
+                                "SYSTEM_PAYMENT",
+                                "CEMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "PENDING_SANC_FEE_PAYMENT",
+                            "action": "PAY",
+                            "nextState": "APPROVED",
+                            "roles": [
+                                "CITIZEN",
+                                "BPA_ARCHITECT",
+                                "SYSTEM_PAYMENT",
+                                "CEMP"
                             ]
                         }
                     ]
@@ -321,15 +360,85 @@
                 {
                     "tenantId": "pb.amritsar",
                     "sla": null,
-                    "state": "REVOCATED",
-                    "applicationStatus": "PERMIT_REVOCATION",
+                    "state": "REJECTED",
+                    "applicationStatus": "REJECTED",
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": true,
                     "isStateUpdatable": false,
                     "actions": null
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "sla": null,
+                    "state": "BACK_FROM_DOC_VERIFICATION",
+                    "applicationStatus": "CITIZEN_ACTION_PENDING_AT_DOC_VERIF",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                     
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "BACK_FROM_DOC_VERIFICATION",
+                            "action": "FORWARD",
+                            "nextState": "DOC_VERIFICATION_PENDING",
+                            "roles": [
+                                "CITIZEN",
+                                "BPA_ARCHITECT"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "sla": null,
+                    "state": "BACK_FROM_FI_VERIFICATION",
+                    "applicationStatus": "CITIZEN_ACTION_PENDING_AT_FI_VERIF",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                       
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "BACK_FROM_FI_VERIFICATION",
+                            "action": "FORWARD",
+                            "nextState": "FIELDINSPECTION_PENDING",
+                            "roles": [
+                                "CITIZEN",
+                                "BPA_ARCHITECT"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "sla": null,
+                    "state": "BACK_FROM_NOC_VERIFICATION",
+                    "applicationStatus": "CITIZEN_ACTION_PENDING_AT_NOC_VERIF",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                      
+                        {
+                            "tenantId": "pb.amritsar",
+                            "currentState": "BACK_FROM_NOC_VERIFICATION",
+                            "action": "FORWARD",
+                            "nextState": "NOC_VERIFICATION_PENDING",
+                            "roles": [
+                                "CITIZEN",
+                                "BPA_ARCHITECT"
+                            ]
+                        }
+                    ]
                 }
             ]
         }
+
     ]
 }
