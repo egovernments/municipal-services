@@ -479,7 +479,7 @@ serviceMaps:
 
            - jsonPath: $.BPA.documents.*.documentType
 
-           - jsonPath: $.BPA.documents.*.fileStore
+           - jsonPath: $.BPA.documents.*.fileStoreId
 
            - jsonPath: $.BPA.auditDetails.lastModifiedBy
 
