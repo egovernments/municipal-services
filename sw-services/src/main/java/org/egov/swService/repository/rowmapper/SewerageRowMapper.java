@@ -1,6 +1,5 @@
 package org.egov.swService.repository.rowmapper;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,9 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.Connection.ApplicationStatusEnum;
 import org.egov.swService.model.Connection.StatusEnum;
-import org.apache.commons.lang3.StringUtils;
 import org.egov.swService.model.Document;
 import org.egov.swService.model.PlumberInfo;
 import org.egov.swService.model.Property;
@@ -27,7 +26,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 	@Override
 	public List<SewerageConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		Map<String, SewerageConnection> connectionListMap = new HashMap<>();
-		SewerageConnection sewarageConnection = null;
+		SewerageConnection sewarageConnection = new SewerageConnection();
 		while (rs.next()) {
 			String Id = rs.getString("connection_Id");
 			if (connectionListMap.getOrDefault(Id, null) == null) {
@@ -94,6 +93,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			plumber.setRelationship(rs.getString("relationship"));
 			plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
 			plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
+			plumber.setDetailsProvidedBy(rs.getString("detailsprovidedby"));
 			sewerageConnection.addPlumberInfoItem(plumber);
 		}
 	}

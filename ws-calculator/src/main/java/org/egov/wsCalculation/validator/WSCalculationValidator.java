@@ -19,6 +19,7 @@ import org.egov.wsCalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Component
 public class WSCalculationValidator {
@@ -46,7 +47,7 @@ public class WSCalculationValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		
 		//Future Billing Period Check
-		if(meterReading.getBillingPeriod() != null)
+		if(!StringUtils.isEmpty(meterReading.getBillingPeriod()))
 		masterDataService.getDemandStartAndEndValue(meterReading.getBillingPeriod());
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
@@ -76,7 +77,7 @@ public class WSCalculationValidator {
 					"Current Meter Reading cannot be less than last meter reading");
 		}
 		
-		if (meterReading.getMeterStatus() == null) {
+		if (StringUtils.isEmpty(meterReading.getMeterStatus())) {
 			errorMap.put("INVALID_METER_READING_STATUS",
 					"Meter status can not be null");
 		}
@@ -86,13 +87,13 @@ public class WSCalculationValidator {
 					"Current Meter Reading cannot be update without current meter reading");
 		}
 
-		if (isUpdate && meterReading.getId() != null && !meterReading.getId().isEmpty()) {
+		if (isUpdate && !StringUtils.isEmpty(meterReading.getId())) {
 			int n = wSCalculationDao.isMeterReadingConnectionExist(Arrays.asList(meterReading.getId()));
 			if (n > 0) {
 				errorMap.put("INVALID_METER_READING_CONNECTION", "Meter reading Id already present");
 			}
 		}
-		if (meterReading.getBillingPeriod() == null || meterReading.getBillingPeriod().isEmpty()) {
+		if (StringUtils.isEmpty(meterReading.getBillingPeriod())) {
 			errorMap.put("INVALID_BILLING_PERIOD", "Meter Reading cannot be updated without billing period");
 		}
 

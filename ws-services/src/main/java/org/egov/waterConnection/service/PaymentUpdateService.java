@@ -1,5 +1,6 @@
 package org.egov.waterConnection.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +118,7 @@ public class PaymentUpdateService {
 		userSearchRequest.put("RequestInfo", requestInfo);
 		userSearchRequest.put("uuid", uuids);
 		Object response = serviceRequestRepository.fetchResult(uri, userSearchRequest);
-		List<Object> users = null;
+		List<Object> users = new ArrayList<>();
 		try {
 			log.info("user info response" + mapper.writeValueAsString(response));
 			DocumentContext context = JsonPath.parse(mapper.writeValueAsString(response));
