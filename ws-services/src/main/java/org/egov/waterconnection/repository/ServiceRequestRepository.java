@@ -22,9 +22,11 @@ public class ServiceRequestRepository {
 	public Object fetchResult(StringBuilder uri, Object request) {
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		Object response = null;
-		log.info("URI: " + uri.toString());
+		StringBuilder str = new StringBuilder(this.getClass().getCanonicalName()).append(".fetchResult:").append(System.lineSeparator());
+		str.append("URI: ").append(uri.toString()).append(System.lineSeparator());
 		try {
-			log.info("Request: " + mapper.writeValueAsString(request));
+			str.append("Request: ").append(mapper.writeValueAsString(request)).append(System.lineSeparator());
+			log.info(str.toString());
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (HttpClientErrorException e) {
 			log.error("External Service threw an Exception: ", e);
@@ -32,7 +34,6 @@ public class ServiceRequestRepository {
 		} catch (Exception e) {
 			log.error("Exception while fetching from searcher: ", e);
 		}
-
 		return response;
 	}
 

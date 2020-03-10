@@ -30,7 +30,7 @@ public class WaterDaoImpl implements WaterDao {
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private WsQueryBuilder wCQueryBuilder;
+	private WsQueryBuilder wsQueryBuilder;
 
 	@Autowired
 	private WaterRowMapper waterRowMapper;
@@ -53,12 +53,11 @@ public class WaterDaoImpl implements WaterDao {
 	public List<WaterConnection> getWaterConnectionList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = wCQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
+		String query = wsQueryBuilder.getSearchQueryString(criteria, preparedStatement, requestInfo);
 		if (query == null)
 			return Collections.emptyList();
 //		if (log.isDebugEnabled()) {
-			StringBuilder str = new StringBuilder("Constructed query is:: ");
-			str.append(query);
+			StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
 			log.debug(str.toString());
 //		}
 		List<WaterConnection> waterConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),

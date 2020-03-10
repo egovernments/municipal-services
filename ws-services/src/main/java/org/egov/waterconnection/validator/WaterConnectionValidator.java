@@ -1,6 +1,5 @@
 package org.egov.waterconnection.validator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
@@ -79,7 +77,7 @@ public class WaterConnectionValidator {
 				builder.append("PROPERTY ID NOT FOUND FOR ")
 						.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo()
 								: waterConnection.getConnectionNo());
-				log.error("", builder.toString());
+				log.error(builder.toString());
 			}
 		});
 	}

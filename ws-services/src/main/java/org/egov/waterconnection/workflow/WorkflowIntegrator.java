@@ -54,12 +54,11 @@ public class WorkflowIntegrator {
 	 * @param waterConnectionRequest
 	 */
 	public void callWorkFlow(WaterConnectionRequest waterConnectionRequest) {
-		WaterConnection connection = waterConnectionRequest.getWaterConnection();
 		ProcessInstance processInstance = ProcessInstance.builder()
 				.businessId(waterConnectionRequest.getWaterConnection().getApplicationNo())
 				.tenantId(waterConnectionRequest.getWaterConnection().getProperty().getTenantId())
 				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
-				.action(connection.getAction()).build();
+				.action(waterConnectionRequest.getWaterConnection().getAction()).build();
 		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())) {
 			if (!CollectionUtils
 					.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAssignes())) {
@@ -105,8 +104,6 @@ public class WorkflowIntegrator {
 				StringBuilder builder = new StringBuilder();
 				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
 				log.error("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
-				builder = new StringBuilder();
-				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
 				throw new CustomException("EG_WS_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
 			throw new CustomException("EG_WF_ERROR", errros.toString());

@@ -45,10 +45,6 @@ public class WorkflowNotificationService {
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 	
-	@Autowired
-	private ObjectMapper mapper;
-	
-
 	/**
 	 * 
 	 * @param record record is bill response.
@@ -63,21 +59,18 @@ public class WorkflowNotificationService {
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 			      EventRequest eventRequest = getEventRequest(request.getWaterConnection(), topic, request.getRequestInfo());
 					if (eventRequest != null) {
-						log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 					List<SMSRequest> smsRequests = getSmsRequest(request.getWaterConnection(), topic, request.getRequestInfo());
 					if (!CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
 			}
 
 		} catch (Exception ex) {
-			log.error(ex.toString());
-			log.error("Error occured while processing the record from topic : " + topic);
+			log.error("Error occured while processing the record from topic : " + topic, ex);
 		}
 	}
 	

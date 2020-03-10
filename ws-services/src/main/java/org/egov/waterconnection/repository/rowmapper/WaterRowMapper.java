@@ -75,10 +75,10 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 	private void addChildrenToProperty(ResultSet rs, WaterConnection waterConnection) throws SQLException {
 		String document_Id = rs.getString("doc_Id");
 		String isActive = rs.getString("doc_active");
-		String activeString = Status.ACTIVE.name();
 		boolean documentActive = false;
-		if (isActive != null)
-			documentActive = isActive.equalsIgnoreCase(activeString) == true ? true : false;
+		if (isActive != null) {
+			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive); 
+		}
 		if (document_Id != null && documentActive) {
 			Document applicationDocument = new Document();
 			applicationDocument.setId(document_Id);

@@ -1,7 +1,6 @@
 package org.egov.waterconnection.service;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
@@ -41,17 +40,15 @@ public class CalculationService {
 	 * 
 	 */
 	public void calculateFeeAndGenerateDemand(WaterConnectionRequest request) {
-		if (request.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
-			StringBuilder uri = waterServiceUtil.getCalculatorURL();
+		if(WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getWaterConnection().getAction())) {
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getWaterConnection().getApplicationNo())
 					.waterConnection(request.getWaterConnection())
 					.tenantId(request.getWaterConnection().getProperty().getTenantId()).build();
-			List<CalculationCriteria> calculationCriterias = Arrays.asList(criteria);
-			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(calculationCriterias)
+			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
 					.requestInfo(request.getRequestInfo()).isconnectionCalculation(false).build();
 			try {
-				Object response = serviceRequestRepository.fetchResult(uri, calRequest);
+				Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getCalculatorURL(), calRequest);
 				CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
 				log.info(mapper.writeValueAsString(calResponse));
 			} catch (Exception ex) {

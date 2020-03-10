@@ -3,7 +3,6 @@ package org.egov.waterconnection.service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,13 +17,13 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.AuditDetails;
+import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
+import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
-import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Idgen.IdResponse;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -33,8 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -82,7 +81,7 @@ public class EnrichmentService {
 				} else {
 					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
 					builder.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo() : waterConnection.getConnectionNo());
-					log.error("", builder.toString());
+					log.error(builder.toString());
 				}
 			});
 		}

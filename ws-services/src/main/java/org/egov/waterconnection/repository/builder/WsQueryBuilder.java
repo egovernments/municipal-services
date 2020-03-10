@@ -27,7 +27,7 @@ public class WsQueryBuilder {
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 //	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
-	private final static String WATER_SEARCH_Query = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource,"
+	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource,"
 			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.waterSubSource, wc.connection_id as connection_Id, wc.connectionExecutionDate,"
 			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
@@ -39,15 +39,15 @@ public class WsQueryBuilder {
 			+  LEFT_OUTER_JOIN_STRING
 			+ "eg_ws_plumberinfo plumber ON plumber.wsid = conn.id";
 	
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM connection WHERE";
+	private static final String NO_OF_CONNECTION_SEARCH_QUERY = "SELECT count(*) FROM connection WHERE";
 	
-	private final String paginationWrapper = "SELECT * FROM " +
+	private static final String PAGINATION_WRAPPER = "SELECT * FROM " +
             "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
             "({})" +
             " result) result_offset " +
             "WHERE offset_ > ? AND offset_ <= ?";
 	
-	private final String ORDER_BY_CLAUSE= " ORDER BY wc.connectionExecutionDate DESC";
+	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.connectionExecutionDate DESC";
 	/**
 	 * 
 	 * @param criteria
@@ -62,7 +62,7 @@ public class WsQueryBuilder {
 			RequestInfo requestInfo) {
 		if (criteria.isEmpty())
 				return null;
-		StringBuilder query = new StringBuilder(WATER_SEARCH_Query);
+		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
@@ -180,11 +180,11 @@ public class WsQueryBuilder {
 
 		preparedStmtList.add(offset);
 		preparedStmtList.add(limit + offset);
-		return paginationWrapper.replace("{}",query);
+		return PAGINATION_WRAPPER.replace("{}",query);
 	}
 
 	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
-		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
+		StringBuilder query = new StringBuilder(NO_OF_CONNECTION_SEARCH_QUERY);
 		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
 		addToPreparedStatement(preparedStatement, connectionIds);
 		return query.toString();

@@ -41,8 +41,7 @@ public class DiffService {
 				editNotificationService.sendEditNotification(request);
 			}
 		} catch (Exception ex) {
-			StringBuilder builder = new StringBuilder("Edit Notification Error!!");
-			log.error(builder.toString(), ex);
+			log.error("Edit Notification Error!!", ex);
 		}
 	}
 	
