@@ -61,10 +61,11 @@ public class EstimationService {
 	@SuppressWarnings("rawtypes")
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo,
 			Map<String, Object> masterData) {
-		if (StringUtils.isEmpty((criteria.getSewerageConnection()))
-				&& !StringUtils.isEmpty(criteria.getConnectionNo())) {
-			criteria.setSewerageConnection(
-					calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), criteria.getTenantId()));
+		SewerageConnection sewerageConnection = null;
+		String tenantId = requestInfo.getUserInfo().getTenantId();
+		if(criteria.getSewerageConnection() == null && !criteria.getConnectionNo().isEmpty()) {
+			sewerageConnection = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), tenantId);
+			criteria.setSewerageConnection(sewerageConnection);
 		}
 		if (criteria.getSewerageConnection() == null) {
 			throw new CustomException("Sewerage Connection not found for given criteria ",
