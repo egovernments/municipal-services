@@ -290,7 +290,7 @@ public class EnrichmentService {
 					}
 					
 					HashMap additionalDetails = ((HashMap) bpa.getAdditionalDetails());
-					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE, conditions.get(0));
+					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
 					
 				}catch(Exception e) {
 					log.warn("No approval conditions found for the application "+ bpa.getApplicationNo());
