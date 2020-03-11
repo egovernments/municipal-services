@@ -286,7 +286,7 @@ public class EnrichmentService {
 				
 				try {
 					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
-					log.info(conditions);
+					log.info(conditions.toString());
 					if( bpa.getAdditionalDetails() == null ) {
 						bpa.setAdditionalDetails( new HashMap());
 					}
@@ -297,7 +297,7 @@ public class EnrichmentService {
 					
 				}catch(Exception e) {
 					log.warn("No approval conditions found for the application "+ bpa.getApplicationNo());
-					log.error(e);
+					e.printStackTrace();
 				}
 				
 				
