@@ -61,7 +61,7 @@ public class EditNotificationService {
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("Exception when trying to send notification. ", ex);
 		}
 	}
 
