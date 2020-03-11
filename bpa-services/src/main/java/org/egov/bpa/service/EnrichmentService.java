@@ -34,7 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -271,6 +276,29 @@ public class EnrichmentService {
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setPermitOrderNo(idResponses.get(0).getId());
+			if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
+					&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)) {
+				Object mdmsData = bpaUtil.mDMSCall(bpaRequest);
+				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
+						.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
+						.replace("{4}", bpa.getApplicationType());
+
+				try {
+					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
+					if( bpa.getAdditionalDetails() == null ) {
+						bpa.setAdditionalDetails( new HashMap());
+					}
+					
+					HashMap additionalDetails = ((HashMap) bpa.getAdditionalDetails());
+					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE, conditions);
+					
+				}catch(Exception e) {
+					log.warn("No approval conditions found for the application "+ bpa.getApplicationNo());
+				}
+				
+				
+			}
+			
 		}
 
 	}

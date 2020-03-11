@@ -219,6 +219,8 @@ public class BPAConstants {
 	public static final String APPROVED_STATE ="APPROVED";
 	public static final String DOCVERIFICATION_STATE  = "DOC_VERIFICATION_PENDING";
 
+	public static final String PENDING_APPROVAL_STATE  = "PENDINGAPPROVAL";
+
 
 	public static final String APPL_FEE ="BPA.NC_APP_FEE";
 	
@@ -229,6 +231,7 @@ public class BPAConstants {
 	public static final String QUESTIONS_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].questions";
 	
 	public static final String DOCTYPES_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].docTypes";
+	public static final String CONDITIONS_MAP = "$.MdmsRes.BPA.CheckList[?(@.WFState==\"{1}\" && @.RiskType==\"{2}\" && @.ServiceType==\"{3}\" && @.applicationType==\"{4}\")].conditions";
 	
 	public static final String CHECKLISTFILTER =  "$.[?(@.WFState==\"{}\")]";
 	public static final String CHECKLIST_TYPE = "checkList";
