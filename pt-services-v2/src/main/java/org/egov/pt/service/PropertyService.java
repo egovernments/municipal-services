@@ -118,8 +118,8 @@ public class PropertyService {
     List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
         List<Property> properties = repository.getPropertiesPlainSearch(criteria);
         enrichmentService.enrichPropertyCriteriaWithOwnerids(criteria, properties);
-        UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
-        enrichmentService.enrichOwner(userDetailResponse, properties);
+        //UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
+        //enrichmentService.enrichOwner(userDetailResponse, properties);
         return properties;
     }
 
