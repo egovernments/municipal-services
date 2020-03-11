@@ -291,7 +291,7 @@ public class EnrichmentService {
 						bpa.setAdditionalDetails( new HashMap());
 					}
 					log.info("=====> additional details set");
-					HashMap additionalDetails = ((HashMap) bpa.getAdditionalDetails());
+					Map additionalDetails = (Map) bpa.getAdditionalDetails();
 					log.info("=====> additional details fetch",additionalDetails);
 					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
 					
