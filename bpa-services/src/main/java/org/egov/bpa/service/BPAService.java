@@ -10,6 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -29,6 +30,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
+import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPA.RiskTypeEnum;
@@ -52,6 +54,7 @@ import org.springframework.util.CollectionUtils;
 
 import io.jaegertracing.thriftjava.Log;
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
 @Service
 @Slf4j
@@ -95,6 +98,9 @@ public class BPAService {
 
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private NotificationUtil notificationUtil;
 
 	@Autowired
 	private BPAWorkflowService bpaWorkflowService;
@@ -140,6 +146,8 @@ public class BPAService {
 	 */
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa;
+		Calendar calendar = Calendar.getInstance();
+
 		bpaValidator.validateSearch(requestInfo, criteria);
 		if (criteria.getMobileNumber() != null) {
 			bpa = getBPAFromMobileNumber(criteria, requestInfo);
@@ -307,9 +315,12 @@ public class BPAService {
 		byte[] ba1 = new byte[1024];
 		int baLength;
 		String fileName = BPAConstants.EDCR_PDF;
-		;
 		PDDocument doc = null;
 		BPA bpa = bpaRequest.getBPA();
+		
+		if(StringUtils.isEmpty(bpa.getPermitOrderNo())) {
+			throw new CustomException("INVALID_REQUEST" , "Permit Order No is required.");
+		}
 
 		try {
 			String pdfUrl = edcrService.getEDCRPdfUrl(bpaRequest);
@@ -335,6 +346,15 @@ public class BPAService {
 				doc = PDDocument.load(new File(fileName));
 
 				PDPageTree allPages = doc.getDocumentCatalog().getPages();
+				
+				String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
+						bpaRequest.getRequestInfo());
+				String permitNo = notificationUtil.getMessageTemplate(BPAConstants.PERMIT_ORDER_NO,
+						localizationMessages);
+				permitNo = permitNo != null ? permitNo : BPAConstants.PERMIT_ORDER_NO;
+				String generatedOn = notificationUtil.getMessageTemplate(BPAConstants.GENERATEDON,
+						localizationMessages);
+				generatedOn = generatedOn != null ? generatedOn : BPAConstants.GENERATEDON;
 
 				for (int i = 0; i < allPages.getCount(); i++) {
 					PDPage page = (PDPage) allPages.get(i);
@@ -351,16 +371,17 @@ public class BPAService {
 					float startX = mediabox.getLowerLeftX() + margin;
 					float startY = mediabox.getUpperRightY() - margin;
 					contentStream.newLineAtOffset(startX, startY);
-					contentStream.showText("PERMIT_ORDER_NO : " + bpaRequest.getBPA().getPermitOrderNo());
+
+					contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getPermitOrderNo());
 					if (bpa.getOrderGeneratedDate() != null) {
 						Date date = new Date(bpa.getOrderGeneratedDate());
 						DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 						String formattedDate = format.format(date);
 						contentStream.newLineAtOffset(400, 4.5f);
-						contentStream.showText("GENERATED_ON : " + formattedDate);
+						contentStream.showText(generatedOn + " : " + formattedDate);
 					} else {
 						contentStream.newLineAtOffset(400, 4.5f);
-						contentStream.showText("GENERATED_ON : " + "NA");
+						contentStream.showText(generatedOn + " : " + "NA");
 					}
 
 					contentStream.endText();

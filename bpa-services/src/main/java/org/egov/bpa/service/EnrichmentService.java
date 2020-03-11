@@ -282,18 +282,22 @@ public class EnrichmentService {
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
 						.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
 						.replace("{4}", bpa.getApplicationType());
-
+				log.info(condeitionsPath);
+				
 				try {
 					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
+					log.info(conditions);
 					if( bpa.getAdditionalDetails() == null ) {
 						bpa.setAdditionalDetails( new HashMap());
 					}
-					
+					log.info("=====> additional details set");
 					HashMap additionalDetails = ((HashMap) bpa.getAdditionalDetails());
+					log.info("=====> additional details fetch",additionalDetails);
 					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
 					
 				}catch(Exception e) {
 					log.warn("No approval conditions found for the application "+ bpa.getApplicationNo());
+					log.error(e);
 				}
 				
 				
