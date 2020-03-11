@@ -35,6 +35,9 @@ public class PlumberInfo   {
 
   @JsonProperty("correspondenceAddress")
   private String correspondenceAddress = null;
+  
+  @JsonProperty("detailsProvidedBy")
+  private String detailsProvidedBy = null;
 
   /**
    * The relationship of gaurdian.
@@ -209,6 +212,20 @@ public class PlumberInfo   {
     this.additionalDetails = additionalDetails;
     return this;
   }
+  
+  public String getDetailsProvidedBy() {
+		return detailsProvidedBy;
+	}
+
+	public void setDetailsProvidedBy(String detailsProvidedBy) {
+		this.detailsProvidedBy = detailsProvidedBy;
+	}
+
+	public PlumberInfo detailsProvidedBy(String detailsProvidedBy) {
+		this.detailsProvidedBy = detailsProvidedBy;
+		return this;
+	}
+
 
   /**
    * Json object to capture any extra information which is not accommodated of model

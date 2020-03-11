@@ -129,7 +129,7 @@ public class OwnerInfo extends User{
 				accountLocked, roles, fatherOrHusbandName, bloodGroup, identificationMark, photo, createdBy,
 				createdDate, lastModifiedBy, lastModifiedDate, tenantId);
 		this.ownerInfoUuid = ownerInfoUuid;
-		mobileNumber = mobileNumber2;
+		this.mobileNumber = mobileNumber2;
 		gender = gender2;
 		fatherOrHusbandName = fatherOrHusbandName2;
 		correspondenceAddress = correspondenceAddress2;

@@ -25,7 +25,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 	@Override
 	public List<SewerageConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		Map<String, SewerageConnection> connectionListMap = new HashMap<>();
-		SewerageConnection sewarageConnection = null;
+		SewerageConnection sewarageConnection = new SewerageConnection();
 		while (rs.next()) {
 			String Id = rs.getString("connection_Id");
 			if (connectionListMap.getOrDefault(Id, null) == null) {
@@ -92,6 +92,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			plumber.setRelationship(rs.getString("relationship"));
 			plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
 			plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
+			plumber.setDetailsProvidedBy(rs.getString("detailsprovidedby"));
 			sewerageConnection.addPlumberInfoItem(plumber);
 		}
 	}

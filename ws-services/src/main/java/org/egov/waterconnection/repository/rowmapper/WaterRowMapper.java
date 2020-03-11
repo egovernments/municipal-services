@@ -99,6 +99,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			plumber.setRelationship(rs.getString("relationship"));
 			plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
 			plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
+			plumber.setDetailsProvidedBy(rs.getString("detailsprovidedby"));
 			waterConnection.addPlumberInfoItem(plumber);
 		}
 	}

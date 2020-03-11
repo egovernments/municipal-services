@@ -188,10 +188,7 @@ public class EstimationService {
 			}
 
 		} else {
-			for (BillingSlab billingSlab : billingSlabs) {
-				sewerageCharge = BigDecimal.valueOf(billingSlab.slabs.get(0).charge);
-				break;
-			}
+			sewerageCharge = BigDecimal.valueOf(billSlab.minimumCharge);
 		}
 		return sewerageCharge;
 	}

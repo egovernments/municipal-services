@@ -272,7 +272,7 @@ public class DemandService {
 		}
 
 		BigDecimal decimalValue = totalTax.remainder(BigDecimal.ONE);
-		BigDecimal midVal = new BigDecimal(0.5);
+		BigDecimal midVal = BigDecimal.valueOf(0.5);
 		BigDecimal roundOff = BigDecimal.ZERO;
 
 		/*
