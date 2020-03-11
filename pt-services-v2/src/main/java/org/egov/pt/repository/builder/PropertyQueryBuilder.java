@@ -51,7 +51,8 @@ public class PropertyQueryBuilder {
 			+ "ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,"
 			+ "unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor,"
 			+ "unit.additionalDetails as unit_additionalDetails,owner.additionalDetails as ownerInfo_additionalDetails,"
-			+ "insti.additionalDetails as insti_additionalDetails,address.additionalDetails as add_additionalDetails "
+			+ "insti.additionalDetails as insti_additionalDetails,address.additionalDetails as add_additionalDetails,"
+			+ "pt.lastModifiedTime as propertylastModifiedTime"
 			+ " FROM eg_pt_property_v2 pt " + INNER_JOIN_STRING
 			+ " eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " + INNER_JOIN_STRING
 			+ " eg_pt_owner_v2 owner ON ptdl.assessmentnumber=owner.propertydetail " + INNER_JOIN_STRING
