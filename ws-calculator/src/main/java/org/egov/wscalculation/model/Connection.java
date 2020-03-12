@@ -1,19 +1,23 @@
 
 package org.egov.wscalculation.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.egov.wscalculation.model.workflow.ProcessInstance;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * This is lightweight property object that can be used as reference by
@@ -24,12 +28,13 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-01-22T12:39:45.543+05:30[Asia/Kolkata]")
 public class Connection {
+
 	@JsonProperty("id")
 	private String id = null;
 
 	@JsonProperty("property")
 	private Property property = null;
-	
+
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
@@ -96,8 +101,8 @@ public class Connection {
 		ACTIVE("Active"),
 
 		INACTIVE("Inactive"),
-		
-	    INWORKFLOW("INWORKFLOW");
+
+		INWORKFLOW("INWORKFLOW");
 
 		private String value;
 
@@ -144,17 +149,19 @@ public class Connection {
 
 	@JsonProperty("roadCuttingArea")
 	private Float roadCuttingArea = null;
-	
-	@JsonProperty("additionalDetails")
-	private Object additionalDetails;
-	
-	
 
-	@NotNull
-	@Size(max = 64)
-	@JsonProperty("action")
-	private String action = null;
-	
+	@JsonProperty("connectionExecutionDate")
+	private BigDecimal connectionExecutionDate = null;
+
+	@JsonProperty("connectionCategory")
+	private String connectionCategory = null;
+
+	@JsonProperty("connectionType")
+	private String connectionType = null;
+
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails = null;
+
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
 
@@ -183,11 +190,6 @@ public class Connection {
 		this.property = property;
 		return this;
 	}
-	
-	public Connection processInstance(ProcessInstance processInstance) {
-		this.processInstance = processInstance;
-		return this;
-	}
 
 	/**
 	 * Get property
@@ -203,21 +205,6 @@ public class Connection {
 
 	public void setProperty(Property property) {
 		this.property = property;
-	}
-	
-	/**
-	 * Get property
-	 * 
-	 * @return property
-	 **/
-	@ApiModelProperty(value = "")
-
-	public ProcessInstance getProcessInstance() {
-		return processInstance;
-	}
-
-	public void setProcessInstance(ProcessInstance processInstance) {
-		this.processInstance = processInstance;
 	}
 
 	public Connection applicationNo(String applicationNo) {
@@ -289,9 +276,9 @@ public class Connection {
 
 	/**
 	 * Formatted connection number, which will be generated using ID-Gen service
-	 * after aproval of connection application in case of new application. If
-	 * the source of data is \"DATA_ENTRY\" then application status will be
-	 * considered as \"APROVED\" application.
+	 * after aproval of connection application in case of new application. If the
+	 * source of data is \"DATA_ENTRY\" then application status will be considered
+	 * as \"APROVED\" application.
 	 * 
 	 * @return connectionNo
 	 **/
@@ -336,8 +323,8 @@ public class Connection {
 		if (this.documents == null) {
 			this.documents = new ArrayList<Document>();
 		}
-		if(!this.documents.contains(documentsItem))
-            this.documents.add(documentsItem);
+		if (!this.documents.contains(documentsItem))
+			this.documents.add(documentsItem);
 		return this;
 	}
 
@@ -392,12 +379,13 @@ public class Connection {
 
 	/**
 	 * It is a master data, defined in MDMS. If road cutting is required to
-	 * established the connection then we need to capture the details of road
-	 * type.
+	 * established the connection then we need to capture the details of road type.
 	 * 
 	 * @return roadType
 	 **/
 	@ApiModelProperty(value = "It is a master data, defined in MDMS. If road cutting is required to established the connection then we need to capture the details of road type.")
+
+	@Size(min = 2, max = 32)
 	public String getRoadType() {
 		return roadType;
 	}
@@ -408,24 +396,6 @@ public class Connection {
 
 	public Connection roadCuttingArea(Float roadCuttingArea) {
 		this.roadCuttingArea = roadCuttingArea;
-		return this;
-	}
-
-	public String getAction() {
-		return action;
-	}
-
-	public void setAction(String action) {
-		this.action = action;
-	}
-
-	public Connection action(String action) {
-		this.action = action;
-		return this;
-	}
-	
-	public Connection additionalDetails(Object additionalDetails) {
-		this.additionalDetails = additionalDetails;
 		return this;
 	}
 
@@ -443,13 +413,100 @@ public class Connection {
 	public void setRoadCuttingArea(Float roadCuttingArea) {
 		this.roadCuttingArea = roadCuttingArea;
 	}
-	
+
+	public Connection connectionExecutionDate(BigDecimal connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
+		return this;
+	}
+
+	/**
+	 * Get connectionExecutionDate
+	 * 
+	 * @return connectionExecutionDate
+	 **/
+	@ApiModelProperty(readOnly = true, value = "")
+
+	@Valid
+	public BigDecimal getConnectionExecutionDate() {
+		return connectionExecutionDate;
+	}
+
+	public void setConnectionExecutionDate(BigDecimal connectionExecutionDate) {
+		this.connectionExecutionDate = connectionExecutionDate;
+	}
+
+	public Connection connectionCategory(String connectionCategory) {
+		this.connectionCategory = connectionCategory;
+		return this;
+	}
+
+	/**
+	 * It is a master data, defined in MDMS
+	 * 
+	 * @return connectionCategory
+	 **/
+	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS")
+	@Size(min = 2, max = 32)
+	public String getConnectionCategory() {
+		return connectionCategory;
+	}
+
+	public void setConnectionCategory(String connectionCategory) {
+		this.connectionCategory = connectionCategory;
+	}
+
+	public Connection connectionType(String connectionType) {
+		this.connectionType = connectionType;
+		return this;
+	}
+
+	/**
+	 * It is a master data, defined in MDMS.
+	 * 
+	 * @return connectionType
+	 **/
+	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
+	@Size(min = 2, max = 32)
+	public String getConnectionType() {
+		return connectionType;
+	}
+
+	public void setConnectionType(String connectionType) {
+		this.connectionType = connectionType;
+	}
+
+	public Connection additionalDetails(Object additionalDetails) {
+		this.additionalDetails = additionalDetails;
+		return this;
+	}
+
+	/**
+	 * Json object to capture any extra information which is not accommodated of
+	 * model
+	 * 
+	 * @return additionalDetails
+	 **/
+	@ApiModelProperty(value = "Json object to capture any extra information which is not accommodated of model")
+
 	public Object getAdditionalDetails() {
 		return additionalDetails;
 	}
 
 	public void setAdditionalDetails(Object additionalDetails) {
 		this.additionalDetails = additionalDetails;
+	}
+
+	public Connection processInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
+		return this;
+	}
+
+	public ProcessInstance getProcessInstance() {
+		return processInstance;
+	}
+
+	public void setProcessInstance(ProcessInstance processInstance) {
+		this.processInstance = processInstance;
 	}
 
 	@Override
@@ -471,13 +528,17 @@ public class Connection {
 				&& Objects.equals(this.plumberInfo, connection.plumberInfo)
 				&& Objects.equals(this.roadType, connection.roadType)
 				&& Objects.equals(this.roadCuttingArea, connection.roadCuttingArea)
+				&& Objects.equals(this.connectionExecutionDate, connection.connectionExecutionDate)
+				&& Objects.equals(this.connectionCategory, connection.connectionCategory)
+				&& Objects.equals(this.connectionType, connection.connectionType)
 				&& Objects.equals(this.additionalDetails, connection.additionalDetails);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, property, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
-				documents, plumberInfo, roadType, roadCuttingArea, additionalDetails);
+				documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate, connectionCategory,
+				connectionType, additionalDetails);
 	}
 
 	@Override
@@ -496,6 +557,9 @@ public class Connection {
 		sb.append("    plumberInfo: ").append(toIndentedString(plumberInfo)).append("\n");
 		sb.append("    roadType: ").append(toIndentedString(roadType)).append("\n");
 		sb.append("    roadCuttingArea: ").append(toIndentedString(roadCuttingArea)).append("\n");
+		sb.append("    connectionExecutionDate: ").append(toIndentedString(connectionExecutionDate)).append("\n");
+		sb.append("    connectionCategory: ").append(toIndentedString(connectionCategory)).append("\n");
+		sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
 		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
 		sb.append("}");
 		return sb.toString();
@@ -511,4 +575,5 @@ public class Connection {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
 }

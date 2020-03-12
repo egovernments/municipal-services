@@ -97,7 +97,7 @@ public class EnrichmentService {
 //		AuditDetails auditDetails = waterServicesUtil
 //				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(Instant.now().getEpochSecond() * 1000);
+		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(BigDecimal.valueOf(Instant.now().getEpochSecond() * 1000));
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
@@ -162,10 +162,10 @@ public class EnrichmentService {
      * @param WaterConnectionRequest The create request
      */
 	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
-		if (waterConnectionRequest.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
+		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
 			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
 		}
-		if (waterConnectionRequest.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.ACTION_APPLY)) {
+		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTION_APPLY)) {
 			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
 		}
 	}

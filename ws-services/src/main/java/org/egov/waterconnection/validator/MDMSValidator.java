@@ -48,7 +48,7 @@ public class MDMSValidator {
 	 * @param request
 	 */
 	public void validateMasterData(WaterConnectionRequest request) {
-		if (request.getWaterConnection().getAction().equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
+		if (request.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
 			String jsonPath = WCConstants.JSONPATH_ROOT;
 			String taxjsonPath = WCConstants.TAX_JSONPATH_ROOT;
 			String tenantId = request.getRequestInfo().getUserInfo().getTenantId();

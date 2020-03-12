@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +51,7 @@ public class WorkflowNotificationService {
 	 */
 	public void process(WaterConnectionRequest request, String topic) {
 		try {
-			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getAction()+"_"+request.getWaterConnection().getApplicationStatus().name())) {
+			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getProcessInstance().getAction()+"_"+request.getWaterConnection().getApplicationStatus().name())) {
 				log.info("Notification Disabled For State :" + request.getWaterConnection().getApplicationStatus().name());
 				return;
 			}
@@ -85,7 +84,7 @@ public class WorkflowNotificationService {
 			RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForInApp(waterConnection.getAction(), waterConnection.getApplicationStatus().name(),
+		String message = notificationUtil.getCustomizedMsgForInApp(waterConnection.getProcessInstance().getAction(), waterConnection.getApplicationStatus().name(),
 				localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
@@ -179,7 +178,7 @@ public class WorkflowNotificationService {
 			RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(waterConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForSMS(waterConnection.getAction(), waterConnection.getApplicationStatus().name(), localizationMessage);
+		String message = notificationUtil.getCustomizedMsgForSMS(waterConnection.getProcessInstance().getAction(), waterConnection.getApplicationStatus().name(), localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
