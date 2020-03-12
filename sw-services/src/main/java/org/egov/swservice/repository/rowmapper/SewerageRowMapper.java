@@ -92,7 +92,6 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			plumber.setRelationship(rs.getString("relationship"));
 			plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
 			plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
-			plumber.setDetailsProvidedBy(rs.getString("detailsprovidedby"));
 			sewerageConnection.addPlumberInfoItem(plumber);
 		}
 	}
