@@ -122,7 +122,14 @@ public class BPAService {
 	
 
 		
-		
+		// generate sanction fee demand as well for the low risk application
+		if(bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
+		}else {
+			calculationService.addCalculation(bpaRequest,
+					BPAConstants.APPLICATION_FEE_KEY);
+		}
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
@@ -265,19 +272,6 @@ public class BPAService {
 //		userService.createUser(bpaRequest);
 	
 		log.info("Bpa status is : " + bpa.getStatus());
-		
-		if(bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
-			
-			// generate sanction fee demand as well for the low risk application
-			if(bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
-				calculationService.addCalculation(bpaRequest,
-						BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
-			}else {
-				calculationService.addCalculation(bpaRequest,
-						BPAConstants.APPLICATION_FEE_KEY);
-			}
-		}
-		
 		// Generate the sanction Demand
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest,
