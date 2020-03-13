@@ -32,7 +32,7 @@ import lombok.Setter;
 public class WaterController {
 
 	@Autowired
-	WaterService waterService;
+	private WaterService waterService;
 
 	@Autowired
 	private final ResponseInfoFactory responseInfoFactory;

@@ -40,6 +40,11 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("noOfTaps")
 	private Integer noOfTaps = null;
+	
+	@JsonProperty("initialMeterReading")
+	private Double initialMeterReading = null;
+	
+	
 
 	public WaterConnection rainWaterHarvesting(Boolean rainWaterHarvesting) {
 		this.rainWaterHarvesting = rainWaterHarvesting;
@@ -122,24 +127,24 @@ public class WaterConnection extends Connection {
 		this.meterInstallationDate = meterInstallationDate;
 	}
 
-	public WaterConnection pipeSize(Double pipeSize) {
-		this.pipeSize = pipeSize;
+	public WaterConnection initialMeterReading(Double initialMeterReading) {
+		this.initialMeterReading = initialMeterReading;
 		return this;
 	}
 
 	/**
-	 * Pipe size for non-metered calulation attribute.
 	 * 
-	 * @return pipeSize
+	 * 
+	 * @return initialMeterReading
 	 **/
-	@ApiModelProperty(value = "Pipe size for non-metered calulation attribute.")
+	@ApiModelProperty(value = "Intial Meter reading will capture the meter reading for first time")
 
-	public Double getPipeSize() {
-		return pipeSize;
+	public Double getInitialMeterReading() {
+		return initialMeterReading;
 	}
 
-	public void setPipeSize(Double pipeSize) {
-		this.pipeSize = pipeSize;
+	public void setInitialMeterReading(Double initialMeterReading) {
+		this.initialMeterReading = initialMeterReading;
 	}
 
 	public WaterConnection noOfTaps(Integer noOfTaps) {
@@ -200,6 +205,26 @@ public class WaterConnection extends Connection {
 	public WaterConnection proposedPipeSize(Double proposedPipeSize) {
 		this.proposedPipeSize = proposedPipeSize;
 		return this;
+	}
+	
+	public WaterConnection pipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
+		return this;
+	}
+
+	/**
+	 * Pipe size for non-metered calulation attribute.
+	 * 
+	 * @return pipeSize
+	 **/
+	@ApiModelProperty(value = "Pipe size for non-metered calulation attribute.")
+
+	public Double getPipeSize() {
+		return pipeSize;
+	}
+
+	public void setPipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
 	}
 
 	@Override

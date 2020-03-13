@@ -50,6 +50,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setProposedTaps(rs.getInt("proposedTaps"));
 				currentWaterConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
+				currentWaterConnection.setInitialMeterReading(rs.getDouble("wc.initialmeterreading"));
 				HashMap<String, Object> penalties = new HashMap<>();
 				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
 				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
