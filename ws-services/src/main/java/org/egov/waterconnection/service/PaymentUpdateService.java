@@ -2,6 +2,7 @@ package org.egov.waterconnection.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class PaymentUpdateService {
 						throw new CustomException("INVALID_RECEIPT",
 								"More than one application found on consumerCode " + criteria.getApplicationNumber());
 					}
-					waterConnections.forEach(waterConnection -> waterConnection.setAction(WCConstants.ACTION_PAY));
+					waterConnections.forEach(waterConnection -> waterConnection.getProcessInstance().setAction((WCConstants.ACTION_PAY)));
 					WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
 							.waterConnection(waterConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
@@ -126,7 +127,10 @@ public class PaymentUpdateService {
 		} catch (JsonProcessingException e) {
 			log.error("error occured while parsing user info", e);
 		}
-		
+		if (CollectionUtils.isEmpty(users)) {
+			throw new CustomException("INVALID_SEARCH_ON_USER",
+					"No user found on given criteria!!!");
+		}
 		return mapper.convertValue(users.get(0), User.class);
 	}
 

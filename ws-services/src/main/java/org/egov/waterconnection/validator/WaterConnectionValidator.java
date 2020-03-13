@@ -38,8 +38,17 @@ public class WaterConnectionValidator {
 				&& (StringUtils.isEmpty(waterConnection.getProperty().getUsageCategory()))) {
 			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Property usage type should not be empty");
 		}
-		if (isUpdate && WCConstants.APPROVE_CONNECTION_CONST
-				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getAction())) {
+		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
+				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
+		}
+		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
+
+		}
+		if (isUpdate && (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
+				&& !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))
+				&& WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(
+						waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 			if (StringUtils.isEmpty(waterConnection.getConnectionType())) {
 				errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
 			}
@@ -54,10 +63,10 @@ public class WaterConnectionValidator {
 							"Meter Installation date cannot be null or negative");
 				}
 			}
-//			if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
-//				errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
-//						"WaterConnection cannot be created without connection category");
-//			}
+			// if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
+			// errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
+			// "WaterConnection cannot be created without connection category");
+			// }
 			if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
 				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
 			}

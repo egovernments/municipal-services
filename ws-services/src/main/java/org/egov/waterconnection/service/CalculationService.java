@@ -40,7 +40,7 @@ public class CalculationService {
 	 * 
 	 */
 	public void calculateFeeAndGenerateDemand(WaterConnectionRequest request) {
-		if(WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getWaterConnection().getAction())) {
+		if(WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getWaterConnection().getProcessInstance().getAction())) {
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getWaterConnection().getApplicationNo())
 					.waterConnection(request.getWaterConnection())

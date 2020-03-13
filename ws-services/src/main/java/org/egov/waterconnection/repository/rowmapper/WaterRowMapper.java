@@ -15,6 +15,7 @@ import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.enums.Status;
+import org.egov.waterconnection.model.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -47,13 +48,9 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setNoOfTaps(rs.getInt("noOfTaps"));
 				currentWaterConnection.setProposedPipeSize(rs.getDouble("proposedPipeSize"));
 				currentWaterConnection.setProposedTaps(rs.getInt("proposedTaps"));
-				currentWaterConnection.setWaterSubSource(rs.getString("waterSubSource"));
-				currentWaterConnection.setAction(rs.getString("action"));
 				currentWaterConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
-				// get property id and get property object
-				Property property = new Property();
-				property.setPropertyId(rs.getString("property_id"));
+				currentWaterConnection.setInitialMeterReading(rs.getDouble("initialmeterreading"));
 				HashMap<String, Object> penalties = new HashMap<>();
 				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
 				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
@@ -62,9 +59,13 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				penalties.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
 				penalties.put(WCConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
 				currentWaterConnection.setAdditionalDetails(penalties);
+				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
+				// get property id and get property object
+				Property property = new Property();
+				property.setPropertyId(rs.getString("property_id"));
 				currentWaterConnection.setProperty(property);
 				// Add documents id's
-				currentWaterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
+				currentWaterConnection.setConnectionExecutionDate(rs.getBigDecimal("connectionExecutionDate"));
 				connectionListMap.put(Id, currentWaterConnection);
 			}
 			addChildrenToProperty(rs, currentWaterConnection);

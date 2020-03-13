@@ -1,17 +1,14 @@
 package org.egov.wscalculation.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import java.util.ArrayList;
-import java.util.List;
+
+import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * WaterConnection
@@ -19,14 +16,9 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-12-02T14:30:33.286+05:30[Asia/Kolkata]")
 public class WaterConnection extends Connection {
-	@JsonProperty("connectionCategory")
-	private String connectionCategory = null;
 
 	@JsonProperty("rainWaterHarvesting")
 	private Boolean rainWaterHarvesting = null;
-
-	@JsonProperty("connectionType")
-	private String connectionType = null;
 
 	@JsonProperty("waterSource")
 	private String waterSource = null;
@@ -36,7 +28,7 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("meterInstallationDate")
 	private Long meterInstallationDate = null;
-	
+
 	@JsonProperty("proposedPipeSize")
 	private Double proposedPipeSize = null;
 
@@ -48,51 +40,6 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("noOfTaps")
 	private Integer noOfTaps = null;
-
-	@JsonProperty("waterSubSource")
-	private String waterSubSource = null;
-
-	@JsonProperty("documents")
-	@Valid
-	private List<Document> documents = null;
-	
-	@JsonProperty("connectionExecutionDate")
-	private Long connectionExecutionDate = 0l;
-
-	public Connection connectionExecutionDate(Long connectionExecutionDate) {
-		this.connectionExecutionDate = connectionExecutionDate;
-		return this;
-	}
-
-	public Long getConnectionExecutionDate() {
-		return connectionExecutionDate;
-	}
-
-	public void setConnectionExecutionDate(Long connectionExecutionDate) {
-		this.connectionExecutionDate = connectionExecutionDate;
-	}
-	
-	public WaterConnection connectionCategory(String connectionCategory) {
-		this.connectionCategory = connectionCategory;
-		return this;
-	}
-
-	/**
-	 * It is a master data, defined in MDMS
-	 * 
-	 * @return connectionCategory
-	 **/
-	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS")
-	
-
-	@Size(min = 2, max = 32)
-	public String getConnectionCategory() {
-		return connectionCategory;
-	}
-
-	public void setConnectionCategory(String connectionCategory) {
-		this.connectionCategory = connectionCategory;
-	}
 
 	public WaterConnection rainWaterHarvesting(Boolean rainWaterHarvesting) {
 		this.rainWaterHarvesting = rainWaterHarvesting;
@@ -114,28 +61,6 @@ public class WaterConnection extends Connection {
 		this.rainWaterHarvesting = rainWaterHarvesting;
 	}
 
-	public WaterConnection connectionType(String connectionType) {
-		this.connectionType = connectionType;
-		return this;
-	}
-
-	/**
-	 * It is a master data, defined in MDMS.
-	 * 
-	 * @return connectionType
-	 **/
-	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-	
-
-	@Size(min = 2, max = 32)
-	public String getConnectionType() {
-		return connectionType;
-	}
-
-	public void setConnectionType(String connectionType) {
-		this.connectionType = connectionType;
-	}
-
 	public WaterConnection waterSource(String waterSource) {
 		this.waterSource = waterSource;
 		return this;
@@ -147,8 +72,6 @@ public class WaterConnection extends Connection {
 	 * @return waterSource
 	 **/
 	@ApiModelProperty(required = true, value = "It is a namespaced master data, defined in MDMS")
-	
-
 	@Size(min = 2, max = 64)
 	public String getWaterSource() {
 		return waterSource;
@@ -239,46 +162,10 @@ public class WaterConnection extends Connection {
 		this.noOfTaps = noOfTaps;
 	}
 
-	public WaterConnection waterSubSource(String waterSubSource) {
-		this.waterSubSource = waterSubSource;
-		return this;
-	}
-
-	/**
-	 * It is a namespaced master data, defined in MDMS.
-	 * 
-	 * @return waterSubSource
-	 **/
-	@ApiModelProperty(value = "It is a namespaced master data, defined in MDMS.")
-
-	@Size(min = 2, max = 64)
-	public String getWaterSubSource() {
-		return waterSubSource;
-	}
-
-	public void setWaterSubSource(String waterSubSource) {
-		this.waterSubSource = waterSubSource;
-	}
-
-	public WaterConnection documents(List<Document> documents) {
-		this.documents = documents;
-		return this;
-	}
-
-	public WaterConnection addDocumentsItem(Document documentsItem) {
-		if (this.documents == null) {
-			this.documents = new ArrayList<Document>();
-		}
-	 if(!this.documents.contains(documentsItem))
-             this.documents.add(documentsItem);
-		return this;
-	}
-	
-	
 	/**
 	 * Proposed taps for non-metered calculation attribute.
 	 * 
-	 * @return proposedTaps
+	 * @return pipeSize
 	 **/
 	@ApiModelProperty(value = "No of proposed taps no is citizen input")
 
@@ -289,17 +176,16 @@ public class WaterConnection extends Connection {
 	public void setProposedTaps(Integer proposedTaps) {
 		this.proposedTaps = proposedTaps;
 	}
-	
-	
+
 	public WaterConnection proposedProposedTaps(Integer proposedTaps) {
 		this.proposedTaps = proposedTaps;
 		return this;
 	}
-	
+
 	/**
 	 * Proposed Pipe size for non-metered calculation attribute.
 	 * 
-	 * @return proposedPipeSize
+	 * @return pipeSize
 	 **/
 	@ApiModelProperty(value = "No of proposed Pipe size is citizen input")
 
@@ -310,27 +196,10 @@ public class WaterConnection extends Connection {
 	public void setProposedPipeSize(Double proposedPipeSize) {
 		this.proposedPipeSize = proposedPipeSize;
 	}
-	
-	
+
 	public WaterConnection proposedPipeSize(Double proposedPipeSize) {
 		this.proposedPipeSize = proposedPipeSize;
 		return this;
-	}
-
-
-	/**
-	 * The documents attached by owner for exemption.
-	 * 
-	 * @return documents
-	 **/
-	@ApiModelProperty(value = "The documents attached by owner for exemption.")
-	
-	public List<Document> getDocuments() {
-		return documents;
-	}
-
-	public void setDocuments(List<Document> documents) {
-		this.documents = documents;
 	}
 
 	@Override
@@ -342,23 +211,15 @@ public class WaterConnection extends Connection {
 			return false;
 		}
 		WaterConnection waterConnection = (WaterConnection) o;
-		return Objects.equals(this.connectionCategory, waterConnection.connectionCategory)
-				&& Objects.equals(this.rainWaterHarvesting, waterConnection.rainWaterHarvesting)
-				&& Objects.equals(this.connectionType, waterConnection.connectionType)
+		return Objects.equals(this.rainWaterHarvesting, waterConnection.rainWaterHarvesting)
 				&& Objects.equals(this.waterSource, waterConnection.waterSource)
 				&& Objects.equals(this.meterId, waterConnection.meterId)
-				&& Objects.equals(this.meterInstallationDate, waterConnection.meterInstallationDate)
-				&& Objects.equals(this.pipeSize, waterConnection.pipeSize)
-				&& Objects.equals(this.noOfTaps, waterConnection.noOfTaps)
-				&& Objects.equals(this.waterSubSource, waterConnection.waterSubSource)
-				&& Objects.equals(this.documents, waterConnection.documents) && super.equals(o);
+				&& Objects.equals(this.meterInstallationDate, waterConnection.meterInstallationDate) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(connectionCategory, rainWaterHarvesting, connectionType, waterSource, meterId,
-				meterInstallationDate, pipeSize, noOfTaps, waterSubSource, documents,
-				super.hashCode());
+		return Objects.hash(rainWaterHarvesting, waterSource, meterId, meterInstallationDate, super.hashCode());
 	}
 
 	@Override
@@ -366,16 +227,10 @@ public class WaterConnection extends Connection {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class WaterConnection {\n");
 		sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-		sb.append("    connectionCategory: ").append(toIndentedString(connectionCategory)).append("\n");
 		sb.append("    rainWaterHarvesting: ").append(toIndentedString(rainWaterHarvesting)).append("\n");
-		sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
 		sb.append("    waterSource: ").append(toIndentedString(waterSource)).append("\n");
 		sb.append("    meterId: ").append(toIndentedString(meterId)).append("\n");
 		sb.append("    meterInstallationDate: ").append(toIndentedString(meterInstallationDate)).append("\n");
-		sb.append("    pipeSize: ").append(toIndentedString(pipeSize)).append("\n");
-		sb.append("    noOfTaps: ").append(toIndentedString(noOfTaps)).append("\n");
-		sb.append("    waterSubSource: ").append(toIndentedString(waterSubSource)).append("\n");
-		sb.append("    documents: ").append(toIndentedString(documents)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

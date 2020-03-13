@@ -167,7 +167,7 @@ public class EstimationService {
 		if (billingSlabs.size() > 1)
 			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
-		billingSlabIds.add(billingSlabs.get(0).id);
+		billingSlabIds.add(billingSlabs.get(0).getId());
 		log.info(" Billing Slab Id For Water Charge Calculation --->  " + billingSlabIds.toString());
 
 		// WaterCharge Calculation
@@ -182,12 +182,12 @@ public class EstimationService {
 		if (isRangeCalculation(calculationAttribute)) {
 			if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
 				for (Slab slab : billSlab.slabs) {
-					if (totalUOM > slab.to) {
-						waterCharge = waterCharge.add(BigDecimal.valueOf(((slab.to) - (slab.from)) * slab.charge));
-						totalUOM = totalUOM - ((slab.to) - (slab.from));
-					} else if (totalUOM < slab.to) {
-						waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * slab.charge));
-						totalUOM = ((slab.to) - (slab.from)) - totalUOM;
+					if (totalUOM > slab.getTo()) {
+						waterCharge = waterCharge.add(BigDecimal.valueOf(((slab.getTo()) - (slab.getFrom())) * slab.getCharge()));
+						totalUOM = totalUOM - ((slab.getTo()) - (slab.getFrom()));
+					} else if (totalUOM < slab.getTo()) {
+						waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * slab.getCharge()));
+						totalUOM = ((slab.getTo()) - (slab.getFrom())) - totalUOM;
 						break;
 					}
 				}
@@ -197,8 +197,8 @@ public class EstimationService {
 			} else if (waterConnection.getConnectionType()
 					.equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
 				for (Slab slab : billSlab.slabs) {
-					if (totalUOM >= slab.from && totalUOM < slab.to) {
-						waterCharge = BigDecimal.valueOf((totalUOM * slab.charge));
+					if (totalUOM >= slab.getFrom() && totalUOM < slab.getTo()) {
+						waterCharge = BigDecimal.valueOf((totalUOM * slab.getCharge()));
 						if (billSlab.minimumCharge > waterCharge.doubleValue()) {
 							waterCharge = BigDecimal.valueOf(billSlab.minimumCharge);
 						}
@@ -223,8 +223,8 @@ public class EstimationService {
 		final String calculationAttribute = calculationAttribue;
 
 		return billingSlabs.stream().filter(slab -> {
-			boolean isBuildingTypeMatching = slab.buildingType.equalsIgnoreCase(buildingType);
-			boolean isConnectionTypeMatching = slab.connectionType.equalsIgnoreCase(connectionType);
+			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
+			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.calculationAttribute.equalsIgnoreCase(calculationAttribute);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
