@@ -48,8 +48,12 @@ public class EnrichmentService {
      */
     public void enrichTLCreateRequest(TradeLicenseRequest tradeLicenseRequest,Object mdmsData) {
         RequestInfo requestInfo = tradeLicenseRequest.getRequestInfo();
-        String uuid = requestInfo.getUserInfo().getUuid();
-        AuditDetails auditDetails = tradeUtil.getAuditDetails(uuid, true);
+        String uuid = "";
+        AuditDetails auditDetails ;
+        if(requestInfo.getUserInfo() != null) {
+        		 uuid = requestInfo.getUserInfo().getUuid();
+        }
+        auditDetails = tradeUtil.getAuditDetails(uuid, true);
         tradeLicenseRequest.getLicenses().forEach(tradeLicense -> {
             tradeLicense.setAuditDetails(auditDetails);
             tradeLicense.setId(UUID.randomUUID().toString());
