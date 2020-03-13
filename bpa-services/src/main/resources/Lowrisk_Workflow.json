@@ -56,12 +56,7 @@
                             "action": "INITIATE",
                             "nextState": "SEND_TO_CITIZEN",
                             "roles": [
-                                "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR"
+                                "BPA_ARCHITECT"
                             ]
                         }
                     ]
@@ -82,12 +77,7 @@
                             "action": "SEND_TO_CITIZEN",
                             "nextState": "CITIZEN_APPROVAL_PENDING",
                             "roles": [
-                                "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR"
+                                "BPA_ARCHITECT"
                             ]
                         },
                         {
@@ -96,12 +86,7 @@
                             "action": "INITIATE",
                             "nextState": "SEND_TO_CITIZEN",
                             "roles": [
-                                "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR"
+                                "BPA_ARCHITECT"
                             ]
                         }
                     ]
@@ -152,12 +137,7 @@
                             "action": "INITIATE",
                             "nextState": "INITIATED",
                             "roles": [
-                                "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR"
+                                "BPA_ARCHITECT"
                             ]
                         },
                         {
@@ -166,12 +146,7 @@
                             "action": "APPLY",
                             "nextState": "PENDING_FEE_PAYMENT",
                             "roles": [
-                                "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR"
+                                "BPA_ARCHITECT"
                             ]
                         }
                     ]
@@ -194,11 +169,6 @@
                             "roles": [
                                 "CITIZEN",
                                 "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR",
                                 "SYSTEM_PAYMENT",
                                 "CEMP"
                             ]
@@ -211,11 +181,6 @@
                             "roles": [
                                 "CITIZEN",
                                 "BPA_ARCHITECT",
-                                "BPA_ENGINEER",
-                                "BPA_BUILDER",
-                                "BPA_STRUCTURALENGINEER",
-                                "BPA_TOWNPLANNER",
-                                "BPA_SUPERVISOR",
                                 "SYSTEM_PAYMENT",
                                 "CEMP"
                             ]

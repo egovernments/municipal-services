@@ -277,7 +277,7 @@ public class NotificationUtil {
 		path = path.replace("{}", notificationCode);
 		String message = null;
 		try {
-			LinkedList data  = JsonPath.parse(localizationMessage).read(path);
+			List data  = JsonPath.parse(localizationMessage).read(path);
 			message = data.get(0).toString();
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);

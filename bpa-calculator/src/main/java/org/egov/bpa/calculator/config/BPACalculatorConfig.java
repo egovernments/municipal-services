@@ -47,12 +47,18 @@ public class BPACalculatorConfig {
     private String lowRiskPermitFeeBusinessService;
   
 
-    //tradelicense Registry
+    //BPA Registry
     @Value("${egov.bpa.host}")
     private String bpaHost;
 
     @Value("${egov.bpa.context.path}")
     private String bpaContextPath;
+    
+    @Value("${egov.edcr.host}")
+    private String edcrHost;
+    
+    @Value("${egov.edcr.getPlan.endpoint}")
+    private String planEndPoint;
 
     @Value("${egov.bpa.create.endpoint}")
     private String bpaCreateEndpoint;
@@ -76,6 +82,30 @@ public class BPACalculatorConfig {
 
     @Value("${egov.low.sanc.fee}")
     private String baseLowSancFeeHead;
+    
+    @Value("${egov.bpa.development.charge.head}")
+    private String developmentChargeHead; 
+    
+    @Value("${egov.bpa.shelter.fund.head}")
+    private String shelterFundHead; 
+    
+    @Value("${egov.bpa.scrutiny.fee.head}")
+    private String scrutinyFeeHead; 
+    
+    @Value("${egov.bpa.labourcess.tax.head}")
+    private String labourCessHead; 
+    
+    @Value("${egov.bpa.low.development.charge.head}")
+    private String lowDevelopmentChargeHead; 
+    
+    @Value("${egov.bpa.low.shelter.fund.head}")
+    private String lowShelterFundHead; 
+    
+    @Value("${egov.bpa.low.scrutiny.fee.head}")
+    private String lowScrutinyFeeHead; 
+    
+    @Value("${egov.bpa.low.labourcess.tax.head}")
+    private String lowLabourCessHead; 
     
     @Value("${egov.appl.fee.defaultAmount}")
     private String applFeeDefaultAmount;
@@ -103,11 +133,21 @@ public class BPACalculatorConfig {
     private String saveTopic;
 
 
-  
-    
-//
-//    @Value("${egov.tl.calculationtype.accessory.default}")
-//    private String defaultAccessoryCalculationType;
+
+	@Value("${egov.bpa.ubl.grade.grampanchayat}")
+	private String gramPanchayatULBGrade;
+	
+	@Value("${egov.bpa.ubl.grade.nagarpanchayat}")
+	private String nagarPanchayatULBGrade;
+	
+	@Value("${egov.bpa.ubl.grade.municipalcouncil}")
+	private String municipalCouncilULBGrade;
+	
+	@Value("${egov.bpa.ubl.grade.municipalcorporationUpto10}")
+	private String municipalCorporationPopulationUpTo10LULBGrade;
+	
+	@Value("${egov.bpa.ubl.grade.municipalcorporationabove10}")
+	private String municipalCorporationPopulationabove10LULBGrade;
 
 
 }

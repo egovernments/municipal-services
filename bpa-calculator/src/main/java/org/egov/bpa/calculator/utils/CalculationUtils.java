@@ -172,6 +172,30 @@ public class CalculationUtils {
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE:
 			billingTaxHead = config.getBaseLowSancFeeHead();
 			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE_DEVELOPENT_CHARGE:
+			billingTaxHead = config.getLowDevelopmentChargeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE_SCRUTINY_FEE:
+			billingTaxHead = config.getLowScrutinyFeeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE_SHELTER_FUND:
+			billingTaxHead = config.getLowShelterFundHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE_LABOUR_CESS:
+			billingTaxHead = config.getLowLabourCessHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE_DEVELOPENT_CHARGE:
+			billingTaxHead = config.getDevelopmentChargeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE_SCRUTINY_FEE:
+			billingTaxHead = config.getScrutinyFeeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE_SHELTER_FUND:
+			billingTaxHead = config.getShelterFundHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE_LABOUR_CESS:
+			billingTaxHead = config.getLabourCessHead();
+			break;
 		default:
 			billingTaxHead = feeType;
 			break;

@@ -135,10 +135,6 @@ public class PaymentNotificationService {
                             util.sendEventNotification(eventRequest);
                     }
                 }
-
-				
-			
-				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
