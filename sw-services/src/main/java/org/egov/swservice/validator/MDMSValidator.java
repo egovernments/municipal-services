@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.CustomException;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
@@ -43,8 +42,8 @@ public class MDMSValidator {
 	private String mdmsEndpoint;
 
 	public void validateMasterData(SewerageConnectionRequest request) {
+		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)){
 		Map<String, String> errorMap = new HashMap<>();
-
 		List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_Connection_Type));
 		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
 		Map<String, List<String>> codes = getAttributeValues(request.getRequestInfo().getUserInfo().getTenantId(), 
@@ -61,7 +60,9 @@ public class MDMSValidator {
 		validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	     }
 	}
+
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
 			String filter, String jsonpath, RequestInfo requestInfo) {

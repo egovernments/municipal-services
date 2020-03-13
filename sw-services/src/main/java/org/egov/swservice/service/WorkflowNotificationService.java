@@ -62,7 +62,7 @@ public class WorkflowNotificationService {
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
 			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(
-					request.getSewerageConnection().getAction() + "_" + request.getSewerageConnection().getApplicationStatus().name())) {
+					request.getSewerageConnection().getProcessInstance().getAction() + "_" + request.getSewerageConnection().getApplicationStatus().name())) {
 				log.info("Notification Disabled For State :" + request.getSewerageConnection().getApplicationStatus().name());
 				return;
 			}
@@ -96,7 +96,7 @@ public class WorkflowNotificationService {
 	private EventRequest getEventRequest(SewerageConnection sewerageConnection, String topic, RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(sewerageConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForInApp(sewerageConnection.getAction(),
+		String message = notificationUtil.getCustomizedMsgForInApp(sewerageConnection.getProcessInstance().getAction(),
 				sewerageConnection.getApplicationStatus().name(), localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
@@ -198,7 +198,7 @@ public class WorkflowNotificationService {
 			RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(sewerageConnection.getProperty().getTenantId(), requestInfo);
-		String message = notificationUtil.getCustomizedMsgForSMS(sewerageConnection.getAction(),
+		String message = notificationUtil.getCustomizedMsgForSMS(sewerageConnection.getProcessInstance().getAction(),
 				sewerageConnection.getApplicationStatus().name(), localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);

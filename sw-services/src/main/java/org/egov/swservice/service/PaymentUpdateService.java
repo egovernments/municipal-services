@@ -85,7 +85,7 @@ public class PaymentUpdateService {
 								"More than one application found on consumerCode " + criteria.getApplicationNumber());
 					}
 					sewerageConnections
-							.forEach(sewerageConnection -> sewerageConnection.setAction(SWConstants.ACTION_PAY));
+							.forEach(sewerageConnection -> sewerageConnection.getProcessInstance().setAction(SWConstants.ACTION_PAY));
 					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
 							.sewerageConnection(sewerageConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
 							.build();
@@ -126,6 +126,9 @@ public class PaymentUpdateService {
 			users = context.read("$.user");
 		} catch (JsonProcessingException e) {
 			log.error("error occured while parsing user info", e);
+		}
+		if (CollectionUtils.isEmpty(users)) {
+			throw new CustomException("INVALID_SEARCH_ON_USER", "No user found on given criteria!!!");
 		}
 		return mapper.convertValue(users.get(0), User.class);
 	}

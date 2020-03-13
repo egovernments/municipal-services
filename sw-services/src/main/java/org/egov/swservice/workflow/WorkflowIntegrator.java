@@ -65,7 +65,7 @@ public class WorkflowIntegrator {
 				.businessId(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
 				.tenantId(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId())
 				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
-				.action(connection.getAction()).build();
+				.action(connection.getProcessInstance().getAction()).build();
 
 		if (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())) {
 			if (!CollectionUtils

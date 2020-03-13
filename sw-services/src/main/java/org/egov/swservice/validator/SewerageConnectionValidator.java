@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Status;
 import org.egov.swservice.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
@@ -35,9 +34,16 @@ public class SewerageConnectionValidator {
 			errorMap.put("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
 					"SewerageConnection cannot be created without property usage type");
 		}
-
-		if (isUpdate && sewerageConnectionRequest.getSewerageConnection().getAction()
-				.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)) {
+		
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance() == null || StringUtils
+				.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
+			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
+		}
+		if (isUpdate && (sewerageConnectionRequest.getSewerageConnection().getProcessInstance() != null)
+				&& !StringUtils
+						.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())
+				&& SWConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(
+						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
 			if (StringUtils.isEmpty(sewerageConnection.getConnectionType())) {
 				errorMap.put("INVALID_SEWERAGE_CONNECTION_TYPE", "Connection type should not be empty");
 			}

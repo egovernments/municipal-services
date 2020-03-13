@@ -1,24 +1,30 @@
 package org.egov.swservice.repository.rowmapper;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+
+import org.egov.swservice.model.Connection.ApplicationStatusEnum;
+import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Document;
 import org.egov.swservice.model.PlumberInfo;
 import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.Status;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
-import org.egov.swservice.model.Connection.StatusEnum;
+import org.egov.swservice.model.workflow.ProcessInstance;
 import org.egov.swservice.util.SWConstants;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
 
@@ -43,12 +49,9 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setProposedToilets(rs.getInt("proposedToilets"));
 				sewarageConnection.setProposedWaterClosets(rs.getInt("proposedWaterClosets"));
 				sewarageConnection.setConnectionType(rs.getString("connectionType"));
-				sewarageConnection.setAction(rs.getString("action"));
 				sewarageConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				sewarageConnection.setRoadType(rs.getString("roadtype"));
 				// get property id and get property object
-				Property property = new Property();
-				property.setPropertyId(rs.getString("property_id"));
 				HashMap<String, Object> penalties = new HashMap<>();
 				penalties.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
 				penalties.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
@@ -57,6 +60,9 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				penalties.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
 				penalties.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
 				sewarageConnection.setAdditionalDetails(penalties);
+				sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
+				Property property = new Property();
+				property.setPropertyId(rs.getString("property_id"));
 				sewarageConnection.setProperty(property);
 				// Add documents id's
 				connectionListMap.put(Id, sewarageConnection);
@@ -70,9 +76,10 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 		String document_Id = rs.getString("doc_Id");
 		String isActive = rs.getString("doc_active");
 		boolean documentActive = false;
-		if (!StringUtils.isEmpty(isActive))
-			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive) == true ? true : false;
-		if (!StringUtils.isEmpty(document_Id) && documentActive) {
+		if (isActive != null) {
+			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive);
+		}
+		if (document_Id != null && documentActive) {
 			Document applicationDocument = new Document();
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
@@ -82,7 +89,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			sewerageConnection.addDocumentsItem(applicationDocument);
 		}
 		String plumber_id = rs.getString("plumber_id");
-		if (!StringUtils.isEmpty(plumber_id)) {
+		if (plumber_id != null) {
 			PlumberInfo plumber = new PlumberInfo();
 			plumber.setId(plumber_id);
 			plumber.setName(rs.getString("plumber_name"));

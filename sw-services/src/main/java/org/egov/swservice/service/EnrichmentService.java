@@ -2,6 +2,7 @@ package org.egov.swservice.service;
 
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -110,6 +111,7 @@ public class EnrichmentService {
 		//		.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
+		sewerageConnectionRequest.getSewerageConnection().setConnectionExecutionDate(BigDecimal.valueOf(Instant.now().getEpochSecond() * 1000));
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
 	}
@@ -145,11 +147,11 @@ public class EnrichmentService {
 	 *            The create request
 	 */
 	private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest) {
-		if (sewerageConnectionRequest.getSewerageConnection().getAction()
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(SWConstants.ACTION_INITIATE)) {
 			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
 		}
-		if (sewerageConnectionRequest.getSewerageConnection().getAction().equalsIgnoreCase(SWConstants.ACTION_APPLY)) {
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTION_APPLY)) {
 			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
 		}
 	}
