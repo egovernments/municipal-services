@@ -263,9 +263,10 @@ public class EnrichmentService {
 				bpa.getApplicationNo());
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
-		if ((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)
+		if((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
+				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
-						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)))) {
+				&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
 			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
