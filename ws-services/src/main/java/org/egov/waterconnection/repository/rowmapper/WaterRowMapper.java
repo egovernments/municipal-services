@@ -7,13 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
+import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Document;
 import org.egov.waterconnection.model.PlumberInfo;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
-import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.enums.Status;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
@@ -77,10 +78,10 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 		String document_Id = rs.getString("doc_Id");
 		String isActive = rs.getString("doc_active");
 		boolean documentActive = false;
-		if (isActive != null) {
-			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive); 
+		if (!StringUtils.isEmpty(isActive)) {
+			documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive);
 		}
-		if (document_Id != null && documentActive) {
+		if (!StringUtils.isEmpty(document_Id) && documentActive) {
 			Document applicationDocument = new Document();
 			applicationDocument.setId(document_Id);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
@@ -90,7 +91,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			waterConnection.addDocumentsItem(applicationDocument);
 		}
 		String plumber_id = rs.getString("plumber_id");
-		if (plumber_id != null) {
+		if (!StringUtils.isEmpty(plumber_id)) {
 			PlumberInfo plumber = new PlumberInfo();
 			plumber.setId(plumber_id);
 			plumber.setName(rs.getString("plumber_name"));
