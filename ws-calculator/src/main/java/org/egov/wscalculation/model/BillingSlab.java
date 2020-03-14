@@ -59,7 +59,7 @@ public class BillingSlab {
 		this.slabs = slabs;
 	}
 
-	public String calculationAttribute = null;
-	public double minimumCharge;
-	public List<Slab> slabs = new ArrayList<>();
+	private String calculationAttribute = null;
+	private double minimumCharge;
+	private List<Slab> slabs = new ArrayList<>();
 }

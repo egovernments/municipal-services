@@ -51,7 +51,6 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setProposedTaps(rs.getInt("proposedTaps"));
 				currentWaterConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
-				currentWaterConnection.setInitialMeterReading(rs.getDouble("initialmeterreading"));
 				HashMap<String, Object> penalties = new HashMap<>();
 				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
 				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
@@ -59,6 +58,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				penalties.put(WCConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
 				penalties.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
 				penalties.put(WCConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
+				penalties.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
 				currentWaterConnection.setAdditionalDetails(penalties);
 				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				// get property id and get property object

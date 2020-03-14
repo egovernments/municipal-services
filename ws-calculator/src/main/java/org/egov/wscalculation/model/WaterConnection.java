@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-12-02T14:30:33.286+05:30[Asia/Kolkata]")
 public class WaterConnection extends Connection {
 
+
 	@JsonProperty("rainWaterHarvesting")
 	private Boolean rainWaterHarvesting = null;
 
@@ -122,26 +123,6 @@ public class WaterConnection extends Connection {
 		this.meterInstallationDate = meterInstallationDate;
 	}
 
-	public WaterConnection pipeSize(Double pipeSize) {
-		this.pipeSize = pipeSize;
-		return this;
-	}
-
-	/**
-	 * Pipe size for non-metered calulation attribute.
-	 * 
-	 * @return pipeSize
-	 **/
-	@ApiModelProperty(value = "Pipe size for non-metered calulation attribute.")
-
-	public Double getPipeSize() {
-		return pipeSize;
-	}
-
-	public void setPipeSize(Double pipeSize) {
-		this.pipeSize = pipeSize;
-	}
-
 	public WaterConnection noOfTaps(Integer noOfTaps) {
 		this.noOfTaps = noOfTaps;
 		return this;
@@ -202,6 +183,26 @@ public class WaterConnection extends Connection {
 		return this;
 	}
 
+	public WaterConnection pipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
+		return this;
+	}
+
+	/**
+	 * Pipe size for non-metered calulation attribute.
+	 * 
+	 * @return pipeSize
+	 **/
+	@ApiModelProperty(value = "Pipe size for non-metered calulation attribute.")
+
+	public Double getPipeSize() {
+		return pipeSize;
+	}
+
+	public void setPipeSize(Double pipeSize) {
+		this.pipeSize = pipeSize;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -245,4 +246,5 @@ public class WaterConnection extends Connection {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
 }

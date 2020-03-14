@@ -106,16 +106,16 @@ public class EnrichmentService {
 	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
-			WCConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
+			WCConstants.ADDITIONAL_OBJ_CONSTANT.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
 			HashMap<String, Object> addDetail = mapper
 					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-			List<String> adhocPenalityAndRebateConst = Arrays.asList(WCConstants.ADHOC_PENALTY,
-					WCConstants.ADHOC_REBATE);
-			for (String constKey : WCConstants.ADHOC_PENALTY_REBATE) {
-				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
+			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY,
+					WCConstants.ADHOC_REBATE, WCConstants.INITIAL_METER_READING_CONST);
+			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
+				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);
 				} else {

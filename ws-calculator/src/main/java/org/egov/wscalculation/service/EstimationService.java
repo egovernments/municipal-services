@@ -181,7 +181,7 @@ public class EstimationService {
 		//For Non metered connection calculation on normal connection
 		if (isRangeCalculation(calculationAttribute)) {
 			if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
-				for (Slab slab : billSlab.slabs) {
+				for (Slab slab : billSlab.getSlabs()) {
 					if (totalUOM > slab.getTo()) {
 						waterCharge = waterCharge.add(BigDecimal.valueOf(((slab.getTo()) - (slab.getFrom())) * slab.getCharge()));
 						totalUOM = totalUOM - ((slab.getTo()) - (slab.getFrom()));
@@ -191,23 +191,23 @@ public class EstimationService {
 						break;
 					}
 				}
-				if (billSlab.minimumCharge > waterCharge.doubleValue()) {
-					waterCharge = BigDecimal.valueOf(billSlab.minimumCharge);
+				if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
+					waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 				}
 			} else if (waterConnection.getConnectionType()
 					.equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
-				for (Slab slab : billSlab.slabs) {
+				for (Slab slab : billSlab.getSlabs()) {
 					if (totalUOM >= slab.getFrom() && totalUOM < slab.getTo()) {
 						waterCharge = BigDecimal.valueOf((totalUOM * slab.getCharge()));
-						if (billSlab.minimumCharge > waterCharge.doubleValue()) {
-							waterCharge = BigDecimal.valueOf(billSlab.minimumCharge);
+						if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
+							waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 						}
 						break;
 					}
 				}
 			}
 		} else {
-			waterCharge = BigDecimal.valueOf(billSlab.minimumCharge);
+			waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 		}
 		return waterCharge;
 	}
@@ -225,7 +225,7 @@ public class EstimationService {
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
-			boolean isCalculationAttributeMatching = slab.calculationAttribute.equalsIgnoreCase(calculationAttribute);
+			boolean isCalculationAttributeMatching = slab.getCalculationAttribute().equalsIgnoreCase(calculationAttribute);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}

@@ -40,11 +40,6 @@ public class WaterConnection extends Connection {
 
 	@JsonProperty("noOfTaps")
 	private Integer noOfTaps = null;
-	
-	@JsonProperty("initialMeterReading")
-	private Double initialMeterReading = null;
-	
-	
 
 	public WaterConnection rainWaterHarvesting(Boolean rainWaterHarvesting) {
 		this.rainWaterHarvesting = rainWaterHarvesting;
@@ -127,26 +122,6 @@ public class WaterConnection extends Connection {
 		this.meterInstallationDate = meterInstallationDate;
 	}
 
-	public WaterConnection initialMeterReading(Double initialMeterReading) {
-		this.initialMeterReading = initialMeterReading;
-		return this;
-	}
-
-	/**
-	 * 
-	 * 
-	 * @return initialMeterReading
-	 **/
-	@ApiModelProperty(value = "Intial Meter reading will capture the meter reading for first time")
-
-	public Double getInitialMeterReading() {
-		return initialMeterReading;
-	}
-
-	public void setInitialMeterReading(Double initialMeterReading) {
-		this.initialMeterReading = initialMeterReading;
-	}
-
 	public WaterConnection noOfTaps(Integer noOfTaps) {
 		this.noOfTaps = noOfTaps;
 		return this;
@@ -206,7 +181,7 @@ public class WaterConnection extends Connection {
 		this.proposedPipeSize = proposedPipeSize;
 		return this;
 	}
-	
+
 	public WaterConnection pipeSize(Double pipeSize) {
 		this.pipeSize = pipeSize;
 		return this;
