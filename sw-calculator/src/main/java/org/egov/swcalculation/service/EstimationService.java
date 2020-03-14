@@ -168,7 +168,7 @@ public class EstimationService {
 			throw new CustomException("More than one Billing Slab are found on criteria ",
 					"More than one billing slab found");
 		// Add Billing Slab Ids
-		billingSlabIds.add(billingSlabs.get(0).id);
+		billingSlabIds.add(billingSlabs.get(0).getId());
 
 		// Sewerage Charge Calculation
 		Double totalUnite = 0.0;
@@ -177,18 +177,18 @@ public class EstimationService {
 			return sewerageCharge;
 		BillingSlab billSlab = billingSlabs.get(0);
 		if (isRangeCalculation(calculationAttribute)) {
-			for (Slab slab : billSlab.slabs) {
-				if (totalUnite >= slab.from && totalUnite < slab.to) {
-					sewerageCharge = BigDecimal.valueOf((totalUnite * slab.charge));
-					if (billSlab.minimumCharge > sewerageCharge.doubleValue()) {
-						sewerageCharge = BigDecimal.valueOf(billSlab.minimumCharge);
+			for (Slab slab : billSlab.getSlabs()) {
+				if (totalUnite >= slab.getFrom() && totalUnite < slab.getTo()) {
+					sewerageCharge = BigDecimal.valueOf((totalUnite * slab.getCharge()));
+					if (billSlab.getMinimumCharge() > sewerageCharge.doubleValue()) {
+						sewerageCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}
 					break;
 				}
 			}
 
 		} else {
-			sewerageCharge = BigDecimal.valueOf(billSlab.minimumCharge);
+			sewerageCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 		}
 		return sewerageCharge;
 	}
@@ -257,9 +257,9 @@ public class EstimationService {
 		final String calculationAttribute = calculationAttribue;
 
 		return billingSlabs.stream().filter(slab -> {
-			boolean isBuildingTypeMatching = slab.buildingType.equalsIgnoreCase(buildingType);
-			boolean isConnectionTypeMatching = slab.connectionType.equalsIgnoreCase(connectionType);
-			boolean isCalculationAttributeMatching = slab.calculationAttribute.equalsIgnoreCase(calculationAttribute);
+			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
+			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
+			boolean isCalculationAttributeMatching = slab.getCalculationAttribute().equalsIgnoreCase(calculationAttribute);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}
