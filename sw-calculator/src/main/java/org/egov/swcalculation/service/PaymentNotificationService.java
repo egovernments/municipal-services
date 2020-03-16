@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -25,7 +22,6 @@ import org.egov.swcalculation.model.DemandNotificationObj;
 import org.egov.swcalculation.model.Event;
 import org.egov.swcalculation.model.EventRequest;
 import org.egov.swcalculation.model.NotificationReceiver;
-import org.egov.swcalculation.model.OwnerInfo;
 import org.egov.swcalculation.model.Recepient;
 import org.egov.swcalculation.model.SMSRequest;
 import org.egov.swcalculation.model.SewerageConnection;
@@ -39,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -209,10 +204,13 @@ public class PaymentNotificationService {
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-//		Map<String, String> mapOfPhnoAndUUIDs = sewerageConnection.getProperty().getOwners().stream()
-//				.collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
+		// Map<String, String> mapOfPhnoAndUUIDs =
+		// sewerageConnection.getProperty().getOwners().stream()
+		// .collect(Collectors.toMap(OwnerInfo::getMobileNumber,
+		// OwnerInfo::getUuid));
 
-		 Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo, sewerageConnection.getProperty().getTenantId());
+		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo,
+				sewerageConnection.getProperty().getTenantId());
 		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
@@ -232,7 +230,7 @@ public class PaymentNotificationService {
 			String actionLink = config.getPayLink().replace("$mobile", mobile)
 					.replace("$consumerCode", sewerageConnection.getConnectionNo())
 					.replace("$tenantId", sewerageConnection.getProperty().getTenantId());
-			actionLink = config.getNotificationUrl()+ actionLink;
+			actionLink = config.getNotificationUrl() + actionLink;
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 			items.add(item);
 			action = Action.builder().actionUrls(items).build();
@@ -256,7 +254,7 @@ public class PaymentNotificationService {
 	 * @param context
 	 * @return
 	 */
-	public HashMap<String, String> mapRecords(DocumentContext context)  {
+	public HashMap<String, String> mapRecords(DocumentContext context) {
 		HashMap<String, String> mappedRecord = new HashMap<>();
 		try {
 			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
@@ -267,8 +265,7 @@ public class PaymentNotificationService {
 					getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			log.error(
-					"Bill Fetch Error:Unable to fetch values from bill for" + context.read("$.Bill[0].billDetails[0]"));
+			log.error("Unable to fetch values from bill ",ex);
 			throw new CustomException("Bill Fetch Error", "Unable to fetch values from bill");
 		}
 
