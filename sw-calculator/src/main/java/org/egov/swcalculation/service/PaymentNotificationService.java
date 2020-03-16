@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -255,22 +256,25 @@ public class PaymentNotificationService {
 	 * @param context
 	 * @return
 	 */
-	public HashMap<String, String> mapRecords(DocumentContext context) {
+	public HashMap<String, String> mapRecords(DocumentContext context)  {
 		HashMap<String, String> mappedRecord = new HashMap<>();
 		try {
 			mappedRecord.put(tenantId, context.read("$.Bill[0].billDetails[0].tenantId"));
 			mappedRecord.put(serviceName, context.read("$.Bill[0].businessService"));
 			mappedRecord.put(consumerCode, context.read("$.Bill[0].consumerCode"));
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
-			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
+			mappedRecord.put(dueDate,
+					getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			log.error(
+					"Bill Fetch Error:Unable to fetch values from bill for" + context.read("$.Bill[0].billDetails[0]"));
 			throw new CustomException("Bill Fetch Error", "Unable to fetch values from bill");
 		}
 
 		return mappedRecord;
 	}
-	
+
 	private String getLatestBillDetails(String billdetails) {
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		log.info("Bill Details : -> " + billdetails);

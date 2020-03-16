@@ -30,7 +30,7 @@ public class PayService {
 	 * 
 	 * @param taxAmt
 	 * @param assessmentYear
-	 * @return
+	 * @returnroundOfDecimals
 	 */
 	public BigDecimal getRebate(BigDecimal taxAmt, String assessmentYear, JSONArray rebateMasterList) {
 
@@ -130,7 +130,7 @@ public class PayService {
 
 		BigDecimal result = creditAmount.add(debitAmount);
 		
-		BigDecimal midValue = new BigDecimal(0.5);
+		BigDecimal midValue = BigDecimal.valueOf(0.5);
 		
 		BigDecimal remainder = result.remainder(BigDecimal.ONE);
 		
