@@ -264,7 +264,6 @@ public class PaymentNotificationService {
 			mappedRecord.put(dueDate,
 					getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.error("Unable to fetch values from bill ",ex);
 			throw new CustomException("Bill Fetch Error", "Unable to fetch values from bill");
 		}
