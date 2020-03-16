@@ -64,7 +64,7 @@ public class WSCalculationValidator {
 		connectionNos.add(meterReading.getConnectionNo());
 		criteria.setConnectionNos(connectionNos);
 		List<MeterReading> previousMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria);
-		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
+		if (!CollectionUtils.isEmpty(previousMeterReading)) {
 			Double currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0)
 					.getCurrentReading();
 			if (meterReading.getCurrentReading() < currentMeterReading) {

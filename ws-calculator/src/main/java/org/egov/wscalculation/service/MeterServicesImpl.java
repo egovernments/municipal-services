@@ -9,10 +9,7 @@ import org.egov.wscalculation.model.CalculationReq;
 import org.egov.wscalculation.model.MeterConnectionRequest;
 import org.egov.wscalculation.model.MeterReading;
 import org.egov.wscalculation.model.MeterReadingSearchCriteria;
-import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
-import org.egov.wscalculation.util.MeterReadingUtil;
-import org.egov.wscalculation.validator.MDMSValidator;
 import org.egov.wscalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -54,10 +51,18 @@ public class MeterServicesImpl implements MeterService {
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
 		wSCalculationDao.savemeterReading(meterConnectionRequest);
+		if (meterConnectionRequest.getMeterReading().getGenerateDemand()) {
+			generateDemandForMeterReading(meterReadingsList, meterConnectionRequest.getRequestInfo());
+		}
+		return meterReadingsList;
+	}
+	
+	
+	private void generateDemandForMeterReading(List<MeterReading> meterReadingsList, RequestInfo requestInfo) {
 		List<CalculationCriteria> criterias = new ArrayList<>();
 		meterReadingsList.forEach(reading -> {
 			CalculationCriteria criteria = new CalculationCriteria();
-			criteria.setTenantId(meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
 			criteria.setAssessmentYear(estimationService.getAssessmentYear());
 			criteria.setCurrentReading(reading.getCurrentReading());
 			criteria.setLastReading(reading.getLastReading());
@@ -65,12 +70,11 @@ public class MeterServicesImpl implements MeterService {
 			criteria.setFrom(reading.getLastReadingDate());
 			criteria.setTo(reading.getCurrentReadingDate());
 			criterias.add(criteria);
-			
+
 		});
-		CalculationReq calculationRequest = CalculationReq.builder()
-				.requestInfo(meterConnectionRequest.getRequestInfo()).calculationCriteria(criterias).isconnectionCalculation(true).build();
+		CalculationReq calculationRequest = CalculationReq.builder().requestInfo(requestInfo)
+				.calculationCriteria(criterias).isconnectionCalculation(true).build();
 		wSCalculationService.getCalculation(calculationRequest);
-		return meterReadingsList;
 	}
 	
 	/**

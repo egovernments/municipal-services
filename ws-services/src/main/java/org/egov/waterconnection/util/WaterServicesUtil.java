@@ -303,4 +303,9 @@ public class WaterServicesUtil {
 		StringBuilder builder = new StringBuilder();
 		return builder.append(config.getCalculatorHost()).append(config.getCalculateEndpoint());
 	}
+	
+	public StringBuilder getMeterReadingCreateURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCalculatorHost()).append(config.getCreateMeterReadingEndpoint());
+	}
 }

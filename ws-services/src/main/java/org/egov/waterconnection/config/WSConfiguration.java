@@ -124,5 +124,11 @@ public class WSConfiguration {
     
     @Value("${egov.receipt.businessservice}")
     private String receiptBusinessservice;
+    
+    @Value("${ws.meterreading.create}")
+    private String createMeterReading;
+    
+    @Value("${ws.meterreading.create.endpoint}")
+    private String createMeterReadingEndpoint;
 
 }

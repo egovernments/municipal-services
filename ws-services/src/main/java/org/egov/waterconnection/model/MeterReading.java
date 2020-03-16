@@ -1,4 +1,4 @@
-package org.egov.wscalculation.model;
+package org.egov.waterconnection.model;
 
 import java.util.Objects;
 
@@ -14,6 +14,7 @@ import javax.validation.constraints.*;
 import org.springframework.validation.annotation.Validated;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 /**
  * This is lightweight meter reading object that can be used as reference by
  * definitions needing meterreading linking.

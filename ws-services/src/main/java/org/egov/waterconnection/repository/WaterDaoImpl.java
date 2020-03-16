@@ -75,6 +75,15 @@ public class WaterDaoImpl implements WaterDao {
 			waterConnectionProducer.push(wsConfiguration.getWorkFlowUpdateTopic(), waterConnectionRequest);
 		}
 	}
+	
+	/**
+	 * push object to create meter reading
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void postForMeterReading(WaterConnectionRequest waterConnectionRequest) {
+		waterConnectionProducer.push(wsConfiguration.getCreateMeterReading(), waterConnectionRequest);
+	}
 
 
 }
