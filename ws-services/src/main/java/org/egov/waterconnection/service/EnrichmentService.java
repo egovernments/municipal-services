@@ -213,6 +213,17 @@ public class EnrichmentService {
 		String applicationStatus = waterConnectionrequest.getWaterConnection().getApplicationStatus().name();
 		if (WCConstants.STATUS_APPROVED.equalsIgnoreCase(applicationStatus)) {
 			setConnectionNO(waterConnectionrequest);
+		}
+	}
+	
+	/**
+	 * Create meter reading for meter connection
+	 * 
+	 * @param waterConnectionrequest
+	 */
+	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest) {
+		if (WCConstants.STATUS_APPROVED
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getApplicationStatus().name())) {
 			waterDao.postForMeterReading(waterConnectionrequest);
 		}
 	}

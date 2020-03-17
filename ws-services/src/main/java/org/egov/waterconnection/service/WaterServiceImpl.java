@@ -131,6 +131,7 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, searchResult);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
+		enrichmentService.postForMeterReading(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 	
