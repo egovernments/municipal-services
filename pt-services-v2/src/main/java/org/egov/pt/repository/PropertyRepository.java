@@ -39,7 +39,7 @@ public class PropertyRepository {
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
 
-		return jdbcTemplate.query("SELECT id from eg_pt_property_v2 ORDER BY createdtime offset " +
+		return jdbcTemplate.query("SELECT propertyid from eg_pt_property_v2 ORDER BY createdtime offset " +
 						" ? " +
 						"limit ? ",
 				preparedStmtList.toArray(),
