@@ -34,7 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class EnrichmentService {
 
 	@Autowired
@@ -258,11 +263,13 @@ public class EnrichmentService {
 				bpa.getApplicationNo());
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
-		if ((state.equalsIgnoreCase(BPAConstants.APPROVED_STATE)
+		if((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
+				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
-						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)))) {
+				&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
+			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
 
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
@@ -270,6 +277,30 @@ public class EnrichmentService {
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setPermitOrderNo(idResponses.get(0).getId());
+			if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
+					&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)) {
+				Object mdmsData = bpaUtil.mDMSCall(bpaRequest);
+				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
+						.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
+						.replace("{4}", bpa.getApplicationType());
+				log.info(condeitionsPath);
+				
+				try {
+					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
+					log.info(conditions.toString());
+					if( bpa.getAdditionalDetails() == null ) {
+						bpa.setAdditionalDetails( new HashMap());
+					}
+					Map additionalDetails = (Map) bpa.getAdditionalDetails();
+					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
+					
+				}catch(Exception e) {
+					log.warn("No approval conditions found for the application "+ bpa.getApplicationNo());
+				}
+				
+				
+			}
+			
 		}
 
 	}

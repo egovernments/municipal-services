@@ -32,7 +32,12 @@
               "action": "INITIATE",
               "nextState": "SEND_TO_CITIZEN",
               "roles": [
-                "BPA_ARCHITECT"
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR"
               ]
             }
           ]
@@ -53,7 +58,12 @@
               "action": "SEND_TO_CITIZEN",
               "nextState": "CITIZEN_APPROVAL_PENDING",
               "roles": [
-                "BPA_ARCHITECT"
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR"
               ]
             },
             {
@@ -62,7 +72,12 @@
               "action": "INITIATE",
               "nextState": "SEND_TO_CITIZEN",
               "roles": [
-                "BPA_ARCHITECT"
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR"
               ]
             }
           ]
@@ -113,7 +128,12 @@
               "action": "INITIATE",
               "nextState": "INITIATED",
               "roles": [
-                "BPA_ARCHITECT"
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR"
               ]
             },
             {
@@ -122,7 +142,12 @@
               "action": "APPLY",
               "nextState": "PENDING_APPL_FEE_PAYMENT",
               "roles": [
-                "BPA_ARCHITECT"
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR"
               ]
             }
           ]
@@ -145,6 +170,11 @@
               "roles": [
                 "CITIZEN",
                 "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
                 "CEMP"
               ]
@@ -157,6 +187,11 @@
               "roles": [
                 "CITIZEN",
                 "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
                 "CEMP"
               ]
@@ -209,7 +244,7 @@
               "action": "REJECT",
               "nextState": "REJECTED",
               "roles": [
-                "BPA_VERIFIER"
+                "BPA_FIELD_INSPECTOR"
               ]
             },
             {
@@ -218,7 +253,7 @@
               "action": "FORWARD",
               "nextState": "NOC_VERIFICATION_PENDING",
               "roles": [
-                "BPA_VERIFIER"
+                "BPA_FIELD_INSPECTOR"
               ]
             }
           ]
@@ -239,7 +274,7 @@
               "action": "REJECT",
               "nextState": "REJECTED",
               "roles": [
-                "BPA_VERIFIER"
+                "BPA_NOC_VERIFIER"
               ]
             },
             {
@@ -248,7 +283,7 @@
               "action": "FORWARD",
               "nextState": "PENDINGAPPROVAL",
               "roles": [
-                "BPA_VERIFIER"
+                "BPA_NOC_VERIFIER"
               ]
             }
           ]
@@ -287,7 +322,7 @@
           "tenantId": "bh",
           "sla": null,
           "state": "PENDING_SANC_FEE_PAYMENT",
-          "applicationStatus": "PENDING_SANC_FEE_PAYMENT",
+          "applicationStatus": "PENDING_SANC_FEE",
           "docUploadRequired": false,
           "isStartState": false,
           "isTerminateState": false,
@@ -301,6 +336,11 @@
               "roles": [
                 "CITIZEN",
                 "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
                 "CEMP"
               ]
@@ -313,6 +353,11 @@
               "roles": [
                 "CITIZEN",
                 "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
                 "CEMP"
               ]

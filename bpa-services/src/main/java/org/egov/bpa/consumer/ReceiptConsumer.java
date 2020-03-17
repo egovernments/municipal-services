@@ -28,6 +28,6 @@ public class ReceiptConsumer {
     @KafkaListener(topics = {"${kafka.topics.receipt.create}"})
     public void listenPayments(final HashMap<String, Object> record) {
         paymentUpdateService.process(record);
-//        paymentNotificationService.process(record); // TODO Notification
+        paymentNotificationService.process(record); // TODO Notification
     }
 }
