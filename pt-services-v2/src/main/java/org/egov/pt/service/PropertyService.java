@@ -112,7 +112,17 @@ public class PropertyService {
     }
 
     List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
-        List<Property> properties = repository.getPropertiesPlainSearch(criteria);
+
+        if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
+            criteria.setLimit(config.getMaxSearchLimit());
+
+        List<String> ids = repository.fetchPropertyIds(criteria);
+        if(ids.isEmpty())
+            return Collections.emptyList();
+
+        PropertyCriteria propertyCriteria = PropertyCriteria.builder().ids(new HashSet<>(ids)).build();
+
+        List<Property> properties = repository.getPropertiesPlainSearch(propertyCriteria);
         enrichmentService.enrichPropertyCriteriaWithOwnerids(criteria, properties);
         UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
         enrichmentService.enrichOwner(userDetailResponse, properties);
