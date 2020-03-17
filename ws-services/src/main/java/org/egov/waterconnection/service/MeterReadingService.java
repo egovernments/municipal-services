@@ -47,6 +47,7 @@ public class MeterReadingService {
 				for (String constKey : numberConstants) {
 					if (addDetail.getOrDefault(constKey, null) != null) {
 						initialMeterReading = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+						break;
 					} else {
 						log.info("Intial Meter Reading Not Present!!");
 						return;
@@ -67,7 +68,6 @@ public class MeterReadingService {
 				log.info(mapper.writeValueAsString(readingResponse));
 			} else {
 				log.info("Intial Meter Reading Not Present!!");
-				return;
 			}
 		} catch (Exception ex) {
 			log.error("Error while creating meter reading!!!", ex);

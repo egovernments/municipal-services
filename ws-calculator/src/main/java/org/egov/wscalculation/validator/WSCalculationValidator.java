@@ -55,7 +55,7 @@ public class WSCalculationValidator {
 			errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER", "Invalid water connection number");
 		}
 		if (connection != null
-				&& !connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+				&& !WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType())) {
 			errorMap.put("INVALID_WATER_CONNECTION_TYPE",
 					"Meter reading can not be create for : " + connection.getConnectionType() + " connection");
 		}
