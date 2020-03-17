@@ -2,9 +2,7 @@ package org.egov.waterconnection.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.egov.waterconnection.constants.WCConstants;
@@ -43,29 +41,22 @@ public class MeterReadingService {
 			if (!StringUtils.isEmpty(request.getWaterConnection().getAdditionalDetails())) {
 				HashMap<String, Object> addDetail = mapper
 						.convertValue(request.getWaterConnection().getAdditionalDetails(), HashMap.class);
-				List<String> numberConstants = Arrays.asList(WCConstants.INITIAL_METER_READING_CONST);
-				for (String constKey : numberConstants) {
-					if (addDetail.getOrDefault(constKey, null) != null) {
-						initialMeterReading = new BigDecimal(String.valueOf(addDetail.get(constKey)));
-						break;
-					} else {
-						log.info("Intial Meter Reading Not Present!!");
-						return;
-					}
+				if (addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) != null) {
+					initialMeterReading = new BigDecimal(
+							String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
+					MeterConnectionRequest req = MeterConnectionRequest.builder()
+							.meterReading(MeterReading.builder()
+									.connectionNo(request.getWaterConnection().getConnectionNo())
+									.currentReading(initialMeterReading.doubleValue())
+									.currentReadingDate(System.currentTimeMillis()).meterStatus(MeterStatusEnum.WORKING)
+									.billingPeriod(getBillingPeriod()).generateDemand(Boolean.FALSE).lastReading(0.0)
+									.lastReadingDate(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)).build())
+							.requestInfo(request.getRequestInfo()).build();
+					Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getMeterReadingCreateURL(),
+							req);
+					MeterReadingResponse readingResponse = mapper.convertValue(response, MeterReadingResponse.class);
+					log.info(mapper.writeValueAsString(readingResponse));
 				}
-				MeterConnectionRequest req = MeterConnectionRequest.builder()
-						.meterReading(MeterReading.builder()
-								.connectionNo(request.getWaterConnection().getConnectionNo())
-								.currentReading(initialMeterReading.doubleValue())
-								.currentReadingDate(System.currentTimeMillis()).meterStatus(MeterStatusEnum.WORKING)
-								.billingPeriod(getBillingPeriod()).generateDemand(Boolean.FALSE).lastReading(0.0)
-								.lastReadingDate(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)).build())
-						.requestInfo(request.getRequestInfo()).build();
-
-				Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getMeterReadingCreateURL(),
-						req);
-				MeterReadingResponse readingResponse = mapper.convertValue(response, MeterReadingResponse.class);
-				log.info(mapper.writeValueAsString(readingResponse));
 			} else {
 				log.info("Intial Meter Reading Not Present!!");
 			}
