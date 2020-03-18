@@ -276,7 +276,7 @@
               "tenantId": "bh",
               "currentState": "PENDING_SANC_FEE_PAYMENT",
               "action": "APPROVE",
-              "nextState": "APPROVED",
+              "nextState": "PENDING_SANC_FEE_PAYMENT",
               "roles": [
                 "BPA_APPROVER"
               ]
