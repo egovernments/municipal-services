@@ -39,7 +39,7 @@
             "tenantId": "pb",
             "businessService": "BPA_LOW",
             "business": "bpa-services",
-            "businessServiceSla": 0,
+            "businessServiceSla": 60,
             "states": [
                 {
                     "tenantId": "pb",
@@ -225,7 +225,7 @@
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": false,
-                    "isStateUpdatable": false,
+                    "isStateUpdatable": true,
                     "actions": [
                         {
                             "tenantId": "pb",
@@ -255,7 +255,7 @@
                     "docUploadRequired": false,
                     "isStartState": false,
                     "isTerminateState": false,
-                    "isStateUpdatable": false,
+                    "isStateUpdatable": true,
                     "actions": [
                         {
                             "tenantId": "pb",
