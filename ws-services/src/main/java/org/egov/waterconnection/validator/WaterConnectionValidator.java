@@ -73,6 +73,9 @@ public class WaterConnectionValidator {
 			if (StringUtils.isEmpty(waterConnection.getRoadType())) {
 				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 			}
+			if (StringUtils.isEmpty(waterConnection.getConnectionExecutionDate())) {
+				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date not be empty");
+			}
 
 		}
 		if (!errorMap.isEmpty())

@@ -3,7 +3,6 @@ package org.egov.waterconnection.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.MeterConnectionRequest;
@@ -44,14 +43,14 @@ public class MeterReadingService {
 				if (addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) != null) {
 					initialMeterReading = new BigDecimal(
 							String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
-					MeterConnectionRequest req = MeterConnectionRequest.builder()
-							.meterReading(MeterReading.builder()
-									.connectionNo(request.getWaterConnection().getConnectionNo())
-									.currentReading(initialMeterReading.doubleValue())
-									.currentReadingDate(System.currentTimeMillis()).meterStatus(MeterStatusEnum.WORKING)
-									.billingPeriod(getBillingPeriod()).generateDemand(Boolean.FALSE).lastReading(0.0)
-									.lastReadingDate(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)).build())
-							.requestInfo(request.getRequestInfo()).build();
+					MeterConnectionRequest req = MeterConnectionRequest.builder().meterReading(MeterReading.builder()
+							.connectionNo(request.getWaterConnection().getConnectionNo())
+							.currentReading(initialMeterReading.doubleValue())
+							.currentReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
+							.meterStatus(MeterStatusEnum.WORKING).billingPeriod(getBillingPeriod())
+							.generateDemand(Boolean.FALSE).lastReading(initialMeterReading.doubleValue())
+							.lastReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
+							.build()).requestInfo(request.getRequestInfo()).build();
 					Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getMeterReadingCreateURL(),
 							req);
 					MeterReadingResponse readingResponse = mapper.convertValue(response, MeterReadingResponse.class);
