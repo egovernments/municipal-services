@@ -301,6 +301,5 @@ public class PTConstants {
 
     public static final String KEY_PDF_DOCUMENTTYPE = "documentType";
 
-
 }
 
