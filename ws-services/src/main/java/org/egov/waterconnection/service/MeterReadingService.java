@@ -1,7 +1,9 @@
 package org.egov.waterconnection.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 
 import org.egov.waterconnection.constants.WCConstants;
@@ -47,7 +49,9 @@ public class MeterReadingService {
 							.connectionNo(request.getWaterConnection().getConnectionNo())
 							.currentReading(initialMeterReading.doubleValue())
 							.currentReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
-							.meterStatus(MeterStatusEnum.WORKING).billingPeriod(getBillingPeriod())
+							.meterStatus(MeterStatusEnum.WORKING)
+							.billingPeriod(getBillingPeriod(
+									request.getWaterConnection().getConnectionExecutionDate().longValue()))
 							.generateDemand(Boolean.FALSE).lastReading(initialMeterReading.doubleValue())
 							.lastReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
 							.build()).requestInfo(request.getRequestInfo()).build();
@@ -64,8 +68,12 @@ public class MeterReadingService {
 		}
 	}
 
-	private String getBillingPeriod() {
-		LocalDate currentdate = LocalDate.now();
+	private String getBillingPeriod(Long connectionExcecutionDate) {
+		int noLength = (int) (Math.log10(connectionExcecutionDate) + 1);
+		LocalDate currentdate = Instant
+				.ofEpochMilli(noLength > 10 ? connectionExcecutionDate : connectionExcecutionDate * 1000)
+				.atZone(ZoneId.systemDefault()).toLocalDate();
+
 		StringBuilder builder = new StringBuilder();
 		return builder.append(currentdate.getMonth().name().substring(0, 3)).append(" - ")
 				.append(String.valueOf(currentdate.getYear())).toString();
