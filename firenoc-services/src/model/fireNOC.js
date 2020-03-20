@@ -176,16 +176,6 @@ const Address = {
         "City of the address. Can be represented by the tenantid itself",
       type: "string"
     },
-    areatype: {
-      description:
-        "area type either it is urban or rural",
-      type: "string"
-    },
-    subdistrict: {
-      description:
-        "subdistrict incase of rural area type",
-      type: "string"
-    },
     pincode: {
       type: "string",
       description:
