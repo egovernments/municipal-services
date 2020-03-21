@@ -34,6 +34,8 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.minidev.json.JSONObject;
+
 @Component
 public class WaterServicesUtil {
 
@@ -53,6 +55,7 @@ public class WaterServicesUtil {
 
 	@Value("${egov.property.searchendpoint}")
 	private String searchPropertyEndPoint;
+	
 
 	@Autowired
 	public WaterServicesUtil(ServiceRequestRepository serviceRequestRepository) {
@@ -65,6 +68,7 @@ public class WaterServicesUtil {
 	private String tenantId = "tenantId=";
 	private String mobileNumber = "mobileNumber=";
 	private String propertyIds = "propertyIds=";
+	private String URL = "url";
 	
 
 	/**
@@ -306,10 +310,29 @@ public class WaterServicesUtil {
 	
 	/**
 	 * 
+	 * @return URL of estimation service
+	 */
+	public StringBuilder getEstimationURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCalculatorHost()).append(config.getEstimationEndpoint());
+	}
+	
+	
+	/**
+	 * 
 	 * @return URL for create meterreading
 	 */
 	public StringBuilder getMeterReadingCreateURL() {
 		StringBuilder builder = new StringBuilder();
 		return builder.append(config.getCalculatorHost()).append(config.getCreateMeterReadingEndpoint());
+	}
+	
+	public String getShortnerURL(String actualURL) {
+		JSONObject obj = new JSONObject();
+		obj.put(URL, actualURL);
+		String url = config.getNotificationUrl() + config.getShortenerURL();
+		
+		Object response = serviceRequestRepository.getShortningURL(new StringBuilder(url), obj);
+		return response.toString();
 	}
 }
