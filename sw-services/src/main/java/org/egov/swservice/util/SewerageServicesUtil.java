@@ -34,11 +34,13 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import net.minidev.json.JSONObject;
+
 @Component
 public class SewerageServicesUtil {
 
 	private ServiceRequestRepository serviceRequestRepository;
-	
+
 	@Autowired
 	private SWConfiguration config;
 
@@ -50,10 +52,10 @@ public class SewerageServicesUtil {
 
 	@Value("${egov.property.searchendpoint}")
 	private String searchPropertyEndPoint;
-	
+
 	@Autowired
 	ObjectMapper mapper;
-	
+
 	@Autowired
 	private WorkflowService workflowService;
 
@@ -63,21 +65,26 @@ public class SewerageServicesUtil {
 
 	}
 
+	private String tenantId = "tenantId=";
+	private String mobileNumber = "mobileNumber=";
+	private String propertyIds = "propertyIds=";
+	private String URL = "url";
+
 	/**
 	 * 
 	 * @param sewarageConnectionRequest
 	 *            SewarageConnectionRequest containing property
 	 * @return List of Property
 	 */
-	
+
 	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
 		Set<String> propertyIds = new HashSet<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		HashMap<String, Object> propertyRequestObj = new HashMap<>();
 		propertyIds.add(sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId());
 		propertyCriteria.setPropertyIds(propertyIds);
-		propertyRequestObj.put("RequestInfoWrapper",
-				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), sewerageConnectionRequest.getRequestInfo()));
+		propertyRequestObj.put("RequestInfoWrapper", getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(),
+				sewerageConnectionRequest.getRequestInfo()));
 		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
 		Object result = serviceRequestRepository.fetchResult(
 				getPropURLForCreate(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId(),
@@ -94,7 +101,6 @@ public class SewerageServicesUtil {
 			RequestInfo requestInfo) {
 		return RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 	}
-
 
 	/**
 	 * 
@@ -122,11 +128,10 @@ public class SewerageServicesUtil {
 				sewerageConnectionRequest.getSewerageConnection().getProperty());
 		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq));
 	}
-	
+
 	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
 		return PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
 	}
-
 
 	/**
 	 * 
@@ -137,20 +142,20 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-//		if ((sewerageConnectionSearchCriteria.getTenantId() == null
-//				|| sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
-//			throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-//		}
+		// if ((sewerageConnectionSearchCriteria.getTenantId() == null
+		// || sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
+		// throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
+		// }
 		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		propertyCriteria.setMobileNumber(sewerageConnectionSearchCriteria.getMobileNumber());
-		
+
 		if (!StringUtils.isEmpty(sewerageConnectionSearchCriteria.getTenantId())) {
 			propertyCriteria.setTenantId(sewerageConnectionSearchCriteria.getTenantId());
 		}
-		
+
 		Object result = serviceRequestRepository.fetchResult(
 				getPropURL(sewerageConnectionSearchCriteria.getTenantId(),
 						sewerageConnectionSearchCriteria.getMobileNumber()),
@@ -166,11 +171,9 @@ public class SewerageServicesUtil {
 		});
 		List<ModuleDetail> moduleDetails = new ArrayList<>();
 		moduleDetails.add(ModuleDetail.builder().moduleName(moduleName).masterDetails(masterDetails).build());
-		return MdmsCriteriaReq.builder().requestInfo(requestInfo).
-				mdmsCriteria(
-						MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build()).build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo)
+				.mdmsCriteria(MdmsCriteria.builder().tenantId(tenantId).moduleDetails(moduleDetails).build()).build();
 	}
-	
 
 	public StringBuilder getPropertyCreateURL() {
 		return new StringBuilder().append(propertyHost).append(createPropertyEndPoint);
@@ -179,7 +182,7 @@ public class SewerageServicesUtil {
 	public StringBuilder getPropertyURL() {
 		return new StringBuilder().append(propertyHost).append(searchPropertyEndPoint);
 	}
-	
+
 	/**
 	 * 
 	 * @return search url for property search
@@ -194,7 +197,7 @@ public class SewerageServicesUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-	
+
 	/**
 	 * 
 	 * @return search url for property search
@@ -209,7 +212,7 @@ public class SewerageServicesUtil {
 
 	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
 		String url = getpropertySearchURLForMobileSearchCitizen();
-		if(tenantId != null)
+		if (tenantId != null)
 			url = getpropertySearchURLForMobileSearch();
 		if (url.indexOf("{1}") > 0)
 			url = url.replace("{1}", tenantId);
@@ -217,7 +220,7 @@ public class SewerageServicesUtil {
 			url = url.replace("{2}", mobileNumber);
 		return new StringBuilder(url);
 	}
-	
+
 	/**
 	 * 
 	 * @return search url for property search employee
@@ -232,7 +235,7 @@ public class SewerageServicesUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-	
+
 	/**
 	 * 
 	 * @return search url for property search citizen
@@ -244,8 +247,7 @@ public class SewerageServicesUtil {
 		url.append("{2}");
 		return url.toString();
 	}
-	
-	
+
 	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
 		String url = getPropertySearchURLForCitizen();
 		if (tenantId != null)
@@ -256,7 +258,7 @@ public class SewerageServicesUtil {
 			url = url.replace("{2}", propertyIds);
 		return new StringBuilder(url);
 	}
-	
+
 	/**
 	 * 
 	 * @param tenantId
@@ -264,13 +266,13 @@ public class SewerageServicesUtil {
 	 * @param requestInfo
 	 * @return List of Property
 	 */
-	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo){
-		
+	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo) {
+
 		Object result = serviceRequestRepository.fetchResult(getPropURLForCreate(tenantId, propertyIds),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
-	
+
 	/**
 	 * Method to return auditDetails for create/update flows
 	 *
@@ -286,17 +288,35 @@ public class SewerageServicesUtil {
 		else
 			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
-	
+
 	public boolean getStatusForUpdate(BusinessService businessService, SewerageConnection searchresult) {
 		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
 	}
-	
+
 	/**
 	 * 
 	 * @return URL of calculator service
 	 */
 	public StringBuilder getCalculatorURL() {
 		return new StringBuilder(config.getCalculatorHost()).append(config.getCalculateEndpoint());
+	}
+
+	/**
+	 * 
+	 * @return URL of estimation service
+	 */
+	public StringBuilder getEstimationURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCalculatorHost()).append(config.getEstimationEndpoint());
+	}
+
+	public String getShortnerURL(String actualURL) {
+		JSONObject obj = new JSONObject();
+		obj.put(URL, actualURL);
+		String url = config.getNotificationUrl() + config.getShortenerURL();
+
+		Object response = serviceRequestRepository.getShortningURL(new StringBuilder(url), obj);
+		return response.toString();
 	}
 
 }

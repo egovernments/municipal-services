@@ -115,5 +115,31 @@ public class SWConfiguration {
     
     @Value("${egov.receipt.businessservice}")
     private String receiptBusinessservice;
+    
+	// sewerage notification links configuration
+
+	@Value("${sw.mseva.app.link}")
+	private String mSevaAppLink;
+
+	@Value("${sw.view.history.link}")
+	private String viewHistoryLink;
+
+	@Value("${sw.connectiondetails.link}")
+	private String connectionDetailsLink;
+
+	@Value("${sw.application.pay.link}")
+	private String applicationPayLink;
+
+	@Value("${egov.sw.estimate.endpoint}")
+	private String estimationEndpoint;
+
+	@Value("${sw.pdfservice.link}")
+	private String pdfServiceLink;
+
+	@Value("${sw.fileStore.link}")
+	private String fileStoreLink;
+
+	@Value("${sw.shortener.url}")
+	private String shortenerURL;
 
 }

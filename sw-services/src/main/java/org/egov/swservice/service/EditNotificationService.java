@@ -80,7 +80,7 @@ public class EditNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
-				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnection, message);
+				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnection, message,requestInfo);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhnoAndUUIDs = workflowNotificationService.fetchUserUUIDs(mobileNumbers, requestInfo,
 				sewerageConnection.getProperty().getTenantId());
@@ -100,7 +100,7 @@ public class EditNotificationService {
 			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
 			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
 			Action action = workflowNotificationService.getActionForEventNotification(mobileNumberAndMesssage, mobile,
-					sewerageConnection);
+					sewerageConnection,requestInfo);
 			events.add(Event.builder().tenantId(sewerageConnection.getProperty().getTenantId())
 					.description(mobileNumberAndMesssage.get(mobile)).eventType(SWConstants.USREVENTS_EVENT_TYPE)
 					.name(SWConstants.USREVENTS_EVENT_NAME).postedBy(SWConstants.USREVENTS_EVENT_POSTEDBY)
@@ -129,7 +129,7 @@ public class EditNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
-				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnection, message);
+				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnection, message, requestInfo);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
