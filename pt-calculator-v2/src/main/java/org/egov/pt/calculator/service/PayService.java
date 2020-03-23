@@ -94,7 +94,7 @@ public class PayService {
 		Calendar cal = Calendar.getInstance();
 		setDateToCalendar(assessmentYear, time, cal);
 
-		if (cal.getTimeInMillis() > System.currentTimeMillis())
+		if (cal.getTimeInMillis() >= System.currentTimeMillis())
 			rebateAmt = mDService.calculateApplicables(taxAmt, rebate);
 		
 		return rebateAmt;
@@ -284,9 +284,9 @@ public class PayService {
 		Integer day = Integer.valueOf(time[0]);
 		Integer month = Integer.valueOf(time[1])-1;
 		// One is subtracted because calender reads january as 0
-		Integer year = Integer.valueOf(assessmentYear.split("-")[0]);
-		if (month < 3) year += 1;
-		cal.set(year, month, day);
+		Integer year = getCurrentYear();
+
+		cal.set(year, month, day,23, 59, 59);
 	}
 
 
@@ -401,8 +401,10 @@ public class PayService {
 		interestAmt = mDService.calculateApplicables(applicableAmount, interestMap);
 		return interestAmt.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
 	}
-
-
-
+// get current year
+	private Integer getCurrentYear(){
+		Integer year = Calendar.getInstance().get(Calendar.YEAR);
+		return year;
+	}
 
 }
