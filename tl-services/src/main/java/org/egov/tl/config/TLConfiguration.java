@@ -91,6 +91,25 @@ public class TLConfiguration {
     @Value("${egov.idgen.bpa.licensenumber.format}")
     private String licenseNumberIdgenFormatBPA;
 
+// changes in the stakeholder license number format
+    @Value("${egov.idgen.bpa.englicensenumber.format}")
+    private String engLicenseNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.strlicensenumber.format}")
+    private String strLicenseNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.tplicensenumber.format}")
+    private String tpLicenseNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.suplicensenumber.format}")
+    private String supLicenseNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.arlicensenumber.format}")
+    private String arctLicenseNumberIdgenFormatBPA;
+
+    @Value("${egov.idgen.bpa.bdlicensenumber.format}")
+    private String bldLicenseNumberIdgenFormatBPA;
+
     //Persister Config
     @Value("${persister.save.tradelicense.topic}")
     private String saveTopic;
