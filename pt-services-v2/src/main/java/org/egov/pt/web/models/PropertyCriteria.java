@@ -21,6 +21,7 @@ public class PropertyCriteria {
 
 	private String tenantId;
 
+	@JsonProperty("ids")
 	private Set<String> ids;
 
 	private Set<String> oldpropertyids;
