@@ -51,11 +51,11 @@ public class WSCalculationValidator {
 			masterDataService.getDemandStartAndEndValue(meterReading.getBillingPeriod());
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
-		if (connection == null) {
+		if (meterConnectionRequest.getMeterReading().getGenerateDemand() && connection == null) {
 			errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER", "Invalid water connection number");
 		}
 		if (connection != null
-				&& !connection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+				&& !WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType())) {
 			errorMap.put("INVALID_WATER_CONNECTION_TYPE",
 					"Meter reading can not be create for : " + connection.getConnectionType() + " connection");
 		}
@@ -64,7 +64,7 @@ public class WSCalculationValidator {
 		connectionNos.add(meterReading.getConnectionNo());
 		criteria.setConnectionNos(connectionNos);
 		List<MeterReading> previousMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria);
-		if (previousMeterReading != null && !previousMeterReading.isEmpty()) {
+		if (!CollectionUtils.isEmpty(previousMeterReading)) {
 			Double currentMeterReading = wSCalculationDao.searchCurrentMeterReadings(criteria).get(0)
 					.getCurrentReading();
 			if (meterReading.getCurrentReading() < currentMeterReading) {

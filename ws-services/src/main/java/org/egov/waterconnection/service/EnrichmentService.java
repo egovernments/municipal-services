@@ -26,6 +26,7 @@ import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.Idgen.IdResponse;
 import org.egov.waterconnection.repository.IdGenRepository;
+import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private WaterDaoImpl waterDao;
 	
 	
 
@@ -205,12 +209,24 @@ public class EnrichmentService {
 	 * 
 	 * @param waterConnectionrequest 
 	 */
-    public void postStatusEnrichment(WaterConnectionRequest waterConnectionrequest){
-    	String applicationStatus = waterConnectionrequest.getWaterConnection().getApplicationStatus().name();
-        if(WCConstants.STATUS_APPROVED.equalsIgnoreCase(applicationStatus)) {
-        	setConnectionNO(waterConnectionrequest);
-        }
-    }
+	public void postStatusEnrichment(WaterConnectionRequest waterConnectionrequest) {
+		String applicationStatus = waterConnectionrequest.getWaterConnection().getApplicationStatus().name();
+		if (WCConstants.STATUS_APPROVED.equalsIgnoreCase(applicationStatus)) {
+			setConnectionNO(waterConnectionrequest);
+		}
+	}
+	
+	/**
+	 * Create meter reading for meter connection
+	 * 
+	 * @param waterConnectionrequest
+	 */
+	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest) {
+		if (WCConstants.STATUS_APPROVED
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getApplicationStatus().name())) {
+			waterDao.postForMeterReading(waterConnectionrequest);
+		}
+	}
     
     
     /**

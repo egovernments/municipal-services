@@ -124,5 +124,35 @@ public class WSConfiguration {
     
     @Value("${egov.receipt.businessservice}")
     private String receiptBusinessservice;
-
+    
+    @Value("${ws.meterreading.create}")
+    private String createMeterReading;
+    
+    @Value("${ws.meterreading.create.endpoint}")
+    private String createMeterReadingEndpoint;
+    
+    @Value("${ws.mseva.app.link}")
+    private String mSevaAppLink;
+    
+    @Value("${ws.view.history.link}")
+    private String viewHistoryLink;
+    
+    @Value("${ws.connectiondetails.link}")
+    private String connectionDetailsLink;
+    
+    @Value("${ws.application.pay.link}")
+    private String applicationPayLink;
+    
+    @Value("${egov.ws.estimate.endpoint}")
+    private String estimationEndpoint;
+    
+    @Value("${ws.pdfservice.link}")
+    private String pdfServiceLink;
+    
+    @Value("${ws.fileStore.link}")
+    private String fileStoreLink;
+    
+    @Value("${ws.shortener.url}")
+    private String shortenerURL;
+    
 }
