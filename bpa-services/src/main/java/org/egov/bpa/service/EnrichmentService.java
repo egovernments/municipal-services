@@ -98,6 +98,12 @@ public class EnrichmentService {
 						document.setId(UUID.randomUUID().toString());
 					});
 			});
+
+		// blocks
+		bpaRequest.getBPA().getBlocks().forEach(block -> {
+				if (block.getSubOccupancyType()!= null)
+						block.setId(UUID.randomUUID().toString());
+			});
 		
 //		if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())){
 //			bpaRequest.getBPA().getInstitution().setId(UUID.randomUUID().toString());
