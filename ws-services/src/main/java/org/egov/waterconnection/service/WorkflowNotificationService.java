@@ -369,7 +369,7 @@ public class WorkflowNotificationService {
 		requestPayload.put(WaterConnectionReplacer, waterconnectionlist);
 		try {
 			StringBuilder builder = new StringBuilder();
-			builder.append(config.getNotificationUrl());
+			builder.append(config.getPdfServiceHost());
 			String pdfLink = config.getPdfServiceLink();
 			pdfLink = pdfLink.replace(tenantIdReplacer, tenantId);
 			builder.append(pdfLink);
@@ -392,13 +392,10 @@ public class WorkflowNotificationService {
 	 * @return file store id
 	 */
 	private String getApplicationDownloadLink(String tenantId, String fileStoreId) {
-		String fileStoreServiceLink = config.getNotificationUrl() + config.getFileStoreLink();
+		String fileStoreServiceLink = config.getFileStoreHost() + config.getFileStoreLink();
 		fileStoreServiceLink = fileStoreServiceLink.replace(tenantIdReplacer, tenantId);
 		fileStoreServiceLink = fileStoreServiceLink.replace(fileStoreIdReplacer, fileStoreId);
 		try {
-			StringBuilder builder = new StringBuilder();
-			builder.append(config.getNotificationUrl());
-			builder.append(config.getPdfServiceLink());
 			Object response = serviceRequestRepository.fetchResultUsingGet(new StringBuilder(fileStoreServiceLink));
 			DocumentContext responseContext = JsonPath.parse(response);
 			List<Object> fileStoreIds = responseContext.read("$.fileStoreIds");
