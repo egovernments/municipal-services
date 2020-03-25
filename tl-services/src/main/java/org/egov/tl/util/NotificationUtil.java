@@ -73,9 +73,9 @@ public class NotificationUtil {
 		 */
 
 		case ACTION_STATUS_APPROVED:
-			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
+			//BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPROVED, localizationMessage);
-			message = getApprovedMsg(license, amountToBePaid, messageTemplate);
+			message = getApprovedMsg(license, messageTemplate);
 			break;
 
 		case ACTION_STATUS_REJECTED:
@@ -229,9 +229,12 @@ public class NotificationUtil {
 	 *            Message from localization for approved
 	 * @return customized message for approved
 	 */
-	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
-		message = message.replace("<2>", license.getTradeName());
-		message = message.replace("<3>", amountToBePaid.toString());
+	private String getApprovedMsg(TradeLicense license, String message) {
+		String expiryDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getValidTo());
+		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
+		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
+		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
+
 		return message;
 	}
 
