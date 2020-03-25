@@ -75,10 +75,10 @@ public class MDMSValidator {
                         errorMap.put("INVALID OWNERSHIPCATEGORY", "The SubOwnerShipCategory '"
                                 + license.getTradeLicenseDetail().getSubOwnerShipCategory() + "' does not exists");
 
-                    if(!masterData.get(TLConstants.STRUCTURE_TYPE).
+                   /* if(!masterData.get(TLConstants.STRUCTURE_TYPE).
                             contains(license.getTradeLicenseDetail().getStructureType()))
                         errorMap.put("INVALID STRUCTURETYPE", "The structureType '"
-                                + license.getTradeLicenseDetail().getStructureType() + "' does not exists");
+                                + license.getTradeLicenseDetail().getStructureType() + "' does not exists");*/
 
                     license.getTradeLicenseDetail().getTradeUnits().forEach(unit -> {
                         if (!tradeTypeUomMap.containsKey(unit.getTradeType()))

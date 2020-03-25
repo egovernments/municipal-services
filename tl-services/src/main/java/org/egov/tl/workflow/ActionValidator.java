@@ -57,10 +57,10 @@ public class ActionValidator {
 //                            errorMap.put("INVALID ACTION", "Action should be APPLY when application document are provided");
 //                    }
                     
-                    if (ACTION_APPLY.equalsIgnoreCase(license.getAction())) {
+                   /* if (ACTION_APPLY.equalsIgnoreCase(license.getAction())) {
                         if (license.getTradeLicenseDetail().getApplicationDocuments() == null)
                             errorMap.put("INVALID ACTION", "Action cannot be changed to APPLY. Application document are not provided");
-                    }
+                    }*/
                     if (!ACTION_APPLY.equalsIgnoreCase(license.getAction()) &&
                             !ACTION_INITIATE.equalsIgnoreCase(license.getAction())) {
                         errorMap.put("INVALID ACTION", "Action can only be APPLY or INITIATE during create");
@@ -93,7 +93,7 @@ public class ActionValidator {
      * @param request The tradeLciense update request
      */
     public void validateUpdateRequest(TradeLicenseRequest request,BusinessService businessService){
-        validateDocumentsForUpdate(request);
+        //validateDocumentsForUpdate(request);
        // validateRole(request);
        // validateAction(request);
         validateIds(request,businessService);

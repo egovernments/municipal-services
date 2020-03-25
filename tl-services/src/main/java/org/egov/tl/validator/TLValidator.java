@@ -75,7 +75,7 @@ public class TLValidator {
             case businessService_TL:
                 valideDates(request, mdmsData);
                 propertyValidator.validateProperty(request);
-                validateTLSpecificNotNullFields(request);
+                //validateTLSpecificNotNullFields(request);
                 break;
 
             case businessService_BPA:
@@ -100,7 +100,7 @@ public class TLValidator {
         }
     }
 
-    private void validateTLSpecificNotNullFields(TradeLicenseRequest request) {
+    /*private void validateTLSpecificNotNullFields(TradeLicenseRequest request) {
         request.getLicenses().forEach(license -> {
             Map<String, String> errorMap = new HashMap<>();
             if (license.getFinancialYear() == null)
@@ -115,7 +115,7 @@ public class TLValidator {
             if (!errorMap.isEmpty())
                 throw new CustomException(errorMap);
         });
-    }
+    }*/
 
     private void validateBPASpecificValidations(TradeLicenseRequest request) {
 
@@ -295,7 +295,7 @@ public class TLValidator {
             case businessService_TL:
                 valideDates(request, mdmsData);
                 propertyValidator.validateProperty(request);
-                validateTLSpecificNotNullFields(request);
+                //validateTLSpecificNotNullFields(request);
                 break;
 
             case businessService_BPA:

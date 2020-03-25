@@ -108,6 +108,7 @@ public class  TradeLicense   {
         @JsonProperty("applicationType")
         private ApplicationTypeEnum applicationType = null;
 
+        @NotNull
         @JsonProperty("workflowCode")
         private String workflowCode = null;
 
@@ -153,9 +154,11 @@ public class  TradeLicense   {
         @JsonProperty("financialYear")
         private String financialYear = null;
 
+        @NotNull
         @JsonProperty("validFrom")
         private Long validFrom = null;
 
+        @NotNull
         @JsonProperty("validTo")
         private Long validTo = null;
 

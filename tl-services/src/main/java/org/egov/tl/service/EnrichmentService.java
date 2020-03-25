@@ -68,15 +68,17 @@ public class EnrichmentService {
                     //TLR Changes
                     if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                         tradeLicense.setLicenseNumber(tradeLicenseRequest.getLicenses().get(0).getLicenseNumber());
-                        Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+
+                        /*Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
                         tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-                        tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
-                    }else{
+                        tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));*/
+                    }
+                    /*else{
                         Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
                         if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
                             tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                             tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
-                    }
+                    }*/
                     if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                             accessory.setTenantId(tradeLicense.getTenantId());
@@ -139,7 +141,7 @@ public class EnrichmentService {
             businessService = businessService_TL;
         switch (businessService) {
             case businessService_TL:
-                boundaryService.getAreaType(tradeLicenseRequest, config.getHierarchyTypeCode());
+               // boundaryService.getAreaType(tradeLicenseRequest, config.getHierarchyTypeCode());
                 break;
         }
     }
@@ -533,7 +535,7 @@ public class EnrichmentService {
         TradeLicenseSearchCriteria searchCriteria = enrichTLSearchCriteriaWithOwnerids(criteria,licenses);
         switch (businessService) {
             case businessService_TL:
-                enrichBoundary(new TradeLicenseRequest(requestInfo, licenses));
+                //enrichBoundary(new TradeLicenseRequest(requestInfo, licenses));
                 break;
         }
         UserDetailResponse userDetailResponse = userService.getUser(searchCriteria,requestInfo);
