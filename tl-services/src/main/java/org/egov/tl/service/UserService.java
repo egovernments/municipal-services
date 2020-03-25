@@ -382,7 +382,8 @@ public class UserService{
     private UserSearchRequest getUserSearchRequest(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
         UserSearchRequest userSearchRequest = new UserSearchRequest();
         userSearchRequest.setRequestInfo(requestInfo);
-        userSearchRequest.setTenantId(criteria.getTenantId().split("\\.")[0]);
+        if(criteria.getTenantId()!=null)
+            userSearchRequest.setTenantId(criteria.getTenantId().split("\\.")[0]);
         userSearchRequest.setMobileNumber(criteria.getMobileNumber());
         userSearchRequest.setActive(true);
         userSearchRequest.setUserType("CITIZEN");
