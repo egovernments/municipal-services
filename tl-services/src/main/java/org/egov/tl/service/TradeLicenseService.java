@@ -112,7 +112,7 @@ public class TradeLicenseService {
                break;
        }
        userService.createUser(tradeLicenseRequest, false);
-       calculationService.addCalculation(tradeLicenseRequest);
+   //    calculationService.addCalculation(tradeLicenseRequest);
 
         /*
          * call workflow service if it's enable else uses internal workflow process
@@ -312,7 +312,7 @@ public class TradeLicenseService {
             }
             enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates,mdmsData);
             userService.createUser(tradeLicenseRequest, false);
-            calculationService.addCalculation(tradeLicenseRequest);
+    //        calculationService.addCalculation(tradeLicenseRequest);
             switch (businessServicefromPath) {
                 case businessService_TL:
                     editNotificationService.sendEditNotification(tradeLicenseRequest, diffMap);
