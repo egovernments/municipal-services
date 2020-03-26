@@ -73,10 +73,15 @@ public class WaterConnectionValidator {
 			if (StringUtils.isEmpty(waterConnection.getRoadType())) {
 				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 			}
-			if (StringUtils.isEmpty(waterConnection.getConnectionExecutionDate())) {
-				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date not be empty");
-			}
 
+		}
+		if (isUpdate && (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
+				&& !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))
+				&& WCConstants.ACTIVATE_CONNECTION_CONST.equalsIgnoreCase(
+						waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			if (StringUtils.isEmpty(waterConnection.getConnectionExecutionDate())) {
+				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
+			}
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
