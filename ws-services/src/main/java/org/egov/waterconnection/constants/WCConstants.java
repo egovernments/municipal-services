@@ -74,6 +74,8 @@ public class WCConstants {
 	
 	public static final String SERVICE_FIELD_VALUE_WS = "WS";
 	
+	public static final String SERVICE_FIELD_VALUE_NOTIFICATION = "Water";
+	
 	
 	//Application Status For Notification
 	public static final String INITIATE_INITIATED = "SUBMIT_APPLICATION_PENDING_FOR_DOCUMENT_VERIFICATION";
@@ -125,8 +127,12 @@ public class WCConstants {
     
     public static final String WC_ROADTYPE_MASTER = "RoadType";
 	
-	public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_WFDOCUMENTS, VARIABLE_PLUMBER));
-	
+	public static final List<String> FIELDS_TO_CHECK = Collections
+			.unmodifiableList(Arrays.asList("rainWaterHarvesting", "waterSource", "meterId", "meterInstallationDate",
+					"proposedPipeSize", "proposedTaps", "pipeSize", "noOfTaps", "oldConnectionNo", "roadType",
+					"roadCuttingArea", "connectionExecutionDate", "connectionCategory", "connectionType",
+					"documentType", "fileStoreId", "licenseNo"));
+
 	public static final String WS_EDIT_SMS = "WS_EDIT_SMS_MESSAGE";
 	
 	public static final String WS_EDIT_IN_APP = "WS_EDIT_IN_APP_MESSAGE";
@@ -151,6 +157,13 @@ public class WCConstants {
 	
 	public static final String INITIAL_METER_READING_CONST = "initialMeterReading";
 	
+	public static final String SUBMIT_APPLICATION_CONST = "SUBMIT_APPLICATION";
+	
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY,
 			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST));
+	
+	public static final List<String> EDIT_NOTIFICATION_STATE = Collections.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
+	
+	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
+	
 }

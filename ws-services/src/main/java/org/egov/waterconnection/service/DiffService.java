@@ -34,12 +34,12 @@ public class DiffService {
 	 */
 	public void checkDifferenceAndSendEditNotification(WaterConnectionRequest request, WaterConnection searchResult) {
 		try {
-			WaterConnection updateConnection = request.getWaterConnection();
-			if (!CollectionUtils.isEmpty(getUpdateFields(updateConnection, searchResult))
-					|| !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
-					|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
-				editNotificationService.sendEditNotification(request);
-			}
+				WaterConnection updateConnection = request.getWaterConnection();
+				if (!CollectionUtils.isEmpty(getUpdateFields(updateConnection, searchResult))
+						|| !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
+						|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
+					editNotificationService.sendEditNotification(request);
+				}
 		} catch (Exception ex) {
 			log.error("Edit Notification Error!!", ex);
 		}
@@ -60,11 +60,11 @@ public class DiffService {
 			return Collections.emptyList();
 		List<String> updatedValues = new LinkedList<>();
 		changes.forEach(change -> {
-			if (!WCConstants.FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
+			if (WCConstants.FIELDS_TO_CHECK.contains(change.getPropertyName())) {
 				updatedValues.add(change.getPropertyName());
             }
 		});
-		log.debug("Updated Fields :----->  "+ updatedValues.toString());
+		log.info("Updated Fields :----->  "+ updatedValues.toString());
 		return updatedValues;
 	}
 	/**
@@ -85,10 +85,11 @@ public class DiffService {
 		for(Object object: objectsAdded) {
 			String className = object.getClass().toString()
 					.substring(object.getClass().toString().lastIndexOf('.') + 1);
-			if (!classModified.contains(className))
+			
+			if (!classModified.contains(className) && !WCConstants.IGNORE_CLASS_ADDED.contains(className))
 					classModified.add(className);
 		}
-		log.debug("Class Modified :----->  "+ classModified.toString());
+		log.info("Class Modified :----->  "+ classModified.toString());
 		return classModified;
 	}
 	

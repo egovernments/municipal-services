@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
+import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
@@ -83,6 +84,18 @@ public class WaterDaoImpl implements WaterDao {
 	 */
 	public void postForMeterReading(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionProducer.push(wsConfiguration.getCreateMeterReading(), waterConnectionRequest);
+	}
+
+	/**
+	 * push object for edit notification
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void pushForEditNotification(WaterConnectionRequest waterConnectionRequest) {
+		if (!WCConstants.EDIT_NOTIFICATION_STATE
+				.contains(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			waterConnectionProducer.push(wsConfiguration.getEditNotificationTopic(), waterConnectionRequest);
+		}
 	}
 
 
