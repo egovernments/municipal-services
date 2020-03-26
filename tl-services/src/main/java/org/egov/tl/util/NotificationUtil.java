@@ -181,7 +181,7 @@ public class NotificationUtil {
 	 */
 	private String getInitiatedMsg(TradeLicense license, String message) {
 		// message = message.replace("<1>",license.);
-		message = message.replace("<2>", license.getTradeName());
+	//	message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", license.getApplicationNumber());
 
 		return message;
@@ -198,7 +198,7 @@ public class NotificationUtil {
 	 */
 	private String getAppliedMsg(TradeLicense license, String message) {
 		// message = message.replace("<1>",);
-		message = message.replace("<2>", license.getTradeName());
+	//	message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", license.getApplicationNumber());
 
 		return message;
@@ -231,7 +231,7 @@ public class NotificationUtil {
 	 */
 	private String getApprovedMsg(TradeLicense license, String message) {
 		String expiryDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getValidTo());
-		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
+//		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
 		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
 
@@ -249,7 +249,7 @@ public class NotificationUtil {
 	 */
 	private String getRejectedMsg(TradeLicense license, String message) {
 		// message = message.replace("<1>",);
-		message = message.replace("<2>", license.getTradeName());
+	//	message = message.replace("<2>", license.getTradeName());
 
 		return message;
 	}
