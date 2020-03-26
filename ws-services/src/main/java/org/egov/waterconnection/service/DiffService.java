@@ -36,7 +36,7 @@ public class DiffService {
 		try {
 				WaterConnection updateConnection = request.getWaterConnection();
 				if (!CollectionUtils.isEmpty(getUpdateFields(updateConnection, searchResult))
-						&& !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
+						|| !CollectionUtils.isEmpty(getObjectsAdded(updateConnection, searchResult))
 						|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
 					editNotificationService.sendEditNotification(request);
 				}
