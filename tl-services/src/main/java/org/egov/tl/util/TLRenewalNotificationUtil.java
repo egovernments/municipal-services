@@ -305,7 +305,7 @@ public class TLRenewalNotificationUtil {
      */
     private String getPendingApprovalMsg(TradeLicense license, String message) {
         message = message.replace("<2>", license.getApplicationNumber());
-        message = message.replace("<3>", license.getTradeName());
+      //  message = message.replace("<3>", license.getTradeName());
         return message;
     }
 

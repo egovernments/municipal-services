@@ -208,9 +208,9 @@ public class TLConstants {
 
     public static final String ACTION_STATUS_REJECTED  = "REJECT_REJECTED";
 
-    public static final String ACTION_STATUS_FIELDINSPECTION  = "FORWARD_FIELDINSPECTION";
+    public static final String ACTION_STATUS_FIELDINSPECTION  = "FORWARD_PENDINGFORAPPROVAL";
 
-    public static final String ACTION_STATUS_PENDINGAPPROVAL  = "FORWARD_PENDINGAPPROVAL";
+    public static final String ACTION_STATUS_PENDINGAPPROVAL  = "FORWARD_PENDINGFORAPPROVAL";
 
     public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
 

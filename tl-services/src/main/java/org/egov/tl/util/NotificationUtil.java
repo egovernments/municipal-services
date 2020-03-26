@@ -264,7 +264,7 @@ public class NotificationUtil {
 	 * @return customized message for rejected
 	 */
 	private String getFieldInspectionMsg(TradeLicense license, String message) {
-		message = message.replace("<2>", license.getTradeName());
+		message = message.replace("<2>", license.getApplicationNumber());
 		return message;
 	}
 
