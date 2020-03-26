@@ -5,15 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class SewerageConnectionValidator {
 
 	/**
@@ -52,6 +55,16 @@ public class SewerageConnectionValidator {
 				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 			}
 
+		}
+		if (isUpdate
+				&& (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())
+						&& !StringUtils.isEmpty(
+								sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()))
+				&& SWConstants.ACTIVATE_CONNECTION_CONST.equalsIgnoreCase(
+						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
+			if (StringUtils.isEmpty(sewerageConnection.getConnectionExecutionDate())) {
+				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
+			}
 		}
 
 		if (!errorMap.isEmpty())
