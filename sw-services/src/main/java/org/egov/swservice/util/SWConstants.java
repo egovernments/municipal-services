@@ -135,5 +135,17 @@ public class SWConstants {
 			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT));
 	
 	public static final String ACTIVATE_CONNECTION_CONST = "ACTIVATE_CONNECTION";
+	
+	public static final String SERVICE_FIELD_VALUE_NOTIFICATION = "Sewerage";
 
+	public static final List<String> FIELDS_TO_CHECK = Collections
+			.unmodifiableList(Arrays.asList("proposedWaterClosets", "proposedToilets", "noOfWaterClosets",
+					"noOfToilets", "oldConnectionNo", "roadType", "roadCuttingArea", "connectionExecutionDate",
+					"connectionCategory", "connectionType", "documentType", "fileStoreId", "licenseNo"));
+
+	public static final String SUBMIT_APPLICATION_CONST = "SUBMIT_APPLICATION";
+	
+	public static final List<String> EDIT_NOTIFICATION_STATE = Collections.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
+
+	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
 }

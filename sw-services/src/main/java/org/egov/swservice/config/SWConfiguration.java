@@ -147,5 +147,8 @@ public class SWConfiguration {
     
     @Value("${egov.filestore.host}")
     private String fileStoreHost;
+    
+    @Value("${sw.editnotification.topic}")
+    private String editNotificationTopic;
 
 }
