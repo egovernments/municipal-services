@@ -133,5 +133,7 @@ public class SWConstants {
 
 	public static final List<String> ADHOC_PENALTY_REBATE = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY,
 			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT));
+	
+	public static final String ACTIVATE_CONNECTION_CONST = "ACTIVATE_CONNECTION";
 
 }
