@@ -14,6 +14,7 @@ import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.workflow.BusinessService;
 import org.egov.waterconnection.repository.WaterDao;
+import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ActionValidator;
 import org.egov.waterconnection.validator.MDMSValidator;
@@ -56,14 +57,13 @@ public class WaterServiceImpl implements WaterService {
 	private ActionValidator actionValidator;
 	
 	@Autowired
-	private DiffService diffService;
-	
-	@Autowired
 	private WaterServicesUtil waterServiceUtil;
 	
 	@Autowired
 	private CalculationService calculationService;
 	
+	@Autowired
+	private WaterDaoImpl waterDaoImpl;
 	
 	
 	
@@ -125,7 +125,8 @@ public class WaterServiceImpl implements WaterService {
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest);
 		
 		//check for edit and send edit notification
-		//diffService.checkDifferenceAndSendEditNotification(waterConnectionRequest, searchResult);
+		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
+		
 		//Call workflow
 		wfIntegrator.callWorkFlow(waterConnectionRequest);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
@@ -142,7 +143,7 @@ public class WaterServiceImpl implements WaterService {
 	 * @param requestInfo
 	 * @return water connection
 	 */
-	private WaterConnection getConnectionForUpdateRequest(String id, RequestInfo requestInfo) {
+	public WaterConnection getConnectionForUpdateRequest(String id, RequestInfo requestInfo) {
 		Set<String> ids = new HashSet<>(Arrays.asList(id));
 		SearchCriteria criteria = new SearchCriteria();
 		criteria.setIds(ids);

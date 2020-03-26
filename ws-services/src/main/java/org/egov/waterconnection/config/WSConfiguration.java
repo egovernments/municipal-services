@@ -161,4 +161,9 @@ public class WSConfiguration {
     @Value("${egov.filestore.host}")
     private String fileStoreHost;
     
+    @Value("${ws.editnotification.topic}")
+    private String editNotificationTopic;
+    
+    
+    
 }

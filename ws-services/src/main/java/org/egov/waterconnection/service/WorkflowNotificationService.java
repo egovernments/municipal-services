@@ -236,7 +236,7 @@ public class WorkflowNotificationService {
 			if (messageToreplace.contains("<Owner Name>"))
 				messageToreplace = messageToreplace.replace("<Owner Name>", mobileAndName.getValue());
 			if (messageToreplace.contains("<Service>"))
-				messageToreplace = messageToreplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_WS);
+				messageToreplace = messageToreplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_NOTIFICATION);
 
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>", waterConnection.getApplicationNo());
@@ -385,6 +385,7 @@ public class WorkflowNotificationService {
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
 	}
+	
 	/**
 	 * 
 	 * @param tenantId
