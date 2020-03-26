@@ -184,6 +184,10 @@ public class TLConfiguration {
     @Value("${notification.sms.enabled.forTLRENEWAL}")
     private Boolean isTLRENEWALSMSEnabled;
 
+    @Value("${notification.citizen.link}")
+    private String citizenLink;
+
+
     //Localization
     @Value("${egov.localization.host}")
     private String localizationHost;

@@ -234,10 +234,7 @@ public class NotificationUtil {
 //		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
 		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
-
-		// Needs to be removed
-		String url = "https://egov-demo.egovernments.org/citizen/language-selection";
-		message = message.replace("<url>", url);
+		message = message.replace("<url>", config.getCitizenLink());
 		return message;
 	}
 
