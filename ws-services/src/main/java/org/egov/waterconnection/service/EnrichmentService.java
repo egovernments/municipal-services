@@ -101,10 +101,14 @@ public class EnrichmentService {
 //		AuditDetails auditDetails = waterServicesUtil
 //				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		waterConnectionRequest.getWaterConnection().setConnectionExecutionDate(BigDecimal.valueOf(Instant.now().getEpochSecond() * 1000));
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
+		//Application creation date
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+	    additionalDetail.put(WCConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
+	    waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+		
 	}
 	@SuppressWarnings("unchecked")
 	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {

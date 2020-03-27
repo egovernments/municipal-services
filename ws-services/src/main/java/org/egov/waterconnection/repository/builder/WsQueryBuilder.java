@@ -28,7 +28,7 @@ public class WsQueryBuilder {
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 //	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.rainWaterHarvesting, wc.connectionType, wc.waterSource,"
-			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading,"
+			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading, wc.appCreatedDate,"
 			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
 			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress, plumber.relationship  FROM connection conn "
@@ -47,7 +47,7 @@ public class WsQueryBuilder {
             " result) result_offset " +
             "WHERE offset_ > ? AND offset_ <= ?";
 	
-	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.connectionExecutionDate DESC";
+	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.wc.appCreatedDate DESC";
 	/**
 	 * 
 	 * @param criteria
@@ -117,12 +117,12 @@ public class WsQueryBuilder {
 		}
 		if (criteria.getFromDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append("  wc.connectionExecutionDate >= ? ");
+			query.append("  wc.appCreatedDate >= ? ");
 			preparedStatement.add(criteria.getFromDate());
 		}
 		if (criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append("  wc.connectionExecutionDate <= ? ");
+			query.append("  wc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
 		}
 		query.append(ORDER_BY_CLAUSE);

@@ -51,15 +51,16 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setProposedTaps(rs.getInt("proposedTaps"));
 				currentWaterConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				currentWaterConnection.setRoadType(rs.getString("roadtype"));
-				HashMap<String, Object> penalties = new HashMap<>();
-				penalties.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
-				penalties.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
-				penalties.put(WCConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
-				penalties.put(WCConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
-				penalties.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
-				penalties.put(WCConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
-				penalties.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
-				currentWaterConnection.setAdditionalDetails(penalties);
+				HashMap<String, Object> additionalDetails = new HashMap<>();
+				additionalDetails.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
+				additionalDetails.put(WCConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
+				additionalDetails.put(WCConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
+				additionalDetails.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
+				additionalDetails.put(WCConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
+				currentWaterConnection.setAdditionalDetails(additionalDetails);
 				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				// get property id and get property object
 				Property property = new Property();
