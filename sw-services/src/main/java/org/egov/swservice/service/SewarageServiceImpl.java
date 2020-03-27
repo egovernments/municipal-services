@@ -12,6 +12,7 @@ import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.workflow.BusinessService;
 import org.egov.swservice.repository.SewarageDao;
+import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ActionValidator;
 import org.egov.swservice.validator.MDMSValidator;
@@ -60,9 +61,10 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Autowired
 	private WorkflowService workflowService;
-
+    
 	@Autowired
-	private DiffService diffService;
+	private SewarageDaoImpl sewarageDaoImpl;
+    
 
 	@Autowired
 	private CalculationService calculationService;
@@ -136,7 +138,7 @@ public class SewarageServiceImpl implements SewarageService {
 		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
-		//diffService.checkDifferenceAndSendEditNotification(sewarageConnectionRequest, searchResult);
+		sewarageDaoImpl.pushForEditNotification(sewarageConnectionRequest);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
@@ -152,7 +154,7 @@ public class SewarageServiceImpl implements SewarageService {
 	 * @param requestInfo
 	 * @return sewerage connection
 	 */
-	private SewerageConnection getConnectionForUpdateRequest(String id, RequestInfo requestInfo) {
+	public SewerageConnection getConnectionForUpdateRequest(String id, RequestInfo requestInfo) {
 		SearchCriteria criteria = new SearchCriteria();
 		Set<String> ids = new HashSet<>(Arrays.asList(id));
 		criteria.setIds(ids);

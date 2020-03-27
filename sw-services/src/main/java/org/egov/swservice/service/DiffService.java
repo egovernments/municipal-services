@@ -64,11 +64,11 @@ public class DiffService {
 		
 		List<String> updatedValues = new LinkedList<>();
 		changes.forEach(change -> {
-			if (!SWConstants.FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
+			if (SWConstants.FIELDS_TO_CHECK.contains(change.getPropertyName())) {
 				updatedValues.add(change.getPropertyName());
 			}
 		});
-		log.debug("Updated Fields :----->  " + updatedValues.toString());
+		log.info("Updated Fields :----->  "+ updatedValues.toString());
 		return updatedValues;
 	}
 
@@ -91,10 +91,10 @@ public class DiffService {
 		for (Object object : objectsAdded) {
 			String className = object.getClass().toString()
 					.substring(object.getClass().toString().lastIndexOf('.') + 1);
-			if (!classModified.contains(className))
+			if (!classModified.contains(className) && !SWConstants.IGNORE_CLASS_ADDED.contains(className))
 				classModified.add(className);
 		}
-		log.debug("Class Modified :----->  " + classModified.toString());
+		log.info("Class Modified :----->  "+ classModified.toString());
 		return classModified;
 	}
 

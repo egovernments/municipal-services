@@ -83,20 +83,24 @@ public class WorkflowNotificationService {
 	 */
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
-			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(
-					request.getSewerageConnection().getProcessInstance().getAction() + "_" + request.getSewerageConnection().getApplicationStatus().name())) {
-				log.info("Notification Disabled For State :" + request.getSewerageConnection().getApplicationStatus().name());
+			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS
+					.contains(request.getSewerageConnection().getProcessInstance().getAction() + "_"
+							+ request.getSewerageConnection().getApplicationStatus().name())) {
+				log.info("Notification Disabled For State :"
+						+ request.getSewerageConnection().getApplicationStatus().name());
 				return;
 			}
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
-				EventRequest eventRequest = getEventRequest(request.getSewerageConnection(), topic, request.getRequestInfo());
+				EventRequest eventRequest = getEventRequest(request.getSewerageConnection(), topic,
+						request.getRequestInfo());
 				if (eventRequest != null) {
 					log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 					notificationUtil.sendEventNotification(eventRequest);
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-				List<SMSRequest> smsRequests = getSmsRequest(request.getSewerageConnection(), topic, request.getRequestInfo());
+				List<SMSRequest> smsRequests = getSmsRequest(request.getSewerageConnection(), topic,
+						request.getRequestInfo());
 				if (!CollectionUtils.isEmpty(smsRequests)) {
 					log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
@@ -130,7 +134,7 @@ public class WorkflowNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
-				sewerageConnection, message,requestInfo);
+				sewerageConnection, message, requestInfo);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, requestInfo,
 				sewerageConnection.getProperty().getTenantId());
@@ -153,7 +157,8 @@ public class WorkflowNotificationService {
 			// List<String> payTriggerList =
 			// Arrays.asList(config.getPayTriggers().split("[,]"));
 
-			Action action = getActionForEventNotification(mobileNumberAndMesssage, mobile, sewerageConnection,requestInfo);
+			Action action = getActionForEventNotification(mobileNumberAndMesssage, mobile, sewerageConnection,
+					requestInfo);
 			events.add(Event.builder().tenantId(sewerageConnection.getProperty().getTenantId())
 					.description(mobileNumberAndMesssage.get(mobile)).eventType(SWConstants.USREVENTS_EVENT_TYPE)
 					.name(SWConstants.USREVENTS_EVENT_NAME).postedBy(SWConstants.USREVENTS_EVENT_POSTEDBY)
@@ -230,7 +235,7 @@ public class WorkflowNotificationService {
 		});
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
-				sewerageConnection, message,requestInfo);
+				sewerageConnection, message, requestInfo);
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			SMSRequest req = new SMSRequest(mobileNumber, messg);
 			smsRequest.add(req);
@@ -239,7 +244,7 @@ public class WorkflowNotificationService {
 	}
 
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,
-			SewerageConnection sewerageConnection, String message,RequestInfo requestInfo) {
+			SewerageConnection sewerageConnection, String message, RequestInfo requestInfo) {
 		Map<String, String> messagetoreturn = new HashMap<>();
 		String messageToreplace = message;
 		for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
@@ -247,15 +252,15 @@ public class WorkflowNotificationService {
 			if (messageToreplace.contains("<Owner Name>"))
 				messageToreplace = messageToreplace.replace("<Owner Name>", mobileAndName.getValue());
 			if (messageToreplace.contains("<Service>"))
-				messageToreplace = messageToreplace.replace("<Service>", SWConstants.SERVICE_FIELD_VALUE_SW);
+				messageToreplace = messageToreplace.replace("<Service>", SWConstants.SERVICE_FIELD_VALUE_NOTIFICATION);
 
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>",
 						sewerageConnection.getApplicationNo());
 
 			if (messageToreplace.contains("<Application download link>"))
-				messageToreplace = messageToreplace.replace("<Application download link>",
-						sewerageServicesUtil.getShortnerURL(getApplicationDownloaderLink(sewerageConnection, requestInfo)));
+				messageToreplace = messageToreplace.replace("<Application download link>", sewerageServicesUtil
+						.getShortnerURL(getApplicationDownloaderLink(sewerageConnection, requestInfo)));
 
 			if (messageToreplace.contains("<mseva URL>"))
 				messageToreplace = messageToreplace.replace("<mseva URL>",
@@ -282,7 +287,6 @@ public class WorkflowNotificationService {
 			if (messageToreplace.contains("<receipt download link>"))
 				messageToreplace = messageToreplace.replace("<receipt download link>",
 						sewerageServicesUtil.getShortnerURL(config.getNotificationUrl()));
-
 
 			if (messageToreplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
@@ -332,18 +336,18 @@ public class WorkflowNotificationService {
 		}
 		return mapOfPhnoAndUUIDs;
 	}
-	
-	
-	   /**
-     * Fetch URL for application download link
-     * 
-     * @param waterConnection
-     * @param requestInfo
-     * @return application download link
-     */
+
+	/**
+	 * Fetch URL for application download link
+	 * 
+	 * @param waterConnection
+	 * @param requestInfo
+	 * @return application download link
+	 */
 	private String getApplicationDownloaderLink(SewerageConnection sewerageConnection, RequestInfo requestInfo) {
-		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(sewerageConnection.getApplicationNo())
-				.sewerageConnection(sewerageConnection).tenantId(sewerageConnection.getProperty().getTenantId()).build();
+		CalculationCriteria criteria = CalculationCriteria.builder()
+				.applicationNo(sewerageConnection.getApplicationNo()).sewerageConnection(sewerageConnection)
+				.tenantId(sewerageConnection.getProperty().getTenantId()).build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
 				.requestInfo(requestInfo).isconnectionCalculation(false).build();
 		try {
@@ -365,6 +369,7 @@ public class WorkflowNotificationService {
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 		}
 	}
+
 	/**
 	 * Get file store id from PDF service
 	 * 
@@ -388,8 +393,9 @@ public class WorkflowNotificationService {
 			Object response = serviceRequestRepository.fetchResult(builder, requestPayload);
 			DocumentContext responseContext = JsonPath.parse(response);
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
-			if(CollectionUtils.isEmpty(fileStoreIds)) {
-				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "NO file store id found from pdf service");
+			if (CollectionUtils.isEmpty(fileStoreIds)) {
+				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
+						"NO file store id found from pdf service");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
@@ -397,6 +403,7 @@ public class WorkflowNotificationService {
 			throw new CustomException("SEWERAGE_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
 	}
+
 	/**
 	 * 
 	 * @param tenantId

@@ -12,6 +12,7 @@ import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.producer.SewarageConnectionProducer;
 import org.egov.swservice.repository.builder.SWQueryBuilder;
 import org.egov.swservice.repository.rowmapper.SewerageRowMapper;
+import org.egov.swservice.util.SWConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -72,6 +73,18 @@ public class SewarageDaoImpl implements SewarageDao {
 			sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
 		} else {
 			sewarageConnectionProducer.push(swConfiguration.getWorkFlowUpdateTopic(), sewerageConnectionRequest);
+		}
+	}
+	
+	/**
+	 * push object for edit notification
+	 * 
+	 * @param sewerageConnectionRequest
+	 */
+	public void pushForEditNotification(SewerageConnectionRequest sewerageConnectionRequest) {
+		if (!SWConstants.EDIT_NOTIFICATION_STATE
+				.contains(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
+			sewarageConnectionProducer.push(swConfiguration.getEditNotificationTopic(), sewerageConnectionRequest);
 		}
 	}
 
