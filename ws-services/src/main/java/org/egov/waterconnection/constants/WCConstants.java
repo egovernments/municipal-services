@@ -159,13 +159,16 @@ public class WCConstants {
 	
 	public static final String SUBMIT_APPLICATION_CONST = "SUBMIT_APPLICATION";
 	
+	public static final String DETAILS_PROVIDED_BY = "detailsProvidedBy";
+	
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY,
-			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST));
+			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST, DETAILS_PROVIDED_BY));
 	
 	public static final List<String> EDIT_NOTIFICATION_STATE = Collections.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
 	
 	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
 	
 	public static final String APP_CREATED_DATE = "appCreatedDate";
+	
 	
 }
