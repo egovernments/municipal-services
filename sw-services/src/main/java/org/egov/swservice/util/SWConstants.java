@@ -148,4 +148,6 @@ public class SWConstants {
 	public static final List<String> EDIT_NOTIFICATION_STATE = Collections.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
 
 	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
+	
+	public static final String APP_CREATED_DATE = "appCreatedDate";
 }

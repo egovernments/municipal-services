@@ -31,7 +31,7 @@ public class SWQueryBuilder {
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_sw_connection WHERE";
 	
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT conn.*, sc.*, document.*, plumber.*, sc.connectionExecutionDate,"
-			+ "sc.noOfWaterClosets, sc.noOfToilets,sc.proposedWaterClosets, sc.proposedToilets, sc.connectionType, sc.connection_id as connection_Id, conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
+			+ "sc.noOfWaterClosets, sc.noOfToilets,sc.proposedWaterClosets, sc.proposedToilets, sc.connectionType, sc.connection_id as connection_Id, sc.appCreatedDate, conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
 			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress, plumber.relationship FROM eg_sw_connection conn "
 	+  INNER_JOIN_STRING 
@@ -116,16 +116,16 @@ public class SWQueryBuilder {
 		}
 		if (criteria.getFromDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append("  sc.connectionExecutionDate >= ? ");
+			query.append("  sc.appCreatedDate >= ? ");
 			preparedStatement.add(criteria.getFromDate());
 		}
 		if (criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append("  sc.connectionExecutionDate <= ? ");
+			query.append("  sc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
 		}
 		//Add OrderBy clause
-		query.append(" ORDER BY sc.connectionExecutionDate DESC");
+		query.append(" ORDER BY sc.appCreatedDate DESC");
 		
 		if (query.toString().indexOf("WHERE") > -1)
 			 return addPaginationWrapper(query.toString(), preparedStatement, criteria);

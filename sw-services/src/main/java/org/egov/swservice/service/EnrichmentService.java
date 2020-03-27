@@ -2,7 +2,6 @@ package org.egov.swservice.service;
 
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,13 +14,13 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.AuditDetails;
+import org.egov.swservice.model.Connection.ApplicationStatusEnum;
+import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SearchCriteria;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Status;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
-import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Idgen.IdResponse;
 import org.egov.swservice.repository.IdGenRepository;
 import org.egov.swservice.util.SWConstants;
@@ -111,7 +110,10 @@ public class EnrichmentService {
 		//		.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
-		sewerageConnectionRequest.getSewerageConnection().setConnectionExecutionDate(BigDecimal.valueOf(Instant.now().getEpochSecond() * 1000));
+		//Application created date
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+	    additionalDetail.put(SWConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
+	    sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
 	}

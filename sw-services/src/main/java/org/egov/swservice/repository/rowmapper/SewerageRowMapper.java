@@ -1,11 +1,9 @@
 package org.egov.swservice.repository.rowmapper;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +20,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Component
 public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
 
@@ -52,14 +47,15 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
 				sewarageConnection.setRoadType(rs.getString("roadtype"));
 				// get property id and get property object
-				HashMap<String, Object> penalties = new HashMap<>();
-				penalties.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
-				penalties.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
-				penalties.put(SWConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
-				penalties.put(SWConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
-				penalties.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
-				penalties.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
-				sewarageConnection.setAdditionalDetails(penalties);
+				HashMap<String, Object> addtionalDetails = new HashMap<>();
+				addtionalDetails.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
+				addtionalDetails.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
+				addtionalDetails.put(SWConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
+				addtionalDetails.put(SWConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
+				addtionalDetails.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
+				addtionalDetails.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
+				addtionalDetails.put(SWConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
+				sewarageConnection.setAdditionalDetails(addtionalDetails);
 				sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				Property property = new Property();
 				property.setPropertyId(rs.getString("property_id"));
