@@ -55,6 +55,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				addtionalDetails.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
 				addtionalDetails.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
 				addtionalDetails.put(SWConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
+				addtionalDetails.put(SWConstants.DETAILS_PROVIDED_BY, rs.getString("detailsprovidedby"));
 				sewarageConnection.setAdditionalDetails(addtionalDetails);
 				sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				Property property = new Property();
