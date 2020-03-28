@@ -265,6 +265,14 @@ public class TLConstants {
 
 
 
+    public static final String ADDITIONALDETAILS_KEY_FROMSTATE = "fromState";
+
+    public static final String ADDITIONALDETAILS_KEY_FROMDISTRICT = "fromDistrict";
+
+    public static final String ADDITIONALDETAILS_KEY_TODISTRICT = "toDistrict";
+
+
+
     public static final String NOTIF_OWNER_NAME_KEY = "{OWNER_NAME}";
 
     public static final String NOTIF_TRADE_NAME_KEY = "{TRADE_NAME}";
@@ -272,6 +280,22 @@ public class TLConstants {
     public static final String NOTIF_TRADE_LICENSENUMBER_KEY = "{LICENSE_NUMBER}";
 
     public static final String NOTIF_EXPIRY_DATE_KEY = "{EXPIRY_DATE}";
+
+    public static final String NOTIF_PASS_CATEGORY_KEY = "{PASS_CATEGORY}";
+
+    public static final String NOTIF_APPLICATION_NUMBER_KEY = "{APPLICATION_NUMBER}";
+
+    public static final String NOTIF_HOST_LINK_KEY = "{HOST_LINK}";
+
+    public static final String NOTIF_FROM_STATE_KEY = "{FROM_STATE}";
+
+    public static final String NOTIF_FROM_DISTRICT_KEY = "{FROM_DISTRICT}";
+
+    public static final String NOTIF_TO_DISTRICT_KEY = "{TO_DISTRICT}";
+
+    public static final String NOTIF_PDF_LINK_KEY = "{PDF_LINK}";
+
+
 
     public static final String validityPeriodMap = "$.MdmsRes.TradeLicense.TradeType[?(@.code==\"{}\")].validityPeriod";
 

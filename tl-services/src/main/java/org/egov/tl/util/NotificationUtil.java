@@ -65,7 +65,7 @@ public class NotificationUtil {
 
 		case ACTION_STATUS_APPLIED:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPLIED, localizationMessage);
-			message = getAppliedMsg(license, messageTemplate);
+			message = getAppliedMsg(license, messageTemplate,localizationMessage);
 			break;
 
 		/*
@@ -77,12 +77,12 @@ public class NotificationUtil {
 		case ACTION_STATUS_APPROVED:
 			//BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPROVED, localizationMessage);
-			message = getApprovedMsg(license, messageTemplate);
+			message = getApprovedMsg(license, messageTemplate, localizationMessage);
 			break;
 
 		case ACTION_STATUS_REJECTED:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_REJECTED, localizationMessage);
-			message = getRejectedMsg(license, messageTemplate);
+			message = getRejectedMsg(license, messageTemplate, localizationMessage);
 			break;
 
 		case ACTION_STATUS_FIELDINSPECTION:
@@ -127,6 +127,8 @@ public class NotificationUtil {
 			message = ((ArrayList<String>) messageObj).get(0);
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
+			log.info("Failed for localization code: "+notificationCode);
+			return null;
 		}
 		return message;
 	}
@@ -241,10 +243,12 @@ public class NotificationUtil {
 	 *            Message from localization for apply
 	 * @return customized message for apply
 	 */
-	private String getAppliedMsg(TradeLicense license, String message) {
+	private String getAppliedMsg(TradeLicense license, String message, String localizationMessage) {
 		// message = message.replace("<1>",);
 	//	message = message.replace("<2>", license.getTradeName());
-		message = message.replace("<3>", license.getApplicationNumber());
+		message = message.replace(NOTIF_APPLICATION_NUMBER_KEY, license.getApplicationNumber());
+		String passCategoryName = getName(license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType(),localizationMessage);
+		message = message.replace(NOTIF_PASS_CATEGORY_KEY, passCategoryName);
 
 		return message;
 	}
@@ -274,13 +278,24 @@ public class NotificationUtil {
 	 *            Message from localization for approved
 	 * @return customized message for approved
 	 */
-	private String getApprovedMsg(TradeLicense license, String message) {
-		String expiryDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getValidTo());
-//		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
-		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
+	private String getApprovedMsg(TradeLicense license, String message, String localizationMessage) {
+
+		String passCategoryName = getName(license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType(),localizationMessage);
+		message = message.replace(NOTIF_PASS_CATEGORY_KEY, passCategoryName);
+
+		String fromState = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText(),localizationMessage);
+		message = message.replace(NOTIF_FROM_STATE_KEY, fromState);
+
+		String fromDistrict = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMDISTRICT).asText(),localizationMessage);
+		message = message.replace(NOTIF_FROM_DISTRICT_KEY, fromDistrict);
+
+		String toDistrict = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TODISTRICT).asText(),localizationMessage);
+		message = message.replace(NOTIF_TO_DISTRICT_KEY, toDistrict);
+
+
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
 		String url = getPDFURL(license);
-		message = message.replace("<url>", url);
+		message = message.replace(NOTIF_PDF_LINK_KEY, url);
 		return message;
 	}
 
@@ -293,9 +308,10 @@ public class NotificationUtil {
 	 *            Message from localization for rejected
 	 * @return customized message for rejected
 	 */
-	private String getRejectedMsg(TradeLicense license, String message) {
-		// message = message.replace("<1>",);
-	//	message = message.replace("<2>", license.getTradeName());
+	private String getRejectedMsg(TradeLicense license, String message, String localizationMessage) {
+		String passCategoryName = getName(license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType(),localizationMessage);
+		message = message.replace(NOTIF_PASS_CATEGORY_KEY, passCategoryName);
+		message = message.replace(NOTIF_HOST_LINK_KEY,config.getHostLink());
 
 		return message;
 	}
@@ -584,15 +600,15 @@ public class NotificationUtil {
 	 * @return
 	 */
 	private String getName(String code,String localizationMessages){
-		try {
-			String localizationCode = NOTIFICATION_TL_PREFIX+code;
-			String name = getMessageTemplate(localizationCode, localizationMessages);
-			return name;
-		}
-		catch (Exception e){
-			e.printStackTrace();
+
+		String localizationCode = NOTIFICATION_TL_PREFIX+code;
+		String name = getMessageTemplate(localizationCode, localizationMessages);
+
+		if(name==null)
 			return code;
-		}
+
+		return name;
+
 	}
 
 	public List<String> getLocalizationCodes(TradeLicenseRequest request){
@@ -601,10 +617,19 @@ public class NotificationUtil {
 		Set<String> codes = new HashSet<>();
 
 		licenses.forEach(license -> {
+			String passCategoryCode = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
+			String fromState = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText();
+			String fromDistrict = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMDISTRICT).asText();
+			String toDistrict = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TODISTRICT).asText();
+
+			codes.add(passCategoryCode);
+			codes.add(fromState);
+			codes.add(fromDistrict);
+			codes.add(toDistrict);
 
 		});
 
-		return new LinkedList<>();
+		return new LinkedList<>(codes);
 	}
 
 }

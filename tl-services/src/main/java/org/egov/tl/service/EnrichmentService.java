@@ -95,7 +95,7 @@ public class EnrichmentService {
                 tradeUnit.setActive(true);
             });
 
-            if (tradeLicense.getAction().equalsIgnoreCase(ACTION_APPLY)) {
+            if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getApplicationDocuments())) {
                 tradeLicense.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
                     document.setId(UUID.randomUUID().toString());
                     document.setActive(true);

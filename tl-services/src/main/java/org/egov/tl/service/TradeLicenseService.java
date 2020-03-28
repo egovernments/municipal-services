@@ -3,6 +3,7 @@ package org.egov.tl.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
@@ -61,6 +62,8 @@ public class TradeLicenseService {
 
     private TLBatchService tlBatchService;
 
+    private ObjectMapper objectMapper;
+
     @Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
     private Boolean pickWFServiceNameFromTradeTypeOnly;
 
@@ -70,7 +73,7 @@ public class TradeLicenseService {
                                TLValidator tlValidator, TLWorkflowService TLWorkflowService,
                                CalculationService calculationService, TradeUtil util, DiffService diffService,
                                TLConfiguration config, EditNotificationService editNotificationService, WorkflowService workflowService,
-                               TradeUtil tradeUtil, TLBatchService tlBatchService) {
+                               TradeUtil tradeUtil, TLBatchService tlBatchService,ObjectMapper objectMapper) {
         this.wfIntegrator = wfIntegrator;
         this.enrichmentService = enrichmentService;
         this.userService = userService;
@@ -86,6 +89,7 @@ public class TradeLicenseService {
         this.workflowService = workflowService;
         this.tradeUtil = tradeUtil;
         this.tlBatchService = tlBatchService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -320,6 +324,14 @@ public class TradeLicenseService {
             }*/
             repository.update(tradeLicenseRequest, idToIsStateUpdatableMap);
             licenceResponse=  tradeLicenseRequest.getLicenses();
+
+            try{
+            System.out.println("license:  "+objectMapper.writeValueAsString(tradeLicenseRequest));}
+            catch (Exception e){
+
+            }
+
+
         }
         return licenceResponse;
         

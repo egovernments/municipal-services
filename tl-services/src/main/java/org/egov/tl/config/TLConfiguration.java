@@ -184,8 +184,11 @@ public class TLConfiguration {
     @Value("${notification.sms.enabled.forTLRENEWAL}")
     private Boolean isTLRENEWALSMSEnabled;
 
-    @Value("${notification.citizen.link}")
+    @Value("${notification.pdf.link}")
     private String citizenPDFLink;
+
+    @Value("${notification.host.link}")
+    private String hostLink;
 
 
     //Localization
