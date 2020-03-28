@@ -64,6 +64,26 @@ public class TradeLicenseSearchCriteria {
     @JsonIgnore
     private List<String> ownerIds;
 
+    public  boolean onlyUuidAndTenantId(){
+        return (
+        this.status == null &&
+        this.applicationType == null &&
+        this.applicationNumber == null &&
+        this.licenseNumbers == null &&
+        this.oldLicenseNumber == null &&
+        this.mobileNumber == null &&
+        this.accountId == null &&
+        this.fromDate == null &&
+        this.toDate == null &&
+        this.businessService == null &&
+        this.validTo == null &&
+        this.offset == null &&
+        this.limit == null &&
+        this.ownerIds == null &&
+        this.ids != null &&
+        this.tenantId != null
+        );
+    }
 
     public boolean isEmpty() {
         return (this.tenantId == null && this.status == null && this.applicationType == null && this.ids == null && this.applicationNumber == null

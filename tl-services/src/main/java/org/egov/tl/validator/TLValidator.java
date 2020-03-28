@@ -537,6 +537,8 @@ public class TLValidator {
 
         if(requestInfo.getUserInfo()!=null)
             userType = requestInfo.getUserInfo().getType();
+        else if(!criteria.onlyUuidAndTenantId())
+            throw new CustomException("INVALID_SEARCH","Not authorized to search");
 
         List<String> allowedservices = Arrays.asList(allowedBusinessService.split(","));
         if ((serviceFromPath != null) && (!allowedservices.contains(serviceFromPath))) {
