@@ -281,6 +281,9 @@ public class TLConstants {
 
     public static final String NOTIF_EXPIRY_DATE_KEY = "{EXPIRY_DATE}";
 
+    public static final String NOTIF_ISSUE_DATE_KEY = "{ISSUE_DATE}";
+
+
     public static final String NOTIF_PASS_CATEGORY_KEY = "{PASS_CATEGORY}";
 
     public static final String NOTIF_APPLICATION_NUMBER_KEY = "{APPLICATION_NUMBER}";

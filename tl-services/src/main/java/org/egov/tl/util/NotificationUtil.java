@@ -292,6 +292,8 @@ public class NotificationUtil {
 		String toDistrict = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TODISTRICT).asText(),localizationMessage);
 		message = message.replace(NOTIF_TO_DISTRICT_KEY, toDistrict);
 
+		String issueDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getIssuedDate());
+		message = message.replace(NOTIF_ISSUE_DATE_KEY, issueDate);
 
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
 		String url = getPDFURL(license);
