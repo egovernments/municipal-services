@@ -533,33 +533,38 @@ public class TLValidator {
             throw new CustomException("INVALID SEARCH", "Business service in Path param and requestbody not matching");
         }
 
+        String userType = "CITIZEN";
+
+        if(requestInfo.getUserInfo()!=null)
+            userType = requestInfo.getUserInfo().getType();
+
         List<String> allowedservices = Arrays.asList(allowedBusinessService.split(","));
         if ((serviceFromPath != null) && (!allowedservices.contains(serviceFromPath))) {
             throw new CustomException("INVALID SEARCH", "Search not allowed on this business service");
         }
 
-        if(!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& criteria.isEmpty())
+        if(!userType.equalsIgnoreCase("CITIZEN" )&& criteria.isEmpty())
             throw new CustomException("INVALID SEARCH","Search without any paramters is not allowed");
 
-        if(!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& criteria.tenantIdOnly())
+        if(!userType.equalsIgnoreCase("CITIZEN" )&& criteria.tenantIdOnly())
             throw new CustomException("INVALID SEARCH","Search based only on tenantId is not allowed");
 
-        if(!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& !criteria.tenantIdOnly()
+        if(!userType.equalsIgnoreCase("CITIZEN" )&& !criteria.tenantIdOnly()
                 && criteria.getTenantId()==null)
             throw new CustomException("INVALID SEARCH","TenantId is mandatory in search");
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" ) && !criteria.isEmpty()
+        if(userType.equalsIgnoreCase("CITIZEN" ) && !criteria.isEmpty()
                 && !criteria.tenantIdOnly() && criteria.getTenantId()==null)
             throw new CustomException("INVALID SEARCH","TenantId is mandatory in search");
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" )&& criteria.tenantIdOnly())
+        if(userType.equalsIgnoreCase("CITIZEN" )&& criteria.tenantIdOnly())
             throw new CustomException("INVALID SEARCH","Search only on tenantId is not allowed");
 
         String allowedParamStr = null;
 
-        if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN" ))
+        if(userType.equalsIgnoreCase("CITIZEN" ))
             allowedParamStr = config.getAllowedCitizenSearchParameters();
-        else if(requestInfo.getUserInfo().getType().equalsIgnoreCase("EMPLOYEE" ))
+        else if(userType.equalsIgnoreCase("EMPLOYEE" ))
             allowedParamStr = config.getAllowedEmployeeSearchParameters();
         else throw new CustomException("INVALID SEARCH","The userType: "+requestInfo.getUserInfo().getType()+
                     " does not have any search config");

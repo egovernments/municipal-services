@@ -69,16 +69,16 @@ public class EnrichmentService {
                     if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                         tradeLicense.setLicenseNumber(tradeLicenseRequest.getLicenses().get(0).getLicenseNumber());
 
-                        /*Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
-                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-                        tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));*/
-                    }
-                    /*else{
                         Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
-                        if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
+                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                        tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
+                    }
+                    else{
+                        Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+                     //   if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
                             tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                             tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
-                    }*/
+                    }
                     if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                             accessory.setTenantId(tradeLicense.getTenantId());

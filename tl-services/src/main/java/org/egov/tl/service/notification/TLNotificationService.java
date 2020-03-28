@@ -110,7 +110,8 @@ public class TLNotificationService {
 					message = tlRenewalNotificationUtil.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
 				}
 				else{
-					String localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo());
+					List<String> codes = util.getLocalizationCodes(request);
+					String localizationMessages = util.getLocalizationMessages(tenantId, request.getRequestInfo(), codes);
 					message = util.getCustomizedMsg(request.getRequestInfo(), license, localizationMessages);
 				}
 

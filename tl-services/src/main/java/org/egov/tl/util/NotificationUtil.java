@@ -17,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.egov.tl.util.TLConstants.*;
 
@@ -56,10 +58,10 @@ public class NotificationUtil {
 		String ACTION_STATUS = license.getAction() + "_" + license.getStatus();
 		switch (ACTION_STATUS) {
 
-		case ACTION_STATUS_INITIATED:
+		/*case ACTION_STATUS_INITIATED:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_INITIATED, localizationMessage);
 			message = getInitiatedMsg(license, messageTemplate);
-			break;
+			break;*/
 
 		case ACTION_STATUS_APPLIED:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPLIED, localizationMessage);
@@ -155,6 +157,33 @@ public class NotificationUtil {
 	}
 
 	/**
+	 * Returns the uri for the localization call
+	 *
+	 * @param tenantId
+	 *            TenantId of the propertyRequest
+	 * @return The uri for localization search call
+	 */
+	public StringBuilder getUri(String tenantId, RequestInfo requestInfo, List<String> additionalCodes) {
+
+		if (config.getIsLocalizationStateLevel())
+			tenantId = tenantId.split("\\.")[0];
+
+		String locale = NOTIFICATION_LOCALE;
+		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("|").length >= 2)
+			locale = requestInfo.getMsgId().split("\\|")[1];
+
+		List<String> codes =  Stream.concat(NOTIFICATION_CODES.stream(), additionalCodes.stream()).collect(Collectors.toList());
+
+		StringBuilder uri = new StringBuilder();
+		uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
+				.append(config.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
+				.append("&tenantId=").append(tenantId).append("&module=").append(TLConstants.MODULE)
+				.append("&codes=").append(StringUtils.join(codes,','));
+
+		return uri;
+	}
+
+	/**
 	 * Fetches messages from localization service
 	 * 
 	 * @param tenantId
@@ -165,6 +194,22 @@ public class NotificationUtil {
 	 */
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
+				requestInfo);
+		String jsonString = new JSONObject(responseMap).toString();
+		return jsonString;
+	}
+
+	/**
+	 * Fetches messages from localization service
+	 *
+	 * @param tenantId
+	 *            tenantId of the tradeLicense
+	 * @param requestInfo
+	 *            The requestInfo of the request
+	 * @return Localization messages for the module
+	 */
+	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo, List<String> additionalCodes) {
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo, additionalCodes),
 				requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
 		return jsonString;
@@ -234,7 +279,8 @@ public class NotificationUtil {
 //		message = message.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
 		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
-		message = message.replace("<url>", config.getCitizenLink());
+		String url = getPDFURL(license);
+		message = message.replace("<url>", url);
 		return message;
 	}
 
@@ -521,6 +567,44 @@ public class NotificationUtil {
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
+	}
+
+
+	private String getPDFURL(TradeLicense license){
+		String url = config.getCitizenPDFLink();
+		url = url.replace(NOTIF_UUID_KEY,license.getId());
+		url = url.replace(NOTIF_TENANTID_KEY,license.getTenantId());
+		return url;
+	}
+
+	/**
+	 * Returns localization for code if not found retirn code itself
+	 * @param code
+	 * @param localizationMessages
+	 * @return
+	 */
+	private String getName(String code,String localizationMessages){
+		try {
+			String localizationCode = NOTIFICATION_TL_PREFIX+code;
+			String name = getMessageTemplate(localizationCode, localizationMessages);
+			return name;
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return code;
+		}
+	}
+
+	public List<String> getLocalizationCodes(TradeLicenseRequest request){
+
+		List<TradeLicense> licenses = request.getLicenses();
+		Set<String> codes = new HashSet<>();
+
+		licenses.forEach(license -> {
+
+		});
+
+		return new LinkedList<>();
 	}
 
 }

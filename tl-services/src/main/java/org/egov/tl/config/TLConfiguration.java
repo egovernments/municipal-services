@@ -185,7 +185,7 @@ public class TLConfiguration {
     private Boolean isTLRENEWALSMSEnabled;
 
     @Value("${notification.citizen.link}")
-    private String citizenLink;
+    private String citizenPDFLink;
 
 
     //Localization

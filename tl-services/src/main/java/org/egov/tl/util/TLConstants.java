@@ -75,6 +75,8 @@ public class TLConstants {
 
     public static final String NOTIFICATION_TL_REMINDER = "tl.en.reminder";
 
+    public static final String NOTIFICATION_TL_PREFIX = "TL_";
+
 
     public static final List<String> NOTIFICATION_CODES = Collections.unmodifiableList(Arrays.asList(
             RENEWAL_NOTIFICATION_INITIATED, RENEWAL_NOTIFICATION_APPLIED, RENEWAL_NOTIFICATION_FIELD_INSPECTION, RENEWAL_NOTIFICATION_PENDINGAPPROVAL,
@@ -278,6 +280,10 @@ public class TLConstants {
     public static final String JOB_EXPIRY = "EXPIRY";
 
     public static final String DEFAULT_WORKFLOW = "NewTL";
+
+    public static final String NOTIF_UUID_KEY = "{UUID}";
+
+    public static final String NOTIF_TENANTID_KEY = "{TENANTID}";
 
     public TLConstants() {}
 
