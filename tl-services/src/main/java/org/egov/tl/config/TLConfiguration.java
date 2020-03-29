@@ -128,7 +128,6 @@ public class TLConfiguration {
     private Integer maxSearchLimit;
 
 
-
     // tradelicense Calculator
     @Value("${egov.tl.calculator.host}")
     private String calculatorHost;
@@ -291,6 +290,9 @@ public class TLConfiguration {
     private String expiryErrorTopic;
 
 
+
+    @Value("${egov.default.from.state}")
+    private String defaultFromState;
 
 
 

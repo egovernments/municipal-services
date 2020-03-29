@@ -283,7 +283,11 @@ public class NotificationUtil {
 		String passCategoryName = getName(license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType(),localizationMessage);
 		message = message.replace(NOTIF_PASS_CATEGORY_KEY, passCategoryName);
 
-		String fromState = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText(),localizationMessage);
+        String fromState = config.getDefaultFromState();
+        if(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE)!=null){
+            fromState = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText(),localizationMessage);
+        }
+
 		message = message.replace(NOTIF_FROM_STATE_KEY, fromState);
 
 		String fromDistrict = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMDISTRICT).asText(),localizationMessage);
@@ -620,16 +624,20 @@ public class NotificationUtil {
 
 		licenses.forEach(license -> {
 			String passCategoryCode = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-			String fromState = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText();
 			String fromDistrict = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMDISTRICT).asText();
 			String toDistrict = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TODISTRICT).asText();
 
 			codes.add(passCategoryCode);
-			codes.add(fromState);
 			codes.add(fromDistrict);
 			codes.add(toDistrict);
 
-		});
+			if(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE)!=null){
+                String fromState = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText();
+                codes.add(fromState);
+			}
+
+
+        });
 
 		return new LinkedList<>(codes);
 	}
