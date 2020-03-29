@@ -74,10 +74,11 @@ public class EnrichmentService {
                         tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
                     }
                     else{
-                        Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+                       // Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
                      //   if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
-                            tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-                            tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
+                        Long currentTime = System.currentTimeMillis();
+                            tradeLicense.setValidFrom(currentTime);
+                            tradeLicense.setValidTo(currentTime+config.getValidityPeriod());
                     }
                     if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
@@ -487,6 +488,7 @@ public class EnrichmentService {
                         license.setLicenseNumber(itr.next());
                         Long time = System.currentTimeMillis();
                         license.setIssuedDate(time);
+                        license.setValidTo(license.getIssuedDate()+config.getValidityPeriod());
                         //license.setValidFrom(time);
                         if (mdmsData != null && businessService.equalsIgnoreCase(businessService_BPA)) {
                             String jsonPath = TLConstants.validityPeriodMap.replace("{}",

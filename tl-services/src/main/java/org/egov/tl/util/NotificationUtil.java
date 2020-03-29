@@ -299,6 +299,9 @@ public class NotificationUtil {
 		String issueDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getIssuedDate());
 		message = message.replace(NOTIF_ISSUE_DATE_KEY, issueDate);
 
+		String expiryDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getValidTo());
+		message = message.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
+
 		message = message.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
 		String url = getPDFURL(license);
 		message = message.replace(NOTIF_PDF_LINK_KEY, url);

@@ -295,5 +295,9 @@ public class TLConfiguration {
     private String defaultFromState;
 
 
+    @Value("${egov.epoch.validity}")
+    private Long validityPeriod;
+
+
 
 }
