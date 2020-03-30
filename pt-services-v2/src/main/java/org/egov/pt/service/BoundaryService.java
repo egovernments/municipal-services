@@ -94,7 +94,7 @@ public class BoundaryService {
         //Adding dummy boundary in case not found in MDMS
         request.getProperties().forEach(property -> {
             Object boundaryObject = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-            if((boundaryObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList)boundaryObject)){
+            if((boundaryObject instanceof ArrayList) && !CollectionUtils.isEmpty((ArrayList)boundaryObject)){
             	Boundary boundary = mapper.convertValue(((ArrayList)boundaryObject).get(0),Boundary.class);
                 if(boundary.getArea()==null || boundary.getName()==null)
                     throw new CustomException("INVALID BOUNDARY DATA","The boundary data for the code "+property.getAddress().getLocality().getCode()+ " is not available");
