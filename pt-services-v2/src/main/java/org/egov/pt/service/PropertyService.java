@@ -1,5 +1,6 @@
 package org.egov.pt.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.producer.Producer;
@@ -14,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 
 @Service
+@Slf4j
 public class PropertyService {
 
     @Autowired
@@ -88,11 +90,15 @@ public class PropertyService {
         return properties;
     }
 
-    public List<Property> searchPropertyPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
-        List<Property> properties = getPropertiesPlainSearch(criteria, requestInfo);
-        enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
-        return properties;
-    }
+	public List<Property> searchPropertyPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
+		List<Property> properties = getPropertiesPlainSearch(criteria, requestInfo);
+		try {
+			enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
+		} catch (Exception e) {
+			log.error("Error during boundary enrichment ", e);
+		}
+		return properties;
+	}
 
     /**
      * Returns list of properties based on the given propertyCriteria with owner fields populated from user service
