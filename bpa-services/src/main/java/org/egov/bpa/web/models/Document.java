@@ -41,6 +41,9 @@ public class Document {
 	
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
+	
+	@JsonProperty("wfState")
+	private String wfState;
 
 
 }

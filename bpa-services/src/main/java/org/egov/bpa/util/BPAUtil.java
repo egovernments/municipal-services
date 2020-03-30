@@ -35,8 +35,7 @@ public class BPAUtil {
 	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
-	public BPAUtil(BPAConfiguration config,
-			ServiceRequestRepository serviceRequestRepository) {
+	public BPAUtil(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 	}
@@ -51,21 +50,19 @@ public class BPAUtil {
 	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
 		Long time = System.currentTimeMillis();
 		if (isCreate)
-			return AuditDetails.builder().createdBy(by).lastModifiedBy(by)
-					.createdTime(time).lastModifiedTime(time).build();
+			return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time)
+					.build();
 		else
-			return AuditDetails.builder().lastModifiedBy(by)
-					.lastModifiedTime(time).build();
+			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
 
 	/**
-	 * Returns the url for mdms search endpoint
+	 * Returns the URL for MDMS search end point
 	 *
-	 * @return url for mdms search endpoint
+	 * @return URL for MDMS search end point
 	 */
 	public StringBuilder getMdmsSearchUrl() {
-		return new StringBuilder().append(config.getMdmsHost()).append(
-				config.getMdmsEndPoint());
+		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
 
 	/**
@@ -85,59 +82,41 @@ public class BPAUtil {
 		// filter to only get code field from master data
 		final String filterCode = "$.[?(@.active==true)].code";
 
-		bpaMasterDtls
-				.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE)
-						.filter(filterCode).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.RISKTYPE_COMPUTATION).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.OCCUPANCY_TYPE).filter(filterCode).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.SUB_OCCUPANCY_TYPE).filter(filterCode)
-				.build());
-		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.USAGES)
-				.filter(filterCode).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.CalculationType).build());
-		bpaMasterDtls.add(MasterDetail.builder()
-				.name(BPAConstants.CHECKLIST_NAME).build());
-		ModuleDetail bpaModuleDtls = ModuleDetail.builder()
-				.masterDetails(bpaMasterDtls)
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.RISKTYPE_COMPUTATION).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.OCCUPANCY_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SUB_OCCUPANCY_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.USAGES).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CalculationType).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CHECKLIST_NAME).build());
+		ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
 				.moduleName(BPAConstants.BPA_MODULE).build();
 
 		// master details for common-masters module
 		List<MasterDetail> commonMasterDetails = new ArrayList<>();
-		commonMasterDetails.add(MasterDetail.builder()
-				.name(BPAConstants.OWNERSHIP_CATEGORY).filter(filterCode)
-				.build());
-		commonMasterDetails.add(MasterDetail.builder()
-				.name(BPAConstants.OWNER_TYPE).filter(filterCode).build());
-		commonMasterDetails.add(MasterDetail.builder()
-				.name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
-		ModuleDetail commonMasterMDtl = ModuleDetail.builder()
-				.masterDetails(commonMasterDetails)
+		commonMasterDetails
+				.add(MasterDetail.builder().name(BPAConstants.OWNERSHIP_CATEGORY).filter(filterCode).build());
+		commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNER_TYPE).filter(filterCode).build());
+		commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
+		ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
 				.moduleName(BPAConstants.COMMON_MASTERS_MODULE).build();
 
 		return Arrays.asList(bpaModuleDtls, commonMasterMDtl);
 
 	}
 
-	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,
-			String tenantId) {
+	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
 		List<ModuleDetail> moduleDetails = new LinkedList<>();
 		moduleDetails.addAll(moduleRequest);
 
-		MdmsCriteria mdmsCriteria = MdmsCriteria.builder()
-				.moduleDetails(moduleDetails).tenantId(tenantId).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId).build();
 
-		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder()
-				.mdmsCriteria(mdmsCriteria).requestInfo(requestInfo).build();
+		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria).requestInfo(requestInfo)
+				.build();
 		return mdmsCriteriaReq;
 	}
 
@@ -145,8 +124,7 @@ public class BPAUtil {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
-		Object result = serviceRequestRepository.fetchResult(
-				getMdmsSearchUrl(), mdmsCriteriaReq);
+		Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 		return result;
 	}
 
@@ -172,5 +150,4 @@ public class BPAUtil {
 			}
 		});
 	}
-
 }

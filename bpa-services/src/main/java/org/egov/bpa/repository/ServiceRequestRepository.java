@@ -20,7 +20,6 @@ public class ServiceRequestRepository {
 
 	private RestTemplate restTemplate;
 
-
 	@Autowired
 	public ServiceRequestRepository(ObjectMapper mapper, RestTemplate restTemplate) {
 		this.mapper = mapper;
@@ -29,15 +28,15 @@ public class ServiceRequestRepository {
 
 	public Object fetchResult(StringBuilder uri, Object request) {
 		Object response = null;
-		log.info("URI: "+uri.toString());
+		log.info("URI: " + uri.toString());
 		try {
-			log.info("Request: "+mapper.writeValueAsString(request));
+			log.info("Request: " + mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
-		}catch(HttpClientErrorException e) {
-			log.error("External Service threw an Exception: ",e);
+		} catch (HttpClientErrorException e) {
+			log.error("External Service threw an Exception: ", e);
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch(Exception e) {
-			log.error("Exception while fetching from searcher: ",e);
+		} catch (Exception e) {
+			log.error("Exception while fetching from searcher: ", e);
 		}
 
 		return response;

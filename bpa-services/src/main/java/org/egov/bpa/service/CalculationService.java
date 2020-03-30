@@ -23,9 +23,9 @@ public class CalculationService {
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.config = config;
 	}
-	
-	public void addCalculation(BPARequest bpaRequest,String feeType) {
-		
+
+	public void addCalculation(BPARequest bpaRequest, String feeType) {
+
 		CalculationReq calulcationRequest = new CalculationReq();
 		calulcationRequest.setRequestInfo(bpaRequest.getRequestInfo());
 		CalulationCriteria calculationCriteria = new CalulationCriteria();
@@ -36,10 +36,10 @@ public class CalculationService {
 		List<CalulationCriteria> criterias = Arrays.asList(calculationCriteria);
 		calulcationRequest.setCalulationCriteria(criterias);
 		StringBuilder url = new StringBuilder();
-		url.append( this.config.getCalculatorHost());
+		url.append(this.config.getCalculatorHost());
 		url.append(this.config.getCalulatorEndPoint());
-		
+
 		this.serviceRequestRepository.fetchResult(url, calulcationRequest);
 	}
-	
+
 }

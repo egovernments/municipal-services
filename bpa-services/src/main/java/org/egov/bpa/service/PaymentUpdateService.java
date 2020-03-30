@@ -46,6 +46,7 @@ public class PaymentUpdateService {
 		this.wfIntegrator = wfIntegrator;
 		this.enrichmentService = enrichmentService;
 		this.mapper = mapper;
+
 	}
 
 	final String tenantId = "tenantId";
@@ -78,7 +79,6 @@ public class PaymentUpdateService {
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(codes);
 					List<BPA> bpas = repository.getBPAData(searchCriteria);
-
 					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
 								"No Building Plan Application found for the comsumerCode "
@@ -113,7 +113,5 @@ public class PaymentUpdateService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }

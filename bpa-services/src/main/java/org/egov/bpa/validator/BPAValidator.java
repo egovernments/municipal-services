@@ -56,15 +56,14 @@ public class BPAValidator {
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData, String currentState) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		BPA bpa = request.getBPA();
-		
 
 		if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				&& !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
 				&& !bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
-			
+
 			String filterExp = "$.[?(@.applicationType=='" + bpa.getApplicationType() + "' && @.ServiceType=='"
-					+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='" + currentState
-					+ "')].docTypes";
+					+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='"
+					+ currentState + "')].docTypes";
 
 			List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
 
@@ -87,7 +86,8 @@ public class BPAValidator {
 				allDocuments.forEach(document -> {
 
 					if (!validDocumentTypes.contains(document.getDocumentType())) {
-						throw new CustomException("BPA_UNKNOWN_DOCUMENTTYPE", document.getDocumentType() + " is Unkown");
+						throw new CustomException("BPA_UNKNOWN_DOCUMENTTYPE",
+								document.getDocumentType() + " is Unkown");
 					}
 				});
 
@@ -136,8 +136,7 @@ public class BPAValidator {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			request.getBPA().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
-					throw new CustomException("BPA_DUPLICATE_DOCUMENT",
-							"Same document cannot be used multiple times");
+					throw new CustomException("BPA_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
 				else
 					documentFileStoreIds.add(document.getFileStoreId());
 			});
@@ -153,29 +152,27 @@ public class BPAValidator {
 	 *            The BPASearch Criteria
 	 */
 	public void validateSearch(RequestInfo requestInfo, BPASearchCriteria criteria) {
+		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && criteria.isEmpty())
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
+
+		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && !criteria.tenantIdOnly()
+				&& criteria.getTenantId() == null)
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && !criteria.isEmpty()
+				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
 
 		String allowedParamStr = null;
-		String userType = requestInfo.getUserInfo().getType();
-		
-		if (userType.equalsIgnoreCase(BPAConstants.EMPLOYEE)) {
-			allowedParamStr = config.getAllowedEmployeeSearchParameters();
-			if(criteria.isEmpty()) {
-				throw new CustomException(BPAConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
-			}
-			else if (!criteria.tenantIdOnly() && criteria.getTenantId() == null) {
-				throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
-			}
-		}
-		else if (userType.equalsIgnoreCase(BPAConstants.CITIZEN)) {
+
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN))
 			allowedParamStr = config.getAllowedCitizenSearchParameters();
-			if( !criteria.isEmpty() && !criteria.tenantIdOnly() && criteria.getTenantId() == null)
-				throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");			
-		}			
-		else {
+		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.EMPLOYEE))
+			allowedParamStr = config.getAllowedEmployeeSearchParameters();
+		else
 			throw new CustomException(BPAConstants.INVALID_SEARCH,
-					"The userType: " + userType + " does not have any search config");
-		}
-		
+					"The userType: " + requestInfo.getUserInfo().getType() + " does not have any search config");
+
 		if (StringUtils.isEmpty(allowedParamStr) && !criteria.isEmpty())
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "No search parameters are expected");
 		else {
@@ -284,47 +281,48 @@ public class BPAValidator {
 		BPA searchedBpa = idToBPAFromSearch.get(bpa.getId());
 
 		if (!searchedBpa.getApplicationNo().equalsIgnoreCase(bpa.getApplicationNo()))
-			errorMap.put(BPAConstants.INVALID_UPDATE, "The application number from search: " + searchedBpa.getApplicationNo()
+			errorMap.put("INVALID UPDATE", "The application number from search: " + searchedBpa.getApplicationNo()
 					+ " and from update: " + bpa.getApplicationNo() + " does not match");
 
 		if (!searchedBpa.getId().equalsIgnoreCase(bpa.getId()))
-			errorMap.put(BPAConstants.INVALID_UPDATE, "The id " + bpa.getId() + " does not exist");
+			errorMap.put("INVALID UPDATE", "The id " + bpa.getId() + " does not exist");
 
 		if (!searchedBpa.getAddress().getId().equalsIgnoreCase(bpa.getAddress().getId()))
-			errorMap.put(BPAConstants.INVALID_UPDATE, "The id " + bpa.getAddress().getId() + " does not exist");
+			errorMap.put("INVALID UPDATE", "The id " + bpa.getAddress().getId() + " does not exist");
 
 		compareIdList(getUnitIds(searchedBpa), getUnitIds(bpa), errorMap);
-		
-		// verify the existing owner from the bpa missing, If yes then mark the missing user active false.
-		Boolean allowOwnerChange =( bpa.getAction() != null 
-				&& ( bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY) 
+
+		// verify the existing owner from the bpa missing, If yes then mark the
+		// missing user active false.
+		Boolean allowOwnerChange = (bpa.getAction() != null
+				&& (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)
 						|| bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_INITIATE)));
-		
+
 		List<String> searchIds = getOwnerIds(searchedBpa);
 		List<String> updateIds = getOwnerIds(bpa);
-		List<OwnerInfo> missingOwners= new ArrayList<OwnerInfo>();
+		List<OwnerInfo> missingOwners = new ArrayList<OwnerInfo>();
 		if (searchIds != null) {
 			searchIds.forEach(searchId -> {
-				if (!((List<String>) updateIds).contains(searchId) )
-					if(allowOwnerChange) {
-						searchedBpa.getOwners().forEach(owner->{
-							if(owner.getUuid().equalsIgnoreCase(searchId)) {
+				if (!((List<String>) updateIds).contains(searchId))
+					if (allowOwnerChange) {
+						searchedBpa.getOwners().forEach(owner -> {
+							if (owner.getUuid().equalsIgnoreCase(searchId)) {
 								owner.setActive(false);
 								missingOwners.add(owner);
 							}
 						});
-					}else {
-						errorMap.put(BPAConstants.INVALID_UPDATE, "The id: " + searchIds + " was not present in update request");
+					} else {
+						errorMap.put("INVALID UPDATE", "The id: " + searchIds + " was not present in update request");
 					}
-					
+
 			});
 		}
-		if(missingOwners.size() > 0) {
-			List<OwnerInfo> existingOwners= bpa.getOwners();
+		if (missingOwners.size() > 0) {
+			List<OwnerInfo> existingOwners = bpa.getOwners();
 			existingOwners.addAll(missingOwners);
-			bpa.setOwners(existingOwners);		
-		}	
-	
+			bpa.setOwners(existingOwners);
+		}
+
 		compareIdList(getOwnerDocIds(searchedBpa), getOwnerDocIds(bpa), errorMap);
 
 		if (!CollectionUtils.isEmpty(errorMap))
@@ -374,7 +372,8 @@ public class BPAValidator {
 		if (searchIds != null)
 			searchIds.forEach(searchId -> {
 				if (!((List<String>) updateIds).contains(searchId))
-					errorMap.put(BPAConstants.INVALID_UPDATE, "The id: " + searchIds + " was not present in update request");
+					errorMap.put(BPAConstants.INVALID_UPDATE,
+							"The id: " + searchIds + " was not present in update request");
 			});
 	}
 
@@ -388,25 +387,15 @@ public class BPAValidator {
 
 		return unitIds;
 	}
-@SuppressWarnings(value = {"rawtypes" })
-	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, List<BPA> searchBPA, String wfState) {
 
+	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
-		if (bpa.getAdditionalDetails() != null) {
-			List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
-			if (!CollectionUtils.isEmpty(checkListFromReq)) {
-				validateQuestions(mdmsData, bpaRequest, checkListFromReq, wfState);
-				validateDocTypes(mdmsData, bpaRequest, checkListFromReq, wfState);
-			} else {
-				log.info("No Checklist found in request with the key.");
-				bpa.setAdditionalDetails(searchBPA.get(0).getAdditionalDetails());
-			}
-		}
+		validateQuestions(mdmsData, bpa, wfState);
+		validateDocTypes(mdmsData, bpa, wfState);
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateQuestions(Object mdmsData, BPARequest bpaRequest, List checkListFromReq, String wfState) {
-		BPA bpa = bpaRequest.getBPA();
+	private void validateQuestions(Object mdmsData, BPA bpa, String wfState) {
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
@@ -424,37 +413,47 @@ public class BPAValidator {
 				mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
 
 			log.info("MDMS questions " + mdmsQns);
+			if (!CollectionUtils.isEmpty(mdmsQns)) {
+				if (bpa.getAdditionalDetails() != null) {
+					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+					if (!CollectionUtils.isEmpty(checkListFromReq)) {
+						for (int i = 0; i < checkListFromReq.size(); i++) {
+							requestCheckList.addAll(
+									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
+						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
+					}
 
-			if (CollectionUtils.isEmpty(checkListFromReq)) {
-				for (int i = 0; i < checkListFromReq.size(); i++) {
-					requestCheckList
-							.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
-				}
-			}
-
-			if (!CollectionUtils.isEmpty(requestCheckList)) {
-				for (Map reqQn : requestCheckList) {
-					requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
-				}
-			}
-
-			log.info("Request questions " + requestQns);
-
-			if (!CollectionUtils.isEmpty(requestQns) && !CollectionUtils.isEmpty(mdmsQns)) {
-				if (requestQns.size() < mdmsQns.size())
-					throw new CustomException("BPA_UNKNOWN_QUESTIONS",
-							"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
-				else {
-					List<String> pendingQns = new ArrayList<String>();
-					for (String qn : mdmsQns) {
-						if (!requestQns.contains(qn)) {
-							pendingQns.add(qn);
+					if (!CollectionUtils.isEmpty(requestCheckList)) {
+						for (Map reqQn : requestCheckList) {
+							requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
 						}
 					}
-					if (pendingQns.size() > 0) {
-						throw new CustomException("BPA_UNKNOWN_QUESTIONS",
-								"Please answer " + StringUtils.join(pendingQns, ","));
+
+					log.info("Request questions " + requestQns);
+
+					if (!CollectionUtils.isEmpty(requestQns)) {
+						if (requestQns.size() < mdmsQns.size())
+							throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+									"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
+						else {
+							List<String> pendingQns = new ArrayList<String>();
+							for (String qn : mdmsQns) {
+								if (!requestQns.contains(qn)) {
+									pendingQns.add(qn);
+								}
+							}
+							if (pendingQns.size() > 0) {
+								throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+										"Please answer " + StringUtils.join(pendingQns, ","));
+							}
+						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
 					}
+				} else {
+					throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
 				}
 			}
 		} catch (PathNotFoundException ex) {
@@ -463,8 +462,7 @@ public class BPAValidator {
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateDocTypes(Object mdmsData, BPARequest bpaRequest, List checkListFromReq, String wfState) {
-		BPA bpa = bpaRequest.getBPA();
+	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState) {
 		List<Map> requestCheckList = new ArrayList<Map>();
 		List<String> requestDocs = new ArrayList<String>();
 		List<String> mdmsDocs = null;
@@ -482,41 +480,65 @@ public class BPAValidator {
 				mdmsDocs = JsonPath.read(docTypesArray.get(0), BPAConstants.DOCTYPESS_PATH);
 
 			log.info("MDMS DocTypes " + mdmsDocs);
-
-			if (!CollectionUtils.isEmpty(checkListFromReq)) {
-				for (int i = 0; i < checkListFromReq.size(); i++) {
-					requestCheckList.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
-				}
-			}
-
-			if (!CollectionUtils.isEmpty(requestCheckList)) {
-				for (Map reqDoc : requestCheckList) {
-					String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
-					if (!StringUtils.isEmpty(fileStoreId)) {
-						requestDocs.add((String) reqDoc.get(BPAConstants.CODE));
+			if (!CollectionUtils.isEmpty(mdmsDocs)) {
+				if (bpa.getAdditionalDetails() != null) {
+					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
+					if (!CollectionUtils.isEmpty(checkListFromReq)) {
+						for (int i = 0; i < checkListFromReq.size(); i++) {
+							requestCheckList
+									.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
+						}
 					} else {
-						throw new CustomException("BPA_UNKNOWN_DOCS", "fileStoreId is not exists for the documents");
+						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 					}
-				}
-			}
 
-			log.info("Request Docs " + requestDocs);
+					if (!CollectionUtils.isEmpty(requestCheckList)) {
+						for (Map reqDoc : requestCheckList) {
+							String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
+							if (!StringUtils.isEmpty(fileStoreId)) {
+								String docType = (String) reqDoc.get(BPAConstants.CODE);
+								int lastIndex = docType.lastIndexOf(".");
+								String documentNs = "";
+								if (lastIndex > 1) {
+									documentNs = docType.substring(0, lastIndex);
+								} else if (lastIndex == 1) {
+									throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+											(String) reqDoc.get(BPAConstants.CODE) + " is Invalid");
+								} else {
+									documentNs = docType;
+								}
 
-			if (!CollectionUtils.isEmpty(requestDocs) && !CollectionUtils.isEmpty(mdmsDocs)) {
-				if (requestDocs.size() < mdmsDocs.size())
-					throw new CustomException("BPA_UNKNOWN_DOCS",
-							"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
-				else {
-					List<String> pendingDocs = new ArrayList<String>();
-					for (String doc : mdmsDocs) {
-						if (!requestDocs.contains(doc)) {
-							pendingDocs.add(doc);
+								requestDocs.add(documentNs);
+							} else {
+								throw new CustomException("BPA_UNKNOWN_DOCS",
+										"fileStoreId is not exists for the documents");
+							}
 						}
 					}
-					if (pendingDocs.size() > 0) {
-						throw new CustomException("BPA_UNKNOWN_DOCS",
-								"Please upload " + StringUtils.join(pendingDocs, ","));
+
+					log.info("Request Docs " + requestDocs);
+
+					if (!CollectionUtils.isEmpty(requestDocs)) {
+						if (requestDocs.size() < mdmsDocs.size())
+							throw new CustomException("BPA_UNKNOWN_DOCS",
+									"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
+						else {
+							List<String> pendingDocs = new ArrayList<String>();
+							for (String doc : mdmsDocs) {
+								if (!requestDocs.contains(doc)) {
+									pendingDocs.add(doc);
+								}
+							}
+							if (pendingDocs.size() > 0) {
+								throw new CustomException("BPA_UNKNOWN_DOCS",
+										"Please upload " + StringUtils.join(pendingDocs, ","));
+							}
+						}
+					} else {
+						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 					}
+				} else {
+					throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 				}
 			}
 		} catch (PathNotFoundException ex) {

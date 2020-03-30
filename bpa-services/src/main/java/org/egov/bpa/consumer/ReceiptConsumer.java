@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReceiptConsumer {
 
-	private PaymentUpdateService paymentUpdateService;	
+	private PaymentUpdateService paymentUpdateService;
 
-    @Autowired
-    public ReceiptConsumer(PaymentUpdateService paymentUpdateService) {
-        this.paymentUpdateService = paymentUpdateService;
-    }
+	@Autowired
+	public ReceiptConsumer(PaymentUpdateService paymentUpdateService) {
+		this.paymentUpdateService = paymentUpdateService;
+	}
 
-    @KafkaListener(topics = {"${kafka.topics.receipt.create}"})
-    public void listenPayments(final HashMap<String, Object> record) {
-        paymentUpdateService.process(record);
-    }
+	@KafkaListener(topics = { "${kafka.topics.receipt.create}" })
+	public void listenPayments(final HashMap<String, Object> record) {
+		paymentUpdateService.process(record);
+	}
 }

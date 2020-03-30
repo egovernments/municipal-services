@@ -45,18 +45,15 @@ public class IdGenRepository {
 	 *            Total Number of idGen ids required
 	 * @return
 	 */
-	public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId,
-			String name, String format, int count) {
+	public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId, String name, String format, int count) {
 
 		List<IdRequest> reqList = new ArrayList<>();
-			reqList.add(IdRequest.builder().idName(name).format(format)
-					.tenantId(tenantId).build());
-		IdGenerationRequest req = IdGenerationRequest.builder()
-				.idRequests(reqList).requestInfo(requestInfo).build();
+		reqList.add(IdRequest.builder().idName(name).format(format).tenantId(tenantId).build());
+		IdGenerationRequest req = IdGenerationRequest.builder().idRequests(reqList).requestInfo(requestInfo).build();
 		IdGenerationResponse response = null;
 		try {
-			response = restTemplate.postForObject(config.getIdGenHost()
-					+ config.getIdGenPath(), req, IdGenerationResponse.class);
+			response = restTemplate.postForObject(config.getIdGenHost() + config.getIdGenPath(), req,
+					IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
 			throw new ServiceCallException(e.getResponseBodyAsString());
 		} catch (Exception e) {

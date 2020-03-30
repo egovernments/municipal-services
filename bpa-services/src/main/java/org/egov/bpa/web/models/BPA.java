@@ -175,7 +175,10 @@ public class BPA {
 	private List<Document> wfDocuments;
 	
 	@JsonProperty("validityDate")
-	private Long validityDate;	
+	private Long validityDate;
+	
+	@JsonProperty("orderGeneratedDate")
+	private Long orderGeneratedDate;
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
