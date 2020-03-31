@@ -252,7 +252,7 @@ public class EstimationService {
 		Property property = sewerageConnection.getProperty();
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = property.getUsageCategory().split("\\.")[0];;
+		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0] : "";
 		final String connectionType = sewerageConnection.getConnectionType();
 		final String calculationAttribute = calculationAttribue;
 
