@@ -95,7 +95,7 @@ public class DemandGenerationConsumer {
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
 				CalculationReqList.add(calcReq);
-				log.info("Consuming record: " + record);
+				log.info("Consuming record on dead letter topic : " + record);
 			} catch (final Exception e) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(": ")
@@ -125,7 +125,7 @@ public class DemandGenerationConsumer {
 			if (errorTopic.equalsIgnoreCase(config.getDeadLetterTopicBatch()))
 				log.info("Batch Processed Successfully: {}", request.getCalculationCriteria());
 		} catch (Exception ex) {
-			log.error("Demand generation error: " + ex);
+			log.error("Demand generation error: ", ex);
 			log.info("From Topic: " + errorTopic);
 			producer.push(errorTopic, request);
 		}
