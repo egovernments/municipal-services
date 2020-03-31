@@ -91,10 +91,10 @@ public class DemandGenerationConsumer {
 		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
 				calculationReq.getCalculationCriteria().get(0).getTenantId());
 		records.forEach(record -> {
+			List<CalculationReq> CalculationReqList = new ArrayList<>();
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
-				// processing single
-				generateDemandInBatch(calcReq, masterMap, config.getDeadLetterTopicSingle());
+				CalculationReqList.add(calcReq);
 				log.info("Consuming record on dead letter topic : " + record);
 			} catch (final Exception e) {
 				StringBuilder builder = new StringBuilder();
@@ -102,6 +102,10 @@ public class DemandGenerationConsumer {
 						.append(e);
 				log.error(builder.toString());
 			}
+			// processing single
+			CalculationReqList.forEach(calcReq -> {
+				generateDemandInBatch(calcReq, masterMap, config.getDeadLetterTopicSingle());
+			});
 		});
 	}
 
