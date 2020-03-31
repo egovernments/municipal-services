@@ -1,6 +1,7 @@
 package org.egov.swcalculation.consumer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -69,13 +70,7 @@ public class DemandGenerationConsumer {
 		log.info("Number of batch records:  " + records.size());
 	}
 
-	/**
-	 * Listens on the dead letter topic of the bulk request and processes every
-	 * record individually and pushes failed records on error topic
-	 * 
-	 * @param records
-	 *            failed batch processing
-	 */
+	
 	/**
 	 * Listens on the dead letter topic of the bulk request and processes every
 	 * record individually and pushes failed records on error topic
@@ -91,21 +86,28 @@ public class DemandGenerationConsumer {
 		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
 				calculationReq.getCalculationCriteria().get(0).getTenantId());
 		records.forEach(record -> {
-			List<CalculationReq> CalculationReqList = new ArrayList<>();
+			log.info("Consuming record on dead letter topic : " + record);
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
-				CalculationReqList.add(calcReq);
-				log.info("Consuming record on dead letter topic : " + record);
+				
+				calcReq.getCalculationCriteria().forEach(calcCriteria -> {
+					CalculationReq request = CalculationReq.builder().calculationCriteria(Arrays.asList(calcCriteria))
+							.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
+					try {
+						log.info("Generating Demand for Criteria : " + calcCriteria);
+						// processing single
+						generateDemandInBatch(request, masterMap, config.getDeadLetterTopicSingle());
+					} catch (final Exception e) {
+						StringBuilder builder = new StringBuilder();
+						builder.append("Error while generating Demand for Criteria: ").append(calcCriteria);
+						log.error(builder.toString(), e);
+					}
+				});
 			} catch (final Exception e) {
 				StringBuilder builder = new StringBuilder();
-				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(": ")
-						.append(e);
-				log.error(builder.toString());
+				builder.append("Error while listening to value: ").append(record).append(" on dead letter topic.");
+				log.error(builder.toString(), e);
 			}
-			// processing single
-			CalculationReqList.forEach(calcReq -> {
-				generateDemandInBatch(calcReq, masterMap, config.getDeadLetterTopicSingle());
-			});
 		});
 	}
 
