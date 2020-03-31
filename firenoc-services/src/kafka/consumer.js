@@ -108,12 +108,12 @@ consumerGroup.on("message", function(message) {
             "message"
           ] = `Dear ${ownerName},Your application for ${firenocType} has been submitted. Your application no. is ${applicationNumber}. Please pay your NoC Fees online or at your applicable fire office`;
           break;
-        case "DOCUMENTVERIFY":
+        case "FIELDINSPECTION":
           smsRequest[
             "message"
           ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for field inpsection.`;
           break;
-        case "FIELDINSPECTION":
+        case "DOCUMENTVERIFY":
           smsRequest[
             "message"
           ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for document verifier.`;
