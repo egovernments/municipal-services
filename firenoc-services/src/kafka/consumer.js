@@ -94,7 +94,7 @@ consumerGroup.on("message", function(message) {
         FireNOCs[i],
         "fireNOCDetails.applicationNumber"
       );
-      let fireNOCNumber = get(FireNOCs[i], "fireNOCDetails.fireNOCNumber");
+      let fireNOCNumber = get(FireNOCs[i], "fireNOCNumber");
       let validTo = get(FireNOCs[i], "fireNOCDetails.validTo");
       let tenantId = get(FireNOCs[i], "tenantId");
       switch (FireNOCs[i].fireNOCDetails.status) {
