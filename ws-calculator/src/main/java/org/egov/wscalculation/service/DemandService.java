@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,10 +21,12 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.model.AuditDetails;
 import org.egov.wscalculation.model.Calculation;
 import org.egov.wscalculation.model.CalculationCriteria;
 import org.egov.wscalculation.model.CalculationReq;
 import org.egov.wscalculation.model.Demand;
+import org.egov.wscalculation.model.Demand.StatusEnum;
 import org.egov.wscalculation.model.DemandDetail;
 import org.egov.wscalculation.model.DemandDetailAndCollection;
 import org.egov.wscalculation.model.DemandRequest;
@@ -33,7 +36,6 @@ import org.egov.wscalculation.model.RequestInfoWrapper;
 import org.egov.wscalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.model.TaxPeriod;
 import org.egov.wscalculation.model.WaterConnection;
-import org.egov.wscalculation.model.Demand.StatusEnum;
 import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.repository.DemandRepository;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
@@ -185,11 +187,19 @@ public class DemandService {
 			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
 			
 			List<DemandDetail> demandDetails = new LinkedList<>();
+			//CreatedBy field in AuditDetails object is not null field for createDemand API
+			String userUUID = requestInfo.getUserInfo().getUuid();
+			userUUID = userUUID != null ? userUUID : "System";
+			AuditDetails auditDetails = AuditDetails.builder()
+                    .createdBy(userUUID)
+                    .createdTime(new Date().getTime())
+                    .lastModifiedBy(userUUID)
+                    .lastModifiedTime(new Date().getTime()).build();
 
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
-						.tenantId(tenantId).build());
+						.tenantId(tenantId).auditDetails(auditDetails).build());
 			});
 			
 			@SuppressWarnings("unchecked")

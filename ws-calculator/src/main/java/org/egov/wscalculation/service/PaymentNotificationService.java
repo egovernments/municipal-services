@@ -111,8 +111,7 @@ public class PaymentNotificationService {
 			}
 
 		} catch (Exception ex) {
-			log.error("", ex);
-			log.error("Error occured while processing the record from topic : " + topic);
+			log.error("Error occured while processing the record: ", ex);
 		}
 	}
 	
