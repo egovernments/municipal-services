@@ -708,8 +708,8 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		if(isCurrentDateIsMatching(
-				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
+//		if(isCurrentDateIsMatching(
+//				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
@@ -723,7 +723,7 @@ public class DemandService {
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 				// log.info("Prepared Statement" + calculationRes.toString());
 
-			}
+//			}
 		}
 	}
 
