@@ -116,8 +116,8 @@ public class DemandGenerationConsumer {
 	private void generateDemandInBatch(CalculationReq request, Map<String, Object> masterMap, String errorTopic) {
 		try {
 			wSCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
-			if (errorTopic.equalsIgnoreCase(config.getDeadLetterTopicBatch()))
-				log.info("Batch Processed Successfully: {}", request.getCalculationCriteria());
+			StringBuilder str = new StringBuilder("Demand generated Successfully. For records : ").append(request.getCalculationCriteria());
+			log.info(str.toString());
 		} catch (Exception ex) {
 			log.error("Demand generation error: ", ex);
 			log.info("From Topic: " + errorTopic);
