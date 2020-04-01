@@ -195,16 +195,17 @@ public class DemandService {
 			//CreatedBy field in AuditDetails object is not null field for createDemand API
 			String userUUID = requestInfo.getUserInfo().getUuid();
 			userUUID = userUUID != null ? userUUID : "System";
-			AuditDetails auditDetails = AuditDetails.builder()
-                    .createdBy(userUUID)
-                    .createdTime(new Date().getTime())
-                    .lastModifiedBy(userUUID)
-                    .lastModifiedTime(new Date().getTime()).build();
+//			AuditDetails auditDetails = AuditDetails.builder()
+//                    .createdBy(userUUID)
+//                    .createdTime(new Date().getTime())
+//                    .lastModifiedBy(userUUID)
+//                    .lastModifiedTime(new Date().getTime()).build();
 
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
-						.tenantId(calculation.getTenantId()).auditDetails(auditDetails).build());
+//						.tenantId(calculation.getTenantId()).auditDetails(auditDetails).build());
+						.tenantId(calculation.getTenantId()).build());
 			});
 			
 			@SuppressWarnings("unchecked")
@@ -718,11 +719,8 @@ public class DemandService {
 	 * 
 	 * @param tenantId TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId) {
-		RequestInfo requestInfo = new RequestInfo();
-		User user = new User();
-		user.setTenantId(tenantId);
-		requestInfo.setUserInfo(user);
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
+		requestInfo.getUserInfo().setTenantId(tenantId);
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
 		Object res = repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), mdmsCriteriaReq);
 		if (res == null) {
@@ -756,7 +754,6 @@ public class DemandService {
 				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 			}
 		}
-		
 	}
 	
 	/**

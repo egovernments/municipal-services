@@ -71,8 +71,8 @@ public class SWCalculationController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler() {
-		sWCalculationService.generateDemandBasedOnTimePeriod();
+	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 
 }
