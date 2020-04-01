@@ -308,4 +308,6 @@ public class BPAConstants {
 	public static final String GENERATEDON = "BPA_PDF_GENERATED_ON";
 
 	public static final String CITIZEN = "CITIZEN";
+	
+	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
 }

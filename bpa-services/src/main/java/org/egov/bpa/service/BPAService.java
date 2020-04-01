@@ -219,8 +219,10 @@ public class BPAService {
 			bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 					workflowService.getCurrentState(bpa.getStatus(), businessService));
 			actionValidator.validateUpdateRequest(bpaRequest, businessService);
-			bpaValidator.validateCheckList(mdmsData, bpaRequest,
-					workflowService.getCurrentState(bpa.getStatus(), businessService));
+			if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
+				bpaValidator.validateCheckList(mdmsData, bpaRequest,
+						workflowService.getCurrentState(bpa.getStatus(), businessService));
+			}
 		}
 
 		wfIntegrator.callWorkFlow(bpaRequest);
