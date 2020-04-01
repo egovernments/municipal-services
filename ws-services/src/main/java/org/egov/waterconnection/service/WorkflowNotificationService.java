@@ -184,11 +184,10 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(tenantIdReplacer, connection.getProperty().getTenantId());
 			}
 			if (code.equalsIgnoreCase("PAY NOW")) {
-				String paymentLink = config.getNotificationUrl() + config.getApplicationPayLink();
-				paymentLink = paymentLink.replace(mobileNoReplacer, mobileNumber);
-				paymentLink = paymentLink.replace(consumerCodeReplacer, connection.getApplicationNo());
-				paymentLink = paymentLink.replace(tenantIdReplacer, connection.getProperty().getTenantId());
-				actionLink = waterServiceUtil.getShortnerURL(paymentLink);
+				actionLink = config.getNotificationUrl() + config.getApplicationPayLink();
+				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
+				actionLink = actionLink.replace(consumerCodeReplacer, connection.getApplicationNo());
+				actionLink = actionLink.replace(tenantIdReplacer, connection.getProperty().getTenantId());
 			}
 			if (code.equalsIgnoreCase("DOWNLOAD RECEIPT")) {
 				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
