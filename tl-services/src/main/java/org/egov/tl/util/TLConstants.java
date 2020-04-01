@@ -264,6 +264,7 @@ public class TLConstants {
 
 
 
+    public static final String ADDITIONALDETAILS_KEY_TOSTATE = "toState";
 
     public static final String ADDITIONALDETAILS_KEY_FROMSTATE = "fromState";
 
@@ -289,6 +290,8 @@ public class TLConstants {
     public static final String NOTIF_APPLICATION_NUMBER_KEY = "{APPLICATION_NUMBER}";
 
     public static final String NOTIF_HOST_LINK_KEY = "{HOST_LINK}";
+
+    public static final String NOTIF_TO_STATE_KEY = "{TO_STATE}";
 
     public static final String NOTIF_FROM_STATE_KEY = "{FROM_STATE}";
 

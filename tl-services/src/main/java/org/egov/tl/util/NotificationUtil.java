@@ -287,8 +287,13 @@ public class NotificationUtil {
         if(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE)!=null){
             fromState = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMSTATE).asText(),localizationMessage);
         }
-
 		message = message.replace(NOTIF_FROM_STATE_KEY, fromState);
+
+		String toState = config.getDefaultFromState();
+		if(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TOSTATE)!=null){
+			toState = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TOSTATE).asText(),localizationMessage);
+		}
+		message = message.replace(NOTIF_TO_STATE_KEY, toState);
 
 		String fromDistrict = getName(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_FROMDISTRICT).asText(),localizationMessage);
 		message = message.replace(NOTIF_FROM_DISTRICT_KEY, fromDistrict);
