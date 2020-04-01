@@ -134,7 +134,8 @@ const envVariables = {
   EGOV_FN_DEFAULT_OFFSET: process.env.EGOV_FN_DEFAULT_OFFSET || 0,
   EGOV_FN_DEFAULT_LIMIT: process.env.EGOV_FN_DEFAULT_OFFSET || 10,
   EGOV_FN_MAX_OFFSET: process.env.EGOV_FN_DEFAULT_OFFSET || 100,
-
+  EGOV_HOST_BASE_URL:process.env.EGOV_HOST_BASE_URL|| "https://mseva-uat.lgpunjab.gov.in/",
+  EGOV_RECEIPT_URL:process.EGOV_RECEIPT_URL||"citizen/fire-noc/search-preview",
   ACTION_PAY: "PAY"
 };
 export default envVariables;

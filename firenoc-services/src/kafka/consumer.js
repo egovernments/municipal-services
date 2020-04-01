@@ -172,6 +172,41 @@ consumerGroup.on("message", function(message) {
       sendEventNotificaiton();
     }
   };
+
+  const sendPaymentMessage=value=>{
+    const { Payment, RequestInfo } = value;
+    smsRequest["mobileNumber"] = get(
+      Receipt[0],
+      "Bill[0].mobileNumber"
+    );
+
+    let paymentAmount=get(Receipt[0],"Bill[0].taxAndPayments[0].amountPaid");
+    console.log("paid amount is",paymentAmount);
+
+    let applicantName=get(Receipt[0],"Bill[0].payerName");
+    console.log("applicantName is",applicantName);
+
+    let receiptNumber=get(Receipt[0],"Bill[0].billDetails[0].receiptNumber");
+
+    let applicationNumber=get(Receipt[0],"Bill[0].billDetails[0].consumerCode");
+    let tenant=get(Receipt[0],"tenantId");
+
+    let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenant}`;
+
+    smsRequest[
+      "message"
+    ] = `Dear ${applicantName}, 
+    A Payment of ${paymentAmount} has been collected successfully.
+    Your receipt no. ${receiptNumber}.
+    You can download your receipt by clicking on the below link:
+    ${downLoadLink}`;
+
+    payloads.push({
+      topic,
+      messages: JSON.stringify(smsRequest)
+    });
+    
+  }
   const FireNOCPaymentStatus = async value => {
     try {
       //console.log("Consumer Payment data"+JSON.stringify(value));
@@ -249,13 +284,9 @@ consumerGroup.on("message", function(message) {
       }
       break;
 
-    // case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
-    //   {
-    //     console.log("reciept hit");
-    //   }
-    //   break;
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
       {
+        sendPaymentMessage(value);
         FireNOCPaymentStatus(value);
       }
       break;
