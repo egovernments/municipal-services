@@ -98,6 +98,9 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 	private void addChildrenToProperty(ResultSet rs, BPA bpa) throws SQLException {
 
 		String tenantId = bpa.getTenantId();
+		AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("bpa_createdBy"))
+				.createdTime(rs.getLong("bpa_createdTime")).lastModifiedBy(rs.getString("bpa_lastModifiedBy"))
+				.lastModifiedTime(rs.getLong("bpa_lastModifiedTime")).build();
 
 		if (bpa == null) {
 			PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
@@ -144,7 +147,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					try {
 						ownerDocument = Document.builder().id(rs.getString("ownerdocid"))
 								.documentType(rs.getString("ownerdocType")).fileStoreId(rs.getString("ownerfileStore"))
-								.documentUid(rs.getString("ownerdocuid")).build();
+								.documentUid(rs.getString("ownerdocuid"))
+								.build();
 						ownerInfo.addDocumentsItem(ownerDocument);
 					} catch (SQLException e) {
 						e.printStackTrace();
@@ -157,7 +161,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		if (documentId != null) {
 			Document document = Document.builder().documentType(rs.getString("bpa_doc_documenttype"))
 					.fileStoreId(rs.getString("bpa_doc_filestore")).id(documentId).wfState(rs.getString("wfstate"))
-					.build();
+					.auditDetails(auditdetails).build();
 			bpa.addDocumentsItem(document);
 		}
 	}
