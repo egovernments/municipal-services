@@ -174,7 +174,7 @@ consumerGroup.on("message", function(message) {
   };
 
   const sendPaymentMessage=value=>{
-    const { Payment, RequestInfo } = value;
+    const { Receipt, RequestInfo } = value;
     smsRequest["mobileNumber"] = get(
       Receipt[0],
       "Bill[0].mobileNumber"
