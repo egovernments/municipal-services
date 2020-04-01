@@ -644,6 +644,11 @@ public class NotificationUtil {
                 codes.add(fromState);
 			}
 
+			if(license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TOSTATE)!=null){
+				String toState = NOTIFICATION_TL_PREFIX+license.getTradeLicenseDetail().getAdditionalDetail().get(ADDITIONALDETAILS_KEY_TOSTATE).asText();
+				codes.add(toState);
+			}
+
 
         });
 
