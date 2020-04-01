@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -21,7 +20,6 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.AuditDetails;
 import org.egov.wscalculation.model.Calculation;
 import org.egov.wscalculation.model.CalculationCriteria;
 import org.egov.wscalculation.model.CalculationReq;
@@ -165,14 +163,6 @@ public class DemandService {
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNO) {
 		List<Demand> demands = new LinkedList<>();
-		//CreatedBy field in AuditDetails object is not null field for createDemand API
-		String userUUID = requestInfo.getUserInfo().getUuid();
-		userUUID = userUUID != null ? userUUID : "System";
-		AuditDetails auditDetails = AuditDetails.builder()
-                .createdBy(userUUID)
-                .createdTime(new Date().getTime())
-                .lastModifiedBy(userUUID)
-                .lastModifiedTime(new Date().getTime()).build();
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = null;
 
@@ -198,7 +188,7 @@ public class DemandService {
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
-						.tenantId(tenantId).auditDetails(auditDetails).build());
+						.tenantId(tenantId).build());
 			});
 			@SuppressWarnings("unchecked")
 			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
@@ -219,12 +209,12 @@ public class DemandService {
 //			Long toDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
 //			Long billExpiryTime = System.currentTimeMillis() + configs.getDemandBillExpiryTime();
 
-			addRoundOffTaxHead(calculation.getTenantId(), demandDetails, auditDetails);
+			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 			
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(minimumPaybleAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
 					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(businessService)
-					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).auditDetails(auditDetails).build());
+					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
 		List<Demand> demandRes = new LinkedList<>();
@@ -280,7 +270,7 @@ public class DemandService {
 		}
 		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
 		combinedBillDetials.addAll(newDemandDetails);
-		addRoundOffTaxHead(calculation.getTenantId(), combinedBillDetials, null);
+		addRoundOffTaxHead(calculation.getTenantId(), combinedBillDetials);
 		return combinedBillDetials;
 	}
 
@@ -292,7 +282,7 @@ public class DemandService {
 	 * @param demandDetails
 	 *            The list of demandDetail
 	 */
-	private void addRoundOffTaxHead(String tenantId, List<DemandDetail> demandDetails, AuditDetails auditDetails) {
+	private void addRoundOffTaxHead(String tenantId, List<DemandDetail> demandDetails) {
 		BigDecimal totalTax = BigDecimal.ZERO;
 
 		DemandDetail prevRoundOffDemandDetail = null;
@@ -344,7 +334,7 @@ public class DemandService {
 		if (roundOff.compareTo(BigDecimal.ZERO) != 0) {
 			DemandDetail roundOffDemandDetail = DemandDetail.builder().taxAmount(roundOff)
 					.taxHeadMasterCode(WSCalculationConstant.WS_Round_Off).tenantId(tenantId)
-					.collectionAmount(BigDecimal.ZERO).auditDetails(auditDetails).build();
+					.collectionAmount(BigDecimal.ZERO).build();
 			demandDetails.add(roundOffDemandDetail);
 		}
 	}
@@ -501,7 +491,7 @@ public class DemandService {
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
 						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
 			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap, taxPeriods);
-			addRoundOffTaxHead(tenantId, demand.getDemandDetails(), null);
+			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 		});
 //		for (String consumerCode : getBillCriteria.getConsumerCodes()) {
@@ -680,11 +670,8 @@ public class DemandService {
 	 * @param tenantId
 	 *            TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId) {
-		RequestInfo requestInfo = new RequestInfo();
-		User user = new User();
-		user.setTenantId(tenantId);
-		requestInfo.setUserInfo(user);
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
+		requestInfo.getUserInfo().setTenantId(tenantId);
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
 		Object res = repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), mdmsCriteriaReq);
 		if (res == null) {
@@ -705,8 +692,7 @@ public class DemandService {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-//		if(isCurrentDateIsMatching(
-//				(String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
+		if(isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
@@ -720,7 +706,7 @@ public class DemandService {
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 				// log.info("Prepared Statement" + calculationRes.toString());
 
-//			}
+			}
 		}
 	}
 
@@ -737,7 +723,7 @@ public class DemandService {
 		} else if (billingFrequency.equalsIgnoreCase(WSCalculationConstant.Quaterly_Billing_Period)) {
 			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	public boolean fetchBill(List<Demand> demandResponse, RequestInfo requestInfo) {

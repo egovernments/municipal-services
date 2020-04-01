@@ -82,8 +82,8 @@ public class CalculatorController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler() {
-		wSCalculationService.generateDemandBasedOnTimePeriod();
+	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 
 }

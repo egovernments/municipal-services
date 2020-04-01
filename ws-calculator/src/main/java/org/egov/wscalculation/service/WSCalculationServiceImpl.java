@@ -265,7 +265,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
-	public void generateDemandBasedOnTimePeriod() {
+	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo) {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
@@ -274,7 +274,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
 		tenantIds.forEach(tenantId -> {
-			demandService.generateDemandForTenantId(tenantId);
+			demandService.generateDemandForTenantId(tenantId, requestInfo);
 		});
 	}
 	

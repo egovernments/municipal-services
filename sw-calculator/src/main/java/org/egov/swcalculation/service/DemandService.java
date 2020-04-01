@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,7 +19,6 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.AuditDetails;
 import org.egov.swcalculation.model.Calculation;
 import org.egov.swcalculation.model.CalculationCriteria;
 import org.egov.swcalculation.model.CalculationReq;
@@ -192,19 +190,9 @@ public class DemandService {
 			
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			
-			//CreatedBy field in AuditDetails object is not null field for createDemand API
-			String userUUID = requestInfo.getUserInfo().getUuid();
-			userUUID = userUUID != null ? userUUID : "System";
-//			AuditDetails auditDetails = AuditDetails.builder()
-//                    .createdBy(userUUID)
-//                    .createdTime(new Date().getTime())
-//                    .lastModifiedBy(userUUID)
-//                    .lastModifiedTime(new Date().getTime()).build();
-
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
 						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
-//						.tenantId(calculation.getTenantId()).auditDetails(auditDetails).build());
 						.tenantId(calculation.getTenantId()).build());
 			});
 			
