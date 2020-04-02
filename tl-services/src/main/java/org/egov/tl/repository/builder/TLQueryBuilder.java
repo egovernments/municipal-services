@@ -215,22 +215,16 @@ public class TLQueryBuilder {
 
 	public String getTLPlainSearchQuery(TradeLicenseSearchCriteria criteria, List<Object> preparedStmtList) {
 		StringBuilder builder = new StringBuilder(QUERY);	
-		
-		if(!StringUtils.isEmpty(criteria.getTenantId())) {
-			if(criteria.getTenantId().equals("pb")) {
-				builder.append("tl.tenantid LIKE ? ");
-				preparedStmtList.add("pb%");
-			}else {
-				builder.append("tl.tenantid = ? ");
-				preparedStmtList.add(criteria.getTenantId());
-			}
-		}else {
-			builder.append("tl.tenantid LIKE ? ");
-			preparedStmtList.add("pb%");
+
+        List<String> ids = criteria.getIds();
+		if (!CollectionUtils.isEmpty(ids)) {
+
+			builder.append(" tl.licensenumber IN (").append(createQuery(ids)).append(")");
+			addToPreparedStatement(preparedStmtList, ids);
 		}
 		
         return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
-	}
+    }
 
 }
