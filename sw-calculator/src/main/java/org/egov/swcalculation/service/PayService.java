@@ -127,39 +127,26 @@ public class PayService {
 	 * @return TaxHead for SW round off
 	 */
 	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount, boolean isConnectionFee) {
-
+		BigDecimal roundOffPos = BigDecimal.ZERO;
+		BigDecimal roundOffNeg = BigDecimal.ZERO;
+		String taxHead = isConnectionFee == true ? SWCalculationConstant.SW_Round_Off
+				: SWCalculationConstant.SW_ONE_TIME_FEE_ROUND_OFF;
 		BigDecimal result = creditAmount.add(debitAmount);
-		
-		BigDecimal midValue = BigDecimal.valueOf(0.5);
-		
-		BigDecimal remainder = result.remainder(BigDecimal.ONE);
-		
-		BigDecimal roundOff = BigDecimal.ZERO;
-		
-		String taxHead = isConnectionFee == true ? SWCalculationConstant.SW_Round_Off : SWCalculationConstant.SW_ONE_TIME_FEE_ROUND_OFF;
-		/*
-		 * If the decimal amount is greater than 0.5 we subtract it from 1 and
-		 * put it as roundOff taxHead so as to nullify the decimal eg: If the
-		 * tax is 12.64 we will add extra tax roundOff taxHead of 0.36 so that
-		 * the total becomes 13
-		 */
-		if(remainder.compareTo(midValue) > 0)
-			roundOff =  BigDecimal.ONE.subtract(remainder);
-		
-		/*
-		 * If the decimal amount is less than 0.5 we put negative of it as
-		 * roundOff taxHead so as to nullify the decimal eg: If the tax is 12.36
-		 * we will add extra tax roundOff taxHead of -0.36 so that the total
-		 * becomes 12
-		 */
-		if(remainder.compareTo(midValue) < 0)
-			roundOff = remainder.negate();
-		
-		if(roundOff.compareTo(BigDecimal.ZERO) != 0)
-			return TaxHeadEstimate.builder().estimateAmount(roundOff).taxHeadCode(taxHead)
-					.build();
+		BigDecimal roundOffAmount = result.setScale(2, 2);
+		BigDecimal reminder = roundOffAmount.remainder(BigDecimal.ONE);
+
+		if (reminder.doubleValue() >= 0.5)
+			roundOffPos = roundOffPos.add(BigDecimal.ONE.subtract(reminder));
+		else if (reminder.doubleValue() < 0.5)
+			roundOffNeg = roundOffNeg.add(reminder).negate();
+
+		if (roundOffPos.doubleValue() > 0)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffPos).taxHeadCode(taxHead).build();
+		else if (roundOffNeg.doubleValue() < 0)
+			return TaxHeadEstimate.builder().estimateAmount(roundOffNeg).taxHeadCode(taxHead).build();
 		else
 			return null;
+		
 	}
 	
 	
