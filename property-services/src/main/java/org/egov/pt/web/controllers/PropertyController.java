@@ -116,7 +116,8 @@ public class PropertyController {
 		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
 		Property property = utils.getPropertyForAssessment(assessmentRequest);
 		Map<String, Object> oldPropertyObjectMap = translationService.translate(assessmentRequest,property);
-		OldProperty oldProperty = mapper.convertValue(oldPropertyObjectMap, OldProperty.class);
+		List<Map<String, Object>> calculationCriteriaArray= (List<Map<String, Object>>)oldPropertyObjectMap.get("CalculationCriteria") ;
+		OldProperty oldProperty = mapper.convertValue(calculationCriteriaArray.get(0).get("property"), OldProperty.class);
 		OldPropertyResponse response = OldPropertyResponse.builder().properties(Collections.singletonList(oldProperty)).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.build();
