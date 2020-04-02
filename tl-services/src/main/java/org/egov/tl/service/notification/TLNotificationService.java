@@ -186,7 +186,8 @@ public class TLNotificationService {
                     List<ActionItem> items = new ArrayList<>();
         			String actionLink = config.getPayLink().replace("$mobile", mobile)
         						.replace("$applicationNo", license.getApplicationNumber())
-        						.replace("$tenantId", license.getTenantId());
+        						.replace("$tenantId", license.getTenantId())
+        						.replace("$businessService", license.getBusinessService());
         			actionLink = config.getUiAppHost() + actionLink;
         			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
         			items.add(item);
@@ -250,7 +251,8 @@ public class TLNotificationService {
 					List<ActionItem> items = new ArrayList<>();
 					String actionLink = config.getPayLink().replace("$mobile", mobile)
 							.replace("$applicationNo", license.getApplicationNumber())
-							.replace("$tenantId", license.getTenantId());
+							.replace("$tenantId", license.getTenantId())
+					        .replace("$businessService", license.getBusinessService());;
 					actionLink = config.getUiAppHost() + actionLink;
 					ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 					items.add(item);
