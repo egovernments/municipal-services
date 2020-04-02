@@ -9,6 +9,7 @@ import java.util.Map;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.oldProperty.OldProperty;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,6 +154,10 @@ public class TranslationService {
 
     }
 
-
-
+    public OldProperty getOldProperty(AssessmentRequest assessmentRequest, Property property) {
+        Map<String, Object> oldPropertyObjectMap = translate(assessmentRequest, property);
+        List<Map<String, Object>> calculationCriteriaArray = (List<Map<String, Object>>) oldPropertyObjectMap.get("CalculationCriteria");
+        OldProperty oldProperty = mapper.convertValue(calculationCriteriaArray.get(0).get("property"), OldProperty.class);
+        return oldProperty;
+    }
 }

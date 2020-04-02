@@ -112,12 +112,10 @@ public class PropertyController {
 	}
 
 	@PostMapping("/_getoldproperty")
-	public ResponseEntity<OldPropertyResponse> propertyMigration(@Valid @RequestBody AssessmentRequest assessmentRequest) {
+	public ResponseEntity<OldPropertyResponse> getOldPropertyFromAssessment(@Valid @RequestBody AssessmentRequest assessmentRequest) {
 		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
 		Property property = utils.getPropertyForAssessment(assessmentRequest);
-		Map<String, Object> oldPropertyObjectMap = translationService.translate(assessmentRequest,property);
-		List<Map<String, Object>> calculationCriteriaArray= (List<Map<String, Object>>)oldPropertyObjectMap.get("CalculationCriteria") ;
-		OldProperty oldProperty = mapper.convertValue(calculationCriteriaArray.get(0).get("property"), OldProperty.class);
+		OldProperty oldProperty = translationService.getOldProperty(assessmentRequest, property);
 		OldPropertyResponse response = OldPropertyResponse.builder().properties(Collections.singletonList(oldProperty)).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.build();
