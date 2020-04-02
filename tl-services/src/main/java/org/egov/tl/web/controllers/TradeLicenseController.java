@@ -22,16 +22,16 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-    @RequestMapping("/v1")
-    public class TradeLicenseController {
+@RequestMapping("/v1")
+public class TradeLicenseController {
 
-        private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-        private final HttpServletRequest request;
+    private final HttpServletRequest request;
 
-        private final TradeLicenseService tradeLicenseService;
+    private final TradeLicenseService tradeLicenseService;
 
-        private final ResponseInfoFactory responseInfoFactory;
+    private final ResponseInfoFactory responseInfoFactory;
 
     @Autowired
     public TradeLicenseController(ObjectMapper objectMapper, HttpServletRequest request,
@@ -86,8 +86,17 @@ import javax.servlet.http.HttpServletRequest;
         return new ResponseEntity(HttpStatus.ACCEPTED);
     }
 
+    @RequestMapping(value = "/_plainsearch", method = RequestMethod.POST)
+    public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+                                                            @Valid @ModelAttribute TradeLicenseSearchCriteria criteria) {
 
+        List<TradeLicense> licenses = tradeLicenseService.plainSearch(criteria, requestInfoWrapper.getRequestInfo());
 
+        TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
+                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 
 }
