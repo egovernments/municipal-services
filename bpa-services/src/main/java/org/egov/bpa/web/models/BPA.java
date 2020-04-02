@@ -179,6 +179,9 @@ public class BPA {
 	
 	@JsonProperty("orderGeneratedDate")
 	private Long orderGeneratedDate;
+	
+	@JsonProperty("tradeType")
+	private String tradeType;
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
