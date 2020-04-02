@@ -3,6 +3,8 @@ package org.egov.tl.repository.builder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.web.models.*;
 import org.egov.tracer.model.CustomException;
@@ -211,8 +213,24 @@ public class TLQueryBuilder {
         }
     }
 
+	public String getTLPlainSearchQuery(TradeLicenseSearchCriteria criteria, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(QUERY);	
+		
+		if(!StringUtils.isEmpty(criteria.getTenantId())) {
+			if(criteria.getTenantId().equals("pb")) {
+				builder.append("tl.tenantid LIKE ? ");
+				preparedStmtList.add("pb%");
+			}else {
+				builder.append("tl.tenantid = ? ");
+				preparedStmtList.add(criteria.getTenantId());
+			}
+		}else {
+			builder.append("tl.tenantid LIKE ? ");
+			preparedStmtList.add("pb%");
+		}
+		
+        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
-
-
+	}
 
 }

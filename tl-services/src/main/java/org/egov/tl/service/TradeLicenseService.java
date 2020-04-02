@@ -212,5 +212,10 @@ public class TradeLicenseService {
         return tradeLicenseRequest.getLicenses();
     }
 
+    public List<TradeLicense> plainSearch(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+        List<TradeLicense> licenses;
+        licenses = getLicensesWithOwnerInfo(criteria,requestInfo);
+        return licenses;
+    }
 
 }

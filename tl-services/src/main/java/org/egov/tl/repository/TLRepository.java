@@ -129,5 +129,13 @@ public class TLRepository {
         });
     }
 
+    public List<TradeLicense> getPlainLicenses(TradeLicenseSearchCriteria criteria) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = queryBuilder.getTLPlainSearchQuery(criteria, preparedStmtList);
+        log.info("Query: " + query);
+        List<TradeLicense> licenses =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+        sortChildObjectsById(licenses);
+        return licenses;
+    }
 
 }
