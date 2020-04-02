@@ -97,31 +97,32 @@ consumerGroup.on("message", function(message) {
       let fireNOCNumber = get(FireNOCs[i], "fireNOCNumber");
       let validTo = get(FireNOCs[i], "fireNOCDetails.validTo");
       let tenantId = get(FireNOCs[i], "tenantId");
+      let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
       switch (FireNOCs[i].fireNOCDetails.status) {
         case "INITIATED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} has been generated. Your application no. is ${applicationNumber}.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.`;
           break;
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} has been submitted. Your application no. is ${applicationNumber}. Please pay your NoC Fees online or at your applicable fire office`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}. Please pay your NoC Fees online or at your applicable fire office`;
           break;
         case "FIELDINSPECTION":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for field inpsection.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType}  Fire NOC with application no. ${applicationNumber} has been forwarded for field inpsection.`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for document verifier.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been forwarded for document verifier.`;
           break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for approver.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been forwarded for approver.`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
@@ -138,12 +139,14 @@ consumerGroup.on("message", function(message) {
 
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} is approved.And your fire NoC has been generated.Your Fire NoC No. is ${fireNOCNumber}. It is valid till ${dateString}`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no.  ${applicationNumber} is approved..and your fire NoC has been generated.Your Fire NoC No. is ${fireNOCNumber}. It is valid till ${dateString}. 
+          You can download your Fire NOC by clicking on the below link:
+          ${downLoadLink}`;
           break;
         case "REJECTED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been rejected.To know more details please contact your applicable fire office`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no.  ${applicationNumber} has been rejected.To know more details please contact your respective  fire office`;
           break;
         // case "CANCELLED":
         //   break;
