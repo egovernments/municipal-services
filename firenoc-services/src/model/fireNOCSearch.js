@@ -31,6 +31,9 @@ const FireNOCSearchRequest = {
     },
     fireNOCType: {
       type: "string"
+    },
+    city:{
+      type:"string"
     }
   },
   // required: ["tenantId"]

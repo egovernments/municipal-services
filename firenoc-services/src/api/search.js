@@ -118,6 +118,23 @@ export const searchApiResponse = async (request, next = {}) => {
       }
     });
   }
+
+  if(queryObj.hasOwnProperty("city"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.city='${queryObj.city}' AND`;
+
+}
+
+
+if(queryObj.hasOwnProperty("fireNOCType"))
+{     
+
+  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.fireNOCType}' AND`;
+
+}
+
+
   if (
     queryObj.hasOwnProperty("fromDate") &&
     queryObj.hasOwnProperty("toDate")
