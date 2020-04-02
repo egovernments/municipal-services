@@ -21,236 +21,214 @@ import org.springframework.stereotype.Component;
 @Component
 public class BPAConfiguration {
 
+	@Value("${app.timezone}")
+	private String timeZone;
 
-    @Value("${app.timezone}")
-    private String timeZone;
+	@PostConstruct
+	public void initialize() {
+		TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
+	}
 
-    @PostConstruct
-    public void initialize() {
-        TimeZone.setDefault(TimeZone.getTimeZone(timeZone));
-    }
+	// User Config
+	@Value("${egov.user.host}")
+	private String userHost;
 
-  
-    // User Config
-    @Value("${egov.user.host}")
-    private String userHost;
+	@Value("${egov.user.context.path}")
+	private String userContextPath;
 
-    @Value("${egov.user.context.path}")
-    private String userContextPath;
+	@Value("${egov.user.create.path}")
+	private String userCreateEndpoint;
 
-    @Value("${egov.user.create.path}")
-    private String userCreateEndpoint;
+	@Value("${egov.user.search.path}")
+	private String userSearchEndpoint;
 
-    @Value("${egov.user.search.path}")
-    private String userSearchEndpoint;
+	@Value("${egov.user.update.path}")
+	private String userUpdateEndpoint;
 
-    @Value("${egov.user.update.path}")
-    private String userUpdateEndpoint;
+	@Value("${egov.user.username.prefix}")
+	private String usernamePrefix;
 
-    @Value("${egov.user.username.prefix}")
-    private String usernamePrefix;
+	// Idgen Config
+	@Value("${egov.idgen.host}")
+	private String idGenHost;
 
+	@Value("${egov.idgen.path}")
+	private String idGenPath;
 
-    //Idgen Config
-    @Value("${egov.idgen.host}")
-    private String idGenHost;
+	@Value("${egov.idgen.bpa.applicationNum.name}")
+	private String applicationNoIdgenName;
 
-    @Value("${egov.idgen.path}")
-    private String idGenPath;
+	@Value("${egov.idgen.bpa.applicationNum.format}")
+	private String applicationNoIdgenFormat;
 
-    @Value("${egov.idgen.bpa.applicationNum.name}")
-    private String applicationNoIdgenName;
+	@Value("${egov.idgen.bpa.permitNum.name}")
+	private String permitNoIdgenName;
 
-    @Value("${egov.idgen.bpa.applicationNum.format}")
-    private String applicationNoIdgenFormat;
-    
-    @Value("${egov.idgen.bpa.permitNum.name}")
-    private String permitNoIdgenName;
+	@Value("${egov.idgen.bpa.permitNum.format}")
+	private String permitNoIdgenFormat;
 
-    @Value("${egov.idgen.bpa.permitNum.format}")
-    private String permitNoIdgenFormat;
+	// Persister Config
+	@Value("${persister.save.buildingplan.topic}")
+	private String saveTopic;
 
+	@Value("${persister.update.buildingplan.topic}")
+	private String updateTopic;
 
+	@Value("${persister.update.buildingplan.workflow.topic}")
+	private String updateWorkflowTopic;
 
+	@Value("${persister.update.buildingplan.adhoc.topic}")
+	private String updateAdhocTopic;
 
-    //Persister Config
-    @Value("${persister.save.buildingplan.topic}")
-    private String saveTopic;
+	// Location Config
+	@Value("${egov.location.host}")
+	private String locationHost;
 
-   @Value("${persister.update.buildingplan.topic}")
-    private String updateTopic;
+	@Value("${egov.location.context.path}")
+	private String locationContextPath;
 
-    @Value("${persister.update.buildingplan.workflow.topic}")
-    private String updateWorkflowTopic;
+	@Value("${egov.location.endpoint}")
+	private String locationEndpoint;
 
-    @Value("${persister.update.buildingplan.adhoc.topic}")
-    private String updateAdhocTopic;
+	@Value("${egov.location.hierarchyTypeCode}")
+	private String hierarchyTypeCode;
 
+	@Value("${egov.bpa.default.limit}")
+	private Integer defaultLimit;
 
-    //Location Config
-    @Value("${egov.location.host}")
-    private String locationHost;
+	@Value("${egov.bpa.default.offset}")
+	private Integer defaultOffset;
 
-    @Value("${egov.location.context.path}")
-    private String locationContextPath;
+	@Value("${egov.bpa.max.limit}")
+	private Integer maxSearchLimit;
 
-    @Value("${egov.location.endpoint}")
-    private String locationEndpoint;
+	// EDCR Service
+	@Value("${egov.edcr.host}")
+	private String edcrHost;
 
-    @Value("${egov.location.hierarchyTypeCode}")
-    private String hierarchyTypeCode;
+	@Value("${egov.edcr.authtoken.endpoint}")
+	private String edcrAuthEndPoint;
 
-    @Value("${egov.bpa.default.limit}")
-    private Integer defaultLimit;
+	@Value("${egov.edcr.getPlan.endpoint}")
+	private String getPlanEndPoint;
 
-    @Value("${egov.bpa.default.offset}")
-    private Integer defaultOffset;
+	// Institutional key word
+	@Value("${egov.ownershipcategory.institutional}")
+	private String institutional;
 
-    @Value("${egov.bpa.max.limit}")
-    private Integer maxSearchLimit;
+	@Value("${egov.receipt.businessservice}")
+	private String businessService;
 
+	// Property Service
+	@Value("${egov.property.service.host}")
+	private String propertyHost;
 
+	@Value("${egov.property.service.context.path}")
+	private String propertyContextPath;
 
-    // EDCR Service
-    @Value("${egov.edcr.host}")
-    private String edcrHost;
+	@Value("${egov.property.endpoint}")
+	private String propertySearchEndpoint;
 
-    @Value("${egov.edcr.authtoken.endpoint}")
-    private String edcrAuthEndPoint;
+	// SMS
+	@Value("${kafka.topics.notification.sms}")
+	private String smsNotifTopic;
 
-    @Value("${egov.edcr.getPlan.endpoint}")
-    private String getPlanEndPoint;
+	@Value("${notification.sms.enabled}")
+	private Boolean isSMSEnabled;
 
+	// Localization
+	@Value("${egov.localization.host}")
+	private String localizationHost;
 
-    //Institutional key word
-    @Value("${egov.ownershipcategory.institutional}")
-    private String institutional;
+	@Value("${egov.localization.context.path}")
+	private String localizationContextPath;
 
+	@Value("${egov.localization.search.endpoint}")
+	private String localizationSearchEndpoint;
 
-    @Value("${egov.receipt.businessservice}")
-    private String businessService;
+	@Value("${egov.localization.statelevel}")
+	private Boolean isLocalizationStateLevel;
 
+	// Calculator
+	@Value("${egov.bpa.calculator.host}")
+	private String calculatorHost;
 
-    //Property Service
-    @Value("${egov.property.service.host}")
-    private String propertyHost;
+	@Value("${egov.bpa.calculator.calculate.endpoint}")
+	private String calulatorEndPoint;
 
-    @Value("${egov.property.service.context.path}")
-    private String propertyContextPath;
+	@Value("${egov.billingservice.host}")
+	private String billingHost;
 
-    @Value("${egov.property.endpoint}")
-    private String propertySearchEndpoint;
+	@Value("${egov.demand.search.endpoint}")
+	private String demandSearchEndpoint;
 
+	// MDMS
+	@Value("${egov.mdms.host}")
+	private String mdmsHost;
 
-    //SMS
-    @Value("${kafka.topics.notification.sms}")
-    private String smsNotifTopic;
+	@Value("${egov.mdms.search.endpoint}")
+	private String mdmsEndPoint;
 
-    @Value("${notification.sms.enabled}")
-    private Boolean isSMSEnabled;
+	// Allowed Search Parameters
+	@Value("${citizen.allowed.search.params}")
+	private String allowedCitizenSearchParameters;
 
+	@Value("${employee.allowed.search.params}")
+	private String allowedEmployeeSearchParameters;
 
+	@Value("${egov.tl.previous.allowed}")
+	private Boolean isPreviousTLAllowed;
 
-    //Localization
-    @Value("${egov.localization.host}")
-    private String localizationHost;
+	@Value("${egov.tl.min.period}")
+	private Long minPeriod;
 
-    @Value("${egov.localization.context.path}")
-    private String localizationContextPath;
+	// Workflow
+	@Value("${create.bpa.workflow.name}")
+	private String businessServiceValue;
 
-    @Value("${egov.localization.search.endpoint}")
-    private String localizationSearchEndpoint;
+	@Value("${create.bpa.low.workflow.name}")
+	private String lowBusinessServiceValue;
 
-    @Value("${egov.localization.statelevel}")
-    private Boolean isLocalizationStateLevel;
+	@Value("${workflow.context.path}")
+	private String wfHost;
 
-    // Calculator
-    @Value("${egov.bpa.calculator.host}")
-    private String calculatorHost;
+	@Value("${workflow.transition.path}")
+	private String wfTransitionPath;
 
-    @Value("${egov.bpa.calculator.calculate.endpoint}")
-    private String calulatorEndPoint;
+	@Value("${workflow.businessservice.search.path}")
+	private String wfBusinessServiceSearchPath;
 
-    @Value("${egov.billingservice.host}")
-    private String billingHost;
+	@Value("${workflow.process.path}")
+	private String wfProcessPath;
 
-    @Value("${egov.demand.search.endpoint}")
-    private String demandSearchEndpoint;
+	@Value("${is.external.workflow.enabled}")
+	private Boolean isExternalWorkFlowEnabled;
 
-    //MDMS
-    @Value("${egov.mdms.host}")
-    private String mdmsHost;
-
-    @Value("${egov.mdms.search.endpoint}")
-    private String mdmsEndPoint;
-
-
-    //Allowed Search Parameters
-    @Value("${citizen.allowed.search.params}")
-    private String allowedCitizenSearchParameters;
-
-    @Value("${employee.allowed.search.params}")
-    private String allowedEmployeeSearchParameters;
-
-
-
-    @Value("${egov.tl.previous.allowed}")
-    private Boolean isPreviousTLAllowed;
-
-    @Value("${egov.tl.min.period}")
-    private Long minPeriod;
-
-
-    // Workflow
-    @Value("${create.bpa.workflow.name}")
-    private String businessServiceValue;
-    
-    @Value("${create.bpa.low.workflow.name}")
-    private String lowBusinessServiceValue;
-
-    @Value("${workflow.context.path}")
-    private String wfHost;
-
-    @Value("${workflow.transition.path}")
-    private String wfTransitionPath;
-
-    @Value("${workflow.businessservice.search.path}")
-    private String wfBusinessServiceSearchPath;
-
-    @Value("${workflow.process.path}")
-    private String wfProcessPath;
-    
-    @Value("${is.external.workflow.enabled}")
-    private Boolean isExternalWorkFlowEnabled;
-
-    //USER EVENTS
+	// USER EVENTS
 	@Value("${egov.ui.app.host}")
 	private String uiAppHost;
-    
+
 	@Value("${egov.usr.events.create.topic}")
 	private String saveUserEventsTopic;
-		
+
 	@Value("${egov.usr.events.pay.link}")
 	private String payLink;
-	
+
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
-	
+
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;
-	
+
 	@Value("${egov.collection.service.host}")
 	private String collectionServiceHost;
 
-	
 	@Value("${egov.collection.service.search.endpoint}")
 	private String collectionServiceSearchEndPoint;
-	
+
 	@Value("${egov.bpa.validity.date.in.months}")
 	private Integer validityInMonths;
-
-
 }

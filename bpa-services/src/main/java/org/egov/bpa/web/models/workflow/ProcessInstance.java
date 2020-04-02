@@ -41,68 +41,68 @@ public class ProcessInstance   {
 
         @Size(max=64)
         @JsonProperty("id")
-        private String id = null;
+        private String id;
 
         @NotNull
         @Size(max=128)
         @JsonProperty("tenantId")
-        private String tenantId = null;
+        private String tenantId;
 
         @NotNull
         @Size(max=128)
         @JsonProperty("businessService")
-        private String businessService = null;
+        private String businessService;
 
         @NotNull
         @Size(max=128)
         @JsonProperty("businessId")
-        private String businessId = null;
+        private String businessId;
 
         @NotNull
         @Size(max=128)
         @JsonProperty("action")
-        private String action = null;
+        private String action;
 
         @NotNull
         @Size(max=64)
         @JsonProperty("moduleName")
-        private String moduleName = null;
+        private String moduleName;
 
         @JsonProperty("state")
-        private State state = null;
+        private State state;
 
         @JsonProperty("comment")
-        private String comment = null;
+        private String comment;
 
         @JsonProperty("documents")
         @Valid
-        private List<Document> documents = null;
+        private List<Document> documents;
 
         @JsonProperty("assigner")
-        private User assigner = null;
+        private User assigner;
 
         @JsonProperty("assignee")
-        private User assignee = null;
+        private User assignee;
 
         @JsonProperty("nextActions")
         @Valid
-        private List<Action> nextActions = null;
+        private List<Action> nextActions;
 
         @JsonProperty("stateSla")
-        private Long stateSla = null;
+        private Long stateSla;
 
         @JsonProperty("businesssServiceSla")
-        private Long businesssServiceSla = null;
+        private Long businesssServiceSla;
 
         @JsonProperty("previousStatus")
         @Size(max=128)
-        private String previousStatus = null;
+        private String previousStatus;
 
         @JsonProperty("entity")
-        private Object entity = null;
+        private Object entity;
 
         @JsonProperty("auditDetails")
-        private AuditDetails auditDetails = null;
+        private AuditDetails auditDetails;
 
 
         public ProcessInstance addDocumentsItem(Document documentsItem) {

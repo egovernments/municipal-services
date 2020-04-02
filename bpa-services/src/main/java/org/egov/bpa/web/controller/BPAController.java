@@ -1,7 +1,5 @@
 package org.egov.bpa.web.controller;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -9,7 +7,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.apache.tomcat.util.http.parser.MediaType;
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -31,11 +28,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Controller
-@RequestMapping("/bpa")
 public class BPAController {
 
 	@Autowired
@@ -47,52 +41,43 @@ public class BPAController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
-	@PostMapping(value = "/appl/_create")
-	public ResponseEntity<BPAResponse> create(
-			@Valid @RequestBody BPARequest bpaRequest) {
+	@PostMapping(value = "/_create")
+	public ResponseEntity<BPAResponse> create(@Valid @RequestBody BPARequest bpaRequest) {
 		bpaUtil.defaultJsonPathConfig();
 		BPA bpa = bpaService.create(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
 		bpas.add(bpa);
-		BPAResponse response = BPAResponse
-				.builder()
-				.BPA(bpas )
-				.responseInfo(
-						responseInfoFactory.createResponseInfoFromRequestInfo(
-								bpaRequest.getRequestInfo(), true)).build();
+		BPAResponse response = BPAResponse.builder().BPA(bpas)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(bpaRequest.getRequestInfo(), true))
+				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "/appl/_update")
-	public ResponseEntity<BPAResponse> update(
-			@Valid @RequestBody BPARequest bpaRequest) {
+	@PostMapping(value = "/_update")
+	public ResponseEntity<BPAResponse> update(@Valid @RequestBody BPARequest bpaRequest) {
 		BPA bpa = bpaService.update(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
 		bpas.add(bpa);
-		BPAResponse response = BPAResponse
-				.builder()
-				.BPA(bpas)
-				.responseInfo(
-						responseInfoFactory.createResponseInfoFromRequestInfo(
-								bpaRequest.getRequestInfo(), true)).build();
+		BPAResponse response = BPAResponse.builder().BPA(bpas)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(bpaRequest.getRequestInfo(), true))
+				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
 	}
-	
-	
-	@RequestMapping(value="/appl/_search", method = RequestMethod.POST)
-    public ResponseEntity<BPAResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                       @Valid @ModelAttribute BPASearchCriteria criteria){
 
-        List<BPA> bpas = bpaService.search(criteria,requestInfoWrapper.getRequestInfo());
+	@PostMapping(value = "/_search")
+	public ResponseEntity<BPAResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute BPASearchCriteria criteria) {
 
-        BPAResponse response = BPAResponse.builder().BPA(bpas).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-	
-	@PostMapping(value = "/appl/_permitorderedcr")
+		List<BPA> bpas = bpaService.search(criteria, requestInfoWrapper.getRequestInfo());
+
+		BPAResponse response = BPAResponse.builder().BPA(bpas).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/_permitorderedcr")
 	public ResponseEntity<Resource> getPdf(@Valid @RequestBody BPARequest bpaRequest) {
 
 		Path path = Paths.get(BPAConstants.EDCR_PDF);

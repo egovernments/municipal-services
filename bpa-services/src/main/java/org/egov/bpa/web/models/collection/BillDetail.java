@@ -60,60 +60,60 @@ import java.util.List;
 public class BillDetail {
 
 	@JsonProperty("id")
-	private String id = null;
+	private String id;
 
 	@JsonProperty("tenantId")
-	private String tenantId = null;
+	private String tenantId;
 
 	@JsonProperty("demandId")
-	private String demandId = null;
+	private String demandId;
 
 	@JsonProperty("billId")
-	private String billId = null;
+	private String billId;
 
 	@JsonProperty("amount")
 	@NotNull
-	private BigDecimal amount = null;
+	private BigDecimal amount;
 
 	@JsonProperty("amountPaid")
-	private BigDecimal amountPaid = null;
+	private BigDecimal amountPaid;
 
 	@NotNull
 	@JsonProperty("fromPeriod")
-	private Long fromPeriod = null;
+	private Long fromPeriod;
 
 	@NotNull
 	@JsonProperty("toPeriod")
-	private Long toPeriod = null;
+	private Long toPeriod;
 
 	@JsonProperty("additionalDetails")
-	private JsonNode additionalDetails = null;
+	private JsonNode additionalDetails;
 
 	@JsonProperty("channel")
-	private String channel = null;
+	private String channel;
 
 	@JsonProperty("voucherHeader")
-	private String voucherHeader = null;
+	private String voucherHeader;
 
 	@JsonProperty("boundary")
-	private String boundary = null;
+	private String boundary;
 
 	@JsonProperty("manualReceiptNumber")
-	private String manualReceiptNumber = null;
+	private String manualReceiptNumber;
 
 	@JsonProperty("manualReceiptDate")
-	private Long manualReceiptDate = null;
+	private Long manualReceiptDate;
 
 
 	@JsonProperty("billAccountDetails")
-	private List<BillAccountDetail> billAccountDetails = null;
+	private List<BillAccountDetail> billAccountDetails;
 
 	@NotNull
 	@JsonProperty("collectionType")
-	private String collectionType = null;
+	private String collectionType;
 
 	@JsonProperty("auditDetails")
-	private AuditDetails auditDetails = null;
+	private AuditDetails auditDetails;
 
 
 	private String billDescription;

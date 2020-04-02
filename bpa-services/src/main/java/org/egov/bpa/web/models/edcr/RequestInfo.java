@@ -1,4 +1,5 @@
 package org.egov.bpa.web.models.edcr;
+
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

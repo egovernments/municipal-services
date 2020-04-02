@@ -23,20 +23,20 @@ public class CalulationCriteria {
 
 	@JsonProperty("BPA")
 	@Valid
-	private BPA bpa = null;
+	private BPA bpa;
 
 	@JsonProperty("applicationNo")
 	@Size(min = 2, max = 64)
-	private String applicationNo = null;
+	private String applicationNo;
 
 	@JsonProperty("tenantId")
 	@NotNull
 	@Size(min = 2, max = 256)
-	private String tenantId = null;
+	private String tenantId;
 	
 	@JsonProperty("feeType")
 	@NotNull
 	@Size(min = 2, max = 64)
-	private String feeType = null;
+	private String feeType;
 
 }

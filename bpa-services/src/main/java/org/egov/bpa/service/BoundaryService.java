@@ -1,13 +1,9 @@
 package org.egov.bpa.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
@@ -22,10 +18,8 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.ReadContext;
 
 @Service
-@Slf4j
 public class BoundaryService {
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -35,8 +29,8 @@ public class BoundaryService {
 	private BPAConfiguration config;
 
 	@Autowired
-	public BoundaryService(ServiceRequestRepository serviceRequestRepository,
-			ObjectMapper mapper, BPAConfiguration config) {
+	public BoundaryService(ServiceRequestRepository serviceRequestRepository, ObjectMapper mapper,
+			BPAConfiguration config) {
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.mapper = mapper;
 		this.config = config;
@@ -50,26 +44,22 @@ public class BoundaryService {
 	 * @param hierarchyTypeCode
 	 *            HierarchyTypeCode of the boundaries
 	 */
+	@SuppressWarnings("rawtypes")
 	public void getAreaType(BPARequest request, String hierarchyTypeCode) {
-		
 
 		String tenantId = request.getBPA().getTenantId();
 
 		LinkedList<String> localities = new LinkedList<>();
 
-		if (request.getBPA().getAddress() == null
-				|| request.getBPA().getAddress().getLocality() == null)
-			throw new CustomException("INVALID ADDRESS",
-					"The address or locality cannot be null");
+		if (request.getBPA().getAddress() == null || request.getBPA().getAddress().getLocality() == null)
+			throw new CustomException("INVALID ADDRESS", "The address or locality cannot be null");
 		localities.add(request.getBPA().getAddress().getLocality().getCode());
 
 		StringBuilder uri = new StringBuilder(config.getLocationHost());
-		uri.append(config.getLocationContextPath()).append(
-				config.getLocationEndpoint());
+		uri.append(config.getLocationContextPath()).append(config.getLocationEndpoint());
 		uri.append("?").append("tenantId=").append(tenantId);
 		if (hierarchyTypeCode != null)
-			uri.append("&").append("hierarchyTypeCode=")
-					.append(hierarchyTypeCode);
+			uri.append("&").append("hierarchyTypeCode=").append(hierarchyTypeCode);
 		uri.append("&").append("boundaryType=").append("Locality");
 
 		if (!CollectionUtils.isEmpty(localities)) {
@@ -80,54 +70,44 @@ public class BoundaryService {
 					uri.append(",");
 			}
 		}
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
-				.fetchResult(uri, request.getRequestInfo());
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("BOUNDARY ERROR",
-					"The response from location service is empty or null");
+			throw new CustomException("BOUNDARY ERROR", "The response from location service is empty or null");
 		String jsonString = new JSONObject(responseMap).toString();
 
 		Map<String, String> propertyIdToJsonPath = getJsonpath(request);
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request
-				.getBPA().getId()));
-		
-		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject) ))
-			throw new CustomException("BOUNDARY MDMS DATA ERROR",
-					"The boundary data was not found");
+		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request.getBPA().getId()));
 
-//		LinkedList<Object> boundaryResponse = context.read(propertyIdToJsonPath
-//				.get(request.getBPA().getId()));
-		Boundary boundary = mapper.convertValue(boundaryObject.get(0),
-				Boundary.class);
+		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject)))
+			throw new CustomException("BOUNDARY MDMS DATA ERROR", "The boundary data was not found");
+
+		// LinkedList<Object> boundaryResponse =
+		// context.read(propertyIdToJsonPath
+		// .get(request.getBPA().getId()));
+		Boundary boundary = mapper.convertValue(boundaryObject.get(0), Boundary.class);
 		if (boundary.getName() == null)
-			throw new CustomException("INVALID BOUNDARY DATA",
-					"The boundary data for the code "
-							+ request.getBPA().getAddress().getLocality()
-									.getCode() + " is not available");
+			throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
+					+ request.getBPA().getAddress().getLocality().getCode() + " is not available");
 		request.getBPA().getAddress().setLocality(boundary);
 
 	}
 
 	/**
-	 * Prepares map of bpaId to jsonpath which contains the code of the
-	 * bpa
+	 * Prepares map of bpaId to jsonpath which contains the code of the bpa
 	 * 
 	 * @param request
 	 *            bpaRequest for create
-	 * @return Map of bpaId to jsonPath with bpa locality
-	 *         code
+	 * @return Map of bpaId to jsonPath with bpa locality code
 	 */
 	private Map<String, String> getJsonpath(BPARequest request) {
 		Map<String, String> idToJsonPath = new LinkedHashMap<>();
 		String jsonpath = "$..boundary[?(@.code==\"{}\")]";
 
-		idToJsonPath.put(
-				request.getBPA().getId(),
-				jsonpath.replace("{}", request.getBPA().getAddress()
-						.getLocality().getCode()));
+		idToJsonPath.put(request.getBPA().getId(),
+				jsonpath.replace("{}", request.getBPA().getAddress().getLocality().getCode()));
 
 		return idToJsonPath;
 	}

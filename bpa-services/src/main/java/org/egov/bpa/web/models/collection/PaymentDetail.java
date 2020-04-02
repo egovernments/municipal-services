@@ -44,10 +44,10 @@ public class PaymentDetail {
     private Long manualReceiptDate;
 
     @JsonProperty("receiptDate")
-    private Long receiptDate = null;
+    private Long receiptDate;
 
     @JsonProperty("receiptType")
-    private String receiptType = null;
+    private String receiptType;
 
     @JsonProperty("businessService")
     private String businessService;

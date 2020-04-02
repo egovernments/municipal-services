@@ -32,38 +32,38 @@ public class BusinessService   {
 
         @Size(max=256)
         @JsonProperty("tenantId")
-        private String tenantId = null;
+        private String tenantId;
 
         @Size(max=256)
         @JsonProperty("uuid")
-        private String uuid = null;
+        private String uuid;
 
         @Size(max=256)
         @JsonProperty("businessService")
-        private String businessService = null;
+        private String businessService;
 
         @Size(max=256)
         @JsonProperty("business")
-        private String business = null;
+        private String business;
 
         @Size(max=1024)
         @JsonProperty("getUri")
-        private String getUri = null;
+        private String getUri;
 
         @Size(max=1024)
         @JsonProperty("postUri")
-        private String postUri = null;
+        private String postUri;
 
         @JsonProperty("businessServiceSla")
-        private Long businessServiceSla = null;
+        private Long businessServiceSla;
 
         @NotNull
         @Valid
         @JsonProperty("states")
-        private List<State> states = null;
+        private List<State> states;
 
         @JsonProperty("auditDetails")
-        private AuditDetails auditDetails = null;
+        private AuditDetails auditDetails;
 
 
         public BusinessService addStatesItem(State statesItem) {

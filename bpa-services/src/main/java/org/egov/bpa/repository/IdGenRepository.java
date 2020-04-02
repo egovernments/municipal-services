@@ -9,9 +9,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.web.models.idgen.IdGenerationRequest;
 import org.egov.bpa.web.models.idgen.IdGenerationResponse;
 import org.egov.bpa.web.models.idgen.IdRequest;
-import org.egov.bpa.web.models.idgen.IdResponse;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.response.ResponseInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,18 +45,15 @@ public class IdGenRepository {
 	 *            Total Number of idGen ids required
 	 * @return
 	 */
-	public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId,
-			String name, String format, int count) {
+	public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId, String name, String format, int count) {
 
 		List<IdRequest> reqList = new ArrayList<>();
-			reqList.add(IdRequest.builder().idName(name).format(format)
-					.tenantId(tenantId).build());
-		IdGenerationRequest req = IdGenerationRequest.builder()
-				.idRequests(reqList).requestInfo(requestInfo).build();
+		reqList.add(IdRequest.builder().idName(name).format(format).tenantId(tenantId).build());
+		IdGenerationRequest req = IdGenerationRequest.builder().idRequests(reqList).requestInfo(requestInfo).build();
 		IdGenerationResponse response = null;
 		try {
-			response = restTemplate.postForObject(config.getIdGenHost()
-					+ config.getIdGenPath(), req, IdGenerationResponse.class);
+			response = restTemplate.postForObject(config.getIdGenHost() + config.getIdGenPath(), req,
+					IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
 			throw new ServiceCallException(e.getResponseBodyAsString());
 		} catch (Exception e) {

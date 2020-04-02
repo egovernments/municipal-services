@@ -15,17 +15,12 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
-
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -47,8 +42,6 @@ public class WorkflowIntegrator {
 
 	private static final String ASSIGNEEKEY = "assignes";
 
-	private static final String UUIDKEY = "uuid";
-
 	private static final String MODULENAMEVALUE = "BPA";
 
 	private static final String WORKFLOWREQUESTARRAYKEY = "ProcessInstances";
@@ -64,7 +57,6 @@ public class WorkflowIntegrator {
 	private RestTemplate rest;
 
 	private BPAConfiguration config;
-
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, BPAConfiguration config) {
@@ -82,38 +74,32 @@ public class WorkflowIntegrator {
 	 * @param bpaRequest
 	 */
 	public void callWorkFlow(BPARequest bpaRequest) {
-
 		String wfTenantId = bpaRequest.getBPA().getTenantId();
-
 		JSONArray array = new JSONArray();
-//		for (BPA bpa : bpaRequest.getBPA()) {
-		
 		BPA bpa = bpaRequest.getBPA();
-
-			JSONObject obj = new JSONObject();
-			obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
-			obj.put(TENANTIDKEY, wfTenantId);
-			if(bpa.getRiskType().toString().equalsIgnoreCase("LOW")){			
-				obj.put(BUSINESSSERVICEKEY, config.getLowBusinessServiceValue());
-			}else{
-				obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-			}
-			obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-			obj.put(ACTIONKEY, bpa.getAction());
-			obj.put(COMMENTKEY, bpa.getComment());
-			if (!CollectionUtils.isEmpty(bpa.getAssignees())) {
-				obj.put(ASSIGNEEKEY,  bpa.getAssignees());
-			}
-			obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
-			array.add(obj);
-//		}
-
+		JSONObject obj = new JSONObject();
+		obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
+		obj.put(TENANTIDKEY, wfTenantId);
+		if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
+			obj.put(BUSINESSSERVICEKEY, config.getLowBusinessServiceValue());
+		} else {
+			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+		}
+		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
+		obj.put(ACTIONKEY, bpa.getAction());
+		obj.put(COMMENTKEY, bpa.getComment());
+		if (!CollectionUtils.isEmpty(bpa.getAssignees())) {
+			obj.put(ASSIGNEEKEY, bpa.getAssignees());
+		}
+		obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
+		array.add(obj);
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, bpaRequest.getRequestInfo());
 		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
 		String response = null;
 		try {
-			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest, String.class);
+			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
+					String.class);
 		} catch (HttpClientErrorException e) {
 
 			/*
@@ -136,20 +122,19 @@ public class WorkflowIntegrator {
 		}
 
 		/*
-		 * on success result from work-flow read the data and set the status back to BPA
-		 * object
+		 * on success result from work-flow read the data and set the status
+		 * back to BPA object
 		 */
 		DocumentContext responseContext = JsonPath.parse(response);
 		List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
 		Map<String, String> idStatusMap = new HashMap<>();
-		responseArray.forEach(
-				object -> {
+		responseArray.forEach(object -> {
 
-					DocumentContext instanceContext = JsonPath.parse(object);
-					idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-				});
+			DocumentContext instanceContext = JsonPath.parse(object);
+			idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
+		});
 		// setting the status back to BPA object from wf response
-		bpa.setStatus( idStatusMap.get(bpa.getApplicationNo()) );
+		bpa.setStatus(idStatusMap.get(bpa.getApplicationNo()));
 
 	}
 }

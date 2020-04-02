@@ -197,7 +197,7 @@ public class DemandService {
     private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo,String feeType){
         String uri = utils.getDemandSearchURL();
         uri = uri.replace("{1}",tenantId);
-        uri = uri.replace("{2}",utils.getBillingBusinessService(feeType));
+        uri = uri.replace("{2}",(feeType.equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ? config.getApplFeeBusinessService() : config.getSanclFeeBusinessService()));
         uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
 
         Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
@@ -277,7 +277,7 @@ public class DemandService {
                     .taxPeriodFrom( startCal.getTimeInMillis())
                     .taxPeriodTo(endCal.getTimeInMillis())
                     .consumerType("BPA")
-                    .businessService(utils.getBillingBusinessService(calculation.getFeeType()))
+                    .businessService(calculation.getFeeType().equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ? config.getApplFeeBusinessService() : config.getSanclFeeBusinessService())
                     .build());
         }
         return demandRepository.saveDemand(requestInfo,demands);

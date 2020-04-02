@@ -68,17 +68,9 @@ public class MDMSService {
         ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDetails)
                 .moduleName(BPACalculatorConstants.MDMS_BPA).build();
 
-        List<MasterDetail> tenantMasterDetails = new ArrayList<>();
-        
-        tenantMasterDetails.add(MasterDetail.builder().name(BPACalculatorConstants.MDMS_MASTER_TENANT)
-        		.build());
-        ModuleDetail tenantModuleDetails = ModuleDetail.builder().masterDetails(tenantMasterDetails)
-                .moduleName(BPACalculatorConstants.MDMS_MODULE_TENANT).build();
-        
         List<ModuleDetail> moduleDetails = new ArrayList<>();
         
         moduleDetails.add(bpaModuleDtls);
-        moduleDetails.add(tenantModuleDetails);
 
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
                 .build();
@@ -144,34 +136,36 @@ public class MDMSService {
      * Creates and return default calculationType values as map
      * @return default calculationType Map
      */
-    public Map defaultMap(String feeType){
+    private Map defaultMap(String feeType){
         Map defaultMap = new HashMap();
         String feeAmount = ( feeType.equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ) ? config.getApplFeeDefaultAmount() : config.getSancFeeDefaultAmount();
-//        log.warn(" ")
-        defaultMap.put( BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT,Integer.valueOf(feeAmount));
+        defaultMap.put( BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT,feeAmount);
         return defaultMap;
     }
 
 
-    public String getUlbGrade(Object mdmsData,String tenantId) {
-//    	HashMap<String,Object> tenants = new HashMap<>();
-    	String ulbGrade =BPACalculatorConstants.DEFAULT_ULB_GRADE;
+    /**
+     * Gets the startDate and the endDate of the financialYear
+     * @param requestInfo The RequestInfo of the calculationRequest
+     * @param license The tradeLicense for which calculation is done
+     * @return Map containing the startDate and endDate
+     */
+   /* public Map<String,Long> getTaxPeriods(RequestInfo requestInfo,BPA bpa,Object mdmsData){
+        Map<String,Long> taxPeriods = new HashMap<>();
         try {
-        	
-        	List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_TENANT_PATH);
+            String jsonPath = BPACalculatorConstants.MDMS_FINACIALYEAR_PATH.replace("{}","2019-20");
+            List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
+            Map<String,Object> financialYearProperties = jsonOutput.get(0);
+            Object startDate = financialYearProperties.get(BPACalculatorConstants.MDMS_STARTDATE);
+            Object endDate = financialYearProperties.get(BPACalculatorConstants.MDMS_ENDDATE);
+            taxPeriods.put(BPACalculatorConstants.MDMS_STARTDATE,(Long) startDate);
+            taxPeriods.put(BPACalculatorConstants.MDMS_ENDDATE,(Long) endDate);
 
-
-            String filterExp = "$.[?(@.code == '"+tenantId+"' )]";
-            List<Object> tenants = JsonPath.read(jsonOutput, filterExp);
-            
-            Map city = (HashMap<String, Object>) tenants.get(0);
-            ulbGrade = (String) ((Map)city.get("city")).get("ulbGrade");
+        } catch (Exception e) {
+            log.error("Error while fetvhing MDMS data", e);
+            throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+"2019-20");
         }
-        catch (Exception e){
-            throw new CustomException("MDMS ERROR","Failed to get calculationType");
-        }
-
-        return ulbGrade;
-    }
+        return taxPeriods;
+    }*/
 
 }

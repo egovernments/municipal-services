@@ -6,12 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.util.BPAConstants.*;
 import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
 import org.egov.bpa.web.models.workflow.Action;
 import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.web.models.workflow.ProcessInstance;
 import org.egov.bpa.web.models.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -23,13 +21,11 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ActionValidator {
 
-	private WorkflowConfig workflowConfig;
 
 	private WorkflowService workflowService;
 
 	@Autowired
-	public ActionValidator(WorkflowConfig workflowConfig, WorkflowService workflowService) {
-		this.workflowConfig = workflowConfig;
+	public ActionValidator(WorkflowService workflowService) {
 		this.workflowService = workflowService;
 	}
 
@@ -67,16 +63,7 @@ public class ActionValidator {
 	 */
 	private void validateDocumentsForUpdate(BPARequest request) {
 		Map<String, String> errorMap = new HashMap<>();
-		BPA bpa = request.getBPA();
-		/*if (BPAConstants.ACTION_INITIATE.equalsIgnoreCase(bpa.getAction())) {
-			if (bpa.getDocuments() != null)
-				errorMap.put("INVALID STATUS", "Status cannot be INITIATE when application document are provided");
-		}
-		if (BPAConstants.ACTION_APPLY.equalsIgnoreCase(bpa.getAction())) {
-			if (bpa.getDocuments() == null)
-				errorMap.put("INVALID STATUS", "Status cannot be APPLY when application document are not provided");
-		}*/
-
+		
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -91,10 +78,6 @@ public class ActionValidator {
 		BPA bpa = request.getBPA();
 		Map<String, String> errorMap = new HashMap<>();
 		RequestInfo requestInfo = request.getRequestInfo();
-//		ProcessInstance processInstance = workflowService.getProcessInstance(bpa.getTenantId(),
-//				request.getRequestInfo(), bpa.getApplicationNo());
-//		if(processInstance == null ) {
-//			errorMap.put("UNAUTHORIZED UPDATE", "Process Instnce does not exists for Application");
 //		}
 		State state = workflowService.getCurrentStateObj(bpa.getStatus(), businessService);
 		if(state != null ) {
@@ -124,28 +107,6 @@ public class ActionValidator {
 	}
 
 	/**
-	 * Validate if the action can be performed on the current status
-	 * 
-	 * @param request
-	 *            The bpa update request
-	 */
-	private void validateAction(BPARequest request) {
-		Map<String, List<String>> actionStatusMap = workflowConfig.getActionCurrentStatusMap();
-		Map<String, String> errorMap = new HashMap<>();
-		BPA bpa = request.getBPA();
-
-		if (actionStatusMap.get(bpa.getStatus().toString()) != null) {
-			if (!actionStatusMap.get(bpa.getStatus().toString()).contains(bpa.getAction().toString()))
-				errorMap.put("UNAUTHORIZED ACTION",
-						"The action " + bpa.getAction() + " cannot be applied on the status " + bpa.getStatus());
-		}
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-	}
-
-	/**
 	 * Validates if the any new object is added in the request
 	 * 
 	 * @param request
@@ -157,19 +118,19 @@ public class ActionValidator {
 		
 		if( !workflowService.isStateUpdatable(bpa.getStatus(), businessService)) {
 			if(bpa.getId() == null) {
-				errorMap.put("INVALID UPDATE", "Id of Application cannot be null");
+				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of Application cannot be null");
 			}
 			if(bpa.getAddress() == null) {
-				errorMap.put("INVALID UPDATE", "Id of address cannot be null");
+				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of address cannot be null");
 			}
 			if(!CollectionUtils.isEmpty(bpa.getOwners())) {
 				bpa.getOwners().forEach(owner -> {
 	                if(owner.getUuid()==null)
-	                    errorMap.put("INVALID UPDATE", "Id of owner cannot be null");
+	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of owner cannot be null");
 	                if(!CollectionUtils.isEmpty(owner.getDocuments())){
 	                    owner.getDocuments().forEach(document -> {
 	                        if(document.getId()==null)
-	                            errorMap.put("INVALID UPDATE", "Id of owner document cannot be null");
+	                            errorMap.put(BPAConstants.INVALID_UPDATE, "Id of owner document cannot be null");
 	                    });
 	                  }
 	                });
@@ -177,13 +138,13 @@ public class ActionValidator {
 			if(!CollectionUtils.isEmpty(bpa.getUnits())) {
 				bpa.getUnits().forEach(tradeUnit -> {
 	                if(tradeUnit.getId()==null)
-	                    errorMap.put("INVALID UPDATE", "Id of tradeUnit cannot be null");
+	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of tradeUnit cannot be null");
 	            });
 			}
 			 if(!CollectionUtils.isEmpty(bpa.getDocuments())){
 				 bpa.getDocuments().forEach(document -> {
                      if(document.getId()==null)
-                         errorMap.put("INVALID UPDATE", "Id of applicationDocument cannot be null");
+                         errorMap.put(BPAConstants.INVALID_UPDATE, "Id of applicationDocument cannot be null");
                  });
              }
 			

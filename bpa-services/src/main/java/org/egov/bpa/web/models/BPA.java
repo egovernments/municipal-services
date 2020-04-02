@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.egov.bpa.web.models.OwnerInfo.RelationshipEnum;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -20,10 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Validated
 @Getter
@@ -173,7 +168,7 @@ public class BPA {
 	
 	@Size(max=64)
     @JsonProperty("assignees")
-    private List<User> assignees = null;
+    private List<User> assignees;
 	
 	@Valid
 	@JsonProperty("wfDocuments")
@@ -229,16 +224,4 @@ public class BPA {
 			
 		return this;
 	}
-/*
-	public String SECTION_CLERKSECTION_CLERK() {
-		// TODO Auto-generated method stub
-		return "INITIATED";
-	}*/
-
-	/*public void addAddressItem(Address addressItem) {
-		if (!((List<Address>) this.address).contains(addressItem))
-			((List<Address>) this.address).add(addressItem);
-		return;
-	}*/
-
 }

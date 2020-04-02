@@ -3,21 +3,14 @@ package org.egov.bpa.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.models.AuditDetails;
-import org.egov.bpa.web.models.BPA;
 import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -34,172 +27,127 @@ import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
 @Component
-@Slf4j
 public class BPAUtil {
 
-	 private BPAConfiguration config;
+	private BPAConfiguration config;
 
-	 @Autowired
-	    private ServiceRequestRepository serviceRequestRepository;
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
 
-	    private WorkflowService workflowService;
+	@Autowired
+	public BPAUtil(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository) {
+		this.config = config;
+		this.serviceRequestRepository = serviceRequestRepository;
+	}
 
-	    @Autowired
-	    public BPAUtil(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository,
-	                     WorkflowService workflowService) {
-	        this.config = config;
-	        this.serviceRequestRepository = serviceRequestRepository;
-	        this.workflowService = workflowService;
-	    }
+	/**
+	 * Method to return auditDetails for create/update flows
+	 *
+	 * @param by
+	 * @param isCreate
+	 * @return AuditDetails
+	 */
+	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
+		Long time = System.currentTimeMillis();
+		if (isCreate)
+			return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time)
+					.build();
+		else
+			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
+	}
 
+	/**
+	 * Returns the URL for MDMS search end point
+	 *
+	 * @return URL for MDMS search end point
+	 */
+	public StringBuilder getMdmsSearchUrl() {
+		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
+	}
 
+	/**
+	 * Creates request to search ApplicationType and etc from MDMS
+	 * 
+	 * @param requestInfo
+	 *            The requestInfo of the request
+	 * @param tenantId
+	 *            The tenantId of the BPA
+	 * @return request to search ApplicationType and etc from MDMS
+	 */
+	public List<ModuleDetail> getBPAModuleRequest() {
 
-	    /**
-	     * Method to return auditDetails for create/update flows
-	     *
-	     * @param by
-	     * @param isCreate
-	     * @return AuditDetails
-	     */
-	    public AuditDetails getAuditDetails(String by, Boolean isCreate) {
-	        Long time = System.currentTimeMillis();
-	        if(isCreate)
-	            return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time).build();
-	        else
-	            return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
-	    }
-	    
-	    /**
-	     * Returns the url for mdms search endpoint
-	     *
-	     * @return url for mdms search endpoint
-	     */
-	    public StringBuilder getMdmsSearchUrl() {
-	        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
-	    }
-	    
+		// master details for BPA module
+		List<MasterDetail> bpaMasterDtls = new ArrayList<>();
 
-	    /**
-	     * Creates request to search financialYear in mdms
-	     * @return MDMS request for financialYear
-	     */
-	    private ModuleDetail getFinancialYearRequest() {
+		// filter to only get code field from master data
+		final String filterCode = "$.[?(@.active==true)].code";
 
-	        // master details for BPA module
-	        List<MasterDetail> masterDetails = new ArrayList<>();
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.RISKTYPE_COMPUTATION).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.OCCUPANCY_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SUB_OCCUPANCY_TYPE).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.USAGES).filter(filterCode).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CalculationType).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CHECKLIST_NAME).build());
+		ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
+				.moduleName(BPAConstants.BPA_MODULE).build();
 
-	        // filter to only get code field from master data
+		// master details for common-masters module
+		List<MasterDetail> commonMasterDetails = new ArrayList<>();
+		commonMasterDetails
+				.add(MasterDetail.builder().name(BPAConstants.OWNERSHIP_CATEGORY).filter(filterCode).build());
+		commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNER_TYPE).filter(filterCode).build());
+		commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
+		ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
+				.moduleName(BPAConstants.COMMON_MASTERS_MODULE).build();
 
-	        final String filterCodeForUom = "$.[?(@.active==true && @.module=='BPA')]";
+		return Arrays.asList(bpaModuleDtls, commonMasterMDtl);
 
-	        masterDetails.add(MasterDetail.builder().name(BPAConstants.MDMS_FINANCIALYEAR).filter(filterCodeForUom).build());
+	}
 
-	        ModuleDetail masterDetail = ModuleDetail.builder().masterDetails(masterDetails)
-	                .moduleName(BPAConstants.MDMS_EGF_MASTER).build();
+	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
+		List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
-	        return masterDetail;
-	    }
-	    
-	    /**
-	     * Creates request to search ApplicationType and etc from MDMS
-	     * @param requestInfo The requestInfo of the request
-	     * @param tenantId The tenantId of the BPA
-	     * @return request to search ApplicationType and etc from MDMS
-	     */
-	    public List<ModuleDetail> getBPAModuleRequest() {
+		List<ModuleDetail> moduleDetails = new LinkedList<>();
+		moduleDetails.addAll(moduleRequest);
 
-	        // master details for BPA module
-	        List<MasterDetail> bpaMasterDtls = new ArrayList<>();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId).build();
 
-	        // filter to only get code field from master data
-	        final String filterCode = "$.[?(@.active==true)].code";
+		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria).requestInfo(requestInfo)
+				.build();
+		return mdmsCriteriaReq;
+	}
 
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.APPLICATION_TYPE).filter(filterCode).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SERVICE_TYPE).filter(filterCode).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE_MAPPING).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.RISKTYPE_COMPUTATION).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.OCCUPANCY_TYPE).filter(filterCode).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.SUB_OCCUPANCY_TYPE).filter(filterCode).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.USAGES).filter(filterCode).build());
-	        bpaMasterDtls.add(MasterDetail.builder().name("CalculationType").build());
-	        bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CHECKLIST_NAME).build());
-	        ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
-	                .moduleName(BPAConstants.BPA_MODULE).build();
-	        
-	        // master details for common-masters module
-	        List<MasterDetail> commonMasterDetails = new ArrayList<>();
-	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNERSHIP_CATEGORY).filter(filterCode).build());
-	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.OWNER_TYPE).filter(filterCode).build());
-	        commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
-	        ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
-	                .moduleName(BPAConstants.COMMON_MASTERS_MODULE).build();
+	public Object mDMSCall(BPARequest bpaRequest) {
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
+		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
+		Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+		return result;
+	}
 
-	        return Arrays.asList(bpaModuleDtls,commonMasterMDtl);
+	public void defaultJsonPathConfig() {
+		Configuration.setDefaults(new Configuration.Defaults() {
 
-	    }
-	    
-	    private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,String tenantId){
-	        List<ModuleDetail> moduleRequest = getBPAModuleRequest();
+			private final JsonProvider jsonProvider = new JacksonJsonProvider();
+			private final MappingProvider mappingProvider = new JacksonMappingProvider();
 
-	        List<ModuleDetail> moduleDetails = new LinkedList<>();
-	        moduleDetails.addAll(moduleRequest);
+			@Override
+			public JsonProvider jsonProvider() {
+				return jsonProvider;
+			}
 
-	        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
-	                .build();
+			@Override
+			public MappingProvider mappingProvider() {
+				return mappingProvider;
+			}
 
-	        MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria)
-	                .requestInfo(requestInfo).build();
-	        return mdmsCriteriaReq;
-	    }
-
-
-
-	    public Object mDMSCall(BPARequest bpaRequest){
-	        RequestInfo requestInfo = bpaRequest.getRequestInfo();
-	        String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
-	        MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo,tenantId);
-	        Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
-	        return result;
-	    }
-	    
-
-	    /**
-	     * Creates a map of id to isStateUpdatable
-	     * @param searchResult Application from DB
-	     * @param businessService The businessService configuration
-	     * @return Map of is to isStateUpdatable
-	     */
-	    public Map<String,Boolean> getIdToIsStateUpdatableMap(BusinessService businessService,List<BPA> searchResult){
-	        Map<String ,Boolean> idToIsStateUpdatableMap = new HashMap<>();
-	        
-	        searchResult.forEach(result -> {
-	            idToIsStateUpdatableMap.put(result.getId(),workflowService.isStateUpdatable(result.getStatus(), businessService));
-	        });
-//	            idToIsStateUpdatableMap.put(searchResult.getId(),workflowService.isStateUpdatable(searchResult.getStatus(), businessService));
-	        return idToIsStateUpdatableMap;
-	    }
-	    
-	    public void defaultJsonPathConfig () {
-	    	Configuration.setDefaults(new Configuration.Defaults() {
-
-	    	    private final JsonProvider jsonProvider = new JacksonJsonProvider();
-	    	    private final MappingProvider mappingProvider = new JacksonMappingProvider();
-	    	      
-	    	    @Override
-	    	    public JsonProvider jsonProvider() {
-	    	        return jsonProvider;
-	    	    }
-
-	    	    @Override
-	    	    public MappingProvider mappingProvider() {
-	    	        return mappingProvider;
-	    	    }
-	    	    
-	    	    @Override
-	    	    public Set<Option> options() {
-	    	        return EnumSet.noneOf(Option.class);
-	    	    }
-	    	});
-	    }
-
+			@Override
+			public Set<Option> options() {
+				return EnumSet.noneOf(Option.class);
+			}
+		});
+	}
 }
