@@ -145,7 +145,7 @@ public class TLRepository {
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
 
-		return jdbcTemplate.query("SELECT licensenumber from eg_tl_tradelicense ORDER BY createdtime offset " +
+		return jdbcTemplate.query("SELECT id from eg_tl_tradelicense ORDER BY createdtime offset " +
 						" ? " +
 						"limit ? ",
 				preparedStmtList.toArray(),

@@ -219,7 +219,7 @@ public class TLQueryBuilder {
         List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
             addClauseIfRequired(preparedStmtList,builder);
-			builder.append(" tl.applicationnumber IN (").append(createQuery(ids)).append(")");
+			builder.append(" tl.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 		
