@@ -180,14 +180,13 @@ public class WorkflowNotificationService {
 	 */
 	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage, String mobileNumber,
 			SewerageConnection connection, RequestInfo requestInfo) {
-		String code = "";
 		String messageTemplate = mobileNumberAndMesssage.get(mobileNumber);
+		List<ActionItem> items = new ArrayList<>();
 		if (messageTemplate.contains("<Action Button>")) {
-			code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
+			String code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
 			messageTemplate = messageTemplate.replace("<Action Button>", "");
 			messageTemplate = messageTemplate.replace("</Action Button>", "");
 			messageTemplate = messageTemplate.replace(code, "");
-			List<ActionItem> items = new ArrayList<>();
 			String actionLink = "";
 			if (code.equalsIgnoreCase("Download Application")) {
 				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
@@ -210,11 +209,9 @@ public class WorkflowNotificationService {
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
 			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
-			return Action.builder().actionUrls(items).build();
 		}
-		// actionLinkAndMsg.put("Action", action);
-		// actionLinkAndMsg.put(key, value);
-		return null;
+		return Action.builder().actionUrls(items).build();
+
 	}
 
 	/**
