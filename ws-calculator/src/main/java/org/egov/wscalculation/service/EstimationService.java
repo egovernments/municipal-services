@@ -119,7 +119,7 @@ public class EstimationService {
 			BigDecimal waterCess;
 			waterCess = waterCessUtil.getWaterCess(waterCharge, WSCalculationConstant.Assesment_Year, waterCessMasterList);
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
-					.estimateAmount(waterCess).build());
+					.estimateAmount(waterCess.setScale(2, 2)).build());
 		}
 //		 get applicable rebate and penalty
 //		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,

@@ -110,7 +110,7 @@ public class EstimationService {
 					.get(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER);
 			BigDecimal sewerageCess = sewerageCessUtil.getSewerageCess(sewarageCharge, SWCalculationConstant.Assesment_Year, sewerageCessMasterList);
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_WATER_CESS)
-					.estimateAmount(sewerageCess).build());
+					.estimateAmount(sewerageCess.setScale(2, 2)).build());
 		}
 
 		// get applicable rebate and penalty
