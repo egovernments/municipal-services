@@ -81,17 +81,24 @@ public class BoundaryService {
         Map<String,String> propertyIdToJsonPath = getJsonpath(request);
 
         DocumentContext context = JsonPath.parse(jsonString);
-
+        
         request.getLicenses().forEach(license -> {
-            Object boundaryObject = context.read(propertyIdToJsonPath.get(license.getId()));
-            if(!(boundaryObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList)boundaryObject))
-                throw new CustomException("BOUNDARY MDMS DATA ERROR","The boundary data was not found");
 
-            ArrayList boundaryResponse = context.read(propertyIdToJsonPath.get(license.getId()));
-            Boundary boundary = mapper.convertValue(boundaryResponse.get(0),Boundary.class);
-            if(boundary.getName()==null)
+            String localityJsonPath = "$..boundary[0].children.[?(@.code==\"{}\")]";
+
+            Object localityObject = context.read(localityJsonPath.replace("{}",
+            		license.getTradeLicenseDetail().getAddress().getLocality().getCode()));
+
+            if(!(localityObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList)localityObject))
+                return;
+
+            ArrayList localityResponse = (ArrayList) localityObject;
+
+            Boundary locality = mapper.convertValue(localityResponse.get(0),Boundary.class);
+
+            if(locality.getName()==null)
                 throw new CustomException("INVALID BOUNDARY DATA","The boundary data for the code "+license.getTradeLicenseDetail().getAddress().getLocality().getCode()+ " is not available");
-            license.getTradeLicenseDetail().getAddress().setLocality(boundary);
+            license.getTradeLicenseDetail().getAddress().setLocality(locality);
 
         });
     }
