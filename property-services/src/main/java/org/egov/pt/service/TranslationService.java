@@ -6,9 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.oldProperty.OldProperty;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ public class TranslationService {
 
         Map<String, Object> propertyMap = new HashMap<>();
         Map<String, Object> propertyDetail = new HashMap<>();
+        Map<String, Object> auditDetails = new HashMap<>();
 
         Map<String, Object> addressMap = new HashMap<>();
         Map<String, Object> localityMap = new HashMap<>();
@@ -52,6 +55,13 @@ public class TranslationService {
         propertyMap.put("status", property.getStatus());
         propertyMap.put("creationReason", property.getCreationReason());
         propertyMap.put("occupancyDate", null);
+
+        auditDetails.put("createdBy", property.getAuditDetails().getCreatedBy());
+        auditDetails.put("lastModifiedBy", property.getAuditDetails().getLastModifiedBy());
+        auditDetails.put("createdTime", property.getAuditDetails().getCreatedTime());
+        auditDetails.put("lastModifiedTime", property.getAuditDetails().getLastModifiedTime());
+        propertyMap.put("auditDetails", auditDetails);
+
 
         String[] propertyTypeMasterData = property.getPropertyType().split("\\.");
         String propertyType = null,propertySubType = null;
@@ -153,6 +163,10 @@ public class TranslationService {
 
     }
 
-
-
+    public OldProperty getOldProperty(AssessmentRequest assessmentRequest, Property property) {
+        Map<String, Object> oldPropertyObjectMap = translate(assessmentRequest, property);
+        List<Map<String, Object>> calculationCriteriaArray = (List<Map<String, Object>>) oldPropertyObjectMap.get("CalculationCriteria");
+        OldProperty oldProperty = mapper.convertValue(calculationCriteriaArray.get(0).get("property"), OldProperty.class);
+        return oldProperty;
+    }
 }
