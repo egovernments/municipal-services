@@ -27,6 +27,11 @@ import static org.egov.tl.util.TLConstants.*;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Slf4j
 public class TradeLicenseService {
@@ -325,14 +330,21 @@ public class TradeLicenseService {
 
     }
 
-    public List<TradeLicense> plainSearch(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo) {
-        List<TradeLicense> licenses;
+    public List<TradeLicense> plainSearch(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+
+        if(criteria.getLimit() == null)
+            criteria.setLimit(config.getDefaultLimit());
+
+        if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
+            criteria.setLimit(config.getMaxSearchLimit());
+
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
         if (ids.isEmpty())
             return Collections.emptyList();
-        criteria.setIds(ids);
-        licenses = repository.getPlainLicenseSearch(criteria);
-        licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria, requestInfo);
+
+        TradeLicenseSearchCriteria newCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
+        List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
         return licenses;
     }
 
