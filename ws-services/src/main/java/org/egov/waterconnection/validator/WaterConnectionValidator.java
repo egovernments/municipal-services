@@ -1,5 +1,6 @@
 package org.egov.waterconnection.validator;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,9 +10,12 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class WaterConnectionValidator {
+	
+	@Autowired
+	private ObjectMapper mapper;
 
 	/**
 	 * 
@@ -28,6 +35,7 @@ public class WaterConnectionValidator {
 	 * @param isUpdate
 	 *            True for update and false for create
 	 */
+	@SuppressWarnings("unchecked")
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
@@ -54,14 +62,28 @@ public class WaterConnectionValidator {
 			}
 			if (!StringUtils.isEmpty(waterConnection.getConnectionType())
 					&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())) {
+				HashMap<String, Object> addDetail = mapper.convertValue(
+						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 				if (waterConnection.getMeterId() == null) {
 					errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
 				}
-				if (waterConnection.getMeterInstallationDate() < 0 || waterConnection.getMeterInstallationDate() == null
+				if (waterConnection.getMeterInstallationDate() == null || waterConnection.getMeterInstallationDate() < 0
 						|| waterConnection.getMeterInstallationDate() == 0) {
 					errorMap.put("INVALID_METER_INSTALLATION_DATE",
 							"Meter Installation date cannot be null or negative");
 				}
+				if (StringUtils.isEmpty(addDetail)
+						|| addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) == null) {
+					errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be null");
+				} else {
+					BigDecimal initialMeterReading = BigDecimal.ZERO;
+					initialMeterReading = new BigDecimal(
+							String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
+					if (initialMeterReading.compareTo(BigDecimal.ZERO) == 0) {
+						errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");
+					}
+				}
+
 			}
 			// if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
 			// errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
