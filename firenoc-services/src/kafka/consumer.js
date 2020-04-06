@@ -97,6 +97,11 @@ consumerGroup.on("message", function(message) {
       let fireNOCNumber = get(FireNOCs[i], "fireNOCNumber");
       let validTo = get(FireNOCs[i], "fireNOCDetails.validTo");
       let tenantId = get(FireNOCs[i], "tenantId");
+      let actionType="forwarded for";
+      let action=get[FireNOCs[i],"fireNOCDetails.action"];
+      if(action==envVariables.SENDBACK){
+        actionType="send back to";
+      }
       let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
       switch (FireNOCs[i].fireNOCDetails.status) {
         case "INITIATED":
@@ -107,22 +112,24 @@ consumerGroup.on("message", function(message) {
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}. Please pay your NoC Fees online or at your applicable fire office`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}.  You can download your Fire NOC by clicking on the below link:
+          ${downLoadLink}
+          Please pay your NoC Fees online or at your applicable fire office`;
           break;
         case "FIELDINSPECTION":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType}  Fire NOC with application no. ${applicationNumber} has been forwarded for field inpsection.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType}  Fire NOC with application no. ${applicationNumber} has been ${actionType} field inpsection.`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been forwarded for document verifier.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been ${actionType} document verifier.`;
           break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been forwarded for approver.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been ${actionType} approver.`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
