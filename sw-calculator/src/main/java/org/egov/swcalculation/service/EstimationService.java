@@ -63,12 +63,12 @@ public class EstimationService {
 			Map<String, Object> masterData) {
 		if (StringUtils.isEmpty((criteria.getSewerageConnection()))
 				&& !StringUtils.isEmpty(criteria.getConnectionNo())) {
-			criteria.setSewerageConnection(
-					calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(), criteria.getTenantId()));
+			criteria.setSewerageConnection(calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(),
+					criteria.getTenantId()));
 		}
-		if (criteria.getSewerageConnection() == null) {
+		if (criteria.getSewerageConnection() == null || StringUtils.isEmpty(criteria.getConnectionNo())) {
 			StringBuilder builder = new StringBuilder();
-			builder.append("Sewerage Connection are not present for ").append(criteria.getConnectionNo())
+			builder.append("Sewerage Connection are not present for ").append(StringUtils.isEmpty(criteria.getConnectionNo()) ? "" : criteria.getConnectionNo())
 					.append(" connection no");
 			throw new CustomException("Sewerage Connection not found for given criteria ", builder.toString());
 		}
@@ -85,8 +85,8 @@ public class EstimationService {
 		// mDataService.setSewerageConnectionMasterValues(requestInfo, tenantId,
 		// billingSlabMaster,
 		// timeBasedExemptionMasterMap);
-		BigDecimal sewarageCharge = getSewerageEstimationCharge(criteria.getSewerageConnection(), criteria, billingSlabMaster,
-				billingSlabIds, requestInfo);
+		BigDecimal sewarageCharge = getSewerageEstimationCharge(criteria.getSewerageConnection(), criteria,
+				billingSlabMaster, billingSlabIds, requestInfo);
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(sewarageCharge, criteria.getSewerageConnection(),
 				timeBasedExemptionMasterMap, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
