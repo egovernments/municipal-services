@@ -72,10 +72,10 @@ const calculateForSingleReq = async (
 ) => {
   let mdms = await mdmsData(requestInfo, calculateCriteria.tenantId);
   let mdmsConfig = {};
-  for (let i = 0; i < mdms.MdmsRes.firenoc.FireNocULBConstats.length; i++) {
+  /*for (let i = 0; i < mdms.MdmsRes.firenoc.FireNocULBConstats.length; i++) {
     let constEntry = mdms.MdmsRes.firenoc.FireNocULBConstats[i];
     mdmsConfig = { ...mdmsConfig, [constEntry.code]: constEntry.value };
-  }
+  }*/
   for (let i = 0; i < mdms.MdmsRes.firenoc.FireNocStateConstats.length; i++) {
     let constEntry = mdms.MdmsRes.firenoc.FireNocStateConstats[i];
     mdmsConfig = { ...mdmsConfig, [constEntry.code]: constEntry.value };
@@ -109,8 +109,8 @@ const calculateForSingleReq = async (
     const adhocRebateEstimate = calculateAdhocRebate(calculateCriteria);
     calculation.taxHeadEstimates.push(adhocRebateEstimate);
   }
-  const taxEstimate = calculateTaxes(mdmsConfig, calculation);
-  calculation.taxHeadEstimates.push(taxEstimate);
+ // const taxEstimate = calculateTaxes(mdmsConfig, calculation);
+ // calculation.taxHeadEstimates.push(taxEstimate);
 
   const roundoffEstimate = calculateRoundOff(calculation);
   calculation.taxHeadEstimates.push(roundoffEstimate);
