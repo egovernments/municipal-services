@@ -98,7 +98,7 @@ consumerGroup.on("message", function(message) {
       let validTo = get(FireNOCs[i], "fireNOCDetails.validTo");
       let tenantId = get(FireNOCs[i], "tenantId");
       let actionType="forwarded for";
-      let action=get[FireNOCs[i],"fireNOCDetails.action"];
+      let action=get(FireNOCs[i],"fireNOCDetails.action");
       if(action==envVariables.SENDBACK){
         actionType="send back to";
       }
