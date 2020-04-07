@@ -54,24 +54,42 @@ public class WaterConnectionValidator {
 
 		}
 		if (isUpdate && (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
-				&& !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))
-				&& WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(
-						waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-			if (StringUtils.isEmpty(waterConnection.getConnectionType())) {
-				errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
+				&& !StringUtils
+						.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))) {
+			if (WCConstants.APPROVE_CONNECTION_CONST
+					.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+				if (StringUtils.isEmpty(waterConnection.getConnectionType())) {
+					errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
+				}
+				if (!StringUtils.isEmpty(waterConnection.getConnectionType())
+						&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())) {
+					if (waterConnection.getMeterId() == null) {
+						errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
+					}
+					if (waterConnection.getMeterInstallationDate() == null
+							|| waterConnection.getMeterInstallationDate() < 0
+							|| waterConnection.getMeterInstallationDate() == 0) {
+						errorMap.put("INVALID_METER_INSTALLATION_DATE",
+								"Meter Installation date cannot be null or negative");
+					}
+
+				}
+				// if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
+				// errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
+				// "WaterConnection cannot be created without connection category");
+				// }
+				if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
+					errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
+				}
+				if (StringUtils.isEmpty(waterConnection.getRoadType())) {
+					errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
+				}
 			}
-			if (!StringUtils.isEmpty(waterConnection.getConnectionType())
-					&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())) {
+
+			if (WCConstants.STATUS_APPROVED
+					.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 				HashMap<String, Object> addDetail = mapper.convertValue(
 						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-				if (waterConnection.getMeterId() == null) {
-					errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
-				}
-				if (waterConnection.getMeterInstallationDate() == null || waterConnection.getMeterInstallationDate() < 0
-						|| waterConnection.getMeterInstallationDate() == 0) {
-					errorMap.put("INVALID_METER_INSTALLATION_DATE",
-							"Meter Installation date cannot be null or negative");
-				}
 				if (StringUtils.isEmpty(addDetail)
 						|| addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) == null) {
 					errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be null");
@@ -83,17 +101,6 @@ public class WaterConnectionValidator {
 						errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");
 					}
 				}
-
-			}
-			// if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
-			// errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
-			// "WaterConnection cannot be created without connection category");
-			// }
-			if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
-				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
-			}
-			if (StringUtils.isEmpty(waterConnection.getRoadType())) {
-				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 			}
 
 		}
