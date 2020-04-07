@@ -86,8 +86,10 @@ public class WaterConnectionValidator {
 				}
 			}
 
-			if (WCConstants.STATUS_APPROVED
-					.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			if (!StringUtils.isEmpty(waterConnection.getConnectionType())
+					&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())
+					&& WCConstants.STATUS_APPROVED.equalsIgnoreCase(
+							waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 				HashMap<String, Object> addDetail = mapper.convertValue(
 						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 				if (StringUtils.isEmpty(addDetail)
