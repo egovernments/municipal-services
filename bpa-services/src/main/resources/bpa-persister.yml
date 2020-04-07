@@ -215,6 +215,25 @@ serviceMaps:
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
   
 
+  
+       - query: INSERT INTO eg_bpa_blocks( id, suboccupancytype, buildingplanid, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?);
+         basePath: BPA.blocks.*
+         jsonMaps:
+          - jsonPath: $.BPA.blocks.*.id
+
+          - jsonPath: $.BPA.blocks.*.subOccupancyType
+
+          - jsonPath: $.BPA.id
+          
+          - jsonPath: $.BPA.blocks.*.auditDetails.createdBy
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.createdTime
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedTime
+
+
 
        - query: INSERT INTO eg_bpa_auditdetails SELECT * FROM eg_bpa_buildingplan WHERE id =?;
          basePath: BPA
@@ -428,6 +447,30 @@ serviceMaps:
           - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
 
           - jsonPath: $.BPA.units.*.id
+
+
+       - query: INSERT INTO eg_bpa_blocks( id, suboccupancytype, buildingplanid, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, buildingplanid) WHERE id IS NOT NULL DO UPDATE SET subOccupancyType=?, lastmodifiedby=?, lastmodifiedtime=?;
+         basePath: BPA.blocks.*
+         jsonMaps:
+          - jsonPath: $.BPA.blocks.*.id
+
+          - jsonPath: $.BPA.blocks.*.subOccupancyType
+
+          - jsonPath: $.BPA.id
+          
+          - jsonPath: $.BPA.blocks.*.auditDetails.createdBy
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.createdTime
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedTime
+
+          - jsonPath: $.BPA.blocks.*.subOccupancyType
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.blocks.*.auditDetails.lastModifiedTime
 
 
 

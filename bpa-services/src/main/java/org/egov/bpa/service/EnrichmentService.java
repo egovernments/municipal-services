@@ -93,6 +93,12 @@ public class EnrichmentService {
 				});
 		});
 
+		// blocks
+		bpaRequest.getBPA().getBlocks().forEach(block -> {
+				if (block.getSubOccupancyType()!= null)
+						block.setId(UUID.randomUUID().toString());
+			});
+		
 		setIdgenIds(bpaRequest);
 		boundaryService.getAreaType(bpaRequest, config.getHierarchyTypeCode());
 	}

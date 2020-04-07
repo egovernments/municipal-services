@@ -34,6 +34,8 @@ public class BPA {
 	private ArrayList<String> unitIds;
 	@JsonIgnore
 	private ArrayList<String> ownerIds;
+	@JsonIgnore
+	private ArrayList<String> blockId;
 	
 	@Size(max = 64)
 	@JsonProperty("id")
@@ -183,6 +185,10 @@ public class BPA {
 	@JsonProperty("tradeType")
 	private String tradeType;
 
+	@JsonProperty("blocks")
+	private List<BPABlocks> blocks;
+	
+
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
 			this.owners = new ArrayList<>();
@@ -225,6 +231,22 @@ public class BPA {
 			this.docIds.add(documentsItem.getId());
 		}
 			
+		return this;
+	}
+	
+	
+	public BPA addBlocks(BPABlocks blockList) {
+		if (this.blocks == null)
+			this.blocks = new ArrayList<>();
+		
+		if(this.blockId == null){
+			this.blockId = new ArrayList<String>();
+		}
+		if(!this.blockId.contains(blockList.getId())){
+			this.blocks.add(blockList);
+			this.blockId.add(blockList.getId());
+		}
+		
 		return this;
 	}
 }
