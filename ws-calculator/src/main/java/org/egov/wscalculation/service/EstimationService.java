@@ -73,7 +73,7 @@ public class EstimationService {
 		if (criteria.getWaterConnection() == null || StringUtils.isEmpty(criteria.getConnectionNo())) {
 			StringBuilder builder = new StringBuilder();
 			builder.append("Water Connection are not present for ")
-					.append((StringUtils.isEmpty(criteria.getConnectionNo()) ? "" : criteria.getConnectionNo()))
+					.append(StringUtils.isEmpty(criteria.getConnectionNo()) ? "" : criteria.getConnectionNo())
 					.append(" connection no");
 			throw new CustomException("Water Connection not found for given criteria ", builder.toString());
 		}
