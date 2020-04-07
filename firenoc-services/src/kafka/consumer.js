@@ -112,7 +112,8 @@ consumerGroup.on("message", function(message) {
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}.  You can download your Fire NOC by clicking on the below link:
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}.  
+          You can download your application form by clicking on the below link:
           ${downLoadLink}
           Please pay your NoC Fees online or at your applicable fire office`;
           break;
