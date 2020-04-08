@@ -130,7 +130,22 @@ export const searchApiResponse = async (request, next = {}) => {
 if(queryObj.hasOwnProperty("fireNOCType"))
 {     
 
-  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.fireNOCType}' AND`;
+  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.applicationType}' AND`;
+
+}
+
+
+if(queryObj.hasOwnProperty("areaType"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.areatype='${queryObj.areaType}' AND`;
+
+}
+
+if(queryObj.hasOwnProperty("subDistrict"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.subdistrict='${queryObj.subDistrict}' AND`;
 
 }
 
