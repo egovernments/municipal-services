@@ -50,6 +50,8 @@ public class TLConstants {
     public static final String NOTIFICATION_SENDBACK_CITIZEN= "tl.en.sendback.citizen";
 
     public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
+    
+    public static final String NOTIFICATION_SENDBACK_TO_INSPECTION= "tl.en.sendback.to.inspection";
 
 
     public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Trade License with application number <APPLICATION_NUMBER> was modified.";
@@ -165,7 +167,8 @@ public class TLConstants {
 
     public static final String ACTION_FORWARD_CITIZENACTIONREQUIRED  = "FORWARDTOEMPLOYEE_FIELDINSPECTION";
 
-
+    public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
+    
     public static final String ACTION_STATUS_PAID  = "PAID";
 
 
