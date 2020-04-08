@@ -207,7 +207,7 @@ public class TradeLicenseService {
 		enrichmentService.postStatusEnrichment(tradeLicenseRequest);
         userService.createUser(tradeLicenseRequest);
         calculationService.addCalculation(tradeLicenseRequest);
-        editNotificationService.sendEditNotification(tradeLicenseRequest,diffMap);
+        //editNotificationService.sendEditNotification(tradeLicenseRequest,diffMap);
         repository.update(tradeLicenseRequest,idToIsStateUpdatableMap);
         return tradeLicenseRequest.getLicenses();
     }
