@@ -30,6 +30,9 @@ public class BPASearchCriteria {
 
 	    @JsonProperty("applicationNos")
 	    private List<String> applicationNos;
+	    
+	    @JsonProperty("permitNos")
+	    private List<String> permitNos;
 
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;

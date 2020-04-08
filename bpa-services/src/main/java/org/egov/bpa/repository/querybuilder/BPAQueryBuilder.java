@@ -31,7 +31,7 @@ public class BPAQueryBuilder {
 			+ "eg_bpa_address bpaaddress ON bpaaddress.buildingplanid = bpa.id"
 			+ INNER_JOIN_STRING
 			+ "eg_bpa_owner bpaowner ON bpaowner.buildingplanid = bpa.id"
-			+ INNER_JOIN_STRING
+			+ LEFT_OUTER_JOIN_STRING
 			+ "eg_bpa_blocks bpablocks ON bpablocks.buildingplanid = bpa.id"
 			+ LEFT_OUTER_JOIN_STRING
 			+ "eg_bpa_document_owner bpaownerdoc ON bpaownerdoc.owner = bpaowner.id" 
@@ -91,6 +91,13 @@ public class BPAQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos)).append(")");
 			addToPreparedStatement(preparedStmtList, applicationNos);
+		}
+		
+		List<String> permitNos = criteria.getPermitNos();
+		if (!CollectionUtils.isEmpty(permitNos)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.permitorderno IN (").append(createQuery(permitNos)).append(")");
+			addToPreparedStatement(preparedStmtList, permitNos);
 		}
 
 		if (criteria.getMobileNumber() != null) {
