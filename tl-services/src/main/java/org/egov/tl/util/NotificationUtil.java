@@ -460,7 +460,7 @@ public class NotificationUtil {
 	}
 	
 	private String getSendToApproverMsg(TradeLicense license, String message) {
-		message = message.replace("<APPLICATION_NUMBER>", license.getTradeName());
+		message = message.replace("<APPLICATION_NUMBER>", license.getApplicationNumber());
 		return message;
 	}
 	
