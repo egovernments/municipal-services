@@ -114,10 +114,13 @@ const createValidate = async (body, errors) => {
         buildingSubUsageTypes.push(buildingType.BuildingSubType);
       })
     if (!some(buildingSubUsageTypes, ["code", billingSlab.buildingUsageType])) {
+      console.log("sub usage types",buildingSubUsageTypes);
+      console.log(" usage type",billingSlab.buildingUsageType);
+
       errors = [
         ...errors,
         {
-          message: "Building usage type is invallid!"
+          message: "Building usage sub type is invallid!"
         }
       ];
     }
