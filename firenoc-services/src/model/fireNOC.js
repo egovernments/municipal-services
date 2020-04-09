@@ -389,6 +389,10 @@ const Buildings = {
       description: "building usage type",
       valid_buildingType: true
     },
+    usageSubType: {
+      type: "string",
+      description: "building usage sub type",
+    },
     uoms: {
       type: "array",
       items: BuildingUOM,
