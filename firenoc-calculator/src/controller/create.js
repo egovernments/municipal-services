@@ -109,7 +109,11 @@ const createValidate = async (body, errors) => {
             "SINGLESLAB and MULTIPLESLAB calculation type should have toUOM and fromUOM"
         }
       ];
-    if (!some(Buildingtypes, ["code", billingSlab.buildingUsageType])) {
+      let buildingSubUsageTypes=[];
+      Buildingtypes.map((buildingType)=>{
+        buildingSubUsageTypes.push(buildingType.BuildingSubType);
+      })
+    if (!some(buildingSubUsageTypes, ["code", billingSlab.buildingUsageType])) {
       errors = [
         ...errors,
         {

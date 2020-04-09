@@ -134,7 +134,7 @@ const calculateNOCFee = async (
   ) {
     let buidingnocfee = 0;
     searchReqParam.buildingUsageType =
-      calculateCriteria.fireNOC.fireNOCDetails.buildings[i].usageType;
+      calculateCriteria.fireNOC.fireNOCDetails.buildings[i].usageSubType;
     let uoms = calculateCriteria.fireNOC.fireNOCDetails.buildings[
       i
     ].uoms.filter(uom => {
