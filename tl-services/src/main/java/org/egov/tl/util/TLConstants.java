@@ -43,6 +43,8 @@ public class TLConstants {
     public static final String NOTIFICATION_OBJECT_MODIFIED = "tl.en.edit.object.modified";
 
     public static final String NOTIFICATION_SENDBACK_TO_INSPECTION= "tl.en.sendback.to.inspection";
+    
+    public static final String NOTIFICATION_SEND_TO_APPROVER= "tl.en.send.to.approver";
 
     public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Trade License with application number <APPLICATION_NUMBER> was modified.";
 
@@ -153,6 +155,8 @@ public class TLConstants {
     public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
     
     public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
+    
+    public static final String ACTION_STATUS_PENDINGAPPROVAL  = "FORWARD_PENDINGAPPROVAL";
     
     public static final String ACTION_STATUS_PAID  = "PAID";
 
