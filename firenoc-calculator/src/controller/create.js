@@ -111,7 +111,7 @@ const createValidate = async (body, errors) => {
       ];
       let buildingSubUsageTypes=[];
       Buildingtypes.map((buildingType)=>{
-        buildingSubUsageTypes.push(buildingType.BuildingSubType);
+        buildingSubUsageTypes.push(...buildingType.BuildingSubType);
       })
     if (!some(buildingSubUsageTypes, ["code", billingSlab.buildingUsageType])) {
       console.log("sub usage types",buildingSubUsageTypes);
