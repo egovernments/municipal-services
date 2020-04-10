@@ -112,8 +112,8 @@ const calculateForSingleReq = async (
  // const taxEstimate = calculateTaxes(mdmsConfig, calculation);
  // calculation.taxHeadEstimates.push(taxEstimate);
 
-  const roundoffEstimate = calculateRoundOff(calculation);
-  calculation.taxHeadEstimates.push(roundoffEstimate);
+  //const roundoffEstimate = calculateRoundOff(calculation);
+  //calculation.taxHeadEstimates.push(roundoffEstimate);
   return calculation;
 };
 
