@@ -140,10 +140,12 @@ const calculateNOCFee = async (
     ].uoms.filter(uom => {
       return uom.isActiveUom;
     });
-    for (let uomindex = 0; uomindex < uoms.length; uomindex++) {
+    //for (let uomindex = 0; uomindex < uoms.length; uomindex++) {
       searchReqParam.uom = uoms[uomindex].code;
       if (mdmsConfig.CALCULATON_TYPE !== "FLAT")
-        searchReqParam.uomValue = uoms[uomindex].value;
+        //searchReqParam.uomValue = uoms[uomindex].value;
+     searchReqParam.uomValue ="HEIGHT_OF_BUILDING";
+
       const billingslabs = await searchService(searchReqParam, {}, pool);
       let errors = [];
       if (billingslabs.length > 1) {
@@ -170,7 +172,7 @@ const calculateNOCFee = async (
           billingslabs[0].rate * Number(searchReqParam.uomValue)
         );
       }
-    }
+   // }
     if (mdmsConfig.CALCULATON_TYPE !== "FLAT") {
       const minimumFee =
         searchReqParam.fireNOCType === "NEW"
