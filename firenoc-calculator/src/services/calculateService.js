@@ -141,10 +141,10 @@ const calculateNOCFee = async (
       return uom.isActiveUom;
     });
     //for (let uomindex = 0; uomindex < uoms.length; uomindex++) {
-      searchReqParam.uom = uoms[uomindex].code;
+      searchReqParam.uom = "HEIGHT_OF_BUILDING";
       if (mdmsConfig.CALCULATON_TYPE !== "FLAT")
-        //searchReqParam.uomValue = uoms[uomindex].value;
-     searchReqParam.uomValue ="HEIGHT_OF_BUILDING";
+      searchReqParam.uomValue = uoms[uomindex].value;
+     //searchReqParam.uomValue ="HEIGHT_OF_BUILDING";
 
       const billingslabs = await searchService(searchReqParam, {}, pool);
       let errors = [];
