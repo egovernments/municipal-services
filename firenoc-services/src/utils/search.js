@@ -124,6 +124,7 @@ const fireNocBuildingsRowMapper = (row, mapper = []) => {
     tenantId: row.tenantid,
     name: row.buildingname,
     usageType: row.usagetype,
+    usageSubType:row.usageSubType,
     uoms: fireNocUomsRowMapper(row),
     applicationDocuments: fireNocApplicationDocumentsRowMapper(row)
   };
