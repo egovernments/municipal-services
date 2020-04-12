@@ -211,11 +211,9 @@ const Address = {
       type: "object",
       properties: {
         code: {
-          type: "string",
-          valid_boundary: true
+          type: "string"
         }
       },
-      required: ["code"]
     }
   },
   required: [ "city"]
