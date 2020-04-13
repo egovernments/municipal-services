@@ -71,7 +71,8 @@ consumerGroup.on("message", function(message) {
     // );
   };
 
-  const sendFireNOCSMSRequest = FireNOCs => {
+  const sendFireNOCSMSRequest = (FireNOCs,RequestInfo) => {
+    
     for (let i = 0; i < FireNOCs.length; i++) {
       smsRequest["mobileNumber"] = get(
         FireNOCs[i],
@@ -103,34 +104,47 @@ consumerGroup.on("message", function(message) {
         actionType="send back to";
       }
       let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
+     
+      let ownerInfo="";
+      ownerInfo= get(RequestInfo,"userInfo.roles");
+      console.log("ownerInfo is", ownerInfo);
+      if(ownerInfo!=null  && ownerInfo.length>0){
+       ownerInfo=ownerInfo[0].name;
+      }
+     console.log("ownerInfo is",ownerInfo);
       switch (FireNOCs[i].fireNOCDetails.status) {
-        case "INITIATED":
+/*case "INITIATED":
           smsRequest[
             "message"
           ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.`;
-          break;
+          break;*/
+
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been submitted. Your application no. is ${applicationNumber}.  
-          You can download your application form by clicking on the below link:
-          ${downLoadLink}
-          Please pay your NoC Fees online or at your applicable fire office`;
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate has been submitted, the application no. is ${applicationNumber}. 
+          You can download your application form by clicking on the below link: 
+           ${downLoadLink}.
+          Kindly pay your NOC Fees online or at your applicable fire office.`;
           break;
         case "FIELDINSPECTION":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType}  Fire NOC with application no. ${applicationNumber} has been ${actionType} field inpsection.`;
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} field inspection.`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been ${actionType} document verifier.`;
-          break;
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} document verifier.`;
+           break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no. ${applicationNumber} has been ${actionType} approver.`;
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} approver.`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
@@ -147,14 +161,18 @@ consumerGroup.on("message", function(message) {
 
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no.  ${applicationNumber} is approved..and your fire NoC has been generated.Your Fire NoC No. is ${fireNOCNumber}. It is valid till ${dateString}. 
-          You can download your Fire NOC by clicking on the below link:
+          ] = `Dear ${ownerName}, 
+          Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and your Fire NOC Certificate has been generated.
+          Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.
+          You can download your Fire NOC Certificate by clicking on the below link:
           ${downLoadLink}`;
           break;
         case "REJECTED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC with application no.  ${applicationNumber} has been rejected.To know more details please contact your respective  fire office`;
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.
+          `;
           break;
         // case "CANCELLED":
         //   break;
@@ -207,9 +225,8 @@ consumerGroup.on("message", function(message) {
     smsRequest[
       "message"
     ] = `Dear ${applicantName}, 
-    A Payment of ${paymentAmount} has been collected successfully.
-    Your receipt no. ${receiptNumber}.
-    You can download your receipt by clicking on the below link:
+    A Payment of ${paymentAmount} has been collected successfully for your Fire NOC Certificate.
+    The payment receipt no. is  ${receiptNumber} and you can download your receipt by clicking on the below link:
     ${downLoadLink}`;
 
     payloads.push({
@@ -278,20 +295,20 @@ consumerGroup.on("message", function(message) {
   switch (message.topic) {
     case envVariables.KAFKA_TOPICS_FIRENOC_CREATE:
       {
-        const { FireNOCs } = value;
-        sendFireNOCSMSRequest(FireNOCs);
+        const { FireNOCs,RequestInfo } = value;
+        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
       }
       break;
     case envVariables.KAFKA_TOPICS_FIRENOC_UPDATE:
       {
         const { FireNOCs } = value;
-        sendFireNOCSMSRequest(FireNOCs);
+        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
       }
       break;
     case envVariables.KAFKA_TOPICS_FIRENOC_WORKFLOW:
       {
         const { FireNOCs } = value;
-        sendFireNOCSMSRequest(FireNOCs);
+        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
       }
       break;
 
