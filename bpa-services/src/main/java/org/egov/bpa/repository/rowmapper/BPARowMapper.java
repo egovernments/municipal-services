@@ -11,6 +11,7 @@ import java.util.Map;
 import org.egov.bpa.web.models.Address;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPA;
+import org.egov.bpa.web.models.BPABlocks;
 import org.egov.bpa.web.models.Boundary;
 import org.egov.bpa.web.models.Document;
 import org.egov.bpa.web.models.GeoLocation;
@@ -146,7 +147,15 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		}
 
 		
+		String blockId = rs.getString("bpablockid");
+			if (blockId != null) {
+					BPABlocks block = BPABlocks.builder()
+							.id(blockId)
+							.subOccupancyType(rs.getString("bpablocksotype")).build();
 
+					bpa.addBlocks(block);
+			}	
+		
 		
 		
 		String ownerId = rs.getString("bpaowner_uuid");

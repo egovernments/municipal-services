@@ -12,15 +12,15 @@ import org.egov.bpa.calculator.web.models.AuditDetails;
 import org.egov.bpa.calculator.web.models.Document;
 import org.egov.bpa.calculator.web.models.Unit;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @Getter
 @Setter
@@ -42,6 +42,10 @@ public class BPA {
 	@NotNull
 	@JsonProperty("applicationType")
 	private String applicationType;
+	
+
+	@JsonProperty("blocks")
+	private List<BPABlocks> blocks;
 	
 	public enum RiskTypeEnum {
 		
