@@ -209,6 +209,8 @@ consumerGroup.on("message", function(message) {
       "Bill[0].mobileNumber"
     );
 
+    let businessService=get(Receipt[0],"Bill[0].taxAndPayments[0].businessService")
+    if (businessService === envVariables.BUSINESS_SERVICE) {
     let paymentAmount=get(Receipt[0],"Bill[0].taxAndPayments[0].amountPaid");
     console.log("paid amount is",paymentAmount);
 
@@ -233,7 +235,7 @@ consumerGroup.on("message", function(message) {
       topic,
       messages: JSON.stringify(smsRequest)
     });
-    
+  } 
   }
   const FireNOCPaymentStatus = async value => {
     try {
