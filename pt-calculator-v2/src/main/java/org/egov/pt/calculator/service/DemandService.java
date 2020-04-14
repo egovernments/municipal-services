@@ -380,11 +380,19 @@ public class DemandService {
 		PropertyDetail detail = property.getPropertyDetails().get(0);
 		String propertyType = detail.getPropertyType();
 		String consumerCode = property.getPropertyId();
+
 		OwnerInfo owner = null;
-		if (null != detail.getCitizenInfo())
+
+		for(OwnerInfo ownerInfo : detail.getOwners()){
+			if(ownerInfo.getStatus().toString().equalsIgnoreCase(OwnerInfo.Status.ACTIVE.toString()))
+				owner = ownerInfo;
+			break;
+		}	
+
+		/*if (null != detail.getCitizenInfo())
 			owner = detail.getCitizenInfo();
 		else
-			owner = detail.getOwners().iterator().next();
+			owner = detail.getOwners().iterator().next();*/
 		
 	//	Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
 
