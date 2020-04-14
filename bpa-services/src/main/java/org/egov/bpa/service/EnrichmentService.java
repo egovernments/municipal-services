@@ -100,10 +100,16 @@ public class EnrichmentService {
 			});
 
 		// blocks
-		bpaRequest.getBPA().getBlocks().forEach(block -> {
-				if (block.getSubOccupancyType()!= null)
+		if(bpaRequest.getBPA().getBlocks() != null ) {
+			bpaRequest.getBPA().getBlocks().forEach(block -> {
+					if (block.getSubOccupancyType()!= null) {
 						block.setId(UUID.randomUUID().toString());
-			});
+					}else {
+						block.setId(UUID.randomUUID().toString());
+					}
+						
+				});
+		}
 		
 //		if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())){
 //			bpaRequest.getBPA().getInstitution().setId(UUID.randomUUID().toString());

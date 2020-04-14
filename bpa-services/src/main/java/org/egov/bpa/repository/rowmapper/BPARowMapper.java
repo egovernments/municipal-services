@@ -151,7 +151,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			if (blockId != null) {
 					BPABlocks block = BPABlocks.builder()
 							.id(blockId)
-							.subOccupancyType(rs.getString("suboccupancytype")).build();
+							.subOccupancyType(rs.getString("bpablocksotype")).build();
 
 					bpa.addBlocks(block);
 			}	
