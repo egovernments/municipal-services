@@ -118,6 +118,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			Unit unit = Unit.builder()
 					.id(rs.getString("bpa_un_id"))
 					.usageCategory(rs.getString("usageCategory"))
+					.auditDetails(auditdetails)
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
 		}
