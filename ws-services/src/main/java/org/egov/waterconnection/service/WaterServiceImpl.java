@@ -128,7 +128,7 @@ public class WaterServiceImpl implements WaterService {
 			str.append("Water Connection Update Request: ").append(mapper.writeValueAsString(waterConnectionRequest));
 			log.info(str.toString());
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			log.debug(e.toString());
 		}
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
