@@ -87,15 +87,13 @@ public class MDMSService {
     public Map<String, Long> getTaxPeriods(RequestInfo requestInfo, TradeLicense license, Object mdmsData) {
         Map<String, Long> taxPeriods = new HashMap<>();
         try {
-            /*
-             * String jsonPath =
-             * TLCalculatorConstants.MDMS_FINACIALYEAR_PATH.replace("{}",license.
-             * getFinancialYear()); List<Map<String,Object>> jsonOutput =
-             * JsonPath.read(mdmsData, jsonPath); Map<String,Object> financialYearProperties
-             * = jsonOutput.get(0);
-             */
-            Object startDate = license.getValidFrom();
-            Object endDate = license.getValidTo();
+
+			String jsonPath = TLCalculatorConstants.MDMS_FINACIALYEAR_PATH.replace("{}", license.getFinancialYear());
+			List<Map<String, Object>> jsonOutput = JsonPath.read(mdmsData, jsonPath);
+			Map<String, Object> financialYearProperties = jsonOutput.get(0);
+
+            Object startDate = financialYearProperties.get(TLCalculatorConstants.MDMS_STARTDATE);
+            Object endDate = financialYearProperties.get(TLCalculatorConstants.MDMS_ENDDATE);
             taxPeriods.put(TLCalculatorConstants.MDMS_STARTDATE, (Long) startDate);
             taxPeriods.put(TLCalculatorConstants.MDMS_ENDDATE, (Long) endDate);
 
