@@ -132,8 +132,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					bpa.addBlocks(block);
 			}*/	
 		
-		
-		
 
 		String ownerId = rs.getString("bpaowner_uuid");
 		if (ownerId != null) {
