@@ -26,7 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class WaterServiceImpl implements WaterService {
 
 	@Autowired
@@ -64,6 +70,9 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private WaterDaoImpl waterDaoImpl;
+	
+	@Autowired
+	private ObjectMapper mapper;
 	
 	
 	
@@ -114,6 +123,13 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		StringBuilder str = new StringBuilder();
+		try {
+			str.append("Water Connection Update Request: ").append(mapper.writeValueAsString(waterConnectionRequest));
+			log.info(str.toString());
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
