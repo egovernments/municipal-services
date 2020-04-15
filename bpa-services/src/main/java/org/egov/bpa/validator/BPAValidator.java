@@ -396,8 +396,6 @@ public class BPAValidator {
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void validateQuestions(Object mdmsData, BPA bpa, String wfState) {
-		List<Map> requestCheckList = new ArrayList<Map>();
-		List<String> requestQns = new ArrayList<String>();
 		List<String> mdmsQns = null;
 
 		log.info("Fetching MDMS result for the state " + wfState);
@@ -418,35 +416,38 @@ public class BPAValidator {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 					if (!CollectionUtils.isEmpty(checkListFromReq)) {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
+							List<Map> requestCheckList = new ArrayList<Map>();
+							List<String> requestQns = new ArrayList<String>();
 							requestCheckList.addAll(
 									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
-						}
-					} else {
-						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
-					}
 
-					if (!CollectionUtils.isEmpty(requestCheckList)) {
-						for (Map reqQn : requestCheckList) {
-							requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
-						}
-					}
-
-					log.info("Request questions " + requestQns);
-
-					if (!CollectionUtils.isEmpty(requestQns)) {
-						if (requestQns.size() < mdmsQns.size())
-							throw new CustomException("BPA_UNKNOWN_QUESTIONS",
-									"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
-						else {
-							List<String> pendingQns = new ArrayList<String>();
-							for (String qn : mdmsQns) {
-								if (!requestQns.contains(qn)) {
-									pendingQns.add(qn);
+							if (!CollectionUtils.isEmpty(requestCheckList)) {
+								for (Map reqQn : requestCheckList) {
+									requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
 								}
 							}
-							if (pendingQns.size() > 0) {
+
+							log.info("Request questions " + requestQns);
+
+							if (!CollectionUtils.isEmpty(requestQns)) {
+								if (requestQns.size() < mdmsQns.size())
+									throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+											"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
+								else {
+									List<String> pendingQns = new ArrayList<String>();
+									for (String qn : mdmsQns) {
+										if (!requestQns.contains(qn)) {
+											pendingQns.add(qn);
+										}
+									}
+									if (pendingQns.size() > 0) {
+										throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+												"Please answer " + StringUtils.join(pendingQns, ","));
+									}
+								}
+							} else {
 								throw new CustomException("BPA_UNKNOWN_QUESTIONS",
-										"Please answer " + StringUtils.join(pendingQns, ","));
+										"Please answer the required questions");
 							}
 						}
 					} else {
@@ -463,8 +464,6 @@ public class BPAValidator {
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState) {
-		List<Map> requestCheckList = new ArrayList<Map>();
-		List<String> requestDocs = new ArrayList<String>();
 		List<String> mdmsDocs = null;
 
 		log.info("Fetching MDMS result for the state " + wfState);
@@ -485,53 +484,53 @@ public class BPAValidator {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 					if (!CollectionUtils.isEmpty(checkListFromReq)) {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
+							List<Map> requestCheckList = new ArrayList<Map>();
+							List<String> requestDocs = new ArrayList<String>();
 							requestCheckList
 									.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
-						}
-					} else {
-						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
-					}
-
-					if (!CollectionUtils.isEmpty(requestCheckList)) {
-						for (Map reqDoc : requestCheckList) {
-							String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
-							if (!StringUtils.isEmpty(fileStoreId)) {
-								String docType = (String) reqDoc.get(BPAConstants.CODE);
-								int lastIndex = docType.lastIndexOf(".");
-								String documentNs = "";
-								if (lastIndex > 1) {
-									documentNs = docType.substring(0, lastIndex);
-								} else if (lastIndex == 1) {
-									throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
-											(String) reqDoc.get(BPAConstants.CODE) + " is Invalid");
-								} else {
-									documentNs = docType;
+							if (!CollectionUtils.isEmpty(requestCheckList)) {
+								for (Map reqDoc : requestCheckList) {
+									String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
+									if (!StringUtils.isEmpty(fileStoreId)) {
+										String docType = (String) reqDoc.get(BPAConstants.CODE);
+										int lastIndex = docType.lastIndexOf(".");
+										String documentNs = "";
+										if (lastIndex > 1) {
+											documentNs = docType.substring(0, lastIndex);
+										} else if (lastIndex == 1) {
+											throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+													(String) reqDoc.get(BPAConstants.CODE) + " is Invalid");
+										} else {
+											documentNs = docType;
+										}
+										requestDocs.add(documentNs);
+									} else {
+										throw new CustomException("BPA_UNKNOWN_DOCS",
+												"fileStoreId is not exists for the documents");
+									}
 								}
+							}
 
-								requestDocs.add(documentNs);
+							log.info("Request Docs " + requestDocs);
+
+							if (!CollectionUtils.isEmpty(requestDocs)) {
+								if (requestDocs.size() < mdmsDocs.size())
+									throw new CustomException("BPA_UNKNOWN_DOCS",
+											"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
+								else {
+									List<String> pendingDocs = new ArrayList<String>();
+									for (String doc : mdmsDocs) {
+										if (!requestDocs.contains(doc)) {
+											pendingDocs.add(doc);
+										}
+									}
+									if (pendingDocs.size() > 0) {
+										throw new CustomException("BPA_UNKNOWN_DOCS",
+												"Please upload " + StringUtils.join(pendingDocs, ","));
+									}
+								}
 							} else {
-								throw new CustomException("BPA_UNKNOWN_DOCS",
-										"fileStoreId is not exists for the documents");
-							}
-						}
-					}
-
-					log.info("Request Docs " + requestDocs);
-
-					if (!CollectionUtils.isEmpty(requestDocs)) {
-						if (requestDocs.size() < mdmsDocs.size())
-							throw new CustomException("BPA_UNKNOWN_DOCS",
-									"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
-						else {
-							List<String> pendingDocs = new ArrayList<String>();
-							for (String doc : mdmsDocs) {
-								if (!requestDocs.contains(doc)) {
-									pendingDocs.add(doc);
-								}
-							}
-							if (pendingDocs.size() > 0) {
-								throw new CustomException("BPA_UNKNOWN_DOCS",
-										"Please upload " + StringUtils.join(pendingDocs, ","));
+								throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
 							}
 						}
 					} else {
