@@ -133,6 +133,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			}*/	
 		
 
+		
+		
 		String ownerId = rs.getString("bpaowner_uuid");
 		if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
