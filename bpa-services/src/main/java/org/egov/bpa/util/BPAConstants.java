@@ -231,6 +231,8 @@ public class BPAConstants {
 	public static final String DOCTYPES_TYPE = "docTypes";
 	public static final String QUESTIONS_TYPE = "questions";
 	public static final String QUESTION_TYPE = "question";
+	public static final String INSPECTION_DATE= "date";
+	public static final String INSPECTION_TIME= "time";
 	public static final String DOCS = "docs";
 	public static final String CODE = "documentType";
 	public static final String QUESTIONS_PATH = "$.[?(@.active==true)].question";

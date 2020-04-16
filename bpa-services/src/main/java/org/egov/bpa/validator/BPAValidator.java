@@ -418,6 +418,7 @@ public class BPAValidator {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestQns = new ArrayList<String>();
+							validateDateTime((Map)checkListFromReq.get(i));
 							requestCheckList.addAll(
 									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
 
@@ -542,6 +543,17 @@ public class BPAValidator {
 			}
 		} catch (PathNotFoundException ex) {
 			log.error("Exception occured while validating the Checklist Documents" + ex.getMessage());
+		}
+	}
+	
+	private void validateDateTime(@SuppressWarnings("rawtypes") Map checkListFromRequest) {
+
+		if (checkListFromRequest.get(BPAConstants.INSPECTION_DATE) == null
+				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_DATE).toString())) {
+			throw new CustomException("BPA_UNKNOWN_DATE", "Please mention the inspection date");
+		} else if (checkListFromRequest.get(BPAConstants.INSPECTION_TIME) == null
+				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
+			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
 		}
 	}
 }
