@@ -27,7 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class SewarageServiceImpl implements SewarageService {
 
 	Logger logger = LoggerFactory.getLogger(SewarageServiceImpl.class);
@@ -68,6 +74,9 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Autowired
 	private CalculationService calculationService;
+	
+	@Autowired
+	private ObjectMapper mapper;
 
 	/**
 	 * @param sewarageConnectionRequest
@@ -126,6 +135,14 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Override
 	public List<SewerageConnection> updateSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
+		StringBuilder str = new StringBuilder();
+		try {
+			str.append("Sewerage Connection Update Request: ")
+					.append(mapper.writeValueAsString(sewarageConnectionRequest));
+			log.info(str.toString());
+		} catch (JsonProcessingException e) {
+			log.debug(e.toString());
+		}
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
 		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		BusinessService businessService = workflowService.getBusinessService(
