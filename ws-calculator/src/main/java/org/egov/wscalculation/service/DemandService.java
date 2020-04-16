@@ -286,6 +286,8 @@ public class DemandService {
 		BigDecimal totalTax = BigDecimal.ZERO;
 
 		DemandDetail prevRoundOffDemandDetail = null;
+		
+		BigDecimal previousRoundOff = BigDecimal.ZERO;
 
 		/*
 		 * Sum all taxHeads except RoundOff as new roundOff will be calculated
@@ -294,7 +296,7 @@ public class DemandService {
 			if (!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(WSCalculationConstant.WS_Round_Off))
 				totalTax = totalTax.add(demandDetail.getTaxAmount());
 			else
-				prevRoundOffDemandDetail = demandDetail;
+				previousRoundOff = previousRoundOff.add(demandDetail.getTaxAmount());
 		}
 
 		BigDecimal decimalValue = totalTax.remainder(BigDecimal.ONE);
@@ -307,7 +309,7 @@ public class DemandService {
 		 * tax is 12.64 we will add extra tax roundOff taxHead of 0.36 so that
 		 * the total becomes 13
 		 */
-		if (decimalValue.compareTo(midVal) > 0)
+		if (decimalValue.compareTo(midVal) >= 0)
 			roundOff = BigDecimal.ONE.subtract(decimalValue);
 
 		/*
@@ -327,8 +329,8 @@ public class DemandService {
 		 * previous roundOff is 0.2 then the new roundOff will be created with
 		 * 0.2 so that the net roundOff will be 0.2 -(-0.36)
 		 */
-		if (prevRoundOffDemandDetail != null) {
-			roundOff = roundOff.subtract(prevRoundOffDemandDetail.getTaxAmount());
+		if (previousRoundOff.compareTo(BigDecimal.ZERO) != 0) {
+			roundOff = roundOff.subtract(previousRoundOff);
 		}
 
 		if (roundOff.compareTo(BigDecimal.ZERO) != 0) {
@@ -637,11 +639,11 @@ public class DemandService {
 
 		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
 			details.add(
-					DemandDetail.builder().taxAmount(penalty).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
+					DemandDetail.builder().taxAmount(penalty.setScale(2, 2)).taxHeadMasterCode(WSCalculationConstant.WS_TIME_PENALTY)
 							.demandId(demandId).tenantId(tenantId).build());
 		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
 			details.add(
-					DemandDetail.builder().taxAmount(interest).taxHeadMasterCode(WSCalculationConstant.WS_TIME_INTEREST)
+					DemandDetail.builder().taxAmount(interest.setScale(2, 2)).taxHeadMasterCode(WSCalculationConstant.WS_TIME_INTEREST)
 							.demandId(demandId).tenantId(tenantId).build());
 		}
 
