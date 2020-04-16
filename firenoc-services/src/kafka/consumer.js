@@ -81,7 +81,7 @@ consumerGroup.on("message", function(message) {
       let firenocType =
         get(FireNOCs[i], "fireNOCDetails.fireNOCType") === "NEW"
           ? "new"
-          : "provision";
+          : "provisional";
 
       let ownerName = get(
         FireNOCs[i],
