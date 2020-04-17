@@ -262,7 +262,7 @@ public class BPAValidator {
 			}
 
 			if (!flag) {
-				errorMap.put("INVALID_UPDATE", "All Units are inactive in the bpa: " + bpa.getApplicationNo());
+				errorMap.put("INVALID_UPDATE", "New blocks are not allowed: " + bpa.getApplicationNo());
 			}
 
 		}
