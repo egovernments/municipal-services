@@ -128,7 +128,7 @@ public class EnrichmentService {
 			HashMap<String, Object> addDetail = mapper.convertValue(
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
-					SWConstants.ADHOC_REBATE);
+					SWConstants.ADHOC_REBATE,SWConstants.APP_CREATED_DATE);
 			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
 				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
