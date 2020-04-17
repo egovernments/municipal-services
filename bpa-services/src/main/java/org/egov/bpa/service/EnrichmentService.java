@@ -100,7 +100,7 @@ public class EnrichmentService {
 			});
 
 		// blocks
-		if(bpaRequest.getBPA().getBlocks() != null ) {
+		/*if(bpaRequest.getBPA().getBlocks() != null ) {
 			bpaRequest.getBPA().getBlocks().forEach(block -> {
 					if (block.getSubOccupancyType()!= null) {
 						block.setId(UUID.randomUUID().toString());
@@ -109,7 +109,7 @@ public class EnrichmentService {
 					}
 						
 				});
-		}
+		}*/
 		
 //		if(bpaRequest.getBPA().getOwnershipCategory().contains(config.getInstitutional())){
 //			bpaRequest.getBPA().getInstitution().setId(UUID.randomUUID().toString());
