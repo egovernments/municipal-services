@@ -185,8 +185,6 @@ public class BPA {
 	@JsonProperty("tradeType")
 	private String tradeType;
 
-	@JsonProperty("blocks")
-	private List<BPABlocks> blocks;
 	
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
@@ -235,18 +233,5 @@ public class BPA {
 	}
 	
 	
-	public BPA addBlocks(BPABlocks blockList) {
-		if (this.blocks == null)
-			this.blocks = new ArrayList<>();
-		
-		if(this.blockId == null){
-			this.blockId = new ArrayList<String>();
-		}
-		if(!this.blockId.contains(blockList.getId())){
-			this.blocks.add(blockList);
-			this.blockId.add(blockList.getId());
-		}
-		
-		return this;
-	}
+	
 }

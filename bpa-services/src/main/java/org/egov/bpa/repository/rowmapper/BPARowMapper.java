@@ -11,7 +11,6 @@ import java.util.Map;
 import org.egov.bpa.web.models.Address;
 import org.egov.bpa.web.models.AuditDetails;
 import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPABlocks;
 import org.egov.bpa.web.models.Boundary;
 import org.egov.bpa.web.models.Document;
 import org.egov.bpa.web.models.GeoLocation;
@@ -116,20 +115,26 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 		String unitId = rs.getString("bpa_un_id");
 		if (unitId != null) {
-			Unit unit = Unit.builder().id(rs.getString("bpa_un_id")).tenantId(tenantId).build();
+			Unit unit = Unit.builder()
+					.id(rs.getString("bpa_un_id"))
+					.usageCategory(rs.getString("usageCategory"))
+					.auditDetails(auditdetails)
+					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
 		}
 		
-		String blockId = rs.getString("bpablockid");
+		/*String blockId = rs.getString("bpablockid");
 			if (blockId != null) {
 					BPABlocks block = BPABlocks.builder()
 							.id(blockId)
 							.subOccupancyType(rs.getString("bpablocksotype")).build();
 
 					bpa.addBlocks(block);
-			}	
+			}*/	
 		
 
+		
+		
 		String ownerId = rs.getString("bpaowner_uuid");
 		if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");

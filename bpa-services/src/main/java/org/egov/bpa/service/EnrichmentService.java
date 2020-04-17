@@ -93,7 +93,7 @@ public class EnrichmentService {
 				});
 		});
 
-		// blocks
+		/*// blocks
 		if(bpaRequest.getBPA().getBlocks() != null ) {
 			bpaRequest.getBPA().getBlocks().forEach(block -> {
 				if (block.getSubOccupancyType()!= null) {
@@ -103,7 +103,7 @@ public class EnrichmentService {
 				}
 					
 			});
-		}
+		}*/
 		
 		
 		setIdgenIds(bpaRequest);

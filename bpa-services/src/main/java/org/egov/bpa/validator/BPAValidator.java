@@ -255,7 +255,7 @@ public class BPAValidator {
 		List<Unit> units = bpa.getUnits();
 		if (!CollectionUtils.isEmpty(units)) {
 			for (Unit unit : units) {
-				if (unit.getId() != null && unit.getActive())
+				if (unit.getId() != null)
 					flag = true;
 				else if (unit.getId() == null)
 					flag = true;
