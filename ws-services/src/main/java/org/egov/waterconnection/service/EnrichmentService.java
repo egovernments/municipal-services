@@ -121,7 +121,7 @@ public class EnrichmentService {
 			HashMap<String, Object> addDetail = mapper
 					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY,
-					WCConstants.ADHOC_REBATE, WCConstants.INITIAL_METER_READING_CONST);
+					WCConstants.ADHOC_REBATE, WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE);
 			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
 				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
