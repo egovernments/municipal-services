@@ -258,14 +258,14 @@ public class BPAValidator {
 		List<Unit> units = bpa.getUnits();
 		if (!CollectionUtils.isEmpty(units)) {
 			for (Unit unit : units) {
-				if (unit.getId() != null && unit.getActive())
+				if (unit.getId() != null)
 					flag = true;
 				else if (unit.getId() == null)
 					flag = true;
 			}
 
 			if (!flag) {
-				errorMap.put("INVALID_UPDATE", "All Units are inactive in the bpa: " + bpa.getApplicationNo());
+				errorMap.put("INVALID_UPDATE", "New blocks are not allowed: " + bpa.getApplicationNo());
 			}
 
 		}
