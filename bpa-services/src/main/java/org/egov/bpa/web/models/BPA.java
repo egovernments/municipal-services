@@ -7,11 +7,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.egov.bpa.web.models.OwnerInfo.RelationshipEnum;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -20,10 +21,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Validated
 @Getter
@@ -187,8 +184,6 @@ public class BPA {
 	@JsonProperty("orderGeneratedDate")
 	private Long orderGeneratedDate;
 
-	@JsonProperty("blocks")
-	private List<BPABlocks> blocks;
 
 	public BPA addOwnersItem(OwnerInfo ownersItem) {
 		if (this.owners == null)
@@ -235,7 +230,7 @@ public class BPA {
 		return this;
 	}
 	
-	public BPA addBlocks(BPABlocks blockList) {
+/*	public BPA addBlocks(BPABlocks blockList) {
 		if (this.blocks == null)
 			this.blocks = new ArrayList<>();
 		
@@ -248,7 +243,7 @@ public class BPA {
 		}
 		
 		return this;
-	}
+	}*/
 /*
 	public String SECTION_CLERKSECTION_CLERK() {
 		// TODO Auto-generated method stub
