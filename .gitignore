@@ -190,6 +190,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# metadata ignore
-.metadata/

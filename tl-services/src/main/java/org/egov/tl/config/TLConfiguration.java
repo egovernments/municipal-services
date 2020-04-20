@@ -90,24 +90,6 @@ public class TLConfiguration {
 
     @Value("${egov.idgen.bpa.licensenumber.format}")
     private String licenseNumberIdgenFormatBPA;
-    
-    @Value("${egov.idgen.bpa.englicensenumber.format}")
-    private String engLicenseNumberIdgenFormatBPA;
-
-    @Value("${egov.idgen.bpa.strlicensenumber.format}")
-    private String strLicenseNumberIdgenFormatBPA;
-
-    @Value("${egov.idgen.bpa.tplicensenumber.format}")
-    private String tpLicenseNumberIdgenFormatBPA;
-
-    @Value("${egov.idgen.bpa.suplicensenumber.format}")
-    private String supLicenseNumberIdgenFormatBPA;
-
-    @Value("${egov.idgen.bpa.arlicensenumber.format}")
-    private String arctLicenseNumberIdgenFormatBPA;
-
-    @Value("${egov.idgen.bpa.bdlicensenumber.format}")
-    private String bldLicenseNumberIdgenFormatBPA;
 
     //Persister Config
     @Value("${persister.save.tradelicense.topic}")
@@ -165,7 +147,7 @@ public class TLConfiguration {
 
     @Value("${egov.bill.gen.endpoint}")
     private String fetchBillEndpoint;
-e
+
     //Institutional key word
     @Value("${egov.ownershipcategory.institutional}")
     private String institutional;
@@ -174,8 +156,6 @@ e
     @Value("${egov.receipt.businessserviceTL}")
     private String businessServiceTL;
 
-    @Value("${egov.receipt.businessserviceBPA}")
-    private String businessServiceBPA;
 
     @Value("${egov.receipt.businessserviceBPA}")
     private String businessServiceBPA;
@@ -203,7 +183,6 @@ e
 
     @Value("${notification.sms.enabled.forTLRENEWAL}")
     private Boolean isTLRENEWALSMSEnabled;
-
 
     //Localization
     @Value("${egov.localization.host}")
@@ -277,11 +256,11 @@ e
 	@Value("${egov.user.event.notification.enabledForTL}")
 	private Boolean isUserEventsNotificationEnabledForTL;
 
-  @Value("${egov.user.event.notification.enabledForTLRenewal}")
-  private Boolean isUserEventsNotificationEnabledForTLRenewal;
+    @Value("${egov.user.event.notification.enabledForTLRenewal}")
+    private Boolean isUserEventsNotificationEnabledForTLRenewal;
 
-  @Value("${egov.user.event.notification.enabledForBPA}")
-  private Boolean isUserEventsNotificationEnabledForBPA;
+    @Value("${egov.user.event.notification.enabledForBPA}")
+    private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;

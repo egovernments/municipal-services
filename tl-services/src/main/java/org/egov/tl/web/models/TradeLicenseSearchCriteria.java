@@ -51,7 +51,7 @@ public class TradeLicenseSearchCriteria {
 
     @JsonProperty("businessService")
     private String businessService = null;
-  
+
     @JsonProperty("validTo")
     private Long validTo = null;
 

@@ -96,7 +96,6 @@ public class WorkflowIntegrator {
 			if((businessServiceFromMDMS.equals(businessService_TL))||(!license.getAction().equalsIgnoreCase(TRIGGER_NOWORKFLOW))) {
 				JSONObject obj = new JSONObject();
 				List<Map<String, String>> uuidmaps = new LinkedList<>();
-
 				if(!CollectionUtils.isEmpty(license.getAssignee())){
 
 					// Adding assignes to processInstance

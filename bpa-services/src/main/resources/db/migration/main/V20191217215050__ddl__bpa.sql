@@ -1,1 +1,0 @@
-ALTER TABLE eg_bpa_owner ALTER COLUMN fatherorhusbandname DROP NOT NULL;

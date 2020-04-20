@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static org.egov.tl.util.TLConstants.*;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -55,7 +56,7 @@ public class TradeLicenseService {
     private WorkflowService workflowService;
 
     private EditNotificationService  editNotificationService;
-  
+
     private TradeUtil tradeUtil;
 
     private TLBatchService tlBatchService;

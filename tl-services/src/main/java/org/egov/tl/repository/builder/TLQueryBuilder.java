@@ -105,7 +105,7 @@ public class TLQueryBuilder {
             }
         }
         else {
-          
+
             if (criteria.getTenantId() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append(" tl.tenantid=? ");

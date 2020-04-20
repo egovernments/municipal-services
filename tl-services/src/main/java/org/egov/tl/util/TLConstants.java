@@ -16,7 +16,7 @@ public class TLConstants {
     public static  final String businessService_DIRECT_RENEWAL = "DIRECTRENEWAL";
     
     public static  final String businessService_EDIT_RENEWAL = "EDITRENEWAL";
-  
+
     public static  final String businessService_BPA = "BPAREG";
 
     public static final String PROPERTY_JSONPATH = "$.Properties[0].propertyId";
@@ -72,7 +72,7 @@ public class TLConstants {
     public static final String NOTIFICATION_SENDBACK_CITIZEN= "tl.en.sendback.citizen";
 
     public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
-  
+
     public static final String NOTIFICATION_TL_REMINDER = "tl.en.reminder";
 
 
@@ -83,6 +83,7 @@ public class TLConstants {
             NOTIFICATION_PAID,NOTIFICATION_APPROVED,NOTIFICATION_REJECTED,NOTIFICATION_CANCELLED,NOTIFICATION_FIELD_CHANGED,NOTIFICATION_OBJECT_ADDED,
             NOTIFICATION_OBJECT_REMOVED,NOTIFICATION_OBJECT_MODIFIED,NOTIFICATION_OBJECT_RENEW_MODIFIED,NOTIFICATION_SENDBACK_CITIZEN,
             NOTIFICATION_FORWARD_CITIZEN,NOTIFICATION_TL_REMINDER));
+
 
     public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Trade License with application number <APPLICATION_NUMBER> was modified.";
 
@@ -142,6 +143,7 @@ public class TLConstants {
     public static final String MDMS_ENDDATE  = "endingDate";
     
     //TL types
+
     public static final String APPLICATION_TYPE_RENEWAL = "RENEWAL";
 
     public static final String APPLICATION_TYPE_NEW = "NEW";
@@ -254,13 +256,6 @@ public class TLConstants {
 	public static final String TL_ACTION_INITIATE = "INITIATE";
 	
 
-	//License format changes
-	public static final String ENGINEER = "ENGINEER";
-	public static final String STRUCTURALENGINEER = "STRUCTURALENGINEER";
-	public static final String BUILDER = "BUILDER";
-	public static final String SUPERVISOR = "SUPERVISOR";
-	public static final String TOWNPLANNER = "TOWNPLANNER";
-	public static final String ARCHITECT = "ARCHITECT";
 
     public static final List<String> FIELDS_TO_IGNORE = Collections.unmodifiableList(Arrays.asList(VARIABLE_ACTION,VARIABLE_WFDOCUMENTS,
             VARIABLE_CREATEDBY,VARIABLE_LASTMODIFIEDBY,VARIABLE_CREATEDTIME,VARIABLE_LASTMODIFIEDTIME,VARIABLE_STATUS,VARIABLE_LASTMODIFIEDDATE,VARIABLE_ISSUED_DATE,VARIABLE_COMMENT));

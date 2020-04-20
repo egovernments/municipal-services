@@ -30,7 +30,7 @@ public class TLNotificationService {
     private NotificationUtil util;
 
 	private BPANotificationUtil bpaNotificationUtil;
-  
+
 	private TLRenewalNotificationUtil tlRenewalNotificationUtil;
 
 	@Autowired
