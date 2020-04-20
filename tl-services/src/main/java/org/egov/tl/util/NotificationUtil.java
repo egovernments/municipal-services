@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.egov.tl.util.TLConstants.*;
@@ -151,7 +152,8 @@ public class NotificationUtil {
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
 				.append(config.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
-				.append("&tenantId=").append(tenantId).append("&module=").append(TLConstants.MODULE);
+				.append("&tenantId=").append(tenantId).append("&module=").append(TLConstants.MODULE)
+				.append("&codes=").append(StringUtils.join(NOTIFICATION_CODES,','));
 
 		return uri;
 	}
@@ -353,6 +355,24 @@ public class NotificationUtil {
 		return messageTemplate;
 	}
 
+
+	/**
+	 *
+	 * @param license
+	 * @param localizationMessages
+	 * @return
+	 */
+	public String getReminderMsg(TradeLicense license, String localizationMessages) {
+
+		String messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_TL_REMINDER, localizationMessages);
+		String expiryDate = new SimpleDateFormat("dd/MM/yyyy").format(license.getValidTo());
+		messageTemplate = messageTemplate.replace(NOTIF_TRADE_NAME_KEY, license.getTradeName());
+		messageTemplate = messageTemplate.replace(NOTIF_EXPIRY_DATE_KEY, expiryDate);
+		messageTemplate = messageTemplate.replace(NOTIF_TRADE_LICENSENUMBER_KEY, license.getLicenseNumber());
+		return messageTemplate;
+	}
+
+
 	/**
 	 * Send the SMSRequest on the SMSNotification kafka topic
 	 * 
@@ -428,6 +448,7 @@ public class NotificationUtil {
 		List<SMSRequest> smsRequest = new LinkedList<>();
 		for (Map.Entry<String, String> entryset : mobileNumberToOwnerName.entrySet()) {
 			String customizedMsg = message.replace("<1>", entryset.getValue());
+			customizedMsg = customizedMsg.replace(NOTIF_OWNER_NAME_KEY, entryset.getValue());
 			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
 		}
 		return smsRequest;
@@ -454,14 +475,28 @@ public class NotificationUtil {
 		 * getEditMsg(license,diff.getClassesRemoved(),messageTemplate);
 		 * finalMessage.append(message); }
 		 */
+		String applicationType = String.valueOf(license.getApplicationType());
+		if(applicationType.equals(APPLICATION_TYPE_RENEWAL)){
+			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
+					|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+				messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_OBJECT_RENEW_MODIFIED, localizationMessage);
+				if (messageTemplate == null)
+					messageTemplate = DEFAULT_OBJECT_RENEWAL_MODIFIED_MSG;
+				message = getEditMsg(license, messageTemplate);
+			}
 
-		if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
-				|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_OBJECT_MODIFIED, localizationMessage);
-			if (messageTemplate == null)
-				messageTemplate = DEFAULT_OBJECT_MODIFIED_MSG;
-			message = getEditMsg(license, messageTemplate);
 		}
+		else{
+			if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
+					|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
+				messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_OBJECT_MODIFIED, localizationMessage);
+				if (messageTemplate == null)
+					messageTemplate = DEFAULT_OBJECT_MODIFIED_MSG;
+				message = getEditMsg(license, messageTemplate);
+			}
+		}
+
+
 
 		return message;
 	}

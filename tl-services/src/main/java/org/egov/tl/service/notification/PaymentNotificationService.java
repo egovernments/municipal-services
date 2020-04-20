@@ -11,6 +11,7 @@ import org.egov.tl.repository.TLRepository;
 import org.egov.tl.service.TradeLicenseService;
 import org.egov.tl.util.BPANotificationUtil;
 import org.egov.tl.util.NotificationUtil;
+import org.egov.tl.util.TLRenewalNotificationUtil;
 import org.egov.tl.web.models.*;
 import org.egov.tl.web.models.collection.PaymentDetail;
 import org.egov.tl.web.models.collection.PaymentRequest;
@@ -20,12 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
 import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 import static org.egov.tl.util.BPAConstants.NOTIFICATION_APPROVED;
 import static org.egov.tl.util.BPAConstants.NOTIFICATION_PENDINGDOCVERIFICATION;
+import static org.egov.tl.util.TLConstants.*;
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
@@ -47,15 +48,18 @@ public class PaymentNotificationService {
 
     private TLNotificationService tlNotificationService;
 
+    private TLRenewalNotificationUtil tlRenewalNotificationUtil;
+
     @Autowired
     public PaymentNotificationService(TLConfiguration config, TradeLicenseService tradeLicenseService,
-                                      NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil,TLNotificationService tlNotificationService) {
+                                      NotificationUtil util, ObjectMapper mapper, BPANotificationUtil bpaNotificationUtil,TLNotificationService tlNotificationService,TLRenewalNotificationUtil tlRenewalNotificationUtil) {
         this.config = config;
         this.tradeLicenseService = tradeLicenseService;
         this.util = util;
         this.mapper = mapper;
         this.bpaNotificationUtil = bpaNotificationUtil;
         this.tlNotificationService = tlNotificationService;
+        this.tlRenewalNotificationUtil=tlRenewalNotificationUtil;
     }
 
 
@@ -82,7 +86,6 @@ public class PaymentNotificationService {
      * @param record The kafka message from receipt create topic
      */
     public void process(HashMap<String, Object> record){
-
         processBusinessService(record, businessService_TL);
         processBusinessService(record, businessService_BPA);
     }
@@ -105,13 +108,22 @@ public class PaymentNotificationService {
                 switch(valMap.get(businessServiceKey))
                 {
                     case businessService_TL:
-                        String localizationMessages = util.getLocalizationMessages(license.getTenantId(), requestInfo);
-                        List<SMSRequest> smsRequests = getSMSRequests(license, valMap, localizationMessages);
-                        util.sendSMS(smsRequests, config.getIsTLSMSEnabled());
+                        String applicationType = String.valueOf(license.getApplicationType());
+                        if(applicationType.equals(APPLICATION_TYPE_RENEWAL)){
+                            String localizationMessages = tlRenewalNotificationUtil.getLocalizationMessages(license.getTenantId(), requestInfo);
+                            List<SMSRequest> smsRequests = getSMSRequests(license, valMap, localizationMessages);
+                            util.sendSMS(smsRequests, config.getIsTLSMSEnabled());
+                        }
+                        else{
+                            String localizationMessages = util.getLocalizationMessages(license.getTenantId(), requestInfo);
+                            List<SMSRequest> smsRequests = getSMSRequests(license, valMap, localizationMessages);
+                            util.sendSMS(smsRequests, config.getIsTLSMSEnabled());
+                        }
+
                         break;
 
                     case businessService_BPA:
-                        localizationMessages = bpaNotificationUtil.getLocalizationMessages(license.getTenantId(), requestInfo);
+                        String localizationMessages = bpaNotificationUtil.getLocalizationMessages(license.getTenantId(), requestInfo);
                         PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
                         String totalAmountPaid = paymentRequest.getPayment().getTotalAmountPaid().toString();
                         Map<String, String> mobileNumberToOwner = new HashMap<>();
@@ -168,7 +180,13 @@ public class PaymentNotificationService {
      * @return The list of the SMS Requests
      */
     private List<SMSRequest> getOwnerSMSRequest(TradeLicense license, Map<String,String> valMap,String localizationMessages){
-        String message = util.getOwnerPaymentMsg(license,valMap,localizationMessages);
+        String applicationType = String.valueOf(license.getApplicationType());
+        String message=null;
+        if(applicationType.equals(APPLICATION_TYPE_RENEWAL)){
+            message = tlRenewalNotificationUtil.getOwnerPaymentMsg(license,valMap,localizationMessages);
+        }
+        else
+             message = util.getOwnerPaymentMsg(license,valMap,localizationMessages);
 
         HashMap<String,String> mobileNumberToOwnerName = new HashMap<>();
         license.getTradeLicenseDetail().getOwners().forEach(owner -> {
@@ -193,7 +211,14 @@ public class PaymentNotificationService {
      * @return
      */
     private SMSRequest getPayerSMSRequest(TradeLicense license,Map<String,String> valMap,String localizationMessages){
-        String message = util.getPayerPaymentMsg(license,valMap,localizationMessages);
+        String applicationType = String.valueOf(license.getApplicationType());
+        String message=null;
+        if(applicationType.equals(APPLICATION_TYPE_RENEWAL)){
+            message = tlRenewalNotificationUtil.getPayerPaymentMsg(license,valMap,localizationMessages);
+        }
+        else
+            message = util.getPayerPaymentMsg(license,valMap,localizationMessages);
+
         String customizedMsg = message.replace("<1>",valMap.get(paidByKey));
         SMSRequest smsRequest = new SMSRequest(valMap.get(payerMobileNumberKey),customizedMsg);
         return smsRequest;

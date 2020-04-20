@@ -162,11 +162,10 @@ public class TLConfiguration {
 
     @Value("${egov.billingservice.host}")
     private String billingHost;
-    
+
     @Value("${egov.bill.gen.endpoint}")
     private String fetchBillEndpoint;
-    
-    
+e
     //Institutional key word
     @Value("${egov.ownershipcategory.institutional}")
     private String institutional;
@@ -175,6 +174,8 @@ public class TLConfiguration {
     @Value("${egov.receipt.businessserviceTL}")
     private String businessServiceTL;
 
+    @Value("${egov.receipt.businessserviceBPA}")
+    private String businessServiceBPA;
 
     @Value("${egov.receipt.businessserviceBPA}")
     private String businessServiceBPA;
@@ -199,6 +200,10 @@ public class TLConfiguration {
 
     @Value("${notification.sms.enabled.forBPA}")
     private Boolean isBPASMSEnabled;
+
+    @Value("${notification.sms.enabled.forTLRENEWAL}")
+    private Boolean isTLRENEWALSMSEnabled;
+
 
     //Localization
     @Value("${egov.localization.host}")
@@ -272,11 +277,35 @@ public class TLConfiguration {
 	@Value("${egov.user.event.notification.enabledForTL}")
 	private Boolean isUserEventsNotificationEnabledForTL;
 
-    @Value("${egov.user.event.notification.enabledForBPA}")
-    private Boolean isUserEventsNotificationEnabledForBPA;
+  @Value("${egov.user.event.notification.enabledForTLRenewal}")
+  private Boolean isUserEventsNotificationEnabledForTLRenewal;
+
+  @Value("${egov.user.event.notification.enabledForBPA}")
+  private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;
+
+
+
+	//Reminder
+    @Value("${egov.tl.reminder.period}")
+    private Long reminderPeriod;
+
+    @Value("${egov.tl.pagination.size}")
+    private Integer paginationSize;
+
+    @Value("${egov.tl.reminder.enable}")
+    private Boolean isReminderEnabled;
+
+    @Value("${egov.tl.batch.reminder.error.topic}")
+    private String reminderErrorTopic;
+
+    @Value("${egov.tl.batch.expire.error.topic}")
+    private String expiryErrorTopic;
+
+
+
 
 
 }
