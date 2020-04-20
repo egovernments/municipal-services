@@ -1,5 +1,7 @@
 package org.egov.bpa.validator;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -564,7 +566,22 @@ public class BPAValidator {
 		if (checkListFromRequest.get(BPAConstants.INSPECTION_DATE) == null
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_DATE).toString())) {
 			throw new CustomException("BPA_UNKNOWN_DATE", "Please mention the inspection date");
-		} else if (checkListFromRequest.get(BPAConstants.INSPECTION_TIME) == null
+		} else {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Date dt;
+			try {
+				dt = sdf.parse(checkListFromRequest.get(BPAConstants.INSPECTION_DATE).toString());
+				long inspectionEpoch = dt.getTime();
+				if (inspectionEpoch > new Date().getTime()) {
+					throw new CustomException("BPA_UNKNOWN_DATE", "Inspection date cannot be a future date");
+				} else if (inspectionEpoch < 0) {
+					throw new CustomException("BPA_UNKNOWN_DATE", "Provide the date in specified format 'yyyy-MM-dd'");
+				}
+			} catch (ParseException e) {
+				throw new CustomException("BPA_UNKNOWN_DATE", "Unable to parase the inspection date");
+			}
+		}
+		if (checkListFromRequest.get(BPAConstants.INSPECTION_TIME) == null
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
 			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
 		}
