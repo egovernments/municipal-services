@@ -165,7 +165,7 @@ public class TLConfiguration {
 
     @Value("${egov.bill.gen.endpoint}")
     private String fetchBillEndpoint;
-e
+
     //Institutional key word
     @Value("${egov.ownershipcategory.institutional}")
     private String institutional;
