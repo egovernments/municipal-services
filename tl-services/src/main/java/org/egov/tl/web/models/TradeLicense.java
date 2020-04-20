@@ -98,7 +98,6 @@ public class  TradeLicense   {
             return null;
         }
     }
-
         @JsonProperty("businessService")
         private String businessService = "TL";
 

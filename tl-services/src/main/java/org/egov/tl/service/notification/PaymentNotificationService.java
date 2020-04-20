@@ -21,15 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
+import lombok.extern.slf4j.Slf4j;
 import java.util.*;
 
 import static org.egov.tl.util.BPAConstants.NOTIFICATION_APPROVED;
 import static org.egov.tl.util.BPAConstants.NOTIFICATION_PENDINGDOCVERIFICATION;
 import static org.egov.tl.util.TLConstants.*;
+import static org.egov.tl.util.TLConstants.businessService_BPA;
+import static org.egov.tl.util.TLConstants.businessService_TL;
 
 
 @Service
+@Slf4j
 public class PaymentNotificationService {
 
 
@@ -230,7 +233,6 @@ public class PaymentNotificationService {
     private Map<String,String> enrichValMap(DocumentContext context, String businessService){
         Map<String,String> valMap = new HashMap<>();
         try{
-
             List <String>businessServiceList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].businessService");
             List <String>consumerCodeList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].bill.consumerCode");
             List <String>mobileNumberList=context.read("$.Payment.paymentDetails[?(@.businessService=='"+businessService+"')].bill.mobileNumber");

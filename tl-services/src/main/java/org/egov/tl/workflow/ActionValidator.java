@@ -82,7 +82,6 @@ public class ActionValidator {
                 errorMap.put("INVALID APPLICATION TYPES", "Application Types should be identical for bulk requests");
             }
         }
-
         if (!errorMap.isEmpty())
             throw new CustomException(errorMap);
     }
