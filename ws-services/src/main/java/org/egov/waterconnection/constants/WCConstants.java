@@ -170,6 +170,7 @@ public class WCConstants {
 	
 	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
 	
+	public static final String SELF = "SELF";
 	
 	
 }

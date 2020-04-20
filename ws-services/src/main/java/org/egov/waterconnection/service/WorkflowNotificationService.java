@@ -245,6 +245,10 @@ public class WorkflowNotificationService {
 			if (messageToreplace.contains("<Service>"))
 				messageToreplace = messageToreplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_NOTIFICATION);
 
+			if (messageToreplace.contains("<Plumber Info>"))
+				messageToreplace = messageToreplace.replace("<Plumber Info>",
+						getMessageForPlumberInfo(waterConnection, messageToreplace));
+
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>", waterConnection.getApplicationNo());
 
@@ -292,6 +296,45 @@ public class WorkflowNotificationService {
 			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
 		}
 		return messagetoreturn;
+	}
+
+	/**
+	 * This method returns message to replace for plumber info depending upon
+	 * whether the plumber info type is either SELF or ULB
+	 * 
+	 * @param waterConnection
+	 * @param messageTemplate
+	 * @return updated messageTemplate
+	 */
+	 
+	public String getMessageForPlumberInfo(WaterConnection waterConnection, String messageTemplate) {
+
+		if (messageTemplate.contains("<Plumber Info>")) {
+			HashMap<String, Object> addDetail = mapper.convertValue(waterConnection.getAdditionalDetails(),
+					HashMap.class);
+			String detailsProvidedBy = String.valueOf(addDetail.get(WCConstants.DETAILS_PROVIDED_BY));
+			if (StringUtils.isEmpty(waterConnection.getAdditionalDetails().toString())
+					|| detailsProvidedBy.equalsIgnoreCase(WCConstants.SELF)) {
+				String code = StringUtils.substringBetween(messageTemplate, "<Plumber Info>", "</Plumber Info>");
+				messageTemplate = messageTemplate.replace("<Plumber Info>", "");
+				messageTemplate = messageTemplate.replace("</Plumber Info>", "");
+				messageTemplate = messageTemplate.replace(code, "");
+			} else {
+				messageTemplate = messageTemplate.replace("<Plumber Info>", "").replace("</Plumber Info>", "");
+				messageTemplate = messageTemplate.replace("<Plumber name>",
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getName()) == true ? ""
+								: waterConnection.getPlumberInfo().get(0).getName());
+				messageTemplate = messageTemplate.replace("<Plumber Licence No.>",
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getLicenseNo()) == true ? ""
+								: waterConnection.getPlumberInfo().get(0).getName());
+				messageTemplate = messageTemplate.replace("<Plumber Mobile No.>",
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getMobileNumber()) == true ? ""
+								: waterConnection.getPlumberInfo().get(0).getName());
+			}
+		}
+
+		return messageTemplate;
+
 	}
 	
 	
