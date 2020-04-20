@@ -258,12 +258,13 @@ public class BPAService {
 			
 		}else {
 			userService.createUser(bpaRequest);
-			bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
-					workflowService.getCurrentState(bpa.getStatus(),
-							businessService));
-			actionValidator.validateUpdateRequest(bpaRequest, businessService);
-			bpaValidator.validateCheckList(mdmsData, bpaRequest,
+			if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
+			        actionValidator.validateUpdateRequest(bpaRequest, businessService);
+				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 					workflowService.getCurrentState(bpa.getStatus(), businessService));
+				bpaValidator.validateCheckList(mdmsData, bpaRequest,
+						workflowService.getCurrentState(bpa.getStatus(), businessService));
+			}
 		}
 
 		wfIntegrator.callWorkFlow(bpaRequest);
