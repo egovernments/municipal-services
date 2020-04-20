@@ -261,7 +261,7 @@ public class BPAValidator {
 				if (unit.getId() != null)
 					flag = true;
 				else if (unit.getId() == null)
-					flag = true;
+					flag = false;
 			}
 
 			if (!flag) {
