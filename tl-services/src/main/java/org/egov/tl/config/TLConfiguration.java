@@ -177,9 +177,6 @@ public class TLConfiguration {
     @Value("${egov.receipt.businessserviceBPA}")
     private String businessServiceBPA;
 
-    @Value("${egov.receipt.businessserviceBPA}")
-    private String businessServiceBPA;
-
     //Property Service
     @Value("${egov.property.service.host}")
     private String propertyHost;
