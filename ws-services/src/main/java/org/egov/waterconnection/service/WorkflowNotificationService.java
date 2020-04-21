@@ -27,6 +27,7 @@ import org.egov.waterconnection.model.Source;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.workflow.BusinessService;
+import org.egov.waterconnection.model.workflow.State;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.NotificationUtil;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -355,13 +356,16 @@ public class WorkflowNotificationService {
 		String resultSla = "";
 		BusinessService businessService = workflowService
 				.getBusinessService(waterConnection.getProperty().getTenantId(), requestInfo);
-		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0
-				&& !StringUtils.isEmpty(String.valueOf(businessService.getStates().get(0).getSla()))) {
-			resultSla = String.valueOf(businessService.getStates().get(0).getSla());
+		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
+			for (State state : businessService.getStates()) {
+				if (WCConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
+					resultSla = String.valueOf(
+							(state.getSla() == null ? config.getSlaDefaultValue() : state.getSla()) / 86400000);
+				}
+			}
 		}
 		return resultSla;
 	}
-	
 	
 	
 	/**

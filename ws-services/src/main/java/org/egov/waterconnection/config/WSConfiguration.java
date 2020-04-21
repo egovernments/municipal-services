@@ -164,6 +164,8 @@ public class WSConfiguration {
     @Value("${ws.editnotification.topic}")
     private String editNotificationTopic;
     
+	@Value("${ws.sla.default.value}")
+	private Long slaDefaultValue;
     
-    
+   
 }

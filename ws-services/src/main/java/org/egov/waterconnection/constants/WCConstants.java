@@ -172,5 +172,7 @@ public class WCConstants {
 	
 	public static final String SELF = "SELF";
 	
+	public static final String PENDING_FOR_CONNECTION_ACTIVATION = "PENDING_FOR_CONNECTION_ACTIVATION";
+	
 	
 }
