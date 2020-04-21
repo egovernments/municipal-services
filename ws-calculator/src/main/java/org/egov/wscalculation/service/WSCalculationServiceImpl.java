@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.model.AdhocTaxReq;
 import org.egov.wscalculation.model.Calculation;
 import org.egov.wscalculation.model.CalculationCriteria;
 import org.egov.wscalculation.model.CalculationReq;
@@ -298,6 +300,26 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	public void unsetWaterConnection(List<Calculation> calculation) {
 		calculation.forEach(cal -> cal.setWaterConnection(null));
+	}
+	
+	/**
+	 * Add adhoc tax to demand
+	 * @param adhocTaxReq
+	 * @return List of Calculation
+	 */
+	public List<Calculation> applyAdhocTax(AdhocTaxReq adhocTaxReq) {
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		if (!(adhocTaxReq.getAdhocpenalty().compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_ADHOC_PENALTY)
+					.estimateAmount(adhocTaxReq.getAdhocpenalty().setScale(2, 2)).build());
+		if (!(adhocTaxReq.getAdhocrebate().compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_ADHOC_REBATE)
+					.estimateAmount(adhocTaxReq.getAdhocrebate().setScale(2, 2).negate()).build());
+		Calculation calculation = Calculation.builder()
+				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
+				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
+		List<Calculation> calculations = Collections.singletonList(calculation);
+		return demandService.updateDemandForAdhochTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 	
 }

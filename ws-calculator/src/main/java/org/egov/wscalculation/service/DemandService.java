@@ -409,6 +409,49 @@ public class DemandService {
 		url.append("{3}");
 		return url;
 	}
+	
+	/**
+	 * Creates demand Search url based on tenanatId,businessService, and
+	 * 
+	 * @return demand search url
+	 */
+	public StringBuilder getDemandSearchURLForDemandId() {
+		StringBuilder url = new StringBuilder(configs.getBillingServiceHost());
+		url.append(configs.getDemandSearchEndPoint());
+		url.append("?");
+		url.append("tenantId=");
+		url.append("{1}");
+		url.append("&");
+		url.append("businessService=");
+		url.append("{2}");
+		url.append("&");
+		url.append("demandId=");
+		url.append("{3}");
+		return url;
+	}
+	/**
+	 * 
+	 * @param tenantId
+	 * @param consumerCodes
+	 * @param taxPeriodFrom
+	 * @param taxPeriodTo
+	 * @param requestInfo
+	 * @return List of Demand
+	 */
+	private List<Demand> searchDemandBasedOnDemandId(String tenantId, Set<String> demandId,
+			RequestInfo requestInfo) {
+		String uri = getDemandSearchURLForDemandId().toString();
+		uri = uri.replace("{1}", tenantId);
+		uri = uri.replace("{2}", configs.getBusinessService());
+		uri = uri.replace("{3}", StringUtils.join(demandId, ','));
+		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		try {
+			return mapper.convertValue(result, DemandResponse.class).getDemands();
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
+		}
+	}
 	/**
 	 * Creates demand Search url based on tenanatId,businessService, period from, period to and
 	 * ConsumerCode 
@@ -745,6 +788,81 @@ public class DemandService {
 			}
 		}
 		return notificationSent;
+	}
+	
+/**
+ * compare and update the demand details
+ * 
+ * @param calculation
+ * @param demandDetails
+ * @return combined demand details list
+ */ 
+	private List<DemandDetail> getUpdatedAdhocTax(Calculation calculation, List<DemandDetail> demandDetails) {
+
+		List<DemandDetail> newDemandDetails = new ArrayList<>();
+		Map<String, List<DemandDetail>> taxHeadToDemandDetail = new HashMap<>();
+
+		demandDetails.forEach(demandDetail -> {
+			if (!taxHeadToDemandDetail.containsKey(demandDetail.getTaxHeadMasterCode())) {
+				List<DemandDetail> demandDetailList = new LinkedList<>();
+				demandDetailList.add(demandDetail);
+				taxHeadToDemandDetail.put(demandDetail.getTaxHeadMasterCode(), demandDetailList);
+			} else
+				taxHeadToDemandDetail.get(demandDetail.getTaxHeadMasterCode()).add(demandDetail);
+		});
+
+		BigDecimal diffInTaxAmount;
+		List<DemandDetail> demandDetailList;
+		BigDecimal total;
+
+		for (TaxHeadEstimate taxHeadEstimate : calculation.getTaxHeadEstimates()) {
+			if (!taxHeadToDemandDetail.containsKey(taxHeadEstimate.getTaxHeadCode()))
+				newDemandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(calculation.getTenantId())
+						.collectionAmount(BigDecimal.ZERO).build());
+			else {
+				demandDetailList = taxHeadToDemandDetail.get(taxHeadEstimate.getTaxHeadCode());
+				total = demandDetailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO,
+						BigDecimal::add);
+				diffInTaxAmount = taxHeadEstimate.getEstimateAmount().subtract(total);
+				if (diffInTaxAmount.compareTo(BigDecimal.ZERO) != 0) {
+					newDemandDetails.add(DemandDetail.builder().taxAmount(diffInTaxAmount)
+							.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).tenantId(calculation.getTenantId())
+							.collectionAmount(BigDecimal.ZERO).build());
+				}
+			}
+		}
+		List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
+		combinedBillDetials.addAll(newDemandDetails);
+		addRoundOffTaxHead(calculation.getTenantId(), combinedBillDetials);
+		return combinedBillDetials;
+	}
+	
+	/**
+	 * Search demand based on demand id and updated the tax heads with new adhoc tax heads
+	 * 
+	 * @param requestInfo
+	 * @param calculations
+	 * @return List of calculation
+	 */
+	public List<Calculation> updateDemandForAdhochTax(RequestInfo requestInfo, List<Calculation> calculations) {
+		List<Demand> demands = new LinkedList<>();
+		for (Calculation calculation : calculations) {
+			Set<String> consumerCodes = new HashSet<>();
+			consumerCodes = Collections.singleton(calculation.getApplicationNO());
+			List<Demand> searchResult = searchDemandBasedOnDemandId(calculation.getTenantId(), consumerCodes,
+					requestInfo);
+			if (CollectionUtils.isEmpty(searchResult))
+				throw new CustomException("INVALID_DEMAND_UPDATE",
+						"No demand exists for Number: " + consumerCodes.toString());
+			Demand demand = searchResult.get(0);
+			demand.setDemandDetails(getUpdatedAdhocTax(calculation, demand.getDemandDetails()));
+			demands.add(demand);
+		}
+
+		log.info("Updated Demand Details " + demands.toString());
+		demandRepository.updateDemand(requestInfo, demands);
+		return calculations;
 	}
 
 }

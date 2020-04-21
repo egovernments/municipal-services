@@ -283,4 +283,10 @@ public class WSCalculationConstant {
 	
 	public static final Long APPLICATION_FEE_DEMAND_EXP_DATE = 220898664000l;
 	
+	public static final String WS_TIME_ADHOC_PENALTY = "WS_TIME_ADHOC_PENALTY";
+	
+	public static final String WS_TIME_ADHOC_REBATE = "WS_TIME_ADHOC_REBATE";
+
+
+	
 }
