@@ -167,7 +167,7 @@ serviceMaps:
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_bpa_unit( id,tenantid, usageCategory, buildingplanid, additionaldetails, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_bpa_unit( id,tenantid, usageCategory, blockIndex, buildingplanid, additionaldetails, createdby,lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: BPA.units.*
          jsonMaps:
           - jsonPath: $.BPA.units.*.id
@@ -175,6 +175,8 @@ serviceMaps:
           - jsonPath: $.BPA.units.*.tenantId
 
           - jsonPath: $.BPA.units.*.usageCategory
+
+          - jsonPath: $.BPA.units.*.blockIndex
 
           - jsonPath: $.BPA.id
 
@@ -415,11 +417,13 @@ serviceMaps:
 
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedTime
 
-       - query: UPDATE eg_bpa_unit SET usageCategory=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?
+       - query: UPDATE eg_bpa_unit SET usageCategory=?, blockIndex=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?
          basePath: BPA.units.*
          jsonMaps: 
 
           - jsonPath: $.BPA.units.*.usageCategory
+
+          - jsonPath: $.BPA.units.*.blockIndex
 
           - jsonPath: $.BPA.units.*.additionalDetails
             type: JSON
@@ -430,6 +434,7 @@ serviceMaps:
           - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
 
           - jsonPath: $.BPA.units.*.id
+
 
 
        - query: UPDATE eg_bpa_document_owner SET tenantId=?,owner=?,active=?, buildingplanid=?, documenttype=?, fileStoreid=?,documentuid=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;

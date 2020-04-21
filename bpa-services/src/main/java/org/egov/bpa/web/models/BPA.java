@@ -6,7 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+import java.util.Collections;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -212,6 +212,9 @@ public class BPA {
 		if(!this.unitIds.contains(unitsItem.getId())){
 			this.units.add(unitsItem);
 			this.unitIds.add(unitsItem.getId());
+			if(this.units.size()>1){
+				this.units.sort((Unit u1, Unit u2)->u1.getBlockIndex().compareTo(u2.getBlockIndex()));
+			}
 		}
 		return this;
 	}
