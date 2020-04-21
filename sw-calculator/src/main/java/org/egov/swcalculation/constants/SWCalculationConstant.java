@@ -279,5 +279,9 @@ public class SWCalculationConstant {
 	public static final Long APPLICATION_FEE_DEMAND_END_DATE = 157784760000l;
 	
 	public static final Long APPLICATION_FEE_DEMAND_EXP_DATE = 220898664000l;
+	
+	public static final String SW_TIME_ADHOC_PENALTY = "SW_TIME_ADHOC_PENALTY";
+
+	public static final String SW_TIME_ADHOC_REBATE = "SW_TIME_ADHOC_REBATE";
 
 }

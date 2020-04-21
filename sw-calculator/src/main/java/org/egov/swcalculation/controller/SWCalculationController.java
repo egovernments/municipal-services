@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.swcalculation.model.AdhocTaxReq;
 import org.egov.swcalculation.model.Calculation;
 import org.egov.swcalculation.model.CalculationReq;
 import org.egov.swcalculation.model.CalculationRes;
@@ -14,6 +15,7 @@ import org.egov.swcalculation.model.GetBillCriteria;
 import org.egov.swcalculation.model.RequestInfoWrapper;
 import org.egov.swcalculation.service.DemandService;
 import org.egov.swcalculation.service.SWCalculationService;
+import org.egov.swcalculation.service.SWCalculationServiceImpl;
 import org.egov.swcalculation.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,13 +38,16 @@ import lombok.Setter;
 public class SWCalculationController {
 	
 	@Autowired
-	SWCalculationService sWCalculationService;
+	private SWCalculationService sWCalculationService;
 	
 	@Autowired
-	DemandService demandService;
+	private DemandService demandService;
 	
 	@Autowired
-	ResponseInfoFactory responseInfoFactory;
+	private ResponseInfoFactory responseInfoFactory;
+	
+	@Autowired
+	private SWCalculationServiceImpl sWCalculationServiceImpl;
 	
 	@PostMapping("/_calculate")
 	public ResponseEntity<CalculationRes> calculate(@RequestBody @Valid CalculationReq calculationReq) {
@@ -75,4 +80,13 @@ public class SWCalculationController {
 		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 
+	@PostMapping("/_applyAdhocTax")
+	public ResponseEntity<CalculationRes> applyAdhocTax(@Valid @RequestBody AdhocTaxReq adhocTaxReq) {
+		List<Calculation> calculations = sWCalculationServiceImpl.applyAdhocTax(adhocTaxReq);
+		CalculationRes response = CalculationRes.builder().calculation(calculations)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(adhocTaxReq.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
+	}
 }

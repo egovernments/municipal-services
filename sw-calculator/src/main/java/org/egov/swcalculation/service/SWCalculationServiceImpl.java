@@ -4,12 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swcalculation.constants.SWCalculationConstant;
+import org.egov.swcalculation.model.AdhocTaxReq;
 import org.egov.swcalculation.model.Calculation;
 import org.egov.swcalculation.model.CalculationCriteria;
 import org.egov.swcalculation.model.CalculationReq;
@@ -239,6 +241,26 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	public void unsetSewerageConnection(List<Calculation> calculation) {
 		calculation.forEach(cal -> cal.setSewerageConnection(null));
+	}
+	
+	/**
+	 * Add adhoc tax to demand
+	 * @param adhocTaxReq
+	 * @return List of Calculation
+	 */
+	public List<Calculation> applyAdhocTax(AdhocTaxReq adhocTaxReq) {
+		List<TaxHeadEstimate> estimates = new ArrayList<>();
+		if (!(adhocTaxReq.getAdhocpenalty().compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_ADHOC_PENALTY)
+					.estimateAmount(adhocTaxReq.getAdhocpenalty().setScale(2, 2)).build());
+		if (!(adhocTaxReq.getAdhocrebate().compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_ADHOC_REBATE)
+					.estimateAmount(adhocTaxReq.getAdhocrebate().setScale(2, 2).negate()).build());
+		Calculation calculation = Calculation.builder()
+				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
+				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
+		List<Calculation> calculations = Collections.singletonList(calculation);
+		return demandService.updateDemandForAdhochTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 
 }
