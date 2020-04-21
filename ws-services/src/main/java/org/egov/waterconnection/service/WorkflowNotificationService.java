@@ -26,9 +26,11 @@ import org.egov.waterconnection.model.SMSRequest;
 import org.egov.waterconnection.model.Source;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.model.workflow.BusinessService;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.NotificationUtil;
 import org.egov.waterconnection.util.WaterServicesUtil;
+import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +58,9 @@ public class WorkflowNotificationService {
 	
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private WorkflowService workflowService;
 	
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
@@ -247,6 +252,9 @@ public class WorkflowNotificationService {
 
 			if (messageToreplace.contains("<Plumber Info>"))
 				messageToreplace = getMessageForPlumberInfo(waterConnection, messageToreplace);
+			
+			if (messageToreplace.contains("<SLA>"))
+				messageToreplace = messageToreplace.replace("<SLA>", getSLAForState(waterConnection,requestInfo));
 
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>", waterConnection.getApplicationNo());
@@ -307,7 +315,6 @@ public class WorkflowNotificationService {
 	 */
 	 
 	public String getMessageForPlumberInfo(WaterConnection waterConnection, String messageTemplate) {
-		
 			HashMap<String, Object> addDetail = mapper.convertValue(waterConnection.getAdditionalDetails(),
 					HashMap.class);
 			if(!StringUtils.isEmpty(String.valueOf(addDetail.get(WCConstants.DETAILS_PROVIDED_BY)))){
@@ -334,6 +341,25 @@ public class WorkflowNotificationService {
 
 		return messageTemplate;
 
+	}
+	
+	/**
+	 * Fetches SLA of CITIZENs based on the phone number.
+	 * 
+	 * @param waterConnection
+	 * @param requestInfo
+	 * @return string consisting SLA
+	 */
+
+	public String getSLAForState(WaterConnection waterConnection, RequestInfo requestInfo) {
+		String resultSla = "";
+		BusinessService businessService = workflowService
+				.getBusinessService(waterConnection.getProperty().getTenantId(), requestInfo);
+		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0
+				&& !StringUtils.isEmpty(String.valueOf(businessService.getStates().get(0).getSla()))) {
+			resultSla = String.valueOf(businessService.getStates().get(0).getSla());
+		}
+		return resultSla;
 	}
 	
 	
