@@ -239,7 +239,7 @@ public class CalculationService {
               searchCriteria.setTradeType(tradeUnit.getTradeType());
               if(tradeUnit.getUomValue()!=null)
               {
-                  searchCriteria.setUomValue(Double.parseDouble(tradeUnit.getUomValue()));
+                  //searchCriteria.setUomValue(Double.parseDouble(tradeUnit.getUomValue()));
                   searchCriteria.setUom(tradeUnit.getUom());
               }
               // Call the Search
