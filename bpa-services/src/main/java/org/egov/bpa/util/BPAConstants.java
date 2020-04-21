@@ -309,4 +309,6 @@ public class BPAConstants {
 	public static final String PERMIT_ORDER_NO = "BPA_PDF_PLANPERMISSION_NO";
 	
 	public static final String GENERATEDON = "BPA_PDF_GENERATED_ON";
+	
+	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
 }
