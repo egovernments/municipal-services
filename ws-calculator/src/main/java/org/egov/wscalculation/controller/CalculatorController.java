@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.wscalculation.model.AdhocTaxReq;
 import org.egov.wscalculation.model.Calculation;
 import org.egov.wscalculation.model.CalculationReq;
 import org.egov.wscalculation.model.CalculationRes;
@@ -85,5 +86,14 @@ public class CalculatorController {
 	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
 		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
+	
+	@PostMapping("/_applyAdhocTax")
+	public ResponseEntity<CalculationRes> applyAdhocTax(@Valid @RequestBody AdhocTaxReq adhocTaxReq) {
+		List<Calculation> calculations = wSCalculationServiceImpl.applyAdhocTax(adhocTaxReq);
+		CalculationRes response = CalculationRes.builder().calculation(calculations)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(adhocTaxReq.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
 
+	}
 }
