@@ -434,9 +434,13 @@ public class BPAValidator {
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestQns = new ArrayList<String>();
 							validateDateTime((Map)checkListFromReq.get(i));
-							requestCheckList.addAll(
-									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
-
+							List<Map> questions = ((Map) checkListFromReq.get(i))
+									.get(BPAConstants.QUESTIONS_TYPE) != null
+											? (List<Map>) ((Map) checkListFromReq.get(i))
+													.get(BPAConstants.QUESTIONS_TYPE)
+											: null;
+							if (questions != null)
+								requestCheckList.addAll(questions);
 							if (!CollectionUtils.isEmpty(requestCheckList)) {
 								for (Map reqQn : requestCheckList) {
 									requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
@@ -502,8 +506,10 @@ public class BPAValidator {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestDocs = new ArrayList<String>();
-							requestCheckList
-									.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
+							List<Map> docs = ((Map) checkListFromReq.get(i)).get(BPAConstants.DOCS) != null
+									? (List<Map>) ((Map) checkListFromReq.get(i)).get(BPAConstants.DOCS) : null;
+							if (docs != null)
+								requestCheckList.addAll(docs);
 							if (!CollectionUtils.isEmpty(requestCheckList)) {
 								for (Map reqDoc : requestCheckList) {
 									String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
