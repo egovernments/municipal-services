@@ -1,6 +1,7 @@
 package org.egov.bpa.web.models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -210,6 +211,9 @@ public class BPA {
 		if(!this.unitIds.contains(unitsItem.getId())){
 			this.units.add(unitsItem);
 			this.unitIds.add(unitsItem.getId());
+			if(this.units.size()>1){
+				this.units.sort((Unit u1, Unit u2)->u1.getBlockIndex().compareTo(u2.getBlockIndex()));
+			}
 		}
 		return this;
 	}

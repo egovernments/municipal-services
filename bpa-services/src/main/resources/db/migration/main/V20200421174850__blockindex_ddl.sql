@@ -1,0 +1,1 @@
+ALTER TABLE eg_bpa_unit ADD COLUMN blockindex character varying(64);
