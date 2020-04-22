@@ -153,4 +153,8 @@ public class SWConstants {
 
 	public static final List<String> IGNORE_CLASS_ADDED = Collections.unmodifiableList(Arrays.asList("PlumberInfo"));
 	
+	public static final String PENDING_FOR_CONNECTION_ACTIVATION = "PENDING_FOR_CONNECTION_ACTIVATION";
+	
+	public static final String SELF = "SELF";
+	
 }

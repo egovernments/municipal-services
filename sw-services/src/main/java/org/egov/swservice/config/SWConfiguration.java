@@ -150,5 +150,8 @@ public class SWConfiguration {
     
     @Value("${sw.editnotification.topic}")
     private String editNotificationTopic;
+    
+    @Value("${sw.sla.default.value}")
+	private Long slaDefaultValue;
 
 }

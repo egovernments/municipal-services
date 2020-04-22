@@ -24,10 +24,13 @@ import org.egov.swservice.model.SMSRequest;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Source;
+import org.egov.swservice.model.workflow.BusinessService;
+import org.egov.swservice.model.workflow.State;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.util.NotificationUtil;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
+import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +62,9 @@ public class WorkflowNotificationService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private WorkflowService workflowService;
 
 	String tenantIdReplacer = "$tenantId";
 	String fileStoreIdsReplacer = "$.filestoreIds";
@@ -269,6 +275,12 @@ public class WorkflowNotificationService {
 			if (messageToreplace.contains("<mseva URL>"))
 				messageToreplace = messageToreplace.replace("<mseva URL>",
 						sewerageServicesUtil.getShortnerURL(config.getNotificationUrl()));
+			
+			if (messageToreplace.contains("<Plumber Info>"))
+				messageToreplace = getMessageForPlumberInfo(sewerageConnection, messageToreplace);
+			
+			if (messageToreplace.contains("<SLA>"))
+				messageToreplace = messageToreplace.replace("<SLA>", getSLAForState(sewerageConnection,requestInfo));
 
 			if (messageToreplace.contains("<mseva app link>"))
 				messageToreplace = messageToreplace.replace("<mseva app link>",
@@ -306,6 +318,67 @@ public class WorkflowNotificationService {
 			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
 		}
 		return messagetoreturn;
+	}
+	
+	/**
+	 * This method returns message to replace for plumber info depending upon
+	 * whether the plumber info type is either SELF or ULB
+	 * 
+	 * @param sewerageConnection
+	 * @param messageTemplate
+	 * @return updated messageTemplate
+	 */
+
+	public String getMessageForPlumberInfo(SewerageConnection sewerageConnection, String messageTemplate) {
+		HashMap<String, Object> addDetail = mapper.convertValue(sewerageConnection.getAdditionalDetails(),
+				HashMap.class);
+		if (!StringUtils.isEmpty(String.valueOf(addDetail.get(SWConstants.DETAILS_PROVIDED_BY)))) {
+			String detailsProvidedBy = String.valueOf(addDetail.get(SWConstants.DETAILS_PROVIDED_BY));
+			if (StringUtils.isEmpty(detailsProvidedBy) || detailsProvidedBy.equalsIgnoreCase(SWConstants.SELF)) {
+				String code = StringUtils.substringBetween(messageTemplate, "<Plumber Info>", "</Plumber Info>");
+				messageTemplate = messageTemplate.replace("<Plumber Info>", "");
+				messageTemplate = messageTemplate.replace("</Plumber Info>", "");
+				messageTemplate = messageTemplate.replace(code, "");
+			} else {
+				messageTemplate = messageTemplate.replace("<Plumber Info>", "").replace("</Plumber Info>", "");
+				messageTemplate = messageTemplate.replace("<Plumber name>",
+						StringUtils.isEmpty(sewerageConnection.getPlumberInfo().get(0).getName()) == true ? ""
+								: sewerageConnection.getPlumberInfo().get(0).getName());
+				messageTemplate = messageTemplate.replace("<Plumber Licence No.>",
+						StringUtils.isEmpty(sewerageConnection.getPlumberInfo().get(0).getLicenseNo()) == true ? ""
+								: sewerageConnection.getPlumberInfo().get(0).getLicenseNo());
+				messageTemplate = messageTemplate.replace("<Plumber Mobile No.>",
+						StringUtils.isEmpty(sewerageConnection.getPlumberInfo().get(0).getMobileNumber()) == true ? ""
+								: sewerageConnection.getPlumberInfo().get(0).getMobileNumber());
+			}
+
+		}
+
+		return messageTemplate;
+
+	}
+
+	/**
+	 * Fetches SLA of CITIZENs based on the phone number.
+	 * 
+	 * @param sewerageConnection
+	 * @param requestInfo
+	 * @return string consisting SLA
+	 */
+
+	public String getSLAForState(SewerageConnection sewerageConnection, RequestInfo requestInfo) {
+		String resultSla = "";
+		BusinessService businessService = workflowService
+				.getBusinessService(sewerageConnection.getProperty().getTenantId(), requestInfo);
+		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
+			for (State state : businessService.getStates()) {
+				if (SWConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
+					resultSla = String.valueOf(
+							(state.getSla() == null ? config.getSlaDefaultValue() : state.getSla()) / 86400000);
+				}
+			}
+		}
+		return resultSla;
 	}
 
 	/**
