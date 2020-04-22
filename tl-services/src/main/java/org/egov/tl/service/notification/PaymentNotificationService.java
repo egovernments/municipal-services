@@ -167,7 +167,7 @@ public class PaymentNotificationService {
             List<SMSRequest> totalSMS = new LinkedList<>();
             totalSMS.addAll(ownersSMSRequest);
             String payerMobileNumber=valMap.get(payerMobileNumberKey);
-         long count= license.getTradeLicenseDetail().getOwners().stream().filter(owner->owner.getMobileNumber()==payerMobileNumber).count();
+         long count= license.getTradeLicenseDetail().getOwners().stream().filter(owner->owner.getMobileNumber().equals(payerMobileNumber)).count();
         		 		 
        if(count==0){
            totalSMS.add(payerSMSRequest);
