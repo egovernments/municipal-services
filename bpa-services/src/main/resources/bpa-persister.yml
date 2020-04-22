@@ -412,11 +412,27 @@ serviceMaps:
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedBy
 
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedTime
-
-       - query: UPDATE eg_bpa_unit SET usageCategory=?, blockIndex=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?
+          
+          
+       - query: INSERT INTO eg_bpa_unit(id, tenantId, buildingplanid, blockindex, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, tenantId, buildingplanid, blockindex) WHERE id IS NOT NULL DO UPDATE SET usageCategory=?, blockIndex=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?;
          basePath: BPA.units.*
          jsonMaps: 
+          - jsonPath: $.BPA.units.*.id
 
+          - jsonPath: $.BPA.units.*.tenantId
+
+          - jsonPath: $.BPA.id
+
+          - jsonPath: $.BPA.units.*.blockindex
+
+          - jsonPath: $.BPA.units.*.auditDetails.createdBy
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.units.*.auditDetails.createdTime
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
+          
           - jsonPath: $.BPA.units.*.usageCategory
 
           - jsonPath: $.BPA.units.*.blockIndex
@@ -428,8 +444,6 @@ serviceMaps:
           - jsonPath: $.BPA.units.*.auditDetails.lastModifiedBy
 
           - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
-
-          - jsonPath: $.BPA.units.*.id
 
 
 
@@ -620,3 +634,37 @@ serviceMaps:
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedBy
 
           - jsonPath: $.BPA.owners.*.auditDetails.lastModifiedTime
+          
+                    
+       - query: INSERT INTO eg_bpa_unit(id, tenantId, buildingplanid, blockindex, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, tenantId, buildingplanid, blockIndex) WHERE id IS NOT NULL DO UPDATE SET usageCategory=?, blockIndex=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?;
+         basePath: BPA.units.*
+         jsonMaps: 
+          - jsonPath: $.BPA.units.*.id
+
+          - jsonPath: $.BPA.units.*.tenantId
+
+          - jsonPath: $.BPA.id
+
+          - jsonPath: $.BPA.units.*.blockindex
+
+          - jsonPath: $.BPA.units.*.auditDetails.createdBy
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.units.*.auditDetails.createdTime
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
+          
+          - jsonPath: $.BPA.units.*.usageCategory
+
+          - jsonPath: $.BPA.units.*.blockIndex
+
+          - jsonPath: $.BPA.units.*.additionalDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.units.*.auditDetails.lastModifiedTime
+
+          
