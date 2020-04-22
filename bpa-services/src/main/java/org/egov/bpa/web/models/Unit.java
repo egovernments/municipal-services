@@ -30,6 +30,10 @@ public class Unit {
 	@JsonProperty("usageCategory")
 	private String usageCategory;
 	
+	@Size(max = 64)
+	@JsonProperty("blockIndex")
+	private Integer blockIndex;
+	
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;	
 	
