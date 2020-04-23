@@ -60,6 +60,9 @@ public class EnrichmentService {
 	@Autowired
 	private WaterDaoImpl waterDao;
 	
+	@Autowired
+	private PdfFileStoreService pdfFileStroeService;
+	
 	
 
 	/**
@@ -132,6 +135,7 @@ public class EnrichmentService {
 			}
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
+		enrichFileStoreIds(waterConnectionRequest);
 	}
 	
 
@@ -246,5 +250,29 @@ public class EnrichmentService {
 					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
 		}
 		request.getWaterConnection().setConnectionNo(connectionNumbers.get(0));
+	}
+	/**
+	 * Enrich fileStoreIds
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	@SuppressWarnings("unchecked")
+	private void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
+		try {
+			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(WCConstants.ACTION_APPROVE)) {
+				HashMap<String, Object> addDetail = mapper.convertValue(
+						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+				addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
+						pdfFileStroeService.getFileStroeId(waterConnectionRequest.getWaterConnection(),
+								waterConnectionRequest.getRequestInfo(), WCConstants.PDF_ESTIMATION_KEY));
+				addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
+						pdfFileStroeService.getFileStroeId(waterConnectionRequest.getWaterConnection(),
+								waterConnectionRequest.getRequestInfo(), WCConstants.PDF_SANCTION_KEY));
+				waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);
+			}
+		} catch (Exception ex) {
+			log.debug(ex.toString());
+		}
 	}
 }
