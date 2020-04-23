@@ -56,6 +56,9 @@ public class EnrichmentService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private PdfFileStoreService pdfFileStroeService;
 
 
 	/**
@@ -118,6 +121,7 @@ public class EnrichmentService {
 		setStatusForCreate(sewerageConnectionRequest);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
@@ -139,6 +143,7 @@ public class EnrichmentService {
 			}
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
+		enrichFileStoreIds(sewerageConnectionRequest);
 	}
 	
 	
@@ -253,17 +258,28 @@ public class EnrichmentService {
 		request.getSewerageConnection().setConnectionNo(connectionNumbers.listIterator().next());
 	}
 
-	  /**
-     * Sets status for create request
-     * @param tradeLicenseRequest The create request
-     */
-	
-//    private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest){
-//    	sewerageConnectionRequest.getSewerageConnection(){
-//            if(.equalsIgnoreCase(ACTION_INITIATE))
-//                license.setStatus(STATUS_INITIATED);
-//            if(license.getAction().equalsIgnoreCase(ACTION_APPLY))
-//                license.setStatus(STATUS_APPLIED);
-//        });
-//    }
+	/**
+	 * Enrich fileStoreIds
+	 * 
+	 * @param sewerageConnectionRequest
+	 */
+	@SuppressWarnings("unchecked")
+	private void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
+		try {
+			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(SWConstants.ACTION_APPROVE)) {
+				HashMap<String, Object> addDetail = mapper.convertValue(
+						sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
+				addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
+						pdfFileStroeService.getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
+								sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_ESTIMATION_KEY));
+				addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
+						pdfFileStroeService.getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
+								sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_SANCTION_KEY));
+				sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(addDetail);
+			}
+		} catch (Exception ex) {
+			log.debug(ex.toString());
+		}
+	}
 }
