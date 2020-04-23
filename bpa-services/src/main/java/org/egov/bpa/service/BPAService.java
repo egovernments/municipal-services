@@ -324,6 +324,7 @@ public class BPAService {
 		return bpa;
 	}
 
+	@SuppressWarnings("resource")
 	public void getEdcrPdf(BPARequest bpaRequest) {
 
 		byte[] ba1 = new byte[1024];
@@ -332,79 +333,86 @@ public class BPAService {
 		PDDocument doc = null;
 		BPA bpa = bpaRequest.getBPA();
 		
-		if(StringUtils.isEmpty(bpa.getPermitOrderNo())) {
-			throw new CustomException("INVALID_REQUEST" , "Permit Order No is required.");
+		if (StringUtils.isEmpty(bpa.getPermitOrderNo())) {
+			throw new CustomException("INVALID_REQUEST", "Permit Order No is required.");
 		}
 
 		try {
 			String pdfUrl = edcrService.getEDCRPdfUrl(bpaRequest);
-			URL url1 = new URL(pdfUrl);
+			URL downloadUrl = new URL(pdfUrl);
 			FileOutputStream fos1 = new FileOutputStream(fileName);
-			System.out.print("Connecting to " + url1.toString() + " ... ");
-			URLConnection urlConn = url1.openConnection();
+			log.info("Connecting to redirect url" + downloadUrl.toString() + " ... ");
+			URLConnection urlConnection = downloadUrl.openConnection();
 
 			// Checking whether the URL contains a PDF
-			if (!urlConn.getContentType().equalsIgnoreCase("application/pdf")) {
-				throw new CustomException("INVALID_CONTENT", "Unable to get pdf from the EDCR");
-			} else {
-
-				// Read the PDF from the URL and save to a local file
-				InputStream is1 = url1.openStream();
-				while ((baLength = is1.read(ba1)) != -1) {
-					fos1.write(ba1, 0, baLength);
-				}
-				fos1.flush();
-				fos1.close();
-				is1.close();
-
-				doc = PDDocument.load(new File(fileName));
-
-				PDPageTree allPages = doc.getDocumentCatalog().getPages();
-				
-				String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
-						bpaRequest.getRequestInfo());
-				String permitNo = notificationUtil.getMessageTemplate(BPAConstants.PERMIT_ORDER_NO,
-						localizationMessages);
-				permitNo = permitNo != null ? permitNo : BPAConstants.PERMIT_ORDER_NO;
-				String generatedOn = notificationUtil.getMessageTemplate(BPAConstants.GENERATEDON,
-						localizationMessages);
-				generatedOn = generatedOn != null ? generatedOn : BPAConstants.GENERATEDON;
-
-				for (int i = 0; i < allPages.getCount(); i++) {
-					PDPage page = (PDPage) allPages.get(i);
-					PDRectangle pageSize = page.getMediaBox();
-					PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true);
-					PDFont font = PDType1Font.TIMES_ROMAN;
-					float fontSize = 12.0f;
-					contentStream.beginText();
-					// set font and font size
-					contentStream.setFont(font, fontSize);
-
-					PDRectangle mediabox = page.getMediaBox();
-					float margin = 20;
-					float startX = mediabox.getLowerLeftX() + margin;
-					float startY = mediabox.getUpperRightY() - margin;
-					contentStream.newLineAtOffset(startX, startY);
-
-					contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getPermitOrderNo());
-					if (bpa.getOrderGeneratedDate() != null) {
-						Date date = new Date(bpa.getOrderGeneratedDate());
-						DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-						String formattedDate = format.format(date);
-						contentStream.newLineAtOffset(400, 4.5f);
-						contentStream.showText(generatedOn + " : " + formattedDate);
-					} else {
-						contentStream.newLineAtOffset(400, 4.5f);
-						contentStream.showText(generatedOn + " : " + "NA");
+			if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
+				String downloadUrlString = urlConnection.getHeaderField("Location");
+				if (!StringUtils.isEmpty(downloadUrlString)) {
+					downloadUrl = new URL(downloadUrlString);
+					log.info("Connecting to download url" + downloadUrl.toString() + " ... ");
+					urlConnection = downloadUrl.openConnection();
+					if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
+						log.error("Download url content type is not application/pdf.");
+						throw new Exception();
 					}
+				} else {
+					log.error("Unable to fetch the location header URL");
+					throw new Exception();
+				}
+			}
+			// Read the PDF from the URL and save to a local file
+			InputStream is1 = downloadUrl.openStream();
+			while ((baLength = is1.read(ba1)) != -1) {
+				fos1.write(ba1, 0, baLength);
+			}
+			fos1.flush();
+			fos1.close();
+			is1.close();
 
-					contentStream.endText();
+			doc = PDDocument.load(new File(fileName));
 
-					contentStream.close();
+			PDPageTree allPages = doc.getDocumentCatalog().getPages();
+
+			String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
+					bpaRequest.getRequestInfo());
+			String permitNo = notificationUtil.getMessageTemplate(BPAConstants.PERMIT_ORDER_NO, localizationMessages);
+			permitNo = permitNo != null ? permitNo : BPAConstants.PERMIT_ORDER_NO;
+			String generatedOn = notificationUtil.getMessageTemplate(BPAConstants.GENERATEDON, localizationMessages);
+			generatedOn = generatedOn != null ? generatedOn : BPAConstants.GENERATEDON;
+
+			for (int i = 0; i < allPages.getCount(); i++) {
+				PDPage page = (PDPage) allPages.get(i);
+				@SuppressWarnings("deprecation")
+				PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true);
+				PDFont font = PDType1Font.TIMES_ROMAN;
+				float fontSize = 12.0f;
+				contentStream.beginText();
+				// set font and font size
+				contentStream.setFont(font, fontSize);
+
+				PDRectangle mediabox = page.getMediaBox();
+				float margin = 20;
+				float startX = mediabox.getLowerLeftX() + margin;
+				float startY = mediabox.getUpperRightY() - margin;
+				contentStream.newLineAtOffset(startX, startY);
+
+				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getPermitOrderNo());
+				if (bpa.getOrderGeneratedDate() != null) {
+					Date date = new Date(bpa.getOrderGeneratedDate());
+					DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+					String formattedDate = format.format(date);
+					contentStream.newLineAtOffset(400, 4.5f);
+					contentStream.showText(generatedOn + " : " + formattedDate);
+				} else {
+					contentStream.newLineAtOffset(400, 4.5f);
+					contentStream.showText(generatedOn + " : " + "NA");
 				}
 
-				doc.save(fileName);
+				contentStream.endText();
+				contentStream.close();
 			}
+			doc.save(fileName);
+
 		} catch (Exception ex) {
 			log.info("Exception occured while downloading pdf", ex.getMessage());
 			throw new CustomException("UNABLE_TO_DOWNLOAD", "Unable to download the file");
