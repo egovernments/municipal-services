@@ -184,6 +184,7 @@ public class WCConstants {
 	
 	public static final String PDF_SANCTION_KEY = "ws-sanctionletter";
 	
-		
+	public static final String PENDING_FOR_CONNECTION_ACTIVATION = "PENDING_FOR_CONNECTION_ACTIVATION";
+	
 	
 }
