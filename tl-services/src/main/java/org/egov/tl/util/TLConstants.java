@@ -74,6 +74,10 @@ public class TLConstants {
     public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
   
     public static final String NOTIFICATION_TL_REMINDER = "tl.en.reminder";
+	
+    public static final String NOTIFICATION_SENDBACK_TO_INSPECTION= "tl.en.sendback.to.inspection";
+	
+    public static final String NOTIFICATION_SEND_TO_APPROVER= "tl.en.send.to.approver";	
 
 
     public static final List<String> NOTIFICATION_CODES = Collections.unmodifiableList(Arrays.asList(
@@ -215,7 +219,10 @@ public class TLConstants {
     public static final String ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION  = "SENDBACKTOCITIZEN_CITIZENACTIONREQUIRED";
 
     public static final String ACTION_FORWARD_CITIZENACTIONREQUIRED  = "FORWARDTOEMPLOYEE_FIELDINSPECTION";
-
+	
+    public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
+	
+    public static final String ACTION_STATUS_PENDINGAPPROVAL  = "FORWARD_PENDINGAPPROVAL";
 
     public static final String ACTION_STATUS_PAID  = "PAID";
 
