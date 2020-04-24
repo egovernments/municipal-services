@@ -222,8 +222,6 @@ public class TLConstants {
 	
     public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
 	
-    public static final String ACTION_STATUS_PENDINGAPPROVAL  = "FORWARD_PENDINGAPPROVAL";
-
     public static final String ACTION_STATUS_PAID  = "PAID";
 
 
