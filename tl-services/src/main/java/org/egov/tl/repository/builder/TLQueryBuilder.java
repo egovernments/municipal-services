@@ -42,7 +42,7 @@ public class TLQueryBuilder {
     private static final String QUERY = "SELECT tl.*,tld.*,tlunit.*,tlacc.*,tlowner.*," +
             "tladdress.*,tlapldoc.*,tlverdoc.*,tlownerdoc.*,tlinsti.*,tl.id as tl_id,tl.tenantid as tl_tenantId,tl.lastModifiedTime as " +
             "tl_lastModifiedTime,tl.createdBy as tl_createdBy,tl.lastModifiedBy as tl_lastModifiedBy,tl.createdTime as " +
-            "tl_createdTime,tld.id as tld_id,tladdress.id as tl_ad_id,tld.createdBy as tld_createdBy," +
+            "tl_createdTime,tl.filestoreid as tl_fileStoreId,tld.id as tld_id,tladdress.id as tl_ad_id,tld.createdBy as tld_createdBy," +
             "tlowner.id as tlowner_uuid,tlowner.active as useractive," +
             "tld.createdTime as tld_createdTime,tld.lastModifiedBy as tld_lastModifiedBy,tld.createdTime as " +
             "tld_createdTime,tlunit.id as tl_un_id,tlunit.tradeType as tl_un_tradeType,tlunit.uom as tl_un_uom,tlunit.active as tl_un_active," +
@@ -74,7 +74,7 @@ public class TLQueryBuilder {
 
 
       private final String paginationWrapper = "SELECT * FROM " +
-              "(SELECT *, DENSE_RANK() OVER (ORDER BY tl_id) offset_ FROM " +
+              "(SELECT *, DENSE_RANK() OVER (ORDER BY tl_lastModifiedTime DESC , tl_id) offset_ FROM " +
               "({})" +
               " result) result_offset " +
               "WHERE offset_ > ? AND offset_ <= ?";
@@ -103,11 +103,9 @@ public class TLQueryBuilder {
                 builder.append(" AND tlowner.active = ? )");
                 preparedStmtList.add(true);
             }
-
         }
-
         else {
-
+          
             if (criteria.getTenantId() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append(" tl.tenantid=? ");
@@ -142,11 +140,24 @@ public class TLQueryBuilder {
                 preparedStmtList.add(criteria.getStatus());
             }
 
-            if (criteria.getLicenseNumber() != null) {
+            if (criteria.getApplicationType() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
-                builder.append("  tl.licensenumber = ? ");
-                preparedStmtList.add(criteria.getLicenseNumber());
+                builder.append("  tl.applicationtype = ? ");
+                preparedStmtList.add(criteria.getApplicationType());
             }
+
+            List<String> licenseNumbers = criteria.getLicenseNumbers();
+            if (!CollectionUtils.isEmpty(licenseNumbers)) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" tl.licensenumber IN (").append(createQuery(licenseNumbers)).append(")");
+                addToPreparedStatement(preparedStmtList, licenseNumbers);
+            }
+            
+//            if (criteria.getLicenseNumber() != null) {
+//                addClauseIfRequired(preparedStmtList, builder);
+//                builder.append("  tl.licensenumber = ? ");
+//                preparedStmtList.add(criteria.getLicenseNumber());
+//            }
 
             if (criteria.getOldLicenseNumber() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
@@ -165,9 +176,15 @@ public class TLQueryBuilder {
                 builder.append("  tl.applicationDate <= ? ");
                 preparedStmtList.add(criteria.getToDate());
             }
-        }
 
-        builder.append("  ORDER BY tl.lastModifiedTime DESC ");
+
+            if (criteria.getValidTo() != null) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append("  tl.validTo <= ? ");
+                preparedStmtList.add(criteria.getValidTo());
+            }
+
+        }
 
        // enrichCriteriaForUpdateSearch(builder,preparedStmtList,criteria);
 

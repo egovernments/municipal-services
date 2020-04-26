@@ -1,0 +1,177 @@
+package org.egov.bpa.calculator.services;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.egov.bpa.calculator.config.BPACalculatorConfig;
+import org.egov.bpa.calculator.repository.ServiceRequestRepository;
+import org.egov.bpa.calculator.utils.BPACalculatorConstants;
+import org.egov.bpa.calculator.web.models.CalculationReq;
+import org.egov.bpa.calculator.web.models.bpa.BPA;
+import org.egov.bpa.calculator.web.models.bpa.BPA.RiskTypeEnum;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.ModuleDetail;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.JsonPath;
+
+@Service
+@Slf4j
+public class MDMSService {
+
+	@Autowired
+	 private ServiceRequestRepository serviceRequestRepository;
+
+	@Autowired
+	private BPACalculatorConfig config;
+	
+    public Object mDMSCall(CalculationReq calculationReq,String tenantId){
+        MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(calculationReq,tenantId);
+        StringBuilder url = getMdmsSearchUrl();
+        Object result = serviceRequestRepository.fetchResult(url , mdmsCriteriaReq);
+        return result;
+    }
+
+    /**
+     * Creates and returns the url for mdms search endpoint
+     *
+     * @return MDMS Search URL
+     */
+    private StringBuilder getMdmsSearchUrl() {
+        return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsSearchEndpoint());
+    }
+
+    /**
+     * Creates MDMS request
+     * @param requestInfo The RequestInfo of the calculationRequest
+     * @param tenantId The tenantId of the tradeLicense
+     * @return MDMSCriteria Request
+     */
+    private MdmsCriteriaReq getMDMSRequest(CalculationReq calculationReq, String tenantId) {
+    	RequestInfo requestInfo = 	calculationReq.getRequestInfo();
+        List<MasterDetail> bpaMasterDetails = new ArrayList<>();
+        
+        bpaMasterDetails.add(MasterDetail.builder().name(BPACalculatorConstants.MDMS_CALCULATIONTYPE)
+        		.build());
+        ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDetails)
+                .moduleName(BPACalculatorConstants.MDMS_BPA).build();
+
+        List<MasterDetail> tenantMasterDetails = new ArrayList<>();
+        
+        tenantMasterDetails.add(MasterDetail.builder().name(BPACalculatorConstants.MDMS_MASTER_TENANT)
+        		.build());
+        ModuleDetail tenantModuleDetails = ModuleDetail.builder().masterDetails(tenantMasterDetails)
+                .moduleName(BPACalculatorConstants.MDMS_MODULE_TENANT).build();
+        
+        List<ModuleDetail> moduleDetails = new ArrayList<>();
+        
+        moduleDetails.add(bpaModuleDtls);
+        moduleDetails.add(tenantModuleDetails);
+
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
+                .build();
+
+        return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+    }
+
+
+    /**
+     * Gets the calculationType for the city for a particular financialYear
+     * If for particular financialYear entry is not there previous year is taken
+     * If MDMS data is not available default values are returned
+     * @param requestInfo The RequestInfo of the calculationRequest
+     * @param license The tradeLicense for which calculation is done
+     * @return Map contianing the calculationType for TradeUnit and accessory
+     */
+    public Map getCalculationType(RequestInfo requestInfo,BPA bpa,Object mdmsData, String feeType){
+        HashMap<String,Object> calculationType = new HashMap<>();
+        try {
+        	
+           
+
+            List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_CALCULATIONTYPE_PATH);
+            String filterExp = "$.[?((@.applicationType == '"+bpa.getApplicationType()+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
+            List<Object> calTypes = JsonPath.read(jsonOutput, filterExp);
+            
+            filterExp = "$.[?(@.serviceType == '"+bpa.getServiceType()+"' || @.serviceType === 'ALL' )]";
+            calTypes = JsonPath.read(calTypes, filterExp);
+            
+            filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' || @.riskType === 'ALL' )]";
+            calTypes = JsonPath.read(calTypes, filterExp);
+            
+            if(calTypes.size() > 1){
+            	
+	            	filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' )]";
+	            	calTypes  = JsonPath.read(calTypes, filterExp);
+	            	
+            }
+            
+            if(calTypes.size() == 0) {
+            		return defaultMap(feeType);
+            }
+            
+             Object obj = calTypes.get(0);
+           
+          
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            
+           String financialYear = currentYear + "-" + (currentYear + 1);
+           System.out.println(financialYear);
+            
+            calculationType = (HashMap<String, Object>) obj;
+        }
+        catch (Exception e){
+            throw new CustomException("MDMS ERROR","Failed to get calculationType");
+        }
+
+        return calculationType;
+    }
+   
+
+    /**
+     * Creates and return default calculationType values as map
+     * @return default calculationType Map
+     */
+    public Map defaultMap(String feeType){
+        Map defaultMap = new HashMap();
+        String feeAmount = ( feeType.equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ) ? config.getApplFeeDefaultAmount() : config.getSancFeeDefaultAmount();
+//        log.warn(" ")
+        defaultMap.put( BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT,Integer.valueOf(feeAmount));
+        return defaultMap;
+    }
+
+
+    public String getUlbGrade(Object mdmsData,String tenantId) {
+//    	HashMap<String,Object> tenants = new HashMap<>();
+    	String ulbGrade =BPACalculatorConstants.DEFAULT_ULB_GRADE;
+        try {
+        	
+        	List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_TENANT_PATH);
+
+
+            String filterExp = "$.[?(@.code == '"+tenantId+"' )]";
+            List<Object> tenants = JsonPath.read(jsonOutput, filterExp);
+            
+            Map city = (HashMap<String, Object>) tenants.get(0);
+            ulbGrade = (String) ((Map)city.get("city")).get("ulbGrade");
+        }
+        catch (Exception e){
+            throw new CustomException("MDMS ERROR","Failed to get calculationType");
+        }
+
+        return ulbGrade;
+    }
+
+}

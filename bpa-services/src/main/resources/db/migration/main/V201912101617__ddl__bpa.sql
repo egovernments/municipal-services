@@ -1,0 +1,1 @@
+ALTER TABLE eg_bpa_buildingplan ADD COLUMN risktype character varying(256)  NOT NULL;
