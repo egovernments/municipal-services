@@ -256,20 +256,11 @@ public class EnrichmentService {
 	 * 
 	 * @param waterConnectionRequest
 	 */
-	@SuppressWarnings("unchecked")
-	private void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
+	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
 		try {
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(WCConstants.ACTION_APPROVE)) {
-				HashMap<String, Object> addDetail = mapper.convertValue(
-						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-				addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
-						pdfFileStroeService.getFileStroeId(waterConnectionRequest.getWaterConnection(),
-								waterConnectionRequest.getRequestInfo(), WCConstants.PDF_ESTIMATION_KEY));
-				addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
-						pdfFileStroeService.getFileStroeId(waterConnectionRequest.getWaterConnection(),
-								waterConnectionRequest.getRequestInfo(), WCConstants.PDF_SANCTION_KEY));
-				waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);
+					.equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION)) {
+				waterDao.enrichFileStoreIds(waterConnectionRequest);
 			}
 		} catch (Exception ex) {
 			log.debug(ex.toString());

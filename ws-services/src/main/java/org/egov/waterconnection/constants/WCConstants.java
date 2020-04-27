@@ -42,7 +42,7 @@ public class WCConstants {
 
     public static final String ACTION_APPLY  = "APPLY";
 
-    public static final String ACTION_APPROVE  = "ACTIVATE_CONNECTION";
+    public static final String ACTIVATE_CONNECTION  = "ACTIVATE_CONNECTION";
 
     public static final String ACTION_REJECT  = "REJECT";
 
@@ -185,6 +185,8 @@ public class WCConstants {
 	public static final String PDF_SANCTION_KEY = "ws-sanctionletter";
 	
 	public static final String PENDING_FOR_CONNECTION_ACTIVATION = "PENDING_FOR_CONNECTION_ACTIVATION";
+	
+	public static final long DAYS_CONST= 86400000l;
 	
 	
 }

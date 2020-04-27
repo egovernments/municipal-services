@@ -97,6 +97,23 @@ public class WaterDaoImpl implements WaterDao {
 			waterConnectionProducer.push(wsConfiguration.getEditNotificationTopic(), waterConnectionRequest);
 		}
 	}
-
+	
+	/**
+	 * Enrich file store Id's
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
+		waterConnectionProducer.push(wsConfiguration.getFileStoreIdsTopic(), waterConnectionRequest);
+	}
+	
+	/**
+	 * Save file store Id's
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void saveFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
+		waterConnectionProducer.push(wsConfiguration.getSaveFileStoreIdsTopic(), waterConnectionRequest);
+	}
 
 }

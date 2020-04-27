@@ -1,17 +1,23 @@
 package org.egov.waterconnection.service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
+import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.CalculationCriteria;
 import org.egov.waterconnection.model.CalculationReq;
 import org.egov.waterconnection.model.CalculationRes;
 import org.egov.waterconnection.model.WaterConnection;
+import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
+import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
+import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -27,34 +33,39 @@ import net.minidev.json.JSONObject;
 @Service
 @Slf4j
 public class PdfFileStoreService {
-	
+
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
-	
+
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
-	
+
 	@Autowired
 	private ObjectMapper mapper;
-	
+
 	@Autowired
 	private WSConfiguration config;
-	
+
+	@Autowired
+	private WaterDaoImpl waterDao;
+
+	@Autowired
+	private WorkflowService workflowService;
+
 	String tenantIdReplacer = "$tenantId";
 	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
 	String WaterConnectionReplacer = "WnsConnection";
 	String fileStoreIdReplacer = "$fileStoreIds";
-	String totalAmount= "totalAmount";
+	String totalAmount = "totalAmount";
 	String applicationFee = "applicationFee";
 	String serviceFee = "serviceFee";
 	String tax = "tax";
 	String pdfTaxhead = "pdfTaxhead";
 	String pdfApplicationKey = "$applicationkey";
-	
-	
-	
+	String sla = "sla";
+	String slaDate = "slaDate";
 
 	/**
 	 * Get fileStroe Id's
@@ -80,6 +91,10 @@ public class PdfFileStoreService {
 			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			waterobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			BigDecimal slaDays = workflowService.getSlaForState(requestInfo.getUserInfo().getTenantId(), requestInfo,
+					waterConnection.getApplicationStatus().name());
+			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
+			waterobject.put(slaDate, slaDays.add(waterConnection.getConnectionExecutionDate()));
 			String tenantId = waterConnection.getProperty().getTenantId().split("\\.")[0];
 			return getFielStoreIdFromPDFService(waterobject, requestInfo, tenantId, applicationKey);
 		} catch (Exception ex) {
@@ -88,7 +103,6 @@ public class PdfFileStoreService {
 		}
 	}
 
-	
 	/**
 	 * Get file store id from PDF service
 	 * 
@@ -97,7 +111,8 @@ public class PdfFileStoreService {
 	 * @param tenantId
 	 * @return file store id
 	 */
-	private String getFielStoreIdFromPDFService(JSONObject waterobject, RequestInfo requestInfo, String tenantId, String applicationKey) {
+	private String getFielStoreIdFromPDFService(JSONObject waterobject, RequestInfo requestInfo, String tenantId,
+			String applicationKey) {
 		JSONArray waterconnectionlist = new JSONArray();
 		waterconnectionlist.add(waterobject);
 		JSONObject requestPayload = new JSONObject();
@@ -112,13 +127,32 @@ public class PdfFileStoreService {
 			Object response = serviceRequestRepository.fetchResult(builder, requestPayload);
 			DocumentContext responseContext = JsonPath.parse(response);
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
-			if(CollectionUtils.isEmpty(fileStoreIds)) {
-				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "NO file store id found from pdf service");
+			if (CollectionUtils.isEmpty(fileStoreIds)) {
+				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
+						"NO file store id found from pdf service");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void process(WaterConnectionRequest waterConnectionRequest, String topic) {
+		HashMap<String, Object> addDetail = mapper
+				.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+		if (addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+			addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
+					getFileStroeId(waterConnectionRequest.getWaterConnection(), waterConnectionRequest.getRequestInfo(),
+							WCConstants.PDF_ESTIMATION_KEY));
+		}
+		if (addDetail.getOrDefault(WCConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
+			addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
+					getFileStroeId(waterConnectionRequest.getWaterConnection(), waterConnectionRequest.getRequestInfo(),
+							WCConstants.PDF_SANCTION_KEY));
+		}
+		waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);
+		waterDao.saveFileStoreIds(waterConnectionRequest);
 	}
 }
