@@ -27,7 +27,7 @@ public class SWConstants {
 
 	public static final String ACTION_APPLY = "APPLY";
 
-	public static final String ACTION_APPROVE = "ACTIVATE_CONNECTION";
+	public static final String ACTIVATE_CONNECTION = "ACTIVATE_CONNECTION";
 
 	public static final String ACTION_REJECT = "REJECT";
 
@@ -166,5 +166,7 @@ public class SWConstants {
 	public static final String PDF_ESTIMATION_KEY = "ws-estimationnotice";
 
 	public static final String PDF_SANCTION_KEY = "ws-sanctionletter";
+	
+	public static final long DAYS_CONST= 86400000l;
 	
 }

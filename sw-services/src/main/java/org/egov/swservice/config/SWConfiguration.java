@@ -153,5 +153,11 @@ public class SWConfiguration {
     
     @Value("${sw.sla.default.value}")
 	private Long slaDefaultValue;
+    
+    @Value("${sw.consume.filestoreids}")
+	private String fileStoreIdsTopic;
+
+	@Value("${egov.sewerageservice.savefilestoreIds}")
+	private String saveFileStoreIdsTopic;
 
 }

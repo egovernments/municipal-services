@@ -60,13 +60,14 @@ public class SewarageDaoImpl implements SewarageDao {
 		StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
 		log.debug(str.toString());
 		// }
-		List<SewerageConnection> sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
+		List<SewerageConnection> sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
+				sewarageRowMapper);
 		if (sewarageConnectionList == null) {
 			return Collections.emptyList();
 		}
 		return sewarageConnectionList;
 	}
-	
+
 	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,
 			boolean isStateUpdatable) {
 		if (isStateUpdatable) {
@@ -75,7 +76,7 @@ public class SewarageDaoImpl implements SewarageDao {
 			sewarageConnectionProducer.push(swConfiguration.getWorkFlowUpdateTopic(), sewerageConnectionRequest);
 		}
 	}
-	
+
 	/**
 	 * push object for edit notification
 	 * 
@@ -86,6 +87,24 @@ public class SewarageDaoImpl implements SewarageDao {
 				.contains(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
 			sewarageConnectionProducer.push(swConfiguration.getEditNotificationTopic(), sewerageConnectionRequest);
 		}
+	}
+
+	/**
+	 * Enrich file store Id's
+	 * 
+	 * @param sewerageConnectionRequest
+	 */
+	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
+		sewarageConnectionProducer.push(swConfiguration.getFileStoreIdsTopic(), sewerageConnectionRequest);
+	}
+
+	/**
+	 * Save file store Id's
+	 * 
+	 * @param sewerageConnectionRequest
+	 */
+	public void saveFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
+		sewarageConnectionProducer.push(swConfiguration.getSaveFileStoreIdsTopic(), sewerageConnectionRequest);
 	}
 
 }

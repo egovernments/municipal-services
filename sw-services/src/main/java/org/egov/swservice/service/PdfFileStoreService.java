@@ -1,6 +1,8 @@
 package org.egov.swservice.service;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -9,8 +11,12 @@ import org.egov.swservice.model.CalculationCriteria;
 import org.egov.swservice.model.CalculationReq;
 import org.egov.swservice.model.CalculationRes;
 import org.egov.swservice.model.SewerageConnection;
+import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
+import org.egov.swservice.repository.SewarageDaoImpl;
+import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
+import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +46,12 @@ public class PdfFileStoreService {
 	@Autowired
 	private SWConfiguration config;
 
+	@Autowired
+	private SewarageDaoImpl sewerageDao;
+
+	@Autowired
+	private WorkflowService workflowService;
+
 	String tenantIdReplacer = "$tenantId";
 	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
@@ -52,6 +64,8 @@ public class PdfFileStoreService {
 	String tax = "tax";
 	String pdfTaxhead = "pdfTaxhead";
 	String pdfApplicationKey = "$applicationkey";
+	String sla = "sla";
+	String slaDate = "slaDate";
 
 	/**
 	 * Get fileStroe Id's
@@ -80,6 +94,10 @@ public class PdfFileStoreService {
 			sewerageobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			sewerageobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			sewerageobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			BigDecimal slaDays = workflowService.getSlaForState(requestInfo.getUserInfo().getTenantId(), requestInfo,
+					sewerageConnection.getApplicationStatus().name());
+			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
+			sewerageobject.put(slaDate, slaDays.add(sewerageConnection.getConnectionExecutionDate()));
 			String tenantId = sewerageConnection.getProperty().getTenantId().split("\\.")[0];
 			return getFielStoreIdFromPDFService(sewerageobject, requestInfo, tenantId, applicationKey);
 		} catch (Exception ex) {
@@ -122,5 +140,23 @@ public class PdfFileStoreService {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("SEWERAGE_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void process(SewerageConnectionRequest sewerageConnectionRequest, String topic) {
+		HashMap<String, Object> addDetail = mapper
+				.convertValue(sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
+		if (addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+			addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
+					getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
+							sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_ESTIMATION_KEY));
+		}
+		if (addDetail.getOrDefault(SWConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
+			addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
+					getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
+							sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_SANCTION_KEY));
+		}
+		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(addDetail);
+		sewerageDao.saveFileStoreIds(sewerageConnectionRequest);
 	}
 }

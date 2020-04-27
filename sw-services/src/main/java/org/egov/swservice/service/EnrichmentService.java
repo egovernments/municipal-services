@@ -23,6 +23,7 @@ import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Status;
 import org.egov.swservice.model.Idgen.IdResponse;
 import org.egov.swservice.repository.IdGenRepository;
+import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
@@ -59,6 +60,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private PdfFileStoreService pdfFileStroeService;
+	
+	@Autowired
+	private SewarageDaoImpl sewerageDao;
 
 
 	/**
@@ -264,19 +268,11 @@ public class EnrichmentService {
 	 * @param sewerageConnectionRequest
 	 */
 	@SuppressWarnings("unchecked")
-	private void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
+	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(SWConstants.ACTION_APPROVE)) {
-				HashMap<String, Object> addDetail = mapper.convertValue(
-						sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
-				addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
-						pdfFileStroeService.getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
-								sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_ESTIMATION_KEY));
-				addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
-						pdfFileStroeService.getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
-								sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_SANCTION_KEY));
-				sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(addDetail);
+					.equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION)) {
+				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);
 			}
 		} catch (Exception ex) {
 			log.debug(ex.toString());
