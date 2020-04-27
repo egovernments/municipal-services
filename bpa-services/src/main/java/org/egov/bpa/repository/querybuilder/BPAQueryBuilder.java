@@ -1,5 +1,6 @@
 package org.egov.bpa.repository.querybuilder;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
@@ -95,6 +96,32 @@ public class BPAQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.permitorderno IN (").append(createQuery(permitNos)).append(")");
 			addToPreparedStatement(preparedStmtList, permitNos);
+		}
+		
+		Long permitDt = criteria.getPermitDate();
+		if ( permitDt != null) {
+			
+			Calendar permitDate = Calendar.getInstance();
+			permitDate.setTimeInMillis(permitDt);
+			
+			int year = permitDate.get(Calendar.YEAR);
+		    int month = permitDate.get(Calendar.MONTH);
+		    int day = permitDate.get(Calendar.DATE);
+			
+			Calendar permitStrDate = Calendar.getInstance();
+			permitStrDate.setTimeInMillis(0);
+			permitStrDate.set(year, month, day, 0, 0, 0);
+			
+			Calendar permitEndDate = Calendar.getInstance();
+			permitEndDate.setTimeInMillis(0);
+			permitEndDate.set(year, month, day, 23, 59, 59);
+			
+			
+			addClauseIfRequired(preparedStmtList, builder);
+			
+			builder.append(" bpa.orderGeneratedDate BETWEEN ").append(permitStrDate.getTimeInMillis()).append(" AND ")
+			.append(permitEndDate.getTimeInMillis());
+			
 		}
 
 		if (criteria.getMobileNumber() != null) {

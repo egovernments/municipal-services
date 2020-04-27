@@ -56,7 +56,10 @@ public class BPASearchCriteria {
 	    private Long fromDate;
 
 	    @JsonProperty("toDate")
-	    private Long toDate;
+	    private Long toDate; 
+	      
+	    @JsonProperty("permitDate")
+	    private Long permitDate; 
 
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNos == null

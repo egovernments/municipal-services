@@ -182,6 +182,9 @@ public class BPA {
 	@JsonProperty("orderGeneratedDate")
 	private Long orderGeneratedDate;
 	
+	@JsonProperty("applicationDate")
+	private Long applicationDate;
+	
 	@JsonProperty("tradeType")
 	private String tradeType;
 

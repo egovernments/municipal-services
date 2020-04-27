@@ -82,6 +82,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.registrationDetails(rs.getString("registrationDetails")).remarks(rs.getString("remarks"))
 						.address(address).id(id).validityDate(rs.getLong("validityDate"))
 						.additionalDetails(additionalDetails).orderGeneratedDate(rs.getLong("orderGeneratedDate"))
+						.applicationDate(rs.getLong("applicationDate"))
 						.tradeType(rs.getString("tradeType")).build();
 
 				buildingMap.put(id, currentbpa);
