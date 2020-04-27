@@ -38,4 +38,8 @@ public class Unit {
 	
 	@JsonProperty("active")
 	private Boolean active;
+	
+	@Size(max = 64)
+	@JsonProperty("blockIndex")
+	private Integer blockIndex;
 }
