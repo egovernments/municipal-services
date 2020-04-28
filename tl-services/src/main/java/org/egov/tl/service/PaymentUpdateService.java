@@ -22,11 +22,9 @@ import org.egov.tl.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,9 +51,6 @@ public class PaymentUpdateService {
 	private WorkflowService workflowService;
 
 	private TradeUtil util;
-
-	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
-	private Boolean pickWFServiceNameFromTradeTypeOnly;
 
 	@Autowired
 	public PaymentUpdateService(TradeLicenseService tradeLicenseService, TLConfiguration config, TLRepository repository,
@@ -92,27 +87,16 @@ public class PaymentUpdateService {
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
 			String tenantId = paymentRequest.getPayment().getTenantId();
+
 			for(PaymentDetail paymentDetail : paymentDetails){
-				if (paymentDetail.getBusinessService().equalsIgnoreCase(businessService_TL) || paymentDetail.getBusinessService().equalsIgnoreCase(businessService_BPA)) {
+
+				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getBusinessService())) {
 					TradeLicenseSearchCriteria searchCriteria = new TradeLicenseSearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					searchCriteria.setApplicationNumber(paymentDetail.getBill().getConsumerCode());
-					searchCriteria.setBusinessService(paymentDetail.getBusinessService());
 					List<TradeLicense> licenses = tradeLicenseService.getLicensesWithOwnerInfo(searchCriteria, requestInfo);
-					String wfbusinessServiceName = null;
-					switch (paymentDetail.getBusinessService()) {
-						case businessService_TL:
-							wfbusinessServiceName = config.getTlBusinessServiceValue();
-							break;
 
-						case businessService_BPA:
-							String tradeType = licenses.get(0).getTradeLicenseDetail().getTradeUnits().get(0).getTradeType();
-							if (pickWFServiceNameFromTradeTypeOnly)
-								tradeType = tradeType.split("\\.")[0];
-							wfbusinessServiceName = tradeType;
-							break;
-					}
-				BusinessService businessService = workflowService.getBusinessService(licenses.get(0).getTenantId(), requestInfo,wfbusinessServiceName);
+					BusinessService businessService = workflowService.getBusinessService(licenses.get(0).getTenantId(), requestInfo);
 
 
 					if (CollectionUtils.isEmpty(licenses))
@@ -138,13 +122,7 @@ public class PaymentUpdateService {
 					updateRequest.getLicenses()
 							.forEach(obj -> log.info(" the status of the application is : " + obj.getStatus()));
 
-					List<String> endStates = Collections.nCopies(updateRequest.getLicenses().size(), STATUS_APPROVED);
-					switch (paymentDetail.getBusinessService()) {
-						case businessService_BPA:
-							endStates = util.getBPAEndState(updateRequest);
-							break;
-					}
-					enrichmentService.postStatusEnrichment(updateRequest,endStates);
+					enrichmentService.postStatusEnrichment(updateRequest);
 
 					/*
 					 * calling repository to update the object in TL tables

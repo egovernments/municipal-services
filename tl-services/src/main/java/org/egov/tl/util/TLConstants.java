@@ -1,6 +1,5 @@
 package org.egov.tl.util;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -10,10 +9,6 @@ import java.util.List;
 @Component
 public class TLConstants {
 
-
-    public static  final String businessService_TL = "TL";
-
-    public static  final String businessService_BPA = "BPAREG";
 
     public static final String PROPERTY_JSONPATH = "$.Properties[0].propertyId";
 
@@ -46,10 +41,6 @@ public class TLConstants {
     public static final String NOTIFICATION_OBJECT_REMOVED = "tl.en.edit.object.removed";
 
     public static final String NOTIFICATION_OBJECT_MODIFIED = "tl.en.edit.object.modified";
-
-    public static final String NOTIFICATION_SENDBACK_CITIZEN= "tl.en.sendback.citizen";
-
-    public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
 
 
     public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Trade License with application number <APPLICATION_NUMBER> was modified.";
@@ -103,6 +94,7 @@ public class TLConstants {
 
     public static final String MDMS_ENDDATE  = "endingDate";
 
+
     // error constants
 
     public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
@@ -120,8 +112,6 @@ public class TLConstants {
     public static final String ACTION_APPROVE  = "APPROVE";
 
     public static final String ACTION_REJECT  = "REJECT";
-
-    public static final String TRIGGER_NOWORKFLOW  = "NOWORKFLOW";
 
     public static final String ACTION_CANCEL  = "CANCEL";
 
@@ -160,11 +150,6 @@ public class TLConstants {
     public static final String ACTION_STATUS_FIELDINSPECTION  = "FORWARD_FIELDINSPECTION";
 
     public static final String ACTION_CANCEL_CANCELLED  = "CANCEL_CANCELLED";
-
-    public static final String ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION  = "SENDBACKTOCITIZEN_CITIZENACTIONREQUIRED";
-
-    public static final String ACTION_FORWARD_CITIZENACTIONREQUIRED  = "FORWARDTOEMPLOYEE_FIELDINSPECTION";
-
 
     public static final String ACTION_STATUS_PAID  = "PAID";
 

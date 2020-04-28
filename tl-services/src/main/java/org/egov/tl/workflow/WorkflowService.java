@@ -38,9 +38,8 @@ public class WorkflowService {
      * @param requestInfo The RequestInfo object of the request
      * @return BusinessService for the the given tenantId
      */
-    public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo,String businessServiceName) {
-
-        StringBuilder url = getSearchURLWithParams(tenantId,businessServiceName);
+    public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo) {
+        StringBuilder url = getSearchURLWithParams(tenantId);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
         Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
         BusinessServiceResponse response = null;
@@ -59,13 +58,13 @@ public class WorkflowService {
      * @param tenantId The tenantId for which url is generated
      * @return The search url
      */
-    private StringBuilder getSearchURLWithParams(String tenantId,String businessServiceName) {
+    private StringBuilder getSearchURLWithParams(String tenantId) {
         StringBuilder url = new StringBuilder(config.getWfHost());
         url.append(config.getWfBusinessServiceSearchPath());
         url.append("?tenantId=");
         url.append(tenantId);
-        url.append("&businessServices=");
-        url.append(businessServiceName);
+        url.append("&businessservices=");
+        url.append(config.getBusinessServiceValue());
         return url;
     }
 

@@ -41,10 +41,6 @@ public class NotificationUtil {
 
 	final String amountPaidKey = "amountPaid";
 
-	final String consumerCodeKey = "consumerCode";
-
-    final String tenantIdKey = "tenantId";
-
 	/**
 	 * Creates customized message based on tradelicense
 	 * 
@@ -89,16 +85,6 @@ public class NotificationUtil {
 		case ACTION_STATUS_FIELDINSPECTION:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION, localizationMessage);
 			message = getFieldInspectionMsg(license, messageTemplate);
-			break;
-
-		case ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION:
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_SENDBACK_CITIZEN, localizationMessage);
-			message = getCitizenSendBack(license, messageTemplate);
-			break;
-
-		case ACTION_FORWARD_CITIZENACTIONREQUIRED:
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FORWARD_CITIZEN, localizationMessage);
-			message = getCitizenForward(license, messageTemplate);
 			break;
 
 		case ACTION_CANCEL_CANCELLED:
@@ -234,8 +220,6 @@ public class NotificationUtil {
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
-		message = message.replace("<applicationNumber>", license.getApplicationNumber());
-		message = message.replace("<tenantId>", license.getTenantId());
 		return message;
 	}
 
@@ -270,40 +254,8 @@ public class NotificationUtil {
 	}
 
 	/**
-	 * Creates customized message for citizen sendback
-	 * 
-	 * @param license
-	 *            tenantId of the tradeLicense
-	 * @param message
-	 *            Message from localization for cancelled
-	 * @return customized message for cancelled
-	 */
-	private String getCitizenSendBack(TradeLicense license, String message) {
-		message = message.replace("<2>", license.getApplicationNumber());
-		message = message.replace("<3>", license.getTradeName());
-
-		return message;
-	}
-
-	/**
-	 * Creates customized message for citizen forward
-	 *
-	 * @param license
-	 *            tenantId of the tradeLicense
-	 * @param message
-	 *            Message from localization for cancelled
-	 * @return customized message for cancelled
-	 */
-	private String getCitizenForward(TradeLicense license, String message) {
-		message = message.replace("<2>", license.getApplicationNumber());
-		message = message.replace("<3>", license.getTradeName());
-
-		return message;
-	}
-
-	/**
 	 * Creates customized message for cancelled
-	 *
+	 * 
 	 * @param license
 	 *            tenantId of the tradeLicense
 	 * @param message
@@ -331,8 +283,6 @@ public class NotificationUtil {
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", license.getTradeName());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
-		messageTemplate = messageTemplate.replace("<applicationNumber>", valMap.get(consumerCodeKey));
-		messageTemplate = messageTemplate.replace("<tenantId>", valMap.get(tenantIdKey));
 		return messageTemplate;
 	}
 
@@ -359,8 +309,8 @@ public class NotificationUtil {
 	 * @param smsRequestList
 	 *            The list of SMSRequest to be sent
 	 */
-	public void sendSMS(List<SMSRequest> smsRequestList, boolean isSMSEnabled) {
-		if (isSMSEnabled) {
+	public void sendSMS(List<SMSRequest> smsRequestList) {
+		if (config.getIsSMSEnabled()) {
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
@@ -404,8 +354,8 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(TradeLicense license) {
-		StringBuilder builder = new StringBuilder(config.getBillingHost());
-		builder.append(config.getFetchBillEndpoint());
+		StringBuilder builder = new StringBuilder(config.getCalculatorHost());
+		builder.append(config.getGetBillEndpoint());
 		builder.append("?tenantId=");
 		builder.append(license.getTenantId());
 		builder.append("&consumerCode=");

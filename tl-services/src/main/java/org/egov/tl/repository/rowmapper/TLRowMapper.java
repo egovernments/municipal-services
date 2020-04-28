@@ -74,7 +74,6 @@ public class TLRowMapper  implements ResultSetExtractor<List<TradeLicense>> {
                         .tradeName(rs.getString("tradeName"))
                         .propertyId(rs.getString("propertyid"))
                         .oldPropertyId(rs.getString("oldpropertyid"))
-                        .businessService(rs.getString("businessservice"))
                         .id(id)
                         .build();
 
@@ -127,14 +126,10 @@ public class TLRowMapper  implements ResultSetExtractor<List<TradeLicense>> {
             { institution = Institution.builder()
                     .id(rs.getString("instiid"))
                     .tenantId(rs.getString("institenantId"))
-                    .name(rs.getString("name"))
+                    .name(rs.getString("institutionName"))
                     .type(rs.getString("institutionType"))
                     .designation(rs.getString("designation"))
                     .active(rs.getBoolean("instiactive"))
-                    .contactNo(rs.getString("insticontactno"))
-                    .instituionName(rs.getString("instiinstituionname"))
-                    .organisationRegistrationNo(rs.getString("instiorganisationregistrationno"))
-                    .address(rs.getString("address"))
                     .build();
             }
 

@@ -103,49 +103,36 @@ public class AssessmentValidator {
 			errorMap.put(ErrorConstants.NO_ASSESSMENTS_FOUND_CODE, ErrorConstants.NO_ASSESSMENTS_FOUND_MSG);
 		} else {
 			Assessment assessmentFromDB = assessments.get(0);
-			if(!CollectionUtils.isEmpty(assessment.getDocuments()) && !CollectionUtils.isEmpty(assessmentFromDB.getDocuments())) {
-				if (assessmentFromDB.getDocuments().size() > assessment.getDocuments().size()) {
-					errorMap.put("MISSING_DOCUMENTS", "Please send all the documents belonging to this assessment");
-				}
+			if (assessmentFromDB.getDocuments().size() > assessment.getDocuments().size()) {
+				errorMap.put("MISSING_DOCUMENTS", "Please send all the documents belonging to this assessment");
 			}
-
-			if(!CollectionUtils.isEmpty(assessment.getUnits()) && !CollectionUtils.isEmpty(assessmentFromDB.getUnits())) {
-				if (assessmentFromDB.getUnits().size() > assessment.getUnits().size()) {
-					errorMap.put("MISSING_UNITS", "Please send all the units belonging to this assessment");
-				}
+			if (assessmentFromDB.getUnits().size() > assessment.getUnits().size()) {
+				errorMap.put("MISSING_UNITS", "Please send all the units belonging to this assessment");
 			}
-      
-			if(!CollectionUtils.isEmpty(assessmentFromDB.getUnits())) {
-				Set<String> existingUnits = assessmentFromDB.getUnits().stream().map(Unit::getId)
-						.collect(Collectors.toSet());
-				if (!CollectionUtils.isEmpty(assessment.getUnits())) {
-					for (Unit unit : assessment.getUnits()) {
-						if (!StringUtils.isEmpty(unit.getId())) {
-							if (!existingUnits.contains(unit.getId())) {
-								errorMap.put("UNIT_NOT_FOUND",
-										"You're trying to update a non-existent unit: " + unit.getId());
-							}
-						}
-					}
-				}
-								
-			}
-			
-			if(!CollectionUtils.isEmpty(assessmentFromDB.getDocuments())) {
-				Set<String> existingDocs = assessmentFromDB.getDocuments().stream().map(Document::getId)
-						.collect(Collectors.toSet());
-				if (!CollectionUtils.isEmpty(assessment.getDocuments())) {
-					for (Document doc : assessment.getDocuments()) {
-						if (!StringUtils.isEmpty(doc.getId())) {
-							if (!existingDocs.contains(doc.getId())) {
-								errorMap.put("DOC_NOT_FOUND",
-										"You're trying to update a non-existent document: " + doc.getId());
-							}
+			Set<String> existingUnits = assessmentFromDB.getUnits().stream().map(Unit::getId)
+					.collect(Collectors.toSet());
+			Set<String> existingDocs = assessmentFromDB.getDocuments().stream().map(Document::getId)
+					.collect(Collectors.toSet());
+			if (!CollectionUtils.isEmpty(assessment.getUnits())) {
+				for (Unit unit : assessment.getUnits()) {
+					if (!StringUtils.isEmpty(unit.getId())) {
+						if (!existingUnits.contains(unit.getId())) {
+							errorMap.put("UNIT_NOT_FOUND",
+									"You're trying to update a non-existent unit: " + unit.getId());
 						}
 					}
 				}
 			}
-
+			if (!CollectionUtils.isEmpty(assessment.getDocuments())) {
+				for (Document doc : assessment.getDocuments()) {
+					if (!StringUtils.isEmpty(doc.getId())) {
+						if (!existingDocs.contains(doc.getId())) {
+							errorMap.put("DOC_NOT_FOUND",
+									"You're trying to update a non-existent document: " + doc.getId());
+						}
+					}
+				}
+			}
 			
 		assessment.setAdditionalDetails(utils.jsonMerge(assessmentFromDB.getAdditionalDetails(), assessment.getAdditionalDetails()));
 			

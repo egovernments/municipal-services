@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -77,9 +78,6 @@ public class EnrichmentService {
 			owner.setStatus(Status.ACTIVE);
 		});
 
-		if (!CollectionUtils.isEmpty(property.getInstitution()))
-			property.getInstitution().forEach(institute -> institute.setId(UUID.randomUUID().toString()));
-
 		property.setAuditDetails(propertyAuditDetails);
 
 		setIdgenIds(request);
@@ -95,7 +93,7 @@ public class EnrichmentService {
     	
     	Property property = request.getProperty();
         RequestInfo requestInfo = request.getRequestInfo();
-        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), true);
+        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getId().toString(), false);
 
 		if (!CollectionUtils.isEmpty(property.getDocuments()))
 			property.getDocuments().forEach(doc -> {
@@ -119,16 +117,7 @@ public class EnrichmentService {
 			owner.setStatus(Status.ACTIVE);
 		});
 		
-		if (!CollectionUtils.isEmpty(property.getInstitution()))
-			property.getInstitution().forEach(institute -> {
-
-				if (null == institute.getId())
-					institute.setId(UUID.randomUUID().toString());
-			});
-		
-		
             property.setAuditDetails(auditDetails);
-            property.setAccountId(propertyFromDb.getAccountId());
             property.getAddress().setId(propertyFromDb.getAddress().getId());
     }
 

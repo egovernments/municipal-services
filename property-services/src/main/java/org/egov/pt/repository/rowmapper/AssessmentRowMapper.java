@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +52,7 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 						.propertyID(rs.getString("ass_propertyid"))
 						.source(Source.valueOf(rs.getString("ass_source")))
 						.units(new ArrayList<>())
-						.documents(new HashSet<>()).build();
+						.documents(new ArrayList<>()).build();
 				
 				try {
 					PGobject obj = (PGobject) rs.getObject("ass_additionaldetails");
@@ -64,16 +63,8 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				} catch (IOException e) {
 					throw new CustomException("PARSING ERROR", "The assessment additionaldetails json cannot be parsed");
 				}
-				
-				Unit unit = getUnit(rs);
-				if(null != unit) {
-					assessment.getUnits().add(unit);
-				}
-				
-				Document document = getDocument(rs);
-				if(null != document) {
-					assessment.getDocuments().add(document);
-				}
+				assessment.getUnits().add(getUnit(rs));
+				assessment.getDocuments().add(getDocument(rs));
 				
 				AuditDetails auditDetails = AuditDetails.builder().createdBy(rs.getString("ass_createdby"))
 						.createdTime(rs.getLong("ass_createdtime")).lastModifiedBy(rs.getString("ass_lastmodifiedby"))
@@ -82,14 +73,8 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				
 				assessmentMap.put(assessment.getId(), assessment);
 			}else {
-				Unit unit = getUnit(rs);
-				if(null != unit) {
-					assessment.getUnits().add(unit);
-				}
-				Document doc = getDocument(rs);
-				if(null != doc) {
-					assessment.getDocuments().add(doc);
-				}
+				assessment.getUnits().add(getUnit(rs));
+				assessment.getDocuments().add(getDocument(rs));
 			}
 		}
 

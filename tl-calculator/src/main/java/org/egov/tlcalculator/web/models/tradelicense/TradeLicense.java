@@ -39,8 +39,6 @@ public class  TradeLicense   {
 
         PERMANENT("PERMANENT");
 
-
-
         private String value;
 
         LicenseTypeEnum(String value) {
@@ -72,9 +70,6 @@ public class  TradeLicense   {
 
     @JsonProperty("applicationNumber")
     private String applicationNumber;
-
-    @JsonProperty("businessService")
-    private String businessService = "TL";
 
     @JsonProperty("oldLicenseNumber")
     private String oldLicenseNumber = null;
