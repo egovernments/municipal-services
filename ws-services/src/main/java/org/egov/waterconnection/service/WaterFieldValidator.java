@@ -15,11 +15,6 @@ public class WaterFieldValidator implements WaterActionValidator {
 	@Override
 	public ValidatorResult validate(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		Map<String, String> errorMap = new HashMap<>();
-		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
-				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
-			return new ValidatorResult(false, errorMap);
-		}
 		if (isUpdate) {
 			if (WCConstants.ACTIVATE_CONNECTION_CONST
 					.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {

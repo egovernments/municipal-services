@@ -23,11 +23,6 @@ public class MeterInfoValidator implements WaterActionValidator {
 	@SuppressWarnings("unchecked")
 	public ValidatorResult validate(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		Map<String, String> errorMap = new HashMap<>();
-		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
-				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
-			return new ValidatorResult(false, errorMap);
-		}
 		if (WCConstants.ACTIVATE_CONNECTION_CONST
 				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())
@@ -42,11 +37,6 @@ public class MeterInfoValidator implements WaterActionValidator {
 					errorMap.put("INVALID_METER_INSTALLATION_DATE",
 							"Meter Installation date cannot be null or negative");
 				}
-
-			}
-			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())
-					&& WCConstants.METERED_CONNECTION
-							.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getConnectionType())) {
 				HashMap<String, Object> addDetail = mapper.convertValue(
 						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 				if (StringUtils.isEmpty(addDetail)
@@ -60,6 +50,7 @@ public class MeterInfoValidator implements WaterActionValidator {
 						errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");
 					}
 				}
+
 			}
 		}
 		if (!errorMap.isEmpty())

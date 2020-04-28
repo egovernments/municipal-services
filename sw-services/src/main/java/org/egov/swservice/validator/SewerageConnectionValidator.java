@@ -7,66 +7,44 @@ import java.util.Map;
 
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.model.ValidatorResult;
+import org.egov.swservice.service.PropertyValidator;
+import org.egov.swservice.service.SewerageFieldValidator;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class SewerageConnectionValidator {
+	
+	@Autowired
+	private PropertyValidator propertyValidator;
+	
+	@Autowired
+	private SewerageFieldValidator sewerageFieldValidator;
 
-	/**
+	/**Used strategy pattern for avoiding multiple if else condition
 	 * 
-	 * @param sewarageConnectionRequest
-	 *            SewarageConnectionRequest is request for create or update
-	 *            sewarage connection
-	 * @param isUpdate
-	 *            True for update and false for create
+	 * @param sewerageConnectionRequest SewarageConnectionRequest is request for create or update
+	 * @param isUpdate True for update and false for create
 	 */
 	public void validateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, boolean isUpdate) {
-		SewerageConnection sewerageConnection = sewerageConnectionRequest.getSewerageConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (sewerageConnectionRequest.getSewerageConnection().getProperty() == null) {
-			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
-		}
-		if (StringUtils.isEmpty(sewerageConnection.getProperty().getUsageCategory())) {
-			errorMap.put("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
-					"SewerageConnection cannot be created without property usage type");
-		}
-		
 		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance() == null || StringUtils
 				.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
 			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
+			throw new CustomException(errorMap);
 		}
-		if (isUpdate && (sewerageConnectionRequest.getSewerageConnection().getProcessInstance() != null)
-				&& !StringUtils
-						.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())
-				&& SWConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(
-						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
-			if (StringUtils.isEmpty(sewerageConnection.getConnectionType())) {
-				errorMap.put("INVALID_SEWERAGE_CONNECTION_TYPE", "Connection type should not be empty");
-			}
-
-			if (StringUtils.isEmpty(sewerageConnection.getRoadType())) {
-				errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
-			}
-
+		ValidatorResult isPropertyValidated = propertyValidator.validate(sewerageConnectionRequest, isUpdate);
+		if (!isPropertyValidated.isStatus()) {
+			errorMap.putAll(isPropertyValidated.getErrorMessage());
 		}
-		if (isUpdate
-				&& (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())
-						&& !StringUtils.isEmpty(
-								sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()))
-				&& SWConstants.ACTIVATE_CONNECTION_CONST.equalsIgnoreCase(
-						sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
-			if (StringUtils.isEmpty(sewerageConnection.getConnectionExecutionDate())) {
-				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
-			}
+		ValidatorResult isSewerageFieldValidated = sewerageFieldValidator.validate(sewerageConnectionRequest, isUpdate);
+		if (!isSewerageFieldValidated.isStatus()) {
+			errorMap.putAll(isSewerageFieldValidated.getErrorMessage());
 		}
-
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
