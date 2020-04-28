@@ -212,6 +212,8 @@ public class EnrichmentService {
 					if (unit.getId() == null) {
 						unit.setTenantId(bpaRequest.getBPA().getTenantId());
 						unit.setId(UUID.randomUUID().toString());
+					}else if(unit.getTenantId() == null) {
+						unit.setTenantId( bpaRequest.getBPA().getTenantId());
 					}
 				});
 			}
