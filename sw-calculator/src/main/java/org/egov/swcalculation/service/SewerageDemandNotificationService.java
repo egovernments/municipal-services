@@ -18,11 +18,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
 @Service
-@Slf4j
 public class SewerageDemandNotificationService {
 
 	@Autowired

@@ -20,7 +20,6 @@ import org.egov.swcalculation.model.EventRequest;
 import org.egov.swcalculation.model.GetBillCriteria;
 import org.egov.swcalculation.model.NotificationReceiver;
 import org.egov.swcalculation.model.SMSRequest;
-import org.egov.swcalculation.model.SewerageConnection;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;
@@ -227,6 +226,7 @@ public class SWCalculationUtil {
 	 *            The requestInfo of the request
 	 * @return Localization messages for the module
 	 */
+	@SuppressWarnings("rawtypes")
 	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
 		return new JSONObject(
 				(LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo), requestInfo))
@@ -242,6 +242,7 @@ public class SWCalculationUtil {
 	 *            The localization messages
 	 * @return message for the specific code
 	 */
+	@SuppressWarnings("unchecked")
 	private String getMessageTemplate(String notificationCode, String localizationMessage) {
 		String path = "$..messages[?(@.code==\"{}\")].message";
 		path = path.replace("{}", notificationCode);
