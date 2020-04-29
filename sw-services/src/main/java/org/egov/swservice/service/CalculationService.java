@@ -2,12 +2,12 @@ package org.egov.swservice.service;
 
 import java.util.Arrays;
 import java.util.List;
+
 import org.egov.swservice.model.CalculationCriteria;
 import org.egov.swservice.model.CalculationReq;
 import org.egov.swservice.model.CalculationRes;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -112,12 +112,6 @@ public class DiffService {
 		if (CollectionUtils.isEmpty(changes))
 			return Collections.emptyList();
 		List<String> classRemoved = new LinkedList<>();
-		// changes.forEach(change -> {
-		// if (change.getPropertyName().equalsIgnoreCase(VARIABLE_ACTIVE)
-		// || change.getPropertyName().equalsIgnoreCase(VARIABLE_USERACTIVE)) {
-		// classRemoved.add(getObjectClassName(change.getAffectedObject().toString()));
-		// }
-		// });
 		return classRemoved;
 	}
 }

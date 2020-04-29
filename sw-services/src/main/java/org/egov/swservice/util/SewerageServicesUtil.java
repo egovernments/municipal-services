@@ -64,10 +64,6 @@ public class SewerageServicesUtil {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
-
-	private String tenantId = "tenantId=";
-	private String mobileNumber = "mobileNumber=";
-	private String propertyIds = "propertyIds=";
 	private String URL = "url";
 
 	/**
@@ -142,10 +138,6 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		// if ((sewerageConnectionSearchCriteria.getTenantId() == null
-		// || sewerageConnectionSearchCriteria.getTenantId().isEmpty())) {
-		// throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-		// }
 		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
 			return Collections.emptyList();
 		}
