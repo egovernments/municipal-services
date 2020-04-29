@@ -12,7 +12,9 @@ import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @Slf4j
@@ -33,17 +35,18 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
-	public List<String> fetchPropertyIds(PropertyCriteria criteria){
+	public Set<String> fetchPropertyIds(PropertyCriteria criteria){
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
 
-		return jdbcTemplate.query("SELECT propertyid from eg_pt_property_v2 ORDER BY createdtime offset " +
+		List<String> ids = jdbcTemplate.query("SELECT propertyid from eg_pt_property_v2 ORDER BY createdtime offset " +
 						" ? " +
 						"limit ? ",
 				preparedStmtList.toArray(),
 				new SingleColumnRowMapper<>(String.class));
+		return new HashSet<>(ids);
 	}
 	
 	public List<Property> getPropertiesPlainSearch(PropertyCriteria criteria){

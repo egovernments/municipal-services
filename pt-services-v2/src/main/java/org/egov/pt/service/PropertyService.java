@@ -111,12 +111,18 @@ public class PropertyService {
         return properties;
     }
 
-    List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
+    private List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
 
         if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
             criteria.setLimit(config.getMaxSearchLimit());
 
-        List<String> ids = repository.fetchPropertyIds(criteria);
+        Set<String> ids = null;
+
+        if(criteria.getIds() != null && !criteria.getIds().isEmpty())
+            ids = criteria.getIds();
+        else
+            ids = repository.fetchPropertyIds(criteria);
+
         if(ids.isEmpty())
             return Collections.emptyList();
 
