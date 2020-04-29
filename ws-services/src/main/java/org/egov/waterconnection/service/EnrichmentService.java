@@ -2,7 +2,6 @@ package org.egov.waterconnection.service;
 
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -59,10 +58,6 @@ public class EnrichmentService {
 	
 	@Autowired
 	private WaterDaoImpl waterDao;
-	
-	@Autowired
-	private PdfFileStoreService pdfFileStroeService;
-	
 	
 
 	/**
