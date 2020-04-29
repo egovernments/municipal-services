@@ -4,30 +4,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.egov.mdms.model.MdmsResponse;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
-import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.BillingSlab;
 import org.egov.wscalculation.model.DemandNotificationObj;
 import org.egov.wscalculation.model.EmailRequest;
 import org.egov.wscalculation.model.NotificationReceiver;
 import org.egov.wscalculation.model.SMSRequest;
 import org.egov.wscalculation.util.NotificationUtil;
-import org.egov.wscalculation.util.WSCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
 @Service
-@Slf4j
 public class DemandNotificationService {
 
 	@Autowired

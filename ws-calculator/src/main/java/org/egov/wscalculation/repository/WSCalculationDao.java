@@ -2,7 +2,6 @@ package org.egov.wscalculation.repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.egov.wscalculation.model.MeterConnectionRequest;
 import org.egov.wscalculation.model.MeterReading;

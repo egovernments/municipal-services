@@ -18,9 +18,6 @@ public class EnrichmentService {
 
 	public void enrichMeterReadingRequest(MeterConnectionRequest meterConnectionRequest) {
 		meterConnectionRequest.getMeterReading().setId(UUID.randomUUID().toString());
-		// meterConnectionRequest.getMeterReading().setCurrentReadingDate(Instant.now().getEpochSecond()
-		// * 1000);
-		// setIdgenIds(meterConnectionRequest);
 		if (meterConnectionRequest.getMeterReading().getLastReadingDate() == null
 				|| meterConnectionRequest.getMeterReading().getLastReadingDate() == 0) {
 			Long lastReadingDate = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30);

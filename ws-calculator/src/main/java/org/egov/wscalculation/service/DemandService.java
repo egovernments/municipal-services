@@ -79,7 +79,7 @@ public class DemandService {
 	private DemandRepository demandRepository;
     
     @Autowired
-    private  WSCalculationDao waterCalculatorDao;
+    private WSCalculationDao waterCalculatorDao;
     
     @Autowired
     private CalculatorUtil calculatorUtils;
@@ -168,12 +168,6 @@ public class DemandService {
 
 			if (calculation.getWaterConnection() != null)
 				connection = calculation.getWaterConnection();
-
-			// else if (calculation != null)
-			// connection = utils.getConnection(requestInfo,
-			// calculation.getWaterConnection().getApplicationNo(),
-			// calculation.getTenantId());
-
 			if (connection == null)
 				throw new CustomException("INVALID_WATER_CONNECTION",
 						"Demand cannot be generated for "
@@ -199,18 +193,9 @@ public class DemandService {
 			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
 			BigDecimal minimumPaybleAmount = isForConnectionNO == true ? configs.getMinimumPayableAmount() : calculation.getTotalAmount();
 			String businessService = isForConnectionNO == true ? configs.getBusinessService() : WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
-		
-//			@SuppressWarnings("unchecked")
-//			Map<String, Map<String, Object>> financialYearMaster = (Map<String, Map<String, Object>>) masterMap
-//					.get(WSCalculationConstant.FINANCIALYEAR_MASTER_KEY);
-//
-//			Map<String, Object> finYearMap = financialYearMaster.get(assessmentYear);
-//			Long fromDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_STARTING_DATE);
-//			Long toDate = (Long) finYearMap.get(WSCalculationConstant.FINANCIAL_YEAR_ENDING_DATE);
-//			Long billExpiryTime = System.currentTimeMillis() + configs.getDemandBillExpiryTime();
 
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
-			
+
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(minimumPaybleAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
 					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(businessService)
@@ -285,8 +270,6 @@ public class DemandService {
 	private void addRoundOffTaxHead(String tenantId, List<DemandDetail> demandDetails) {
 		BigDecimal totalTax = BigDecimal.ZERO;
 
-		DemandDetail prevRoundOffDemandDetail = null;
-		
 		BigDecimal previousRoundOff = BigDecimal.ZERO;
 
 		/*
@@ -374,20 +357,20 @@ public class DemandService {
 	 * @param requestInfo
 	 * @return List of Demand
 	 */
-	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCodes,
-			RequestInfo requestInfo) {
-		String uri = getDemandSearchURLForUpdate().toString();
-		uri = uri.replace("{1}", tenantId);
-		uri = uri.replace("{2}", configs.getBusinessService());
-		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
-		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
-				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		try {
-			return mapper.convertValue(result, DemandResponse.class).getDemands();
-		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
-		}
-	}
+//	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCodes,
+//			RequestInfo requestInfo) {
+//		String uri = getDemandSearchURLForUpdate().toString();
+//		uri = uri.replace("{1}", tenantId);
+//		uri = uri.replace("{2}", configs.getBusinessService());
+//		uri = uri.replace("{3}", StringUtils.join(consumerCodes, ','));
+//		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
+//				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+//		try {
+//			return mapper.convertValue(result, DemandResponse.class).getDemands();
+//		} catch (IllegalArgumentException e) {
+//			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
+//		}
+//	}
 
 	
 	/**
@@ -539,21 +522,6 @@ public class DemandService {
 			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 		});
-//		for (String consumerCode : getBillCriteria.getConsumerCodes()) {
-//			Demand demand = consumerCodeToDemandMap.get(consumerCode);
-//			if (demand == null)
-//				throw new CustomException(WSCalculationConstant.EMPTY_DEMAND_ERROR_CODE,
-//						"No demand found for the consumerCode: " + consumerCode);
-//
-//			if (demand.getStatus() != null
-//					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
-//				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
-//						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
-//			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap, taxPeriods);
-//			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
-//			demandsToBeUpdated.add(demand);
-//		}
-
 		/**
 		 * Call demand update in bulk to update the interest or penalty
 		 */
