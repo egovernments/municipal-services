@@ -37,6 +37,9 @@ public class WaterFieldValidator implements WaterActionValidator {
 				if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getRoadType())) {
 					errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 				}
+				if (waterConnectionRequest.getWaterConnection().getRoadCuttingArea() == null) {
+					errorMap.put("INVALID_ROAD_CUTTING_AREA", "Road cutting area should not be empty");
+				}
 			}
 		}
 		if (!errorMap.isEmpty())

@@ -42,7 +42,7 @@ public class MDMSValidator {
 	private String mdmsEndpoint;
 
 	public void validateMasterData(SewerageConnectionRequest request) {
-		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)){
+		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION_CONST)){
 		Map<String, String> errorMap = new HashMap<>();
 		List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_Connection_Type));
 		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));

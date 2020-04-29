@@ -443,7 +443,8 @@ public class EstimationService {
 	private BigDecimal getChargeForRoadCutting(Map<String, Object> masterData, String roadType, Float roadCuttingArea) {
 		JSONArray roadSlab = (JSONArray) masterData.getOrDefault(SWCalculationConstant.SC_ROADTYPE_MASTER, null);
 		BigDecimal charge = BigDecimal.ZERO;
-		BigDecimal cuttingArea = new BigDecimal(roadCuttingArea.toString());
+		BigDecimal cuttingArea = new BigDecimal(
+				roadCuttingArea == null ? BigDecimal.ZERO.toString() : roadCuttingArea.toString());
 		JSONObject masterSlab = new JSONObject();
 		if (roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);

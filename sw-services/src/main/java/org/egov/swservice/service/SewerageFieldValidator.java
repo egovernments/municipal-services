@@ -31,6 +31,9 @@ public class SewerageFieldValidator implements SewerageActionValidator {
 				if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getRoadType())) {
 					errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
 				}
+				if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getRoadCuttingArea())) {
+					errorMap.put("INVALID_ROAD_CUTTING_AREA", "Road cutting area should not be empty");
+				}
 			}
 		}
 		if (!errorMap.isEmpty())
