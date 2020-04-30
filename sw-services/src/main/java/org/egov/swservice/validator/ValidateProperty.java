@@ -55,13 +55,16 @@ public class ValidateProperty {
 	public void enrichPropertyForSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		if (isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
 			List<Property> propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
-			if (!CollectionUtils.isEmpty(propertyList) && StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
+			if (CollectionUtils.isEmpty(propertyList)) {
+				throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY",
+						"Sewerage connection cannot be enriched without property");
+			}
+			if (StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
 				throw new CustomException("INVALID_SEWERAGE_CONNECTION_PROPERTY_USAGE_TYPE",
 						"Sewerage connection cannot be enriched without property usage type");
 			}
 			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
-		}
-		else {
+		} else {
 			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for sewerage connection");
 		}
 	}

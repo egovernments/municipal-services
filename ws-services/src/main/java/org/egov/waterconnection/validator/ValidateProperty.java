@@ -34,35 +34,35 @@ public class ValidateProperty {
 	 * @return true if property id is present otherwise return false
 	 */
 	public boolean isPropertyIdPresent(WaterConnectionRequest waterConnectionRequest) {
-		Property property = waterConnectionRequest.getWaterConnection().getProperty();
-		if (StringUtils.isEmpty(property.getPropertyId())) {
+		if (waterConnectionRequest.getWaterConnection().getProperty() == null
+				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()))
 			return false;
-		}
 		return true;
 	}
 	
 	
-	
+	/**
+	 * 
+	 * @param waterConnectionRequest WaterConnectionRequest
+	 */
 	public void enrichPropertyForWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		List<Property> propertyList;
 		if (isPropertyIdPresent(waterConnectionRequest)) {
-			propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
-		} else {
-			throw new CustomException("PROPERTY_NOT_FOUND",
-					"No property found for water connection");
-		}
-	
-		if (!CollectionUtils.isEmpty(propertyList)) {
+			List<Property> propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
+			if (CollectionUtils.isEmpty(propertyList)) {
+				throw new CustomException("INVALID WATER CONNECTION PROPERTY",
+						"Water connection cannot be enriched without property");
+			}
 			if (StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
 				throw new CustomException("INVALID WATER CONNECTION PROPERTY USAGE TYPE",
 						"Water connection cannot be enriched without property usage type");
 			}
 			waterConnectionRequest.getWaterConnection().setProperty(propertyList.get(0));
-		} else {
-			throw new CustomException("INVALID WATER CONNECTION PROPERTY",
-					"Water connection cannot be enriched without property");
+
 		}
-		
+		else {
+			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for water connection");
+		}
+
 	}
 	
 }
