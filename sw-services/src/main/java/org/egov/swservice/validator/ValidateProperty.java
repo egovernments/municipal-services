@@ -34,38 +34,35 @@ public class ValidateProperty {
 			throw new CustomException("INVALID PROPERTY", "SewerageConnection cannot be updated without tenantId");
 		}
 	}
-
-	/**
-	 * 
-	 * @param sewarageConnectionRequest
-	 *            SewarageConnectionRequest is request to be validated against
-	 *            property ID
-	 * @return true if property id is present otherwise return false
-	 */
-
+	
+	
+   /**
+    * 
+    * @param sewerageConnectionRequest SewarageConnectionRequest is request to be validated against property ID
+    * @return true if property id is present otherwise return false
+    */
 	public boolean isPropertyIdPresentForSewerage(SewerageConnectionRequest sewerageConnectionRequest) {
-		Property property = sewerageConnectionRequest.getSewerageConnection().getProperty();
-		if (StringUtils.isEmpty(property.getPropertyId())) {
+		if (sewerageConnectionRequest.getSewerageConnection().getProperty() == null
+				|| StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId()))
 			return false;
-		}
 		return true;
 	}
 
+	/**
+	 * 
+	 * @param sewerageConnectionRequest SewarageConnectionRequest
+	 */
 	public void enrichPropertyForSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		List<Property> propertyList;
 		if (isPropertyIdPresentForSewerage(sewerageConnectionRequest)) {
-			propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
-			if(!CollectionUtils.isEmpty(propertyList)) {
-				if (StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
-					throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
-							"Sewerage connection cannot be enriched without property usage type");
-				}
-				sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
+			List<Property> propertyList = sewerageServiceUtil.propertySearch(sewerageConnectionRequest);
+			if (!CollectionUtils.isEmpty(propertyList) && StringUtils.isEmpty(propertyList.get(0).getUsageCategory())) {
+				throw new CustomException("INVALID_SEWERAGE_CONNECTION_PROPERTY_USAGE_TYPE",
+						"Sewerage connection cannot be enriched without property usage type");
 			}
-		} else {
-//			propertyList = sewerageServiceUtil.createPropertyRequest(sewerageConnectionRequest);
-			throw new CustomException("PROPERTY_NOT_FOUND",
-					"No property found for sewerage connection");
+			sewerageConnectionRequest.getSewerageConnection().setProperty(propertyList.get(0));
+		}
+		else {
+			throw new CustomException("PROPERTY_NOT_FOUND", "No property found for sewerage connection");
 		}
 	}
 
