@@ -490,6 +490,8 @@ public class PaymentNotificationService {
 	private String getCustomizedOfflinePaymentMessage(String message, Map<String, String> valMap) {
 		message = message.replace("<amount>", valMap.get("amountPaid"));
 		message = message.replace("<insert mode of payment>", valMap.get("paymentMode"));
+		message = message.replace("<insert Property Tax Assessment ID>", valMap.get("propertyId"));
+		message = message.replace("<tenantId>", valMap.get("tenantId"));
 		message = message.replace("<Enter pending amount>", valMap.get("amountDue"));
 		message = message.replace("<pay_link>", "$paylink");
 		// message = message.replace("<Insert FY>",valMap.get("financialYear"));
