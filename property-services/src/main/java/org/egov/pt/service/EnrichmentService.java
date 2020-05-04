@@ -225,6 +225,8 @@ public class EnrichmentService {
 					}
 				});
 		});
+		 AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
+		 property.setAuditDetails(auditDetails);
 	}
 
 	/**
