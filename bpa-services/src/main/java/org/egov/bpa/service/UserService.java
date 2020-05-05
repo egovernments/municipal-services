@@ -20,6 +20,7 @@ import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.LandInfo;
 import org.egov.bpa.web.model.LandRequest;
 import org.egov.bpa.web.model.OwnerInfo;
+import org.egov.bpa.web.model.UserInfo;
 import org.egov.bpa.web.model.user.CreateUserRequest;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.user.UserSearchRequest;
@@ -53,19 +54,19 @@ public class UserService {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		Role role = getCitizenRole();
 
-		bpa.getOwners().forEach(owner -> {
+		bpa.getLandInfo().getOwners().forEach(owner -> {
 			if (owner.getUuid() == null) {
 				addUserDefaultFields(bpa.getTenantId().split("\\.")[0], role, owner);
 				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 						.append(config.getUserCreateEndpoint());
 				setUserName(owner);
-				owner.setType(BPAConstants.CITIZEN);
+				owner.setOwnerType(BPAConstants.CITIZEN);
 				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 				if (userDetailResponse.getUser().get(0).getUuid() == null) {
 					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
 				}
 				log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
-				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
+//				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
 				setOwnerFields(owner, userDetailResponse, requestInfo);
 			} else {
 				if(owner.getTenantId() ==null) {
@@ -93,11 +94,11 @@ public class UserService {
 	 * @param userFromSearchResult
 	 *            The current user details according to searcvh
 	 */
-	private void addNonUpdatableFields(User user, User userFromSearchResult) {
-		user.setUserName(userFromSearchResult.getUserName());
+	private void addNonUpdatableFields(UserInfo user, UserInfo userFromSearchResult) {
+		/*user.setUserName(userFromSearchResult.getUserName());
 		user.setId(userFromSearchResult.getId());
 		user.setActive(userFromSearchResult.getActive());
-		user.setPassword(userFromSearchResult.getPassword());
+		user.setPassword(userFromSearchResult.getPassword());*/
 	}
 
 	/**
@@ -110,17 +111,19 @@ public class UserService {
 	 * @return The search response from the user service
 	 */
 	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
+		
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
 		
-		if (owner.getId() != null)
-			userSearchRequest.setId(Arrays.asList(owner.getId().toString()));
+		if (owner.getUuid() != null)
+			userSearchRequest.setId(Arrays.asList(owner.getUuid().toString()));
 		
 		if (owner.getUuid() != null)
 			userSearchRequest.setUuid(Arrays.asList(owner.getUuid()));
 		
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
+//		return null;
 	}
 
 	/**
@@ -145,12 +148,12 @@ public class UserService {
 	 */
 	private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse, RequestInfo requestInfo) {
 		owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-		owner.setId(userDetailResponse.getUser().get(0).getId());
+//		owner.setId(userDetailResponse.getUser().get(0).getId());
 		owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
-		owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+		/*owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
 		owner.setCreatedDate(System.currentTimeMillis());
 		owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
-		owner.setLastModifiedDate(System.currentTimeMillis());
+		owner.setLastModifiedDate(System.currentTimeMillis());*/
 	}
 
 	/**
@@ -164,10 +167,10 @@ public class UserService {
 	 *            The user whose fields are to be set
 	 */
 	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner) {
-		owner.setActive(true);
+//		owner.setActive(true);
 		owner.setTenantId(tenantId);
-		owner.setRoles(Collections.singletonList(role));
-		owner.setType(BPAConstants.CITIZEN);
+//		owner.setRoles(Collections.singletonList(role));
+//		owner.setType(BPAConstants.CITIZEN);
 	}
 
 	/**
@@ -187,9 +190,9 @@ public class UserService {
 		 List<String> ids = new ArrayList<String>();
 		 List<String> uuids = new ArrayList<String>();
 		 bpas.forEach(bpa -> {
-			 bpa.getOwners().forEach(owner->{
-				 if (owner.getId() != null)
-					 ids.add(owner.getId().toString());
+			 bpa.getLandInfo().getOwners().forEach(owner->{
+				 if (owner.getUuid() != null)
+					 ids.add(owner.getUuid().toString());
 					
 					if (owner.getUuid() != null)
 						uuids.add(owner.getUuid().toString());
@@ -304,8 +307,8 @@ public class UserService {
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
-		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
-			userSearchRequest.setUuid(criteria.getOwnerIds());
+		/*if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			userSearchRequest.setUuid(criteria.getOwnerIds());*/
 		return userSearchRequest;
 	}
 

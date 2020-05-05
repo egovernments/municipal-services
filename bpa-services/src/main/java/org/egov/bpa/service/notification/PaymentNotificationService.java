@@ -11,11 +11,11 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.EventRequest;
+import org.egov.bpa.web.model.SMSRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -99,7 +99,7 @@ public class PaymentNotificationService {
 
 				String message = "Dear <1>, The payment for you application with the application no as: "
 						+ bpa.getApplicationNo() + " is done Successfully. Waiting for Docverification.";
-				bpa.getOwners().forEach(owner -> {
+				bpa.getLandInfo().getOwners().forEach(owner -> {
 					if (owner.getMobileNumber() != null)
 						mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 				});
@@ -178,7 +178,7 @@ public class PaymentNotificationService {
 
 		BPASearchCriteria searchCriteria = new BPASearchCriteria();
 		List<String> codes = Arrays.asList(consumerCode);
-		searchCriteria.setApplicationNos(codes);
+		searchCriteria.setApplicationNo(codes);
 		searchCriteria.setTenantId(tenantId);
 		List<BPA> bpas = bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
 

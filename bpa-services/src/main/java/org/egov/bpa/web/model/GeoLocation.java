@@ -18,12 +18,12 @@ import lombok.Setter;
 @Builder
 public class GeoLocation {
 	@JsonProperty("latitude")
-	  private Double latitude = null;
+	  private Double latitude;
 
 	  @JsonProperty("longitude")
-	  private Double longitude = null;
+	  private Double longitude;
 
 	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails = null;
+	  private Object additionalDetails;
 
 }

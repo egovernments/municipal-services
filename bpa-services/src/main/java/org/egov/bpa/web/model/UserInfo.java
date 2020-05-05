@@ -21,30 +21,30 @@ import lombok.Setter;
 @Builder
 public class UserInfo {
 	  @JsonProperty("tenantId")
-	  private String tenantId = null;
+	  private String tenantId;
 
 	  @JsonProperty("uuid")
-	  private String uuid = null;
+	  private String uuid;
 
 	  @JsonProperty("userName")
-	  private String userName = null;
+	  private String userName;
 
 	  @JsonProperty("password")
-	  private String password = null;
+	  private String password;
 
 	  @JsonProperty("idToken")
-	  private String idToken = null;
+	  private String idToken;
 
 	  @JsonProperty("mobile")
-	  private String mobile = null;
+	  private String mobile;
 
 	  @JsonProperty("email")
-	  private String email = null;
+	  private String email;
 
 	  @JsonProperty("primaryrole")
 	  private List<Role> primaryrole = new ArrayList<Role>();
 
 	  @JsonProperty("additionalroles")
-	  private List<TenantRole> additionalroles = null;
+	  private List<TenantRole> additionalroles;
 
 }

@@ -25,16 +25,22 @@ public class BPASearchCriteria {
 
 
 	    @JsonProperty("edcrNumber")
-	    private String edcrNumber;
+	    private List<String> edcrNumber;
 
 	    @JsonProperty("applicationNo")
-	    private String applicationNo;
+	    private List<String> applicationNo;
 	    
 	    @JsonProperty("approvalNo")
-	    private String approvalNo;
+	    private List<String> approvalNo;
 
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;
+
+	    @JsonProperty("offset")
+	    private Integer offset;
+
+	    @JsonProperty("limit")
+	    private Integer limit;
 
 		
 	    public boolean isEmpty() {

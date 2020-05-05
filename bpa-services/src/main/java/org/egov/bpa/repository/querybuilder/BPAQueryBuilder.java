@@ -76,25 +76,25 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
-		List<String> edcrNumbers = criteria.getEdcrNumbers();
+		List<String> edcrNumbers = criteria.getEdcrNumber();
 		if (!CollectionUtils.isEmpty(edcrNumbers)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
 			addToPreparedStatement(preparedStmtList, edcrNumbers);
 		}
 
-		List<String> applicationNos = criteria.getApplicationNos();
+		List<String> applicationNos = criteria.getApplicationNo();
 		if (!CollectionUtils.isEmpty(applicationNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos)).append(")");
 			addToPreparedStatement(preparedStmtList, applicationNos);
 		}
 		
-		List<String> permitNos = criteria.getPermitNos();
-		if (!CollectionUtils.isEmpty(permitNos)) {
+		List<String> approvalNo = criteria.getApprovalNo();
+		if (!CollectionUtils.isEmpty(approvalNo)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.permitorderno IN (").append(createQuery(permitNos)).append(")");
-			addToPreparedStatement(preparedStmtList, permitNos);
+			builder.append(" bpa.permitorderno IN (").append(createQuery(approvalNo)).append(")");
+			addToPreparedStatement(preparedStmtList, approvalNo);
 		}
 
 		if (criteria.getMobileNumber() != null) {
@@ -102,7 +102,7 @@ public class BPAQueryBuilder {
 			builder.append(" bpaowner.mobileNumber = ? ");
 			preparedStmtList.add(criteria.getMobileNumber());
 
-		} else if (criteria.getCreatedBy() != null) {
+		} /*else if (criteria.getCreatedBy() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" ( bpa.createdby = ? ");
 			preparedStmtList.add(criteria.getCreatedBy());
@@ -127,7 +127,7 @@ public class BPAQueryBuilder {
 		if(criteria.getOrderGeneratedDate() != null){
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.orderGeneratedDate = ").append(criteria.getOrderGeneratedDate());
-		}
+		}*/
 		
 		addClauseIfRequired(preparedStmtList, builder);
 		builder.append(" bpaowner.active = TRUE"); // To get the active owners

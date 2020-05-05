@@ -118,7 +118,7 @@ public class BPAService {
 			}
 
 			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
-				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
+//				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			}
 
 			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
@@ -189,7 +189,7 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
 		}
 
-		bpa.getOwners().forEach(owner -> {
+		bpa.getLandInfo().getOwners().forEach(owner -> {
 			if (owner.getOwnerType() == null) {
 				owner.setOwnerType("NONE");
 			}
@@ -205,17 +205,17 @@ public class BPAService {
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 
-		if (bpa.getAction() != null && (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
-				|| bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
+		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
+				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
 
-			if (bpa.getComment() == null || bpa.getComment().isEmpty()) {
+			if (bpa.getWorkflow().getComments() == null || bpa.getWorkflow().getComments().isEmpty()) {
 				throw new CustomException("BPA_UPDATE_ERROR_COMMENT_REQUIRED",
 						"Comment is mandaotory, please provide the comments ");
 			}
 
 		} else {
 			userService.createUser(bpaRequest);
-			if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
+			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 			        actionValidator.validateUpdateRequest(bpaRequest, businessService);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 					workflowService.getCurrentState(bpa.getStatus(), businessService));
@@ -230,10 +230,10 @@ public class BPAService {
 
 		log.info("Bpa status is : " + bpa.getStatus());
 
-		if (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
+		if (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
 
 			// generate sanction fee demand as well for the low risk application
-			if (bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+			if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
 				calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 			} else {
 				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
@@ -241,15 +241,15 @@ public class BPAService {
 		}
 
 		// Generate the sanction Demand
-		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+		/*if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
-		}
+		}*/
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
 
-		List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive())
+		/*List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive())
 				.collect(Collectors.toList());
 		bpaRequest.getBPA().getOwners().clear();
-		bpaRequest.getBPA().setOwners(activeOwners);
+		bpaRequest.getBPA().setOwners(activeOwners);*/
 
 		return bpaRequest.getBPA();
 

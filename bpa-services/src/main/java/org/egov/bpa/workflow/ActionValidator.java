@@ -13,6 +13,7 @@ import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.LandRequest;
 import org.egov.bpa.web.model.workflow.Action;
 import org.egov.bpa.web.model.workflow.BusinessService;
+import org.egov.bpa.web.model.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.google.common.util.concurrent.Service.State;
 
 @Component
 public class ActionValidator {
@@ -97,7 +97,7 @@ public class ActionValidator {
 				});
 			});
 
-			if (!validActions.contains(bpa.getAction())) {
+			if (!validActions.contains(bpa.getWorkflow().getAction())) {
 				errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
 			}
 		}else {
@@ -124,7 +124,7 @@ public class ActionValidator {
 			if(bpa.getId() == null) {
 				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of Application cannot be null");
 			}
-			if(bpa.getAddress() == null) {
+			/*if(bpa.getAddress() == null) {
 				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of address cannot be null");
 			}
 			if(!CollectionUtils.isEmpty(bpa.getOwners())) {
@@ -144,7 +144,7 @@ public class ActionValidator {
 	                if(tradeUnit.getId()==null)
 	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of tradeUnit cannot be null");
 	            });
-			}
+			}*/
 			 if(!CollectionUtils.isEmpty(bpa.getDocuments())){
 				 bpa.getDocuments().forEach(document -> {
                      if(document.getId()==null)

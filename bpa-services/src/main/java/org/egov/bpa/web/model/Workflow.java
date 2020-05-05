@@ -20,15 +20,15 @@ import lombok.Setter;
 @Builder
 public class Workflow {
 	 @JsonProperty("action")
-	  private String action = null;
+	  private String action;
 
 	  @JsonProperty("assignes")
-	  private List<String> assignes = null;
+	  private List<String> assignes;
 
 	  @JsonProperty("comments")
-	  private String comments = null;
+	  private String comments;
 
 	  @JsonProperty("varificationDocuments")
-	  private List<Document> varificationDocuments = null;
+	  private List<Document> varificationDocuments;
 
 }

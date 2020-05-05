@@ -34,9 +34,6 @@ public class LandInfo {
 	  @JsonProperty("tenantId")
 	  private String tenantId;
 
-	  @JsonProperty("accountId")
-	  private String accountId;
-
 	  @JsonProperty("status")
 	  private Status status;
 
@@ -66,4 +63,7 @@ public class LandInfo {
 
 	  @JsonProperty("additionalDetails")
 	  private Object additionalDetails;
+
+	  @JsonProperty("auditDetails")
+	  private AuditDetails auditDetails;
 }

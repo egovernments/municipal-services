@@ -39,7 +39,7 @@ public class MDMSValidator {
 
 		validateIfMasterPresent(masterArray, masterData);
 
-		bpaRequest.getBPA().getOwners().forEach(owner -> {
+		/*bpaRequest.getBPA().getOwners().forEach(owner -> {
 			if (owner.getOwnerType() == null) {
 				owner.setOwnerType("NONE");
 			}
@@ -77,7 +77,7 @@ public class MDMSValidator {
 			errorMap.put("INVALID USAGES", "The Usages '" + bpaRequest.getBPA().getUsages() + "' does not exists");
 
 		if (!CollectionUtils.isEmpty(errorMap))
-			throw new CustomException(errorMap);
+			throw new CustomException(errorMap);*/
 	}
 
 

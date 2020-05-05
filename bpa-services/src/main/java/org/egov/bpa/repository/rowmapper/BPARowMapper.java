@@ -8,14 +8,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.bpa.web.models.Address;
-import org.egov.bpa.web.models.AuditDetails;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.Boundary;
-import org.egov.bpa.web.models.Document;
-import org.egov.bpa.web.models.GeoLocation;
-import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.Unit;
+import org.egov.bpa.web.model.Address;
+import org.egov.bpa.web.model.AuditDetails;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.Boundary;
+import org.egov.bpa.web.model.Document;
+import org.egov.bpa.web.model.GeoLocation;
+import org.egov.bpa.web.model.OccupancyType;
+import org.egov.bpa.web.model.OwnerInfo;
+import org.egov.bpa.web.model.Unit;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -71,19 +72,18 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno"))
 						.street(rs.getString("street")).tenantId(tenantId).build();
 
-				currentbpa = BPA.builder().auditDetails(auditdetails).applicationNo(applicationNo)
-						.status(rs.getString("status")).tenantId(tenantId).permitOrderNo(permitNumber)
-						.edcrNumber(rs.getString("edcrnumber")).serviceType(rs.getString("servicetype"))
-						.applicationType(rs.getString("applicationType"))
-						.riskType(BPA.RiskTypeEnum.fromValue(rs.getString("riskType")))
-						.ownershipCategory(rs.getString("ownershipcategory")).holdingNo(rs.getString("holdingNo"))
-						.occupancyType(rs.getString("occupancyType")).subOccupancyType(rs.getString("subOccupancyType"))
-						.usages(rs.getString("usages")).govtOrQuasi(rs.getString("govtOrQuasi"))
-						.registrationDetails(rs.getString("registrationDetails")).remarks(rs.getString("remarks"))
-						.address(address).id(id).validityDate(rs.getLong("validityDate"))
-						.additionalDetails(additionalDetails).orderGeneratedDate(rs.getLong("orderGeneratedDate"))
-						.tradeType(rs.getString("tradeType"))
-						.applicationDate(rs.getLong("applicationDate"))
+				currentbpa = BPA.builder()
+						.auditDetails(auditdetails)
+						.applicationNo(applicationNo)
+						.status(BPA.StatusEnum.fromValue(rs.getString("status")))
+						.tenantId(tenantId)
+						.approvalNo(rs.getString("approvalNo"))
+						.edcrNumber(rs.getString("edcrnumber"))
+						.riskType(rs.getString("riskType"))
+						.accountId(rs.getString("accountId"))
+						.landId(rs.getString("landId"))
+						.id(id)
+						.additionalDetails(additionalDetails)
 						.build();
 
 				buildingMap.put(id, currentbpa);
@@ -116,16 +116,21 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		}
 
 		String unitId = rs.getString("bpa_un_id");
-		if (unitId != null) {
+		/*if (unitId != null) {
 			Unit unit = Unit.builder()
 					.id(rs.getString("bpa_un_id"))
+					.tenantId(rs.getString("tenantId"))
+					.floorNo(rs.getString("floorNo"))
+					.unitType(rs.getString("unitType"))
 					.usageCategory(rs.getString("usageCategory"))
-					.blockIndex(rs.getInt("blockIndex"))
-					.auditDetails(auditdetails)
+//					.occupancyType(rs.getString("occupancyType"))
+					.occupancyDate(rs.getLong("occupancyDate"))
+					.additionalDetails(rs.getString("additionalDetails"))
+					.floorNo(rs.getString("floorNo"))
 					.tenantId(tenantId).build();
 			bpa.addUnitsItem(unit);
 		}
-		
+		*/
 		/*String blockId = rs.getString("bpablockid");
 			if (blockId != null) {
 					BPABlocks block = BPABlocks.builder()
@@ -139,7 +144,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		
 		
 		String ownerId = rs.getString("bpaowner_uuid");
-		if (ownerId != null) {
+		/*if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
 			Double ownerShipPercentage = (Double) rs.getObject("ownershippercentage");
 
@@ -152,13 +157,13 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					.relationship(OwnerInfo.RelationshipEnum.fromValue(rs.getString("relationship")))
 					.institutionId(rs.getString("institutionid")).build();
 			bpa.addOwnersItem(owner);
-		}
+		}*/
 
 		// Add owner document to the specific bpa for which it was used
 		String docowner = rs.getString("docuserid");
 		String ownerDocId = rs.getString("ownerdocid");
 
-		if (ownerDocId != null) {
+		/*if (ownerDocId != null) {
 
 			bpa.getOwners().forEach(ownerInfo -> {
 				if (docowner.equalsIgnoreCase(ownerInfo.getUuid())) {
@@ -174,13 +179,15 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 					}
 				}
 			});
-		}
+		}*/
 
 		String documentId = rs.getString("bpa_doc_id");
 		if (documentId != null) {
 			Document document = Document.builder().documentType(rs.getString("bpa_doc_documenttype"))
-					.fileStoreId(rs.getString("bpa_doc_filestore")).id(documentId).wfState(rs.getString("wfstate"))
-					.auditDetails(auditdetails).build();
+					.fileStore(rs.getString("bpa_doc_filestore"))
+					.id(documentId)
+					.additionalDetails(rs.getString("additionalDetails"))
+					.documentUid(rs.getString("documentUid")).build();
 			bpa.addDocumentsItem(document);
 		}
 	}

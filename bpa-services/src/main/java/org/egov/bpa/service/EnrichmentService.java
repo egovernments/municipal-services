@@ -69,15 +69,15 @@ public class EnrichmentService {
 		bpaRequest.getBPA().setId(UUID.randomUUID().toString());
 
 		// address
-		bpaRequest.getBPA().getAddress().setId(UUID.randomUUID().toString());
-		bpaRequest.getBPA().getAddress().setTenantId(bpaRequest.getBPA().getTenantId());
+		bpaRequest.getBPA().getLandInfo().getAddress().setId(UUID.randomUUID().toString());
+		bpaRequest.getBPA().getLandInfo().getAddress().setTenantId(bpaRequest.getBPA().getTenantId());
 
 		// units
-		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnit())) {
-			bpaRequest.getBPA().getUnit().forEach(unit -> {
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getUnit())) {
+			bpaRequest.getBPA().getLandInfo().getUnit().forEach(unit -> {
 				unit.setTenantId(bpaRequest.getBPA().getTenantId());
 				unit.setId(UUID.randomUUID().toString());
-				unit.setAuditDetails(auditDetails);
+//				unit.setAuditDetails(auditDetails);
 			});
 		}
 
@@ -90,7 +90,7 @@ public class EnrichmentService {
 			});
 
 		// owners
-		bpaRequest.getBPA().getOwners().forEach(owner -> {
+		bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
 
 			if (!CollectionUtils.isEmpty(owner.getDocuments()))
 				owner.getDocuments().forEach(document -> {
@@ -175,8 +175,8 @@ public class EnrichmentService {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
 
 			// BPA Units
-			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnit())) {
-				bpaRequest.getBPA().getUnit().forEach(unit -> {
+			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getUnit())) {
+				bpaRequest.getBPA().getLandInfo().getUnit().forEach(unit -> {
 					if (unit.getId() == null) {
 						unit.setTenantId(bpaRequest.getBPA().getTenantId());
 						unit.setId(UUID.randomUUID().toString());
@@ -185,8 +185,8 @@ public class EnrichmentService {
 			}
 
 			// BPA Owner Documents
-			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getOwners())) {
-				bpaRequest.getBPA().getOwners().forEach(owner -> {
+			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getOwners())) {
+				bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
 					if (!CollectionUtils.isEmpty(owner.getDocuments()))
 						owner.getDocuments().forEach(document -> {
 							if (document.getId() == null) {
@@ -204,18 +204,18 @@ public class EnrichmentService {
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
 				if (document.getId() == null) {
-					document.setWfState(state);
+//					document.setWfState(state);
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
 		// BPA WfDocuments
-		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getWfDocuments())) {
+		/*if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getWfDocuments())) {
 			bpaRequest.getBPA().getWfDocuments().forEach(document -> {
 				if (document.getId() == null) {
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
-		}
+		}*/
 
 	}
 
@@ -233,20 +233,22 @@ public class EnrichmentService {
 						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
-			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
+//			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
 
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
-			bpa.setValidityDate(calendar.getTimeInMillis());
+//			bpa.setValidityDate(calendar.getTimeInMillis());
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
-			bpa.setPermitOrderNo(idResponses.get(0).getId());
+//			bpa.setPermitOrderNo(idResponses.get(0).getId());
 			if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
 					&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)) {
-				Object mdmsData = bpaUtil.mDMSCall(bpaRequest);
+				
+				Object mdmsData = bpaUtil.mDMSCall(bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
-						.replace("{2}", bpa.getRiskType().toString()).replace("{3}", bpa.getServiceType())
-						.replace("{4}", bpa.getApplicationType());
+						.replace("{2}", bpa.getRiskType().toString())
+						/*.replace("{3}", bpa.getServiceType())
+						.replace("{4}", bpa.getApplicationType())*/;
 				log.info(condeitionsPath);
 
 				try {
@@ -264,9 +266,9 @@ public class EnrichmentService {
 			}
 		}
 		
-		if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
+		/*if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
 			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
-		}
+		}*/
 		
 	}
 
@@ -291,7 +293,7 @@ public class EnrichmentService {
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
 		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
 		bpas.forEach(bpa -> {
-			bpa.getOwners().forEach(owner -> {
+			bpa.getLandInfo().getOwners().forEach(owner -> {
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
 					throw new CustomException("OWNER SEARCH ERROR",
 							"The owner of the bpa " + bpa.getId() + " is not coming in user search");
@@ -321,7 +323,7 @@ public class EnrichmentService {
 	public void enrichSearchCriteriaWithAccountId(RequestInfo requestInfo, BPASearchCriteria criteria) {
 
 		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN)) {
-			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
+//			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
 		}
 
@@ -353,11 +355,11 @@ public class EnrichmentService {
 	 *            The response of user search
 	 */
 	public void enrichBPACriteriaWithOwnerids(BPASearchCriteria criteria, UserDetailResponse userDetailResponse) {
-		if (CollectionUtils.isEmpty(criteria.getOwnerIds())) {
+	/*	if (CollectionUtils.isEmpty(criteria.getOwnerIds())) {
 			Set<String> ownerids = new HashSet<>();
 			userDetailResponse.getUser().forEach(owner -> ownerids.add(owner.getUuid()));
 			criteria.setOwnerIds(new ArrayList<>(ownerids));
-		}
+		}*/
 	}
 
 	public void enrichLandCreateRequest(@Valid LandRequest landRequest, Object mdmsData) {
@@ -416,18 +418,8 @@ public class EnrichmentService {
 	public LandInfo enrichLandInfoSearch(LandInfo landInfo, @Valid LandSearchCriteria criteria,
 			RequestInfo requestInfo) {
 		// TODO Auto-generated method stub
-		List<BPARequest> bprs = new ArrayList<BPARequest>();
-		bpas.forEach(bpa -> {
-			bprs.add(new BPARequest(requestInfo, bpa));
-		});
-		if (criteria.getLimit() == null || !criteria.getLimit().equals(-1)) {
-			enrichBoundary(bprs);
-		}
-
-		UserDetailResponse userDetailResponse = userService.getUsersForLandInfo(landInfo);
-		enrichOwner(userDetailResponse, bpas); // completed
-		return bpas;
-//		return null;
+		
+		return null;
 	}
 
 	public void enrichLandUpdateRequest(@Valid LandRequest landRequest, BusinessService businessService) {
