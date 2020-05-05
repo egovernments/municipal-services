@@ -2,19 +2,19 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.RequestInfoWrapper;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.web.models.workflow.BusinessServiceResponse;
-import org.egov.bpa.web.models.workflow.ProcessInstance;
-import org.egov.bpa.web.models.workflow.ProcessInstanceResponse;
-import org.egov.bpa.web.models.workflow.State;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.bpa.web.model.workflow.BusinessService;
+import org.egov.bpa.web.model.workflow.BusinessServiceResponse;
+import org.egov.bpa.web.model.workflow.ProcessInstance;
+import org.egov.bpa.web.model.workflow.ProcessInstanceResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.Service.State;
 
 @Service
 public class WorkflowService {

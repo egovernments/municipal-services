@@ -16,17 +16,7 @@ import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.service.UserService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
-import org.egov.bpa.web.models.Action;
-import org.egov.bpa.web.models.ActionItem;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Event;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.Recepient;
-import org.egov.bpa.web.models.SMSRequest;
-import org.egov.bpa.web.models.Source;
-import org.egov.bpa.web.models.user.UserDetailResponse;
+import org.egov.bpa.web.model.BPARequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,7 +62,7 @@ public class BPANotificationService {
 		}
 		if (null != config.getIsUserEventsNotificationEnabled()) {
 			if (config.getIsUserEventsNotificationEnabled()) {
-				EventRequest eventRequest = getEvents(bpaRequest);
+				eventRequest eventRequest = getEvents(bpaRequest);
 				if (null != eventRequest)
 					util.sendEventNotification(eventRequest);
 			}

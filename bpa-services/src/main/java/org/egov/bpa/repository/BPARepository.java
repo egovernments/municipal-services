@@ -1,18 +1,20 @@
 package org.egov.bpa.repository;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.querybuilder.BPAQueryBuilder;
 import org.egov.bpa.repository.rowmapper.BPARowMapper;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Document;
-import org.egov.bpa.web.models.User;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.LandInfo;
+import org.egov.bpa.web.model.LandRequest;
+import org.egov.bpa.web.model.LandSearchCriteria;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,6 +47,10 @@ public class BPARepository {
 	 */
 	public void save(BPARequest bpaRequest) {
 		producer.push(config.getSaveTopic(), bpaRequest);
+	}
+	
+	public void saveLand(LandRequest landRequest) {
+//		producer.push(config.getSaveTopic(), landRequest);
 	}
 
 	public void update(BPARequest bpaRequest, boolean isStateUpdatable) {
@@ -91,10 +97,15 @@ public class BPARepository {
 	private void sortChildObjectsById(List<BPA> bpaData) {
 		if (CollectionUtils.isEmpty(bpaData))
 			return;
-		bpaData.forEach(bpa -> {
+		/*bpaData.forEach(bpa -> {
 			bpa.getOwners().sort(Comparator.comparing(User::getUuid));
 			if (!CollectionUtils.isEmpty(bpa.getDocuments()))
 				bpa.getDocuments().sort(Comparator.comparing(Document::getId));
-		});
+		});*/
+	}
+
+	public LandInfo getLandInfoData(@Valid LandSearchCriteria criteria) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

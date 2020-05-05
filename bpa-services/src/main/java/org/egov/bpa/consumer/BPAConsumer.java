@@ -2,10 +2,8 @@ package org.egov.bpa.consumer;
 
 import java.util.HashMap;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.service.notification.BPANotificationService;
-import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.model.BPARequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -13,6 +11,8 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

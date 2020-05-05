@@ -5,16 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.validation.Valid;
 
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -77,6 +80,7 @@ public class MDMSValidator {
 			throw new CustomException(errorMap);
 	}
 
+
 	/**
 	 * Fetches all the values of particular attribute as map of field name to
 	 * list
@@ -124,6 +128,12 @@ public class MDMSValidator {
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+
+
+	public void validateMdmsData(@Valid LandRequest landRequest, Object mdmsData) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -12,18 +12,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
-import org.egov.bpa.web.models.AuditDetails;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.idgen.IdResponse;
-import org.egov.bpa.web.models.user.UserDetailResponse;
-import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.web.model.AuditDetails;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.LandInfo;
+import org.egov.bpa.web.model.LandRequest;
+import org.egov.bpa.web.model.LandSearchCriteria;
+import org.egov.bpa.web.model.OwnerInfo;
+import org.egov.bpa.web.model.idgen.IdResponse;
+import org.egov.bpa.web.model.user.UserDetailResponse;
+import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -68,8 +73,8 @@ public class EnrichmentService {
 		bpaRequest.getBPA().getAddress().setTenantId(bpaRequest.getBPA().getTenantId());
 
 		// units
-		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnits())) {
-			bpaRequest.getBPA().getUnits().forEach(unit -> {
+		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnit())) {
+			bpaRequest.getBPA().getUnit().forEach(unit -> {
 				unit.setTenantId(bpaRequest.getBPA().getTenantId());
 				unit.setId(UUID.randomUUID().toString());
 				unit.setAuditDetails(auditDetails);
@@ -170,8 +175,8 @@ public class EnrichmentService {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
 
 			// BPA Units
-			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnits())) {
-				bpaRequest.getBPA().getUnits().forEach(unit -> {
+			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getUnit())) {
+				bpaRequest.getBPA().getUnit().forEach(unit -> {
 					if (unit.getId() == null) {
 						unit.setTenantId(bpaRequest.getBPA().getTenantId());
 						unit.setId(UUID.randomUUID().toString());
@@ -222,11 +227,6 @@ public class EnrichmentService {
 				bpa.getApplicationNo());
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
-		
-		if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
-			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
-		}
-		
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
@@ -263,6 +263,11 @@ public class EnrichmentService {
 				}
 			}
 		}
+		
+		if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
+			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
+		}
+		
 	}
 
 	public List<BPA> enrichBPASearch(List<BPA> bpas, BPASearchCriteria criteria, RequestInfo requestInfo) {
@@ -353,5 +358,80 @@ public class EnrichmentService {
 			userDetailResponse.getUser().forEach(owner -> ownerids.add(owner.getUuid()));
 			criteria.setOwnerIds(new ArrayList<>(ownerids));
 		}
+	}
+
+	public void enrichLandCreateRequest(@Valid LandRequest landRequest, Object mdmsData) {
+		
+
+		RequestInfo requestInfo = landRequest.getRequestInfo();
+		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+//		landRequest.getLandInfo().setAuditDetails(auditDetails);
+		landRequest.getLandInfo().setId(UUID.randomUUID().toString());
+
+		// address
+		landRequest.getLandInfo().getAddress().setId(UUID.randomUUID().toString());
+		landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
+
+		// units
+		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnit())) {
+			landRequest.getLandInfo().getUnit().forEach(unit -> {
+				unit.setTenantId(landRequest.getLandInfo().getTenantId());
+				unit.setId(UUID.randomUUID().toString());
+//				unit.setAuditDetails(auditDetails);
+			});
+		}
+
+		// Land info Documents
+		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getDocuments()))
+			landRequest.getLandInfo().getDocuments().forEach(document -> {
+				/*if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}*/
+			});
+
+		// owners
+		landRequest.getLandInfo().getOwners().forEach(owner -> {
+			if (!CollectionUtils.isEmpty(owner.getDocuments()))
+				owner.getDocuments().forEach(document -> {
+//					document.setId(UUID.randomUUID().toString());
+				});
+		});
+
+		//institution
+		if(landRequest.getLandInfo().getInstitution().getId()==null){
+			landRequest.getLandInfo().getInstitution().setId(UUID.randomUUID().toString());
+		}
+		
+		
+		
+		setIdgenIds(landRequest);
+//		boundaryService.getAreaType(landRequest, config.getHierarchyTypeCode());
+	}
+
+	private void setIdgenIds(@Valid LandRequest landRequest) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public LandInfo enrichLandInfoSearch(LandInfo landInfo, @Valid LandSearchCriteria criteria,
+			RequestInfo requestInfo) {
+		// TODO Auto-generated method stub
+		List<BPARequest> bprs = new ArrayList<BPARequest>();
+		bpas.forEach(bpa -> {
+			bprs.add(new BPARequest(requestInfo, bpa));
+		});
+		if (criteria.getLimit() == null || !criteria.getLimit().equals(-1)) {
+			enrichBoundary(bprs);
+		}
+
+		UserDetailResponse userDetailResponse = userService.getUsersForLandInfo(landInfo);
+		enrichOwner(userDetailResponse, bpas); // completed
+		return bpas;
+//		return null;
+	}
+
+	public void enrichLandUpdateRequest(@Valid LandRequest landRequest, BusinessService businessService) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -13,11 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.Difference;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.RequestInfoWrapper;
-import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.model.BPA;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -62,7 +58,7 @@ public class NotificationUtil {
 	 */
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
-		if (bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
+		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {

@@ -10,15 +10,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Document;
-import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.Unit;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.Document;
+import org.egov.bpa.web.model.LandRequest;
+import org.egov.bpa.web.model.LandSearchCriteria;
+import org.egov.bpa.web.model.OwnerInfo;
+import org.egov.bpa.web.model.Unit;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +47,9 @@ public class BPAValidator {
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateApplicationDocuments(bpaRequest, mdmsData, null);
-		validateUser(bpaRequest);
+//		validateUser(bpaRequest);
 	}
 
-	private void validateUser(BPARequest bpaRequest) {
-		BPA bpa = bpaRequest.getBPA();
-		bpa.getOwners().forEach(user -> {
-			if (org.springframework.util.StringUtils.isEmpty(user.getRelationship())) {
-				throw new CustomException("BPA.CREATE.USER", " Owner relation ship is mandatory " + user.toString());
-			}
-		});
-	}
 
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData, String currentState) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
@@ -137,10 +133,10 @@ public class BPAValidator {
 		if (request.getBPA().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			request.getBPA().getDocuments().forEach(document -> {
-				if (documentFileStoreIds.contains(document.getFileStoreId()))
+				if (documentFileStoreIds.contains(document.getFileStore()))
 					throw new CustomException("BPA_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
 				else
-					documentFileStoreIds.add(document.getFileStoreId());
+					documentFileStoreIds.add(document.getFileStore());
 			});
 		}
 	}
@@ -153,6 +149,7 @@ public class BPAValidator {
 	 * @param criteria
 	 *            The BPASearch Criteria
 	 */
+//TODO need to make the changes in the data
 	public void validateSearch(RequestInfo requestInfo, BPASearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && criteria.isEmpty())
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
@@ -220,6 +217,12 @@ public class BPAValidator {
 		if (criteria.getToDate() != null && criteria.getFromDate() != null
 				&& (criteria.getFromDate() > criteria.getToDate()))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "To date cannot be prior to from date");
+		
+		if (criteria.getApplicationDate() != null && (criteria.getApplicationDate() > new Date().getTime()))
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Application date cannot be a future date");
+		
+		if (criteria.getOrderGeneratedDate() != null && (criteria.getOrderGeneratedDate() > new Date().getTime()))
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Order Genarated date cannot be a future date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
@@ -421,13 +424,9 @@ public class BPAValidator {
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestQns = new ArrayList<String>();
 							validateDateTime((Map)checkListFromReq.get(i));
-							List<Map> questions = ((Map) checkListFromReq.get(i))
-									.get(BPAConstants.QUESTIONS_TYPE) != null
-											? (List<Map>) ((Map) checkListFromReq.get(i))
-													.get(BPAConstants.QUESTIONS_TYPE)
-											: null;
-							if (questions != null)
-								requestCheckList.addAll(questions);
+							requestCheckList.addAll(
+									(List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.QUESTIONS_TYPE));
+
 							if (!CollectionUtils.isEmpty(requestCheckList)) {
 								for (Map reqQn : requestCheckList) {
 									requestQns.add((String) reqQn.get(BPAConstants.QUESTION_TYPE));
@@ -493,10 +492,8 @@ public class BPAValidator {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestDocs = new ArrayList<String>();
-							List<Map> docs = ((Map) checkListFromReq.get(i)).get(BPAConstants.DOCS) != null
-									? (List<Map>) ((Map) checkListFromReq.get(i)).get(BPAConstants.DOCS) : null;
-							if (docs != null)
-								requestCheckList.addAll(docs);
+							requestCheckList
+									.addAll((List<Map>) ((Map) (checkListFromReq).get(i)).get(BPAConstants.DOCS));
 							if (!CollectionUtils.isEmpty(requestCheckList)) {
 								for (Map reqDoc : requestCheckList) {
 									String fileStoreId = ((String) reqDoc.get(BPAConstants.FILESTOREID));
@@ -578,5 +575,48 @@ public class BPAValidator {
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
 			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
 		}
+	}
+
+	
+//	land info related data...
+	
+	
+	
+	public void validateCreate(@Valid LandRequest landRequest, Object mdmsData) {
+		mdmsValidator.validateMdmsData(landRequest, mdmsData);
+		validateApplicationDocuments(landRequest, mdmsData, null);
+		validateUser(landRequest);
+		
+	}
+
+	private void validateUser(@Valid LandRequest landRequest) {
+		landRequest.getLandInfo().getOwners().forEach(owner->{
+			if (org.springframework.util.StringUtils.isEmpty(owner.getRelationship())) {
+				throw new CustomException("BPA.CREATE.USER", " Owner relation ship is mandatory " + owner.toString());
+			}
+		});		
+	}
+
+	private void validateApplicationDocuments(@Valid LandRequest landRequest, Object mdmsData, Object currentState) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void validateSearch(RequestInfo requestInfo, @Valid LandSearchCriteria criteria) {
+		// TODO Auto-generated method stub
+		String allowedParamStr = null;
+
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN))
+			allowedParamStr = config.getAllowedCitizenSearchParameters();
+		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.EMPLOYEE))
+			allowedParamStr = config.getAllowedEmployeeSearchParameters();
+		
+		List<String> allowedParams = Arrays.asList(allowedParamStr.split(","));
+		validateSearchParams(criteria, allowedParams);
+	}
+	private void validateSearchParams(@Valid LandSearchCriteria criteria, List<String> allowedParams) {
+		// TODO Auto-generated method stub
+		
 	}
 }

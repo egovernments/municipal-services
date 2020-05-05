@@ -1,5 +1,7 @@
 package org.egov.bpa.web.model;
 
+import java.util.List;
+
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
@@ -22,5 +24,5 @@ public class LandResponse {
 	  private ResponseInfo responseInfo;
 
 	  @JsonProperty("LandInfo")
-	  private LandInfo landInfo;
+	  private List<LandInfo> landInfo;
 }

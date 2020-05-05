@@ -9,19 +9,23 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.User;
-import org.egov.bpa.web.models.user.CreateUserRequest;
-import org.egov.bpa.web.models.user.UserDetailResponse;
-import org.egov.bpa.web.models.user.UserSearchRequest;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.LandInfo;
+import org.egov.bpa.web.model.LandRequest;
+import org.egov.bpa.web.model.OwnerInfo;
+import org.egov.bpa.web.model.user.CreateUserRequest;
+import org.egov.bpa.web.model.user.UserDetailResponse;
+import org.egov.bpa.web.model.user.UserSearchRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -303,5 +307,48 @@ public class UserService {
 		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
 			userSearchRequest.setUuid(criteria.getOwnerIds());
 		return userSearchRequest;
+	}
+
+	public void createUser(@Valid LandRequest landRequest) {
+		// TODO Auto-generated method stub
+		LandInfo landInfo = landRequest.getLandInfo();
+		RequestInfo requestInfo = landRequest.getRequestInfo();
+		Role role = getCitizenRole();
+
+		landInfo.getOwners().forEach(owner -> {
+			/*if (owner.getUuid() == null) {
+				addUserDefaultFields(bpa.getTenantId().split("\\.")[0], role, owner);
+				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
+						.append(config.getUserCreateEndpoint());
+				setUserName(owner);
+				owner.setType(BPAConstants.CITIZEN);
+				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+				if (userDetailResponse.getUser().get(0).getUuid() == null) {
+					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
+				}
+				log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
+				setOwnerFields(owner, userDetailResponse, requestInfo);
+			} else {
+				if(owner.getTenantId() ==null) {
+					owner.setTenantId( bpa.getTenantId());
+				}
+				UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
+				if (userDetailResponse.getUser().isEmpty())
+					throw new CustomException("INVALID USER", "The uuid " + owner.getUuid() + " does not exists");
+				StringBuilder uri = new StringBuilder(config.getUserHost());
+				uri = uri.append(config.getUserContextPath()).append(config.getUserUpdateEndpoint());
+				OwnerInfo user = new OwnerInfo();
+				user.addUserWithoutAuditDetail(owner);
+				addNonUpdatableFields(user, userDetailResponse.getUser().get(0));
+				userDetailResponse = userCall(new CreateUserRequest(requestInfo, user), uri);
+				setOwnerFields(owner, userDetailResponse, requestInfo);
+			}*/
+		});
+	}
+
+	public UserDetailResponse getUsersForLandInfo(LandInfo landInfo) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

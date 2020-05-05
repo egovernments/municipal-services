@@ -6,17 +6,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.validator.MDMSValidator;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPA.RiskTypeEnum;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.edcr.RequestInfo;
-import org.egov.bpa.web.models.edcr.RequestInfoWrapper;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.LandRequest;
+import org.egov.bpa.web.model.RequestInfo;
+import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.json.JSONObject;
@@ -60,7 +62,7 @@ public class EDCRService {
 	public void validateEdcrPlan(BPARequest request, Object mdmsData) {
 
 		String edcrNo = request.getBPA().getEdcrNumber();
-		RiskTypeEnum riskType = request.getBPA().getRiskType();
+//		RiskTypeEnum riskType = request.getBPA().getRiskType();
 		StringBuilder uri = new StringBuilder(config.getEdcrHost());
 		BPA bpa = request.getBPA();
 
@@ -157,5 +159,14 @@ public class EDCRService {
 		List<String> planReports = context.read("edcrDetail.*.planReport");
 
 		return CollectionUtils.isEmpty(planReports) ? null : planReports.get(0);
+	}
+
+	/**
+	 * the method for the landinfo which we need 
+	 * in this new requirement to validate the edcr data */
+	
+	public void validateEdcrPlan(@Valid LandRequest landRequest, Object mdmsData) {
+		// TODO Auto-generated method stub
+		
 	}
 }

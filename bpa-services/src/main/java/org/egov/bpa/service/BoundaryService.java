@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.Boundary;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.Boundary;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,9 +51,9 @@ public class BoundaryService {
 
 		LinkedList<String> localities = new LinkedList<>();
 
-		if (request.getBPA().getAddress() == null || request.getBPA().getAddress().getLocality() == null)
+		/*if (request.getBPA().getAddress() == null || request.getBPA().getAddress().getLocality() == null)
 			throw new CustomException("INVALID ADDRESS", "The address or locality cannot be null");
-		localities.add(request.getBPA().getAddress().getLocality().getCode());
+		localities.add(request.getBPA().getAddress().getLocality().getCode());*/
 
 		StringBuilder uri = new StringBuilder(config.getLocationHost());
 		uri.append(config.getLocationContextPath()).append(config.getLocationEndpoint());
@@ -88,10 +88,10 @@ public class BoundaryService {
 		// context.read(propertyIdToJsonPath
 		// .get(request.getBPA().getId()));
 		Boundary boundary = mapper.convertValue(boundaryObject.get(0), Boundary.class);
-		if (boundary.getName() == null)
+		/*if (boundary.getName() == null)
 			throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
 					+ request.getBPA().getAddress().getLocality().getCode() + " is not available");
-		request.getBPA().getAddress().setLocality(boundary);
+		request.getBPA().getAddress().setLocality(boundary);*/
 
 	}
 
@@ -106,8 +106,8 @@ public class BoundaryService {
 		Map<String, String> idToJsonPath = new LinkedHashMap<>();
 		String jsonpath = "$..boundary[?(@.code==\"{}\")]";
 
-		idToJsonPath.put(request.getBPA().getId(),
-				jsonpath.replace("{}", request.getBPA().getAddress().getLocality().getCode()));
+		/*idToJsonPath.put(request.getBPA().getId(),
+				jsonpath.replace("{}", request.getBPA().getAddress().getLocality().getCode()));*/
 
 		return idToJsonPath;
 	}

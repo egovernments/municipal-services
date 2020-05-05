@@ -9,8 +9,9 @@ import java.util.Set;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.AuditDetails;
-import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.model.AuditDetails;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.LandRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -120,14 +121,13 @@ public class BPAUtil {
 		return mdmsCriteriaReq;
 	}
 
-	public Object mDMSCall(BPARequest bpaRequest) {
-		RequestInfo requestInfo = bpaRequest.getRequestInfo();
-		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
+	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
 		Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 		return result;
 	}
-
+	
+	
 	public void defaultJsonPathConfig() {
 		Configuration.setDefaults(new Configuration.Defaults() {
 
