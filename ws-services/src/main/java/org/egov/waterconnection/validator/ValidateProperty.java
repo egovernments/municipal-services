@@ -26,10 +26,6 @@ public class ValidateProperty {
 		if (StringUtils.isEmpty(property.getPropertyId())) {
 			throw new CustomException("INVALID PROPERTY", "WaterConnection cannot be updated without propertyId");
 		}
-		// if (property.getTenantId() == null || property.getTenantId().isEmpty()) {
-		// errorMap.put("INVALID PROPERTY", "WaterConnection cannot be updated without
-		// tenantId");
-		// }
 	}
 
 	/**
@@ -52,7 +48,6 @@ public class ValidateProperty {
 		if (isPropertyIdPresent(waterConnectionRequest)) {
 			propertyList = waterServiceUtil.propertySearch(waterConnectionRequest);
 		} else {
-//			propertyList = waterServiceUtil.createPropertyRequest(waterConnectionRequest);
 			throw new CustomException("PROPERTY_NOT_FOUND",
 					"No property found for water connection");
 		}

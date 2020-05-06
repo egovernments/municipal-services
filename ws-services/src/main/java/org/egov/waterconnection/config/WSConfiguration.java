@@ -167,5 +167,10 @@ public class WSConfiguration {
 	@Value("${ws.sla.default.value}")
 	private Long slaDefaultValue;
     
+	@Value("${ws.consume.filestoreids}")
+	private String fileStoreIdsTopic;
+
+	@Value("${egov.waterservice.savefilestoreIds}")
+	private String saveFileStoreIdsTopic;
    
 }

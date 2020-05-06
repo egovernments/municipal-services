@@ -82,9 +82,6 @@ public class EstimationService {
 				(JSONArray) masterData.get(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
 		timeBasedExemptionMasterMap.put(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER,
 				(JSONArray) (masterData.getOrDefault(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER, null)));
-		// mDataService.setSewerageConnectionMasterValues(requestInfo, tenantId,
-		// billingSlabMaster,
-		// timeBasedExemptionMasterMap);
 		BigDecimal sewarageCharge = getSewerageEstimationCharge(criteria.getSewerageConnection(), criteria,
 				billingSlabMaster, billingSlabIds, requestInfo);
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(sewarageCharge, criteria.getSewerageConnection(),
@@ -112,26 +109,6 @@ public class EstimationService {
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_WATER_CESS)
 					.estimateAmount(sewerageCess.setScale(2, 2)).build());
 		}
-
-		// get applicable rebate and penalty
-		// Map<String, BigDecimal> rebatePenaltyMap =
-		// payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
-		// assessmentYear, timeBasedExemeptionMasterMap);
-		// if (null != rebatePenaltyMap) {
-		// BigDecimal rebate =
-		// rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_REBATE);
-		// BigDecimal penalty =
-		// rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_PENALTY);
-		// BigDecimal interest =
-		// rebatePenaltyMap.get(WSCalculationConstant.WS_TIME_INTEREST);
-		// estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_REBATE)
-		// .estimateAmount(rebate).build());
-		// estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_PENALTY)
-		// .estimateAmount(penalty).build());
-		// estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TIME_INTEREST)
-		// .estimateAmount(interest).build());
-		// payableTax = payableTax.add(rebate).add(penalty).add(interest);
-		// }
 		return estimates;
 	}
 
@@ -443,7 +420,8 @@ public class EstimationService {
 	private BigDecimal getChargeForRoadCutting(Map<String, Object> masterData, String roadType, Float roadCuttingArea) {
 		JSONArray roadSlab = (JSONArray) masterData.getOrDefault(SWCalculationConstant.SC_ROADTYPE_MASTER, null);
 		BigDecimal charge = BigDecimal.ZERO;
-		BigDecimal cuttingArea = new BigDecimal(roadCuttingArea.toString());
+		BigDecimal cuttingArea = new BigDecimal(
+				roadCuttingArea == null ? BigDecimal.ZERO.toString() : roadCuttingArea.toString());
 		JSONObject masterSlab = new JSONObject();
 		if (roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);

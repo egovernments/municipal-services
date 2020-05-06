@@ -6,15 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
-import org.egov.tracer.model.CustomException;
-import lombok.extern.slf4j.Slf4j;
-import org.egov.tracer.model.ServiceCallException;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.Idgen.IdGenerationRequest;
 import org.egov.swservice.model.Idgen.IdGenerationResponse;
 import org.egov.swservice.model.Idgen.IdRequest;
+import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;

@@ -156,6 +156,8 @@ public class SewarageServiceImpl implements SewarageService {
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
 		sewarageDaoImpl.pushForEditNotification(sewarageConnectionRequest);
+		//Enrich file store Id After payment
+		enrichmentService.enrichFileStoreIds(sewarageConnectionRequest);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);

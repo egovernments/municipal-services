@@ -1,21 +1,21 @@
 package org.egov.waterconnection.validator;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
-import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.model.ValidatorResult;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.service.MeterInfoValidator;
+import org.egov.waterconnection.service.PropertyValidator;
+import org.egov.waterconnection.service.WaterFieldValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,97 +23,39 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class WaterConnectionValidator {
+
+	@Autowired
+	private PropertyValidator propertyValidator;
 	
 	@Autowired
-	private ObjectMapper mapper;
+	private WaterFieldValidator waterFieldValidator;
+	
+	@Autowired
+	private MeterInfoValidator meterInfoValidator;
 
-	/**
+
+	/**Used strategy pattern for avoiding multiple if else condition
 	 * 
 	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest is request for create or update water
-	 *            connection
 	 * @param isUpdate
-	 *            True for update and false for create
 	 */
-	@SuppressWarnings("unchecked")
 	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
-		WaterConnection waterConnection = waterConnectionRequest.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())) {
-			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
-		}
-		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())
-				&& (StringUtils.isEmpty(waterConnection.getProperty().getUsageCategory()))) {
-			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Property usage type should not be empty");
-		}
 		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
 				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
+			throw new CustomException(errorMap);
 		}
-		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
+		ValidatorResult isPropertyValidated = propertyValidator.validate(waterConnectionRequest, isUpdate);
+		if (!isPropertyValidated.isStatus())
+			errorMap.putAll(isPropertyValidated.getErrorMessage());
+		ValidatorResult isWaterFieldValidated = waterFieldValidator.validate(waterConnectionRequest, isUpdate);
+		if (!isWaterFieldValidated.isStatus())
+			errorMap.putAll(isWaterFieldValidated.getErrorMessage());
+		ValidatorResult isMeterInfoValidated = meterInfoValidator.validate(waterConnectionRequest, isUpdate);
+		if (!isMeterInfoValidated.isStatus())
+			errorMap.putAll(isMeterInfoValidated.getErrorMessage());
 
-		}
-		if (isUpdate && (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
-				&& !StringUtils
-						.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))) {
-			if (WCConstants.APPROVE_CONNECTION_CONST
-					.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-				if (StringUtils.isEmpty(waterConnection.getConnectionType())) {
-					errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
-				}
-				if (!StringUtils.isEmpty(waterConnection.getConnectionType())
-						&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())) {
-					if (waterConnection.getMeterId() == null) {
-						errorMap.put("INVALID_METER_ID", "Meter Id cannot be empty");
-					}
-					if (waterConnection.getMeterInstallationDate() == null
-							|| waterConnection.getMeterInstallationDate() < 0
-							|| waterConnection.getMeterInstallationDate() == 0) {
-						errorMap.put("INVALID_METER_INSTALLATION_DATE",
-								"Meter Installation date cannot be null or negative");
-					}
-
-				}
-				// if (StringUtils.isEmpty(waterConnection.getConnectionCategory())) {
-				// errorMap.put("INVALID_WATER_CONNECTION_CATEGORY",
-				// "WaterConnection cannot be created without connection category");
-				// }
-				if (StringUtils.isEmpty(waterConnection.getWaterSource())) {
-					errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
-				}
-				if (StringUtils.isEmpty(waterConnection.getRoadType())) {
-					errorMap.put("INVALID_ROAD_TYPE", "Road type should not be empty");
-				}
-			}
-
-			if (!StringUtils.isEmpty(waterConnection.getConnectionType())
-					&& WCConstants.METERED_CONNECTION.equalsIgnoreCase(waterConnection.getConnectionType())
-					&& WCConstants.ACTIVATE_CONNECTION_CONST.equalsIgnoreCase(
-							waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-				HashMap<String, Object> addDetail = mapper.convertValue(
-						waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-				if (StringUtils.isEmpty(addDetail)
-						|| addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) == null) {
-					errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be null");
-				} else {
-					BigDecimal initialMeterReading = BigDecimal.ZERO;
-					initialMeterReading = new BigDecimal(
-							String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
-					if (initialMeterReading.compareTo(BigDecimal.ZERO) == 0) {
-						errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");
-					}
-				}
-			}
-
-		}
-		if (isUpdate && (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
-				&& !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()))
-				&& WCConstants.ACTIVATE_CONNECTION_CONST.equalsIgnoreCase(
-						waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-			if (StringUtils.isEmpty(waterConnection.getConnectionExecutionDate())) {
-				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
-			}
-		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
@@ -140,7 +82,6 @@ public class WaterConnectionValidator {
 		validateAllIds(request.getWaterConnection(), searchResult);
 		validateDuplicateDocuments(request);
 		setFieldsFromSearch(request,searchResult);
-		setStatusForDocuments(request, searchResult);
 		
 	}
    
@@ -185,27 +126,5 @@ public class WaterConnectionValidator {
 	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult) {
 		request.getWaterConnection().setApplicationStatus(searchResult.getApplicationStatus());
 		request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
-	}
-	
-	/**
-	 * 
-	 * @param request
-	 * @param searchResult
-	 */
-	private void setStatusForDocuments(WaterConnectionRequest request, WaterConnection searchResult) {
-//		if (!CollectionUtils.isEmpty(searchResult.getDocuments())) {
-//			ArrayList<String> fileStoreIds = new ArrayList<>();
-//			if (!CollectionUtils.isEmpty(request.getWaterConnection().getDocuments())) {
-//				request.getWaterConnection().getDocuments().forEach(document -> {
-//					fileStoreIds.add(document.getFileStoreId());
-//				});
-//			}
-//			searchResult.getDocuments().forEach(document -> {
-//				if (!fileStoreIds.contains(document.getFileStoreId())) {
-//					document.setStatus(Status.INACTIVE);
-//					request.getWaterConnection().getDocuments().add(document);
-//				}
-//			});
-//		}
 	}
 }

@@ -80,6 +80,7 @@ public class WorkflowNotificationService {
 	String consumerCodeReplacer = "$consumerCode";
 	String connectionNoReplacer = "$connectionNumber";
 	String mobileNoReplacer = "$mobileNo";
+	String applicationKey = "$applicationkey";
 
 	/**
 	 * 
@@ -329,6 +330,7 @@ public class WorkflowNotificationService {
 	 * @return updated messageTemplate
 	 */
 
+	@SuppressWarnings("unchecked")
 	public String getMessageForPlumberInfo(SewerageConnection sewerageConnection, String messageTemplate) {
 		HashMap<String, Object> addDetail = mapper.convertValue(sewerageConnection.getAdditionalDetails(),
 				HashMap.class);
@@ -467,7 +469,7 @@ public class WorkflowNotificationService {
 			StringBuilder builder = new StringBuilder();
 			builder.append(config.getPdfServiceHost());
 			String pdfLink = config.getPdfServiceLink();
-			pdfLink = pdfLink.replace(tenantIdReplacer, tenantId);
+			pdfLink = pdfLink.replace(tenantIdReplacer, tenantId).replace(applicationKey, SWConstants.PDF_APPLICATION_KEY);;
 			builder.append(pdfLink);
 			Object response = serviceRequestRepository.fetchResult(builder, requestPayload);
 			DocumentContext responseContext = JsonPath.parse(response);

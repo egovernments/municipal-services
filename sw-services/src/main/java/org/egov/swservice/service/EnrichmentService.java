@@ -23,6 +23,7 @@ import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Status;
 import org.egov.swservice.model.Idgen.IdResponse;
 import org.egov.swservice.repository.IdGenRepository;
+import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
@@ -56,6 +57,12 @@ public class EnrichmentService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private PdfFileStoreService pdfFileStroeService;
+	
+	@Autowired
+	private SewarageDaoImpl sewerageDao;
 
 
 	/**
@@ -118,6 +125,7 @@ public class EnrichmentService {
 		setStatusForCreate(sewerageConnectionRequest);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
@@ -139,6 +147,7 @@ public class EnrichmentService {
 			}
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
+		enrichFileStoreIds(sewerageConnectionRequest);
 	}
 	
 	
@@ -253,17 +262,20 @@ public class EnrichmentService {
 		request.getSewerageConnection().setConnectionNo(connectionNumbers.listIterator().next());
 	}
 
-	  /**
-     * Sets status for create request
-     * @param tradeLicenseRequest The create request
-     */
-	
-//    private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest){
-//    	sewerageConnectionRequest.getSewerageConnection(){
-//            if(.equalsIgnoreCase(ACTION_INITIATE))
-//                license.setStatus(STATUS_INITIATED);
-//            if(license.getAction().equalsIgnoreCase(ACTION_APPLY))
-//                license.setStatus(STATUS_APPLIED);
-//        });
-//    }
+	/**
+	 * Enrich fileStoreIds
+	 * 
+	 * @param sewerageConnectionRequest
+	 */
+	@SuppressWarnings("unchecked")
+	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
+		try {
+			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION)) {
+				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);
+			}
+		} catch (Exception ex) {
+			log.debug(ex.toString());
+		}
+	}
 }

@@ -468,12 +468,13 @@ public class EstimationService {
 		JSONObject masterSlab = new JSONObject();
 		if(roadSlab != null) {
 			masterSlab.put("RoadType", roadSlab);
-			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='"+roadType+"')]");
-			if(CollectionUtils.isEmpty(filteredMasters))
+			JSONArray filteredMasters = JsonPath.read(masterSlab, "$.RoadType[?(@.code=='" + roadType + "')]");
+			if (CollectionUtils.isEmpty(filteredMasters))
 				return BigDecimal.ZERO;
 			JSONObject master = mapper.convertValue(filteredMasters.get(0), JSONObject.class);
 			charge = new BigDecimal(master.getAsNumber(WSCalculationConstant.UNIT_COST_CONST).toString());
-			charge = charge.multiply(new BigDecimal(roadCuttingArea.toString()));
+			charge = charge.multiply(
+					new BigDecimal(roadCuttingArea == null ? BigDecimal.ZERO.toString() : roadCuttingArea.toString()));
 		}
 		return charge;
 	}

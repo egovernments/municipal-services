@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.workflow.ProcessInstance;
 import org.egov.swservice.model.workflow.ProcessInstanceRequest;
 import org.egov.swservice.model.workflow.ProcessInstanceResponse;
-import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,9 +38,6 @@ public class WorkflowIntegrator {
 
 	@Autowired
 	private ObjectMapper mapper;
-
-	@Autowired
-	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, SWConfiguration config) {

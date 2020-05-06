@@ -1,5 +1,7 @@
 package org.egov.swservice.workflow;
 
+import java.math.BigDecimal;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.RequestInfoWrapper;
@@ -84,5 +86,24 @@ public class WorkflowService {
 		}
 		return null;
 	}
+	
+	/**
+	    * Return sla based on state code
+	    * 
+	    * @param tenantId
+	    * @param requestInfo
+	    * @param stateCode
+	    * @return no of days for sla
+	    */
+		public BigDecimal getSlaForState(String tenantId, RequestInfo requestInfo, String stateCode) {
+			BusinessService businessService = getBusinessService(tenantId, requestInfo);
+			return new BigDecimal(businessService.getStates().stream().filter(state -> state.getApplicationStatus() != null
+					&& state.getApplicationStatus().equalsIgnoreCase(stateCode)).map(state -> {
+						if (state.getSla() == null) {
+							return config.getSlaDefaultValue();
+						}
+						return state.getSla();
+					}).findFirst().orElse(config.getSlaDefaultValue()));
+		}
 
 }

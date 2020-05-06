@@ -2,7 +2,6 @@ package org.egov.waterconnection.service;
 
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -59,7 +58,6 @@ public class EnrichmentService {
 	
 	@Autowired
 	private WaterDaoImpl waterDao;
-	
 	
 
 	/**
@@ -132,6 +130,7 @@ public class EnrichmentService {
 			}
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
+		enrichFileStoreIds(waterConnectionRequest);
 	}
 	
 
@@ -246,5 +245,20 @@ public class EnrichmentService {
 					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
 		}
 		request.getWaterConnection().setConnectionNo(connectionNumbers.get(0));
+	}
+	/**
+	 * Enrich fileStoreIds
+	 * 
+	 * @param waterConnectionRequest
+	 */
+	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
+		try {
+			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION)) {
+				waterDao.enrichFileStoreIds(waterConnectionRequest);
+			}
+		} catch (Exception ex) {
+			log.debug(ex.toString());
+		}
 	}
 }
