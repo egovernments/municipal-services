@@ -17,8 +17,7 @@ import io.swagger.annotations.ApiModelProperty;
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-11T12:10:14.583+05:30[Asia/Kolkata]")
 public class WaterConnection extends Connection {
 
-	@JsonProperty("rainWaterHarvesting")
-	private Boolean rainWaterHarvesting = null;
+	
 
 	@JsonProperty("waterSource")
 	private String waterSource = null;
@@ -41,25 +40,6 @@ public class WaterConnection extends Connection {
 	@JsonProperty("noOfTaps")
 	private Integer noOfTaps = null;
 
-	public WaterConnection rainWaterHarvesting(Boolean rainWaterHarvesting) {
-		this.rainWaterHarvesting = rainWaterHarvesting;
-		return this;
-	}
-
-	/**
-	 * Get rainWaterHarvesting
-	 * 
-	 * @return rainWaterHarvesting
-	 **/
-	@ApiModelProperty(value = "")
-
-	public Boolean isRainWaterHarvesting() {
-		return rainWaterHarvesting;
-	}
-
-	public void setRainWaterHarvesting(Boolean rainWaterHarvesting) {
-		this.rainWaterHarvesting = rainWaterHarvesting;
-	}
 
 	public WaterConnection waterSource(String waterSource) {
 		this.waterSource = waterSource;
@@ -211,15 +191,14 @@ public class WaterConnection extends Connection {
 			return false;
 		}
 		WaterConnection waterConnection = (WaterConnection) o;
-		return Objects.equals(this.rainWaterHarvesting, waterConnection.rainWaterHarvesting)
-				&& Objects.equals(this.waterSource, waterConnection.waterSource)
+		return Objects.equals(this.waterSource, waterConnection.waterSource)
 				&& Objects.equals(this.meterId, waterConnection.meterId)
 				&& Objects.equals(this.meterInstallationDate, waterConnection.meterInstallationDate) && super.equals(o);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(rainWaterHarvesting, waterSource, meterId, meterInstallationDate, super.hashCode());
+		return Objects.hash(waterSource, meterId, meterInstallationDate, super.hashCode());
 	}
 
 	@Override
@@ -227,7 +206,6 @@ public class WaterConnection extends Connection {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class WaterConnection {\n");
 		sb.append("    ").append(toIndentedString(super.toString())).append("\n");
-		sb.append("    rainWaterHarvesting: ").append(toIndentedString(rainWaterHarvesting)).append("\n");
 		sb.append("    waterSource: ").append(toIndentedString(waterSource)).append("\n");
 		sb.append("    meterId: ").append(toIndentedString(meterId)).append("\n");
 		sb.append("    meterInstallationDate: ").append(toIndentedString(meterInstallationDate)).append("\n");
