@@ -94,7 +94,7 @@ public class PropertyService {
 
     public List<Property> searchPropertyPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
         List<Property> properties = getPropertiesPlainSearch(criteria, requestInfo);
-        enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
+        //enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
         return properties;
     }
 
@@ -117,7 +117,7 @@ public class PropertyService {
 
     List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
         List<Property> properties = repository.getPropertiesPlainSearch(criteria);
-        enrichmentService.enrichPropertyCriteriaWithOwnerids(criteria, properties);
+        //enrichmentService.enrichPropertyCriteriaWithOwnerids(criteria, properties);
         //UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
         //enrichmentService.enrichOwner(userDetailResponse, properties);
         return properties;

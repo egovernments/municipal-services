@@ -50,8 +50,6 @@ public class PropertyQueryBuilder {
 			+ "insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId,"
 			+ "ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,"
 			+ "unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor,"
-			+ "unit.additionalDetails as unit_additionalDetails,owner.additionalDetails as ownerInfo_additionalDetails,"
-			+ "insti.additionalDetails as insti_additionalDetails,address.additionalDetails as add_additionalDetails,"
 			+ "pt.lastModifiedTime as propertylastModifiedTime,pt.createdby as propertyCreatedby,"
 			+ "pt.lastModifiedBy as propertyModifiedBy,pt.createdTime as propertyCreatedTime "
 			+ " FROM eg_pt_property_v2 pt " + INNER_JOIN_STRING
@@ -122,9 +120,35 @@ public class PropertyQueryBuilder {
 			builder.append("pt.tenantid LIKE ? ");
 			preparedStmtList.add("pb%");
 		}
-		
-        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
+
+		/*builder.append("AND pt.propertyid LIKE ?");
+		System.out.println("\n\ncriteria.getPropertyId()-->"+criteria.getPropertyId()+"\n\n");
+		preparedStmtList.add(criteria.getPropertyId());*/
+
+		//return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+		return addPaginationClause(builder, preparedStmtList, criteria);
+
+	}
+
+	private static String addPaginationClause(StringBuilder selectQuery, List<Object> preparedStmtList,
+											  PropertyCriteria criteria) {
+
+		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
+			selectQuery.append("and pt.propertyid in (select propertyid from eg_pt_property_v2 where tenantid= ? order by propertyid offset ? limit ?)");
+			preparedStmtList.add(criteria.getTenantId());
+			preparedStmtList.add(criteria.getOffset());
+			preparedStmtList.add(criteria.getLimit());
+
+			return addOrderByClause(selectQuery, criteria);
+
+		} else
+			return addOrderByClause(selectQuery, criteria);
+	}
+
+	private static String addOrderByClause(StringBuilder selectQuery,
+										   PropertyCriteria criteria) {
+		return selectQuery.append(" ORDER BY pt.propertyid DESC ").toString();
 	}
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
