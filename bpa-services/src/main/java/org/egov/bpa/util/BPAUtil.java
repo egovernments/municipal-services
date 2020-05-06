@@ -10,8 +10,6 @@ import java.util.Set;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.model.AuditDetails;
-import org.egov.bpa.web.model.BPARequest;
-import org.egov.bpa.web.model.LandRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;

@@ -9,11 +9,10 @@ import javax.validation.Valid;
 
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPARequest;
-import org.egov.bpa.web.model.LandRequest;
+import org.egov.land.web.models.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -135,5 +134,4 @@ public class MDMSValidator {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

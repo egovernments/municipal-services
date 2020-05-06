@@ -1,9 +1,8 @@
-package org.egov.bpa.repository.querybuilder;
+package org.egov.land.repository.querybuilder;
 
 import java.util.List;
 
-import org.egov.bpa.web.model.LandSearchCriteria;
-import org.springframework.util.CollectionUtils;
+import org.egov.land.web.models.LandSearchCriteria;
 
 public class LandQueryBuilder {
 

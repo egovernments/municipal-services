@@ -10,8 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.util.BPAConstants;
@@ -19,10 +17,6 @@ import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.Document;
-import org.egov.bpa.web.model.LandRequest;
-import org.egov.bpa.web.model.LandSearchCriteria;
-import org.egov.bpa.web.model.OwnerInfo;
-import org.egov.bpa.web.model.Unit;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -572,48 +566,5 @@ public class BPAValidator {
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
 			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
 		}
-	}
-
-	
-//	land info related data...
-	
-	
-	
-	public void validateCreate(@Valid LandRequest landRequest, Object mdmsData) {
-		mdmsValidator.validateMdmsData(landRequest, mdmsData);
-		validateApplicationDocuments(landRequest, mdmsData, null);
-		validateUser(landRequest);
-		
-	}
-
-	private void validateUser(@Valid LandRequest landRequest) {
-		landRequest.getLandInfo().getOwners().forEach(owner->{
-			if (org.springframework.util.StringUtils.isEmpty(owner.getRelationship())) {
-				throw new CustomException("BPA.CREATE.USER", " Owner relation ship is mandatory " + owner.toString());
-			}
-		});		
-	}
-
-	private void validateApplicationDocuments(@Valid LandRequest landRequest, Object mdmsData, Object currentState) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void validateSearch(RequestInfo requestInfo, @Valid LandSearchCriteria criteria) {
-		// TODO Auto-generated method stub
-		String allowedParamStr = null;
-
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN))
-			allowedParamStr = config.getAllowedCitizenSearchParameters();
-		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.EMPLOYEE))
-			allowedParamStr = config.getAllowedEmployeeSearchParameters();
-		
-		List<String> allowedParams = Arrays.asList(allowedParamStr.split(","));
-		validateSearchParams(criteria, allowedParams);
-	}
-	private void validateSearchParams(@Valid LandSearchCriteria criteria, List<String> allowedParams) {
-		// TODO Auto-generated method stub
-		
 	}
 }

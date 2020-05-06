@@ -1,4 +1,4 @@
-package org.egov.bpa.web.model;
+package org.egov.land.web.models;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;

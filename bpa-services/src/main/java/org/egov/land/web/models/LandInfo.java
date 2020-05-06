@@ -1,8 +1,12 @@
-package org.egov.bpa.web.model;
+package org.egov.land.web.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.land.web.models.Address;
+import org.egov.land.web.models.Institution;
+import org.egov.land.web.models.Source;
+import org.egov.land.web.models.Status;
+import org.egov.land.web.models.Unit;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,7 +48,7 @@ public class LandInfo {
 	  private String ownershipCategory;
 
 	  @JsonProperty("owners")
-	  private List<OwnerInfo> owners = new ArrayList<OwnerInfo>();
+	  private List<OwnerInfo> owners;
 
 	  @JsonProperty("institution")
 	  private Institution institution;

@@ -1,8 +1,5 @@
-package org.egov.bpa.web.model;
+package org.egov.land.web.models;
 
-import java.util.List;
-
-import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,10 +16,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LandResponse {
-	 @JsonProperty("ResponseInfo")
-	  private ResponseInfo responseInfo;
+public class Role {
+	 @JsonProperty("name")
+	  private String name = null;
 
-	  @JsonProperty("LandInfo")
-	  private List<LandInfo> landInfo;
+	  @JsonProperty("code")
+	  private String code = null;
+
+	  @JsonProperty("description")
+	  private String description = null;
+
 }

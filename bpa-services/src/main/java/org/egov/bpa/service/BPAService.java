@@ -12,9 +12,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.validation.Valid;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -28,14 +25,9 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.validator.BPAValidator;
-import org.egov.bpa.validator.LandValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
-import org.egov.bpa.web.model.LandInfo;
-import org.egov.bpa.web.model.LandRequest;
-import org.egov.bpa.web.model.LandSearchCriteria;
-import org.egov.bpa.web.model.OwnerInfo;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.ActionValidator;

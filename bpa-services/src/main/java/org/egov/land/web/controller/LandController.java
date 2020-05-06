@@ -1,19 +1,17 @@
-package org.egov.bpa.web.controller;
+package org.egov.land.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.bpa.service.BPAService;
-import org.egov.bpa.service.LandService;
-import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
-import org.egov.bpa.web.model.BPA;
-import org.egov.bpa.web.model.LandInfo;
-import org.egov.bpa.web.model.LandRequest;
-import org.egov.bpa.web.model.LandResponse;
-import org.egov.bpa.web.model.LandSearchCriteria;
 import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.land.service.LandService;
+import org.egov.land.web.models.LandInfo;
+import org.egov.land.web.models.LandRequest;
+import org.egov.land.web.models.LandResponse;
+import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +19,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/v1/land")
 public class LandController {
 	
 	@Autowired
 	private LandService landService;
-
-//	@Autowired
-//	private BPAUtil landUtil;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
@@ -39,8 +32,10 @@ public class LandController {
 	@PostMapping(value = "land/_create")
 	public ResponseEntity<LandResponse> landCreate(@Valid @RequestBody LandRequest landRequest) {
 		//landUtil.defaultJsonPathConfig();
-		List<LandInfo> landInfo = landService.create(landRequest);
-		LandResponse response = LandResponse.builder().landInfo(landInfo)
+		LandInfo landInfo = landService.create(landRequest);
+		List<LandInfo> landInfos = new ArrayList<LandInfo>();
+		landInfos.add(landInfo);
+		LandResponse response = LandResponse.builder().landInfo(landInfos)
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(landRequest.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -50,8 +45,10 @@ public class LandController {
 	@PostMapping(value = "land/_update")
 	public ResponseEntity<LandResponse> landUpdate(@Valid @RequestBody LandRequest landRequest) {
 
-		List<LandInfo> landInfo = landService.update(landRequest);
-		LandResponse response = LandResponse.builder().landInfo(landInfo)
+		LandInfo landInfo = landService.update(landRequest);
+		List<LandInfo> landInfos = new ArrayList<LandInfo>();
+		landInfos.add(landInfo);
+		LandResponse response = LandResponse.builder().landInfo(landInfos)
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(landRequest.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);

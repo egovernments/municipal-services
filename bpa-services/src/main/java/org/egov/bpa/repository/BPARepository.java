@@ -12,10 +12,10 @@ import org.egov.bpa.repository.rowmapper.BPARowMapper;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
-import org.egov.bpa.web.model.LandInfo;
-import org.egov.bpa.web.model.LandRequest;
-import org.egov.bpa.web.model.LandSearchCriteria;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.land.web.models.LandInfo;
+import org.egov.land.web.models.LandRequest;
+import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -49,9 +49,9 @@ public class BPARepository {
 		producer.push(config.getSaveTopic(), bpaRequest);
 	}
 	
-	public void saveLand(LandRequest landRequest) {
+//	public void saveLand(LandRequest landRequest) {
 //		producer.push(config.getSaveTopic(), landRequest);
-	}
+//	}
 
 	public void update(BPARequest bpaRequest, boolean isStateUpdatable) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -107,5 +107,10 @@ public class BPARepository {
 	public LandInfo getLandInfoData(@Valid LandSearchCriteria criteria) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void saveLand(@Valid LandRequest landRequest) {
+		// TODO Auto-generated method stub
+		
 	}
 }
