@@ -1,11 +1,14 @@
 package org.egov.bpa.web.controller;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
 import org.egov.bpa.service.BPAService;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
 import org.egov.bpa.web.model.BPA;
@@ -13,15 +16,21 @@ import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPAResponse;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/v1/bpa")
 public class BPAController {
 
 	@Autowired
@@ -33,7 +42,7 @@ public class BPAController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
-	@PostMapping(value = "bpa/_create")
+	@PostMapping(value = "/_create")
 	public ResponseEntity<BPAResponse> create(@Valid @RequestBody BPARequest bpaRequest) {
 		bpaUtil.defaultJsonPathConfig();
 		BPA bpa = bpaService.create(bpaRequest);
@@ -45,7 +54,7 @@ public class BPAController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping(value = "bpa/_update")
+	@PostMapping(value = "/_update")
 	public ResponseEntity<BPAResponse> update(@Valid @RequestBody BPARequest bpaRequest) {
 		BPA bpa = bpaService.update(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
@@ -57,7 +66,7 @@ public class BPAController {
 
 	}
 
-	@PostMapping(value = "bpa/_search")
+	@PostMapping(value = "/_search")
 	public ResponseEntity<BPAResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute BPASearchCriteria criteria) {
 
@@ -69,5 +78,22 @@ public class BPAController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/_permitorderedcr")
+	public ResponseEntity<Resource> getPdf(@Valid @RequestBody BPARequest bpaRequest) {
+
+		Path path = Paths.get(BPAConstants.EDCR_PDF);
+		Resource resource = null;
+
+		bpaService.getEdcrPdf(bpaRequest);
+		try {
+			resource = new UrlResource(path.toUri());
+		} catch (Exception ex) {
+			throw new CustomException("UNABLE_TO_DOWNLOAD", "Unable to download the file");
+		}
+
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+				.body(resource);
+	}
 
 }
