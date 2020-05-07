@@ -45,14 +45,15 @@ export const createApiResponse = async ({ body }, res, next) => {
   //model validator
   let errors = validateFireNOCModel(body, mdms);
   if (errors.length > 0) {
-    next({
+   next ({
       errorType: "custom",
+      status:400, 
       errorReponse: {
-        ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
+        ResponseInfo: requestInfoToResponseInfo({...body.RequestInfo, status:"failed"}, false),
         Errors: errors
       }
     });
-    return;
+    
   }
 
   // console.log(JSON.stringify(mdms));
