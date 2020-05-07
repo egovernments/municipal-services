@@ -28,7 +28,7 @@ CREATE TABLE eg_land_Address(
 	additionDetails character varying(64),
 	buildingName character varying(64),
 	street character varying(64),
-	landInfoId character varying(64)
+	landInfoId character varying(64),
 
 	CONSTRAINT uk_eg_land_Address UNIQUE (id),
 	CONSTRAINT fk_eg_land_Address FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
@@ -121,10 +121,9 @@ CREATE TABLE eg_land_unit(
 	additionalDetails JSONB,
 	
 	landInfoId character varying(64),
-	
-	
+		
 	CONSTRAINT pk_eg_land_unit PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_unit UNIQUE (id,landInfoId,blockindex),
+	CONSTRAINT uk_eg_land_unit UNIQUE (id,landInfoId,tenantId),
 	CONSTRAINT fk_eg_land_unit FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 
 );
@@ -148,9 +147,9 @@ CREATE TABLE eg_land_constructionDetail(
 	lastModifiedTime bigint,
 	
 	
-	CONSTRAINT pk_eg_land_unit PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_unit UNIQUE (id,landInfoId,blockindex),
-	CONSTRAINT fk_eg_land_unit FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
+	CONSTRAINT pk_eg_land_constructionDetail PRIMARY KEY (id),
+	CONSTRAINT uk_eg_land_constructionDetail UNIQUE (id),
+	CONSTRAINT fk_eg_land_constructionDetail FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 
 );
 
@@ -168,5 +167,6 @@ CREATE TABLE public.eg_land_auditdetails
     createdby character varying(64) COLLATE pg_catalog."default",
     lastmodifiedby character varying(64) COLLATE pg_catalog."default",
     createdtime bigint,
-    lastmodifiedtime bigint
+    lastmodifiedtime bigint,
+    CONSTRAINT pk_eg_land_auditdetails PRIMARY KEY (id)
 );

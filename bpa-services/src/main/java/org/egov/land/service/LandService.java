@@ -4,11 +4,10 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.bpa.repository.BPARepository;
-import org.egov.bpa.service.EnrichmentService;
 import org.egov.bpa.service.UserService;
-import org.egov.bpa.util.BPAUtil;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.land.repository.LandRepository;
+import org.egov.land.util.LandUtil;
 import org.egov.land.validator.LandValidator;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
@@ -24,30 +23,30 @@ public class LandService {
 	LandValidator landValidator;
 
 	@Autowired
-	EnrichmentService enrichmentService;
+	private LandEnrichmentService enrichmentService;
 
 	@Autowired
 	UserService userService;
 
 	@Autowired
-	private BPARepository repository;
+	private LandRepository repository;
 
 	@Autowired
-	private BPAUtil util;
+	private LandUtil util;
 
 	public LandInfo create(@Valid LandRequest landRequest) {
 		RequestInfo requestInfo = landRequest.getRequestInfo();
 		String tenantId = landRequest.getLandInfo().getTenantId().split("\\.")[0];
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		if (landRequest.getLandInfo().getTenantId().split("\\.").length == 1) {
-			throw new CustomException("Invalid Tenant ", " land cannot be considered at StateLevel");
+			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
+
 		landValidator.validateCreate(landRequest, mdmsData);
-		enrichmentService.enrichLandCreateRequest(landRequest, mdmsData);
+		enrichmentService.enrichBPACreateRequest(landRequest, mdmsData);
 
 		userService.createUser(landRequest);
-
-		repository.saveLand(landRequest);
+		repository.save(landRequest);
 		return landRequest.getLandInfo();
 	}
 
@@ -55,17 +54,7 @@ public class LandService {
 		return null;
 	}
 
-	private List<LandInfo> getLandInfoWithOwnerInfo(@Valid LandRequest landRequest) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	public List<LandInfo> search(@Valid LandSearchCriteria criteria, RequestInfo requestInfo) {
-		return null;
-	}
-
-	private LandInfo getLandInfoFromMobileNumber(@Valid LandSearchCriteria criteria, RequestInfo requestInfo) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

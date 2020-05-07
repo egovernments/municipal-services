@@ -24,7 +24,7 @@ import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.OwnerInfo;
-import org.egov.land.web.models.UserInfo;
+import org.egov.land.web.models.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,7 +91,7 @@ public class UserService {
 	 * @param userFromSearchResult
 	 *            The current user details according to searcvh
 	 */
-	private void addNonUpdatableFields(UserInfo user, UserInfo userFromSearchResult) {
+	private void addNonUpdatableFields(User user, User userFromSearchResult) {
 		/*user.setUserName(userFromSearchResult.getUserName());
 		user.setId(userFromSearchResult.getId());
 		user.setActive(userFromSearchResult.getActive());
@@ -316,22 +316,21 @@ public class UserService {
 		Role role = getCitizenRole();
 
 		landInfo.getOwners().forEach(owner -> {
-			/*if (owner.getUuid() == null) {
-				addUserDefaultFields(bpa.getTenantId().split("\\.")[0], role, owner);
+			if (owner.getUuid() == null) {
+				addUserDefaultFields(landInfo.getTenantId().split("\\.")[0], role, owner);
 				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 						.append(config.getUserCreateEndpoint());
 				setUserName(owner);
-				owner.setType(BPAConstants.CITIZEN);
+//				owner.setType(BPAConstants.CITIZEN);
 				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 				if (userDetailResponse.getUser().get(0).getUuid() == null) {
 					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
 				}
 				log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
-				log.info("owner created Id --> " + userDetailResponse.getUser().get(0).getId());
 				setOwnerFields(owner, userDetailResponse, requestInfo);
 			} else {
 				if(owner.getTenantId() ==null) {
-					owner.setTenantId( bpa.getTenantId());
+					owner.setTenantId( landInfo.getTenantId());
 				}
 				UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
 				if (userDetailResponse.getUser().isEmpty())
@@ -343,7 +342,7 @@ public class UserService {
 				addNonUpdatableFields(user, userDetailResponse.getUser().get(0));
 				userDetailResponse = userCall(new CreateUserRequest(requestInfo, user), uri);
 				setOwnerFields(owner, userDetailResponse, requestInfo);
-			}*/
+			}
 		});
 	}
 

@@ -90,13 +90,13 @@ public class EnrichmentService {
 			});
 
 		// owners
-		bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
-
-			if (!CollectionUtils.isEmpty(owner.getDocuments()))
-				owner.getDocuments().forEach(document -> {
-					document.setId(UUID.randomUUID().toString());
-				});
-		});
+//		bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
+//
+//			if (!CollectionUtils.isEmpty(owner.getDocuments()))
+//				owner.getDocuments().forEach(document -> {
+//					document.setId(UUID.randomUUID().toString());
+//				});
+//		});
 
 		/*// blocks
 		if(bpaRequest.getBPA().getBlocks() != null ) {
@@ -187,12 +187,12 @@ public class EnrichmentService {
 			// BPA Owner Documents
 			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getOwners())) {
 				bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
-					if (!CollectionUtils.isEmpty(owner.getDocuments()))
-						owner.getDocuments().forEach(document -> {
-							if (document.getId() == null) {
-								document.setId(UUID.randomUUID().toString());
-							}
-						});
+//					if (!CollectionUtils.isEmpty(owner.getDocuments()))
+//						owner.getDocuments().forEach(document -> {
+//							if (document.getId() == null) {
+//								document.setId(UUID.randomUUID().toString());
+//							}
+//						});
 				});
 			} else {
 				throw new CustomException("INVALID UPDATE", "Owners cannot be empty");
@@ -393,10 +393,10 @@ public class EnrichmentService {
 
 		// owners
 		landRequest.getLandInfo().getOwners().forEach(owner -> {
-			if (!CollectionUtils.isEmpty(owner.getDocuments()))
-				owner.getDocuments().forEach(document -> {
-//					document.setId(UUID.randomUUID().toString());
-				});
+//			if (!CollectionUtils.isEmpty(owner.getDocuments()))
+//				owner.getDocuments().forEach(document -> {
+////					document.setId(UUID.randomUUID().toString());
+//				});
 		});
 
 		//institution

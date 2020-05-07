@@ -15,12 +15,12 @@ import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 public class LandController {
 	
 	@Autowired
@@ -29,9 +29,9 @@ public class LandController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 	
-	@PostMapping(value = "land/_create")
-	public ResponseEntity<LandResponse> landCreate(@Valid @RequestBody LandRequest landRequest) {
-		//landUtil.defaultJsonPathConfig();
+	@PostMapping(value = "/land/_create")
+	public ResponseEntity<LandResponse> create(@Valid @RequestBody LandRequest landRequest) {
+//		landUtil.defaultJsonPathConfig();
 		LandInfo landInfo = landService.create(landRequest);
 		List<LandInfo> landInfos = new ArrayList<LandInfo>();
 		landInfos.add(landInfo);
@@ -42,8 +42,8 @@ public class LandController {
 	}
 	
 
-	@PostMapping(value = "land/_update")
-	public ResponseEntity<LandResponse> landUpdate(@Valid @RequestBody LandRequest landRequest) {
+	@PostMapping(value = "/land/_update")
+	public ResponseEntity<LandResponse> update(@Valid @RequestBody LandRequest landRequest) {
 
 		LandInfo landInfo = landService.update(landRequest);
 		List<LandInfo> landInfos = new ArrayList<LandInfo>();
@@ -55,7 +55,7 @@ public class LandController {
 
 	}
 
-	@PostMapping(value = "land/_search")
+	@PostMapping(value = "/land/_search")
 	public ResponseEntity<LandResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute LandSearchCriteria criteria) {
 

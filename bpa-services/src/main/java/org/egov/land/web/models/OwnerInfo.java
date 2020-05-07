@@ -1,7 +1,6 @@
 package org.egov.land.web.models;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -17,21 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class OwnerInfo extends UserInfo {
-	 @JsonProperty("name")
-	  private String name;
-
-	  @JsonProperty("mobileNumber")
-	  private String mobileNumber;
-
-	  @JsonProperty("gender")
-	  private String gender;
-
-	  @JsonProperty("fatherOrHusbandName")
-	  private String fatherOrHusbandName;
-
-	  @JsonProperty("correspondenceAddress")
-	  private String correspondenceAddress;
+public class OwnerInfo extends User {
 
 	  @JsonProperty("isPrimaryOwner")
 	  private Boolean isPrimaryOwner;
@@ -45,8 +30,8 @@ public class OwnerInfo extends UserInfo {
 	  @JsonProperty("institutionId")
 	  private String institutionId;
 
-	  @JsonProperty("documents")
-	  private List<Document> documents;
+//	  @JsonProperty("documents")
+//	  private List<Document> documents;
 
 	  @JsonProperty("relationship")
 	  private Relationship relationship;
@@ -96,7 +81,7 @@ public class OwnerInfo extends UserInfo {
 	     * Populates Owner fields from the given User object
 	     * @param user User object obtained from user service
 	     */
-	    public void addUserDetail(UserInfo user){
+	    public void addUserDetail(User user){
 //	            this.setId(user.getId());
 //	            this.setLastModifiedDate(user.getLastModifiedDate());
 //	            this.setLastModifiedBy(user.getLastModifiedBy());
@@ -144,7 +129,7 @@ public class OwnerInfo extends UserInfo {
 	            this.setUuid(user.getUuid());
 	    }
 
-	    public void addCitizenDetail(UserInfo user){
+	    public void addCitizenDetail(User user){
 	            this.setTenantId(user.getTenantId());
 	            this.setUserName(user.getUserName());
 	            /*this.setId(user.getId());

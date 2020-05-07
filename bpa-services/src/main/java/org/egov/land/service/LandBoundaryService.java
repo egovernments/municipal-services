@@ -1,4 +1,4 @@
-package org.egov.bpa.service;
+package org.egov.land.service;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.model.BPARequest;
 import org.egov.land.web.models.Boundary;
+import org.egov.land.web.models.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 @Service
-public class BoundaryService {
+public class LandBoundaryService {
 
 	private ServiceRequestRepository serviceRequestRepository;
 
@@ -29,7 +29,7 @@ public class BoundaryService {
 	private BPAConfiguration config;
 
 	@Autowired
-	public BoundaryService(ServiceRequestRepository serviceRequestRepository, ObjectMapper mapper,
+	public LandBoundaryService(ServiceRequestRepository serviceRequestRepository, ObjectMapper mapper,
 			BPAConfiguration config) {
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.mapper = mapper;
@@ -45,9 +45,9 @@ public class BoundaryService {
 	 *            HierarchyTypeCode of the boundaries
 	 */
 	@SuppressWarnings("rawtypes")
-	public void getAreaType(BPARequest request, String hierarchyTypeCode) {
+	public void getAreaType(LandRequest request, String hierarchyTypeCode) {
 
-		String tenantId = request.getBPA().getTenantId();
+		String tenantId = request.getLandInfo().getTenantId();
 
 		LinkedList<String> localities = new LinkedList<>();
 
@@ -79,7 +79,7 @@ public class BoundaryService {
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request.getBPA().getId()));
+		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request.getLandInfo().getId()));
 
 		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject)))
 			throw new CustomException("BOUNDARY MDMS DATA ERROR", "The boundary data was not found");
@@ -102,7 +102,7 @@ public class BoundaryService {
 	 *            bpaRequest for create
 	 * @return Map of bpaId to jsonPath with bpa locality code
 	 */
-	private Map<String, String> getJsonpath(BPARequest request) {
+	private Map<String, String> getJsonpath(LandRequest request) {
 		Map<String, String> idToJsonPath = new LinkedHashMap<>();
 		String jsonpath = "$..boundary[?(@.code==\"{}\")]";
 
