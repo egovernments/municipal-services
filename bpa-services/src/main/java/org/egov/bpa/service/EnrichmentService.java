@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -22,6 +23,7 @@ import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.edcr.RequestInfoWrapper;
 import org.egov.land.web.models.OwnerInfo;
 import org.egov.bpa.web.model.idgen.IdResponse;
 import org.egov.bpa.web.model.user.UserDetailResponse;
@@ -32,6 +34,7 @@ import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -67,8 +70,9 @@ public class EnrichmentService {
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		bpaRequest.getBPA().setAuditDetails(auditDetails);
 		bpaRequest.getBPA().setId(UUID.randomUUID().toString());
+		bpaRequest.getBPA().setLandId(UUID.randomUUID().toString()); //TODO need to change id value based on the Land info id;
 
-		// address
+		/*// address
 		bpaRequest.getBPA().getLandInfo().getAddress().setId(UUID.randomUUID().toString());
 		bpaRequest.getBPA().getLandInfo().getAddress().setTenantId(bpaRequest.getBPA().getTenantId());
 
@@ -79,7 +83,7 @@ public class EnrichmentService {
 				unit.setId(UUID.randomUUID().toString());
 //				unit.setAuditDetails(auditDetails);
 			});
-		}
+		}*/
 
 		// BPA Documents
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
@@ -97,20 +101,7 @@ public class EnrichmentService {
 //					document.setId(UUID.randomUUID().toString());
 //				});
 //		});
-
-		/*// blocks
-		if(bpaRequest.getBPA().getBlocks() != null ) {
-			bpaRequest.getBPA().getBlocks().forEach(block -> {
-				if (block.getSubOccupancyType()!= null) {
-					block.setId(UUID.randomUUID().toString());
-				}else {
-					block.setId(UUID.randomUUID().toString());
-				}
-					
-			});
-		}*/
-		
-		
+	
 		setIdgenIds(bpaRequest);
 		boundaryService.getAreaType(bpaRequest, config.getHierarchyTypeCode());
 	}

@@ -231,4 +231,9 @@ public class BPAConfiguration {
 
 	@Value("${egov.bpa.validity.date.in.months}")
 	private Integer validityInMonths;
+	
+	//landInfo
+	
+	@Value("${egov.landinfo.host}")
+	private String landInfoHost;
 }

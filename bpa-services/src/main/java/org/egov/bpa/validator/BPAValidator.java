@@ -6,19 +6,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.Document;
+import org.egov.bpa.web.model.edcr.RequestInfoWrapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -37,6 +42,9 @@ public class BPAValidator {
 
 	@Autowired
 	private BPAConfiguration config;
+	
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
 
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
@@ -56,6 +64,10 @@ public class BPAValidator {
 			String filterExp = "$.[?(@.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='"
 					+ currentState + "')].docTypes";
 
+			/*String filterExp = "$.[?(@.applicationType=='" + bpa.getApplicationType() + "' && @.ServiceType=='"
+					+ bpa.getServiceType() + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='"
+					+ currentState + "')].docTypes";*/
+			
 			List<Object> docTypeMappings = JsonPath.read(masterData.get(BPAConstants.DOCUMENT_TYPE_MAPPING), filterExp);
 
 			List<Document> allDocuments = new ArrayList<Document>();
@@ -566,5 +578,19 @@ public class BPAValidator {
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
 			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
 		}
+	}
+
+
+	public void addLandInfoToBPA(BPARequest bpaRequest) {
+		// TODO Auto-generated method stub
+//		LinkedHashMap responseMap = null;
+		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
+		Object result = null;
+		try {
+			 result = serviceRequestRepository.fetchResult(uri,bpaRequest.getRequestInfo());
+			}catch(ServiceCallException se) {
+				throw new CustomException("LandInfo ERROR", " Invalid Land data");
+			}
+		System.out.println("Land Info data" + result);
 	}
 }

@@ -8,15 +8,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.bpa.web.model.Address;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.Boundary;
 import org.egov.bpa.web.model.Document;
 import org.egov.bpa.web.model.GeoLocation;
-import org.egov.bpa.web.model.OccupancyType;
-import org.egov.bpa.web.model.OwnerInfo;
-import org.egov.bpa.web.model.Unit;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -65,12 +61,12 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 				GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();
 
-				Address address = Address.builder().buildingName(rs.getString("buildingName"))
+				/*Address address = Address.builder().buildingName(rs.getString("buildingName"))
 						.city(rs.getString("city")).plotNo(rs.getString("plotno")).district(rs.getString("district"))
 						.region(rs.getString("region")).state(rs.getString("state")).country(rs.getString("country"))
 						.id(rs.getString("bpa_ad_id")).landmark(rs.getString("landmark")).locality(locality)
 						.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno"))
-						.street(rs.getString("street")).tenantId(tenantId).build();
+						.street(rs.getString("street")).tenantId(tenantId).build();*/
 
 				currentbpa = BPA.builder()
 						.auditDetails(auditdetails)
