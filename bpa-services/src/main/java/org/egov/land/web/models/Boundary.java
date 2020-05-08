@@ -19,25 +19,29 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Boundary {
+
+	@JsonProperty("id")
+	private String id;
+	
 	@JsonProperty("code")
-	  private String code;
+	private String code;
 
-	  @JsonProperty("name")
-	  private String name;
+	@JsonProperty("name")
+	private String name;
 
-	  @JsonProperty("label")
-	  private String label;
+	@JsonProperty("label")
+	private String label;
 
-	  @JsonProperty("latitude")
-	  private String latitude;
+	@JsonProperty("latitude")
+	private String latitude;
 
-	  @JsonProperty("longitude")
-	  private String longitude;
+	@JsonProperty("longitude")
+	private String longitude;
 
-	  @JsonProperty("children")
-	  private List<Boundary> children;
+	@JsonProperty("children")
+	private List<Boundary> children;
 
-	  @JsonProperty("materializedPath")
-	  private String materializedPath;
+	@JsonProperty("materializedPath")
+	private String materializedPath;
 
 }

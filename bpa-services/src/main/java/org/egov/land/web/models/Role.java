@@ -18,12 +18,12 @@ import lombok.Setter;
 @Builder
 public class Role {
 	 @JsonProperty("name")
-	  private String name = null;
+	  private String name;
 
 	  @JsonProperty("code")
-	  private String code = null;
+	  private String code;
 
 	  @JsonProperty("description")
-	  private String description = null;
+	  private String description;
 
 }

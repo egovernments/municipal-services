@@ -166,8 +166,8 @@ public class EnrichmentService {
 			bpaRequest.getBPA().setAuditDetails(auditDetails);
 
 			// BPA Units
-			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getUnit())) {
-				bpaRequest.getBPA().getLandInfo().getUnit().forEach(unit -> {
+			if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getLandInfo().getUnits())) {
+				bpaRequest.getBPA().getLandInfo().getUnits().forEach(unit -> {
 					if (unit.getId() == null) {
 						unit.setTenantId(bpaRequest.getBPA().getTenantId());
 						unit.setId(UUID.randomUUID().toString());
@@ -366,8 +366,8 @@ public class EnrichmentService {
 		landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
 
 		// units
-		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnit())) {
-			landRequest.getLandInfo().getUnit().forEach(unit -> {
+		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnits())) {
+			landRequest.getLandInfo().getUnits().forEach(unit -> {
 				unit.setTenantId(landRequest.getLandInfo().getTenantId());
 				unit.setId(UUID.randomUUID().toString());
 //				unit.setAuditDetails(auditDetails);

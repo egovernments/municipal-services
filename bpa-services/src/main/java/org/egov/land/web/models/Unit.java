@@ -18,30 +18,33 @@ import lombok.Setter;
 @Builder
 public class Unit {
 	@JsonProperty("id")
-	  private String id;
+	private String id;
 
-	  @JsonProperty("tenantId")
-	  private String tenantId;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-	  @JsonProperty("floorNo")
-	  private String floorNo;
+	@JsonProperty("floorNo")
+	private String floorNo;
 
-	  @JsonProperty("unitType")
-	  private String unitType;
+	@JsonProperty("unitType")
+	private String unitType;
 
-	  @JsonProperty("usageCategory")
-	  private String usageCategory;
+	@JsonProperty("usageCategory")
+	private String usageCategory;
 
-	  @JsonProperty("occupancyType")
-	  private OccupancyType occupancyType;
+	@JsonProperty("occupancyType")
+	private OccupancyType occupancyType;
 
-	  @JsonProperty("occupancyDate")
-	  private Long occupancyDate;
+	@JsonProperty("occupancyDate")
+	private Long occupancyDate;
 
-	  @JsonProperty("constructionDetail")
-	  private ConstructionDetail constructionDetail;
+	@JsonProperty("constructionDetail")
+	private ConstructionDetail constructionDetail;
 
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 
 }

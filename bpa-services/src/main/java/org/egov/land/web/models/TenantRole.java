@@ -1,6 +1,5 @@
 package org.egov.land.web.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
@@ -21,9 +20,9 @@ import lombok.Setter;
 @Builder
 public class TenantRole {
 	  @SerializedName("tenantId")
-	  private String tenantId = null;
+	  private String tenantId;
 
 	  @SerializedName("roles")
-	  private List<Role> roles = new ArrayList<Role>();
+	  private List<Role> roles;
 
 }

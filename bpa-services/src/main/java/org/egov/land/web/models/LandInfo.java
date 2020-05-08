@@ -25,49 +25,48 @@ import lombok.Setter;
 @Builder
 public class LandInfo {
 
-	
 	@JsonProperty("id")
-	  private String id;
+	private String id;
 
-	  @JsonProperty("landUId")
-	  private String landUId;
+	@JsonProperty("landUid")
+	private String landUid;
 
-	  @JsonProperty("landUniqueRegNo")
-	  private String landUniqueRegNo;
+	@JsonProperty("landUniqueRegNo")
+	private String landUniqueRegNo;
 
-	  @JsonProperty("tenantId")
-	  private String tenantId;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-	  @JsonProperty("status")
-	  private Status status;
+	@JsonProperty("status")
+	private Status status;
 
-	  @JsonProperty("address")
-	  private Address address;
+	@JsonProperty("address")
+	private Address address;
 
-	  @JsonProperty("ownershipCategory")
-	  private String ownershipCategory;
+	@JsonProperty("ownershipCategory")
+	private String ownershipCategory;
 
-	  @JsonProperty("owners")
-	  private List<OwnerInfo> owners;
+	@JsonProperty("owners")
+	private List<OwnerInfo> owners;
 
-	  @JsonProperty("institution")
-	  private Institution institution;
+	@JsonProperty("institution")
+	private Institution institution;
 
-	  @JsonProperty("source")
-	  private Source source;
+	@JsonProperty("source")
+	private Source source;
 
-	  @JsonProperty("channel")
-	  private Channel channel;
+	@JsonProperty("channel")
+	private Channel channel;
 
-	  @JsonProperty("documents")
-	  private List<Document> documents;
+	@JsonProperty("documents")
+	private List<Document> documents;
 
-	  @JsonProperty("unit")
-	  private List<Unit> unit;
+	@JsonProperty("units")
+	private List<Unit> units;
 
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
 
-	  @JsonProperty("auditDetails")
-	  private AuditDetails auditDetails;
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 }

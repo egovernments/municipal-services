@@ -27,7 +27,7 @@ public class LandRepository {
 	 *            The bpa create request
 	 */
 	public void save(LandRequest landRequest) {
-		producer.push(config.getSaveTopic(), landRequest);
+		producer.push(config.getSaveLandInfoTopic(), landRequest);
 	}
 	
 //	public void saveLand(LandRequest landRequest) {

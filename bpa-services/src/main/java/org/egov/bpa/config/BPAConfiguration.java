@@ -236,4 +236,7 @@ public class BPAConfiguration {
 	
 	@Value("${egov.landinfo.host}")
 	private String landInfoHost;
+	
+	@Value("${persister.save.landinfo.topic}")
+	private String saveLandInfoTopic;
 }

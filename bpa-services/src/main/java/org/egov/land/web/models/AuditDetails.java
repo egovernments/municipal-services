@@ -19,15 +19,15 @@ import lombok.Setter;
 @Builder
 public class AuditDetails {
 	 @JsonProperty("createdBy")
-	  private String createdBy = null;
+	  private String createdBy;
 
 	  @JsonProperty("lastModifiedBy")
-	  private String lastModifiedBy = null;
+	  private String lastModifiedBy;
 
 	  @JsonProperty("createdTime")
-	  private Long createdTime = null;
+	  private Long createdTime;
 
 	  @JsonProperty("lastModifiedTime")
-	  private Long lastModifiedTime = null;
+	  private Long lastModifiedTime;
 
 }

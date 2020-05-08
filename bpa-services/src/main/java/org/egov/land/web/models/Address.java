@@ -17,52 +17,55 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Address {
-	  @JsonProperty("tenantId")
-	  private String tenantId;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-	  @JsonProperty("doorNo")
-	  private String doorNo;
+	@JsonProperty("doorNo")
+	private String doorNo;
 
-	  @JsonProperty("plotNo")
-	  private String plotNo;
+	@JsonProperty("plotNo")
+	private String plotNo;
 
-	  @JsonProperty("id")
-	  private String id;
+	@JsonProperty("id")
+	private String id;
 
-	  @JsonProperty("landmark")
-	  private String landmark;
+	@JsonProperty("landmark")
+	private String landmark;
 
-	  @JsonProperty("city")
-	  private String city;
+	@JsonProperty("city")
+	private String city;
 
-	  @JsonProperty("district")
-	  private String district;
+	@JsonProperty("district")
+	private String district;
 
-	  @JsonProperty("region")
-	  private String region;
+	@JsonProperty("region")
+	private String region;
 
-	  @JsonProperty("state")
-	  private String state;
+	@JsonProperty("state")
+	private String state;
 
-	  @JsonProperty("country")
-	  private String country;
+	@JsonProperty("country")
+	private String country;
 
-	  @JsonProperty("pincode")
-	  private String pincode;
+	@JsonProperty("pincode")
+	private String pincode;
 
-	  @JsonProperty("additionDetails")
-	  private String additionDetails;
+	@JsonProperty("additionDetails")
+	private String additionDetails;
 
-	  @JsonProperty("buildingName")
-	  private String buildingName;
+	@JsonProperty("buildingName")
+	private String buildingName;
 
-	  @JsonProperty("street")
-	  private String street;
+	@JsonProperty("street")
+	private String street;
 
-	  @JsonProperty("locality")
-	  private Boundary locality;
+	@JsonProperty("locality")
+	private Boundary locality;
 
-	  @JsonProperty("geoLocation")
-	  private GeoLocation geoLocation;
+	@JsonProperty("geoLocation")
+	private GeoLocation geoLocation;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 
 }

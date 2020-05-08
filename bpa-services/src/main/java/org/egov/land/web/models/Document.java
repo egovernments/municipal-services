@@ -14,19 +14,22 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Document {
-	 @JsonProperty("id")
-	  private String id;
+	
+	@JsonProperty("id")
+	private String id;
 
-	  @JsonProperty("documentType")
-	  private String documentType;
+	@JsonProperty("documentType")
+	private String documentType;
 
-	  @JsonProperty("fileStore")
-	  private String fileStore;
+	@JsonProperty("fileStore")
+	private String fileStore;
 
-	  @JsonProperty("documentUid")
-	  private String documentUid;
+	@JsonProperty("documentUid")
+	private String documentUid;
 
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
 
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 }

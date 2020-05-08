@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.bpa.service.UserService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.repository.LandRepository;
 import org.egov.land.util.LandUtil;
@@ -26,7 +25,7 @@ public class LandService {
 	private LandEnrichmentService enrichmentService;
 
 	@Autowired
-	UserService userService;
+	private LandUserService userService;
 
 	@Autowired
 	private LandRepository repository;
@@ -43,7 +42,7 @@ public class LandService {
 		}
 
 		landValidator.validateCreate(landRequest, mdmsData);
-		enrichmentService.enrichBPACreateRequest(landRequest, mdmsData);
+		enrichmentService.enrichLandInfoCreateRequest(landRequest, mdmsData);
 
 		userService.createUser(landRequest);
 		repository.save(landRequest);

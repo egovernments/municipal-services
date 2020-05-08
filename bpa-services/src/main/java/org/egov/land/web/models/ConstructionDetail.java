@@ -20,33 +20,33 @@ import lombok.Setter;
 @Builder
 public class ConstructionDetail {
 	@JsonProperty("id")
-	  private String id;
+	private String id;
 
-	  @JsonProperty	("carpetArea")
-	  private BigDecimal carpetArea;
+	@JsonProperty("carpetArea")
+	private BigDecimal carpetArea;
 
-	  @JsonProperty("builtUpArea")
-	  private BigDecimal builtUpArea;
+	@JsonProperty("builtUpArea")
+	private BigDecimal builtUpArea;
 
-	  @JsonProperty("plinthArea")
-	  private BigDecimal plinthArea;
+	@JsonProperty("plinthArea")
+	private BigDecimal plinthArea;
 
-	  @JsonProperty("superBuiltUpArea")
-	  private BigDecimal superBuiltUpArea;
+	@JsonProperty("superBuiltUpArea")
+	private BigDecimal superBuiltUpArea;
 
-	  @JsonProperty("constructionType")
-	  private String constructionType;
+	@JsonProperty("constructionType")
+	private String constructionType;
 
-	  @JsonProperty("constructionDate")
-	  private Long constructionDate;
+	@JsonProperty("constructionDate")
+	private Long constructionDate;
 
-	  @JsonProperty("dimensions")
-	  private Object dimensions;
+	@JsonProperty("dimensions")
+	private Object dimensions;
 
-	  @JsonProperty("auditDetails")
-	  private AuditDetails auditDetails;
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
 
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
 
 }
