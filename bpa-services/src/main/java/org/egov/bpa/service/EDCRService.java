@@ -2,7 +2,9 @@ package org.egov.bpa.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,7 +61,7 @@ public class EDCRService {
 	 * 
 	 */
 	@SuppressWarnings("rawtypes")
-	public void validateEdcrPlan(BPARequest request, Object mdmsData) {
+	public Map<String, String> validateEdcrPlan(BPARequest request, Object mdmsData) {
 
 		String edcrNo = request.getBPA().getEdcrNumber();
 		String riskType = request.getBPA().getRiskType();
@@ -100,6 +102,19 @@ public class EDCRService {
 				.read("edcrDetail.*.planDetail.virtualBuilding.occupancyTypes.*.type.code");
 		TypeRef<List<Double>> typeRef = new TypeRef<List<Double>>() {
 		};
+//		((Object) bpa.getAdditionalDetails()).put(servicetYPE);
+		bpa.setAdditionalDetails(new HashMap());
+		Map<String, String> additionalDetails = (Map) bpa.getAdditionalDetails();
+		LinkedList<String> serviceType = context.read("edcrDetail.*.planDetail.planInformation.serviceType");
+		if(serviceType == null || serviceType.size() == 0){
+			serviceType.add("NEW_CONSTRUCTION");
+		}
+		LinkedList<String> applicationType = context.read("edcrDetail.*.appliactionType");
+		if(applicationType == null || applicationType.size() == 0){
+			applicationType.add("permit");
+		}
+		additionalDetails.put("serviceType", serviceType.get(0));
+		additionalDetails.put("applicationType", applicationType.get(0));
 		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area", typeRef);
 		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",
 				typeRef);
@@ -134,6 +149,7 @@ public class EDCRService {
 						"The OccupancyType " + OccupancyType + " is not supported! ");
 			}
 		}
+		return additionalDetails;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -161,12 +177,5 @@ public class EDCRService {
 		return CollectionUtils.isEmpty(planReports) ? null : planReports.get(0);
 	}
 
-	/**
-	 * the method for the landinfo which we need 
-	 * in this new requirement to validate the edcr data */
-	
-	public void validateEdcrPlan(@Valid LandRequest landRequest, Object mdmsData) {
-		// TODO Auto-generated method stub
-		
-	}
+
 }

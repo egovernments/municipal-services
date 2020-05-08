@@ -10,9 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -29,7 +29,6 @@ import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
-import org.egov.bpa.web.model.edcr.RequestInfoWrapper;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.ActionValidator;
@@ -37,9 +36,7 @@ import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
-import org.egov.land.web.models.LandInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -91,9 +88,10 @@ public class BPAService {
 		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
-		edcrService.validateEdcrPlan(bpaRequest, mdmsData);
-		bpaValidator.validateCreate(bpaRequest, mdmsData);
-//		bpaValidator.addLandInfoToBPA(bpaRequest);
+		
+		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
+		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
+		bpaValidator.addLandInfoToBPA(bpaRequest);
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
 
 //		LandInfo landInfo = getLandData(bpaRequest.getRequestInfo(), );
@@ -101,8 +99,8 @@ public class BPAService {
 		
 		
 		wfIntegrator.callWorkFlow(bpaRequest);
-/*
-		if (bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+
+		/*if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
@@ -111,11 +109,6 @@ public class BPAService {
 		return bpaRequest.getBPA();
 	}
 
-	private LandInfo getLandData() {
-		// TODO Auto-generated method stub
-		
-		return null;
-	}
 
 	/**
 	 * Searches the Bpa for the given criteria if search is on owner paramter
