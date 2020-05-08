@@ -1,6 +1,13 @@
 package org.egov.wscalculation.validator;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +28,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class WSCalculationValidator {
 
 	@Autowired
@@ -47,8 +57,7 @@ public class WSCalculationValidator {
 		Map<String, String> errorMap = new HashMap<>();
 
 		// Future Billing Period Check
-		if (!StringUtils.isEmpty(meterReading.getBillingPeriod()))
-			masterDataService.getDemandStartAndEndValue(meterReading.getBillingPeriod());
+		validateBillingPeriod(meterReading.getBillingPeriod());
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand() && connection == null) {
@@ -104,6 +113,35 @@ public class WSCalculationValidator {
 
 		if (!errorMap.isEmpty()) {
 			throw new CustomException(errorMap);
+		}
+	}
+	
+	/**
+	 * Billing Period Validation
+	 */
+	private void validateBillingPeriod(String billingPeriod) {
+		if (StringUtils.isEmpty(billingPeriod))
+			 throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing can not empty!!");
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			ZoneId defaultZoneId = ZoneId.systemDefault();
+			Date billingDate = sdf.parse(billingPeriod.split("-")[1].trim());
+			Instant instant = billingDate.toInstant();
+			LocalDate billingLocalDate = instant.atZone(defaultZoneId).toLocalDate();
+			LocalDate localDateTime = LocalDate.now();
+			if ((billingLocalDate.getYear() == localDateTime.getYear())
+					&& (billingLocalDate.getMonthValue() > localDateTime.getMonthValue())) {
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			}
+			if ((billingLocalDate.getYear() > localDateTime.getYear())) {
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			}
+
+		} catch (CustomException | ParseException ex) {
+			log.error("", ex);
+			if (ex instanceof CustomException)
+				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+			throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing period can not parsed!!");
 		}
 	}
 

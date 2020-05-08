@@ -488,7 +488,6 @@ public class MasterDataService {
 			ZoneId defaultZoneId = ZoneId.systemDefault();
 			String dateAndYearMap[] = billingPeriodString.split("-");
 
-			System.out.println(dateAndYearMap[0].trim());
 			Date billingDate = sdf.parse(dateAndYearMap[0].trim() + "-" + dateAndYearMap[1].trim());
 			Instant instant = billingDate.toInstant();
 			LocalDate billingLocalDate = instant.atZone(defaultZoneId).toLocalDate();
@@ -512,7 +511,6 @@ public class MasterDataService {
 			log.error("", ex);
 			if(ex instanceof CustomException) 
 				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
-			
 			throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing period can not parsed!!");
 		}
 		return dateMap;
