@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -26,13 +26,11 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.validator.BPAValidator;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPA.RiskTypeEnum;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.OwnerInfo;
-import org.egov.bpa.web.models.user.UserDetailResponse;
-import org.egov.bpa.web.models.workflow.BusinessService;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.user.UserDetailResponse;
+import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
@@ -82,29 +80,35 @@ public class BPAService {
 
 	@Autowired
 	private NotificationUtil notificationUtil;
-
+	
 	public BPA create(BPARequest bpaRequest) {
-
-		Object mdmsData = util.mDMSCall(bpaRequest);
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
+		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
-		edcrService.validateEdcrPlan(bpaRequest, mdmsData);
-		bpaValidator.validateCreate(bpaRequest, mdmsData);
+		
+		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
+		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
+		bpaValidator.addLandInfoToBPA(bpaRequest);
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
 
-		userService.createUser(bpaRequest);
-
+//		LandInfo landInfo = getLandData(bpaRequest.getRequestInfo(), );
+//		userService.createUser(bpaRequest);
+		
+		
 		wfIntegrator.callWorkFlow(bpaRequest);
 
-		if (bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+		/*if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
-		}
+		}*/
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
+
 
 	/**
 	 * Searches the Bpa for the given criteria if search is on owner paramter
@@ -128,7 +132,7 @@ public class BPAService {
 			}
 
 			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
-				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
+//				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
 			}
 
 			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
@@ -182,15 +186,24 @@ public class BPAService {
 	 *            The update Request
 	 * @return Updated bpa
 	 */
+	/**
+	 * Updates the bpa
+	 * 
+	 * @param bpaRequest
+	 *            The update Request
+	 * @return Updated bpa
+	 */
 	public BPA update(BPARequest bpaRequest) {
-		Object mdmsData = util.mDMSCall(bpaRequest);
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
+		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		BPA bpa = bpaRequest.getBPA();
 
 		if (bpa.getId() == null) {
 			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
 		}
 
-		bpa.getOwners().forEach(owner -> {
+		bpa.getLandInfo().getOwners().forEach(owner -> {
 			if (owner.getOwnerType() == null) {
 				owner.setOwnerType("NONE");
 			}
@@ -206,17 +219,17 @@ public class BPAService {
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 
-		if (bpa.getAction() != null && (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
-				|| bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
+		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
+				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
 
-			if (bpa.getComment() == null || bpa.getComment().isEmpty()) {
+			if (bpa.getWorkflow().getComments() == null || bpa.getWorkflow().getComments().isEmpty()) {
 				throw new CustomException("BPA_UPDATE_ERROR_COMMENT_REQUIRED",
 						"Comment is mandaotory, please provide the comments ");
 			}
 
 		} else {
 			userService.createUser(bpaRequest);
-			if (!bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
+			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 			        actionValidator.validateUpdateRequest(bpaRequest, businessService);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 					workflowService.getCurrentState(bpa.getStatus(), businessService));
@@ -231,10 +244,10 @@ public class BPAService {
 
 		log.info("Bpa status is : " + bpa.getStatus());
 
-		if (bpa.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
+		if (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
 
 			// generate sanction fee demand as well for the low risk application
-			if (bpaRequest.getBPA().getRiskType().equals(RiskTypeEnum.LOW)) {
+			if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
 				calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 			} else {
 				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
@@ -242,19 +255,20 @@ public class BPAService {
 		}
 
 		// Generate the sanction Demand
-		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+		/*if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
-		}
+		}*/
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
 
-		List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive())
+		/*List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive())
 				.collect(Collectors.toList());
 		bpaRequest.getBPA().getOwners().clear();
-		bpaRequest.getBPA().setOwners(activeOwners);
+		bpaRequest.getBPA().setOwners(activeOwners);*/
 
 		return bpaRequest.getBPA();
 
 	}
+
 
 	/**
 	 * Returns bpa from db for the update request
@@ -277,7 +291,6 @@ public class BPAService {
 		return bpa;
 	}
 
-	@SuppressWarnings("resource")
 	public void getEdcrPdf(BPARequest bpaRequest) {
 
 		byte[] ba1 = new byte[1024];
@@ -286,7 +299,7 @@ public class BPAService {
 		PDDocument doc = null;
 		BPA bpa = bpaRequest.getBPA();
 
-		if (StringUtils.isEmpty(bpa.getPermitOrderNo())) {
+		if (StringUtils.isEmpty(bpa.getApprovalNo())) {
 			throw new CustomException("INVALID_REQUEST", "Permit Order No is required.");
 		}
 
@@ -349,17 +362,18 @@ public class BPAService {
 				float startY = mediabox.getUpperRightY() - margin;
 				contentStream.newLineAtOffset(startX, startY);
 
-				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getPermitOrderNo());
-				if (bpa.getOrderGeneratedDate() != null) {
-					Date date = new Date(bpa.getOrderGeneratedDate());
+				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getApprovalNo());
+//				if (bpa.getOrderGeneratedDate() != null) {
+//					Date date = new Date(bpa.getOrderGeneratedDate());
+				Date date = new Date();
 					DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 					String formattedDate = format.format(date);
 					contentStream.newLineAtOffset(400, 4.5f);
 					contentStream.showText(generatedOn + " : " + formattedDate);
-				} else {
+//				} else {
 					contentStream.newLineAtOffset(400, 4.5f);
 					contentStream.showText(generatedOn + " : " + "NA");
-				}
+//				}
 
 				contentStream.endText();
 				contentStream.close();
@@ -379,4 +393,5 @@ public class BPAService {
 			}
 		}
 	}
+
 }

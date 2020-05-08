@@ -1,7 +1,6 @@
 package org.egov.bpa.util;
 
 import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
-import static org.egov.bpa.util.BPAConstants.DEFAULT_OBJECT_MODIFIED_MSG;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
@@ -13,11 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.Difference;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.RequestInfoWrapper;
-import org.egov.bpa.web.models.SMSRequest;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.EventRequest;
+import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.bpa.web.model.SMSRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -62,11 +60,11 @@ public class NotificationUtil {
 	 */
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
-		if (bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
+		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {
-			String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
+			String ACTION_STATUS = bpa.getWorkflow().getAction() + "_" + bpa.getStatus();
 			switch (ACTION_STATUS) {
 
 			case BPAConstants.ACTION_STATUS_INITIATED:
@@ -142,11 +140,11 @@ public class NotificationUtil {
 
 	public String getEventsCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
-		if (bpa.getStatus().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
+		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.M_APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {
-			String ACTION_STATUS = bpa.getAction() + "_" + bpa.getStatus();
+			String ACTION_STATUS = bpa.getWorkflow().getAction() + "_" + bpa.getStatus();
 			switch (ACTION_STATUS) {
 
 			case BPAConstants.ACTION_STATUS_INITIATED:
@@ -278,7 +276,7 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(BPA bpa) {
-		String status = bpa.getStatus();
+		String status = bpa.getStatus().toString();
 		String code = null;
 		if (status.equalsIgnoreCase("PENDING_APPL_FEE")) {
 			code = "BPA.NC_APP_FEE";
@@ -347,7 +345,7 @@ public class NotificationUtil {
 	 * @return customized message for initiate
 	 */
 	private String getInitiatedMsg(BPA bpa, String message) {
-		message = message.replace("<2>", bpa.getServiceType());
+//		message = message.replace("<2>", bpa.getServiceType());
 		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
 	}
@@ -367,7 +365,7 @@ public class NotificationUtil {
 	 * @param smsRequestList
 	 *            The list of SMSRequest to be sent
 	 */
-	public void sendSMS(List<SMSRequest> smsRequestList, boolean isSMSEnabled) {
+	public void sendSMS(List<org.egov.bpa.web.model.SMSRequest> smsRequestList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.info("Messages from localization couldn't be fetched!");
@@ -397,7 +395,7 @@ public class NotificationUtil {
 		return smsRequest;
 	}
 
-	public String getCustomizedMsg(Difference diff, BPA bpa, String localizationMessage) {
+	/*public String getCustomizedMsg(Difference diff, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
 
 		if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
@@ -409,7 +407,7 @@ public class NotificationUtil {
 		}
 
 		return message;
-	}
+	}*/
 
 	/**
 	 * Creates customized message for field chnaged
@@ -451,7 +449,7 @@ public class NotificationUtil {
 	public String getOwnerPaymentMsg(BPA bpa, Map<String, String> valMap, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(BPAConstants.NOTIFICATION_PAYMENT_OWNER, localizationMessages);
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
-		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
+//		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
 		return messageTemplate;
 	}
@@ -468,7 +466,7 @@ public class NotificationUtil {
 	public String getPayerPaymentMsg(BPA bpa, Map<String, String> valMap, String localizationMessages) {
 		String messageTemplate = getMessageTemplate(BPAConstants.NOTIFICATION_PAYMENT_PAYER, localizationMessages);
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
-		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
+//		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
 		return messageTemplate;
 	}

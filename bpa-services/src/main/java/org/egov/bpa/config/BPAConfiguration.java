@@ -231,4 +231,21 @@ public class BPAConfiguration {
 
 	@Value("${egov.bpa.validity.date.in.months}")
 	private Integer validityInMonths;
+	
+	//landInfo
+	
+	@Value("${egov.landinfo.host}")
+	private String landInfoHost;
+	
+	@Value("${egov.landinfo.create.endpoint}")
+	private String landInfoCreate;
+	
+	@Value("${egov.landinfo.update.endpoint}")
+	private String landInfoUpdate;
+	
+	@Value("${egov.landinfo.search.endpoint}")
+	private String landInfoSearch;
+	
+	@Value("${persister.save.landinfo.topic}")
+	private String saveLandInfoTopic;
 }

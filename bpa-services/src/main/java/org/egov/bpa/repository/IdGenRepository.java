@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
-import org.egov.bpa.web.models.idgen.IdGenerationRequest;
-import org.egov.bpa.web.models.idgen.IdGenerationResponse;
-import org.egov.bpa.web.models.idgen.IdRequest;
+import org.egov.bpa.web.model.idgen.IdGenerationRequest;
+import org.egov.bpa.web.model.idgen.IdGenerationResponse;
+import org.egov.bpa.web.model.idgen.IdRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;

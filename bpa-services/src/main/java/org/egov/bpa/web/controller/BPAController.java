@@ -11,11 +11,11 @@ import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPAResponse;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.RequestInfoWrapper;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPAResponse;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -27,8 +27,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@RequestMapping("/v1/bpa")
 public class BPAController {
 
 	@Autowired

@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.CalculationReq;
-import org.egov.bpa.web.models.CalulationCriteria;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.CalculationReq;
+import org.egov.bpa.web.model.CalulationCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

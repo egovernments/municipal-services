@@ -7,11 +7,11 @@ import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.collection.PaymentDetail;
-import org.egov.bpa.web.models.collection.PaymentRequest;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.collection.PaymentDetail;
+import org.egov.bpa.web.model.collection.PaymentRequest;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -77,14 +77,14 @@ public class PaymentUpdateService {
 					BPASearchCriteria searchCriteria = new BPASearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
-					searchCriteria.setApplicationNos(codes);
+					searchCriteria.setApplicationNo(codes);
 					List<BPA> bpas = repository.getBPAData(searchCriteria);
 					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
 								"No Building Plan Application found for the comsumerCode "
-										+ searchCriteria.getApplicationNos());
+										+ searchCriteria.getApplicationNo());
 					}
-					bpas.forEach(bpa -> bpa.setAction("PAY"));
+					bpas.forEach(bpa -> bpa.getWorkflow().setAction("PAY"));
 
 					// FIXME check if the update call to repository can be avoided
 					// FIXME check why aniket is not using request info from consumer

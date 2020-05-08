@@ -2,13 +2,14 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.RequestInfoWrapper;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.web.models.workflow.BusinessServiceResponse;
-import org.egov.bpa.web.models.workflow.ProcessInstance;
-import org.egov.bpa.web.models.workflow.ProcessInstanceResponse;
-import org.egov.bpa.web.models.workflow.State;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPA.StatusEnum;
+import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.bpa.web.model.workflow.BusinessService;
+import org.egov.bpa.web.model.workflow.BusinessServiceResponse;
+import org.egov.bpa.web.model.workflow.ProcessInstance;
+import org.egov.bpa.web.model.workflow.ProcessInstanceResponse;
+import org.egov.bpa.web.model.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,16 +113,16 @@ public class WorkflowService {
 	/**
 	 * Returns boolean value to specifying if the state is updatable
 	 * 
-	 * @param string
+	 * @param statusEnum
 	 *            The stateCode of the bpa
 	 * @param businessService
 	 *            The BusinessService of the application flow
 	 * @return State object to be fetched
 	 */
-	public Boolean isStateUpdatable(String string, BusinessService businessService) {
-		for (State state : businessService.getStates()) {
+	public Boolean isStateUpdatable(StatusEnum statusEnum, BusinessService businessService) {
+		for (org.egov.bpa.web.model.workflow.State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(string.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
 				return state.getIsStateUpdatable();
 		}
 		return Boolean.FALSE;
@@ -130,16 +131,16 @@ public class WorkflowService {
 	/**
 	 * Returns State name fo the current state of the document
 	 * 
-	 * @param string
+	 * @param statusEnum
 	 *            The stateCode of the bpa
 	 * @param businessService
 	 *            The BusinessService of the application flow
 	 * @return State String to be fetched
 	 */
-	public String getCurrentState(String string, BusinessService businessService) {
+	public String getCurrentState(StatusEnum statusEnum, BusinessService businessService) {
 		for (State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(string.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
 				return state.getState();
 		}
 		return null;
@@ -148,16 +149,16 @@ public class WorkflowService {
 	/**
 	 * Returns State Obj fo the current state of the document
 	 * 
-	 * @param string
+	 * @param statusEnum
 	 *            The stateCode of the bpa
 	 * @param businessService
 	 *            The BusinessService of the application flow
 	 * @return State object to be fetched
 	 */
-	public State getCurrentStateObj(String string, BusinessService businessService) {
+	public State getCurrentStateObj(StatusEnum statusEnum, BusinessService businessService) {
 		for (State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(string.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
 				return state;
 		}
 		return null;

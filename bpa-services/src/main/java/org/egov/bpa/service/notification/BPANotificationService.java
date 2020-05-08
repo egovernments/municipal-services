@@ -9,30 +9,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.service.UserService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
-import org.egov.bpa.web.models.Action;
-import org.egov.bpa.web.models.ActionItem;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.BPASearchCriteria;
-import org.egov.bpa.web.models.Event;
-import org.egov.bpa.web.models.EventRequest;
-import org.egov.bpa.web.models.Recepient;
-import org.egov.bpa.web.models.SMSRequest;
-import org.egov.bpa.web.models.Source;
-import org.egov.bpa.web.models.user.UserDetailResponse;
+import org.egov.bpa.web.model.ActionItem;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.Event;
+import org.egov.bpa.web.model.EventRequest;
+import org.egov.bpa.web.model.Recepient;
+import org.egov.bpa.web.model.SMSRequest;
+import org.egov.bpa.web.model.Source;
+import org.egov.bpa.web.model.user.UserDetailResponse;
+import org.egov.bpa.web.model.workflow.Action;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -121,7 +121,7 @@ public class BPANotificationService {
 			if (payTriggerList.contains(bpaApplication.getStatus())) {
 				List<ActionItem> items = new ArrayList<>();
 				String busineService = null;
-				if (bpaApplication.getStatus().equalsIgnoreCase("PENDING_APPL_FEE")) {
+				if (bpaApplication.getStatus().toString().equalsIgnoreCase("PENDING_APPL_FEE")) {
 					busineService = "BPA.NC_APP_FEE";
 				} else {
 					busineService = "BPA.NC_SAN_FEE";
@@ -132,12 +132,14 @@ public class BPANotificationService {
 				actionLink = config.getUiAppHost() + actionLink;
 				ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 				items.add(item);
-				action = Action.builder().actionUrls(items).build();
+//				action = Action.builder().actionUrls(items).build();
 			}
 
 			events.add(Event.builder().tenantId(bpaApplication.getTenantId()).description(mobileNumberToMsg.get(mobile))
 					.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
-					.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
+					.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY)
+//					.source(Source.WEBAPP)
+					.recepient(recepient)
 					.eventDetails(null).actions(action).build());
 		}
 
@@ -216,15 +218,15 @@ public class BPANotificationService {
 		List<String> ownerId = new ArrayList<String>();
 		ownerId.add(stakeUUID);
 		BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
-		bpaSearchCriteria.setOwnerIds(ownerId);
+//		bpaSearchCriteria.setOwnerIds(ownerId);
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
-		if (!bpaRequest.getBPA().getAction().equals("SEND_TO_ARCHITECT")
+		/*if (!bpaRequest.getBPA().getWorkflow().getAction().equals("SEND_TO_ARCHITECT")
 				&& (!bpaRequest.getBPA().getStatus().equals("INPROGRESS")
-						|| !bpaRequest.getBPA().getAction().equals("APPROVE"))) {
-			if (bpaRequest.getBPA().getOwners().get(0).getId() == null) {
+						|| !bpaRequest.getBPA().getWorkflow().getAction().equals("APPROVE"))) {
+			if (bpaRequest.getBPA().getLandInfo().getOwners().get(0).getId() == null) {
 				BPASearchCriteria bpaOwnerSearchCriteria = new BPASearchCriteria();
 				List<String> ownerIds = new ArrayList<String>();
 				ownerIds.add(bpaRequest.getBPA().getOwners().get(0).getUuid());
@@ -243,7 +245,7 @@ public class BPANotificationService {
 					}
 				});
 			}
-		}
+		}*/
 		return mobileNumberToOwner;
 	}
 }

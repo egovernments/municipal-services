@@ -5,18 +5,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
-import org.egov.bpa.web.models.workflow.Action;
-import org.egov.bpa.web.models.workflow.BusinessService;
-import org.egov.bpa.web.models.workflow.State;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.workflow.Action;
+import org.egov.bpa.web.model.workflow.BusinessService;
+import org.egov.bpa.web.model.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
+import org.egov.land.web.models.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
 
 @Component
 public class ActionValidator {
@@ -93,7 +97,7 @@ public class ActionValidator {
 				});
 			});
 
-			if (!validActions.contains(bpa.getAction())) {
+			if (!validActions.contains(bpa.getWorkflow().getAction())) {
 				errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
 			}
 		}else {
@@ -120,7 +124,7 @@ public class ActionValidator {
 			if(bpa.getId() == null) {
 				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of Application cannot be null");
 			}
-			if(bpa.getAddress() == null) {
+			/*if(bpa.getAddress() == null) {
 				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of address cannot be null");
 			}
 			if(!CollectionUtils.isEmpty(bpa.getOwners())) {
@@ -140,7 +144,7 @@ public class ActionValidator {
 	                if(tradeUnit.getId()==null)
 	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of tradeUnit cannot be null");
 	            });
-			}
+			}*/
 			 if(!CollectionUtils.isEmpty(bpa.getDocuments())){
 				 bpa.getDocuments().forEach(document -> {
                      if(document.getId()==null)
@@ -151,6 +155,30 @@ public class ActionValidator {
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+
+	public void validateUpdateRequest(@Valid LandRequest landRequest, BusinessService businessService) {
+		// TODO Auto-generated method stub
+		validateDocumentsForUpdate(landRequest);
+		validateRoleAction(landRequest,businessService);
+//		validateAction(landRequest);
+		validateIds(landRequest, businessService);
+	}
+
+
+	private void validateIds(@Valid LandRequest landRequest, BusinessService businessService) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void validateRoleAction(@Valid LandRequest landRequest, BusinessService businessService) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void validateDocumentsForUpdate(@Valid LandRequest landRequest) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

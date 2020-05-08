@@ -4,13 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-
 import org.egov.bpa.config.BPAConfiguration;
-import org.egov.bpa.web.models.BPA;
-import org.egov.bpa.web.models.BPARequest;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.Workflow;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +18,10 @@ import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -74,67 +75,11 @@ public class WorkflowIntegrator {
 	 * @param bpaRequest
 	 */
 	public void callWorkFlow(BPARequest bpaRequest) {
-		String wfTenantId = bpaRequest.getBPA().getTenantId();
-		JSONArray array = new JSONArray();
-		BPA bpa = bpaRequest.getBPA();
-		JSONObject obj = new JSONObject();
-		obj.put(BUSINESSIDKEY, bpa.getApplicationNo());
-		obj.put(TENANTIDKEY, wfTenantId);
-		if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
-			obj.put(BUSINESSSERVICEKEY, config.getLowBusinessServiceValue());
-		} else {
-			obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
-		}
-		obj.put(MODULENAMEKEY, MODULENAMEVALUE);
-		obj.put(ACTIONKEY, bpa.getAction());
-		obj.put(COMMENTKEY, bpa.getComment());
-		if (!CollectionUtils.isEmpty(bpa.getAssignees())) {
-			obj.put(ASSIGNEEKEY, bpa.getAssignees());
-		}
-		obj.put(DOCUMENTSKEY, bpa.getWfDocuments());
-		array.add(obj);
-		JSONObject workFlowRequest = new JSONObject();
-		workFlowRequest.put(REQUESTINFOKEY, bpaRequest.getRequestInfo());
-		workFlowRequest.put(WORKFLOWREQUESTARRAYKEY, array);
-		String response = null;
-		try {
-			response = rest.postForObject(config.getWfHost().concat(config.getWfTransitionPath()), workFlowRequest,
-					String.class);
-		} catch (HttpClientErrorException e) {
 
-			/*
-			 * extracting message from client error exception
-			 */
-			DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-			List<Object> errros = null;
-			try {
-				errros = responseContext.read("$.Errors");
-			} catch (PathNotFoundException pnfe) {
-				log.error("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
-						" Unable to read the json path in error object : " + pnfe.getMessage());
-			}
-			throw new CustomException("EG_WF_ERROR", errros.toString());
-		} catch (Exception e) {
-			throw new CustomException("EG_WF_ERROR",
-					" Exception occured while integrating with workflow : " + e.getMessage());
-		}
+	}
 
-		/*
-		 * on success result from work-flow read the data and set the status
-		 * back to BPA object
-		 */
-		DocumentContext responseContext = JsonPath.parse(response);
-		List<Map<String, Object>> responseArray = responseContext.read(PROCESSINSTANCESJOSNKEY);
-		Map<String, String> idStatusMap = new HashMap<>();
-		responseArray.forEach(object -> {
-
-			DocumentContext instanceContext = JsonPath.parse(object);
-			idStatusMap.put(instanceContext.read(BUSINESSIDJOSNKEY), instanceContext.read(STATUSJSONKEY));
-		});
-		// setting the status back to BPA object from wf response
-		bpa.setStatus(idStatusMap.get(bpa.getApplicationNo()));
-
+	public void callWorkFlow(Workflow workflow) {
+		// TODO Auto-generated method stub
+		
 	}
 }

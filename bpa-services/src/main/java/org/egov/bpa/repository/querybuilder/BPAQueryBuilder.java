@@ -1,10 +1,9 @@
 package org.egov.bpa.repository.querybuilder;
 
-import java.util.Calendar;
 import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
-import org.egov.bpa.web.models.BPASearchCriteria;
+import org.egov.bpa.web.model.BPASearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -21,7 +20,7 @@ public class BPAQueryBuilder {
 	private static final String QUERY = "SELECT bpa.*,bpaunit.*,bpaowner.*,"
 			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-			+ "bpa_createdTime,bpa.validityDate,bpa.additionalDetails,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
+			+ "bpa_createdTime,bpa.additionalDetails,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
 			+ "bpaowner.id as bpaowner_uuid," 
 			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
 			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestoreid as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
@@ -77,51 +76,25 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
-		List<String> edcrNumbers = criteria.getEdcrNumbers();
+		List<String> edcrNumbers = criteria.getEdcrNumber();
 		if (!CollectionUtils.isEmpty(edcrNumbers)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
 			addToPreparedStatement(preparedStmtList, edcrNumbers);
 		}
 
-		List<String> applicationNos = criteria.getApplicationNos();
+		List<String> applicationNos = criteria.getApplicationNo();
 		if (!CollectionUtils.isEmpty(applicationNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos)).append(")");
 			addToPreparedStatement(preparedStmtList, applicationNos);
 		}
 		
-		List<String> permitNos = criteria.getPermitNos();
-		if (!CollectionUtils.isEmpty(permitNos)) {
+		List<String> approvalNo = criteria.getApprovalNo();
+		if (!CollectionUtils.isEmpty(approvalNo)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.permitorderno IN (").append(createQuery(permitNos)).append(")");
-			addToPreparedStatement(preparedStmtList, permitNos);
-		}
-		
-		Long permitDt = criteria.getPermitDate();
-		if ( permitDt != null) {
-			
-			Calendar permitDate = Calendar.getInstance();
-			permitDate.setTimeInMillis(permitDt);
-			
-			int year = permitDate.get(Calendar.YEAR);
-		    int month = permitDate.get(Calendar.MONTH);
-		    int day = permitDate.get(Calendar.DATE);
-			
-			Calendar permitStrDate = Calendar.getInstance();
-			permitStrDate.setTimeInMillis(0);
-			permitStrDate.set(year, month, day, 0, 0, 0);
-			
-			Calendar permitEndDate = Calendar.getInstance();
-			permitEndDate.setTimeInMillis(0);
-			permitEndDate.set(year, month, day, 23, 59, 59);
-			
-			
-			addClauseIfRequired(preparedStmtList, builder);
-			
-			builder.append(" bpa.orderGeneratedDate BETWEEN ").append(permitStrDate.getTimeInMillis()).append(" AND ")
-			.append(permitEndDate.getTimeInMillis());
-			
+			builder.append(" bpa.permitorderno IN (").append(createQuery(approvalNo)).append(")");
+			addToPreparedStatement(preparedStmtList, approvalNo);
 		}
 
 		if (criteria.getMobileNumber() != null) {
@@ -129,7 +102,7 @@ public class BPAQueryBuilder {
 			builder.append(" bpaowner.mobileNumber = ? ");
 			preparedStmtList.add(criteria.getMobileNumber());
 
-		} else if (criteria.getCreatedBy() != null) {
+		} /*else if (criteria.getCreatedBy() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" ( bpa.createdby = ? ");
 			preparedStmtList.add(criteria.getCreatedBy());
@@ -145,7 +118,17 @@ public class BPAQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.createdtime >= ").append(criteria.getFromDate());
 		}
+		
+		if(criteria.getApplicationDate() != null){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.applicationDate = ").append(criteria.getApplicationDate());
+		}
 
+		if(criteria.getOrderGeneratedDate() != null){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.orderGeneratedDate = ").append(criteria.getOrderGeneratedDate());
+		}*/
+		
 		addClauseIfRequired(preparedStmtList, builder);
 		builder.append(" bpaowner.active = TRUE"); // To get the active owners
 
