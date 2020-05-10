@@ -15,6 +15,7 @@ import org.egov.pt.models.user.User;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.repository.builder.PropertyQueryBuilder;
+import org.egov.pt.repository.rowmapper.OpenPropertyRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyAuditRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.service.UserService;
@@ -25,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Sets;
 
@@ -39,6 +41,9 @@ public class PropertyRepository {
 
 	@Autowired
 	private PropertyRowMapper rowMapper;
+	
+	@Autowired
+	private OpenPropertyRowMapper openRowMapper;
 	
 	@Autowired
 	private PropertyAuditRowMapper auditRowMapper;
@@ -56,11 +61,14 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria) {
+	public List<Property> getProperties(PropertyCriteria criteria, String authToken) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		if (StringUtils.isEmpty(authToken))
+			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
+		else
+			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
 	public List<String> fetchAuditUUIDs(PropertyCriteria criteria) {
@@ -91,11 +99,11 @@ public class PropertyRepository {
 
 		List<Property> properties;
 
-		if (criteria.isAudit()) {
+		if (criteria.isAudit() && !StringUtils.isEmpty(requestInfo.getAuthToken())) {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria);
+			properties = getProperties(criteria, requestInfo.getAuthToken());
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
