@@ -3,6 +3,7 @@ package org.egov.tl.util;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.producer.Producer;
@@ -232,6 +233,11 @@ public class NotificationUtil {
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
+
+		URIBuilder uriBuilder = new URIBuilder().setHost(config.getUiAppHost()).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
+				.setParameter("tenantId",license.getTenantId()).setParameter("businessService",businessService_TL);
+
+		message = message.replace(PAYMENT_LINK_PLACEHOLDER,uriBuilder.toString());
 		return message;
 	}
 

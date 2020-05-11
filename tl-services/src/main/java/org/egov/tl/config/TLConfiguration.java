@@ -249,6 +249,9 @@ public class TLConfiguration {
 		
 	@Value("${egov.usr.events.pay.link}")
 	private String payLink;
+
+    @Value("${egov.msg.pay.link}")
+    private String payLinkSMS;
 	
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
