@@ -177,6 +177,9 @@ public class PropertyConfiguration {
 	
 	@Value("${egov.pt.assessment.update.topic}")
 	private String updateAssessmentTopic;
+
+    @Value("${egov.msg.pay.link}")
+    private String payLinkSMS;
 	
 
     // Workflow

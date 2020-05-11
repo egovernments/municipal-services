@@ -1,20 +1,12 @@
 package org.egov.pt.service;
 
 
-import static org.egov.pt.util.PTConstants.LOCALIZATION_ASMT_PREFIX;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_ASMT_PREFIX;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_ASSESSMENTNUMBER;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_ASSESSMENT_CREATE;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_ASSESSMENT_UPDATE;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_FINANCIALYEAR;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_PROPERTYID;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_STATUS;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Assessment;
@@ -31,6 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
+
+import static org.egov.pt.util.PTConstants.*;
 
 @Slf4j
 @Component
@@ -159,6 +153,12 @@ public class AssessmentNotificationService {
 
         if(messageTemplate.contains(NOTIFICATION_FINANCIALYEAR))
             messageTemplate = messageTemplate.replace(NOTIFICATION_FINANCIALYEAR, assessment.getFinancialYear());
+
+        if(messageTemplate.contains(NOTIFICATION_PAYMENT_LINK)){
+             URIBuilder uriBuilder = new URIBuilder().setHost(config.getUiAppHost()).setPath(config.getPayLinkSMS()).setParameter("consumerCode",property.getPropertyId())
+                .setParameter("tenantId",property.getTenantId()).setParameter("businessService",PT_BUSINESSSERVICE);
+             messageTemplate = messageTemplate.replace(NOTIFICATION_PAYMENT_LINK,uriBuilder.toString());
+        }
 
         return messageTemplate;
     }

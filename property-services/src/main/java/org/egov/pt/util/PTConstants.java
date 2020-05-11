@@ -259,6 +259,7 @@ public class PTConstants {
 
     public static final String NOTIFICATION_ASMT_PREFIX = "ASMT_MSG_";
 
+    public static final String NOTIFICATION_PAYMENT_LINK = "{PAYMENT_LINK}";
 
 
     public static final String ONLINE_PAYMENT_MODE = "ONLINE";
