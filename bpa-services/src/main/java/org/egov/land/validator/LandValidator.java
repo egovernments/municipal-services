@@ -17,13 +17,12 @@ public class LandValidator {
 //	private MDMSValidator mdmsValidator;
 	
 	
-	public void validateCreate(@Valid LandRequest landRequest, Object mdmsData) {
+	public void validateLandInfo(@Valid LandRequest landRequest) {
 //		mdmsValidator.validateMdmsData(landRequest, mdmsData);
-		validateApplicationDocuments(landRequest, mdmsData, null);
-		validateUser(landRequest);
-		
+		validateApplicationDocuments(landRequest, null);
+		validateUser(landRequest);		
 	}
-
+	
 	private void validateUser(@Valid LandRequest landRequest) {
 		landRequest.getLandInfo().getOwners().forEach(owner->{
 			if (StringUtils.isEmpty(owner.getRelationship())) {
@@ -32,7 +31,7 @@ public class LandValidator {
 		});		
 	}
 
-	private void validateApplicationDocuments(@Valid LandRequest landRequest, Object mdmsData, Object currentState) {
+	private void validateApplicationDocuments(@Valid LandRequest landRequest, Object currentState) {
 		if (landRequest.getLandInfo().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			landRequest.getLandInfo().getDocuments().forEach(document -> {

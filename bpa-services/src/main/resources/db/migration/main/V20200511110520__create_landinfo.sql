@@ -148,31 +148,6 @@ CREATE TABLE eg_land_unit(
 
 );
 
-CREATE TABLE eg_land_constructionDetail(
-
-	id character varying(64),
-	carpetArea bigint,
-	builtUpArea bigint,	
-	plinthArea bigint,
-	superBuiltUpArea bigint,	
-	constructionType character varying(64),
-	constructionDate bigint,
-	dimensions character varying(256),
-	additionalDetails JSONB,
-	
-	unitId character varying(64),
-	createdBy character varying(64),
-	lastModifiedBy character varying(64),
-	createdTime bigint,
-	lastModifiedTime bigint,
-	
-	
-	CONSTRAINT pk_eg_land_constructionDetail PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_constructionDetail UNIQUE (id),
-	CONSTRAINT fk_eg_land_constructionDetail FOREIGN KEY (unitId) REFERENCES eg_land_unit (id)
-
-);
-
 CREATE TABLE public.eg_land_auditdetails
 (
     id character varying(256) COLLATE pg_catalog."default" NOT NULL,
@@ -187,6 +162,5 @@ CREATE TABLE public.eg_land_auditdetails
     createdby character varying(64) COLLATE pg_catalog."default",
     lastmodifiedby character varying(64) COLLATE pg_catalog."default",
     createdtime bigint,
-    lastmodifiedtime bigint,
-    CONSTRAINT pk_eg_land_auditdetails PRIMARY KEY (id)
+    lastmodifiedtime bigint
 );

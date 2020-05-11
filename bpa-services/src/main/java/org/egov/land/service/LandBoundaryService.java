@@ -40,7 +40,7 @@ public class LandBoundaryService {
 	 * Enriches the locality object by calling the location service
 	 * 
 	 * @param request
-	 *            bpaRequest for create
+	 *            LandRequest for create
 	 * @param hierarchyTypeCode
 	 *            HierarchyTypeCode of the boundaries
 	 */
@@ -51,9 +51,9 @@ public class LandBoundaryService {
 
 		LinkedList<String> localities = new LinkedList<>();
 
-		/*if (request.getBPA().getAddress() == null || request.getBPA().getAddress().getLocality() == null)
+		if (request.getLandInfo().getAddress() == null || request.getLandInfo().getAddress().getLocality() == null)
 			throw new CustomException("INVALID ADDRESS", "The address or locality cannot be null");
-		localities.add(request.getBPA().getAddress().getLocality().getCode());*/
+		localities.add(request.getLandInfo().getAddress().getLocality().getCode());
 
 		StringBuilder uri = new StringBuilder(config.getLocationHost());
 		uri.append(config.getLocationContextPath()).append(config.getLocationEndpoint());
@@ -84,30 +84,28 @@ public class LandBoundaryService {
 		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject)))
 			throw new CustomException("BOUNDARY MDMS DATA ERROR", "The boundary data was not found");
 
-		// LinkedList<Object> boundaryResponse =
-		// context.read(propertyIdToJsonPath
-		// .get(request.getBPA().getId()));
 		Boundary boundary = mapper.convertValue(boundaryObject.get(0), Boundary.class);
-		/*if (boundary.getName() == null)
+		if (boundary.getName() == null)
 			throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
-					+ request.getBPA().getAddress().getLocality().getCode() + " is not available");
-		request.getBPA().getAddress().setLocality(boundary);*/
+					+ request.getLandInfo().getAddress().getLocality().getCode() + " is not available");
+		request.getLandInfo().getAddress().setLocality(boundary);
 
 	}
 
 	/**
-	 * Prepares map of bpaId to jsonpath which contains the code of the bpa
+	 * Prepares map of landInfoId to jsonpath which contains the code of the
+	 * land
 	 * 
 	 * @param request
-	 *            bpaRequest for create
-	 * @return Map of bpaId to jsonPath with bpa locality code
+	 *            landRequest for create
+	 * @return Map of landInfoId to jsonPath with land locality code
 	 */
 	private Map<String, String> getJsonpath(LandRequest request) {
 		Map<String, String> idToJsonPath = new LinkedHashMap<>();
 		String jsonpath = "$..boundary[?(@.code==\"{}\")]";
 
-		/*idToJsonPath.put(request.getBPA().getId(),
-				jsonpath.replace("{}", request.getBPA().getAddress().getLocality().getCode()));*/
+		idToJsonPath.put(request.getLandInfo().getId(),
+				jsonpath.replace("{}", request.getLandInfo().getAddress().getLocality().getCode()));
 
 		return idToJsonPath;
 	}

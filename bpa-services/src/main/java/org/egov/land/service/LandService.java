@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.repository.LandRepository;
-import org.egov.land.util.LandUtil;
 import org.egov.land.validator.LandValidator;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
@@ -30,19 +29,13 @@ public class LandService {
 	@Autowired
 	private LandRepository repository;
 
-	@Autowired
-	private LandUtil util;
-
 	public LandInfo create(@Valid LandRequest landRequest) {
-		RequestInfo requestInfo = landRequest.getRequestInfo();
-		String tenantId = landRequest.getLandInfo().getTenantId().split("\\.")[0];
-		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		if (landRequest.getLandInfo().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
-
-		landValidator.validateCreate(landRequest, mdmsData);
-		enrichmentService.enrichLandInfoCreateRequest(landRequest, mdmsData);
+		
+		landValidator.validateLandInfo(landRequest);
+		enrichmentService.enrichLandInfoRequest(landRequest, false);
 
 		userService.createUser(landRequest);
 		repository.save(landRequest);
@@ -50,9 +43,25 @@ public class LandService {
 	}
 
 	public LandInfo update(@Valid LandRequest landRequest) {
-		return null;
-	}
+		LandInfo landInfo = landRequest.getLandInfo();
 
+		if (landInfo.getId() == null) {
+			throw new CustomException("UPDATE ERROR", "Id is mandatory to update ");
+		}
+
+		landInfo.getOwners().forEach(owner -> {
+			if (owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
+		landValidator.validateLandInfo(landRequest);
+		// landRequest.getLandInfo().setAuditDetails(searchResult.get(0).getAuditDetails());
+		enrichmentService.enrichLandInfoRequest(landRequest, true);
+		repository.update(landRequest);
+
+		return landRequest.getLandInfo();
+	}
+	
 	public List<LandInfo> search(@Valid LandSearchCriteria criteria, RequestInfo requestInfo) {
 		return null;
 	}

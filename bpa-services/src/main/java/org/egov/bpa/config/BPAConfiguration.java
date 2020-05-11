@@ -248,4 +248,7 @@ public class BPAConfiguration {
 	
 	@Value("${persister.save.landinfo.topic}")
 	private String saveLandInfoTopic;
+	
+	@Value("${persister.update.landinfo.topic}")
+	private String updateLandInfoTopic;
 }

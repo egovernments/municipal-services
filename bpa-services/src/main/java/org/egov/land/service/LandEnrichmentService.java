@@ -2,6 +2,7 @@ package org.egov.land.service;
 
 import java.util.UUID;
 
+import org.egov.bpa.config.BPAConfiguration;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.util.LandUtil;
 import org.egov.land.web.models.AuditDetails;
@@ -16,45 +17,62 @@ public class LandEnrichmentService {
 
 	@Autowired
 	private LandUtil landUtil;
+	
+	@Autowired
+	private LandBoundaryService boundaryService;
+	
+	@Autowired
+	private BPAConfiguration config;
 
-	public void enrichLandInfoCreateRequest(LandRequest landRequest, Object mdmsData) {
+	public void enrichLandInfoRequest(LandRequest landRequest, boolean isUpdate) {
 		RequestInfo requestInfo = landRequest.getRequestInfo();
 		AuditDetails auditDetails = landUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		landRequest.getLandInfo().setAuditDetails(auditDetails);
-		landRequest.getLandInfo().setId(UUID.randomUUID().toString());
-		landRequest.getLandInfo().getInstitution().setId(UUID.randomUUID().toString());
-		if(StringUtils.isEmpty(landRequest.getLandInfo().getInstitution().getTenantId())){
-			landRequest.getLandInfo().getInstitution().setTenantId( landRequest.getLandInfo().getTenantId());
+		if (!isUpdate) {
+			landRequest.getLandInfo().setId(UUID.randomUUID().toString());
+			boundaryService.getAreaType(landRequest, config.getHierarchyTypeCode());
+		}
+
+		if (landRequest.getLandInfo().getInstitution() != null) {
+			if (StringUtils.isEmpty(landRequest.getLandInfo().getInstitution().getId()))
+				landRequest.getLandInfo().getInstitution().setId(UUID.randomUUID().toString());
+			if (StringUtils.isEmpty(landRequest.getLandInfo().getInstitution().getTenantId()))
+				landRequest.getLandInfo().getInstitution().setTenantId(landRequest.getLandInfo().getTenantId());
 		}
 
 		// address
-		landRequest.getLandInfo().getAddress().setId(UUID.randomUUID().toString());
-		landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
-		landRequest.getLandInfo().getAddress().setAuditDetails(auditDetails);
-		landRequest.getLandInfo().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
-		landRequest.getLandInfo().getAddress().getLocality().setId(UUID.randomUUID().toString());
-
+		if (landRequest.getLandInfo().getAddress() != null) {
+			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getId()))
+				landRequest.getLandInfo().getAddress().setId(UUID.randomUUID().toString());
+			landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
+			landRequest.getLandInfo().getAddress().setAuditDetails(auditDetails);
+			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getGeoLocation().getId()))
+				landRequest.getLandInfo().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
+			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getLocality().getId()))
+				landRequest.getLandInfo().getAddress().getLocality().setId(UUID.randomUUID().toString());
+		}
 		// units
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnits())) {
 			landRequest.getLandInfo().getUnits().forEach(unit -> {
+				if(StringUtils.isEmpty(unit.getId())) {
+					unit.setId(UUID.randomUUID().toString());
+				}
 				unit.setTenantId(landRequest.getLandInfo().getTenantId());
-				unit.setId(UUID.randomUUID().toString());
 				unit.setAuditDetails(auditDetails);
-				unit.getConstructionDetail().setAuditDetails(auditDetails);
 			});
 		}
 
-		//Documents
+		// Documents
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getDocuments())) {
 			landRequest.getLandInfo().getDocuments().forEach(document -> {
-				if (document.getId() == null) {
+				if (StringUtils.isEmpty(document.getId())) {
 					document.setId(UUID.randomUUID().toString());
 				}
 				document.setAuditDetails(auditDetails);
 			});
 		}
-		
-		//Owners
+
+		// Owners
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getOwners())) {
 			landRequest.getLandInfo().getOwners().forEach(owner -> {
 				owner.setAuditDetails(auditDetails);

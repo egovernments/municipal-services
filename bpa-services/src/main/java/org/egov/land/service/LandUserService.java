@@ -120,6 +120,7 @@ public class LandUserService {
 	 *            The requestInfo of the request
 	 */
 	private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse, RequestInfo requestInfo) {
+		owner.setId(userDetailResponse.getUser().get(0).getId());
 		owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
 		owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
 	}
