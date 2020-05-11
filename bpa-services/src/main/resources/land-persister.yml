@@ -314,17 +314,18 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.id
 
 
-       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landinfoid) WHERE id IS NOT NULL DO UPDATE SET uuid=?, mobilenumber=?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
+       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, uuid) WHERE uuid IS NOT NULL DO UPDATE SET mobilenumber=?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
+         basePath: LandInfo.owners.*
          jsonMaps:
           - jsonPath: $.LandInfo.owners.*.id
 
           - jsonPath: $.LandInfo.owners.*.uuid
 
-          - jsonPath: $.LandInfo.owners.*.mobilenumber
+          - jsonPath: $.LandInfo.owners.*.mobileNumber
 
-          - jsonPath: $.LandInfo.owners.*.isprimaryowner
+          - jsonPath: $.LandInfo.owners.*.isPrimaryOwner
 
-          - jsonPath: $.LandInfo.owners.*.ownershippercentage
+          - jsonPath: $.LandInfo.owners.*.ownerShipPercentage
 
           - jsonPath: $.LandInfo.owners.*.institutionId
 
@@ -344,9 +345,7 @@ serviceMaps:
 
           - jsonPath: $.LandInfo.owners.*.auditDetails.lastModifiedTime
 
-          - jsonPath: $.LandInfo.owners.*.uuid
-
-          - jsonPath: $.LandInfo.owners.*.mobilenumber
+          - jsonPath: $.LandInfo.owners.*.mobileNumber
 
           - jsonPath: $.LandInfo.owners.*.isPrimaryOwner
 
@@ -382,6 +381,7 @@ serviceMaps:
 
 
        - query: INSERT INTO eg_land_document( id, documenttype, filestore, documentUid, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landinfoid) WHERE id IS NOT NULL DO UPDATE SET documentType=?, filestore=?, documentuid=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
+         basePath: LandInfo.documents.*
          jsonMaps:
           - jsonPath: $.LandInfo.documents.*.id
 
@@ -421,7 +421,8 @@ serviceMaps:
 
 
 
-       - query: INSERT INTO eg_bpa_unit( id,tenantid, floorNo, unitType, usageCategory,occupancyType, occupancyDate,additionaldetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landinfoid) WHERE id IS NOT NULL DO UPDATE SET floorNo=?, unitType=?, usageCategory=?, occupancyType=?, occupancyDate=?, additionalDetails=?,lastModifiedBy=?, lastModifiedTime=?;
+       - query: INSERT INTO eg_land_unit( id,tenantid, floorNo, unitType, usageCategory,occupancyType, occupancyDate,additionaldetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landinfoid) WHERE id IS NOT NULL DO UPDATE SET floorNo=?, unitType=?, usageCategory=?, occupancyType=?, occupancyDate=?, additionalDetails=?,lastModifiedBy=?, lastModifiedTime=?;
+         basePath: LandInfo.units.*
          jsonMaps:
           - jsonPath: $.LandInfo.units.*.id
 
