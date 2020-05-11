@@ -81,11 +81,9 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_land_ownerInfo( id, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: LandInfo.owners.*
          jsonMaps:
-          - jsonPath: $.LandInfo.owners.*.id
-          
           - jsonPath: $.LandInfo.owners.*.uuid
 
           - jsonPath: $.LandInfo.owners.*.mobileNumber
@@ -314,11 +312,9 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.id
 
 
-       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, uuid) WHERE uuid IS NOT NULL DO UPDATE SET mobilenumber=?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
+       - query: INSERT INTO eg_land_ownerInfo( id, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landInfoId) WHERE id IS NOT NULL DO UPDATE SET mobilenumber=?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
          basePath: LandInfo.owners.*
          jsonMaps:
-          - jsonPath: $.LandInfo.owners.*.id
-
           - jsonPath: $.LandInfo.owners.*.uuid
 
           - jsonPath: $.LandInfo.owners.*.mobileNumber

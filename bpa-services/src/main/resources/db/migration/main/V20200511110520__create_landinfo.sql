@@ -70,8 +70,7 @@ CREATE TABLE eg_land_boundary(
 );
 
 CREATE TABLE eg_land_ownerInfo(
-	id bigint,
-	uuid character varying(64),
+	id character varying(64),
 	mobileNumber character varying(256) NOT NULL,
 	isprimaryowner boolean,
 	ownershippercentage double precision,
@@ -86,7 +85,7 @@ CREATE TABLE eg_land_ownerInfo(
     lastmodifiedtime bigint,
 	
 	CONSTRAINT uk_eg_land_ownerInfo UNIQUE (id),
-	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id, uuid),
+	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id, landInfoId),
 	CONSTRAINT fk_eg_land_ownerInfo FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
@@ -121,7 +120,7 @@ CREATE TABLE eg_land_document(
     lastmodifiedtime bigint,
 
 	CONSTRAINT uk_eg_land_document UNIQUE (id),
-	CONSTRAINT pk_eg_land_document PRIMARY KEY (id),
+	CONSTRAINT pk_eg_land_document PRIMARY KEY (id, landInfoId),
 	CONSTRAINT fk_eg_land_document FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
