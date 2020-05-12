@@ -112,22 +112,19 @@ public class MDMSValidator {
 		if (!StringUtils.isEmpty(waterConnection.getConnectionType())
 				&& !codes.get(WCConstants.MDMS_WC_Connection_Type).contains(waterConnection.getConnectionType())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("The WaterConnection connection type ").append(waterConnection.getConnectionType())
-					.append(" does not exists");
+			messageBuilder.append("Connection type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_CONNECTION_TYPE", messageBuilder.toString());
 		}
 		if (!StringUtils.isEmpty(waterConnection.getWaterSource())
 				&& !codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("The WaterConnection connection source ").append(waterConnection.getWaterSource())
-					.append(" does not exists");
+			messageBuilder.append("Water Source value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_CONNECTION_SOURCE", messageBuilder.toString());
 		}
 		if (!StringUtils.isEmpty(waterConnection.getRoadType())
 				&& !codes.get(WCConstants.WC_ROADTYPE_MASTER).contains(waterConnection.getRoadType())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("The WaterConnection road type ").append(waterConnection.getRoadType())
-					.append(" does not exists");
+			messageBuilder.append("Road type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_ROAD_TYPE", messageBuilder.toString());
 		}
 

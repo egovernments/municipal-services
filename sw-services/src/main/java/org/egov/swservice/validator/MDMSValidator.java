@@ -97,16 +97,13 @@ public class MDMSValidator {
 		if (sewerageConnection.getConnectionType() != null 
 				&& !codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("The SewerageConnection connection type ")
-					.append(sewerageConnection.getConnectionType()).append(" does not exists");
-			errorMap.put("INVALID SEWERAGE CONNECTION TYPE", "The SewerageConnection connection type '"
-					+ sewerageConnection.getConnectionType() + "' does not exists");
+			messageBuilder.append("Connection type value is invalid, please enter proper value! ");
+			errorMap.put("INVALID SEWERAGE CONNECTION TYPE", messageBuilder.toString());
 		}
 		if (sewerageConnection.getRoadType() != null
 				&& !codes.get(SWConstants.SC_ROADTYPE_MASTER).contains(sewerageConnection.getRoadType())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("The SewerageConnection road type ").append(sewerageConnection.getRoadType())
-					.append(" does not exists");
+			messageBuilder.append("Road type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_ROAD_TYPE", messageBuilder.toString());
 		}
 		return errorMap;
