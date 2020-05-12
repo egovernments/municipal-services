@@ -26,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Sets;
@@ -61,11 +62,11 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria, String authToken) {
+	public List<Property> getProperties(PropertyCriteria criteria, org.egov.common.contract.request.User userInfo) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		if (StringUtils.isEmpty(authToken))
+		if (ObjectUtils.isEmpty(userInfo))
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
 		else
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
@@ -103,7 +104,7 @@ public class PropertyRepository {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria, requestInfo.getAuthToken());
+			properties = getProperties(criteria, requestInfo.getUserInfo());
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
