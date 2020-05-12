@@ -1,6 +1,7 @@
 package org.egov.land.web.models;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import org.springframework.validation.annotation.Validated;
 
@@ -18,6 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OwnerInfo extends User {
 
+	@JsonProperty("ownerId")
+	private String ownerId;
+	
 	@JsonProperty("isPrimaryOwner")
 	private Boolean isPrimaryOwner;
 
@@ -107,4 +111,20 @@ public class OwnerInfo extends User {
 		this.setUuid(user.getUuid());
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		OwnerInfo owner = (OwnerInfo) obj;
+		
+		return Objects.equals(additionalDetails, owner.additionalDetails) &&
+                Objects.equals(institutionId, owner.institutionId) &&
+                Objects.equals(isPrimaryOwner, owner.isPrimaryOwner) &&
+                Objects.equals(ownerShipPercentage, owner.ownerShipPercentage) &&
+                Objects.equals(ownerType, owner.ownerType);
+	}
 }

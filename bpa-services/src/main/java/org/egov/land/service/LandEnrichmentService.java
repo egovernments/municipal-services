@@ -75,6 +75,8 @@ public class LandEnrichmentService {
 		// Owners
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getOwners())) {
 			landRequest.getLandInfo().getOwners().forEach(owner -> {
+				if(StringUtils.isEmpty(owner.getOwnerId()))
+					owner.setOwnerId(UUID.randomUUID().toString());
 				owner.setAuditDetails(auditDetails);
 			});
 		}

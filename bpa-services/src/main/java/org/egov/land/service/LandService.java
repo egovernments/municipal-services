@@ -35,9 +35,9 @@ public class LandService {
 		}
 		
 		landValidator.validateLandInfo(landRequest);
-		enrichmentService.enrichLandInfoRequest(landRequest, false);
-
-		userService.createUser(landRequest);
+		userService.manageUser(landRequest);
+		
+		enrichmentService.enrichLandInfoRequest(landRequest, false);		
 		repository.save(landRequest);
 		return landRequest.getLandInfo();
 	}
@@ -55,7 +55,7 @@ public class LandService {
 			}
 		});
 		landValidator.validateLandInfo(landRequest);
-		// landRequest.getLandInfo().setAuditDetails(searchResult.get(0).getAuditDetails());
+		userService.manageUser(landRequest);
 		enrichmentService.enrichLandInfoRequest(landRequest, true);
 		repository.update(landRequest);
 

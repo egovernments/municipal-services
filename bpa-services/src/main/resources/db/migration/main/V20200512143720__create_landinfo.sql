@@ -55,22 +55,9 @@ CREATE TABLE eg_land_GeoLocation(
 	CONSTRAINT fk_eg_bpa_GeoLocation FOREIGN KEY (addressId) REFERENCES eg_land_Address (id)
 );
 
-CREATE TABLE eg_land_boundary(
-
-	id character varying(64) NOT NULL,
-	code character varying(64) NOT NULL,
-	name character varying(256),
-	label character varying(256),
-	latitude character varying(256),
-	longitude character varying(256),
-	materializedPath character varying(256),
-	addressId character varying(64),
-
-	CONSTRAINT fk_eg_land_boundary FOREIGN KEY (addressId) REFERENCES eg_land_Address (id)
-);
-
 CREATE TABLE eg_land_ownerInfo(
 	id character varying(64),
+	uuid character varying(64),
 	mobileNumber character varying(256) NOT NULL,
 	isprimaryowner boolean,
 	ownershippercentage double precision,
@@ -84,8 +71,8 @@ CREATE TABLE eg_land_ownerInfo(
     createdtime bigint,
     lastmodifiedtime bigint,
 	
-	CONSTRAINT uk_eg_land_ownerInfo UNIQUE (id),
-	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id, landInfoId),
+	CONSTRAINT uk_eg_land_ownerInfo UNIQUE (id, landInfoId),
+	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id),
 	CONSTRAINT fk_eg_land_ownerInfo FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
@@ -119,8 +106,8 @@ CREATE TABLE eg_land_document(
     createdtime bigint,
     lastmodifiedtime bigint,
 
-	CONSTRAINT uk_eg_land_document UNIQUE (id),
-	CONSTRAINT pk_eg_land_document PRIMARY KEY (id, landInfoId),
+	CONSTRAINT uk_eg_land_document UNIQUE (id, landInfoId),
+	CONSTRAINT pk_eg_land_document PRIMARY KEY (id),
 	CONSTRAINT fk_eg_land_document FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
@@ -142,7 +129,7 @@ CREATE TABLE eg_land_unit(
     lastmodifiedtime bigint,
 		
 	CONSTRAINT pk_eg_land_unit PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_unit UNIQUE (id,landInfoId,tenantId),
+	CONSTRAINT uk_eg_land_unit UNIQUE (id, landInfoId, tenantId),
 	CONSTRAINT fk_eg_land_unit FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 
 );
