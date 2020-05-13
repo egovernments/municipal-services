@@ -225,6 +225,15 @@
               "roles": [
                 "BPA_VERIFIER"
               ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "DOC_VERIFICATION_PENDING",
+              "action": "SEND_BACK_TO_CITIZEN",
+              "nextState": "BACK_FROM_DOC_VERIFICATION",
+              "roles": [
+                "BPA_VERIFIER"
+              ]
             }
           ]
         },
@@ -236,7 +245,7 @@
           "docUploadRequired": false,
           "isStartState": false,
           "isTerminateState": false,
-          "isStateUpdatable": true,
+          "isStateUpdatable": false,
           "actions": [
             {
               "tenantId": "pb",
@@ -255,6 +264,15 @@
               "roles": [
                 "BPA_FIELD_INSPECTOR"
               ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "FIELDINSPECTION_PENDING",
+              "action": "SEND_BACK_TO_CITIZEN",
+              "nextState": "BACK_FROM_FI_VERIFICATION",
+              "roles": [
+                "BPA_FIELD_INSPECTOR"
+              ]
             }
           ]
         },
@@ -266,7 +284,7 @@
           "docUploadRequired": false,
           "isStartState": false,
           "isTerminateState": false,
-          "isStateUpdatable": true,
+          "isStateUpdatable": false,
           "actions": [
             {
               "tenantId": "pb",
@@ -282,6 +300,15 @@
               "currentState": "NOC_VERIFICATION_PENDING",
               "action": "FORWARD",
               "nextState": "PENDINGAPPROVAL",
+              "roles": [
+                "BPA_NOC_VERIFIER"
+              ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "NOC_VERIFICATION_PENDING",
+              "action": "SEND_BACK_TO_CITIZEN",
+              "nextState": "BACK_FROM_NOC_VERIFICATION",
               "roles": [
                 "BPA_NOC_VERIFIER"
               ]
@@ -385,6 +412,72 @@
           "isTerminateState": true,
           "isStateUpdatable": false,
           "actions": null
+        },
+        {
+          "tenantId": "pb",
+          "sla": null,
+          "state": "BACK_FROM_DOC_VERIFICATION",
+          "applicationStatus": "CITIZEN_ACTION_PENDING_AT_DOC_VERIF",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "tenantId": "pb",
+              "currentState": "BACK_FROM_DOC_VERIFICATION",
+              "action": "FORWARD",
+              "nextState": "DOC_VERIFICATION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            }
+          ]
+        },
+        {
+          "tenantId": "pb",
+          "sla": null,
+          "state": "BACK_FROM_FI_VERIFICATION",
+          "applicationStatus": "CITIZEN_ACTION_PENDING_AT_FI_VERIF",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "tenantId": "pb",
+              "currentState": "BACK_FROM_FI_VERIFICATION",
+              "action": "FORWARD",
+              "nextState": "FIELDINSPECTION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            }
+          ]
+        },
+        {
+          "tenantId": "pb",
+          "sla": null,
+          "state": "BACK_FROM_NOC_VERIFICATION",
+          "applicationStatus": "CITIZEN_ACTION_PENDING_AT_NOC_VERIF",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "tenantId": "pb",
+              "currentState": "BACK_FROM_NOC_VERIFICATION",
+              "action": "FORWARD",
+              "nextState": "NOC_VERIFICATION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT"
+              ]
+            }
+          ]
         }
       ]
     }
