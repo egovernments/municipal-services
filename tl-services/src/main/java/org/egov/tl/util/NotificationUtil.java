@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -31,13 +32,16 @@ public class NotificationUtil {
 
 	private Producer producer;
 
+	private RestTemplate restTemplate;
+
 	@Autowired
-	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			Producer producer) {
+	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, Producer producer, RestTemplate restTemplate) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.producer = producer;
+		this.restTemplate = restTemplate;
 	}
+
 
 	final String receiptNumberKey = "receiptNumber";
 
@@ -244,7 +248,7 @@ public class NotificationUtil {
 		URIBuilder uriBuilder = new URIBuilder().setHost(UIHost).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
 				.setParameter("tenantId",license.getTenantId()).setParameter("businessService",businessService_TL);
 
-		message = message.replace(PAYMENT_LINK_PLACEHOLDER,uriBuilder.toString());
+		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(uriBuilder.toString()));
 		return message;
 	}
 
@@ -531,6 +535,27 @@ public class NotificationUtil {
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
+	}
+
+
+	/**
+	 * Method to shortent the url
+	 * returns the same url if shortening fails
+	 * @param url
+	 */
+	public String getShortenedUrl(String url){
+
+		HashMap<String,String> body = new HashMap<>();
+		body.put("url",url);
+		StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
+		builder.append(config.getUrlShortnerEndpoint());
+		String res = restTemplate.postForObject(builder.toString(), body, String.class);
+
+		if(StringUtils.isEmpty(res)){
+			log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
+			return url;
+		}
+		else return res;
 	}
 
 }

@@ -288,6 +288,13 @@ public class TLConfiguration {
 
 
 
+    // url shortner
+
+    @Value("${egov.url.shortner.host}")
+    private String urlShortnerHost;
+
+    @Value("${egov.url.shortner.endpoint}")
+    private String urlShortnerEndpoint;
 
 
 }
