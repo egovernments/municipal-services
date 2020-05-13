@@ -234,7 +234,14 @@ public class NotificationUtil {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
 
-		URIBuilder uriBuilder = new URIBuilder().setHost(config.getUiAppHost()).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
+
+		String UIHost = config.getUiAppHost();
+
+		if (UIHost.endsWith("/")) {
+			UIHost = UIHost.substring(0, UIHost.length() - 1);
+		}
+
+		URIBuilder uriBuilder = new URIBuilder().setHost(UIHost).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
 				.setParameter("tenantId",license.getTenantId()).setParameter("businessService",businessService_TL);
 
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER,uriBuilder.toString());
