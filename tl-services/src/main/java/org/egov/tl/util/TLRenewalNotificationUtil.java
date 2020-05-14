@@ -30,13 +30,17 @@ public class TLRenewalNotificationUtil {
 
     private Producer producer;
 
+    private NotificationUtil notificationUtil;
+
     @Autowired
-    public TLRenewalNotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository,
-                            Producer producer) {
+    public TLRenewalNotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, Producer producer, NotificationUtil notificationUtil) {
         this.config = config;
         this.serviceRequestRepository = serviceRequestRepository;
         this.producer = producer;
+        this.notificationUtil = notificationUtil;
     }
+
+
 
     final String receiptNumberKey = "receiptNumber";
 
@@ -245,9 +249,16 @@ public class TLRenewalNotificationUtil {
         String date = epochToDate(license.getValidTo());
         message = message.replace("<4>", date);
 
-        URIBuilder uriBuilder = new URIBuilder().setHost(config.getUiAppHost()).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
-                .setParameter("tenantId",license.getTenantId()).setParameter("businessService",businessService_TL);
-        message = message.replace(PAYMENT_LINK_PLACEHOLDER,uriBuilder.toString());
+        String UIHost = config.getUiAppHost();
+
+        String paymentPath = config.getPayLinkSMS();
+        paymentPath = paymentPath.replace("$consumercode",license.getApplicationNumber());
+        paymentPath = paymentPath.replace("$tenantId",license.getTenantId());
+        paymentPath = paymentPath.replace("$businessservice",businessService_TL);
+
+        String finalPath = UIHost + paymentPath;
+
+        message = message.replace(PAYMENT_LINK_PLACEHOLDER,notificationUtil.getShortenedUrl(finalPath));
 
         return message;
     }
