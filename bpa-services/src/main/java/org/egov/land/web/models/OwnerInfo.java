@@ -1,13 +1,14 @@
 package org.egov.land.web.models;
 
 import java.math.BigDecimal;
-import java.util.Objects;
+import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +27,7 @@ public class OwnerInfo extends User {
 	private Boolean isPrimaryOwner;
 
 	@JsonProperty("ownerShipPercentage")
-	private BigDecimal ownerShipPercentage;
+	private Double ownerShipPercentage;
 
 	@JsonProperty("ownerType")
 	private String ownerType;
@@ -119,12 +120,32 @@ public class OwnerInfo extends User {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		OwnerInfo owner = (OwnerInfo) obj;
 		
-		return Objects.equals(additionalDetails, owner.additionalDetails) &&
-                Objects.equals(institutionId, owner.institutionId) &&
-                Objects.equals(isPrimaryOwner, owner.isPrimaryOwner) &&
-                Objects.equals(ownerShipPercentage, owner.ownerShipPercentage) &&
-                Objects.equals(ownerType, owner.ownerType);
+		return true;
+	}
+
+	@Builder
+	public OwnerInfo(Long id, String uuid, String userName, String password, String salutation, String name,
+			String gender, String mobileNumber, String emailId, String altContactNumber, String pan,
+			String aadhaarNumber, String permanentAddress, String permanentCity, String permanentPincode,
+			String correspondenceCity, String correspondencePincode, String correspondenceAddress, Boolean active,
+			Long dob, Long pwdExpiryDate, String locale, String type, String signature, Boolean accountLocked,
+			List<Role> roles, String fatherOrHusbandName, String bloodGroup, String identificationMark, String photo,
+			String createdBy, Long createdDate, String lastModifiedBy, Long lastModifiedDate, String otpReference,
+			String tenantId, String ownerId, Boolean isPrimaryOwner, Double ownerShipPercentage, String ownerType,
+			String institutionId, Relationship relationship, Object additionalDetails, AuditDetails auditDetails) {
+		super(id, uuid, userName, password, salutation, name, gender, mobileNumber, emailId, altContactNumber, pan,
+				aadhaarNumber, permanentAddress, permanentCity, permanentPincode, correspondenceCity,
+				correspondencePincode, correspondenceAddress, active, dob, pwdExpiryDate, locale, type, signature,
+				accountLocked, roles, fatherOrHusbandName, bloodGroup, identificationMark, photo, createdBy,
+				createdDate, lastModifiedBy, lastModifiedDate, otpReference, tenantId);
+		this.ownerId = ownerId;
+		this.isPrimaryOwner = isPrimaryOwner;
+		this.ownerShipPercentage = ownerShipPercentage;
+		this.ownerType = ownerType;
+		this.institutionId = institutionId;
+		this.relationship = relationship;
+		this.additionalDetails = additionalDetails;
+		this.auditDetails = auditDetails;
 	}
 }

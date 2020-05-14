@@ -2,6 +2,9 @@ package org.egov.land.web.models;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -17,30 +20,33 @@ import lombok.Setter;
 @Builder
 public class LandSearchCriteria {
 
+	@JsonProperty("tenantId")
+	@NotNull
+	private String tenantId;
 
-	 @JsonProperty("tenantId")
-	    private String tenantId;
+	@JsonProperty("ids")
+	private List<String> ids;
 
-	    @JsonProperty("ids")
-	    private List<String> ids;
+	@JsonProperty("landUid")
+	private String landUid;
 
-	    @JsonProperty("applicationNos")
-	    private String landUid;
+	@JsonProperty("mobileNumber")
+	private String mobileNumber;
+	
+    @JsonProperty("offset")
+    private Integer offset;
 
-	    @JsonProperty("mobileNumber")
-	    private String mobileNumber;
+    @JsonProperty("limit")
+    private Integer limit;
+    
+    @JsonIgnore
+    private List<String> ownerIds;
 
-		
-	    public boolean isEmpty() {
-	        return (this.tenantId == null && this.ids == null && this.landUid == null
-	                && this.mobileNumber == null
-	                
-	        );
-	    }
+	public boolean isEmpty() {
+		return (this.tenantId == null && this.ids == null && this.landUid == null && this.mobileNumber == null);
+	}
 
-	    public boolean tenantIdOnly() {
-	        return (this.tenantId != null &&  this.ids == null && this.landUid == null
-	                && this.mobileNumber == null
-	        );
-	    }
+	public boolean tenantIdOnly() {
+		return (this.tenantId != null && this.ids == null && this.landUid == null && this.mobileNumber == null);
+	}
 }

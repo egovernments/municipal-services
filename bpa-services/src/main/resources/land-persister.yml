@@ -39,7 +39,7 @@ serviceMaps:
           - jsonPath: $.LandInfo.auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_land_Address( id, tenantid, doorno, plotno,landmark, city, district, region, state, country, pincode, additiondetails, buildingname, street, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
+       - query: INSERT INTO eg_land_Address( id, tenantid, doorno, plotno,landmark, city, district, region, state, country, pincode, additiondetails, buildingname, street, locality, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) 
          basePath: LandInfo.address
          jsonMaps:
           - jsonPath: $.LandInfo.address.id
@@ -69,6 +69,8 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.buildingName
 
           - jsonPath: $.LandInfo.address.street
+
+          - jsonPath: $.LandInfo.address.locality.code
 
           - jsonPath: $.LandInfo.id
 
@@ -259,7 +261,7 @@ serviceMaps:
            - jsonPath: $.LandInfo.id
 
 
-       - query: UPDATE eg_land_address SET  doorno=?, plotno=?, district=?, region=?, state=?, country=?, pincode=?, additiondetails=?, buildingname=?, street=?, landmark=?, city=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
+       - query: UPDATE eg_land_address SET  doorno=?, plotno=?, district=?, region=?, state=?, country=?, pincode=?, additiondetails=?, buildingname=?, street=?, landmark=?, city=?, locality=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
          basePath: LandInfo.address
          jsonMaps:
 
@@ -286,6 +288,8 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.landmark
 
           - jsonPath: $.LandInfo.address.city
+
+          - jsonPath: $.LandInfo.address.locality.code
 
           - jsonPath: $.LandInfo.auditDetails.lastModifiedBy
 

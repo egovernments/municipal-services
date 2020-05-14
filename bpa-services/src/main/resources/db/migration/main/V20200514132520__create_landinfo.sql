@@ -29,6 +29,7 @@ CREATE TABLE eg_land_Address(
 	region character varying(64),
 	state character varying(64),
 	country character varying(64),
+	locality character varying(64),
 	pincode character varying(64),
 	additionDetails character varying(64),
 	buildingName character varying(64),
