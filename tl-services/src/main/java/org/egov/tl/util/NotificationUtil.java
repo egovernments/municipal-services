@@ -241,14 +241,14 @@ public class NotificationUtil {
 
 		String UIHost = config.getUiAppHost();
 
-		if (UIHost.endsWith("/")) {
-			UIHost = UIHost.substring(0, UIHost.length() - 1);
-		}
+		String paymentPath = config.getPayLinkSMS();
+		paymentPath = paymentPath.replace("$consumercode",license.getApplicationNumber());
+		paymentPath = paymentPath.replace("$tenantId",license.getTenantId());
+		paymentPath = paymentPath.replace("$businessservice",businessService_TL);
 
-		URIBuilder uriBuilder = new URIBuilder().setHost(UIHost).setPath(config.getPayLinkSMS()).setParameter("consumerCode",license.getApplicationNumber())
-				.setParameter("tenantId",license.getTenantId()).setParameter("businessService",businessService_TL);
+		String finalPath = UIHost + paymentPath;
 
-		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(uriBuilder.toString()));
+		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(finalPath));
 		return message;
 	}
 
