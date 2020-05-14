@@ -71,7 +71,7 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 
 				currentLandInfo = LandInfo.builder().id(id).landUid(rs.getString("landuid"))
 						.landUniqueRegNo(rs.getString("land_regno")).tenantId(tenantId)
-						.status(Status.fromValue(rs.getString("status"))).address(address)
+						.status(rs.getString("status") != null ? Status.fromValue(rs.getString("status")) : null).address(address)
 						.ownershipCategory(rs.getString("ownershipcategory"))
 						.source(rs.getString("source") != null ? Source.fromValue(rs.getString("source")) : null)
 						.channel(rs.getString("channel") != null ? Channel.fromValue(rs.getString("channel")) : null)

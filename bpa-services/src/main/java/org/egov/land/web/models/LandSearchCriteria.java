@@ -38,9 +38,6 @@ public class LandSearchCriteria {
 
     @JsonProperty("limit")
     private Integer limit;
-    
-    @JsonIgnore
-    private List<String> ownerIds;
 
 	public boolean isEmpty() {
 		return (this.tenantId == null && this.ids == null && this.landUid == null && this.mobileNumber == null);

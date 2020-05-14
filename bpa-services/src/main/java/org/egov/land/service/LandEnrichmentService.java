@@ -108,11 +108,11 @@ public class LandEnrichmentService {
 	}
 
 	/**
-	 * Creates search criteria from list of bpa's
+	 * Creates search criteria from list of landInfo's
 	 * 
 	 * @param landInfo
 	 *            's list The landInfo whose id's are added to search
-	 * @return landSearch criteria on basis of bpa id
+	 * @return landSearch criteria on basis of landInfo id
 	 */
 	public LandSearchCriteria getLandCriteriaFromIds(List<LandInfo> landInfo, Integer limit) {
 		LandSearchCriteria criteria = new LandSearchCriteria();
@@ -160,13 +160,5 @@ public class LandEnrichmentService {
 					owner.addUserDetail(userIdToOwnerMap.get(owner.getUuid()));
 			});
 		});
-	}
-
-	public void enrichLandInfoCriteriaWithOwnerids(LandSearchCriteria criteria, UserDetailResponse userDetailResponse) {
-		if (CollectionUtils.isEmpty(criteria.getOwnerIds())) {
-			Set<String> ownerids = new HashSet<>();
-			userDetailResponse.getUser().forEach(owner -> ownerids.add(owner.getUuid()));
-			criteria.setOwnerIds(new ArrayList<>(ownerids));
-		}
 	}
 }
