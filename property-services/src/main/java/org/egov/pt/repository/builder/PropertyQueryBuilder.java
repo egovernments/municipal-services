@@ -24,8 +24,6 @@ public class PropertyQueryBuilder {
 	
 	private static String PROEPRTY_AUDIT_QUERY = "select property from eg_pt_property_audit where propertyid=?";
 
-    private static String PROEPRTY_AUDIT_QUERY_BULK = "select property from eg_pt_property_audit where audituuid IN {replace}";
-
 	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_property where id in (select propertyid from eg_pt_owner where userid IN {replace})";
 	
 	private static String REPLACE_STRING = "{replace}";
@@ -201,14 +199,6 @@ public class PropertyQueryBuilder {
 		query.append(")");
 		
 		return PROEPRTY_ID_QUERY.replace(REPLACE_STRING, query).toString();
-	}
-
-
-	public String getPropertyAuditBulkSearchQuery(Set<String> audituuids) {
-		StringBuilder query = new StringBuilder("(");
-		query.append(createQuery(audituuids));
-		query.append(")");
-		return PROEPRTY_AUDIT_QUERY_BULK.replace(REPLACE_STRING, query).toString();
 	}
 
 	private String createQuery(Set<String> ids) {

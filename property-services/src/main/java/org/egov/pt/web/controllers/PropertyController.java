@@ -89,7 +89,7 @@ public class PropertyController {
 		return new ResponseEntity<>(resultMap, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/_plainauditsearch", method = RequestMethod.POST)
+	@RequestMapping(value = "/_plainsearch", method = RequestMethod.POST)
 	public ResponseEntity<PropertyResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 														@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
 		List<Property> properties = propertyService.searchPropertyPlainSearch(propertyCriteria, requestInfoWrapper.getRequestInfo());

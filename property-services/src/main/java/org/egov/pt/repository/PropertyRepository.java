@@ -72,20 +72,14 @@ public class PropertyRepository {
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
-	public List<String> fetchAuditUUIDs(PropertyCriteria criteria) {
+	public List<String> fetchIds(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
-		return jdbcTemplate.query("select audituuid from eg_pt_property_audit order by auditcreatedtime,audituuid offset " +
+		return jdbcTemplate.query("select id from eg_pt_property order by createdtime,id offset " +
 						" ? " +
 						"limit ? ",
 				preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
-	}
-
-	public List<Property> getPropertiesBulkSearch(PropertyCriteria criteria) {
-		if (criteria.getUuids() == null || criteria.getUuids().isEmpty())
-			throw new CustomException("PLAIN_SEARCH_ERROR", "Search only allowed by ids!");
-		return getPropertyAuditBulk(criteria);
 	}
 
 	/**
@@ -126,10 +120,6 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, criteria.getPropertyIds().toArray(), auditRowMapper);
 	}
 
-	private List<Property> getPropertyAuditBulk(PropertyCriteria criteria) {
-		String query = queryBuilder.getPropertyAuditBulkSearchQuery(criteria.getUuids());
-		return jdbcTemplate.query(query, criteria.getUuids().toArray(), auditRowMapper);
-	}
 
 	/**
 	 * 
