@@ -142,9 +142,6 @@ public class LandUserService {
 		Set<String> uuids = new HashSet<String>();
 		landInfos.forEach(landInfo -> {
 			landInfo.getOwners().forEach(owner -> {
-//				if (owner.getUuid() != null)
-//					ids.add(owner.getUuid().toString());
-
 				if (owner.getUuid() != null)
 					uuids.add(owner.getUuid().toString());
 			});

@@ -59,7 +59,8 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 
 				Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
-				GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();
+				GeoLocation geoLocation = GeoLocation.builder().id(rs.getString("landInfo_geo_loc")).latitude(latitude)
+						.longitude(longitude).build();
 
 				Address address = Address.builder().buildingName(rs.getString("buildingName"))
 						.city(rs.getString("city")).plotNo(rs.getString("plotno")).district(rs.getString("district"))

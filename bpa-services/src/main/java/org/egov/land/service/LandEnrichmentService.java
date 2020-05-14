@@ -10,10 +10,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.land.web.models.Source;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.util.LandUtil;
 import org.egov.land.web.models.AuditDetails;
+import org.egov.land.web.models.Channel;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
@@ -53,6 +55,14 @@ public class LandEnrichmentService {
 				landRequest.getLandInfo().getInstitution().setId(UUID.randomUUID().toString());
 			if (StringUtils.isEmpty(landRequest.getLandInfo().getInstitution().getTenantId()))
 				landRequest.getLandInfo().getInstitution().setTenantId(landRequest.getLandInfo().getTenantId());
+		}
+		
+		if (StringUtils.isEmpty(landRequest.getLandInfo().getChannel())) {
+			landRequest.getLandInfo().setChannel(Channel.SYSTEM);
+		}
+
+		if (StringUtils.isEmpty(landRequest.getLandInfo().getSource())) {
+			landRequest.getLandInfo().setSource(Source.MUNICIPAL_RECORDS);
 		}
 
 		// address
@@ -132,14 +142,7 @@ public class LandEnrichmentService {
 
 	private void enrichBoundary(List<LandRequest> landRequests) {
 		landRequests.forEach(landRequest -> {
-			String code = null;
-			if (landRequest.getLandInfo().getAddress() != null
-					&& landRequest.getLandInfo().getAddress().getLocality() != null) {
-				code = landRequest.getLandInfo().getAddress().getLocality().getCode() != null
-						? landRequest.getLandInfo().getAddress().getLocality().getCode()
-						: config.getHierarchyTypeCode();
-				boundaryService.getAreaType(landRequest, code);
-			}
+			boundaryService.getAreaType(landRequest, config.getHierarchyTypeCode());
 		});
 	}
 

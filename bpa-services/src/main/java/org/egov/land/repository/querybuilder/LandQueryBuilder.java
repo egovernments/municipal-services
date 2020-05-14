@@ -77,6 +77,13 @@ public class LandQueryBuilder {
 			preparedStmtList.add(criteria.getMobileNumber());
 
 		}
+		
+		if (criteria.getLandUid() != null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" landInfo.landuid = ? ");
+			preparedStmtList.add(criteria.getLandUid());
+		}
+		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}
