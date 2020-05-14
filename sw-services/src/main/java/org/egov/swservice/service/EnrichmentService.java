@@ -59,9 +59,6 @@ public class EnrichmentService {
 	private ObjectMapper mapper;
 	
 	@Autowired
-	private PdfFileStoreService pdfFileStroeService;
-	
-	@Autowired
 	private SewarageDaoImpl sewerageDao;
 
 
@@ -112,9 +109,9 @@ public class EnrichmentService {
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
-		//TODO - Models need to be updated with AuditDetails
-		//AuditDetails auditDetails = sewerageServicesUtil
-		//		.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		AuditDetails auditDetails = sewerageServicesUtil
+				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		//Application created date
@@ -208,6 +205,7 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
 		if (!CollectionUtils.isEmpty(connection.getDocuments())) {
 			connection.getDocuments().forEach(document -> {

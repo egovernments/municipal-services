@@ -1,7 +1,6 @@
 
 package org.egov.swcalculation.model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -99,9 +98,7 @@ public class Connection {
 	public enum StatusEnum {
 		ACTIVE("Active"),
 
-		INACTIVE("Inactive"),
-
-		INWORKFLOW("INWORKFLOW");
+		INACTIVE("Inactive");
 
 		private String value;
 
@@ -150,7 +147,7 @@ public class Connection {
 	private Float roadCuttingArea = null;
 
 	@JsonProperty("connectionExecutionDate")
-	private BigDecimal connectionExecutionDate = null;
+	private Long connectionExecutionDate = null;
 
 	@JsonProperty("connectionCategory")
 	private String connectionCategory = null;
@@ -163,6 +160,9 @@ public class Connection {
 
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -275,9 +275,9 @@ public class Connection {
 
 	/**
 	 * Formatted connection number, which will be generated using ID-Gen service
-	 * after aproval of connection application in case of new application. If
-	 * the source of data is \"DATA_ENTRY\" then application status will be
-	 * considered as \"APROVED\" application.
+	 * after aproval of connection application in case of new application. If the
+	 * source of data is \"DATA_ENTRY\" then application status will be considered
+	 * as \"APROVED\" application.
 	 * 
 	 * @return connectionNo
 	 **/
@@ -378,8 +378,7 @@ public class Connection {
 
 	/**
 	 * It is a master data, defined in MDMS. If road cutting is required to
-	 * established the connection then we need to capture the details of road
-	 * type.
+	 * established the connection then we need to capture the details of road type.
 	 * 
 	 * @return roadType
 	 **/
@@ -414,7 +413,7 @@ public class Connection {
 		this.roadCuttingArea = roadCuttingArea;
 	}
 
-	public Connection connectionExecutionDate(BigDecimal connectionExecutionDate) {
+	public Connection connectionExecutionDate(Long connectionExecutionDate) {
 		this.connectionExecutionDate = connectionExecutionDate;
 		return this;
 	}
@@ -427,11 +426,11 @@ public class Connection {
 	@ApiModelProperty(readOnly = true, value = "")
 
 	@Valid
-	public BigDecimal getConnectionExecutionDate() {
+	public Long getConnectionExecutionDate() {
 		return connectionExecutionDate;
 	}
 
-	public void setConnectionExecutionDate(BigDecimal connectionExecutionDate) {
+	public void setConnectionExecutionDate(Long connectionExecutionDate) {
 		this.connectionExecutionDate = connectionExecutionDate;
 	}
 
@@ -507,6 +506,19 @@ public class Connection {
 
 	public void setProcessInstance(ProcessInstance processInstance) {
 		this.processInstance = processInstance;
+	}
+
+	public Connection auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 
 	@Override
