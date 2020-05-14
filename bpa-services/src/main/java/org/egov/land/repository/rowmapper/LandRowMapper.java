@@ -117,10 +117,12 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 			landInfo.addOwnersItem(owner);
 		}
 
-		Institution institution = Institution.builder().id(rs.getString("land_inst_id"))
-				.type(rs.getString("land_inst_type")).tenantId(tenantId).designation(rs.getString("designation"))
-				.nameOfAuthorizedPerson(rs.getString("nameOfAuthorizedPerson")).build();
-		landInfo.setInstitution(institution);
+		if(rs.getString("land_inst_id") != null) {
+			Institution institution = Institution.builder().id(rs.getString("land_inst_id"))
+					.type(rs.getString("land_inst_type")).tenantId(tenantId).designation(rs.getString("designation"))
+					.nameOfAuthorizedPerson(rs.getString("nameOfAuthorizedPerson")).build();
+			landInfo.setInstitution(institution);
+		}
 
 		String documentId = rs.getString("landInfo_doc_id");
 		if (documentId != null) {
