@@ -20,14 +20,11 @@ import org.egov.pt.repository.rowmapper.PropertyAuditRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.service.UserService;
 import org.egov.pt.util.PropertyUtil;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import com.google.common.collect.Sets;
 
@@ -62,11 +59,11 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria, org.egov.common.contract.request.User userInfo) {
+	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
-		if (ObjectUtils.isEmpty(userInfo))
+		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
 		else
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
@@ -93,12 +90,14 @@ public class PropertyRepository {
 	public List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
+		
+		Boolean isOpenSearch = util.isPropertySearchOpen(requestInfo.getUserInfo());
 
-		if (criteria.isAudit() && !StringUtils.isEmpty(requestInfo.getAuthToken())) {
+		if (criteria.isAudit() && !isOpenSearch) {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria, requestInfo.getUserInfo());
+			properties = getProperties(criteria, isOpenSearch);
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();

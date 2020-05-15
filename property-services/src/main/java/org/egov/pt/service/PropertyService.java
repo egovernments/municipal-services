@@ -309,7 +309,7 @@ public class PropertyService {
 
 		PropertyCriteria propertyCriteria = PropertyCriteria.builder().uuids(new HashSet<>(uuids)).limit(criteria.getLimit()).build();
 
-		List<Property> properties = repository.getProperties(propertyCriteria,requestInfo.getUserInfo());
+		List<Property> properties = repository.getProperties(propertyCriteria, false);
 		if(properties.isEmpty())
 			return Collections.emptyList();
 		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)

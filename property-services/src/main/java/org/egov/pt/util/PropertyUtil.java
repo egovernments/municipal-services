@@ -11,8 +11,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
@@ -211,5 +214,17 @@ public void setdataForNotification(PropertyRequest request, String notificationA
 			workflow = ProcessInstance.builder().notificationAction(notificationAction).build();
 		}
 		request.getProperty().setWorkflow(workflow);
+	}
+
+	/**
+	 * Public method to infer whether the search is for open or authenticated user
+	 * 
+	 * @param userInfo
+	 * @return
+	 */
+	public Boolean isPropertySearchOpen(User userInfo) {
+
+		return userInfo.getType().equalsIgnoreCase("SYSTEM")
+				&& userInfo.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()).contains("ANONYMOUS");
 	}
 }

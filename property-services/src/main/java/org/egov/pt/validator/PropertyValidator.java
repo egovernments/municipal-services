@@ -488,8 +488,15 @@ public class PropertyValidator {
 		List<String> allowedParams = null;
 		
 		User user = requestInfo.getUserInfo();
-		String userType = requestInfo.getUserInfo().getType();
+		String userType = user.getType();
 		Boolean isUserCitizen = "CITIZEN".equalsIgnoreCase(userType);
+		
+		if(propertyUtil.isPropertySearchOpen(user)) {
+			
+			if(StringUtils.isEmpty(criteria.getLocality()))
+					throw new CustomException("EG_PT_INVALID_SEARCH"," locality is mandatory for open search");
+		}
+		
 		
 		Boolean isCriteriaEmpty = CollectionUtils.isEmpty(criteria.getOldpropertyids())
 				&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
