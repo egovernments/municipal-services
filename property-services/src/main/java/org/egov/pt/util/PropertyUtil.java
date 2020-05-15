@@ -58,7 +58,7 @@ public class PropertyUtil extends CommonUtils {
 	 * @param properties         List of property whose owner's are to be populated
 	 *                           from userDetailResponse
 	 */
-	public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties) {
+	public void enrichOwner(UserDetailResponse userDetailResponse, List<Property> properties, Boolean isSearchOpen) {
 
 		List<OwnerInfo> users = userDetailResponse.getUser();
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
@@ -69,14 +69,39 @@ public class PropertyUtil extends CommonUtils {
 			property.getOwners().forEach(owner -> {
 
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
-					log.info("OWNER SEARCH ERROR", "The owner with UUID : \"" + owner.getUuid() +
-							"\" for the property with Id \"" + property.getPropertyId() + "\" is not present in user search response");
-				else
-					owner.addUserDetail(userIdToOwnerMap.get(owner.getUuid()));
+					log.info("OWNER SEARCH ERROR",
+							"The owner with UUID : \"" + owner.getUuid() + "\" for the property with Id \""
+									+ property.getPropertyId() + "\" is not present in user search response");
+				else {
+
+					OwnerInfo info = userIdToOwnerMap.get(owner.getUuid());
+					if (isSearchOpen) {
+						owner.addUserDetail(getMaskedOwnerInfo(info));
+					} else {
+						owner.addUserDetail(info);
+					}
+				}
 			});
 		});
 	}
 	
+	/**
+	 * nullifying the PII's for open search
+	 * @param info
+	 * @return
+	 */
+	private org.egov.pt.models.user.User getMaskedOwnerInfo(OwnerInfo info) {
+
+		info.setMobileNumber(null);
+		info.setUuid(null);
+		info.setUserName(null);
+		info.setGender(null);
+		info.setAltContactNumber(null);
+		info.setPwdExpiryDate(null);
+		
+		return info;
+	}
+
 
 	public ProcessInstanceRequest getProcessInstanceForMutationPayment(PropertyRequest propertyRequest) {
 
