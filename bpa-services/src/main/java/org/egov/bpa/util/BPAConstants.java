@@ -13,6 +13,8 @@ public class BPAConstants {
 
 	public static final String BPA_MODULE_CODE = "BPA";
 
+	public static final String BPA_LOW_MODULE_CODE = "BPA_LOW";
+
 	public static final String COMMON_MASTERS_MODULE = "common-masters";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";

@@ -13,6 +13,7 @@ CREATE TABLE eg_bpa_buildingplan(
     approvalno character varying(64) DEFAULT NULL,
     approvaldate bigint,
     applicationdate bigint,
+    businessService character varying(64) DEFAULT NULL::character varying,
     accountid character varying(256) DEFAULT NULL,
     CONSTRAINT pk_eg_bpa_buildingplan PRIMARY KEY (id)
 );
@@ -33,6 +34,7 @@ CREATE TABLE public.eg_bpa_auditdetails(
     approvalno character varying(64) DEFAULT NULL::character varying,
     approvaldate bigint,
     applicationdate bigint,
+    businessService character varying(64) DEFAULT NULL::character varying,
     accountid character varying(256) DEFAULT NULL::character varying
 );
 

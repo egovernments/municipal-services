@@ -24,73 +24,73 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class BPA {
-	
+
 	@JsonIgnore
-	private ArrayList<String> docIds ;
-	
-	
-	 @JsonProperty("id")
-	  private String id;
+	private ArrayList<String> docIds;
 
-	  @JsonProperty("applicationNo")
-	  private String applicationNo;
+	@JsonProperty("id")
+	private String id;
 
-	  @JsonProperty("approvalNo")
-	  private String approvalNo;
+	@JsonProperty("applicationNo")
+	private String applicationNo;
 
-	  @JsonProperty("accountId")
-	  private String accountId;
+	@JsonProperty("approvalNo")
+	private String approvalNo;
 
-	  @JsonProperty("edcrNumber")
-	  private String edcrNumber;
+	@JsonProperty("accountId")
+	private String accountId;
 
-	  @JsonProperty("riskType")
-	  private String riskType;
-	  
-	  @JsonProperty("landId")
-	  private String landId;
+	@JsonProperty("edcrNumber")
+	private String edcrNumber;
 
-	  @NotNull
-	  @JsonProperty("tenantId")
-	  private String tenantId;
-	  
-	  @JsonProperty("status")
-	  private String status;
+	@JsonProperty("riskType")
+	private String riskType;
 
-	  @JsonProperty("documents")
-	  private List<Document> documents;
+	@JsonProperty("landId")
+	private String landId;
 
-	  @JsonProperty("landInfo")
-	  private LandInfo landInfo;
-	  
-	  @JsonProperty("approvalDate")
-	  private Long approvalDate;
+	@NotNull
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-	  @JsonProperty("workflow")
-	  private Workflow workflow;
-	  
-	  @JsonProperty("auditDetails")
-	  private AuditDetails auditDetails;
-	  
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
-	  
-		
+	@JsonProperty("status")
+	private String status;
 
-		public BPA addDocumentsItem(Document documentsItem) {
-			if (this.documents == null) {
-				this.documents = new ArrayList<>();
-			}
-			if(this.docIds == null){
-				this.docIds = new ArrayList<String>();
-			}
-			
-			if(!this.docIds.contains(documentsItem.getId())){
-				this.documents.add(documentsItem);
-				this.docIds.add(documentsItem.getId());
-			}
-				
-			return this;
+	@JsonProperty("documents")
+	private List<Document> documents;
+
+	@JsonProperty("landInfo")
+	private LandInfo landInfo;
+
+	@JsonProperty("approvalDate")
+	private Long approvalDate;
+
+	@JsonProperty("workflow")
+	private Workflow workflow;
+
+	@JsonProperty("businessService")
+	private String businessService;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails;
+
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
+
+	public BPA addDocumentsItem(Document documentsItem) {
+		if (this.documents == null) {
+			this.documents = new ArrayList<>();
 		}
-		
+		if (this.docIds == null) {
+			this.docIds = new ArrayList<String>();
+		}
+
+		if (!this.docIds.contains(documentsItem.getId())) {
+			this.documents.add(documentsItem);
+			this.docIds.add(documentsItem.getId());
+		}
+
+		return this;
+	}
+
 }

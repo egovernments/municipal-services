@@ -65,6 +65,12 @@ public class EnrichmentService {
 		bpaRequest.getBPA().setLandId(bpaRequest.getBPA().getLandInfo().getId()); 
 		bpaRequest.getBPA().setAccountId(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
 
+		if(!bpaRequest.getBPA().getRiskType().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)){
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_MODULE_CODE);
+		}else{
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_LOW_MODULE_CODE);
+		}
+
 		// BPA Documents
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
@@ -72,7 +78,6 @@ public class EnrichmentService {
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
-	
 		setIdgenIds(bpaRequest);
 	}
 
