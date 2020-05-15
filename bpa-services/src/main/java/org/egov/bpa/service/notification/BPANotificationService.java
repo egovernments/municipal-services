@@ -22,7 +22,6 @@ import org.egov.bpa.web.model.Event;
 import org.egov.bpa.web.model.EventRequest;
 import org.egov.bpa.web.model.Recepient;
 import org.egov.bpa.web.model.SMSRequest;
-import org.egov.bpa.web.model.Source;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.Action;
 import org.egov.common.contract.request.RequestInfo;

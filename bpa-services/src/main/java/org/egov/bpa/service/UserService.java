@@ -187,6 +187,7 @@ public class UserService {
 		 List<String> ids = new ArrayList<String>();
 		 List<String> uuids = new ArrayList<String>();
 		 bpas.forEach(bpa -> {
+			 if(bpa.getLandInfo()!=null){
 			 bpa.getLandInfo().getOwners().forEach(owner->{
 				 if (owner.getUuid() != null)
 					 ids.add(owner.getUuid().toString());
@@ -194,7 +195,7 @@ public class UserService {
 					if (owner.getUuid() != null)
 						uuids.add(owner.getUuid().toString());
 			 });
-			 
+		 }
 		});
 			
 		 userSearchRequest.setId(ids);

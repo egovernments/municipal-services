@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO eg_bpa_buildingplan(id, applicationNo, approvalNo, accountId, edcrNumber, tenantId, status, action, assignes, comments, additionalDetails, createdBy, lastmodifiedBy, createdTime, lastmodifiedTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+       - query: INSERT INTO eg_bpa_buildingplan(id, applicationNo, approvalNo, landId, accountId, edcrNumber, tenantId, status, approvalDate, additionalDetails, createdBy, lastmodifiedBy, createdTime, lastmodifiedTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
          basePath: BPA
          jsonMaps:
           - jsonPath: $.BPA.id
@@ -15,6 +15,8 @@ serviceMaps:
           - jsonPath: $.BPA.applicationNo
           
           - jsonPath: $.BPA.approvalNo
+          
+          - jsonPath: $.BPA.landId
           
           - jsonPath: $.BPA.accountId
 
@@ -24,11 +26,7 @@ serviceMaps:
           
           - jsonPath: $.BPA.status
           
-          - jsonPath: $.BPA.workflow.action
-
-          - jsonPath: $.BPA.workflow.assignes
-
-          - jsonPath: $.BPA.workflow.comments
+          - jsonPath: $.BPA.approvalDate
 
           - jsonPath: $.BPA.additionalDetails
             type: JSON
@@ -85,14 +83,12 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, riskType=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, validityDate=?, orderGeneratedDate=? WHERE id=?;
+       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, approvalDate=? WHERE id=?;
          basePath: BPA
          jsonMaps:
           - jsonPath: $.BPA.applicationNo
           
           - jsonPath: $.BPA.approvalNo
-
-          - jsonPath: $.BPA.riskType
 
           - jsonPath: $.BPA.status
 
@@ -104,9 +100,7 @@ serviceMaps:
 
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
-          - jsonPath: $.BPA.validityDate
-
-          - jsonPath: $.BPA.orderGeneratedDate
+          - jsonPath: $.BPA.approvalDate
 
           - jsonPath: $.BPA.id
 
@@ -130,7 +124,7 @@ serviceMaps:
   
            - jsonPath: $.BPA.id
   
-           - jsonPath: $.BPA.documents.*.documentuid
+           - jsonPath: $.BPA.documents.*.documentUid
   
            - jsonPath: $.BPA.documents.*.additionalDetails
   
@@ -161,7 +155,7 @@ serviceMaps:
    queryMaps:
    
           
-       - query: INSERT INTO eg_bpa_document(id, documenttype, filestore, buildingplanid, documentuid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  filestore =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?;
+       - query: INSERT INTO eg_bpa_document(id, documentType, fileStore, buildingplanid, documentUid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  filestore =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?;
          basePath: BPA.documents.*
          jsonMaps:
           
@@ -173,7 +167,7 @@ serviceMaps:
   
            - jsonPath: $.BPA.id
   
-           - jsonPath: $.BPA.documents.*.documentuid
+           - jsonPath: $.BPA.documents.*.documentUid
   
            - jsonPath: $.BPA.documents.*.additionalDetails
   
@@ -204,16 +198,25 @@ serviceMaps:
 
            - jsonPath: $.BPA.id
 
-       - query: UPDATE eg_bpa_buildingplan SET status =?, approvalNo=?, additionaldetails=?  WHERE id =?;
+
+       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, approvalDate=? WHERE id=?;
          basePath: BPA
          jsonMaps:
-           - jsonPath: $.BPA.status
-           
-           - jsonPath: $.BPA.approvalNo
-           
-           - jsonPath: $.BPA.additionalDetails
-             type: JSON
-             dbType: JSONB
-              
-           - jsonPath: $.BPA.id
+          - jsonPath: $.BPA.applicationNo
+          
+          - jsonPath: $.BPA.approvalNo
+
+          - jsonPath: $.BPA.status
+
+          - jsonPath: $.BPA.additionalDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedTime
+
+          - jsonPath: $.BPA.approvalDate
+
+          - jsonPath: $.BPA.id
 

@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -29,13 +30,14 @@ import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
-import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
+import org.egov.land.web.models.LandInfo;
+import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,9 +58,6 @@ public class BPAService {
 
 	@Autowired
 	private EDCRService edcrService;
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private BPARepository repository;
@@ -121,24 +120,66 @@ public class BPAService {
 	 * @return List of bpa for the given criteria
 	 */
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
-		List<BPA> bpa;
+		List<BPA> bpa = new LinkedList<>();
 		bpaValidator.validateSearch(requestInfo, criteria);
+		LandSearchCriteria landcriteria = new LandSearchCriteria();
+		landcriteria.setTenantId(criteria.getTenantId());
 		if (criteria.getMobileNumber() != null) {
-			bpa = getBPAFromMobileNumber(criteria, requestInfo);
+			landcriteria.setMobileNumber(criteria.getMobileNumber());
+			ArrayList<LandInfo> landInfo = bpaValidator.searchLandInfoToBPA(requestInfo, landcriteria);
+			bpa = getBPAFromLandId(criteria, requestInfo);
+			if (landInfo.size() > 0) {
+				for (int i = 0; i < bpa.size(); i++) {
+					for (int j = 0; j < landInfo.size(); j++) {
+						if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
+							bpa.get(i).setLandInfo(landInfo.get(j));
+						}
+					}
+				}
+				bpa = bpa.stream().filter(a -> a.getLandInfo() != null).collect(Collectors.toList());
+			}
 		} else {
 			List<String> roles = new ArrayList<>();
 			for (Role role : requestInfo.getUserInfo().getRoles()) {
 				roles.add(role.getCode());
 			}
 
-			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
-//				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
-			}
 
 			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
+			ArrayList<String> data = new ArrayList<String>();
+			if (bpa.size() > 0) {
+				for(int i=0; i<bpa.size(); i++){
+					data.add(bpa.get(i).getLandId());
+				}
+				landcriteria.setIds(data);
+				ArrayList<LandInfo> landInfo = bpaValidator.searchLandInfoToBPA(requestInfo, landcriteria);
+				
+				for (int i = 0; i < bpa.size(); i++) {
+					for (int j = 0; j < landInfo.size(); j++) {
+						if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
+							bpa.get(i).setLandInfo(landInfo.get(j));
+						}
+					}
+				}
+			}
 		}
 		return bpa;
 	}
+
+	
+
+
+	private List<BPA> getBPAFromLandId(BPASearchCriteria criteria, RequestInfo requestInfo) {
+		// TODO Auto-generated method stub
+		List<BPA> bpa = new LinkedList<>();
+		bpa = repository.getBPAData(criteria);
+		if (bpa.size() == 0) {
+			return Collections.emptyList();
+		}
+//		criteria = enrichmentService.getBPACriteriaFromIds(bpa, criteria.getLimit());
+		return bpa;
+	}
+
 
 	/**
 	 * Returns the bpa with enriched owners from user service
@@ -153,29 +194,7 @@ public class BPAService {
 		List<BPA> bpa = repository.getBPAData(criteria);
 		if (bpa.isEmpty())
 			return Collections.emptyList();
-		bpa = enrichmentService.enrichBPASearch(bpa, criteria, requestInfo);
-		return bpa;
-	}
-
-	private List<BPA> getBPAFromMobileNumber(BPASearchCriteria criteria, RequestInfo requestInfo) {
-
-		List<BPA> bpa = new LinkedList<>();
-		UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
-		// If user not found with given user fields return empty list
-		if (userDetailResponse.getUser().size() == 0) {
-			return Collections.emptyList();
-		}
-		enrichmentService.enrichBPACriteriaWithOwnerids(criteria, userDetailResponse);
-		bpa = repository.getBPAData(criteria);
-
-		if (bpa.size() == 0) {
-			return Collections.emptyList();
-		}
-
-		// Add bpaId of all bpa's owned by the user
 		criteria = enrichmentService.getBPACriteriaFromIds(bpa, criteria.getLimit());
-		// Get all bpa with ownerInfo enriched from user service
-		bpa = getBPAWithOwnerInfo(criteria, requestInfo);
 		return bpa;
 	}
 
@@ -203,11 +222,6 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
 		}
 
-		bpa.getLandInfo().getOwners().forEach(owner -> {
-			if (owner.getOwnerType() == null) {
-				owner.setOwnerType("NONE");
-			}
-		});
 		BusinessService businessService = workflowService.getBusinessService(bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
@@ -228,11 +242,12 @@ public class BPAService {
 			}
 
 		} else {
-			userService.createUser(bpaRequest);
+			// userService.createUser(bpaRequest);
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
-			        actionValidator.validateUpdateRequest(bpaRequest, businessService);
+				actionValidator.validateUpdateRequest(bpaRequest, businessService);
+				bpaValidator.updateLandInfo(bpaRequest);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
-					workflowService.getCurrentState(bpa.getStatus(), businessService));
+						workflowService.getCurrentState(bpa.getStatus(), businessService));
 				bpaValidator.validateCheckList(mdmsData, bpaRequest,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
 			}
@@ -253,18 +268,7 @@ public class BPAService {
 				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
 			}
 		}
-
-		// Generate the sanction Demand
-		/*if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
-			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
-		}*/
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
-
-		/*List<OwnerInfo> activeOwners = bpaRequest.getBPA().getOwners().stream().filter(o -> o.getActive())
-				.collect(Collectors.toList());
-		bpaRequest.getBPA().getOwners().clear();
-		bpaRequest.getBPA().setOwners(activeOwners);*/
-
 		return bpaRequest.getBPA();
 
 	}
@@ -287,7 +291,7 @@ public class BPAService {
 
 		List<BPA> bpa = repository.getBPAData(criteria);
 
-		bpa = enrichmentService.enrichBPASearch(bpa, criteria, request.getRequestInfo());
+//		bpa = enrichmentService.enrichBPASearch(bpa, criteria, request.getRequestInfo());
 		return bpa;
 	}
 
@@ -363,17 +367,16 @@ public class BPAService {
 				contentStream.newLineAtOffset(startX, startY);
 
 				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getApprovalNo());
-//				if (bpa.getOrderGeneratedDate() != null) {
-//					Date date = new Date(bpa.getOrderGeneratedDate());
-				Date date = new Date();
+				if (bpa.getApprovalDate() != null) {
+					Date date = new Date(bpa.getApprovalDate());
 					DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 					String formattedDate = format.format(date);
 					contentStream.newLineAtOffset(400, 4.5f);
 					contentStream.showText(generatedOn + " : " + formattedDate);
-//				} else {
+				} else {
 					contentStream.newLineAtOffset(400, 4.5f);
 					contentStream.showText(generatedOn + " : " + "NA");
-//				}
+				}
 
 				contentStream.endText();
 				contentStream.close();
@@ -393,5 +396,4 @@ public class BPAService {
 			}
 		}
 	}
-
 }

@@ -1,5 +1,6 @@
 package org.egov.bpa.repository.querybuilder;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
@@ -17,27 +18,12 @@ public class BPAQueryBuilder {
 	private static final String INNER_JOIN_STRING = " INNER JOIN ";
 	private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
-	private static final String QUERY = "SELECT bpa.*,bpaunit.*,bpaowner.*,"
-			+ "bpaaddress.*,bpageolocation.*,bpadoc.*,bpaownerdoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
+	private static final String QUERY = "SELECT bpa.*,bpadoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
 			+ "bpa_lastModifiedTime,bpa.createdBy as bpa_createdBy,bpa.lastModifiedBy as bpa_lastModifiedBy,bpa.createdTime as "
-			+ "bpa_createdTime,bpa.additionalDetails,bpaaddress.id as bpa_ad_id,bpageolocation.id as bpa_geo_loc,"
-			+ "bpaowner.id as bpaowner_uuid," 
-			+ "bpaownerdoc.owner as docuserid,bpaownerdoc.id as ownerdocid,"
-			+ "bpaownerdoc.documenttype as ownerdocType,bpaownerdoc.filestoreid as ownerfileStore,bpaownerdoc.buildingplanid as docdetailid,bpaownerdoc.documentuid as ownerdocuid,"
-			+ "bpaunit.id as bpa_un_id, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestoreid as bpa_doc_filestore"
+			+ "bpa_createdTime,bpa.additionalDetails,bpa.landId as bpa_landId, bpadoc.id as bpa_doc_id,bpadoc.documenttype as bpa_doc_documenttype,bpadoc.filestore as bpa_doc_filestore"
 			+ " FROM eg_bpa_buildingplan bpa"
-			+ INNER_JOIN_STRING
-			+ "eg_bpa_address bpaaddress ON bpaaddress.buildingplanid = bpa.id"
-			+ INNER_JOIN_STRING
-			+ "eg_bpa_owner bpaowner ON bpaowner.buildingplanid = bpa.id"
 			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_bpa_document_owner bpaownerdoc ON bpaownerdoc.owner = bpaowner.id" 
-			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_bpa_unit bpaunit ON bpaunit.buildingplanid = bpa.id" 
-			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_bpa_document bpadoc ON bpadoc.buildingplanid = bpa.id" 
-			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_bpa_geolocation bpageolocation ON bpageolocation.addressid = bpaaddress.id";;
+			+ "eg_bpa_document bpadoc ON bpadoc.buildingplanid = bpa.id";;
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY bpa_lastModifiedTime DESC) offset_ FROM " + "({})"
@@ -76,7 +62,7 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
-		List<String> edcrNumbers = criteria.getEdcrNumber();
+		List<String> edcrNumbers = criteria.getEdcrNumbers();
 		if (!CollectionUtils.isEmpty(edcrNumbers)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
@@ -93,16 +79,51 @@ public class BPAQueryBuilder {
 		List<String> approvalNo = criteria.getApprovalNo();
 		if (!CollectionUtils.isEmpty(approvalNo)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.permitorderno IN (").append(createQuery(approvalNo)).append(")");
+			builder.append(" bpa.approvalNo IN (").append(createQuery(approvalNo)).append(")");
 			addToPreparedStatement(preparedStmtList, approvalNo);
 		}
-
-		if (criteria.getMobileNumber() != null) {
+		String landId = criteria.getLandId();
+		if (landId!=null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.landId = ?");
+			preparedStmtList.add(criteria.getLandId());
+		}
+		List<String> status = criteria.getStatus();
+		if (!CollectionUtils.isEmpty(status)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.status IN (").append(createQuery(status)).append(")");
+			addToPreparedStatement(preparedStmtList, status);
+		}
+		Long permitDt = criteria.getApprovalDate();
+		if ( permitDt != null) {
+			
+			Calendar permitDate = Calendar.getInstance();
+			permitDate.setTimeInMillis(permitDt);
+			
+			int year = permitDate.get(Calendar.YEAR);
+		    int month = permitDate.get(Calendar.MONTH);
+		    int day = permitDate.get(Calendar.DATE);
+			
+			Calendar permitStrDate = Calendar.getInstance();
+			permitStrDate.setTimeInMillis(0);
+			permitStrDate.set(year, month, day, 0, 0, 0);
+			
+			Calendar permitEndDate = Calendar.getInstance();
+			permitEndDate.setTimeInMillis(0);
+			permitEndDate.set(year, month, day, 23, 59, 59);
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.approvalDate BETWEEN ").append(permitStrDate.getTimeInMillis()).append(" AND ")
+			.append(permitEndDate.getTimeInMillis());
+			
+		}
+		
+		/*if (criteria.getMobileNumber() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpaowner.mobileNumber = ? ");
 			preparedStmtList.add(criteria.getMobileNumber());
 
-		} /*else if (criteria.getCreatedBy() != null) {
+		}*/
+		/*else if (criteria.getCreatedBy() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" ( bpa.createdby = ? ");
 			preparedStmtList.add(criteria.getCreatedBy());
@@ -129,8 +150,8 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.orderGeneratedDate = ").append(criteria.getOrderGeneratedDate());
 		}*/
 		
-		addClauseIfRequired(preparedStmtList, builder);
-		builder.append(" bpaowner.active = TRUE"); // To get the active owners
+//		addClauseIfRequired(preparedStmtList, builder);
+//		builder.append(" bpaowner.active = TRUE"); // To get the active owners
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
