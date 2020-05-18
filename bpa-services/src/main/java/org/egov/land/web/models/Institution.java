@@ -17,22 +17,23 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Institution {
+	
 	@JsonProperty("id")
-	  private String id;
+	private String id;
 
-	  @JsonProperty("tenantId")
-	  private String tenantId;
+	@JsonProperty("tenantId")
+	private String tenantId;
 
-	  @JsonProperty("type")
-	  private String type;
+	@JsonProperty("type")
+	private String type;
 
-	  @JsonProperty("designation")
-	  private String designation;
+	@JsonProperty("designation")
+	private String designation;
 
-	  @JsonProperty("nameOfAuthorizedPerson")
-	  private String nameOfAuthorizedPerson;
+	@JsonProperty("nameOfAuthorizedPerson")
+	private String nameOfAuthorizedPerson;
 
-	  @JsonProperty("additionalDetails")
-	  private Object additionalDetails;
+	@JsonProperty("additionalDetails")
+	private Object additionalDetails;
 
 }

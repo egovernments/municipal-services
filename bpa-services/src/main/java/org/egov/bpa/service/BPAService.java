@@ -92,18 +92,14 @@ public class BPAService {
 		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
 		bpaValidator.addLandInfoToBPA(bpaRequest);
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
-
-//		LandInfo landInfo = getLandData(bpaRequest.getRequestInfo(), );
-//		userService.createUser(bpaRequest);
-		
 		
 		wfIntegrator.callWorkFlow(bpaRequest);
 
-		/*if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
+		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
-		}*/
+		}
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
@@ -268,6 +264,12 @@ public class BPAService {
 				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
 			}
 		}
+		
+		// Generate the sanction Demand
+		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
+			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+		}
+		
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
 		return bpaRequest.getBPA();
 
