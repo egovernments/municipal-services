@@ -178,8 +178,6 @@ serviceMaps:
            - jsonPath: $.BPA.auditDetails.createdTime
 
            - jsonPath: $.BPA.auditDetails.lastModifiedTime
-           
-           - jsonPath: $.BPA.documents.*.wfState
 
            - jsonPath: $.BPA.documents.*.documentType
 
