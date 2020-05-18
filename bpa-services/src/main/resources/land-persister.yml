@@ -162,35 +162,35 @@ serviceMaps:
 
 
        - query: INSERT INTO eg_land_unit( id,tenantid, floorNo, unitType, usageCategory,occupancyType, occupancyDate,additionaldetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-         basePath: LandInfo.units.*
+         basePath: LandInfo.unit.*
          jsonMaps:
-          - jsonPath: $.LandInfo.units.*.id
+          - jsonPath: $.LandInfo.unit.*.id
 
-          - jsonPath: $.LandInfo.units.*.tenantId
+          - jsonPath: $.LandInfo.unit.*.tenantId
 
-          - jsonPath: $.LandInfo.units.*.floorNo
+          - jsonPath: $.LandInfo.unit.*.floorNo
 
-          - jsonPath: $.LandInfo.units.*.unitType
+          - jsonPath: $.LandInfo.unit.*.unitType
 
-          - jsonPath: $.LandInfo.units.*.usageCategory
+          - jsonPath: $.LandInfo.unit.*.usageCategory
 
-          - jsonPath: $.LandInfo.units.*.occupancyType
+          - jsonPath: $.LandInfo.unit.*.occupancyType
 
-          - jsonPath: $.LandInfo.units.*.occupancyDate
+          - jsonPath: $.LandInfo.unit.*.occupancyDate
 
-          - jsonPath: $.LandInfo.units.*.additionalDetails
+          - jsonPath: $.LandInfo.unit.*.additionalDetails
             type: JSON
             dbType: JSONB
 
           - jsonPath: $.LandInfo.id
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.createdBy
+          - jsonPath: $.LandInfo.unit.*.auditDetails.createdBy
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedBy
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedBy
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.createdTime
+          - jsonPath: $.LandInfo.unit.*.auditDetails.createdTime
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedTime
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedTime
 
 
        - query: INSERT INTO eg_land_geolocation( id, latitude, longitude, additionaldetails, addressid) VALUES (?, ?, ?, ?, ?);
@@ -425,50 +425,50 @@ serviceMaps:
 
 
        - query: INSERT INTO eg_land_unit( id,tenantid, floorNo, unitType, usageCategory,occupancyType, occupancyDate,additionaldetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landinfoid) WHERE id IS NOT NULL DO UPDATE SET floorNo=?, unitType=?, usageCategory=?, occupancyType=?, occupancyDate=?, additionalDetails=?,lastModifiedBy=?, lastModifiedTime=?;
-         basePath: LandInfo.units.*
+         basePath: LandInfo.unit.*
          jsonMaps:
-          - jsonPath: $.LandInfo.units.*.id
+          - jsonPath: $.LandInfo.unit.*.id
 
-          - jsonPath: $.LandInfo.units.*.tenantId
+          - jsonPath: $.LandInfo.unit.*.tenantId
 
-          - jsonPath: $.LandInfo.units.*.floorNo
+          - jsonPath: $.LandInfo.unit.*.floorNo
 
-          - jsonPath: $.LandInfo.units.*.unitType
+          - jsonPath: $.LandInfo.unit.*.unitType
 
-          - jsonPath: $.LandInfo.units.*.usageCategory
+          - jsonPath: $.LandInfo.unit.*.usageCategory
 
-          - jsonPath: $.LandInfo.units.*.occupancyType
+          - jsonPath: $.LandInfo.unit.*.occupancyType
 
-          - jsonPath: $.LandInfo.units.*.occupancyDate
+          - jsonPath: $.LandInfo.unit.*.occupancyDate
 
-          - jsonPath: $.LandInfo.units.*.additionalDetails
+          - jsonPath: $.LandInfo.unit.*.additionalDetails
             type: JSON
             dbType: JSONB
 
           - jsonPath: $.LandInfo.id
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.createdBy
+          - jsonPath: $.LandInfo.unit.*.auditDetails.createdBy
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedBy
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedBy
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.createdTime
+          - jsonPath: $.LandInfo.unit.*.auditDetails.createdTime
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedTime
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedTime
 
-          - jsonPath: $.LandInfo.units.*.floorNo
+          - jsonPath: $.LandInfo.unit.*.floorNo
 
-          - jsonPath: $.LandInfo.units.*.unitType
+          - jsonPath: $.LandInfo.unit.*.unitType
 
-          - jsonPath: $.LandInfo.units.*.usageCategory
+          - jsonPath: $.LandInfo.unit.*.usageCategory
 
-          - jsonPath: $.LandInfo.units.*.occupancyType
+          - jsonPath: $.LandInfo.unit.*.occupancyType
 
-          - jsonPath: $.LandInfo.units.*.occupancyDate
+          - jsonPath: $.LandInfo.unit.*.occupancyDate
 
-          - jsonPath: $.LandInfo.units.*.additionalDetails
+          - jsonPath: $.LandInfo.unit.*.additionalDetails
             type: JSON
             dbType: JSONB
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedBy
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedBy
 
-          - jsonPath: $.LandInfo.units.*.auditDetails.lastModifiedTime
+          - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedTime
