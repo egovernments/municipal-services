@@ -58,8 +58,8 @@ public class LandInfo {
 	@JsonProperty("documents")
 	private List<Document> documents;
 
-	@JsonProperty("units")
-	private List<Unit> units;
+	@JsonProperty("unit")
+	private List<Unit> unit;
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
@@ -93,14 +93,14 @@ public class LandInfo {
 	}
 
 	public LandInfo addUnitsItem(Unit unitsItem) {
-		if (this.units == null)
-			this.units = new ArrayList<>();
+		if (this.unit == null)
+			this.unit = new ArrayList<>();
 		
 		if(this.unitIds == null){
 			this.unitIds = new ArrayList<String>();
 		}
 		if(!this.unitIds.contains(unitsItem.getId())){
-			this.units.add(unitsItem);
+			this.unit.add(unitsItem);
 			this.unitIds.add(unitsItem.getId());			
 		}
 		return this;

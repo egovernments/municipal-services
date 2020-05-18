@@ -77,8 +77,8 @@ public class LandEnrichmentService {
 				landRequest.getLandInfo().getAddress().getLocality().setId(UUID.randomUUID().toString());
 		}
 		// units
-		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnits())) {
-			landRequest.getLandInfo().getUnits().forEach(unit -> {
+		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnit())) {
+			landRequest.getLandInfo().getUnit().forEach(unit -> {
 				if (StringUtils.isEmpty(unit.getId())) {
 					unit.setId(UUID.randomUUID().toString());
 				}
