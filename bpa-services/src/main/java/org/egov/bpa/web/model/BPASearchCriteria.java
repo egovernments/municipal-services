@@ -2,6 +2,7 @@ package org.egov.bpa.web.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -49,12 +50,15 @@ public class BPASearchCriteria {
 	      
 	    @JsonProperty("approvalDate")
 	    private Long approvalDate;
+	    
+	    @JsonIgnore
+	    private List<String> ownerIds;
 
 		
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
-	                && this.approvalDate == null
+	                && this.approvalDate == null && this.ownerIds == null
 	                
 	        );
 	    }
@@ -62,7 +66,7 @@ public class BPASearchCriteria {
 	    public boolean tenantIdOnly() {
 	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
-	                && this.approvalDate == null
+	                && this.approvalDate == null && this.ownerIds == null
 	        );
 	    }
 }

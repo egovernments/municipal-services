@@ -28,6 +28,7 @@ import org.egov.land.web.models.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -305,8 +306,8 @@ public class UserService {
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
-		/*if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
-			userSearchRequest.setUuid(criteria.getOwnerIds());*/
+		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			userSearchRequest.setUuid(criteria.getOwnerIds());
 		return userSearchRequest;
 	}
 

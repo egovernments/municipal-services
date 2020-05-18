@@ -2,6 +2,7 @@ package org.egov.bpa.util;
 
 import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
 
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -345,7 +346,9 @@ public class NotificationUtil {
 	 * @return customized message for initiate
 	 */
 	private String getInitiatedMsg(BPA bpa, String message) {
-//		message = message.replace("<2>", bpa.getServiceType());
+		Map<String, String> data = (Map<String, String>) bpa.getAdditionalDetails();
+		String serviceType = data.get("serviceType");
+		message = message.replace("<2>", serviceType);
 		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
 	}

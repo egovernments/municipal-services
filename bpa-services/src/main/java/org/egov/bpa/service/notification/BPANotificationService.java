@@ -25,6 +25,7 @@ import org.egov.bpa.web.model.SMSRequest;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.Action;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -212,39 +213,26 @@ public class BPANotificationService {
 	private Map<String, String> getUserList(BPARequest bpaRequest) {
 		Map<String, String> mobileNumberToOwner = new HashMap<>();
 		String tenantId = bpaRequest.getBPA().getTenantId();
-
 		String stakeUUID = bpaRequest.getBPA().getAuditDetails().getCreatedBy();
 		List<String> ownerId = new ArrayList<String>();
 		ownerId.add(stakeUUID);
 		BPASearchCriteria bpaSearchCriteria = new BPASearchCriteria();
-//		bpaSearchCriteria.setOwnerIds(ownerId);
+		bpaSearchCriteria.setOwnerIds(ownerId);
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
-		/*if (!bpaRequest.getBPA().getWorkflow().getAction().equals("SEND_TO_ARCHITECT")
+		if (!bpaRequest.getBPA().getWorkflow().getAction().equals("SEND_TO_ARCHITECT")
 				&& (!bpaRequest.getBPA().getStatus().equals("INPROGRESS")
 						|| !bpaRequest.getBPA().getWorkflow().getAction().equals("APPROVE"))) {
-			if (bpaRequest.getBPA().getLandInfo().getOwners().get(0).getId() == null) {
-				BPASearchCriteria bpaOwnerSearchCriteria = new BPASearchCriteria();
-				List<String> ownerIds = new ArrayList<String>();
-				ownerIds.add(bpaRequest.getBPA().getOwners().get(0).getUuid());
-				bpaOwnerSearchCriteria.setOwnerIds(ownerIds);
-				bpaOwnerSearchCriteria.setTenantId(tenantId);
-				UserDetailResponse ownerDetailResponse = userService.getUser(bpaOwnerSearchCriteria,
-						bpaRequest.getRequestInfo());
-				mobileNumberToOwner.put(ownerDetailResponse.getUser().get(0).getMobileNumber(),
-						ownerDetailResponse.getUser().get(0).getName());
-			} else {
-				bpaRequest.getBPA().getOwners().forEach(owner -> {
-					if (owner.isPrimaryOwner()) {
-						if (owner.getMobileNumber() != null) {
-							mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
-						}
+			
+			bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
+					if (owner.getMobileNumber() != null) {
+						mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 					}
-				});
-			}
-		}*/
+			});
+			
+		}
 		return mobileNumberToOwner;
 	}
 }
