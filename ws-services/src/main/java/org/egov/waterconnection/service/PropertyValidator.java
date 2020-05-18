@@ -14,6 +14,9 @@ public class PropertyValidator implements WaterActionValidator {
 	@Override
 	public ValidatorResult validate(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
 		Map<String, String> errorMap = new HashMap<>();
+		if(StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getPropertyId())) {
+			errorMap.put("INVALID_PROPERTY_UUID", "Property uuid should not be empty");
+		}
 		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())) {
 			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
 		}

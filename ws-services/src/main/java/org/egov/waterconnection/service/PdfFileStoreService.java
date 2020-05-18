@@ -94,7 +94,7 @@ public class PdfFileStoreService {
 			BigDecimal slaDays = workflowService.getSlaForState(requestInfo.getUserInfo().getTenantId(), requestInfo,
 					waterConnection.getApplicationStatus().name());
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
-			waterobject.put(slaDate, slaDays.add(waterConnection.getConnectionExecutionDate()));
+			waterobject.put(slaDate, slaDays.add(new BigDecimal(waterConnection.getConnectionExecutionDate())));
 			String tenantId = waterConnection.getProperty().getTenantId().split("\\.")[0];
 			return getFielStoreIdFromPDFService(waterobject, requestInfo, tenantId, applicationKey);
 		} catch (Exception ex) {

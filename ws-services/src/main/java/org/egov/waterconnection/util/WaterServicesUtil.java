@@ -2,10 +2,9 @@ package org.egov.waterconnection.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -40,7 +39,7 @@ import net.minidev.json.JSONObject;
 public class WaterServicesUtil {
 
 	@Autowired
-	ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 	
 	@Autowired
 	private WSConfiguration config;
@@ -68,6 +67,7 @@ public class WaterServicesUtil {
 	private String tenantId = "tenantId=";
 	private String mobileNumber = "mobileNumber=";
 	private String propertyIds = "propertyIds=";
+	private String uuids = "uuids=";
 	private String URL = "url";
 	
 
@@ -93,17 +93,13 @@ public class WaterServicesUtil {
 	 * @return List of Property
 	 */
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
-		Set<String> propertyIds = new HashSet<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		propertyIds.add(waterConnectionRequest.getWaterConnection().getProperty().getPropertyId());
-		propertyCriteria.setPropertyIds(propertyIds);
-		propertyRequestObj.put("RequestInfoWrapper",
-				getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(), waterConnectionRequest.getRequestInfo()));
-		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
+		HashSet<String> propertyUUID = new HashSet<>();
+		propertyUUID.add(waterConnectionRequest.getWaterConnection().getPropertyId());
+		propertyCriteria.setUuids(propertyUUID);
+		propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getProperty().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(
-				getPropURLForCreate(waterConnectionRequest.getWaterConnection().getProperty().getTenantId(),
-						waterConnectionRequest.getWaterConnection().getProperty().getPropertyId()),
+				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
@@ -135,23 +131,27 @@ public class WaterServicesUtil {
 	 */
 	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		// if ((waterConnectionSearchCriteria.getTenantId() == null
-		// || waterConnectionSearchCriteria.getTenantId().isEmpty())) {
-		// throw new CustomException("INVALID SEARCH", "TENANT ID NOT PRESENT");
-		// }
-		if (StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())) {
+		PropertyCriteria criteria = new PropertyCriteria();
+		if (StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())
+				|| StringUtils.isEmpty(waterConnectionSearchCriteria.getPropertyId())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		if (!StringUtils.isEmpty(waterConnectionSearchCriteria.getTenantId())) {
 			propertyCriteria.setTenantId(waterConnectionSearchCriteria.getTenantId());
+			criteria.setTenantId(tenantId);
 		}
 		if (!StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())) {
 			propertyCriteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
+			criteria.setMobileNumber(waterConnectionSearchCriteria.getMobileNumber());
 		}
-		return getPropertyDetails(serviceRequestRepository.fetchResult(
-				getPropURL(waterConnectionSearchCriteria.getTenantId(),
-						waterConnectionSearchCriteria.getMobileNumber()),
+		if (!StringUtils.isEmpty(waterConnectionSearchCriteria.getPropertyId())) {
+			HashSet<String> propertyIds = new HashSet<>();
+			propertyIds.add(waterConnectionSearchCriteria.getPropertyId());
+			propertyCriteria.setPropertyIds(propertyIds);
+			criteria.setPropertyIds(propertyIds);
+		}
+		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyURL(criteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 	}
 	
@@ -162,16 +162,11 @@ public class WaterServicesUtil {
 	 * @param requestInfo
 	 * @return List of Property
 	 */
-	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo) {
-		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropURLForCreate(tenantId, propertyIds),
+	public List<Property> searchPropertyOnId(PropertyCriteria criteria, RequestInfo requestInfo) {
+		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyURL(criteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 	}
 	
-	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
-			RequestInfo requestInfo) {
-		return RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-	}
-
 	/**
 	 * 
 	 * @param result
@@ -215,80 +210,38 @@ public class WaterServicesUtil {
 
 	/**
 	 * 
-	 * @return search url for property search
+	 * @param criteria
+	 * @return property URL
 	 */
-	private String getpropertySearchURLForMobileSearch() {
+	private StringBuilder getPropertyURL(PropertyCriteria criteria) {
 		StringBuilder url = new StringBuilder(getPropertyURL());
+		boolean isanyparametermatch = false;
 		url.append("?");
-		url.append(tenantId);
-		url.append("{1}");
-		url.append("&");
-		url.append(mobileNumber);
-		url.append("{2}");
-		return url.toString();
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			isanyparametermatch = true;
+			url.append(tenantId).append(criteria.getTenantId());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+			if (isanyparametermatch)url.append("&");
+			isanyparametermatch = true;
+			String propertyIdsString = criteria.getPropertyIds().stream().map(propertyId -> propertyId)
+					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
+			url.append(propertyIds).append(propertyIdsString);
+		}
+		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
+			if (isanyparametermatch)url.append("&");
+			isanyparametermatch = true;
+			url.append(mobileNumber).append(criteria.getMobileNumber());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getUuids())) {
+			if (isanyparametermatch)url.append("&");
+			String uuidString = criteria.getUuids().stream().map(uuid -> uuid).collect(Collectors.toSet()).stream()
+					.collect(Collectors.joining(","));
+			url.append(uuids).append(uuidString);
+		}
+		return url;
 	}
 	
-	/**
-	 * 
-	 * @return search url for property search
-	 */
-	private String getpropertySearchURLForMobileSearchCitizen() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append(mobileNumber);
-		url.append("{2}");
-		return url.toString();
-	}
-
-	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
-		String url = getpropertySearchURLForMobileSearchCitizen();
-		if(tenantId != null)
-			url = getpropertySearchURLForMobileSearch();
-		if (url.indexOf("{1}") > 0)
-			url = url.replace("{1}", tenantId);
-		if (url.indexOf("{2}") > 0)
-			url = url.replace("{2}", mobileNumber);
-		return new StringBuilder(url);
-	}
-	
-	/**
-	 * 
-	 * @return search url for property search employee
-	 */
-	private String getPropertySearchURLForEmployee() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append(tenantId);
-		url.append("{1}");
-		url.append("&");
-		url.append(propertyIds);
-		url.append("{2}");
-		return url.toString();
-	}
-	
-	/**
-	 * 
-	 * @return search url for property search citizen
-	 */
-	private String getPropertySearchURLForCitizen() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append(propertyIds);
-		url.append("{2}");
-		return url.toString();
-	}
-	
-	
-	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
-		String url = getPropertySearchURLForCitizen();
-		if (tenantId != null)
-			url = getPropertySearchURLForEmployee();
-		if (url.indexOf("{1}") > 0)
-			url = url.replace("{1}", tenantId);
-		if (url.indexOf("{2}") > 0)
-			url = url.replace("{2}", propertyIds);
-		return new StringBuilder(url);
-	}
 	
 	/**
 	 *

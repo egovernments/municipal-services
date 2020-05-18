@@ -1,7 +1,6 @@
 
 package org.egov.waterconnection.model;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -99,9 +98,7 @@ public class Connection {
 	public enum StatusEnum {
 		ACTIVE("Active"),
 
-		INACTIVE("Inactive"),
-
-		INWORKFLOW("INWORKFLOW");
+		INACTIVE("Inactive");
 
 		private String value;
 
@@ -150,7 +147,7 @@ public class Connection {
 	private Float roadCuttingArea = null;
 
 	@JsonProperty("connectionExecutionDate")
-	private BigDecimal connectionExecutionDate = null;
+	private Long connectionExecutionDate = null;
 
 	@JsonProperty("connectionCategory")
 	private String connectionCategory = null;
@@ -163,10 +160,12 @@ public class Connection {
 
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
-	
+
 	@JsonProperty("propertyId")
 	private String propertyId = null;
-	
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -355,8 +354,8 @@ public class Connection {
 		if (this.plumberInfo == null) {
 			this.plumberInfo = new ArrayList<PlumberInfo>();
 		}
-		if(!this.plumberInfo.contains(plumberInfoItem))
-            this.plumberInfo.add(plumberInfoItem);
+		if (!this.plumberInfo.contains(plumberInfoItem))
+			this.plumberInfo.add(plumberInfoItem);
 		return this;
 	}
 
@@ -417,7 +416,7 @@ public class Connection {
 		this.roadCuttingArea = roadCuttingArea;
 	}
 
-	public Connection connectionExecutionDate(BigDecimal connectionExecutionDate) {
+	public Connection connectionExecutionDate(Long connectionExecutionDate) {
 		this.connectionExecutionDate = connectionExecutionDate;
 		return this;
 	}
@@ -430,11 +429,11 @@ public class Connection {
 	@ApiModelProperty(readOnly = true, value = "")
 
 	@Valid
-	public BigDecimal getConnectionExecutionDate() {
+	public Long getConnectionExecutionDate() {
 		return connectionExecutionDate;
 	}
 
-	public void setConnectionExecutionDate(BigDecimal connectionExecutionDate) {
+	public void setConnectionExecutionDate(Long connectionExecutionDate) {
 		this.connectionExecutionDate = connectionExecutionDate;
 	}
 
@@ -511,11 +510,11 @@ public class Connection {
 	public void setProcessInstance(ProcessInstance processInstance) {
 		this.processInstance = processInstance;
 	}
-	
+
 	public void setPropertyId(String propertyId) {
 		this.propertyId = propertyId;
 	}
-	
+
 	public String getPropertyId() {
 		return propertyId;
 	}
@@ -523,6 +522,19 @@ public class Connection {
 	public Connection propertyId(String propertyId) {
 		this.propertyId = propertyId;
 		return this;
+	}
+
+	public Connection auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 
 	@Override
