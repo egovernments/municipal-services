@@ -17,6 +17,7 @@ import org.egov.swservice.model.AuditDetails;
 import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Property;
+import org.egov.swservice.model.PropertyCriteria;
 import org.egov.swservice.model.SearchCriteria;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
@@ -75,24 +76,24 @@ public class EnrichmentService {
 			SearchCriteria sewerageConnectionSearchCriteria) {
 
 		if (!sewerageConnectionList.isEmpty()) {
-			String propertyIdsString = sewerageConnectionList.stream()
-					.map(sewerageConnection -> sewerageConnection.getProperty().getPropertyId())
-					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
+			PropertyCriteria criteria = PropertyCriteria
+					.builder().uuids(sewerageConnectionList.stream()
+							.map(connection -> connection.getProperty().getId()).collect(Collectors.toSet()))
+					.tenantId(sewerageConnectionSearchCriteria.getTenantId()).build();
 			List<Property> propertyList = sewerageServicesUtil
-					.searchPropertyOnId(sewerageConnectionSearchCriteria.getTenantId(), propertyIdsString, requestInfo);
+					.searchPropertyOnId(criteria, requestInfo);
 			HashMap<String, Property> propertyMap = propertyList.stream()
-					.collect(Collectors.toMap(Property::getPropertyId, Function.identity(),
+					.collect(Collectors.toMap(Property::getId, Function.identity(),
 							(oldValue, newValue) -> newValue, LinkedHashMap::new));
 			sewerageConnectionList.forEach(sewerageConnection -> {
-
-				String propertyId = sewerageConnection.getProperty().getPropertyId();
-				if (propertyMap.containsKey(propertyId)) {
-					sewerageConnection.setProperty(propertyMap.get(propertyId));
+				String Id = sewerageConnection.getProperty().getId();
+				if (propertyMap.containsKey(Id)) {
+					sewerageConnection.setProperty(propertyMap.get(Id));
 				} else {
-					StringBuilder builder = new StringBuilder();
+					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
 					builder.append(sewerageConnection.getConnectionNo() == null ? sewerageConnection.getApplicationNo()
 							: sewerageConnection.getConnectionNo());
-					log.error("", builder.toString());
+					log.error(builder.toString());
 				}
 			});
 
@@ -265,7 +266,6 @@ public class EnrichmentService {
 	 * 
 	 * @param sewerageConnectionRequest
 	 */
-	@SuppressWarnings("unchecked")
 	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()

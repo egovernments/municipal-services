@@ -69,7 +69,7 @@ public class SWQueryBuilder {
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
+			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -87,11 +87,11 @@ public class SWQueryBuilder {
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 		}
 
-		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.property_id = ? ");
-			preparedStatement.add(criteria.getPropertyId());
-		}
+//		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
+//			addClauseIfRequired(preparedStatement, query);
+//			query.append(" conn.property_id = ? ");
+//			preparedStatement.add(criteria.getPropertyId());
+//		}
 		if (!StringUtils.isEmpty(criteria.getOldConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");

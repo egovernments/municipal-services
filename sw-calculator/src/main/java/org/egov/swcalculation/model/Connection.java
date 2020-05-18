@@ -163,6 +163,22 @@ public class Connection {
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+	
+	@JsonProperty("propertyId")
+	private String propertyId = null;
+	
+	public void setPropertyId(String propertyId) {
+		this.propertyId = propertyId;
+	}
+
+	public String getPropertyId() {
+		return propertyId;
+	}
+
+	public Connection propertyId(String propertyId) {
+		this.propertyId = propertyId;
+		return this;
+	}
 
 	public Connection id(String id) {
 		this.id = id;

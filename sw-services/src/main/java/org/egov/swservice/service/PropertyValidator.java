@@ -14,6 +14,10 @@ public class PropertyValidator implements SewerageActionValidator {
 	@Override
 	public ValidatorResult validate(SewerageConnectionRequest sewerageConnectionRequest, boolean isUpdate) {
 		Map<String, String> errorMap = new HashMap<>();
+		
+		if(StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getPropertyId())) {
+			errorMap.put("INVALID_PROPERTY_UUID", "Property uuid should not be empty");
+		}
 		if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProperty())) {
 			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
 		}
