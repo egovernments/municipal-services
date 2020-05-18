@@ -65,9 +65,10 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				additionalDetails.put(WCConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
 				currentWaterConnection.setAdditionalDetails(additionalDetails);
 				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
+				currentWaterConnection.setPropertyId(rs.getString("property_id"));
 				// get property id and get property object
 				Property property = new Property();
-				property.setPropertyId(rs.getString("property_id"));
+				property.setId(rs.getString("property_id"));
 				currentWaterConnection.setProperty(property);
 				// Add documents id's
 				currentWaterConnection.setConnectionExecutionDate(rs.getBigDecimal("connectionExecutionDate"));
