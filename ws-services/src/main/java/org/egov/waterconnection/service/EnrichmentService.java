@@ -96,8 +96,9 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-//		AuditDetails auditDetails = waterServicesUtil
-//				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		AuditDetails auditDetails = waterServicesUtil
+				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
@@ -186,6 +187,7 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
 		if (!CollectionUtils.isEmpty(connection.getDocuments())) {
 			connection.getDocuments().forEach(document -> {
