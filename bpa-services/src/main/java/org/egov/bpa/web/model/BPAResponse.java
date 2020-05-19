@@ -15,7 +15,7 @@ public class BPAResponse {
 	 @JsonProperty("ResponseInfo")
 	  private ResponseInfo responseInfo;
 
-	  @JsonProperty("BPA")
+	  @JsonProperty("Bpa")
 	  @Valid
 	  private List<BPA> BPA;
 
