@@ -109,7 +109,7 @@ public class PropertyRepository {
 		userSearchRequest.setUuid(ownerIds);
 
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-		util.enrichOwner(userDetailResponse, properties);
+		util.enrichOwner(userDetailResponse, properties, isOpenSearch);
 		return properties;
 	}
 	

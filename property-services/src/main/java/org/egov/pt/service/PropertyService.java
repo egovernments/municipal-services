@@ -319,7 +319,7 @@ public class PropertyService {
 		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
 		userSearchRequest.setUuid(ownerIds);
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-		util.enrichOwner(userDetailResponse, properties);
+		util.enrichOwner(userDetailResponse, properties, false);
 		return properties;
 	}
 }
