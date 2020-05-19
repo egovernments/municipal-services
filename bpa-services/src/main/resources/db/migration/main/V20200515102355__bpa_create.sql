@@ -41,7 +41,7 @@ CREATE TABLE public.eg_bpa_auditdetails(
 CREATE TABLE public.eg_bpa_document(
     id character varying(64)  NOT NULL,
     documenttype character varying(64),
-    filestore character varying(64),
+    filestoreid character varying(64),
     documentuid character varying(64),
     buildingplanid character varying(64),
     additionaldetails jsonb,

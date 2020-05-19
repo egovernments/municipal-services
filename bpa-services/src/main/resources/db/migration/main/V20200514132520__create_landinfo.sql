@@ -97,7 +97,7 @@ CREATE TABLE eg_land_institution(
 CREATE TABLE eg_land_document(
 	id character varying(64),
 	documentType character varying(256),
-	fileStore character varying(256),
+	fileStoreId character varying(256),
 	documentUid character varying(256),
 	additionalDetails JSONB,
 	

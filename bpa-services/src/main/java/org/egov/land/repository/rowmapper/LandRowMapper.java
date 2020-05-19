@@ -127,7 +127,7 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 		String documentId = rs.getString("landInfo_doc_id");
 		if (documentId != null) {
 			Document document = Document.builder().documentType(rs.getString("landInfo_doc_documenttype"))
-					.fileStore(rs.getString("landInfo_doc_filestore")).id(documentId)
+					.fileStoreId(rs.getString("landInfo_doc_filestore")).id(documentId)
 					.documentUid(rs.getString("documentUid")).build();
 			landInfo.addDocumentsItem(document);
 		}

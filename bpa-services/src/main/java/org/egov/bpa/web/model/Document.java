@@ -20,8 +20,8 @@ public class Document {
 	  @JsonProperty("documentType")
 	  private String documentType;
 
-	  @JsonProperty("fileStore")
-	  private String fileStore;
+	  @JsonProperty("fileStoreId")
+	  private String fileStoreId;
 
 	  @JsonProperty("documentUid")
 	  private String documentUid;
