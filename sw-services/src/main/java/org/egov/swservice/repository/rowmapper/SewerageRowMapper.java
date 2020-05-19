@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.swservice.model.AuditDetails;
 import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Document;
@@ -38,7 +39,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
 				sewarageConnection.setConnectionNo(rs.getString("connectionNo"));
 				sewarageConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
-				sewarageConnection.setConnectionExecutionDate(rs.getBigDecimal("connectionExecutionDate"));
+				sewarageConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
 				sewarageConnection.setNoOfToilets(rs.getInt("noOfToilets"));
 				sewarageConnection.setNoOfWaterClosets(rs.getInt("noOfWaterClosets"));
 				sewarageConnection.setProposedToilets(rs.getInt("proposedToilets"));
@@ -61,8 +62,17 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setAdditionalDetails(addtionalDetails);
 				sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				Property property = new Property();
-				property.setPropertyId(rs.getString("property_id"));
+				property.setId(rs.getString("property_id"));
 				sewarageConnection.setProperty(property);
+				
+				 AuditDetails auditdetails = AuditDetails.builder()
+	                        .createdBy(rs.getString("sw_createdBy"))
+	                        .createdTime(rs.getLong("sw_createdTime"))
+	                        .lastModifiedBy(rs.getString("sw_lastModifiedBy"))
+	                        .lastModifiedTime(rs.getLong("sw_lastModifiedTime"))
+	                        .build();
+				 sewarageConnection.setAuditDetails(auditdetails);
+				 
 				// Add documents id's
 				connectionListMap.put(Id, sewarageConnection);
 			}

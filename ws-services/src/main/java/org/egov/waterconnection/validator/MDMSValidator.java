@@ -118,7 +118,7 @@ public class MDMSValidator {
 		if (!StringUtils.isEmpty(waterConnection.getWaterSource())
 				&& !codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource())) {
 			messageBuilder = new StringBuilder();
-			messageBuilder.append("Water Source value is invalid, please enter proper value! ");
+			messageBuilder.append("Water Source / Water Sub Source value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_CONNECTION_SOURCE", messageBuilder.toString());
 		}
 		if (!StringUtils.isEmpty(waterConnection.getRoadType())

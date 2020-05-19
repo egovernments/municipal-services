@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 public class ValidateProperty {
 
 	@Autowired
-	WaterServicesUtil waterServiceUtil;
+	private WaterServicesUtil waterServiceUtil;
 	
 	/**
 	 * 

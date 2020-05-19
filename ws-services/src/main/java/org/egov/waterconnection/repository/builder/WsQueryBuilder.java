@@ -30,9 +30,14 @@ public class WsQueryBuilder {
 	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.connectionType, wc.waterSource,"
 			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading, wc.appCreatedDate,"
 			+ " wc.detailsprovidedby, wc.estimationfileStoreId , wc.sanctionfileStoreId ,"
-			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
-			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
-			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress, plumber.relationship FROM connection conn "
+			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea,"
+			+ " conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason,"
+			+ " conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment, conn.createdBy as ws_createdBy, conn.lastModifiedBy as ws_lastModifiedBy,"
+			+ " conn.createdTime as ws_createdTime, conn.lastModifiedTime as ws_lastModifiedTime, "
+			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id,"
+			+ " plumber.name as plumber_name, plumber.licenseno,"
+			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress,"
+			+ " plumber.relationship FROM connection conn "
 			+  INNER_JOIN_STRING 
 			+" water_service_connection wc ON wc.connection_id = conn.id"
 			+  LEFT_OUTER_JOIN_STRING
@@ -67,7 +72,7 @@ public class WsQueryBuilder {
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
+			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -80,11 +85,11 @@ public class WsQueryBuilder {
 			query.append(" conn.tenantid = ? ");
 			preparedStatement.add(criteria.getTenantId());
 		}
-		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.property_id = ? ");
-			preparedStatement.add(criteria.getPropertyId());
-		}
+//		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
+//			addClauseIfRequired(preparedStatement, query);
+//			query.append(" conn.property_id = ? ");
+//			preparedStatement.add(criteria.getPropertyId());
+//		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");

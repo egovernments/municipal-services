@@ -19,10 +19,10 @@ import org.springframework.util.CollectionUtils;
 public class SWQueryBuilder {
 
 	@Autowired
-	SewerageServicesUtil sewerageServicesUtil;
+	private SewerageServicesUtil sewerageServicesUtil;
 
 	@Autowired
-	SWConfiguration config;
+	private SWConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 	 private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
@@ -32,7 +32,10 @@ public class SWQueryBuilder {
 	
 	private final static String SEWERAGE_SEARCH_QUERY = "SELECT conn.*, sc.*, document.*, plumber.*, sc.connectionExecutionDate,"
 			+ "sc.noOfWaterClosets, sc.noOfToilets,sc.proposedWaterClosets, sc.proposedToilets, sc.connectionType, sc.connection_id as connection_Id, sc.appCreatedDate,  sc.detailsprovidedby, sc.estimationfileStoreId , sc.sanctionfileStoreId ,"
-			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
+			+ " conn.id as conn_id, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id,"
+			+ " conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.createdBy as sw_createdBy,"
+			+ " conn.lastModifiedBy as sw_lastModifiedBy, conn.createdTime as sw_createdTime, conn.lastModifiedTime as sw_lastModifiedTime, "
+			+ " conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
 			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress, plumber.relationship FROM eg_sw_connection conn "
 	+  INNER_JOIN_STRING 
@@ -66,7 +69,7 @@ public class SWQueryBuilder {
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
+			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -84,11 +87,11 @@ public class SWQueryBuilder {
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 		}
 
-		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.property_id = ? ");
-			preparedStatement.add(criteria.getPropertyId());
-		}
+//		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
+//			addClauseIfRequired(preparedStatement, query);
+//			query.append(" conn.property_id = ? ");
+//			preparedStatement.add(criteria.getPropertyId());
+//		}
 		if (!StringUtils.isEmpty(criteria.getOldConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");

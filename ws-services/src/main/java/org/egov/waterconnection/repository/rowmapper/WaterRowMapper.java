@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.model.AuditDetails;
 import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Document;
@@ -64,12 +65,22 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				additionalDetails.put(WCConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
 				currentWaterConnection.setAdditionalDetails(additionalDetails);
 				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
+				currentWaterConnection.setPropertyId(rs.getString("property_id"));
 				// get property id and get property object
 				Property property = new Property();
-				property.setPropertyId(rs.getString("property_id"));
+				property.setId(rs.getString("property_id"));
 				currentWaterConnection.setProperty(property);
 				// Add documents id's
-				currentWaterConnection.setConnectionExecutionDate(rs.getBigDecimal("connectionExecutionDate"));
+				currentWaterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
+				
+				AuditDetails auditdetails = AuditDetails.builder()
+	                        .createdBy(rs.getString("ws_createdBy"))
+	                        .createdTime(rs.getLong("ws_createdTime"))
+	                        .lastModifiedBy(rs.getString("ws_lastModifiedBy"))
+	                        .lastModifiedTime(rs.getLong("ws_lastModifiedTime"))
+	                        .build();
+				 currentWaterConnection.setAuditDetails(auditdetails);
+				 
 				connectionListMap.put(Id, currentWaterConnection);
 			}
 			addChildrenToProperty(rs, currentWaterConnection);

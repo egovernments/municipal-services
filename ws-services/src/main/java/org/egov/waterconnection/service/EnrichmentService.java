@@ -19,6 +19,7 @@ import org.egov.waterconnection.model.AuditDetails;
 import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Property;
+import org.egov.waterconnection.model.PropertyCriteria;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnection;
@@ -67,22 +68,23 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
 			SearchCriteria waterConnectionSearchCriteria) {
-		
-		if(!CollectionUtils.isEmpty(waterConnectionList)) {
-			String propertyIdsString = waterConnectionList.stream()
-					.map(waterConnection -> waterConnection.getProperty().getPropertyId()).collect(Collectors.toSet())
-					.stream().collect(Collectors.joining(","));
-			List<Property> propertyList = waterServicesUtil.searchPropertyOnId(waterConnectionSearchCriteria.getTenantId(),
-					propertyIdsString, requestInfo);
-			HashMap<String, Property> propertyMap = propertyList.stream().collect(Collectors.toMap(Property::getPropertyId,
+
+		if (!CollectionUtils.isEmpty(waterConnectionList)) {
+			PropertyCriteria criteria = PropertyCriteria
+					.builder().uuids(waterConnectionList.stream()
+							.map(waterConnection -> waterConnection.getProperty().getId()).collect(Collectors.toSet()))
+					.tenantId(waterConnectionSearchCriteria.getTenantId()).build();
+			List<Property> propertyList = waterServicesUtil.searchPropertyOnId(criteria, requestInfo);
+			HashMap<String, Property> propertyMap = propertyList.stream().collect(Collectors.toMap(Property::getId,
 					Function.identity(), (oldValue, newValue) -> newValue, LinkedHashMap::new));
 			waterConnectionList.forEach(waterConnection -> {
-				String propertyId = waterConnection.getProperty().getPropertyId();
-				if (propertyMap.containsKey(propertyId)) {
-					waterConnection.setProperty(propertyMap.get(propertyId));
+				String Id = waterConnection.getProperty().getId();
+				if (propertyMap.containsKey(Id)) {
+					waterConnection.setProperty(propertyMap.get(Id));
 				} else {
 					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
-					builder.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo() : waterConnection.getConnectionNo());
+					builder.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo()
+							: waterConnection.getConnectionNo());
 					log.error(builder.toString());
 				}
 			});
@@ -96,8 +98,9 @@ public class EnrichmentService {
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
-//		AuditDetails auditDetails = waterServicesUtil
-//				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		AuditDetails auditDetails = waterServicesUtil
+				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
+		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
@@ -186,6 +189,7 @@ public class EnrichmentService {
 		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
+		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		WaterConnection connection = waterConnectionRequest.getWaterConnection();
 		if (!CollectionUtils.isEmpty(connection.getDocuments())) {
 			connection.getDocuments().forEach(document -> {

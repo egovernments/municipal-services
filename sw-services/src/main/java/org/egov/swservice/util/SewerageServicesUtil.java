@@ -2,10 +2,9 @@ package org.egov.swservice.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -53,7 +52,7 @@ public class SewerageServicesUtil {
 	private String searchPropertyEndPoint;
 
 	@Autowired
-	ObjectMapper mapper;
+	private ObjectMapper mapper;
 
 	@Autowired
 	private WorkflowService workflowService;
@@ -63,6 +62,10 @@ public class SewerageServicesUtil {
 		this.serviceRequestRepository = serviceRequestRepository;
 
 	}
+	private String tenantId = "tenantId=";
+	private String mobileNumber = "mobileNumber=";
+	private String propertyIds = "propertyIds=";
+	private String uuids = "uuids=";
 	private String URL = "url";
 
 	/**
@@ -73,28 +76,19 @@ public class SewerageServicesUtil {
 	 */
 
 	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
-		Set<String> propertyIds = new HashSet<>();
+		HashSet<String> propertyUUID = new HashSet<>();
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		HashMap<String, Object> propertyRequestObj = new HashMap<>();
-		propertyIds.add(sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId());
-		propertyCriteria.setPropertyIds(propertyIds);
-		propertyRequestObj.put("RequestInfoWrapper", getPropertyRequestInfoWrapperSearch(new RequestInfoWrapper(),
-				sewerageConnectionRequest.getRequestInfo()));
-		propertyRequestObj.put("PropertyCriteria", propertyCriteria);
+		propertyUUID.add(sewerageConnectionRequest.getSewerageConnection().getPropertyId());
+		propertyCriteria.setUuids(propertyUUID);
+		propertyCriteria.setTenantId(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(
-				getPropURLForCreate(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId(),
-						sewerageConnectionRequest.getSewerageConnection().getProperty().getPropertyId()),
+				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
 			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
 		}
 		return propertyList;
-	}
-
-	private RequestInfoWrapper getPropertyRequestInfoWrapperSearch(RequestInfoWrapper requestInfoWrapper,
-			RequestInfo requestInfo) {
-		return RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 	}
 
 	/**
@@ -120,7 +114,7 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
+		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber()) || StringUtils.isEmpty(sewerageConnectionSearchCriteria.getPropertyId())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
@@ -129,10 +123,14 @@ public class SewerageServicesUtil {
 		if (!StringUtils.isEmpty(sewerageConnectionSearchCriteria.getTenantId())) {
 			propertyCriteria.setTenantId(sewerageConnectionSearchCriteria.getTenantId());
 		}
+		if (!StringUtils.isEmpty(sewerageConnectionSearchCriteria.getPropertyId())) {
+			HashSet<String> propertyIds = new HashSet<>();
+			propertyIds.add(sewerageConnectionSearchCriteria.getPropertyId());
+			propertyCriteria.setPropertyIds(propertyIds);
+		}
 
 		Object result = serviceRequestRepository.fetchResult(
-				getPropURL(sewerageConnectionSearchCriteria.getTenantId(),
-						sewerageConnectionSearchCriteria.getMobileNumber()),
+				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
@@ -159,90 +157,14 @@ public class SewerageServicesUtil {
 
 	/**
 	 * 
-	 * @return search url for property search
-	 */
-	private String getpropertySearchURLForMobileSearch() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append("tenantId=");
-		url.append("{1}");
-		url.append("&");
-		url.append("mobileNumber=");
-		url.append("{2}");
-		return url.toString();
-	}
-
-	/**
-	 * 
-	 * @return search url for property search
-	 */
-	private String getpropertySearchURLForMobileSearchCitizen() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append("mobileNumber=");
-		url.append("{2}");
-		return url.toString();
-	}
-
-	private StringBuilder getPropURL(String tenantId, String mobileNumber) {
-		String url = getpropertySearchURLForMobileSearchCitizen();
-		if (tenantId != null)
-			url = getpropertySearchURLForMobileSearch();
-		if (url.indexOf("{1}") > 0)
-			url = url.replace("{1}", tenantId);
-		if (url.indexOf("{2}") > 0)
-			url = url.replace("{2}", mobileNumber);
-		return new StringBuilder(url);
-	}
-
-	/**
-	 * 
-	 * @return search url for property search employee
-	 */
-	private String getPropertySearchURLForEmployee() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append("tenantId=");
-		url.append("{1}");
-		url.append("&");
-		url.append("propertyIds=");
-		url.append("{2}");
-		return url.toString();
-	}
-
-	/**
-	 * 
-	 * @return search url for property search citizen
-	 */
-	private String getPropertySearchURLForCitizen() {
-		StringBuilder url = new StringBuilder(getPropertyURL());
-		url.append("?");
-		url.append("propertyIds=");
-		url.append("{2}");
-		return url.toString();
-	}
-
-	private StringBuilder getPropURLForCreate(String tenantId, String propertyIds) {
-		String url = getPropertySearchURLForCitizen();
-		if (tenantId != null)
-			url = getPropertySearchURLForEmployee();
-		if (url.indexOf("{1}") > 0)
-			url = url.replace("{1}", tenantId);
-		if (url.indexOf("{2}") > 0)
-			url = url.replace("{2}", propertyIds);
-		return new StringBuilder(url);
-	}
-
-	/**
-	 * 
 	 * @param tenantId
 	 * @param propertyId
 	 * @param requestInfo
 	 * @return List of Property
 	 */
-	public List<Property> searchPropertyOnId(String tenantId, String propertyIds, RequestInfo requestInfo) {
+	public List<Property> searchPropertyOnId(PropertyCriteria criteria, RequestInfo requestInfo) {
 
-		Object result = serviceRequestRepository.fetchResult(getPropURLForCreate(tenantId, propertyIds),
+		Object result = serviceRequestRepository.fetchResult(getPropertyURL(criteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		return getPropertyDetails(result);
 	}
@@ -291,6 +213,41 @@ public class SewerageServicesUtil {
 
 		Object response = serviceRequestRepository.getShortningURL(new StringBuilder(url), obj);
 		return response.toString();
+	}
+	
+	/**
+	 * 
+	 * @return search url for property search
+	 * @param criteria
+	 * @return property URL
+	 */
+	private StringBuilder getPropertyURL(PropertyCriteria criteria) {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		boolean isanyparametermatch = false;
+		url.append("?");
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			isanyparametermatch = true;
+			url.append(tenantId).append(criteria.getTenantId());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+			if (isanyparametermatch)url.append("&");
+			isanyparametermatch = true;
+			String propertyIdsString = criteria.getPropertyIds().stream().map(propertyId -> propertyId)
+					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
+			url.append(propertyIds).append(propertyIdsString);
+		}
+		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
+			if (isanyparametermatch)url.append("&");
+			isanyparametermatch = true;
+			url.append(mobileNumber).append(criteria.getMobileNumber());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getUuids())) {
+			if (isanyparametermatch)url.append("&");
+			String uuidString = criteria.getUuids().stream().map(uuid -> uuid).collect(Collectors.toSet()).stream()
+					.collect(Collectors.joining(","));
+			url.append(uuids).append(uuidString);
+		}
+		return url;
 	}
 
 }
