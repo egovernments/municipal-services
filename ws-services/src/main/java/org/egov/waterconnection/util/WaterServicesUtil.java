@@ -16,7 +16,6 @@ import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.AuditDetails;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.PropertyCriteria;
-import org.egov.waterconnection.model.PropertyRequest;
 import org.egov.waterconnection.model.PropertyResponse;
 import org.egov.waterconnection.model.RequestInfoWrapper;
 import org.egov.waterconnection.model.SearchCriteria;
@@ -110,19 +109,6 @@ public class WaterServicesUtil {
 	
 	/**
 	 * 
-	 * @param waterConnectionRequest
-	 * @return Created property list
-	 */
-	public List<Property> createPropertyRequest(WaterConnectionRequest waterConnectionRequest) {
-		List<Property> propertyList = new ArrayList<>();
-		propertyList.add(waterConnectionRequest.getWaterConnection().getProperty());
-		PropertyRequest propertyReq = getPropertyRequest(waterConnectionRequest.getRequestInfo(),
-				waterConnectionRequest.getWaterConnection().getProperty());
-		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq));
-	}
-
-	/**
-	 * 
 	 * @param waterConnectionSearchCriteria
 	 *            WaterConnectionSearchCriteria containing search criteria on
 	 *            water connection
@@ -181,10 +167,6 @@ public class WaterServicesUtil {
 		} catch (Exception ex) {
 			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
 		}
-	}
-
-	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
-		return PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
 	}
 
 	public StringBuilder getPropertyCreateURL() {

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 
 import org.egov.waterconnection.constants.WCConstants;
@@ -73,9 +75,11 @@ public class MeterReadingService {
 		LocalDate currentdate = Instant
 				.ofEpochMilli(noLength > 10 ? connectionExcecutionDate : connectionExcecutionDate * 1000)
 				.atZone(ZoneId.systemDefault()).toLocalDate();
-
+		LocalDate startingDate = currentdate.with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate endDate = currentdate.with(TemporalAdjusters.lastDayOfMonth());
 		StringBuilder builder = new StringBuilder();
-		return builder.append(currentdate.getMonth().name().substring(0, 3)).append(" - ")
-				.append(String.valueOf(currentdate.getYear())).toString();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		return builder.append(startingDate.format(formatter)).append(" - ").append(endDate.format(formatter))
+				.toString();
 	}
 }

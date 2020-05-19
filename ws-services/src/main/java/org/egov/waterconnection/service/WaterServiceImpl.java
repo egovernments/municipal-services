@@ -85,7 +85,6 @@ public class WaterServiceImpl implements WaterService {
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
-		//mDMSValidator.validateMasterData(waterConnectionRequest);
 		enrichmentService.enrichWaterConnection(waterConnectionRequest);
 		//call work-flow
 		if (config.getIsExternalWorkFlowEnabled())

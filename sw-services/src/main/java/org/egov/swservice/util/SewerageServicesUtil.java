@@ -16,7 +16,6 @@ import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.AuditDetails;
 import org.egov.swservice.model.Property;
 import org.egov.swservice.model.PropertyCriteria;
-import org.egov.swservice.model.PropertyRequest;
 import org.egov.swservice.model.PropertyResponse;
 import org.egov.swservice.model.RequestInfoWrapper;
 import org.egov.swservice.model.SearchCriteria;
@@ -105,24 +104,7 @@ public class SewerageServicesUtil {
 			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
 		}
 	}
-
-	/*
-	 * @param sewerageConnectionRequest
-	 * 
-	 * @return Created property list
-	 */
-	public List<Property> createPropertyRequest(SewerageConnectionRequest sewerageConnectionRequest) {
-		List<Property> propertyList = new ArrayList<>();
-		propertyList.add(sewerageConnectionRequest.getSewerageConnection().getProperty());
-		PropertyRequest propertyReq = getPropertyRequest(sewerageConnectionRequest.getRequestInfo(),
-				sewerageConnectionRequest.getSewerageConnection().getProperty());
-		return getPropertyDetails(serviceRequestRepository.fetchResult(getPropertyCreateURL(), propertyReq));
-	}
-
-	private PropertyRequest getPropertyRequest(RequestInfo requestInfo, Property propertyList) {
-		return PropertyRequest.builder().requestInfo(requestInfo).property(propertyList).build();
-	}
-
+	
 	/**
 	 * 
 	 * @param sewerageConnectionSearchCriteria

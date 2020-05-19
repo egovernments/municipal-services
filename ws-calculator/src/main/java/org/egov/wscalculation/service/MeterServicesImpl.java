@@ -47,7 +47,6 @@ public class MeterServicesImpl implements MeterService {
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
-		// mDMSValidator.validateMasterData(meterConnectionRequest);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
 		wSCalculationDao.savemeterReading(meterConnectionRequest);
