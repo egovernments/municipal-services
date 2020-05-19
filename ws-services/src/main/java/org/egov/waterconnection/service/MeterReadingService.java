@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.MeterConnectionRequest;
 import org.egov.waterconnection.model.MeterReading;
@@ -36,6 +37,9 @@ public class MeterReadingService {
 
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
+	
+	@Autowired
+	private MasterDataService masterDataService;
 
 	@SuppressWarnings("unchecked")
 	public void process(WaterConnectionRequest request, String topic) {
@@ -53,7 +57,7 @@ public class MeterReadingService {
 							.currentReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
 							.meterStatus(MeterStatusEnum.WORKING)
 							.billingPeriod(getBillingPeriod(
-									request.getWaterConnection().getConnectionExecutionDate().longValue()))
+									request.getWaterConnection().getConnectionExecutionDate().longValue(), request.getRequestInfo()))
 							.generateDemand(Boolean.FALSE).lastReading(initialMeterReading.doubleValue())
 							.lastReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
 							.build()).requestInfo(request.getRequestInfo()).build();
@@ -70,16 +74,27 @@ public class MeterReadingService {
 		}
 	}
 
-	private String getBillingPeriod(Long connectionExcecutionDate) {
+	private String getBillingPeriod(Long connectionExcecutionDate, RequestInfo requestInfo) {
 		int noLength = (int) (Math.log10(connectionExcecutionDate) + 1);
 		LocalDate currentdate = Instant
 				.ofEpochMilli(noLength > 10 ? connectionExcecutionDate : connectionExcecutionDate * 1000)
 				.atZone(ZoneId.systemDefault()).toLocalDate();
-		LocalDate startingDate = currentdate.with(TemporalAdjusters.firstDayOfMonth());
-		LocalDate endDate = currentdate.with(TemporalAdjusters.lastDayOfMonth());
+		LocalDate startingDate = currentdate, endDate = currentdate;
+		String billingCycyle = masterDataService.getBillingCycle(requestInfo, requestInfo.getUserInfo().getTenantId());
+		if (billingCycyle.equalsIgnoreCase(WCConstants.Monthly_Billing_Period)) {
+			startingDate = currentdate.with(TemporalAdjusters.firstDayOfMonth());
+			endDate = currentdate.with(TemporalAdjusters.lastDayOfMonth());
+		} else if (billingCycyle.equalsIgnoreCase(WCConstants.Quaterly_Billing_Period)) {
+			startingDate = currentdate.with(currentdate.getMonth().firstMonthOfQuarter())
+					.with(TemporalAdjusters.firstDayOfMonth());
+			endDate = startingDate.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
+		}
+
 		StringBuilder builder = new StringBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return builder.append(startingDate.format(formatter)).append(" - ").append(endDate.format(formatter))
 				.toString();
 	}
+	
+	
 }

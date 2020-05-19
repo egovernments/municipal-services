@@ -188,5 +188,19 @@ public class WCConstants {
 	
 	public static final long DAYS_CONST= 86400000l;
 	
+	public static final String BillingPeriod = "billingPeriod";
+	
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
+	
+	public static final String  Billing_Period_Master = "Billing_Period_Master";
+	
+	public static final String Quaterly_Billing_Period = "quarterly";
+
+	public static final String Monthly_Billing_Period = "monthly";
+
+	public static final String Billing_Cycle_String = "billingCycle";
+
+
+
 	
 }

@@ -183,7 +183,7 @@ public class WSCalculationConstant {
 
 	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
 
-	public static final String Quaterly_Billing_Period = "quaterly";
+	public static final String Quaterly_Billing_Period = "quarterly";
 
 	public static final String Monthly_Billing_Period = "monthly";
 
