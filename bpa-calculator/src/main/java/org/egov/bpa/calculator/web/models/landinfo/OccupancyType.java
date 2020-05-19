@@ -1,11 +1,10 @@
-package org.egov.land.web.models;
+package org.egov.bpa.calculator.web.models.landinfo;
 
-public enum Relationship {
-	FATHER("FATHER"), HUSBAND("HUSBAND");
-
+public enum OccupancyType {
+	OWNER("OWNER"), TENANT("TENANT");
 	private String value;
 
-	Relationship(String value) {
+	OccupancyType(String value) {
 		this.value = value;
 	}
 
@@ -18,13 +17,12 @@ public enum Relationship {
 		return String.valueOf(value);
 	}
 
-	public static Relationship fromValue(String text) {
-		for (Relationship b : Relationship.values()) {
+	public static OccupancyType fromValue(String text) {
+		for (OccupancyType b : OccupancyType.values()) {
 			if (String.valueOf(b.value).equals(text)) {
 				return b;
 			}
 		}
 		return null;
 	}
-
 }

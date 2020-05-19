@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.egov.bpa.util.ResponseInfoFactory;
 import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.land.service.LandService;
+import org.egov.land.util.LandUtil;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandResponse;
@@ -18,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/v1")
 public class LandController {
 	
 	@Autowired
@@ -29,9 +32,12 @@ public class LandController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 	
+	@Autowired
+	private LandUtil landUtil;
+	
 	@PostMapping(value = "/land/_create")
 	public ResponseEntity<LandResponse> create(@Valid @RequestBody LandRequest landRequest) {
-//		landUtil.defaultJsonPathConfig();
+		landUtil.defaultJsonPathConfig();
 		LandInfo landInfo = landService.create(landRequest);
 		List<LandInfo> landInfos = new ArrayList<LandInfo>();
 		landInfos.add(landInfo);

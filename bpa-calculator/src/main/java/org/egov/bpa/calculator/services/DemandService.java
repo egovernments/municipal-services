@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -243,7 +242,7 @@ public class DemandService {
             String tenantId = calculation.getTenantId();
             String consumerCode = calculation.getBpa().getApplicationNo();
 
-            User owner = bpa.getOwners().get(0).toCommonUser();
+            User owner = bpa.getLandInfo().getOwners().get(0).toCommonUser();
 
             List<DemandDetail> demandDetails = new LinkedList<>();
 

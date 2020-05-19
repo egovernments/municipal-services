@@ -1,11 +1,12 @@
-package org.egov.land.web.models;
+package org.egov.bpa.calculator.web.models.landinfo;
 
-public enum Relationship {
-	FATHER("FATHER"), HUSBAND("HUSBAND");
+public enum Source {
+	MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
+	FIELD_SURVEY("FIELD_SURVEY");
 
 	private String value;
 
-	Relationship(String value) {
+	Source(String value) {
 		this.value = value;
 	}
 
@@ -18,13 +19,12 @@ public enum Relationship {
 		return String.valueOf(value);
 	}
 
-	public static Relationship fromValue(String text) {
-		for (Relationship b : Relationship.values()) {
+	public static Source fromValue(String text) {
+		for (Source b : Source.values()) {
 			if (String.valueOf(b.value).equals(text)) {
 				return b;
 			}
 		}
 		return null;
 	}
-
 }

@@ -3,10 +3,12 @@ package org.egov.land.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
@@ -15,7 +17,6 @@ import org.egov.bpa.web.model.user.CreateUserRequest;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.user.UserSearchRequest;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
@@ -23,6 +24,7 @@ import org.egov.land.web.models.OwnerInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -41,37 +43,36 @@ public class LandUserService {
 	@Autowired
 	private ObjectMapper mapper;
 
-	public void createUser(LandRequest bpaRequest) {
-		LandInfo landInfo = bpaRequest.getLandInfo();
-		RequestInfo requestInfo = bpaRequest.getRequestInfo();
-		Role role = getCitizenRole();
+	public void manageUser(LandRequest landRequest) {
+		LandInfo landInfo = landRequest.getLandInfo();
+		RequestInfo requestInfo = landRequest.getRequestInfo();
 
 		landInfo.getOwners().forEach(owner -> {
-			if (owner.getUuid() == null) {
-				addUserDefaultFields(landInfo.getTenantId().split("\\.")[0], role, owner);
-				StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
-						.append(config.getUserCreateEndpoint());
-				setUserName(owner);
-				owner.setOwnerType(BPAConstants.CITIZEN);
-				UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-				if (userDetailResponse.getUser().get(0).getUuid() == null) {
-					throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
-				}
-				log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
-				setOwnerFields(owner, userDetailResponse, requestInfo);
-			} else {
+			UserDetailResponse userDetailResponse = null;
+			if (owner.getMobileNumber() != null) {
 				if (owner.getTenantId() == null) {
-					owner.setTenantId(landInfo.getTenantId());
+					addUserDefaultFields(landInfo.getTenantId().split("\\.")[0], owner);
 				}
-				UserDetailResponse userDetailResponse = userExists(owner, requestInfo);
-				if (userDetailResponse.getUser().isEmpty())
-					throw new CustomException("INVALID USER", "The uuid " + owner.getUuid() + " does not exists");
-				StringBuilder uri = new StringBuilder(config.getUserHost());
-				uri = uri.append(config.getUserContextPath()).append(config.getUserUpdateEndpoint());
-				OwnerInfo user = new OwnerInfo();
-				user.addUserWithoutAuditDetail(owner);
-				userDetailResponse = userCall(new CreateUserRequest(requestInfo, user), uri);
-				setOwnerFields(owner, userDetailResponse, requestInfo);
+
+				userDetailResponse = userExists(owner, requestInfo);
+
+				if (userDetailResponse == null || CollectionUtils.isEmpty(userDetailResponse.getUser())
+						|| !owner.equals(userDetailResponse.getUser().get(0))) {
+					// if no user found with mobileNo or details were changed,
+					// creating new one..
+					StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
+							.append(config.getUserCreateEndpoint());
+					setUserName(owner);
+					owner.setOwnerType(BPAConstants.CITIZEN);
+					userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+					log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+					owner.setOwnerId(null);
+				}
+				if (userDetailResponse != null)
+					setOwnerFields(owner, userDetailResponse, requestInfo);
+			} else {
+				log.info("MobileNo is not existed in ownerInfo.");
+				throw new CustomException("INVALID_ONWER_ERROR", "MobileNo is mandatory for ownerInfo");
 			}
 		});
 	}
@@ -89,11 +90,7 @@ public class LandUserService {
 
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
-
-		if (owner.getUuid() != null) {
-			userSearchRequest.setId(Arrays.asList(owner.getId().toString()));
-			userSearchRequest.setUuid(Arrays.asList(owner.getUuid()));
-		}
+		userSearchRequest.setMobileNumber(owner.getMobileNumber());
 
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
@@ -106,7 +103,7 @@ public class LandUserService {
 	 *            The owner to whom the username is to assigned
 	 */
 	private void setUserName(OwnerInfo owner) {
-		owner.setUserName(owner.getMobileNumber());
+		owner.setUserName(UUID.randomUUID().toString());
 	}
 
 	/**
@@ -120,6 +117,7 @@ public class LandUserService {
 	 *            The requestInfo of the request
 	 */
 	private void setOwnerFields(OwnerInfo owner, UserDetailResponse userDetailResponse, RequestInfo requestInfo) {
+		owner.setId(userDetailResponse.getUser().get(0).getId());
 		owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
 		owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
 	}
@@ -134,38 +132,25 @@ public class LandUserService {
 	 * @param owner
 	 *            The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner) {
+	private void addUserDefaultFields(String tenantId, OwnerInfo owner) {
 		owner.setTenantId(tenantId);
 	}
 
-	/**
-	 * Creates citizen role
-	 * 
-	 * @return Role object for citizen
-	 */
-	private Role getCitizenRole() {
-		Role role = new Role();
-		role.setCode(BPAConstants.CITIZEN);
-		role.setName("Citizen");
-		return role;
-	}
-
-	public UserDetailResponse getUsersForBpas(List<LandInfo> landInfos) {
+	public UserDetailResponse getUsersForLandInfos(List<LandInfo> landInfos) {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		List<String> ids = new ArrayList<String>();
-		List<String> uuids = new ArrayList<String>();
+		Set<String> uuids = new HashSet<String>();
 		landInfos.forEach(landInfo -> {
 			landInfo.getOwners().forEach(owner -> {
-				if (owner.getUuid() != null)
-					ids.add(owner.getUuid().toString());
-
 				if (owner.getUuid() != null)
 					uuids.add(owner.getUuid().toString());
 			});
 		});
 
-		userSearchRequest.setId(ids);
-		userSearchRequest.setUuid(uuids);
+		for (String uuid : uuids) {
+			ids.add(uuid);
+		}
+		userSearchRequest.setUuid(ids);
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
 	}

@@ -3,8 +3,8 @@ package org.egov.bpa.workflow;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.model.BPA;
-import org.egov.bpa.web.model.BPA.StatusEnum;
 import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.bpa.web.model.Status;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.web.model.workflow.BusinessServiceResponse;
 import org.egov.bpa.web.model.workflow.ProcessInstance;
@@ -119,10 +119,10 @@ public class WorkflowService {
 	 *            The BusinessService of the application flow
 	 * @return State object to be fetched
 	 */
-	public Boolean isStateUpdatable(StatusEnum statusEnum, BusinessService businessService) {
+	public Boolean isStateUpdatable(String status, BusinessService businessService) {
 		for (org.egov.bpa.web.model.workflow.State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(status.toString()))
 				return state.getIsStateUpdatable();
 		}
 		return Boolean.FALSE;
@@ -137,10 +137,10 @@ public class WorkflowService {
 	 *            The BusinessService of the application flow
 	 * @return State String to be fetched
 	 */
-	public String getCurrentState(StatusEnum statusEnum, BusinessService businessService) {
+	public String getCurrentState(String status, BusinessService businessService) {
 		for (State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(status.toString()))
 				return state.getState();
 		}
 		return null;
@@ -155,10 +155,10 @@ public class WorkflowService {
 	 *            The BusinessService of the application flow
 	 * @return State object to be fetched
 	 */
-	public State getCurrentStateObj(StatusEnum statusEnum, BusinessService businessService) {
+	public State getCurrentStateObj(String status, BusinessService businessService) {
 		for (State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(statusEnum.toString()))
+					&& state.getApplicationStatus().equalsIgnoreCase(status.toString()))
 				return state;
 		}
 		return null;

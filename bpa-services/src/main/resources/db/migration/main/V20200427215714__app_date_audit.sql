@@ -1,1 +1,0 @@
-ALTER TABLE eg_bpa_auditdetails ADD COLUMN applicationDate bigint;

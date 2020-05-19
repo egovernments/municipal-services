@@ -1,21 +1,16 @@
 package org.egov.bpa.calculator.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
 import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 import org.egov.bpa.calculator.web.models.CalculationReq;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
-import org.egov.bpa.calculator.web.models.bpa.BPA.RiskTypeEnum;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
@@ -26,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -87,17 +84,18 @@ public class MDMSService {
      * @param license The tradeLicense for which calculation is done
      * @return Map contianing the calculationType for TradeUnit and accessory
      */
-    public Map getCalculationType(RequestInfo requestInfo,BPA bpa,Object mdmsData, String feeType){
+    @SuppressWarnings("rawtypes")
+	public Map getCalculationType(RequestInfo requestInfo,BPA bpa,Object mdmsData, String feeType){
         HashMap<String,Object> calculationType = new HashMap<>();
         try {
         	
            
 
             List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_CALCULATIONTYPE_PATH);
-            String filterExp = "$.[?((@.applicationType == '"+bpa.getApplicationType()+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
+            String filterExp = "$.[?((@.applicationType == '"+((Map)bpa.getAdditionalDetails()).get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
             List<Object> calTypes = JsonPath.read(jsonOutput, filterExp);
             
-            filterExp = "$.[?(@.serviceType == '"+bpa.getServiceType()+"' || @.serviceType === 'ALL' )]";
+            filterExp = "$.[?(@.serviceType == '"+((Map)bpa.getAdditionalDetails()).get("serviceType")+"' || @.serviceType === 'ALL' )]";
             calTypes = JsonPath.read(calTypes, filterExp);
             
             filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' || @.riskType === 'ALL' )]";

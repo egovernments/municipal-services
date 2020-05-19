@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -12,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.validation.Valid;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
@@ -23,18 +20,13 @@ import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
-import org.egov.bpa.web.model.edcr.RequestInfoWrapper;
-import org.egov.land.web.models.OwnerInfo;
 import org.egov.bpa.web.model.idgen.IdResponse;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.land.web.models.LandInfo;
-import org.egov.land.web.models.LandRequest;
-import org.egov.land.web.models.LandSearchCriteria;
+import org.egov.land.web.models.OwnerInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -73,6 +65,12 @@ public class EnrichmentService {
 		bpaRequest.getBPA().setLandId(bpaRequest.getBPA().getLandInfo().getId()); 
 		bpaRequest.getBPA().setAccountId(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
 
+		if(!bpaRequest.getBPA().getRiskType().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)){
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_MODULE_CODE);
+		}else{
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_LOW_MODULE_CODE);
+		}
+
 		// BPA Documents
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
@@ -80,7 +78,6 @@ public class EnrichmentService {
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
-	
 		setIdgenIds(bpaRequest);
 	}
 
@@ -175,10 +172,12 @@ public class EnrichmentService {
 						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
-//			bpa.setOrderGeneratedDate(Calendar.getInstance().getTimeInMillis());
+			bpa.setApprovalDate(Calendar.getInstance().getTimeInMillis());
 
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
+			Map<String, Object> additionalDetail = (Map) bpa.getAdditionalDetails();
+			additionalDetail.put("validityDate", calendar.getTimeInMillis());
 //			bpa.setValidityDate(calendar.getTimeInMillis());
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
@@ -207,10 +206,6 @@ public class EnrichmentService {
 				}
 			}
 		}
-		
-		/*if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
-			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
-		}*/
 		
 	}
 
@@ -246,12 +241,6 @@ public class EnrichmentService {
 
 	}
 
-	private void enrichBoundary(List<BPARequest> bpaRequests) {
-		bpaRequests.forEach(bpaRequest -> {
-//			boundaryService.getAreaType(bpaRequest, config.getHierarchyTypeCode());
-		});
-
-	}
 
 	/**
 	 * Adds accountId of the logged in user to search criteria

@@ -28,6 +28,7 @@ import org.egov.land.web.models.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -187,6 +188,7 @@ public class UserService {
 		 List<String> ids = new ArrayList<String>();
 		 List<String> uuids = new ArrayList<String>();
 		 bpas.forEach(bpa -> {
+			 if(bpa.getLandInfo()!=null){
 			 bpa.getLandInfo().getOwners().forEach(owner->{
 				 if (owner.getUuid() != null)
 					 ids.add(owner.getUuid().toString());
@@ -194,7 +196,7 @@ public class UserService {
 					if (owner.getUuid() != null)
 						uuids.add(owner.getUuid().toString());
 			 });
-			 
+		 }
 		});
 			
 		 userSearchRequest.setId(ids);
@@ -304,8 +306,8 @@ public class UserService {
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
-		/*if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
-			userSearchRequest.setUuid(criteria.getOwnerIds());*/
+		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
+			userSearchRequest.setUuid(criteria.getOwnerIds());
 		return userSearchRequest;
 	}
 

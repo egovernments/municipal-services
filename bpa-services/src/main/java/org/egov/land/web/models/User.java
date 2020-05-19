@@ -14,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,10 +23,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
 
-	 @JsonProperty("id")
+	@JsonProperty("id")
     private Long id;
 	 
     @Size(max=64)
@@ -175,9 +173,10 @@ public class User {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             User user = (User) o;
-            return Objects.equals(uuid, user.uuid) &&
-                    Objects.equals(name, user.name) &&
-                    Objects.equals(mobileNumber, user.mobileNumber);
+            return  Objects.equals(name, user.name) &&
+                    Objects.equals(mobileNumber, user.mobileNumber) &&
+                    Objects.equals(gender, user.gender) &&
+                    Objects.equals(emailId, user.emailId);
     }
 
     @Override

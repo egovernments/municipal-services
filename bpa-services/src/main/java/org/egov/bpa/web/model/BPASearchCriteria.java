@@ -2,6 +2,7 @@ package org.egov.bpa.web.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -23,9 +24,11 @@ public class BPASearchCriteria {
 	    @JsonProperty("ids")
 	    private List<String> ids;
 
+	    @JsonProperty("status")
+	    private List<String> status;
 
 	    @JsonProperty("edcrNumber")
-	    private List<String> edcrNumber;
+	    private List<String> edcrNumbers;
 
 	    @JsonProperty("applicationNo")
 	    private List<String> applicationNo;
@@ -36,23 +39,34 @@ public class BPASearchCriteria {
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;
 
+	    @JsonProperty("landId")
+	    private String landId;
+
 	    @JsonProperty("offset")
 	    private Integer offset;
 
 	    @JsonProperty("limit")
-	    private Integer limit;
+	    private Integer limit; 
+	      
+	    @JsonProperty("approvalDate")
+	    private Long approvalDate;
+	    
+	    @JsonIgnore
+	    private List<String> ownerIds;
 
 		
 	    public boolean isEmpty() {
-	        return (this.tenantId == null && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null && this.edcrNumber == null && this.approvalNo == null
+	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
+	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
+	                && this.approvalDate == null && this.ownerIds == null
 	                
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
-	        return (this.tenantId != null && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null && this.edcrNumber == null && this.approvalNo == null
+	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
+	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
+	                && this.approvalDate == null && this.ownerIds == null
 	        );
 	    }
 }

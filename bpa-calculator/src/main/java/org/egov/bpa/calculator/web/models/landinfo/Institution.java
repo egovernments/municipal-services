@@ -1,23 +1,8 @@
-package org.egov.land.web.models;
-
-import org.springframework.validation.annotation.Validated;
+package org.egov.bpa.calculator.web.models.landinfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Validated
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Institution {
-	
 	@JsonProperty("id")
 	private String id;
 

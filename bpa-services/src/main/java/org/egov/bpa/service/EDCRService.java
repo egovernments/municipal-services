@@ -71,7 +71,7 @@ public class EDCRService {
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		List<String> edcrNumbers = new ArrayList<String>();
 		edcrNumbers.add(bpa.getEdcrNumber());
-		criteria.setEdcrNumber(edcrNumbers);
+		criteria.setEdcrNumbers(edcrNumbers);
 		List<BPA> bpas = bpaRepository.getBPAData(criteria);
 		if (!CollectionUtils.isEmpty(bpas)) {
 			throw new CustomException(" Duplicate EDCR ",

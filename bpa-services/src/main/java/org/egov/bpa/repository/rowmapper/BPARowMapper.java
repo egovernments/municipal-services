@@ -37,7 +37,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 		while (rs.next()) {
 			String id = rs.getString("bpa_id");
 			String applicationNo = rs.getString("applicationno");
-			String permitNumber = rs.getString("permitorderno");
+			String approvalNo = rs.getString("approvalNo");
 			BPA currentbpa = buildingMap.get(id);
 			String tenantId = rs.getString("bpa_tenantId");
 			if (currentbpa == null) {
@@ -54,12 +54,12 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.createdTime(rs.getLong("bpa_createdTime")).lastModifiedBy(rs.getString("bpa_lastModifiedBy"))
 						.lastModifiedTime(lastModifiedTime).build();
 
-				Double latitude = (Double) rs.getObject("latitude");
-				Double longitude = (Double) rs.getObject("longitude");
+//				Double latitude = (Double) rs.getObject("latitude");
+//				Double longitude = (Double) rs.getObject("longitude");
 
-				Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
+//				Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
-				GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();
+//				GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();
 
 				/*Address address = Address.builder().buildingName(rs.getString("buildingName"))
 						.city(rs.getString("city")).plotNo(rs.getString("plotno")).district(rs.getString("district"))
@@ -71,11 +71,11 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 				currentbpa = BPA.builder()
 						.auditDetails(auditdetails)
 						.applicationNo(applicationNo)
-						.status(BPA.StatusEnum.fromValue(rs.getString("status")))
+						.status(rs.getString("status"))
 						.tenantId(tenantId)
-						.approvalNo(rs.getString("approvalNo"))
+						.approvalNo(approvalNo)
 						.edcrNumber(rs.getString("edcrnumber"))
-						.riskType(rs.getString("riskType"))
+						.approvalDate(rs.getLong("approvalDate"))
 						.accountId(rs.getString("accountId"))
 						.landId(rs.getString("landId"))
 						.id(id)
@@ -111,71 +111,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			bpa.setAdditionalDetails(additionalDetail);
 		}
 
-		String unitId = rs.getString("bpa_un_id");
-		/*if (unitId != null) {
-			Unit unit = Unit.builder()
-					.id(rs.getString("bpa_un_id"))
-					.tenantId(rs.getString("tenantId"))
-					.floorNo(rs.getString("floorNo"))
-					.unitType(rs.getString("unitType"))
-					.usageCategory(rs.getString("usageCategory"))
-//					.occupancyType(rs.getString("occupancyType"))
-					.occupancyDate(rs.getLong("occupancyDate"))
-					.additionalDetails(rs.getString("additionalDetails"))
-					.floorNo(rs.getString("floorNo"))
-					.tenantId(tenantId).build();
-			bpa.addUnitsItem(unit);
-		}
-		*/
-		/*String blockId = rs.getString("bpablockid");
-			if (blockId != null) {
-					BPABlocks block = BPABlocks.builder()
-							.id(blockId)
-							.subOccupancyType(rs.getString("bpablocksotype")).build();
-
-					bpa.addBlocks(block);
-			}*/	
-		
-
-		
-		
-		String ownerId = rs.getString("bpaowner_uuid");
-		/*if (ownerId != null) {
-			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
-			Double ownerShipPercentage = (Double) rs.getObject("ownershippercentage");
-
-			OwnerInfo owner = OwnerInfo.builder().tenantId(tenantId).name(rs.getString("name"))
-					.uuid(rs.getString("bpaowner_uuid")).tenantId(tenantId).mobileNumber(rs.getString("mobilenumber"))
-					.gender(rs.getString("gender")).fatherOrHusbandName(rs.getString("fatherorhusbandname"))
-					.correspondenceAddress(rs.getString("correspondenceAddress")).isPrimaryOwner(isPrimaryOwner)
-					.ownerType(rs.getString("ownerType")).ownerShipPercentage(ownerShipPercentage)
-					.active(rs.getBoolean("active"))
-					.relationship(OwnerInfo.RelationshipEnum.fromValue(rs.getString("relationship")))
-					.institutionId(rs.getString("institutionid")).build();
-			bpa.addOwnersItem(owner);
-		}*/
-
-		// Add owner document to the specific bpa for which it was used
-		String docowner = rs.getString("docuserid");
-		String ownerDocId = rs.getString("ownerdocid");
-
-		/*if (ownerDocId != null) {
-
-			bpa.getOwners().forEach(ownerInfo -> {
-				if (docowner.equalsIgnoreCase(ownerInfo.getUuid())) {
-					Document ownerDocument;
-					try {
-						ownerDocument = Document.builder().id(rs.getString("ownerdocid"))
-								.documentType(rs.getString("ownerdocType")).fileStoreId(rs.getString("ownerfileStore"))
-								.documentUid(rs.getString("ownerdocuid"))
-								.build();
-						ownerInfo.addDocumentsItem(ownerDocument);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-				}
-			});
-		}*/
 
 		String documentId = rs.getString("bpa_doc_id");
 		if (documentId != null) {

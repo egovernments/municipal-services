@@ -1,1 +1,0 @@
-ALTER TABLE eg_bpa_auditdetails DROP CONSTRAINT IF EXISTS pk_eg_bpa_auditdetails ;

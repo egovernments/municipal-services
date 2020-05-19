@@ -29,6 +29,7 @@ CREATE TABLE eg_land_Address(
 	region character varying(64),
 	state character varying(64),
 	country character varying(64),
+	locality character varying(64),
 	pincode character varying(64),
 	additionDetails character varying(64),
 	buildingName character varying(64),
@@ -55,22 +56,8 @@ CREATE TABLE eg_land_GeoLocation(
 	CONSTRAINT fk_eg_bpa_GeoLocation FOREIGN KEY (addressId) REFERENCES eg_land_Address (id)
 );
 
-CREATE TABLE eg_land_boundary(
-
-	id character varying(64) NOT NULL,
-	code character varying(64) NOT NULL,
-	name character varying(256),
-	label character varying(256),
-	latitude character varying(256),
-	longitude character varying(256),
-	materializedPath character varying(256),
-	addressId character varying(64),
-
-	CONSTRAINT fk_eg_land_boundary FOREIGN KEY (addressId) REFERENCES eg_land_Address (id)
-);
-
 CREATE TABLE eg_land_ownerInfo(
-	id bigint,
+	id character varying(64),
 	uuid character varying(64),
 	mobileNumber character varying(256) NOT NULL,
 	isprimaryowner boolean,
@@ -85,8 +72,8 @@ CREATE TABLE eg_land_ownerInfo(
     createdtime bigint,
     lastmodifiedtime bigint,
 	
-	CONSTRAINT uk_eg_land_ownerInfo UNIQUE (id),
-	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id, uuid),
+	CONSTRAINT uk_eg_land_ownerInfo UNIQUE (id, landInfoId),
+	CONSTRAINT pk_eg_land_ownerInfo PRIMARY KEY (id),
 	CONSTRAINT fk_eg_land_ownerInfo FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
@@ -120,7 +107,7 @@ CREATE TABLE eg_land_document(
     createdtime bigint,
     lastmodifiedtime bigint,
 
-	CONSTRAINT uk_eg_land_document UNIQUE (id),
+	CONSTRAINT uk_eg_land_document UNIQUE (id, landInfoId),
 	CONSTRAINT pk_eg_land_document PRIMARY KEY (id),
 	CONSTRAINT fk_eg_land_document FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
@@ -143,33 +130,8 @@ CREATE TABLE eg_land_unit(
     lastmodifiedtime bigint,
 		
 	CONSTRAINT pk_eg_land_unit PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_unit UNIQUE (id,landInfoId,tenantId),
+	CONSTRAINT uk_eg_land_unit UNIQUE (id, landInfoId, tenantId),
 	CONSTRAINT fk_eg_land_unit FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
-
-);
-
-CREATE TABLE eg_land_constructionDetail(
-
-	id character varying(64),
-	carpetArea bigint,
-	builtUpArea bigint,	
-	plinthArea bigint,
-	superBuiltUpArea bigint,	
-	constructionType character varying(64),
-	constructionDate bigint,
-	dimensions character varying(256),
-	additionalDetails JSONB,
-	
-	unitId character varying(64),
-	createdBy character varying(64),
-	lastModifiedBy character varying(64),
-	createdTime bigint,
-	lastModifiedTime bigint,
-	
-	
-	CONSTRAINT pk_eg_land_constructionDetail PRIMARY KEY (id),
-	CONSTRAINT uk_eg_land_constructionDetail UNIQUE (id),
-	CONSTRAINT fk_eg_land_constructionDetail FOREIGN KEY (unitId) REFERENCES eg_land_unit (id)
 
 );
 
@@ -187,6 +149,5 @@ CREATE TABLE public.eg_land_auditdetails
     createdby character varying(64) COLLATE pg_catalog."default",
     lastmodifiedby character varying(64) COLLATE pg_catalog."default",
     createdtime bigint,
-    lastmodifiedtime bigint,
-    CONSTRAINT pk_eg_land_auditdetails PRIMARY KEY (id)
+    lastmodifiedtime bigint
 );

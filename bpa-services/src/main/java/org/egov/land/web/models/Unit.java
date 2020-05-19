@@ -38,9 +38,6 @@ public class Unit {
 	@JsonProperty("occupancyDate")
 	private Long occupancyDate;
 
-	@JsonProperty("constructionDetail")
-	private ConstructionDetail constructionDetail;
-
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails;
 

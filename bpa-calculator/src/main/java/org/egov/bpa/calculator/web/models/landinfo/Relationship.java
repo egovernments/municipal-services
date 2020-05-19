@@ -1,4 +1,4 @@
-package org.egov.land.web.models;
+package org.egov.bpa.calculator.web.models.landinfo;
 
 public enum Relationship {
 	FATHER("FATHER"), HUSBAND("HUSBAND");
@@ -26,5 +26,4 @@ public enum Relationship {
 		}
 		return null;
 	}
-
 }

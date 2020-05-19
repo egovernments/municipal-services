@@ -169,8 +169,8 @@ public class CalculationService {
 		Map calculationTypeMap = mdmsService.getCalculationType(requestInfo,
 				bpa, mdmsData,calulationCriteria.getFeeType());
 		
-		int amountCalculationType =  (int) calculationTypeMap
-				.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT);
+		int amountCalculationType =  Integer.parseInt(calculationTypeMap
+				.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT).toString());
 		
 	      TaxHeadEstimate estimate = new TaxHeadEstimate();
 	      BigDecimal totalTax = BigDecimal.valueOf(amountCalculationType);

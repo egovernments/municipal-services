@@ -1,7 +1,10 @@
-package org.egov.land.web.models;
+package org.egov.bpa.calculator.web.models.landinfo;
 
 import java.util.List;
 
+import org.egov.bpa.calculator.web.models.AuditDetails;
+import org.egov.bpa.calculator.web.models.User;
+import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
