@@ -166,6 +166,10 @@ public class EnrichmentService {
 				bpa.getApplicationNo());
 
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
+
+		if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
+			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
+		}
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)

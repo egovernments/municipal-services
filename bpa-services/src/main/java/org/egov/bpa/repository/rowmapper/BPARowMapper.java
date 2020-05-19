@@ -78,6 +78,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.approvalDate(rs.getLong("approvalDate"))
 						.accountId(rs.getString("accountId"))
 						.landId(rs.getString("landId"))
+						.applicationDate(rs.getLong("applicationDate"))
 						.id(id)
 						.additionalDetails(additionalDetails)
 						.build();

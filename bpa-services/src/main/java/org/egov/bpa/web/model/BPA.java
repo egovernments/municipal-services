@@ -70,6 +70,9 @@ public class BPA {
 
 	@JsonProperty("businessService")
 	private String businessService;
+	
+	@JsonProperty("applicationDate")
+	private Long applicationDate;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
