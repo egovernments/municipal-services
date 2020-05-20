@@ -100,9 +100,9 @@ public class EDCRService {
 		List<String> edcrStatus = context.read("edcrDetail.*.status");
 		List<String> OccupancyTypes = context
 				.read("edcrDetail.*.planDetail.virtualBuilding.occupancyTypes.*.type.code");
-		TypeRef<List<Double>> typeRef = new TypeRef<List<Double>>() {
-		};
-		Map<String, String> additionalDetails = (Map) bpa.getAdditionalDetails();
+		TypeRef<List<Double>> typeRef = new TypeRef<List<Double>>(){};
+		Map<String, String> additionalDetails = bpa.getAdditionalDetails() != null ? (Map)bpa.getAdditionalDetails()
+				: new HashMap<String, String>();
 		LinkedList<String> serviceType = context.read("edcrDetail.*.planDetail.planInformation.serviceType");
 		if(serviceType == null || serviceType.size() == 0){
 			serviceType.add("NEW_CONSTRUCTION");
