@@ -30,8 +30,8 @@ public class Connection {
 	@JsonProperty("id")
 	private String id = null;
 
-	@JsonProperty("property")
-	private Property property = null;
+	@JsonProperty("propertyId")
+	private String propertyId = null;
 
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
@@ -40,6 +40,14 @@ public class Connection {
 	 * Gets or Sets applicationStatus
 	 */
 	public enum ApplicationStatusEnum {
+		// REJECTED("Rejected"),
+
+		APPROVED("Approved"),
+
+		CANCELED("Canceled"),
+
+		INPROGRESS("InProgress"),
+
 		INITIATED("INITIATED"),
 
 		REJECTED("REJECTED"),
@@ -58,13 +66,7 @@ public class Connection {
 
 		CONNECTION_ACTIVATED("CONNECTION_ACTIVATED"),
 
-		APPLIED("Applied"),
-
-		APPROVED("Approved"),
-
-		CANCELED("Canceled"),
-
-		INPROGRESS("InProgress");
+		APPLIED("Applied");
 
 		private String value;
 
@@ -158,15 +160,11 @@ public class Connection {
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails = null;
 
-	@JsonProperty("processInstance")
-	private ProcessInstance processInstance = null;
-	
-	@JsonProperty("propertyId")
-	private String propertyId = null;
-
-
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+
+	@JsonProperty("processInstance")
+	private ProcessInstance processInstance = null;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -189,25 +187,24 @@ public class Connection {
 		this.id = id;
 	}
 
-	public Connection property(Property property) {
-		this.property = property;
+	public Connection propertyId(String propertyId) {
+		this.propertyId = propertyId;
 		return this;
 	}
 
 	/**
-	 * Get property
+	 * UUID of the property.
 	 * 
-	 * @return property
+	 * @return propertyId
 	 **/
-	@ApiModelProperty(value = "")
+	@ApiModelProperty(value = "UUID of the property.")
 
-	@Valid
-	public Property getProperty() {
-		return property;
+	public String getPropertyId() {
+		return propertyId;
 	}
 
-	public void setProperty(Property property) {
-		this.property = property;
+	public void setPropertyId(String propertyId) {
+		this.propertyId = propertyId;
 	}
 
 	public Connection applicationNo(String applicationNo) {
@@ -449,6 +446,7 @@ public class Connection {
 	 * @return connectionCategory
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS")
+
 	@Size(min = 2, max = 32)
 	public String getConnectionCategory() {
 		return connectionCategory;
@@ -469,6 +467,7 @@ public class Connection {
 	 * @return connectionType
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
+
 	@Size(min = 2, max = 32)
 	public String getConnectionType() {
 		return connectionType;
@@ -499,6 +498,27 @@ public class Connection {
 		this.additionalDetails = additionalDetails;
 	}
 
+	public Connection auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+
+	@Valid
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+	}
+
 	public Connection processInstance(ProcessInstance processInstance) {
 		this.processInstance = processInstance;
 		return this;
@@ -511,32 +531,6 @@ public class Connection {
 	public void setProcessInstance(ProcessInstance processInstance) {
 		this.processInstance = processInstance;
 	}
-	
-	public void setPropertyId(String propertyId) {
-		this.propertyId = propertyId;
-	}
-	
-	public String getPropertyId() {
-		return propertyId;
-	}
-
-	public Connection propertyId(String propertyId) {
-		this.propertyId = propertyId;
-		return this;
-	}
-
-	public Connection auditDetails(AuditDetails auditDetails) {
-		this.auditDetails = auditDetails;
-		return this;
-	}
-
-	public AuditDetails getAuditDetails() {
-		return auditDetails;
-	}
-
-	public void setAuditDetails(AuditDetails auditDetails) {
-		this.auditDetails = auditDetails;
-	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -547,7 +541,7 @@ public class Connection {
 			return false;
 		}
 		Connection connection = (Connection) o;
-		return Objects.equals(this.id, connection.id) && Objects.equals(this.property, connection.property)
+		return Objects.equals(this.id, connection.id) && Objects.equals(this.propertyId, connection.propertyId)
 				&& Objects.equals(this.applicationNo, connection.applicationNo)
 				&& Objects.equals(this.applicationStatus, connection.applicationStatus)
 				&& Objects.equals(this.status, connection.status)
@@ -560,14 +554,15 @@ public class Connection {
 				&& Objects.equals(this.connectionExecutionDate, connection.connectionExecutionDate)
 				&& Objects.equals(this.connectionCategory, connection.connectionCategory)
 				&& Objects.equals(this.connectionType, connection.connectionType)
-				&& Objects.equals(this.additionalDetails, connection.additionalDetails);
+				&& Objects.equals(this.additionalDetails, connection.additionalDetails)
+				&& Objects.equals(this.auditDetails, connection.auditDetails);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, property, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
+		return Objects.hash(id, propertyId, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
 				documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate, connectionCategory,
-				connectionType, additionalDetails);
+				connectionType, additionalDetails, auditDetails);
 	}
 
 	@Override
@@ -576,7 +571,7 @@ public class Connection {
 		sb.append("class Connection {\n");
 
 		sb.append("    id: ").append(toIndentedString(id)).append("\n");
-		sb.append("    property: ").append(toIndentedString(property)).append("\n");
+		sb.append("    propertyId: ").append(toIndentedString(propertyId)).append("\n");
 		sb.append("    applicationNo: ").append(toIndentedString(applicationNo)).append("\n");
 		sb.append("    applicationStatus: ").append(toIndentedString(applicationStatus)).append("\n");
 		sb.append("    status: ").append(toIndentedString(status)).append("\n");
@@ -590,6 +585,7 @@ public class Connection {
 		sb.append("    connectionCategory: ").append(toIndentedString(connectionCategory)).append("\n");
 		sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
 		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
+		sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

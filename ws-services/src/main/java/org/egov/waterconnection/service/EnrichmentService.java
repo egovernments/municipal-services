@@ -4,11 +4,9 @@ package org.egov.waterconnection.service;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -18,9 +16,6 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.AuditDetails;
 import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.PropertyCriteria;
-import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
@@ -28,7 +23,6 @@ import org.egov.waterconnection.model.Idgen.IdResponse;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
-import org.egov.waterconnection.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -52,44 +46,12 @@ public class EnrichmentService {
 	private WSConfiguration config;
 
 	@Autowired
-	private ValidateProperty validateProperty;
-	
-	@Autowired
 	private ObjectMapper mapper;
 	
 	@Autowired
 	private WaterDaoImpl waterDao;
 	
 
-	/**
-	 * 
-	 * @param waterConnectionList List of water connection for enriching the water connection with property.
-	 * @param requestInfo is RequestInfo from request
-	 */
-	public void enrichWaterSearch(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
-			SearchCriteria waterConnectionSearchCriteria) {
-
-		if (!CollectionUtils.isEmpty(waterConnectionList)) {
-			PropertyCriteria criteria = PropertyCriteria
-					.builder().uuids(waterConnectionList.stream()
-							.map(waterConnection -> waterConnection.getProperty().getId()).collect(Collectors.toSet()))
-					.tenantId(waterConnectionSearchCriteria.getTenantId()).build();
-			List<Property> propertyList = waterServicesUtil.searchPropertyOnId(criteria, requestInfo);
-			HashMap<String, Property> propertyMap = propertyList.stream().collect(Collectors.toMap(Property::getId,
-					Function.identity(), (oldValue, newValue) -> newValue, LinkedHashMap::new));
-			waterConnectionList.forEach(waterConnection -> {
-				String Id = waterConnection.getProperty().getId();
-				if (propertyMap.containsKey(Id)) {
-					waterConnection.setProperty(propertyMap.get(Id));
-				} else {
-					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
-					builder.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo()
-							: waterConnection.getConnectionNo());
-					log.error(builder.toString());
-				}
-			});
-		}
-	}
 
 	/**
 	 * Enrich water connection
@@ -97,7 +59,6 @@ public class EnrichmentService {
 	 * @param waterConnectionRequest
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
@@ -186,7 +147,6 @@ public class EnrichmentService {
 	 * @param waterConnectionRequest
 	 */
 	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		validateProperty.enrichPropertyForWaterConnection(waterConnectionRequest);
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);

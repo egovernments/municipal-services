@@ -7,6 +7,7 @@ import java.util.Map;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
 import org.egov.waterconnection.model.workflow.ProcessInstanceRequest;
@@ -52,10 +53,10 @@ public class WorkflowIntegrator {
 	 *
 	 * @param waterConnectionRequest
 	 */
-	public void callWorkFlow(WaterConnectionRequest waterConnectionRequest) {
+	public void callWorkFlow(WaterConnectionRequest waterConnectionRequest, Property property) {
 		ProcessInstance processInstance = ProcessInstance.builder()
 				.businessId(waterConnectionRequest.getWaterConnection().getApplicationNo())
-				.tenantId(waterConnectionRequest.getWaterConnection().getProperty().getTenantId())
+				.tenantId(property.getTenantId())
 				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
 				.action(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()).build();
 		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())) {

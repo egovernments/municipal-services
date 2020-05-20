@@ -30,10 +30,12 @@ import org.egov.wscalculation.model.DemandDetailAndCollection;
 import org.egov.wscalculation.model.DemandRequest;
 import org.egov.wscalculation.model.DemandResponse;
 import org.egov.wscalculation.model.GetBillCriteria;
+import org.egov.wscalculation.model.Property;
 import org.egov.wscalculation.model.RequestInfoWrapper;
 import org.egov.wscalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.model.TaxPeriod;
 import org.egov.wscalculation.model.WaterConnection;
+import org.egov.wscalculation.model.WaterConnectionRequest;
 import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.repository.DemandRepository;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
@@ -89,6 +91,9 @@ public class DemandService {
     
     @Autowired
     private WSCalculationProducer wsCalculationProducer;
+    
+    @Autowired
+    private WSCalculationUtil wsCalculationUtil;
 
 
 	/**
@@ -164,20 +169,20 @@ public class DemandService {
 			Map<String, Object> masterMap, boolean isForConnectionNO) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
-			WaterConnection connection = null;
-
-			if (calculation.getWaterConnection() != null)
-				connection = calculation.getWaterConnection();
-			if (connection == null)
-				throw new CustomException("INVALID_WATER_CONNECTION",
-						"Demand cannot be generated for "
-								+ (isForConnectionNO == true ? calculation.getConnectionNo() : calculation.getApplicationNO())
-								+ " Water Connection with this number does not exist ");
-
+			WaterConnection connection = calculation.getWaterConnection();
+			if (connection == null) {
+				throw new CustomException("INVALID_WATER_CONNECTION", "Demand cannot be generated for "
+						+ (isForConnectionNO == true ? calculation.getConnectionNo() : calculation.getApplicationNO())
+						+ " Water Connection with this number does not exist ");
+			}
+			WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder().waterConnection(connection)
+					.requestInfo(requestInfo).build();
+			Property property = wsCalculationUtil.getProperty(waterConnectionRequest);
 			String tenantId = calculation.getTenantId();
-			String consumerCode = isForConnectionNO == true ?  calculation.getConnectionNo() : calculation.getApplicationNO();
-			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
-			
+			String consumerCode = isForConnectionNO == true ? calculation.getConnectionNo()
+					: calculation.getApplicationNO();
+			User owner = property.getOwners().get(0).toCommonUser();
+
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
@@ -185,14 +190,16 @@ public class DemandService {
 						.tenantId(tenantId).build());
 			});
 			@SuppressWarnings("unchecked")
-			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
+			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(WSCalculationConstant.BillingPeriod);
 
 			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
-			BigDecimal minimumPaybleAmount = isForConnectionNO == true ? configs.getMinimumPayableAmount() : calculation.getTotalAmount();
-			String businessService = isForConnectionNO == true ? configs.getBusinessService() : WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
+			BigDecimal minimumPaybleAmount = isForConnectionNO == true ? configs.getMinimumPayableAmount()
+					: calculation.getTotalAmount();
+			String businessService = isForConnectionNO == true ? configs.getBusinessService()
+					: WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
 
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 

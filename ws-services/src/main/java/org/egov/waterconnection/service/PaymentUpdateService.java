@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
@@ -18,6 +20,7 @@ import org.egov.waterconnection.model.collection.PaymentDetail;
 import org.egov.waterconnection.model.collection.PaymentRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.repository.WaterDao;
+import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,9 @@ public class PaymentUpdateService {
 	
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
+	
+	@Autowired
+	private ValidateProperty validateProperty;
 
 	/**
 	 * After payment change the application status
@@ -80,20 +86,25 @@ public class PaymentUpdateService {
 						throw new CustomException("INVALID_RECEIPT",
 								"No waterConnection found for the consumerCode " + criteria.getApplicationNumber());
 					}
+					Optional<WaterConnection> connections = waterConnections.stream().findFirst();
+					WaterConnection connection = connections.get();
 					if (waterConnections.size() > 1) {
 						throw new CustomException("INVALID_RECEIPT",
 								"More than one application found on consumerCode " + criteria.getApplicationNumber());
 					}
 					waterConnections.forEach(waterConnection -> waterConnection.getProcessInstance().setAction((WCConstants.ACTION_PAY)));
 					WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
-							.waterConnection(waterConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
+							.waterConnection(connection).requestInfo(paymentRequest.getRequestInfo())
 							.build();
 					try {
 						log.info("WaterConnection Request " + mapper.writeValueAsString(waterConnectionRequest));
 					} catch (Exception ex) {
 						log.error("Temp Catch Excption:", ex);
 					}
-					wfIntegrator.callWorkFlow(waterConnectionRequest);
+					
+					Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+					
+					wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 					log.info("Water connection application status: "
 							+ waterConnectionRequest.getWaterConnection().getApplicationStatus());
 					repo.updateWaterConnection(waterConnectionRequest, false);

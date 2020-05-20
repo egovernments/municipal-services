@@ -12,11 +12,12 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.CalculationCriteria;
 import org.egov.waterconnection.model.CalculationReq;
 import org.egov.waterconnection.model.CalculationRes;
-import org.egov.waterconnection.model.WaterConnection;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
+import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +52,9 @@ public class PdfFileStoreService {
 
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private ValidateProperty validateProperty;
 
 	String tenantIdReplacer = "$tenantId";
 	String fileStoreIdsReplacer = "$.filestoreIds";
@@ -74,15 +78,15 @@ public class PdfFileStoreService {
 	 * @param requestInfo
 	 * @return file store id
 	 */
-	public String getFileStroeId(WaterConnection waterConnection, RequestInfo requestInfo, String applicationKey) {
-		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(waterConnection.getApplicationNo())
-				.waterConnection(waterConnection).tenantId(waterConnection.getProperty().getTenantId()).build();
+	public String getFileStroeId(WaterConnectionRequest waterConnectionRequest, Property property, String applicationKey) {
+		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(waterConnectionRequest.getWaterConnection().getApplicationNo())
+				.waterConnection(waterConnectionRequest.getWaterConnection()).tenantId(property.getTenantId()).build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
-				.requestInfo(requestInfo).isconnectionCalculation(false).build();
+				.requestInfo(waterConnectionRequest.getRequestInfo()).isconnectionCalculation(false).build();
 		try {
 			Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
-			JSONObject waterobject = mapper.convertValue(waterConnection, JSONObject.class);
+			JSONObject waterobject = mapper.convertValue(waterConnectionRequest.getWaterConnection(), JSONObject.class);
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
@@ -91,12 +95,12 @@ public class PdfFileStoreService {
 			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			waterobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
-			BigDecimal slaDays = workflowService.getSlaForState(requestInfo.getUserInfo().getTenantId(), requestInfo,
-					waterConnection.getApplicationStatus().name());
+			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),
+					waterConnectionRequest.getWaterConnection().getApplicationStatus().name());
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
-			waterobject.put(slaDate, slaDays.add(new BigDecimal(waterConnection.getConnectionExecutionDate())));
-			String tenantId = waterConnection.getProperty().getTenantId().split("\\.")[0];
-			return getFielStoreIdFromPDFService(waterobject, requestInfo, tenantId, applicationKey);
+			waterobject.put(slaDate, slaDays.add(new BigDecimal(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())));
+			String tenantId = property.getTenantId().split("\\.")[0];
+			return getFielStoreIdFromPDFService(waterobject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
@@ -140,16 +144,19 @@ public class PdfFileStoreService {
 
 	@SuppressWarnings("unchecked")
 	public void process(WaterConnectionRequest waterConnectionRequest, String topic) {
+		
+		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+
 		HashMap<String, Object> addDetail = mapper
 				.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 		if (addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest.getWaterConnection(), waterConnectionRequest.getRequestInfo(),
+					getFileStroeId(waterConnectionRequest, property,
 							WCConstants.PDF_ESTIMATION_KEY));
 		}
 		if (addDetail.getOrDefault(WCConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest.getWaterConnection(), waterConnectionRequest.getRequestInfo(),
+					getFileStroeId(waterConnectionRequest, property,
 							WCConstants.PDF_SANCTION_KEY));
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);

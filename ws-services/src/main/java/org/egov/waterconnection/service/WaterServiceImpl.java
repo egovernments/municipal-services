@@ -9,6 +9,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
@@ -85,10 +86,11 @@ public class WaterServiceImpl implements WaterService {
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
+		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		enrichmentService.enrichWaterConnection(waterConnectionRequest);
-		//call work-flow
+		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
-			wfIntegrator.callWorkFlow(waterConnectionRequest);
+			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
@@ -102,7 +104,6 @@ public class WaterServiceImpl implements WaterService {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
 		waterConnectionValidator.validatePropertyForConnection(waterConnectionList);
-		enrichmentService.enrichWaterSearch(waterConnectionList, requestInfo,criteria);
 		return waterConnectionList;
 	}
 	/**
@@ -133,11 +134,12 @@ public class WaterServiceImpl implements WaterService {
 		mDMSValidator.validateMasterData(waterConnectionRequest);
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
+		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
-		validateProperty.validatePropertyCriteria(waterConnectionRequest);
+		validateProperty.validatePropertyCriteria(property);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
-		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest);
+		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
 		
 		//check for edit and send edit notification
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
@@ -145,7 +147,7 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichFileStoreIds(waterConnectionRequest);
 		
 		//Call workflow
-		wfIntegrator.callWorkFlow(waterConnectionRequest);
+		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, searchResult);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);

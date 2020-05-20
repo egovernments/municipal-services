@@ -7,6 +7,7 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.CalculationCriteria;
 import org.egov.waterconnection.model.CalculationReq;
 import org.egov.waterconnection.model.CalculationRes;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -39,12 +40,12 @@ public class CalculationService {
 	 *Estimate the fee for water application and generate the demand
 	 * 
 	 */
-	public void calculateFeeAndGenerateDemand(WaterConnectionRequest request) {
+	public void calculateFeeAndGenerateDemand(WaterConnectionRequest request, Property property) {
 		if(WCConstants.APPROVE_CONNECTION_CONST.equalsIgnoreCase(request.getWaterConnection().getProcessInstance().getAction())) {
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getWaterConnection().getApplicationNo())
 					.waterConnection(request.getWaterConnection())
-					.tenantId(request.getWaterConnection().getProperty().getTenantId()).build();
+					.tenantId(property.getTenantId()).build();
 			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
 					.requestInfo(request.getRequestInfo()).isconnectionCalculation(false).build();
 			try {

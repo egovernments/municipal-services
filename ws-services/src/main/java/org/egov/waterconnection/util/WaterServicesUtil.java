@@ -96,7 +96,7 @@ public class WaterServicesUtil {
 		HashSet<String> propertyUUID = new HashSet<>();
 		propertyUUID.add(waterConnectionRequest.getWaterConnection().getPropertyId());
 		propertyCriteria.setUuids(propertyUUID);
-		propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getProperty().getTenantId());
+		propertyCriteria.setTenantId(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());

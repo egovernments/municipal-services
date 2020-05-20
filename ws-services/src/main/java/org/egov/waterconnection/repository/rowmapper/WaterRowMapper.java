@@ -14,7 +14,6 @@ import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Document;
 import org.egov.waterconnection.model.PlumberInfo;
-import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.enums.Status;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
@@ -66,10 +65,6 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setAdditionalDetails(additionalDetails);
 				currentWaterConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
 				currentWaterConnection.setPropertyId(rs.getString("property_id"));
-				// get property id and get property object
-				Property property = new Property();
-				property.setId(rs.getString("property_id"));
-				currentWaterConnection.setProperty(property);
 				// Add documents id's
 				currentWaterConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
 				

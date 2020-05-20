@@ -19,12 +19,15 @@ import org.egov.wscalculation.model.Calculation;
 import org.egov.wscalculation.model.CalculationCriteria;
 import org.egov.wscalculation.model.CalculationReq;
 import org.egov.wscalculation.model.Category;
+import org.egov.wscalculation.model.Property;
 import org.egov.wscalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.model.TaxHeadMaster;
 import org.egov.wscalculation.model.WaterConnection;
+import org.egov.wscalculation.model.WaterConnectionRequest;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.util.WSCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,6 +59,11 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private ServiceRequestRepository repository;
+	
+	@Autowired
+	private WSCalculationUtil wSCalculationUtil;
+	
+	
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge And Estimation Charge
@@ -123,10 +131,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 		WaterConnection waterConnection = criteria.getWaterConnection();
-
-		String tenantId = null != waterConnection.getProperty().getTenantId()
-				? waterConnection.getProperty().getTenantId()
-				: criteria.getTenantId();
+		Property property = wSCalculationUtil.getProperty(
+				WaterConnectionRequest.builder().waterConnection(waterConnection).requestInfo(requestInfo).build());
+		
+		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap

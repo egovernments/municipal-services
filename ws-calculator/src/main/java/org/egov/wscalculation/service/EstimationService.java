@@ -24,7 +24,9 @@ import org.egov.wscalculation.model.SearchCriteria;
 import org.egov.wscalculation.model.Slab;
 import org.egov.wscalculation.model.TaxHeadEstimate;
 import org.egov.wscalculation.model.WaterConnection;
+import org.egov.wscalculation.model.WaterConnectionRequest;
 import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,9 @@ public class EstimationService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private WSCalculationUtil wSCalculationUtil;
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head
@@ -62,6 +67,7 @@ public class EstimationService {
 	 *            request info from incoming request.
 	 * @return Map<String, Double>
 	 */
+	@SuppressWarnings("rawtypes")
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo,
 			Map<String, Object> masterData) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
@@ -219,10 +225,13 @@ public class EstimationService {
 
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs,
 			String calculationAttribue, RequestInfo requestInfo) {
-		Property property = waterConnection.getProperty();
+
+		Property property = wSCalculationUtil.getProperty(
+				WaterConnectionRequest.builder().waterConnection(waterConnection).requestInfo(requestInfo).build());
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0] : "";
+		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0]
+				: "";
 		// final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
 		final String calculationAttribute = calculationAttribue;
@@ -230,7 +239,8 @@ public class EstimationService {
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
-			boolean isCalculationAttributeMatching = slab.getCalculationAttribute().equalsIgnoreCase(calculationAttribute);
+			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
+					.equalsIgnoreCase(calculationAttribute);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}
@@ -348,6 +358,7 @@ public class EstimationService {
 	 * @param masterData
 	 * @return Fee Estimation Map
 	 */
+	@SuppressWarnings("rawtypes")
 	public Map<String, List> getFeeEstimation(CalculationCriteria criteria, RequestInfo requestInfo,
 			Map<String, Object> masterData) {
 		WaterConnection waterConnection = null;
@@ -364,7 +375,7 @@ public class EstimationService {
 		}
 		ArrayList<String> billingSlabIds = new ArrayList<>();
 		billingSlabIds.add("");
-		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData);
+		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData, requestInfo);
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
 		// //Billing slab id
@@ -380,10 +391,14 @@ public class EstimationService {
 	 * @return return all tax heads
 	 */
 	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
-			Map<String, Object> masterData) {
+			Map<String, Object> masterData, RequestInfo requestInfo) {
 		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(WSCalculationConstant.WC_FEESLAB_MASTER, null);
 		if (feeSlab == null)
 			throw new CustomException("FEE_SLAB_NOT_FOUND", "fee slab master data not found!!");
+		
+		Property property = wSCalculationUtil.getProperty(WaterConnectionRequest.builder()
+				.waterConnection(criteria.getWaterConnection()).requestInfo(requestInfo).build());
+		
 		JSONObject feeObj = mapper.convertValue(feeSlab.get(0), JSONObject.class);
 		BigDecimal formFee = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.FORM_FEE_CONST) != null) {
@@ -413,12 +428,12 @@ public class EstimationService {
 			roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
 					criteria.getWaterConnection().getRoadCuttingArea());
 		BigDecimal roadPlotCharge = BigDecimal.ZERO;
-		if (criteria.getWaterConnection().getProperty().getLandArea() != null)
-			roadPlotCharge = getPlotSizeFee(masterData, criteria.getWaterConnection().getProperty().getLandArea());
+		if (property.getLandArea() != null)
+			roadPlotCharge = getPlotSizeFee(masterData, property.getLandArea());
 		BigDecimal usageTypeCharge = BigDecimal.ZERO;
 		if (criteria.getWaterConnection().getRoadCuttingArea() != null)
 			usageTypeCharge = getUsageTypeFee(masterData,
-					criteria.getWaterConnection().getProperty().getUsageCategory(),
+					property.getUsageCategory(),
 					criteria.getWaterConnection().getRoadCuttingArea());
 		BigDecimal tax = BigDecimal.ZERO;
 		BigDecimal totalCharge = BigDecimal.ZERO;

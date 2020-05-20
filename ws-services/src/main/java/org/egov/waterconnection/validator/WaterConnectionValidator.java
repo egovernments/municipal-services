@@ -62,7 +62,7 @@ public class WaterConnectionValidator {
 	
 	public void validatePropertyForConnection(List<WaterConnection> waterConnectionList) {
 		waterConnectionList.forEach(waterConnection -> {
-			if (StringUtils.isEmpty(waterConnection.getProperty().getId())) {
+			if (StringUtils.isEmpty(waterConnection.getId())) {
 				StringBuilder builder = new StringBuilder();
 				builder.append("PROPERTY UUID NOT FOUND FOR ")
 						.append(waterConnection.getConnectionNo() == null ? waterConnection.getApplicationNo()
