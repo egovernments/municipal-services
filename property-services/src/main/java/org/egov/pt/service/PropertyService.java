@@ -300,17 +300,27 @@ public class PropertyService {
 
 
 	List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
-
 		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
 			criteria.setLimit(config.getMaxSearchLimit());
+		if(criteria.getLimit()==null)
+			criteria.setLimit(config.getDefaultLimit());
+		if(criteria.getOffset()==null)
+			criteria.setOffset(config.getDefaultOffset());
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		if (criteria.getUuids() != null || criteria.getPropertyIds() != null) {
+			if (criteria.getUuids() != null)
+				propertyCriteria.setUuids(criteria.getUuids());
+			if (criteria.getPropertyIds() != null)
+				propertyCriteria.setPropertyIds(criteria.getPropertyIds());
 
-		List<String> uuids = repository.fetchIds(criteria);
-		if(uuids.isEmpty())
-			return Collections.emptyList();
-
-		PropertyCriteria propertyCriteria = PropertyCriteria.builder().uuids(new HashSet<>(uuids)).limit(criteria.getLimit()).build();
-
-		List<Property> properties = repository.getProperties(propertyCriteria, false);
+		} else {
+			List<String> uuids = repository.fetchIds(criteria);
+			if (uuids.isEmpty())
+				return Collections.emptyList();
+			propertyCriteria.setUuids(new HashSet<>(uuids));
+		}
+		propertyCriteria.setLimit(criteria.getLimit());
+		List<Property> properties = repository.getProperties(propertyCriteria,false);
 		if(properties.isEmpty())
 			return Collections.emptyList();
 		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)

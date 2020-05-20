@@ -166,11 +166,26 @@ public class AssessmentService {
 	public List<Assessment> getAssessmenPlainSearch(AssessmentSearchCriteria criteria) {
 		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
 			criteria.setLimit(config.getMaxSearchLimit());
-		List<String> assessmentNumbers = repository.fetchAssessmentNumbers(criteria);
-		if (assessmentNumbers.isEmpty())
-			return Collections.emptyList();
-		AssessmentSearchCriteria assessmentSearchCriteria = AssessmentSearchCriteria.builder().limit(criteria.getLimit())
-				.assessmentNumbers(new HashSet<>(assessmentNumbers)).build();
+		if(criteria.getLimit()==null)
+			criteria.setLimit(config.getDefaultLimit());
+		if(criteria.getOffset()==null)
+			criteria.setOffset(config.getDefaultOffset());
+		AssessmentSearchCriteria assessmentSearchCriteria = new AssessmentSearchCriteria();
+		if (criteria.getIds() != null || criteria.getPropertyIds() != null || criteria.getAssessmentNumbers() != null) {
+			if (criteria.getIds() != null)
+				assessmentSearchCriteria.setIds(criteria.getIds());
+			if (criteria.getPropertyIds() != null)
+				assessmentSearchCriteria.setPropertyIds(criteria.getPropertyIds());
+			if (criteria.getAssessmentNumbers() != null)
+				assessmentSearchCriteria.setAssessmentNumbers(criteria.getAssessmentNumbers());
+
+		} else {
+			List<String> assessmentNumbers = repository.fetchAssessmentNumbers(criteria);
+			if (assessmentNumbers.isEmpty())
+				return Collections.emptyList();
+			assessmentSearchCriteria.setAssessmentNumbers(new HashSet<>(assessmentNumbers));
+		}
+		assessmentSearchCriteria.setLimit(criteria.getLimit());
 		return repository.getAssessmentPlainSearch(assessmentSearchCriteria);
 	}
 
