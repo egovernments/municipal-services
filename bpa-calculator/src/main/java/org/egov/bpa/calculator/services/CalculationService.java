@@ -43,7 +43,6 @@ public class CalculationService {
 
 	@Autowired
 	private DemandService demandService;
-;
 
 
 	@Autowired

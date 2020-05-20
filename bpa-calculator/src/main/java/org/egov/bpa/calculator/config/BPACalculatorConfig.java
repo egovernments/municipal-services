@@ -92,6 +92,11 @@ public class BPACalculatorConfig {
     @Value("${persister.save.bpa.calculation.topic}")
     private String saveTopic;
 
+    @Value("${egov.edcr.host}")
+	private String edcrHost;
+    
+    @Value("${egov.edcr.getPlan.endpoint}")
+	private String getPlanEndPoint;
 
     //CalculaterType Default Values
 //    @Value("${egov.tl.calculationtype.tradetype.default}")

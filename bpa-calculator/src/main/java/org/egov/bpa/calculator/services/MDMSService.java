@@ -3,6 +3,7 @@ package org.egov.bpa.calculator.services;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
 import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 import org.egov.bpa.calculator.web.models.CalculationReq;
+import org.egov.bpa.calculator.web.models.RequestInfoWrapper;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -17,12 +19,20 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
+import org.json.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 
 @Service
 @Slf4j
@@ -92,10 +102,13 @@ public class MDMSService {
            
 
             List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_CALCULATIONTYPE_PATH);
-            String filterExp = "$.[?((@.applicationType == '"+((Map)bpa.getAdditionalDetails()).get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
+            Map<String, String> edcrResponse = getEDCRDetails(requestInfo, bpa);
+            log.info("applicationType is " + edcrResponse.get("applicationType"));
+            log.info("serviceType is " + edcrResponse.get("serviceType"));
+            String filterExp = "$.[?((@.applicationType == '"+ edcrResponse.get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
             List<Object> calTypes = JsonPath.read(jsonOutput, filterExp);
             
-            filterExp = "$.[?(@.serviceType == '"+((Map)bpa.getAdditionalDetails()).get("serviceType")+"' || @.serviceType === 'ALL' )]";
+            filterExp = "$.[?(@.serviceType == '"+ edcrResponse.get("serviceType")+"' || @.serviceType === 'ALL' )]";
             calTypes = JsonPath.read(calTypes, filterExp);
             
             filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' || @.riskType === 'ALL' )]";
@@ -123,13 +136,52 @@ public class MDMSService {
             calculationType = (HashMap<String, Object>) obj;
         }
         catch (Exception e){
-            throw new CustomException("MDMS ERROR","Failed to get calculationType");
+            throw new CustomException("CALCULATION_ERROR", "Failed to get calculationType");
         }
 
         return calculationType;
     }
    
+	@SuppressWarnings("rawtypes")
+	public Map<String, String> getEDCRDetails(RequestInfo requestInfo, BPA bpa) {
 
+		String edcrNo = bpa.getEdcrNumber();
+		StringBuilder uri = new StringBuilder(config.getEdcrHost());
+
+		uri.append(config.getGetPlanEndPoint());
+		uri.append("?").append("tenantId=").append(bpa.getTenantId());
+		uri.append("&").append("edcrNumber=").append(edcrNo);
+		RequestInfo edcrRequestInfo = new RequestInfo();
+		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
+		edcrRequestInfo.setUserInfo(null); //since EDCR service is not accepting userInfo
+		LinkedHashMap responseMap = null;
+		try {
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new RequestInfoWrapper(edcrRequestInfo));
+		} catch (ServiceCallException se) {
+			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+		}
+
+		if (CollectionUtils.isEmpty(responseMap))
+			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+
+		String jsonString = new JSONObject(responseMap).toString();
+		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+		Map<String, String> additionalDetails = new HashMap<String, String>();
+		JSONArray serviceType = context.read("edcrDetail.*.planDetail.planInformation.serviceType");
+		if (CollectionUtils.isEmpty(serviceType)) {
+			serviceType.add("NEW_CONSTRUCTION");
+		}
+		JSONArray applicationType = context.read("edcrDetail.*.appliactionType");
+		if (StringUtils.isEmpty(applicationType)) {
+			applicationType.add("permit");
+		}
+		additionalDetails.put("serviceType", serviceType.get(0).toString());
+		additionalDetails.put("applicationType", applicationType.get(0).toString());
+
+		return additionalDetails;
+	}
+	
     /**
      * Creates and return default calculationType values as map
      * @return default calculationType Map
