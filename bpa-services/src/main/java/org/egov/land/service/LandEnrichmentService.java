@@ -71,10 +71,9 @@ public class LandEnrichmentService {
 				landRequest.getLandInfo().getAddress().setId(UUID.randomUUID().toString());
 			landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
 			landRequest.getLandInfo().getAddress().setAuditDetails(auditDetails);
-			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getGeoLocation().getId()))
+			if (landRequest.getLandInfo().getAddress().getGeoLocation() != null
+					&& StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getGeoLocation().getId()))
 				landRequest.getLandInfo().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
-			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getLocality().getId()))
-				landRequest.getLandInfo().getAddress().getLocality().setId(UUID.randomUUID().toString());
 		}
 		// units
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnit())) {
