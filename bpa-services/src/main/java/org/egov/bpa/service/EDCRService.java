@@ -147,6 +147,7 @@ public class EDCRService {
 						"The OccupancyType " + OccupancyType + " is not supported! ");
 			}
 		}
+		bpa.setAdditionalDetails(additionalDetails);
 		return additionalDetails;
 	}
 
