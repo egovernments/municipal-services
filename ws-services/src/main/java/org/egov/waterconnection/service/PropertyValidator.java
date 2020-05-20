@@ -17,13 +17,6 @@ public class PropertyValidator implements WaterActionValidator {
 		if(StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getPropertyId())) {
 			errorMap.put("INVALID_PROPERTY_UUID", "Property uuid should not be empty");
 		}
-		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty())) {
-			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
-		}
-		if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProperty()) && (StringUtils
-				.isEmpty(waterConnectionRequest.getWaterConnection().getProperty().getUsageCategory()))) {
-			errorMap.put("INVALID_WATER_CONNECTION_PROPERTY_USAGE_TYPE", "Property usage type should not be empty");
-		}
 		if (!errorMap.isEmpty())
 			return new ValidatorResult(false, errorMap);
 		return new ValidatorResult(true, errorMap);

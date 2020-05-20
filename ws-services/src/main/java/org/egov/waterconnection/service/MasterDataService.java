@@ -38,7 +38,7 @@ public class MasterDataService {
 	 */
 	private MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(WCConstants.BillingPeriod)
+		MasterDetail mstrDetail = MasterDetail.builder().name(WCConstants.BILLING_PERIOD)
 				.filter("[?(@.active== " + true + " && @.connectionType== '" + WCConstants.METERED_CONNECTION + "')]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WCConstants.MDMS_WC_MOD_NAME)
@@ -62,13 +62,13 @@ public class MasterDataService {
 		if (res == null) {
 			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
 		}
-		List<Map<String, Object>> jsonOutput = JsonPath.read(res, WCConstants.JSONPATH_ROOT_FOR_BilingPeriod);
+		List<Map<String, Object>> jsonOutput = JsonPath.read(res, WCConstants.JSONPATH_ROOT_FOR_BILLING);
 		return jsonOutput.get(0);
 	}
 	
 	public String getBillingCycle(RequestInfo requestInfo, String tenantId) {
 		Map<String, Object> billingMap = loadBillingFrequencyMasterData(requestInfo, tenantId);
-		return (String) billingMap.get(WCConstants.Billing_Cycle_String);
+		return (String) billingMap.get(WCConstants.BILLING_CYCLE_STRING);
 	}
 	
 }

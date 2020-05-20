@@ -18,14 +18,6 @@ public class PropertyValidator implements SewerageActionValidator {
 		if(StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getPropertyId())) {
 			errorMap.put("INVALID_PROPERTY_UUID", "Property uuid should not be empty");
 		}
-		if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProperty())) {
-			errorMap.put("INVALID_PROPERTY", "Property should not be empty");
-		}
-		if (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProperty()) && (StringUtils
-				.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProperty().getUsageCategory()))) {
-			errorMap.put("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
-					"SewerageConnection cannot be created without property usage type");
-		}
 		if (!errorMap.isEmpty())
 			return new ValidatorResult(false, errorMap);
 		return new ValidatorResult(true, errorMap);

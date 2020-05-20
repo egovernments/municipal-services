@@ -81,10 +81,10 @@ public class MeterReadingService {
 				.atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate startingDate = currentdate, endDate = currentdate;
 		String billingCycyle = masterDataService.getBillingCycle(requestInfo, requestInfo.getUserInfo().getTenantId());
-		if (billingCycyle.equalsIgnoreCase(WCConstants.Monthly_Billing_Period)) {
+		if (WCConstants.MONTHLY_BILLING_CONST.equalsIgnoreCase(billingCycyle)) {
 			startingDate = currentdate.with(TemporalAdjusters.firstDayOfMonth());
 			endDate = currentdate.with(TemporalAdjusters.lastDayOfMonth());
-		} else if (billingCycyle.equalsIgnoreCase(WCConstants.Quaterly_Billing_Period)) {
+		} else if (billingCycyle.equalsIgnoreCase(WCConstants.QUARTERLY_BILLING_CONST)) {
 			startingDate = currentdate.with(currentdate.getMonth().firstMonthOfQuarter())
 					.with(TemporalAdjusters.firstDayOfMonth());
 			endDate = startingDate.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
