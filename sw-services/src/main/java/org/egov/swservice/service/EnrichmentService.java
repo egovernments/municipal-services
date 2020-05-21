@@ -121,9 +121,6 @@ public class EnrichmentService {
 				.equalsIgnoreCase(SWConstants.ACTION_INITIATE)) {
 			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
 		}
-		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTION_APPLY)) {
-			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
-		}
 	}
 	
 
@@ -194,8 +191,8 @@ public class EnrichmentService {
 	 * @param sewerageConnectionrequest 
 	 */
 	public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest) {
-		if (SWConstants.STATUS_APPROVED
-				.equalsIgnoreCase(sewerageConnectionRequest.getSewerageConnection().getApplicationStatus().name())) {
+		if (SWConstants.ACTIVATE_CONNECTION
+				.equalsIgnoreCase(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
 			setConnectionNO(sewerageConnectionRequest);
 		}
 	}

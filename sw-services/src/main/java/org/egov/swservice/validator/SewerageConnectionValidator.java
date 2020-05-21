@@ -106,7 +106,6 @@ public class SewerageConnectionValidator {
 	 * @param searchResult sewerage connection search result
 	 */
 	private void setFieldsFromSearch(SewerageConnectionRequest request, SewerageConnection searchResult) {
-		request.getSewerageConnection().setApplicationStatus(searchResult.getApplicationStatus());
 		request.getSewerageConnection().setConnectionNo(searchResult.getConnectionNo());
 	}
 	

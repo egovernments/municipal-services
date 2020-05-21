@@ -159,5 +159,8 @@ public class SWConfiguration {
 
 	@Value("${egov.sewerageservice.savefilestoreIds}")
 	private String saveFileStoreIdsTopic;
+	
+	@Value("${workflow.process.search.path}")
+	private String wfProcessSearchPath;
 
 }

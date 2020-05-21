@@ -185,8 +185,8 @@ public class SewerageServicesUtil {
 			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
 
-	public boolean getStatusForUpdate(BusinessService businessService, SewerageConnection searchresult) {
-		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
+	public boolean getStatusForUpdate(BusinessService businessService, String applicationStatus) {
+		return workflowService.isStateUpdatable(applicationStatus, businessService);
 	}
 
 	/**

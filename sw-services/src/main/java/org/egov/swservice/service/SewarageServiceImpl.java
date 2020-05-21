@@ -147,6 +147,9 @@ public class SewarageServiceImpl implements SewarageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
 		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
+		String previousApplicationStatus = workflowService.getApplicationStatus(
+				sewarageConnectionRequest.getRequestInfo(),
+				sewarageConnectionRequest.getSewerageConnection().getApplicationNo());
 		validateProperty.validatePropertyCriteriaForCreateSewerage(property);
 		BusinessService businessService = workflowService.getBusinessService(
 				sewarageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
@@ -154,17 +157,17 @@ public class SewarageServiceImpl implements SewarageService {
 		SewerageConnection searchResult = getConnectionForUpdateRequest(
 				sewarageConnectionRequest.getSewerageConnection().getId(), sewarageConnectionRequest.getRequestInfo());
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
-		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
+		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService, previousApplicationStatus);
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest, property);
 		sewarageDaoImpl.pushForEditNotification(sewarageConnectionRequest);
-		//Enrich file store Id After payment
+		// Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(sewarageConnectionRequest);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewarageConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
-		sewarageDao.updateSewerageConnection(sewarageConnectionRequest, 
-				sewerageServicesUtil.getStatusForUpdate(businessService, searchResult));
+		sewarageDao.updateSewerageConnection(sewarageConnectionRequest,
+				sewerageServicesUtil.getStatusForUpdate(businessService, previousApplicationStatus));
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
 	}
 

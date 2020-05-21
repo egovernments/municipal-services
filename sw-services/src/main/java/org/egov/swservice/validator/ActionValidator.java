@@ -24,9 +24,9 @@ public class ActionValidator {
 	 * @param request
 	 * @param businessService
 	 */
-	public void validateUpdateRequest(SewerageConnectionRequest request, BusinessService businessService) {
+	public void validateUpdateRequest(SewerageConnectionRequest request, BusinessService businessService, String applicationStatus) {
 		validateDocumentsForUpdate(request);
-		validateIds(request, businessService);
+		validateIds(request, businessService, applicationStatus);
 	}
 
 	/**
@@ -49,9 +49,9 @@ public class ActionValidator {
 	 * @param request
 	 * @param businessService
 	 */
-	private void validateIds(SewerageConnectionRequest request, BusinessService businessService) {
+	private void validateIds(SewerageConnectionRequest request, BusinessService businessService, String previousApplicationStatus) {
 		Map<String, String> errorMap = new HashMap<>();
-		if (!workflowService.isStateUpdatable(request.getSewerageConnection().getApplicationStatus().name(), businessService)) {
+		if (!workflowService.isStateUpdatable(previousApplicationStatus, businessService)) {
 			if (request.getSewerageConnection().getId() == null)
 				errorMap.put("INVALID_UPDATE", "Id of sewerageConnection cannot be null");
 			if (!CollectionUtils.isEmpty(request.getSewerageConnection().getDocuments())) {
