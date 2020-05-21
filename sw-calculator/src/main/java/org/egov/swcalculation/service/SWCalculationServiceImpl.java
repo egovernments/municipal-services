@@ -16,10 +16,13 @@ import org.egov.swcalculation.model.Calculation;
 import org.egov.swcalculation.model.CalculationCriteria;
 import org.egov.swcalculation.model.CalculationReq;
 import org.egov.swcalculation.model.Category;
+import org.egov.swcalculation.model.Property;
 import org.egov.swcalculation.model.SewerageConnection;
+import org.egov.swcalculation.model.SewerageConnectionRequest;
 import org.egov.swcalculation.model.TaxHeadEstimate;
 import org.egov.swcalculation.model.TaxHeadMaster;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
+import org.egov.swcalculation.util.SWCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +46,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	@Autowired
 	private SewerageCalculatorDao sewerageCalculatorDao;
+	
+	@Autowired
+	private SWCalculationUtil sWCalculationUtil;
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Sewerage Charge
@@ -88,9 +94,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
-		String tenantId = null != sewerageConnection.getProperty().getTenantId()
-				? sewerageConnection.getProperty().getTenantId()
-				: criteria.getTenantId();
+		
+		Property property = sWCalculationUtil.getProperty(SewerageConnectionRequest.builder()
+				.sewerageConnection(sewerageConnection).requestInfo(requestInfo).build());
+
+		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
 		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap

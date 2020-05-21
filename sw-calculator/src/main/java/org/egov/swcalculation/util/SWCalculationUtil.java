@@ -2,10 +2,12 @@ package org.egov.swcalculation.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,28 +21,27 @@ import org.egov.swcalculation.model.EmailRequest;
 import org.egov.swcalculation.model.EventRequest;
 import org.egov.swcalculation.model.GetBillCriteria;
 import org.egov.swcalculation.model.NotificationReceiver;
+import org.egov.swcalculation.model.Property;
+import org.egov.swcalculation.model.PropertyCriteria;
+import org.egov.swcalculation.model.PropertyResponse;
+import org.egov.swcalculation.model.RequestInfoWrapper;
 import org.egov.swcalculation.model.SMSRequest;
+import org.egov.swcalculation.model.SewerageConnectionRequest;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
+import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+
 @Component
 @Slf4j
 public class SWCalculationUtil {
@@ -56,6 +57,23 @@ public class SWCalculationUtil {
 
 	@Autowired
 	private SWCalculationProducer producer;
+	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
+	
+	@Value("${egov.property.service.host}")
+	private String propertyHost;
+
+	@Value("${egov.property.searchendpoint}")
+	private String searchPropertyEndPoint;
+
+	private String tenantId = "tenantId=";
+	private String mobileNumber = "mobileNumber=";
+	private String propertyIds = "propertyIds=";
+	private String uuids = "uuids=";
+	private String URL = "url";
+
 
 	/**
 	 * Returns the tax head search Url with tenantId and SW service name
@@ -366,5 +384,102 @@ public class SWCalculationUtil {
 		producer.push(config.getSaveUserEventsTopic(), request);
 	}
 	
+	
+	/**
+	 * 
+	 * @param SewerageConnectionRequest
+	 *            SewerageConnectionRequest containing property
+	 * @return List of Property
+	 */
+	public List<Property> propertySearch(SewerageConnectionRequest sewerageConnectionRequest) {
+		PropertyCriteria propertyCriteria = new PropertyCriteria();
+		HashSet<String> propertyUUID = new HashSet<>();
+		propertyUUID.add(sewerageConnectionRequest.getSewerageConnection().getPropertyId());
+		propertyCriteria.setUuids(propertyUUID);
+		propertyCriteria.setTenantId(sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		Object result = serviceRequestRepository.fetchResult(getPropertyURL(propertyCriteria),
+				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
+		List<Property> propertyList = getPropertyDetails(result);
+		if (CollectionUtils.isEmpty(propertyList)) {
+			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
+		}
+		return propertyList;
+	}
+
+	/**
+	 * 
+	 * @param SewerageConnectionRequest
+	 *            SewerageConnectionRequest
+	 */
+	public Property getProperty(SewerageConnectionRequest sewerageConnectionRequest) {
+		Optional<Property> propertyList = propertySearch(sewerageConnectionRequest).stream().findFirst();
+		if (!propertyList.isPresent()) {
+			throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY",
+					"Swerage connection cannot be enriched without property");
+		}
+		Property property = propertyList.get();
+		if (StringUtils.isEmpty(property.getUsageCategory())) {
+			throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
+					"Sewerage connection cannot be enriched without property usage type");
+		}
+		return property;
+	}
+
+	/**
+	 * 
+	 * @param criteria
+	 * @return property URL
+	 */
+	private StringBuilder getPropertyURL(PropertyCriteria criteria) {
+		StringBuilder url = new StringBuilder(getPropertyURL());
+		boolean isanyparametermatch = false;
+		url.append("?");
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			isanyparametermatch = true;
+			url.append(tenantId).append(criteria.getTenantId());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
+			if (isanyparametermatch)
+				url.append("&");
+			isanyparametermatch = true;
+			String propertyIdsString = criteria.getPropertyIds().stream().map(propertyId -> propertyId)
+					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
+			url.append(propertyIds).append(propertyIdsString);
+		}
+		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
+			if (isanyparametermatch)
+				url.append("&");
+			isanyparametermatch = true;
+			url.append(mobileNumber).append(criteria.getMobileNumber());
+		}
+		if (!CollectionUtils.isEmpty(criteria.getUuids())) {
+			if (isanyparametermatch)
+				url.append("&");
+			String uuidString = criteria.getUuids().stream().map(uuid -> uuid).collect(Collectors.toSet()).stream()
+					.collect(Collectors.joining(","));
+			url.append(uuids).append(uuidString);
+		}
+		return url;
+	}
+
+	/**
+	 * 
+	 * @param result
+	 *            Response object from property service call
+	 * @return List of property
+	 */
+	private List<Property> getPropertyDetails(Object result) {
+
+		try {
+			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
+			return propertyResponse.getProperties();
+		} catch (Exception ex) {
+			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+		}
+	}
+
+	public StringBuilder getPropertyURL() {
+		return new StringBuilder().append(propertyHost).append(searchPropertyEndPoint);
+	}
 	
 }

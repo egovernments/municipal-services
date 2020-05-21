@@ -18,9 +18,11 @@ import org.egov.swcalculation.model.Property;
 import org.egov.swcalculation.model.RequestInfoWrapper;
 import org.egov.swcalculation.model.SearchCriteria;
 import org.egov.swcalculation.model.SewerageConnection;
+import org.egov.swcalculation.model.SewerageConnectionRequest;
 import org.egov.swcalculation.model.Slab;
 import org.egov.swcalculation.model.TaxHeadEstimate;
 import org.egov.swcalculation.util.CalculatorUtils;
+import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.util.SewerageCessUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class EstimationService {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	@Autowired
+	private SWCalculationUtil sWCalculationUtil;
 
 	/**
 	 * Generates a List of Tax head estimates with tax head code, tax head
@@ -226,7 +231,11 @@ public class EstimationService {
 	 */
 	private List<BillingSlab> getSlabsFiltered(SewerageConnection sewerageConnection, List<BillingSlab> billingSlabs,
 			String calculationAttribue, RequestInfo requestInfo) {
-		Property property = sewerageConnection.getProperty();
+		
+		SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
+				.sewerageConnection(sewerageConnection).requestInfo(requestInfo).build();
+		Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
+		
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
 		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0] : "";
@@ -290,7 +299,7 @@ public class EstimationService {
 		}
 		ArrayList<String> billingSlabIds = new ArrayList<>();
 		billingSlabIds.add("");
-		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData);
+		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData, requestInfo);
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
 		// //Billing slab id
@@ -305,10 +314,14 @@ public class EstimationService {
 	 * @return return all tax heads
 	 */
 	private List<TaxHeadEstimate> getTaxHeadForFeeEstimation(CalculationCriteria criteria,
-			Map<String, Object> masterData) {
+			Map<String, Object> masterData, RequestInfo requestInfo) {
 		JSONArray feeSlab = (JSONArray) masterData.getOrDefault(SWCalculationConstant.SC_FEESLAB_MASTER, null);
 		if (feeSlab == null)
 			throw new CustomException("FEE_SLAB_NOT_FOUND", "fee slab master data not found!!");
+		
+		Property property = sWCalculationUtil.getProperty(SewerageConnectionRequest.builder()
+				.sewerageConnection(criteria.getSewerageConnection()).requestInfo(requestInfo).build());
+		
 		JSONObject feeObj = mapper.convertValue(feeSlab.get(0), JSONObject.class);
 		BigDecimal formFee = BigDecimal.ZERO;
 		if (feeObj.get(SWCalculationConstant.FORM_FEE_CONST) != null) {
@@ -339,13 +352,13 @@ public class EstimationService {
 					criteria.getSewerageConnection().getRoadCuttingArea());
 		}
 		BigDecimal roadPlotCharge = BigDecimal.ZERO;
-		if (criteria.getSewerageConnection().getProperty().getLandArea() != null) {
-			roadPlotCharge = getPlotSizeFee(masterData, criteria.getSewerageConnection().getProperty().getLandArea());
+		if (property.getLandArea() != null) {
+			roadPlotCharge = getPlotSizeFee(masterData, property.getLandArea());
 		}
 		BigDecimal usageTypeCharge = BigDecimal.ZERO;
 		if (criteria.getSewerageConnection().getRoadCuttingArea() != null) {
 			usageTypeCharge = getUsageTypeFee(masterData,
-					criteria.getSewerageConnection().getProperty().getUsageCategory(),
+					property.getUsageCategory(),
 					criteria.getSewerageConnection().getRoadCuttingArea());
 		}
 		

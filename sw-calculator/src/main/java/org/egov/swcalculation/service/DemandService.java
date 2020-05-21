@@ -29,8 +29,10 @@ import org.egov.swcalculation.model.DemandDetailAndCollection;
 import org.egov.swcalculation.model.DemandRequest;
 import org.egov.swcalculation.model.DemandResponse;
 import org.egov.swcalculation.model.GetBillCriteria;
+import org.egov.swcalculation.model.Property;
 import org.egov.swcalculation.model.RequestInfoWrapper;
 import org.egov.swcalculation.model.SewerageConnection;
+import org.egov.swcalculation.model.SewerageConnectionRequest;
 import org.egov.swcalculation.model.TaxHeadEstimate;
 import org.egov.swcalculation.model.TaxPeriod;
 import org.egov.swcalculation.producer.SWCalculationProducer;
@@ -95,6 +97,9 @@ public class DemandService {
     
     @Autowired
     private KafkaTemplate kafkaTemplate;
+    
+    @Autowired
+    private SWCalculationUtil sWCalculationUtil;
 
 	/**
 	 * Creates or updates Demand
@@ -166,19 +171,22 @@ public class DemandService {
 			Map<String, Object> masterMap,boolean isForConnectionNO) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
-			SewerageConnection connection = null;
 
-			if (calculation.getSewerageConnection() != null)
-				connection = calculation.getSewerageConnection();
+			SewerageConnection connection = calculation.getSewerageConnection();
 
 			if (connection == null)
 				throw new CustomException("INVALID_SEWERAGE_CONNECTION",
 						"Demand cannot be generated for "
 								+ (isForConnectionNO == true ? calculation.getConnectionNo() : calculation.getApplicationNO())
 								+ " Water Connection with this number does not exist ");
-
+			
+			SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
+					.sewerageConnection(connection).requestInfo(requestInfo).build();
+			
+			Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
+			
 			String consumerCode = isForConnectionNO == true ?  calculation.getConnectionNo() : calculation.getApplicationNO();
-			User owner = connection.getProperty().getOwners().get(0).toCommonUser();
+			User owner = property.getOwners().get(0).toCommonUser();
 			
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			

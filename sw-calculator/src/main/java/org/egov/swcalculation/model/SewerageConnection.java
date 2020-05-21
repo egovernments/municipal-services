@@ -1,6 +1,5 @@
 package org.egov.swcalculation.model;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.validation.Valid;
@@ -17,17 +16,17 @@ import io.swagger.annotations.ApiModelProperty;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-03-13T11:29:47.358+05:30[Asia/Kolkata]")
 public class SewerageConnection extends Connection {
-	@JsonProperty("noOfWaterClosets")
-	private Integer noOfWaterClosets = null;
-
 	@JsonProperty("proposedWaterClosets")
 	private Integer proposedWaterClosets = null;
 
-	@JsonProperty("noOfToilets")
-	private Integer noOfToilets = null;
-
 	@JsonProperty("proposedToilets")
 	private Integer proposedToilets = null;
+
+	@JsonProperty("noOfWaterClosets")
+	private Integer noOfWaterClosets = null;
+
+	@JsonProperty("noOfToilets")
+	private Integer noOfToilets = null;
 
 	public SewerageConnection noOfWaterClosets(Integer noOfWaterClosets) {
 		this.noOfWaterClosets = noOfWaterClosets;
