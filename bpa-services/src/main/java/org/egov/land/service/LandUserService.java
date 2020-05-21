@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
@@ -91,6 +92,11 @@ public class LandUserService {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(owner.getMobileNumber());
+		if(!StringUtils.isEmpty(owner.getUuid())) {
+			List<String> uuids = new ArrayList<String>();
+			uuids.add(owner.getUuid());
+			userSearchRequest.setUuid(uuids);
+		}
 
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
