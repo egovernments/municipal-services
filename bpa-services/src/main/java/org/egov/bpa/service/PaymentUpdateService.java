@@ -10,6 +10,7 @@ import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.Workflow;
 import org.egov.bpa.web.model.collection.PaymentDetail;
 import org.egov.bpa.web.model.collection.PaymentRequest;
 import org.egov.bpa.workflow.WorkflowIntegrator;
@@ -84,8 +85,9 @@ public class PaymentUpdateService {
 								"No Building Plan Application found for the comsumerCode "
 										+ searchCriteria.getApplicationNo());
 					}
-					bpas.forEach(bpa -> bpa.getWorkflow().setAction("PAY"));
-
+					Workflow workflow = Workflow.builder().action("PAY").build();
+					bpas.forEach(bpa -> bpa.setWorkflow(workflow));
+					
 					// FIXME check if the update call to repository can be avoided
 					// FIXME check why aniket is not using request info from consumer
 					// REMOVE SYSTEM HARDCODING AFTER ALTERING THE CONFIG IN WF FOR TL
