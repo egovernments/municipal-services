@@ -80,7 +80,7 @@ public class BPAService {
 	private NotificationUtil notificationUtil;
 
 	@Autowired
-	private LandService landService;
+	private BPALandService landService;
 	
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
