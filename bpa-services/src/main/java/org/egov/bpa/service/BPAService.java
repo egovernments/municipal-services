@@ -234,9 +234,9 @@ public class BPAService {
 			// userService.createUser(bpaRequest);
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 				actionValidator.validateUpdateRequest(bpaRequest, businessService);
-				landService.updateLandInfo(bpaRequest);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
+				landService.updateLandInfo(bpaRequest);
 				bpaValidator.validateCheckList(mdmsData, bpaRequest,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
 			}
@@ -248,11 +248,6 @@ public class BPAService {
 
 		log.info("Bpa status is : " + bpa.getStatus());
 
-		if (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
-			// generate sanction fee demand as well for the low risk application
-				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
-		}
-		
 		// Generate the sanction Demand
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
