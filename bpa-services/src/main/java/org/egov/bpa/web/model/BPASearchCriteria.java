@@ -25,16 +25,16 @@ public class BPASearchCriteria {
 	    private List<String> ids;
 
 	    @JsonProperty("status")
-	    private List<String> status;
+	    private String status;
 
 	    @JsonProperty("edcrNumber")
-	    private List<String> edcrNumbers;
+	    private String edcrNumber;
 
 	    @JsonProperty("applicationNo")
-	    private List<String> applicationNo;
-	    
+	    private String applicationNo;
+	    	
 	    @JsonProperty("approvalNo")
-	    private List<String> approvalNo;
+	    private String approvalNo;
 
 	    @JsonProperty("mobileNumber")
 	    private String mobileNumber;
@@ -50,6 +50,12 @@ public class BPASearchCriteria {
 	      
 	    @JsonProperty("approvalDate")
 	    private Long approvalDate;
+
+	    @JsonProperty("applicationType")
+	    private String applicationType;
+
+	    @JsonProperty("serviceType")
+	    private String serviceType;
 	    
 	    @JsonIgnore
 	    private List<String> ownerIds;
@@ -57,16 +63,16 @@ public class BPASearchCriteria {
 		
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
-	                && this.approvalDate == null && this.ownerIds == null
+	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
+	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
 	                
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
 	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
-	                && this.mobileNumber == null && this.landId == null && this.edcrNumbers == null && this.approvalNo == null 
-	                && this.approvalDate == null && this.ownerIds == null
+	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
+	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
 	        );
 	    }
 }

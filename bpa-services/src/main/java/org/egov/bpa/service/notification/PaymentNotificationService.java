@@ -177,10 +177,10 @@ public class PaymentNotificationService {
 			String businessService) {
 
 		BPASearchCriteria searchCriteria = new BPASearchCriteria();
-		List<String> codes = Arrays.asList(consumerCode);
-		searchCriteria.setApplicationNo(codes);
+//		List<String> codes = Arrays.asList(consumerCode);
+		searchCriteria.setApplicationNo(consumerCode);
 		searchCriteria.setTenantId(tenantId);
-		List<BPA> bpas = bpaService.getBPAWithOwnerInfo(searchCriteria, requestInfo);
+		List<BPA> bpas = bpaService.getBPAFromCriteria(searchCriteria, requestInfo);
 
 		if (CollectionUtils.isEmpty(bpas))
 			throw new CustomException("INVALID RECEIPT",

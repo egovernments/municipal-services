@@ -207,11 +207,11 @@ public class BPAValidator {
 		if (criteria.getApplicationNo() != null && !allowedParams.contains("applicationNo"))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
 
-		if (criteria.getEdcrNumbers() != null && !allowedParams.contains("edcrNumber"))
+		if (criteria.getEdcrNumber() != null && !allowedParams.contains("edcrNumber"))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on edcrNumber is not allowed");
 
-		/*if (criteria.getStatus() != null && !allowedParams.contains("status"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on Status is not allowed");*/
+		if (criteria.getStatus() != null && !allowedParams.contains("status"))
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on Status is not allowed");
 
 		if (criteria.getIds() != null && !allowedParams.contains("ids"))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on ids is not allowed");
@@ -513,87 +513,8 @@ public class BPAValidator {
 	}
 
 
-	public void addLandInfoToBPA(BPARequest bpaRequest) {
-		// TODO Auto-generated method stub
-		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
-		uri.append(config.getLandInfoCreate());
-		
-		LandRequest landRequest = new LandRequest();
-		landRequest.setRequestInfo(bpaRequest.getRequestInfo());
-		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
-		LinkedHashMap responseMap = null;
-		try {
-			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,landRequest);
-			}catch(ServiceCallException se) {
-				throw new CustomException("LandInfo ERROR", " Invalid Land data");
-			}
-		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
-		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
-		bpaRequest.getBPA().setLandInfo(landData);
-		bpaRequest.getBPA().setLandId(landData.getId());
-	}
-
-
-	public void updateLandInfo(BPARequest bpaRequest) {
-		// TODO Auto-generated method stub
-		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
-		uri.append(config.getLandInfoUpdate());
-		
-		LandRequest landRequest = new LandRequest();
-		landRequest.setRequestInfo(bpaRequest.getRequestInfo());
-		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
-		LinkedHashMap responseMap = null;
-		try {
-			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,landRequest);
-			}catch(ServiceCallException se) {
-				throw new CustomException("LandInfo ERROR", " Invalid Land data");
-			}
-		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
-		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
-		bpaRequest.getBPA().setLandInfo(landData);
-		bpaRequest.getBPA().setLandId(landData.getId());
-	}
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public ArrayList<LandInfo> searchLandInfoToBPA(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
-		// TODO Auto-generated method stub
-		
 	
-		StringBuilder url = getLandSerchURLWithParams(requestInfo, landcriteria);
-		
-		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		LinkedHashMap responseMap = null;
-		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
-		ArrayList<LandInfo> landData = new ArrayList<LandInfo>();
-		if (!CollectionUtils.isEmpty(landInfo)) {
-			for (int i = 0; i < landInfo.size(); i++) {
-				landData.add(mapper.convertValue(landInfo.get(i), LandInfo.class));
-			}
-		}	
-		
-		return landData;
-	}
 
 
-	private StringBuilder getLandSerchURLWithParams(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
-		// TODO Auto-generated method stub
-		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
-		uri.append(config.getLandInfoSearch());
-		uri.append("?tenantId=");
-		uri.append(landcriteria.getTenantId());
-		LandSearchCriteria landSearchCriteria = new LandSearchCriteria();
-		LandRequest landRequest = new LandRequest();
-		landRequest.setRequestInfo(requestInfo);
-		if (landcriteria.getMobileNumber() != null) {
-			landSearchCriteria.setMobileNumber(landcriteria.getMobileNumber());
-		} else {
-			landSearchCriteria.setIds(landcriteria.getIds());
-		}
-		return uri;
-	}
+	
 }

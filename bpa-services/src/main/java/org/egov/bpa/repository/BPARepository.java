@@ -48,10 +48,6 @@ public class BPARepository {
 	public void save(BPARequest bpaRequest) {
 		producer.push(config.getSaveTopic(), bpaRequest);
 	}
-	
-//	public void saveLand(LandRequest landRequest) {
-//		producer.push(config.getSaveTopic(), landRequest);
-//	}
 
 	public void update(BPARequest bpaRequest, boolean isStateUpdatable) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();

@@ -35,7 +35,6 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -79,6 +78,9 @@ public class BPAService {
 
 	@Autowired
 	private NotificationUtil notificationUtil;
+
+	@Autowired
+	private LandService landService;
 	
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -90,16 +92,12 @@ public class BPAService {
 		
 		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
 		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
-		bpaValidator.addLandInfoToBPA(bpaRequest);
+		landService.addLandInfoToBPA(bpaRequest);
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
 		
 		wfIntegrator.callWorkFlow(bpaRequest);
 
-		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
-			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
-		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
-		}
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
@@ -122,7 +120,7 @@ public class BPAService {
 		landcriteria.setTenantId(criteria.getTenantId());
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
-			ArrayList<LandInfo> landInfo = bpaValidator.searchLandInfoToBPA(requestInfo, landcriteria);
+			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 			bpa = getBPAFromLandId(criteria, requestInfo);
 			if (landInfo.size() > 0) {
 				for (int i = 0; i < bpa.size(); i++) {
@@ -135,20 +133,16 @@ public class BPAService {
 				bpa = bpa.stream().filter(a -> a.getLandInfo() != null).collect(Collectors.toList());
 			}
 		} else {
-			List<String> roles = new ArrayList<>();
-			for (Role role : requestInfo.getUserInfo().getRoles()) {
-				roles.add(role.getCode());
-			}
+		
 
-
-			bpa = getBPAWithOwnerInfo(criteria, requestInfo);
+			bpa = getBPAFromCriteria(criteria, requestInfo);
 			ArrayList<String> data = new ArrayList<String>();
 			if (bpa.size() > 0) {
 				for(int i=0; i<bpa.size(); i++){
 					data.add(bpa.get(i).getLandId());
 				}
 				landcriteria.setIds(data);
-				ArrayList<LandInfo> landInfo = bpaValidator.searchLandInfoToBPA(requestInfo, landcriteria);
+				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 				
 				for (int i = 0; i < bpa.size(); i++) {
 					for (int j = 0; j < landInfo.size(); j++) {
@@ -186,11 +180,10 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
-	public List<BPA> getBPAWithOwnerInfo(BPASearchCriteria criteria, RequestInfo requestInfo) {
+	public List<BPA> getBPAFromCriteria(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa = repository.getBPAData(criteria);
 		if (bpa.isEmpty())
 			return Collections.emptyList();
-		criteria = enrichmentService.getBPACriteriaFromIds(bpa, criteria.getLimit());
 		return bpa;
 	}
 
@@ -221,7 +214,7 @@ public class BPAService {
 		BusinessService businessService = workflowService.getBusinessService(bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
-		List<BPA> searchResult = getBPAWithOwnerInfo(bpaRequest);
+		List<BPA> searchResult = getBPAWithBPAId(bpaRequest);
 		if (CollectionUtils.isEmpty(searchResult)) {
 			throw new CustomException("UPDATE ERROR", "Failed to Update the Application");
 		}
@@ -241,7 +234,7 @@ public class BPAService {
 			// userService.createUser(bpaRequest);
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 				actionValidator.validateUpdateRequest(bpaRequest, businessService);
-				bpaValidator.updateLandInfo(bpaRequest);
+				landService.updateLandInfo(bpaRequest);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
 				bpaValidator.validateCheckList(mdmsData, bpaRequest,
@@ -256,13 +249,8 @@ public class BPAService {
 		log.info("Bpa status is : " + bpa.getStatus());
 
 		if (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)) {
-
 			// generate sanction fee demand as well for the low risk application
-			if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
-				calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
-			} else {
 				calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
-			}
 		}
 		
 		// Generate the sanction Demand
@@ -283,17 +271,13 @@ public class BPAService {
 	 *            The update request
 	 * @return List of bpas
 	 */
-	public List<BPA> getBPAWithOwnerInfo(BPARequest request) {
+	public List<BPA> getBPAWithBPAId(BPARequest request) {
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		List<String> ids = new LinkedList<>();
 		ids.add(request.getBPA().getId());
-
 		criteria.setTenantId(request.getBPA().getTenantId());
 		criteria.setIds(ids);
-
 		List<BPA> bpa = repository.getBPAData(criteria);
-
-//		bpa = enrichmentService.enrichBPASearch(bpa, criteria, request.getRequestInfo());
 		return bpa;
 	}
 

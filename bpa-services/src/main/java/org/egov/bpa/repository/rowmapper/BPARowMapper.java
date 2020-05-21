@@ -54,19 +54,6 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.createdTime(rs.getLong("bpa_createdTime")).lastModifiedBy(rs.getString("bpa_lastModifiedBy"))
 						.lastModifiedTime(lastModifiedTime).build();
 
-//				Double latitude = (Double) rs.getObject("latitude");
-//				Double longitude = (Double) rs.getObject("longitude");
-
-//				Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
-
-//				GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();
-
-				/*Address address = Address.builder().buildingName(rs.getString("buildingName"))
-						.city(rs.getString("city")).plotNo(rs.getString("plotno")).district(rs.getString("district"))
-						.region(rs.getString("region")).state(rs.getString("state")).country(rs.getString("country"))
-						.id(rs.getString("bpa_ad_id")).landmark(rs.getString("landmark")).locality(locality)
-						.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno"))
-						.street(rs.getString("street")).tenantId(tenantId).build();*/
 
 				currentbpa = BPA.builder()
 						.auditDetails(auditdetails)
@@ -81,6 +68,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.applicationDate(rs.getLong("applicationDate"))
 						.id(id)
 						.additionalDetails(additionalDetails)
+						.businessService(rs.getString("businessService"))
 						.build();
 
 				buildingMap.put(id, currentbpa);

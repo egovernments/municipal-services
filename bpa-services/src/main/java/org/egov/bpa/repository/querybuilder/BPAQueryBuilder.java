@@ -62,25 +62,25 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
-		List<String> edcrNumbers = criteria.getEdcrNumbers();
-		if (!CollectionUtils.isEmpty(edcrNumbers)) {
+		String edcrNumbers = criteria.getEdcrNumber();
+		if (edcrNumbers!=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNumbers)).append(")");
-			addToPreparedStatement(preparedStmtList, edcrNumbers);
+			builder.append(" bpa.edcrNumber = ?");
+			preparedStmtList.add(criteria.getEdcrNumber());
 		}
 
-		List<String> applicationNos = criteria.getApplicationNo();
-		if (!CollectionUtils.isEmpty(applicationNos)) {
+		String applicationNo = criteria.getApplicationNo();
+		if (applicationNo!=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.applicationNo IN (").append(createQuery(applicationNos)).append(")");
-			addToPreparedStatement(preparedStmtList, applicationNos);
+			builder.append(" bpa.applicationNo =?");
+			preparedStmtList.add(criteria.getApplicationNo());
 		}
 		
-		List<String> approvalNo = criteria.getApprovalNo();
-		if (!CollectionUtils.isEmpty(approvalNo)) {
+		String approvalNo = criteria.getApprovalNo();
+		if (approvalNo!=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.approvalNo IN (").append(createQuery(approvalNo)).append(")");
-			addToPreparedStatement(preparedStmtList, approvalNo);
+			builder.append(" bpa.approvalNo = ?");
+			preparedStmtList.add(criteria.getApprovalNo());
 		}
 		String landId = criteria.getLandId();
 		if (landId!=null) {
@@ -88,11 +88,12 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.landId = ?");
 			preparedStmtList.add(criteria.getLandId());
 		}
-		List<String> status = criteria.getStatus();
-		if (!CollectionUtils.isEmpty(status)) {
+		String status = criteria.getStatus();
+		if (status!=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.status IN (").append(createQuery(status)).append(")");
-			addToPreparedStatement(preparedStmtList, status);
+			builder.append(" bpa.status = ?");
+			preparedStmtList.add(criteria.getStatus());
+			
 		}
 		Long permitDt = criteria.getApprovalDate();
 		if ( permitDt != null) {
@@ -116,42 +117,6 @@ public class BPAQueryBuilder {
 			.append(permitEndDate.getTimeInMillis());
 			
 		}
-		
-		/*if (criteria.getMobileNumber() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpaowner.mobileNumber = ? ");
-			preparedStmtList.add(criteria.getMobileNumber());
-
-		}*/
-		/*else if (criteria.getCreatedBy() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" ( bpa.createdby = ? ");
-			preparedStmtList.add(criteria.getCreatedBy());
-			builder.append(" OR bpaowner.id = ? )");
-			preparedStmtList.add(criteria.getCreatedBy());
-		}
-
-		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.createdtime BETWEEN ").append(criteria.getFromDate()).append(" AND ")
-					.append(criteria.getToDate());
-		} else if (criteria.getFromDate() != null && criteria.getToDate() == null) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.createdtime >= ").append(criteria.getFromDate());
-		}
-		
-		if(criteria.getApplicationDate() != null){
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.applicationDate = ").append(criteria.getApplicationDate());
-		}
-
-		if(criteria.getOrderGeneratedDate() != null){
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.orderGeneratedDate = ").append(criteria.getOrderGeneratedDate());
-		}*/
-		
-//		addClauseIfRequired(preparedStmtList, builder);
-//		builder.append(" bpaowner.active = TRUE"); // To get the active owners
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 

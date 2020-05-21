@@ -76,8 +76,8 @@ public class PaymentUpdateService {
 				if (businessServices.contains(paymentDetail.getBusinessService())) {
 					BPASearchCriteria searchCriteria = new BPASearchCriteria();
 					searchCriteria.setTenantId(tenantId);
-					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
-					searchCriteria.setApplicationNo(codes);
+//					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
+					searchCriteria.setApplicationNo(paymentDetail.getBill().getConsumerCode());
 					List<BPA> bpas = repository.getBPAData(searchCriteria);
 					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
