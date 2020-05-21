@@ -102,11 +102,14 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 
 		String documentId = rs.getString("bpa_doc_id");
+		Object docdetails = new Gson().fromJson(rs.getString("doc_details").equals("{}")
+				|| rs.getString("doc_details").equals("null") ? null : rs.getString("doc_details"),
+				Object.class);
 		if (documentId != null) {
 			Document document = Document.builder().documentType(rs.getString("bpa_doc_documenttype"))
 					.fileStoreId(rs.getString("bpa_doc_filestore"))
 					.id(documentId)
-					.additionalDetails(rs.getString("additionalDetails"))
+					.additionalDetails(docdetails)
 					.documentUid(rs.getString("documentUid")).build();
 			bpa.addDocumentsItem(document);
 		}
