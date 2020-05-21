@@ -156,7 +156,7 @@ public class LandEnrichmentService {
 					throw new CustomException("OWNER SEARCH ERROR",
 							"The owner of the landInfo " + landInfo.getId() + " is not coming in user search");
 				else
-					owner.addUserDetail(userIdToOwnerMap.get(owner.getUuid()));
+					owner.addUserWithoutAuditDetail(userIdToOwnerMap.get(owner.getUuid()));
 			});
 		});
 	}
