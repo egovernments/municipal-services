@@ -135,8 +135,10 @@ public class WaterServiceImpl implements WaterService {
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
+				waterConnectionRequest.getWaterConnection().getApplicationNo());
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
-		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService);
+		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
 		validateProperty.validatePropertyCriteria(property);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
@@ -149,7 +151,7 @@ public class WaterServiceImpl implements WaterService {
 		//Call workflow
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
-		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, searchResult);
+		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
 		enrichmentService.postForMeterReading(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());

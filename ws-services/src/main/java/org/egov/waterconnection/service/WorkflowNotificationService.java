@@ -96,19 +96,22 @@ public class WorkflowNotificationService {
 	 */
 	public void process(WaterConnectionRequest request, String topic) {
 		try {
-			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getProcessInstance().getAction()+"_"+request.getWaterConnection().getApplicationStatus().name())) {
-				log.info("Notification Disabled For State :" + request.getWaterConnection().getApplicationStatus().name());
+			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
+					request.getWaterConnection().getApplicationNo());
+			
+			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getProcessInstance().getAction()+"_"+applicationStatus)) {
+				log.info("Notification Disabled For State :" + applicationStatus);
 				return;
 			}
 			Property property = validateProperty.getOrValidateProperty(request);
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
-			      EventRequest eventRequest = getEventRequest(request, topic, property);
+			      EventRequest eventRequest = getEventRequest(request, topic, property, applicationStatus);
 					if (eventRequest != null) {
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-					List<SMSRequest> smsRequests = getSmsRequest(request, topic, property);
+					List<SMSRequest> smsRequests = getSmsRequest(request, topic, property, applicationStatus);
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						notificationUtil.sendSMS(smsRequests);
 					}
@@ -126,10 +129,10 @@ public class WorkflowNotificationService {
 	 * @param requestInfo
 	 * @return EventRequest Object
 	 */
-	private EventRequest getEventRequest(WaterConnectionRequest request, String topic, Property property) {
+	private EventRequest getEventRequest(WaterConnectionRequest request, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), request.getRequestInfo());
-		String message = notificationUtil.getCustomizedMsgForInApp(request.getWaterConnection().getProcessInstance().getAction(), request.getWaterConnection().getApplicationStatus().name(),
+		String message = notificationUtil.getCustomizedMsgForInApp(request.getWaterConnection().getProcessInstance().getAction(), applicationStatus,
 				localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
@@ -224,12 +227,12 @@ public class WorkflowNotificationService {
 	 * @return
 	 */
 	private List<SMSRequest> getSmsRequest(WaterConnectionRequest waterConnectionRequest, String topic,
-			Property property) {
+			Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil.getLocalizationMessages(property.getTenantId(),
 				waterConnectionRequest.getRequestInfo());
 		String message = notificationUtil.getCustomizedMsgForSMS(
-				waterConnectionRequest.getWaterConnection().getProcessInstance().getAction(),
-				waterConnectionRequest.getWaterConnection().getApplicationStatus().name(), localizationMessage);
+				waterConnectionRequest.getWaterConnection().getProcessInstance().getAction(), applicationStatus,
+				localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -239,8 +242,8 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest,
-				message, property);
+		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
+				waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
 			SMSRequest req = new SMSRequest(mobileNumber, messg);

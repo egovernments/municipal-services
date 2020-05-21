@@ -124,7 +124,6 @@ public class WaterConnectionValidator {
 	 * @param searchResult water connection search result
 	 */
 	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult) {
-		request.getWaterConnection().setApplicationStatus(searchResult.getApplicationStatus());
 		request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
 	}
 }

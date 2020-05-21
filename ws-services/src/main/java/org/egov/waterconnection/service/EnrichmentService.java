@@ -128,18 +128,6 @@ public class EnrichmentService {
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
 	
-	 /**
-     * Sets status for create request
-     * @param WaterConnectionRequest The create request
-     */
-	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
-		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
-			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
-		}
-		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTION_APPLY)) {
-			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.APPLIED);
-		}
-	}
 	
 	/**
 	 * Enrich update water connection
@@ -177,8 +165,8 @@ public class EnrichmentService {
 	 * @param waterConnectionrequest 
 	 */
 	public void postStatusEnrichment(WaterConnectionRequest waterConnectionrequest) {
-		String applicationStatus = waterConnectionrequest.getWaterConnection().getApplicationStatus().name();
-		if (WCConstants.STATUS_APPROVED.equalsIgnoreCase(applicationStatus)) {
+		if (WCConstants.ACTIVATE_CONNECTION
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
 			setConnectionNO(waterConnectionrequest);
 		}
 	}
@@ -189,8 +177,8 @@ public class EnrichmentService {
 	 * @param waterConnectionrequest
 	 */
 	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest) {
-		if (WCConstants.STATUS_APPROVED
-				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getApplicationStatus().name())) {
+		if (WCConstants.ACTIVATE_CONNECTION
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
 			waterDao.postForMeterReading(waterConnectionrequest);
 		}
 	}
@@ -225,4 +213,18 @@ public class EnrichmentService {
 			log.debug(ex.toString());
 		}
 	}
+	
+	/**
+	 * Sets status for create request
+	 * 
+	 * @param WaterConnectionRequest
+	 *            The create request
+	 */
+	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
+		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
+			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
+		}
+	}
+
 }

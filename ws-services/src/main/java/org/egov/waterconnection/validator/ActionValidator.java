@@ -26,9 +26,9 @@ public class ActionValidator {
 	 * @param request
 	 * @param businessService
 	 */
-	public void validateUpdateRequest(WaterConnectionRequest request, BusinessService businessService) {
+	public void validateUpdateRequest(WaterConnectionRequest request, BusinessService businessService, String applicationStatus) {
 		validateDocumentsForUpdate(request);
-		validateIds(request, businessService);
+		validateIds(request, businessService, applicationStatus);
 	}
 
 	/**
@@ -50,10 +50,10 @@ public class ActionValidator {
 	 * @param request
 	 * @param businessService
 	 */
-	private void validateIds(WaterConnectionRequest request, BusinessService businessService) {
+	private void validateIds(WaterConnectionRequest request, BusinessService businessService, String applicationStatus) {
 		WaterConnection connection = request.getWaterConnection();
 		Map<String, String> errorMap = new HashMap<>();
-		if (!workflowService.isStateUpdatable(connection.getApplicationStatus().name(), businessService)) {
+		if (!workflowService.isStateUpdatable(applicationStatus, businessService)) {
 			if (connection.getId() == null)
 				errorMap.put("INVALID_UPDATE", "Id of waterConnection cannot be null");
 			if (!CollectionUtils.isEmpty(connection.getDocuments())) {

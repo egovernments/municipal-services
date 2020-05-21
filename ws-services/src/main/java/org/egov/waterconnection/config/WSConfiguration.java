@@ -59,6 +59,9 @@ public class WSConfiguration {
 
 	@Value("${workflow.businessservice.search.path}")
 	private String wfBusinessServiceSearchPath;
+	
+	@Value("${workflow.process.search.path}")
+	private String wfProcessSearchPath;
 
 	@Value("${is.external.workflow.enabled}")
 	private Boolean isExternalWorkFlowEnabled;

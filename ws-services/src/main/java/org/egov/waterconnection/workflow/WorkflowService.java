@@ -1,9 +1,7 @@
 package org.egov.waterconnection.workflow;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -11,10 +9,14 @@ import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.RequestInfoWrapper;
 import org.egov.waterconnection.model.workflow.BusinessService;
 import org.egov.waterconnection.model.workflow.BusinessServiceResponse;
+import org.egov.waterconnection.model.workflow.ProcessInstance;
+import org.egov.waterconnection.model.workflow.ProcessInstanceResponse;
 import org.egov.waterconnection.model.workflow.State;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @Service
@@ -97,4 +99,54 @@ public class WorkflowService {
 					return state.getSla();
 				}).findFirst().orElse(config.getSlaDefaultValue()));
 	}
+	
+	/**
+	 * Get the workflow processInstance for the given tenant
+	 * 
+	 * @param tenantId
+	 *            The tenantId for which businessService is requested
+	 * @param requestInfo
+	 *            The RequestInfo object of the request
+	 * @return BusinessService for the the given tenantId
+	 */
+	public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo) {
+		StringBuilder url = getProcessInstanceSearchURL(requestInfo.getUserInfo().getTenantId(), applicationNo);
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
+		ProcessInstanceResponse response = null;
+		try {
+			response = mapper.convertValue(result, ProcessInstanceResponse.class);
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse response of process instance");
+		}
+		Optional<ProcessInstance> processInstance = response.getProcessInstances().stream().findFirst();
+		return processInstance.get();
+	}
+	/**
+	 * 
+	 * @param tenantId
+	 * @param applicationNo
+	 * @return
+	 */
+	private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNo) {
+		StringBuilder url = new StringBuilder(config.getWfHost());
+		url.append(config.getWfProcessSearchPath());
+		url.append("?tenantId=");
+		url.append(tenantId);
+		url.append("&businessservices=");
+		url.append(config.getBusinessServiceValue());
+		url.append("&businessIds=");
+		url.append(applicationNo);
+		return url;
+	}
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param applicationNo
+	 * @return
+	 */
+	public String getApplicationStatus(RequestInfo requestInfo, String applicationNo) {
+		return getProcessInstance(requestInfo, applicationNo).getState().getApplicationStatus();
+	}
+
 }

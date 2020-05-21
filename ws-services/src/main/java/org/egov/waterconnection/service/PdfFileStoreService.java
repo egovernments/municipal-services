@@ -83,6 +83,8 @@ public class PdfFileStoreService {
 				.waterConnection(waterConnectionRequest.getWaterConnection()).tenantId(property.getTenantId()).build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
 				.requestInfo(waterConnectionRequest.getRequestInfo()).isconnectionCalculation(false).build();
+		String applicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
+				waterConnectionRequest.getWaterConnection().getApplicationNo());
 		try {
 			Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
@@ -95,8 +97,7 @@ public class PdfFileStoreService {
 			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			waterobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
-			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),
-					waterConnectionRequest.getWaterConnection().getApplicationStatus().name());
+			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
 			waterobject.put(slaDate, slaDays.add(new BigDecimal(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())));
 			String tenantId = property.getTenantId().split("\\.")[0];

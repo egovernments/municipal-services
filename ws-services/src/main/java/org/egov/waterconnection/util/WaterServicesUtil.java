@@ -231,8 +231,8 @@ public class WaterServicesUtil {
 	 * @param searchresult
 	 * @return true if state updatable is true else false
 	 */
-	public boolean getStatusForUpdate(BusinessService businessService, WaterConnection searchresult) {
-		return workflowService.isStateUpdatable(searchresult.getApplicationStatus().name(), businessService);
+	public boolean getStatusForUpdate(BusinessService businessService, String applicationStatus) {
+		return workflowService.isStateUpdatable(applicationStatus, businessService);
 	}
 	/**
 	 * 

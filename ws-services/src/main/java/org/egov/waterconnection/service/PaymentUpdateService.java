@@ -105,8 +105,6 @@ public class PaymentUpdateService {
 					Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 					
 					wfIntegrator.callWorkFlow(waterConnectionRequest, property);
-					log.info("Water connection application status: "
-							+ waterConnectionRequest.getWaterConnection().getApplicationStatus());
 					repo.updateWaterConnection(waterConnectionRequest, false);
 				}
 			}
