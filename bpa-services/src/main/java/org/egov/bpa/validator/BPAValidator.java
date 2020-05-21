@@ -569,14 +569,12 @@ public class BPAValidator {
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
-		ArrayList<LandInfo> landData = new ArrayList<LandInfo>(); 
-		for(int i=0; i<=landInfo.size(); i++){
-			
-			landData.add(mapper.convertValue(landInfo.get(0), LandInfo.class));
-		}
-		
-		System.out.println("LAND DATA from the service request repository is" + landInfo);
-		
+		ArrayList<LandInfo> landData = new ArrayList<LandInfo>();
+		if (!CollectionUtils.isEmpty(landInfo)) {
+			for (int i = 0; i < landInfo.size(); i++) {
+				landData.add(mapper.convertValue(landInfo.get(i), LandInfo.class));
+			}
+		}	
 		
 		return landData;
 	}
