@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SearchCriteria;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
@@ -17,6 +19,7 @@ import org.egov.swservice.model.collection.PaymentRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.repository.SewarageDao;
 import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.workflow.WorkflowIntegrator;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,9 @@ public class PaymentUpdateService {
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
+	
+	@Autowired
+	private ValidateProperty validateProperty;
 
 	/**
 	 * After payment change the application status
@@ -80,6 +86,8 @@ public class PaymentUpdateService {
 						throw new CustomException("INVALID_RECEIPT",
 								"No sewerageConnection found for the consumerCode " + criteria.getApplicationNumber());
 					}
+					Optional<SewerageConnection> connections = sewerageConnections.stream().findFirst();
+					SewerageConnection connection = connections.get();
 					if (sewerageConnections.size() > 1) {
 						throw new CustomException("INVALID_RECEIPT",
 								"More than one application found on consumerCode " + criteria.getApplicationNumber());
@@ -87,14 +95,16 @@ public class PaymentUpdateService {
 					sewerageConnections
 							.forEach(sewerageConnection -> sewerageConnection.getProcessInstance().setAction(SWConstants.ACTION_PAY));
 					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
-							.sewerageConnection(sewerageConnections.get(0)).requestInfo(paymentRequest.getRequestInfo())
+							.sewerageConnection(connection).requestInfo(paymentRequest.getRequestInfo())
 							.build();
 					try {
 						log.info("", "Sewerage Request " + mapper.writeValueAsString(sewerageConnectionRequest));
 					} catch (Exception ex) {
 						log.error("", ex);
 					}
-					wfIntegrator.callWorkFlow(sewerageConnectionRequest);
+					
+					Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
+					wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 					log.info("Sewerage connection application status: "
 							+ sewerageConnectionRequest.getSewerageConnection().getApplicationStatus());
 					repo.updateSewerageConnection(sewerageConnectionRequest, false);

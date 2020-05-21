@@ -10,12 +10,13 @@ import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.CalculationCriteria;
 import org.egov.swservice.model.CalculationReq;
 import org.egov.swservice.model.CalculationRes;
-import org.egov.swservice.model.SewerageConnection;
+import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
+import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,9 @@ public class PdfFileStoreService {
 
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private ValidateProperty validateProperty;
 
 	String tenantIdReplacer = "$tenantId";
 	String fileStoreIdsReplacer = "$.filestoreIds";
@@ -75,17 +79,19 @@ public class PdfFileStoreService {
 	 * @param applicationKey
 	 * @return file store id
 	 */
-	public String getFileStroeId(SewerageConnection sewerageConnection, RequestInfo requestInfo,
+	public String getFileStroeId(SewerageConnectionRequest sewerageConnectionRequest, Property property,
 			String applicationKey) {
 		CalculationCriteria criteria = CalculationCriteria.builder()
-				.applicationNo(sewerageConnection.getApplicationNo()).sewerageConnection(sewerageConnection)
-				.tenantId(sewerageConnection.getProperty().getTenantId()).build();
+				.applicationNo(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
+				.sewerageConnection(sewerageConnectionRequest.getSewerageConnection()).tenantId(property.getTenantId())
+				.build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
-				.requestInfo(requestInfo).isconnectionCalculation(false).build();
+				.requestInfo(sewerageConnectionRequest.getRequestInfo()).isconnectionCalculation(false).build();
 		try {
 			Object response = serviceRequestRepository.fetchResult(sewerageServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
-			JSONObject sewerageobject = mapper.convertValue(sewerageConnection, JSONObject.class);
+			JSONObject sewerageobject = mapper.convertValue(sewerageConnectionRequest.getSewerageConnection(),
+					JSONObject.class);
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
@@ -94,12 +100,16 @@ public class PdfFileStoreService {
 			sewerageobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			sewerageobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			sewerageobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
-			BigDecimal slaDays = workflowService.getSlaForState(requestInfo.getUserInfo().getTenantId(), requestInfo,
-					sewerageConnection.getApplicationStatus().name());
+			BigDecimal slaDays = workflowService.getSlaForState(
+					sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
+					sewerageConnectionRequest.getRequestInfo(),
+					sewerageConnectionRequest.getSewerageConnection().getApplicationStatus().name());
 			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
-			sewerageobject.put(slaDate, slaDays.add(new BigDecimal(sewerageConnection.getConnectionExecutionDate())));
-			String tenantId = sewerageConnection.getProperty().getTenantId().split("\\.")[0];
-			return getFielStoreIdFromPDFService(sewerageobject, requestInfo, tenantId, applicationKey);
+			sewerageobject.put(slaDate, slaDays.add(
+					new BigDecimal(sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate())));
+			String tenantId = property.getTenantId().split("\\.")[0];
+			return getFielStoreIdFromPDFService(sewerageobject, sewerageConnectionRequest.getRequestInfo(), tenantId,
+					applicationKey);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("SEWERAGE_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
@@ -144,17 +154,18 @@ public class PdfFileStoreService {
 
 	@SuppressWarnings("unchecked")
 	public void process(SewerageConnectionRequest sewerageConnectionRequest, String topic) {
+
+		Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
+
 		HashMap<String, Object> addDetail = mapper
 				.convertValue(sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 		if (addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
-					getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
-							sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_ESTIMATION_KEY));
+					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_ESTIMATION_KEY));
 		}
 		if (addDetail.getOrDefault(SWConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
-					getFileStroeId(sewerageConnectionRequest.getSewerageConnection(),
-							sewerageConnectionRequest.getRequestInfo(), SWConstants.PDF_SANCTION_KEY));
+					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_SANCTION_KEY));
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(addDetail);
 		sewerageDao.saveFileStoreIds(sewerageConnectionRequest);

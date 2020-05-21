@@ -80,7 +80,7 @@ public class SewerageServicesUtil {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		propertyUUID.add(sewerageConnectionRequest.getSewerageConnection().getPropertyId());
 		propertyCriteria.setUuids(propertyUUID);
-		propertyCriteria.setTenantId(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId());
+		propertyCriteria.setTenantId(sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());

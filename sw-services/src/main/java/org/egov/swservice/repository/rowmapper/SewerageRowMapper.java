@@ -61,9 +61,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				addtionalDetails.put(SWConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
 				sewarageConnection.setAdditionalDetails(addtionalDetails);
 				sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
-				Property property = new Property();
-				property.setId(rs.getString("property_id"));
-				sewarageConnection.setProperty(property);
+				sewarageConnection.setPropertyId(rs.getString("property_id"));
 				
 				 AuditDetails auditdetails = AuditDetails.builder()
 	                        .createdBy(rs.getString("sw_createdBy"))

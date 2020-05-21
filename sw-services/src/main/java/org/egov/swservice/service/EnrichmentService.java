@@ -63,44 +63,6 @@ public class EnrichmentService {
 	private SewarageDaoImpl sewerageDao;
 
 
-	/**
-	 * 
-	 * @param sewerageConnectionList
-	 *            List of sewerage connection for enriching the sewerage connection
-	 *            with property.
-	 * @param requestInfo 
-	 *            is RequestInfo from request
-	 */
-
-	public void enrichSewerageSearch(List<SewerageConnection> sewerageConnectionList, RequestInfo requestInfo,
-			SearchCriteria sewerageConnectionSearchCriteria) {
-
-		if (!sewerageConnectionList.isEmpty()) {
-			PropertyCriteria criteria = PropertyCriteria
-					.builder().uuids(sewerageConnectionList.stream()
-							.map(connection -> connection.getProperty().getId()).collect(Collectors.toSet()))
-					.tenantId(sewerageConnectionSearchCriteria.getTenantId()).build();
-			List<Property> propertyList = sewerageServicesUtil
-					.searchPropertyOnId(criteria, requestInfo);
-			HashMap<String, Property> propertyMap = propertyList.stream()
-					.collect(Collectors.toMap(Property::getId, Function.identity(),
-							(oldValue, newValue) -> newValue, LinkedHashMap::new));
-			sewerageConnectionList.forEach(sewerageConnection -> {
-				String Id = sewerageConnection.getProperty().getId();
-				if (propertyMap.containsKey(Id)) {
-					sewerageConnection.setProperty(propertyMap.get(Id));
-				} else {
-					StringBuilder builder = new StringBuilder("NO PROPERTY FOUND FOR ");
-					builder.append(sewerageConnection.getConnectionNo() == null ? sewerageConnection.getApplicationNo()
-							: sewerageConnection.getConnectionNo());
-					log.error(builder.toString());
-				}
-			});
-
-		}
-	}
-	
-
 	
 	/**
 	 * 
@@ -109,7 +71,6 @@ public class EnrichmentService {
 	 */
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
@@ -203,7 +164,6 @@ public class EnrichmentService {
 	 * @param sewarageConnectionRequest
 	 */
 	public void enrichUpdateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
-		validateProperty.enrichPropertyForSewerageConnection(sewerageConnectionRequest);
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), false);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);

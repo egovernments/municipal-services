@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.Connection.ApplicationStatusEnum;
+import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.workflow.ProcessInstance;
@@ -54,12 +55,12 @@ public class WorkflowIntegrator {
 	 *
 	 * @param sewerageRequest
 	 */
-	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest) {
+	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
 
 		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
 		ProcessInstance processInstance = ProcessInstance.builder()
 				.businessId(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
-				.tenantId(sewerageConnectionRequest.getSewerageConnection().getProperty().getTenantId())
+				.tenantId(property.getTenantId())
 				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
 				.action(connection.getProcessInstance().getAction()).build();
 

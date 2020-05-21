@@ -6,6 +6,7 @@ import java.util.List;
 import org.egov.swservice.model.CalculationCriteria;
 import org.egov.swservice.model.CalculationReq;
 import org.egov.swservice.model.CalculationRes;
+import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.util.SewerageServicesUtil;
@@ -40,13 +41,13 @@ public class CalculationService {
 	 *            demand
 	 * 
 	 */
-	public void calculateFeeAndGenerateDemand(SewerageConnectionRequest request) {
+	public void calculateFeeAndGenerateDemand(SewerageConnectionRequest request, Property property) {
 		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase("APPROVE_FOR_CONNECTION")){
 			StringBuilder uri = sewerageServicesUtil.getCalculatorURL();
 			CalculationCriteria criteria = CalculationCriteria.builder()
 					.applicationNo(request.getSewerageConnection().getApplicationNo())
 					.sewerageConnection(request.getSewerageConnection())
-					.tenantId(request.getSewerageConnection().getProperty().getTenantId()).build();
+					.tenantId(property.getTenantId()).build();
 			List<CalculationCriteria> calculationCriterias = Arrays.asList(criteria);
 			CalculationReq calRequest = CalculationReq.builder().calculationCriteria(calculationCriterias)
 					.requestInfo(request.getRequestInfo()).isconnectionCalculation(false).build();

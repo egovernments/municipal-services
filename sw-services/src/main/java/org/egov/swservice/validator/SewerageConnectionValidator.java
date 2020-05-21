@@ -112,10 +112,9 @@ public class SewerageConnectionValidator {
 	
 	public void validatePropertyForConnection(List<SewerageConnection> sewerageConnectionList) {
 		sewerageConnectionList.forEach(sewerageConnection -> {
-			if (sewerageConnection.getProperty().getPropertyId() == null
-					|| sewerageConnection.getProperty().getPropertyId().isEmpty()) {
-				throw new CustomException("INVALID SEARCH",
-						"PROPERTY ID NOT FOUND FOR " + sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION NO");
+			if (StringUtils.isEmpty(sewerageConnection.getPropertyId())) {
+				throw new CustomException("INVALID SEARCH", "PROPERTY ID NOT FOUND FOR "
+						+ sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION NO");
 			}
 		});
 	}

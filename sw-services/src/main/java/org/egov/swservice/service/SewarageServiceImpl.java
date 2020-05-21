@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SearchCriteria;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
@@ -90,10 +91,11 @@ public class SewarageServiceImpl implements SewarageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
 		mDMSValidator.validateMasterData(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
+		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
-			wfIntegrator.callWorkFlow(sewarageConnectionRequest);
+			wfIntegrator.callWorkFlow(sewarageConnectionRequest, property);
 		return Arrays.asList(sewarageConnectionRequest.getSewerageConnection());
 	}
 
@@ -108,7 +110,6 @@ public class SewarageServiceImpl implements SewarageService {
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
 		validateProperty.validatePropertyForConnection(sewarageConnectionList);
-		enrichmentService.enrichSewerageSearch(sewarageConnectionList, requestInfo, criteria);
 		return sewarageConnectionList;
 	}
 
@@ -145,6 +146,8 @@ public class SewarageServiceImpl implements SewarageService {
 		}
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, true);
 		mDMSValidator.validateMasterData(sewarageConnectionRequest);
+		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
+		validateProperty.validatePropertyCriteriaForCreateSewerage(property);
 		BusinessService businessService = workflowService.getBusinessService(
 				sewarageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
 				sewarageConnectionRequest.getRequestInfo());
@@ -152,14 +155,13 @@ public class SewarageServiceImpl implements SewarageService {
 				sewarageConnectionRequest.getSewerageConnection().getId(), sewarageConnectionRequest.getRequestInfo());
 		enrichmentService.enrichUpdateSewerageConnection(sewarageConnectionRequest);
 		actionValidator.validateUpdateRequest(sewarageConnectionRequest, businessService);
-		validateProperty.validatePropertyCriteriaForCreateSewerage(sewarageConnectionRequest);
 		sewerageConnectionValidator.validateUpdate(sewarageConnectionRequest, searchResult);
-		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest);
+		calculationService.calculateFeeAndGenerateDemand(sewarageConnectionRequest, property);
 		sewarageDaoImpl.pushForEditNotification(sewarageConnectionRequest);
 		//Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(sewarageConnectionRequest);
 		// Call workflow
-		wfIntegrator.callWorkFlow(sewarageConnectionRequest);
+		wfIntegrator.callWorkFlow(sewarageConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(sewarageConnectionRequest);
 		sewarageDao.updateSewerageConnection(sewarageConnectionRequest, 
 				sewerageServicesUtil.getStatusForUpdate(businessService, searchResult));
