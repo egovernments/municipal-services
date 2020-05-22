@@ -60,6 +60,8 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 						.applicationNo(applicationNo)
 						.status(rs.getString("status"))
 						.tenantId(tenantId)
+						.riskType(((Map) additionalDetails).get("riskType") != null
+								? ((Map) additionalDetails).get("riskType").toString() : null)
 						.approvalNo(approvalNo)
 						.edcrNumber(rs.getString("edcrnumber"))
 						.approvalDate(rs.getLong("approvalDate"))

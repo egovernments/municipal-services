@@ -139,11 +139,9 @@ public class EnrichmentService {
 		bpaRequest.getBPA().getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
 		
 		// BPA Documents
-		String state = workflowService.getCurrentState(bpaRequest.getBPA().getStatus(), businessService);
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {
 				if (document.getId() == null) {
-//					document.setWfState(state);
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
@@ -170,11 +168,7 @@ public class EnrichmentService {
 		if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
 			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
 		}
-		if(bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)){
-			bpa.setRiskType(BPAConstants.LOW_RISKTYPE);
-		}else{
-			bpa.setRiskType(BPAConstants.HIGH_RISKTYPE);
-		}
+		
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
@@ -187,7 +181,6 @@ public class EnrichmentService {
 			calendar.add(Calendar.MONTH, vailidityInMonths);
 			Map<String, Object> additionalDetail = (Map) bpa.getAdditionalDetails();
 			additionalDetail.put("validityDate", calendar.getTimeInMillis());
-//			bpa.setValidityDate(calendar.getTimeInMillis());
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setApprovalNo(idResponses.get(0).getId());
@@ -197,8 +190,8 @@ public class EnrichmentService {
 				Object mdmsData = bpaUtil.mDMSCall(bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
 						.replace("{2}", bpa.getRiskType().toString())
-						/*.replace("{3}", bpa.getServiceType())
-						.replace("{4}", bpa.getApplicationType())*/;
+						.replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
+						.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());
 				log.info(condeitionsPath);
 
 				try {
