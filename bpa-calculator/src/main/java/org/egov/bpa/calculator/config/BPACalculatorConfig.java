@@ -97,6 +97,9 @@ public class BPACalculatorConfig {
     
     @Value("${egov.edcr.getPlan.endpoint}")
 	private String getPlanEndPoint;
+    
+    @Value("${egov.demand.lowriskpermit.businessservice}")
+    private String lowRiskPermitFeeBusinessService;
 
     //CalculaterType Default Values
 //    @Value("${egov.tl.calculationtype.tradetype.default}")

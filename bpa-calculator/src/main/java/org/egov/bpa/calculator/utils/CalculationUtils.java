@@ -124,4 +124,33 @@ public class CalculationUtils {
 
         return response.getBpa().get(0);
     }
+    
+    /**
+     * identify the billingBusinessService matching to the calculation FeeType
+     */
+	public String getBillingBusinessService(String feeType) {
+
+		String billingBusinessService;
+		switch (feeType) {
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE:
+			billingBusinessService = config.getApplFeeBusinessService();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE:
+			billingBusinessService = config.getSanclFeeBusinessService();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE:
+			billingBusinessService = config.getLowRiskPermitFeeBusinessService();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE:
+			billingBusinessService = config.getLowRiskPermitFeeBusinessService();
+			break;
+		case BPACalculatorConstants.LOW_RISK_PERMIT_FEE_TYPE:
+			billingBusinessService = config.getLowRiskPermitFeeBusinessService();
+			break;
+		default:
+			billingBusinessService = feeType;
+			break;
+		}
+		return billingBusinessService;
+	}
 }
