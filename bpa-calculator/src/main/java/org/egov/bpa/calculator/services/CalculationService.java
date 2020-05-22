@@ -129,20 +129,21 @@ public class CalculationService {
 			CalulationCriteria calulationCriteria, RequestInfo requestInfo,
 			Object mdmsData) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
-		EstimatesAndSlabs estimatesAndSlabs = getBaseTax(calulationCriteria,
-				requestInfo, mdmsData);
+		EstimatesAndSlabs estimatesAndSlabs;
+		if (calulationCriteria.getFeeType().equalsIgnoreCase(BPACalculatorConstants.LOW_RISK_PERMIT_FEE_TYPE)) {
 
-		estimates.addAll(estimatesAndSlabs.getEstimates());
+			calulationCriteria.setFeeType(BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE);
+			estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
 
-		/*
-		 * if(calulationCriteria.getBpa().getAdhocPenalty()!=null)
-		 * estimates.add(getAdhocPenalty(calulationCriteria));
-		 * 
-		 * if(calulationCriteria.getTradelicense().getTradeLicenseDetail().
-		 * getAdhocExemption()!=null)
-		 * estimates.add(getAdhocExemption(calulationCriteria));
-		 */
+			estimates.addAll(estimatesAndSlabs.getEstimates());
 
+			calulationCriteria.setFeeType(BPACalculatorConstants.LOW_RISK_PERMIT_FEE_TYPE);
+
+		} else {
+			estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
+			estimates.addAll(estimatesAndSlabs.getEstimates());
+		}
+		
 		estimatesAndSlabs.setEstimates(estimates);
 
 		return estimatesAndSlabs;

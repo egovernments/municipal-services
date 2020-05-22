@@ -38,7 +38,9 @@ public class BPACalculatorConstants {
 	
 	public static final String MDMS_CALCULATIONTYPE_SANC_FEETYPE = "SanctionFee";
 
+	public static final String LOW_RISK_PERMIT_FEE_TYPE = "LOW_RISK_PERMIT_FEE";
 
+	public static final String MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE = "Low_SanctionFee";;
 
 	
 }
