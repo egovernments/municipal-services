@@ -82,12 +82,28 @@ export const searchApiResponse = async (request, next = {}) => {
     let searchUserUUID = get(userSearchResponse, "user.0.uuid");
     // if (searchUserUUID) {
     //   // console.log(searchUserUUID);
+    var userSearchResponseJson = JSON.parse(JSON.stringify(userSearchResponse));  
+    var userUUIDArray =[];
+    for(var i =0;i<userSearchResponseJson.user.length;i++){
+      userUUIDArray.push(userSearchResponseJson.user[i].uuid);
+    }
     if (isUser) {
       sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
         queryObj.mobileNumber}') AND`;
     } else {
-      sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
-        queryObj.mobileNumber}' AND`;
+        sqlQuery = `${sqlQuery} FO.useruuid in (`;
+        if(userUUIDArray.length > 0){
+          for(var j =0;j<userUUIDArray.length;j++){
+            if(j==0)
+              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
+
+            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
+          }      
+        }
+        else
+          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
+
+        sqlQuery = `${sqlQuery}) AND`;  
     }
     // }
   }
