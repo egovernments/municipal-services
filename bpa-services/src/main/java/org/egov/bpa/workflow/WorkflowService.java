@@ -57,28 +57,6 @@ public class WorkflowService {
 	}
 
 	/**
-	 * Get the workflow processInstance for the given tenant
-	 * 
-	 * @param tenantId
-	 *            The tenantId for which businessService is requested
-	 * @param requestInfo
-	 *            The RequestInfo object of the request
-	 * @return BusinessService for the the given tenantId
-	 */
-	public ProcessInstance getProcessInstance(BPA bpa, RequestInfo requestInfo, String applicationNo) {
-		StringBuilder url = getSearchURLWithParams(bpa, false, applicationNo);
-		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-		ProcessInstanceResponse response = null;
-		try {
-			response = mapper.convertValue(result, ProcessInstanceResponse.class);
-		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
-		}
-		return response.getProcessInstances().get(0);
-	}
-
-	/**
 	 * Creates url for search based on given tenantId
 	 *
 	 * @param tenantId
@@ -95,6 +73,7 @@ public class WorkflowService {
 		url.append("?tenantId=");
 		url.append(bpa.getTenantId());
 		if (businessService) {
+			if(bpa.getRiskType()!=null){
 			if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
 				url.append("&businessServices=");
 				url.append(config.getLowBusinessServiceValue());
@@ -102,6 +81,10 @@ public class WorkflowService {
 
 				url.append("&businessServices=");
 				url.append(config.getBusinessServiceValue());
+			}
+			}else{
+				url.append("&businessServices=");
+				url.append(bpa.getBusinessService());
 			}
 		} else {
 			url.append("&businessIds=");
