@@ -97,7 +97,12 @@ public class BPAService {
 		
 		wfIntegrator.callWorkFlow(bpaRequest);
 
+		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
+			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
+		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
+		}
+		
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
