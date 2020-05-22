@@ -101,9 +101,6 @@ public class BPALandService {
 			landData.add(mapper.convertValue(landInfo.get(i), LandInfo.class));
 		}
 		}
-		System.out.println("LAND DATA from the service request repository is" + landInfo);
-		
-		
 		return landData;
 	}
 	
@@ -118,8 +115,12 @@ public class BPALandService {
 		landRequest.setRequestInfo(requestInfo);
 		if (landcriteria.getMobileNumber() != null) {
 			landSearchCriteria.setMobileNumber(landcriteria.getMobileNumber());
+			uri.append("&").append("&mobileNumber=");
+			uri.append(landcriteria.getMobileNumber());
 		} else {
 			landSearchCriteria.setIds(landcriteria.getIds());
+			uri.append("&").append("ids=");
+			uri.append(landcriteria.getIds().get(0));
 		}
 		return uri;
 	}
