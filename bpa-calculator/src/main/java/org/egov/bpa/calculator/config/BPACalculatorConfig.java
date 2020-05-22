@@ -78,6 +78,12 @@ public class BPACalculatorConfig {
 
     @Value("${egov.taxhead.adhoc.exemption}")
     private String adhocExemptionTaxHead;
+    
+	@Value("${egov.low.appl.fee}")
+	private String baseLowApplFeeHead;
+	
+	@Value("${egov.low.sanc.fee}")
+	private String baseLowSancFeeHead;
 
 
     //MDMS

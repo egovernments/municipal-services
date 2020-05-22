@@ -186,7 +186,7 @@ public class CalculationService {
 	      estimate.setEstimateAmount(totalTax);
 	      estimate.setCategory(Category.FEE);
 	      
-	      String taxHeadCode = ( calulationCriteria.getFeeType().equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE ) ? config.getBaseApplFeeHead() : config.getBaseSancFeeHead());
+	      String taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType());
 	      estimate.setTaxHeadCode(taxHeadCode);
 
 	      estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));

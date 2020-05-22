@@ -153,4 +153,30 @@ public class CalculationUtils {
 		}
 		return billingBusinessService;
 	}
+	
+	/**
+	* identify the billingBusinessService matching to the calculation FeeType
+	*/
+	public String getTaxHeadCode(String feeType) {
+
+		String billingTaxHead;
+		switch (feeType) {
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE:
+			billingTaxHead = config.getBaseApplFeeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE:
+			billingTaxHead = config.getBaseSancFeeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE:
+			billingTaxHead = config.getBaseLowApplFeeHead();
+			break;
+		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE:
+			billingTaxHead = config.getBaseLowSancFeeHead();
+			break;
+		default:
+			billingTaxHead = feeType;
+			break;
+		}
+		return billingTaxHead;
+	}
 }
