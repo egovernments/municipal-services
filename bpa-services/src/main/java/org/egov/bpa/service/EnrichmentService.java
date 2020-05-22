@@ -170,6 +170,11 @@ public class EnrichmentService {
 		if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
 			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
 		}
+		if(bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)){
+			bpa.setRiskType(BPAConstants.LOW_RISKTYPE);
+		}else{
+			bpa.setRiskType(BPAConstants.HIGH_RISKTYPE);
+		}
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
