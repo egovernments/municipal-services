@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.egov.swservice.model.workflow.ProcessInstance;
@@ -30,9 +31,12 @@ public class Connection {
 	@JsonProperty("id")
 	private String id = null;
 
+	@JsonProperty("tenantId")
+	private String tenantId = null;
+
 	@JsonProperty("propertyId")
 	private String propertyId = null;
-	
+
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
@@ -160,10 +164,10 @@ public class Connection {
 
 	@JsonProperty("processInstance")
 	private ProcessInstance processInstance = null;
-	
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
-	
+
 	public Connection id(String id) {
 		this.id = id;
 		return this;
@@ -185,7 +189,27 @@ public class Connection {
 		this.id = id;
 	}
 
+	public Connection tenantId(String tenantId) {
+		this.tenantId = tenantId;
+		return this;
+	}
 
+	/**
+	 * Unique ULB identifier.
+	 * 
+	 * @return tenantId
+	 **/
+	@ApiModelProperty(value = "Unique ULB identifier.")
+
+	@Size(min = 2, max = 256)
+	@NotNull
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
 
 	public Connection applicationNo(String applicationNo) {
 		this.applicationNo = applicationNo;
@@ -488,7 +512,7 @@ public class Connection {
 	public void setProcessInstance(ProcessInstance processInstance) {
 		this.processInstance = processInstance;
 	}
-	
+
 	public Connection auditDetails(AuditDetails auditDetails) {
 		this.auditDetails = auditDetails;
 		return this;
@@ -501,7 +525,7 @@ public class Connection {
 	public void setAuditDetails(AuditDetails auditDetails) {
 		this.auditDetails = auditDetails;
 	}
-	
+
 	public void setPropertyId(String propertyId) {
 		this.propertyId = propertyId;
 	}
@@ -524,7 +548,8 @@ public class Connection {
 			return false;
 		}
 		Connection connection = (Connection) o;
-		return Objects.equals(this.id, connection.id) && Objects.equals(this.propertyId, connection.propertyId)
+		return Objects.equals(this.id, connection.id) && Objects.equals(this.tenantId, connection.tenantId)
+				&& Objects.equals(this.propertyId, connection.propertyId)
 				&& Objects.equals(this.applicationNo, connection.applicationNo)
 				&& Objects.equals(this.applicationStatus, connection.applicationStatus)
 				&& Objects.equals(this.status, connection.status)
@@ -543,9 +568,9 @@ public class Connection {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, propertyId, applicationNo, applicationStatus, status, connectionNo, oldConnectionNo,
-				documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate, connectionCategory,
-				connectionType, additionalDetails, auditDetails);
+		return Objects.hash(id, tenantId, propertyId, applicationNo, applicationStatus, status, connectionNo,
+				oldConnectionNo, documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate,
+				connectionCategory, connectionType, additionalDetails, auditDetails);
 	}
 
 	@Override
@@ -554,6 +579,7 @@ public class Connection {
 		sb.append("class Connection {\n");
 
 		sb.append("    id: ").append(toIndentedString(id)).append("\n");
+		sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
 		sb.append("    propertyId: ").append(toIndentedString(propertyId)).append("\n");
 		sb.append("    applicationNo: ").append(toIndentedString(applicationNo)).append("\n");
 		sb.append("    applicationStatus: ").append(toIndentedString(applicationStatus)).append("\n");

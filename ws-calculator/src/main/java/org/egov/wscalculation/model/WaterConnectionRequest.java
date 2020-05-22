@@ -1,9 +1,14 @@
 package org.egov.wscalculation.model;
 
-import java.util.List;
 import java.util.Objects;
+
+import javax.validation.Valid;
+
+import org.egov.common.contract.request.RequestInfo;
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -11,12 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.response.ResponseInfo;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Contract class to receive request. Array of Property items are used in case

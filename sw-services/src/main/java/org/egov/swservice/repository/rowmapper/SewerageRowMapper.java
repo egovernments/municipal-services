@@ -32,6 +32,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 			String Id = rs.getString("connection_Id");
 			if (connectionListMap.getOrDefault(Id, null) == null) {
 				sewarageConnection = new SewerageConnection();
+				sewarageConnection.setTenantId(rs.getString("tenantid"));
 				sewarageConnection.setId(rs.getString("connection_Id"));
 				sewarageConnection.setApplicationNo(rs.getString("applicationNo"));
 				sewarageConnection

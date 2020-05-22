@@ -28,7 +28,7 @@ public class WCConstants {
 
 	public static final String MDMS_WC_Connection_Type = "connectionType";
 
-	public static final String MDMS_WC_Water_Source = "waterSourceWithSubSource";
+	public static final String MDMS_WC_Water_Source = "waterSource";
 
 	public static final String INVALID_CONNECTION_CATEGORY = "Invalid Connection Category";
 

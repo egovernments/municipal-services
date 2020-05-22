@@ -19,7 +19,6 @@ import org.egov.swservice.model.PropertyCriteria;
 import org.egov.swservice.model.PropertyResponse;
 import org.egov.swservice.model.RequestInfoWrapper;
 import org.egov.swservice.model.SearchCriteria;
-import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.workflow.BusinessService;
 import org.egov.swservice.repository.ServiceRequestRepository;
@@ -80,7 +79,10 @@ public class SewerageServicesUtil {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
 		propertyUUID.add(sewerageConnectionRequest.getSewerageConnection().getPropertyId());
 		propertyCriteria.setUuids(propertyUUID);
-		propertyCriteria.setTenantId(sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		if (sewerageConnectionRequest.getRequestInfo().getUserInfo() != null
+				&& "EMPLOYEE".equalsIgnoreCase(sewerageConnectionRequest.getRequestInfo().getUserInfo().getType())) {
+			propertyCriteria.setTenantId(sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		}
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
@@ -114,7 +116,7 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber()) || StringUtils.isEmpty(sewerageConnectionSearchCriteria.getPropertyId())) {
+		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
