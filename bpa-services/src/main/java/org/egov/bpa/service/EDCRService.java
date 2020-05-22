@@ -145,6 +145,7 @@ public class EDCRService {
 						"The OccupancyType " + OccupancyType + " is not supported! ");
 			}
 		}
+		additionalDetails.put("riskType", bpa.getRiskType());
 		bpa.setAdditionalDetails(additionalDetails);
 		return additionalDetails;
 	}
