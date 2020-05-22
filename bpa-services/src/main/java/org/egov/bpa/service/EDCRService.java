@@ -1,14 +1,11 @@
 package org.egov.bpa.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.validation.Valid;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
@@ -20,7 +17,6 @@ import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.edcr.RequestInfo;
 import org.egov.bpa.web.model.edcr.RequestInfoWrapper;
-import org.egov.land.web.models.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.json.JSONObject;
@@ -60,7 +56,7 @@ public class EDCRService {
 	 *            BPARequest for create
 	 * 
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Map<String, String> validateEdcrPlan(BPARequest request, Object mdmsData) {
 
 		String edcrNo = request.getBPA().getEdcrNumber();

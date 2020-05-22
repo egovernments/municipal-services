@@ -10,9 +10,7 @@ import java.util.Map;
 
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
-import org.egov.bpa.web.model.Boundary;
 import org.egov.bpa.web.model.Document;
-import org.egov.bpa.web.model.GeoLocation;
 import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -29,7 +27,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 	@Autowired
 	private ObjectMapper mapper;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Override
 	public List<BPA> extractData(ResultSet rs) throws SQLException, DataAccessException {
 

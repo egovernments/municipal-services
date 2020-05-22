@@ -2,7 +2,6 @@ package org.egov.bpa.util;
 
 import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -200,7 +199,6 @@ public class NotificationUtil {
 				break;
 			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
 				messageTemplate = getMessageTemplate(BPAConstants.M_PERMIT_FEE_GENERATED, localizationMessage);
-				// message = getPaymentMsg(requestInfo,bpa, messageTemplate);
 				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
 
@@ -345,6 +343,7 @@ public class NotificationUtil {
 	 *            Message from localization for initiate
 	 * @return customized message for initiate
 	 */
+	@SuppressWarnings("unchecked")
 	private String getInitiatedMsg(BPA bpa, String message) {
 		Map<String, String> data = (Map<String, String>) bpa.getAdditionalDetails();
 		String serviceType = data.get("serviceType");
@@ -353,14 +352,6 @@ public class NotificationUtil {
 		return message;
 	}
 
-	/*
-	 * private String getPaymentMsg(RequestInfo requestInfo, BPA bpa, String
-	 * message) { message = message.replace("<2>", bpa.getServiceType());
-	 * message = message.replace("<3>", bpa.getApplicationNo()); StringBuilder
-	 * paymentUrl = new StringBuilder(); BigDecimal amount=
-	 * getAmountToBePaid(requestInfo, bpa); message = message.replace("<4>",
-	 * amount.toString()); return message; }
-	 */
 
 	/**
 	 * Send the SMSRequest on the SMSNotification kafka topic
@@ -397,34 +388,8 @@ public class NotificationUtil {
 		}
 		return smsRequest;
 	}
-
-	/*public String getCustomizedMsg(Difference diff, BPA bpa, String localizationMessage) {
-		String message = null, messageTemplate;
-
-		if (!CollectionUtils.isEmpty(diff.getFieldsChanged()) || !CollectionUtils.isEmpty(diff.getClassesAdded())
-				|| !CollectionUtils.isEmpty(diff.getClassesRemoved())) {
-			messageTemplate = getMessageTemplate(BPAConstants.NOTIFICATION_OBJECT_MODIFIED, localizationMessage);
-			if (messageTemplate == null)
-				messageTemplate = DEFAULT_OBJECT_MODIFIED_MSG;
-			message = getEditMsg(bpa, messageTemplate);
-		}
-
-		return message;
-	}*/
-
-	/**
-	 * Creates customized message for field chnaged
-	 * 
-	 * @param message
-	 *            Message from localization for field change
-	 * @return customized message for field change
-	 */
-
-	private String getEditMsg(BPA bpa, String message) {
-		message = message.replace("<APPLICATION_NUMBER>", bpa.getApplicationNo());
-		return message;
-	}
-
+	
+	
 	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
@@ -434,44 +399,7 @@ public class NotificationUtil {
 		producer.push(config.getSaveUserEventsTopic(), request);
 
 		log.info("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
-		/*
-		 * if(request.getEvents().get(1) != null){ log.info(" USER::  " +
-		 * request.getEvents().get(1).getDescription()); }
-		 */
 	}
 
-	/**
-	 * Creates message for completed payment for owners
-	 * 
-	 * @param valMap
-	 *            The map containing required values from receipt
-	 * @param localizationMessages
-	 *            Message from localization
-	 * @return message for completed payment for owners
-	 */
-	public String getOwnerPaymentMsg(BPA bpa, Map<String, String> valMap, String localizationMessages) {
-		String messageTemplate = getMessageTemplate(BPAConstants.NOTIFICATION_PAYMENT_OWNER, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
-//		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
-		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
-		return messageTemplate;
-	}
-
-	/**
-	 * Creates message for completed payment for payer
-	 * 
-	 * @param valMap
-	 *            The map containing required values from receipt
-	 * @param localizationMessages
-	 *            Message from localization
-	 * @return message for completed payment for payer
-	 */
-	public String getPayerPaymentMsg(BPA bpa, Map<String, String> valMap, String localizationMessages) {
-		String messageTemplate = getMessageTemplate(BPAConstants.NOTIFICATION_PAYMENT_PAYER, localizationMessages);
-		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
-//		messageTemplate = messageTemplate.replace("<3>", bpa.getApplicationType());
-		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
-		return messageTemplate;
-	}
 
 }

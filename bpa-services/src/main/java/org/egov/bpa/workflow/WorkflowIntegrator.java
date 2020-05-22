@@ -7,8 +7,6 @@ import java.util.Map;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
-import org.egov.bpa.web.model.Status;
-import org.egov.bpa.web.model.Workflow;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

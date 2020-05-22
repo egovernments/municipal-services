@@ -126,6 +126,13 @@ public class BPAService {
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+			ArrayList<String> landId = new ArrayList<String>();
+			if(landInfo.size()>0){
+				landInfo.forEach(land->{
+					landId.add(land.getId());
+				});
+				criteria.setLandId(landId);
+			}
 			bpa = getBPAFromLandId(criteria, requestInfo);
 			if (landInfo.size() > 0) {
 				for (int i = 0; i < bpa.size(); i++) {
@@ -135,7 +142,6 @@ public class BPAService {
 						}
 					}
 				}
-				bpa = bpa.stream().filter(a -> a.getLandInfo() != null).collect(Collectors.toList());
 			}
 		} else {
 		
@@ -165,13 +171,11 @@ public class BPAService {
 
 
 	private List<BPA> getBPAFromLandId(BPASearchCriteria criteria, RequestInfo requestInfo) {
-		// TODO Auto-generated method stub
 		List<BPA> bpa = new LinkedList<>();
 		bpa = repository.getBPAData(criteria);
 		if (bpa.size() == 0) {
 			return Collections.emptyList();
 		}
-//		criteria = enrichmentService.getBPACriteriaFromIds(bpa, criteria.getLimit());
 		return bpa;
 	}
 
@@ -236,7 +240,6 @@ public class BPAService {
 			}
 
 		} else {
-			// userService.createUser(bpaRequest);
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 				actionValidator.validateUpdateRequest(bpaRequest, businessService);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
@@ -281,6 +284,7 @@ public class BPAService {
 		return bpa;
 	}
 
+	@SuppressWarnings("resource")
 	public void getEdcrPdf(BPARequest bpaRequest) {
 
 		byte[] ba1 = new byte[1024];

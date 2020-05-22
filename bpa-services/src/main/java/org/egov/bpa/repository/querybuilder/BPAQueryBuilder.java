@@ -15,7 +15,6 @@ public class BPAQueryBuilder {
 	@Autowired
 	private BPAConfiguration config;
 
-	private static final String INNER_JOIN_STRING = " INNER JOIN ";
 	private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
 	private static final String QUERY = "SELECT bpa.*,bpadoc.*,bpa.id as bpa_id,bpa.tenantid as bpa_tenantId,bpa.lastModifiedTime as "
@@ -82,12 +81,15 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.approvalNo = ?");
 			preparedStmtList.add(criteria.getApprovalNo());
 		}
-		String landId = criteria.getLandId();
-		if (landId!=null) {
+		
+		
+		List<String>landId  = criteria.getLandId();
+		if (!CollectionUtils.isEmpty(landId)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.landId = ?");
-			preparedStmtList.add(criteria.getLandId());
+			builder.append(" bpa.landId IN (").append(createQuery(landId)).append(")");
+			addToPreparedStatement(preparedStmtList, landId);
 		}
+		
 		String status = criteria.getStatus();
 		if (status!=null) {
 			addClauseIfRequired(preparedStmtList, builder);

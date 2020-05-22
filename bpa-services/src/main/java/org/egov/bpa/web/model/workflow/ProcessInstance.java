@@ -10,11 +10,9 @@ import javax.validation.constraints.Size;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.Document;
 import org.egov.common.contract.request.User;
-import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

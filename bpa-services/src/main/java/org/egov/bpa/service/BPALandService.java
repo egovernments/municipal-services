@@ -33,6 +33,7 @@ public class BPALandService {
 	@Autowired
 	private ObjectMapper mapper;
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void addLandInfoToBPA(BPARequest bpaRequest) {
 		// TODO Auto-generated method stub
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
@@ -58,6 +59,7 @@ public class BPALandService {
 
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateLandInfo(BPARequest bpaRequest) {
 		// TODO Auto-generated method stub
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());

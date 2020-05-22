@@ -40,7 +40,7 @@ public class BPASearchCriteria {
 	    private String mobileNumber;
 
 	    @JsonProperty("landId")
-	    private String landId;
+	    private List<String> landId;
 
 	    @JsonProperty("offset")
 	    private Integer offset;

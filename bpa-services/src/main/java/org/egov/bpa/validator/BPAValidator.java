@@ -6,31 +6,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
-import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.Document;
-import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.land.web.models.LandInfo;
-import org.egov.land.web.models.LandRequest;
-import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
@@ -45,17 +37,10 @@ public class BPAValidator {
 
 	@Autowired
 	private BPAConfiguration config;
-	
-	@Autowired
-	private ServiceRequestRepository serviceRequestRepository;
-	
-	@Autowired
-	private ObjectMapper mapper;
 
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateApplicationDocuments(bpaRequest, mdmsData, null, values);
-//		validateUser(bpaRequest);
 	}
 
 
@@ -66,9 +51,6 @@ public class BPAValidator {
 		if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				&& !bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
 				&& !bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
-
-			/*String filterExp = "$.[?(@.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='"
-					+ currentState + "')].docTypes";*/
 
 			String applicationType = values.get("applicationType");
 			String serviceType = values.get("serviceType");
@@ -227,17 +209,6 @@ public class BPAValidator {
 		
 		if (criteria.getApprovalDate() != null && (criteria.getApprovalDate() > new Date().getTime()))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Permit Order Genarated date cannot be a future date");
-
-		/*if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "From date cannot be a future date");
-
-		if (criteria.getToDate() != null && criteria.getFromDate() != null
-				&& (criteria.getFromDate() > criteria.getToDate()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "To date cannot be prior to from date");
-		
-		if (criteria.getApplicationDate() != null && (criteria.getApplicationDate() > new Date().getTime()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Application date cannot be a future date");
-		*/
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
@@ -286,9 +257,6 @@ public class BPAValidator {
 			errorMap.put("INVALID UPDATE", "The id " + bpa.getId() + " does not exist");
 
 
-		Boolean allowOwnerChange = (bpa.getWorkflow().getAction() != null
-				&& (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_APPLY)
-						|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_INITIATE)));
 
 
 		if (!CollectionUtils.isEmpty(errorMap))
@@ -297,38 +265,6 @@ public class BPAValidator {
 
 
 
-
-	/**
-	 * Checks if the ids are present in the searchedIds
-	 * 
-	 * @param searchIds
-	 *            Ids got from search
-	 * @param updateIds
-	 *            The ids received from update Request
-	 * @param errorMap
-	 *            The map for collecting errors
-	 */
-
-	@SuppressWarnings("unchecked")
-	private void compareIdList(List<String> searchIds, Object updateIds, Map<String, String> errorMap) {
-		if (searchIds != null)
-			searchIds.forEach(searchId -> {
-				if (!((List<String>) updateIds).contains(searchId))
-					errorMap.put(BPAConstants.INVALID_UPDATE,
-							"The id: " + searchIds + " was not present in update request");
-			});
-	}
-
-/*	private List<String> getUnitIds(BPA searchedBpa) {
-		List<String> unitIds = new LinkedList<>();
-		if (!CollectionUtils.isEmpty(searchedBpa.getUnits())) {
-			searchedBpa.getUnits().forEach(unit -> {
-				unitIds.add(unit.getId());
-			});
-		}
-
-		return unitIds;
-	}*/
 
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
@@ -344,7 +280,8 @@ public class BPAValidator {
 
 		try {
 			String questionsPath = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
-					.replace("{2}", bpa.getRiskType().toString());
+					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
+					.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());;
 
 			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, questionsPath);
 
@@ -412,7 +349,8 @@ public class BPAValidator {
 
 		try {
 			String docTypesPath = BPAConstants.DOCTYPES_MAP.replace("{1}", wfState)
-					.replace("{2}", bpa.getRiskType().toString());
+					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
+					.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());;
 
 			List<Object> docTypesArray = (List<Object>) JsonPath.read(mdmsData, docTypesPath);
 

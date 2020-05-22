@@ -5,8 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.validation.Valid;
-
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -15,7 +13,6 @@ import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.web.model.workflow.State;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
-import org.egov.land.web.models.LandRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,23 +50,9 @@ public class ActionValidator {
 	 *            The BPA update request
 	 */
 	public void validateUpdateRequest(BPARequest request, BusinessService businessService) {
-		validateDocumentsForUpdate(request);
 		validateRoleAction(request,businessService);
 //		validateAction(request);
 		validateIds(request, businessService);
-	}
-
-	/**
-	 * Validates the applicationDocument
-	 * 
-	 * @param request
-	 *            The bpa create or update request
-	 */
-	private void validateDocumentsForUpdate(BPARequest request) {
-		Map<String, String> errorMap = new HashMap<>();
-		
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
 	}
 
 	/**
@@ -124,27 +107,7 @@ public class ActionValidator {
 			if(bpa.getId() == null) {
 				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of Application cannot be null");
 			}
-			/*if(bpa.getAddress() == null) {
-				errorMap.put(BPAConstants.INVALID_UPDATE, "Id of address cannot be null");
-			}
-			if(!CollectionUtils.isEmpty(bpa.getOwners())) {
-				bpa.getOwners().forEach(owner -> {
-	                if(owner.getUuid()==null)
-	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of owner cannot be null");
-	                if(!CollectionUtils.isEmpty(owner.getDocuments())){
-	                    owner.getDocuments().forEach(document -> {
-	                        if(document.getId()==null)
-	                            errorMap.put(BPAConstants.INVALID_UPDATE, "Id of owner document cannot be null");
-	                    });
-	                  }
-	                });
-			}
-			if(!CollectionUtils.isEmpty(bpa.getUnits())) {
-				bpa.getUnits().forEach(tradeUnit -> {
-	                if(tradeUnit.getId()==null)
-	                    errorMap.put(BPAConstants.INVALID_UPDATE, "Id of tradeUnit cannot be null");
-	            });
-			}*/
+			
 			 if(!CollectionUtils.isEmpty(bpa.getDocuments())){
 				 bpa.getDocuments().forEach(document -> {
                      if(document.getId()==null)
@@ -157,28 +120,5 @@ public class ActionValidator {
 			throw new CustomException(errorMap);
 	}
 
-	public void validateUpdateRequest(@Valid LandRequest landRequest, BusinessService businessService) {
-		// TODO Auto-generated method stub
-		validateDocumentsForUpdate(landRequest);
-		validateRoleAction(landRequest,businessService);
-//		validateAction(landRequest);
-		validateIds(landRequest, businessService);
-	}
-
-
-	private void validateIds(@Valid LandRequest landRequest, BusinessService businessService) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void validateRoleAction(@Valid LandRequest landRequest, BusinessService businessService) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void validateDocumentsForUpdate(@Valid LandRequest landRequest) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

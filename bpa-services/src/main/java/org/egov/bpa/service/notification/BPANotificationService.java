@@ -25,7 +25,6 @@ import org.egov.bpa.web.model.SMSRequest;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.Action;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

@@ -1,7 +1,6 @@
 package org.egov.bpa.service.notification;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -177,7 +176,6 @@ public class PaymentNotificationService {
 			String businessService) {
 
 		BPASearchCriteria searchCriteria = new BPASearchCriteria();
-//		List<String> codes = Arrays.asList(consumerCode);
 		searchCriteria.setApplicationNo(consumerCode);
 		searchCriteria.setTenantId(tenantId);
 		List<BPA> bpas = bpaService.getBPAFromCriteria(searchCriteria, requestInfo);

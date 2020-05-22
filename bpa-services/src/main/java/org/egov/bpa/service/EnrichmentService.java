@@ -1,14 +1,10 @@
 package org.egov.bpa.service;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,13 +15,10 @@ import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
-import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.idgen.IdResponse;
-import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.land.web.models.OwnerInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,13 +42,7 @@ public class EnrichmentService {
 	private IdGenRepository idGenRepository;
 
 	@Autowired
-	private BoundaryService boundaryService;
-
-	@Autowired
 	private WorkflowService workflowService;
-
-	@Autowired
-	private UserService userService;
 
 	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -210,91 +197,6 @@ public class EnrichmentService {
 		}
 		
 	}
-
-	public List<BPA> enrichBPASearch(List<BPA> bpas, BPASearchCriteria criteria, RequestInfo requestInfo) {
-
-		List<BPARequest> bprs = new ArrayList<BPARequest>();
-		bpas.forEach(bpa -> {
-			bprs.add(new BPARequest(requestInfo, bpa));
-		});
-//		if (criteria.getLimit() == null || !criteria.getLimit().equals(-1)) {
-//			enrichBoundary(bprs);
-//		}
-
-		UserDetailResponse userDetailResponse = userService.getUsersForBpas(bpas);
-		enrichOwner(userDetailResponse, bpas); // completed
-		return bpas;
-	}
-
-	private void enrichOwner(UserDetailResponse userDetailResponse, List<BPA> bpas) {
-
-		List<OwnerInfo> users = userDetailResponse.getUser();
-		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
-		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
-		bpas.forEach(bpa -> {
-			bpa.getLandInfo().getOwners().forEach(owner -> {
-				if (userIdToOwnerMap.get(owner.getUuid()) == null)
-					throw new CustomException("OWNER SEARCH ERROR",
-							"The owner of the bpa " + bpa.getId() + " is not coming in user search");
-				else
-					owner.addUserDetail(userIdToOwnerMap.get(owner.getUuid()));
-			});
-		});
-
-	}
-
-
-	/**
-	 * Adds accountId of the logged in user to search criteria
-	 * 
-	 * @param requestInfo
-	 *            The requestInfo of search request
-	 * @param criteria
-	 *            The bpaSearch criteria
-	 */
-
-	public void enrichSearchCriteriaWithAccountId(RequestInfo requestInfo, BPASearchCriteria criteria) {
-
-		if (criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN)) {
-//			criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
-			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
-		}
-
-	}
-
-	/**
-	 * Creates search criteria from list of bpa's
-	 * 
-	 * @param bpa
-	 *            's list The bpa whose id's are added to search
-	 * @return bpaSearch criteria on basis of bpa id
-	 */
-	public BPASearchCriteria getBPACriteriaFromIds(List<BPA> bpa, Integer limit) {
-		BPASearchCriteria criteria = new BPASearchCriteria();
-		Set<String> bpaIds = new HashSet<>();
-		bpa.forEach(data -> bpaIds.add(data.getId()));
-		criteria.setIds(new LinkedList<>(bpaIds));
-		criteria.setTenantId(bpa.get(0).getTenantId());
-		criteria.setLimit(limit);
-		return criteria;
-	}
-
-	/**
-	 * Adds the ownerIds from userSearchReponse to search criteria
-	 * 
-	 * @param criteria
-	 *            The BPA search Criteria
-	 * @param userDetailResponse
-	 *            The response of user search
-	 */
-	public void enrichBPACriteriaWithOwnerids(BPASearchCriteria criteria, UserDetailResponse userDetailResponse) {
-	/*	if (CollectionUtils.isEmpty(criteria.getOwnerIds())) {
-			Set<String> ownerids = new HashSet<>();
-			userDetailResponse.getUser().forEach(owner -> ownerids.add(owner.getUuid()));
-			criteria.setOwnerIds(new ArrayList<>(ownerids));
-		}*/
-	}
-
 
 
 }
