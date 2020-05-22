@@ -48,7 +48,7 @@ config:
       - work-dir: "tl-calculator/src/main/resources/db"
         image-name: "tl-calculator-db"
         
-  - name: "municipal-services/tl-services"
+  - name: "builds/municipal-services/tl-services"
     build:
       - work-dir: "tl-services"
         image-name: "tl-services"
