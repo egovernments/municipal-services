@@ -299,12 +299,20 @@ public class NotificationUtil {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository
 				.fetchResult(getBillUri(bpa), new RequestInfoWrapper(
 						requestInfo));
-		String jsonString = new JSONObject(responseMap).toString();
-
-		BigDecimal amountToBePaid = null;
+		JSONObject jsonObject = new JSONObject(responseMap);
+		BigDecimal amountToBePaid;
+		double amount = 0.0;
 		try {
-			Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT);
-			amountToBePaid = new BigDecimal(obj.toString());
+		    /* Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT);  */
+			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
+			JSONObject firstElement = (JSONObject) demandArray.get(0);
+			JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+			for (int i = 0; i < demandDetails.length(); i++) {
+				JSONObject object = (JSONObject) demandDetails.get(i);
+				Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+				amount = amount + taxAmt;
+			}
+			amountToBePaid = BigDecimal.valueOf(amount);
 		} catch (Exception e) {
 			throw new CustomException("PARSING ERROR",
 					"Failed to parse the response using jsonPath: "
