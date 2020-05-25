@@ -168,6 +168,9 @@ public class BPAConstants {
 	
 	public static final String ACTION_STATUS_PENDING_APPL_FEE = "APPLY_PENDING_APPL_FEE";
 	
+	public static final String ACTION_STATUS_PENDING_FEE = "APPLY_PENDING_FEE";
+
+	
 	public static final String ACTION_STATUS_DOC_VERIFICATION = "PAY_DOC_VERIFICATION_INPROGRESS";
 	
 	public static final String ACTION_STATUS_FI_VERIFICATION = "FORWARD_FIELDINSPECTION_INPROGRESS";
