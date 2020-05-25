@@ -305,12 +305,18 @@ public class NotificationUtil {
 		try {
 		    /* Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT);  */
 			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
-			JSONObject firstElement = (JSONObject) demandArray.get(0);
-			JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
-			for (int i = 0; i < demandDetails.length(); i++) {
-				JSONObject object = (JSONObject) demandDetails.get(i);
-				Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
-				amount = amount + taxAmt;
+			if (demandArray != null) {
+				JSONObject firstElement = (JSONObject) demandArray.get(0);
+				if (firstElement != null) {
+					JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+					if (demandDetails != null) {
+						for (int i = 0; i < demandDetails.length(); i++) {
+							JSONObject object = (JSONObject) demandDetails.get(i);
+							Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+							amount = amount + taxAmt;
+						}
+					}
+				}
 			}
 			amountToBePaid = BigDecimal.valueOf(amount);
 		} catch (Exception e) {
