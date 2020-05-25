@@ -109,12 +109,17 @@ public class NotificationUtil {
 				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
 				
+			case BPAConstants.ACTION_STATUS_PENDING_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.APP_FEE_PENDNG, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
 			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
 				messageTemplate = getMessageTemplate(
 						BPAConstants.APP_FEE_PENDNG, localizationMessage);
 //				message = getPaymentMsg(requestInfo,bpa, messageTemplate);
 				message = getInitiatedMsg(bpa, messageTemplate);
-
 				break;
 				
 			case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
@@ -203,6 +208,12 @@ public class NotificationUtil {
 			case BPAConstants.ACTION_STATUS_CITIZEN_APPROVE:
 				messageTemplate = getMessageTemplate(
 						BPAConstants.M_CITIZEN_APPROVED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;
+				
+			case BPAConstants.ACTION_STATUS_PENDING_FEE:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_APP_FEE_PENDNG, localizationMessage);
 				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
 				
@@ -342,6 +353,9 @@ public class NotificationUtil {
 			code= "BPA.NC_APP_FEE";
 		}else{
 			code= "BPA.NC_SAN_FEE";
+		}
+		if(status.equalsIgnoreCase("PENDING_FEE")){
+			code= "BPA.LOW_RISK_PERMIT_FEE";
 		}
 		StringBuilder builder = new StringBuilder(config.getBillingHost());
 		builder.append(config.getDemandSearchEndpoint());
