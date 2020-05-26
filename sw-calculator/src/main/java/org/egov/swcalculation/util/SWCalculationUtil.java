@@ -396,7 +396,7 @@ public class SWCalculationUtil {
 		HashSet<String> propertyUUID = new HashSet<>();
 		propertyUUID.add(sewerageConnectionRequest.getSewerageConnection().getPropertyId());
 		propertyCriteria.setUuids(propertyUUID);
-		propertyCriteria.setTenantId(sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		propertyCriteria.setTenantId(sewerageConnectionRequest.getSewerageConnection().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
