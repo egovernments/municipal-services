@@ -118,8 +118,8 @@ public class WorkflowService {
 		 *            The RequestInfo object of the request
 		 * @return BusinessService for the the given tenantId
 		 */
-		public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo) {
-			StringBuilder url = getProcessInstanceSearchURL(requestInfo.getUserInfo().getTenantId(), applicationNo);
+		public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo, String tenantId) {
+			StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNo);
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 			Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 			ProcessInstanceResponse response = null;
@@ -154,8 +154,8 @@ public class WorkflowService {
 		 * @param applicationNo
 		 * @return
 		 */
-		public String getApplicationStatus(RequestInfo requestInfo, String applicationNo) {
-			return getProcessInstance(requestInfo, applicationNo).getState().getApplicationStatus();
+		public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId) {
+			return getProcessInstance(requestInfo, applicationNo, tenantId).getState().getApplicationStatus();
 		}
 
 }

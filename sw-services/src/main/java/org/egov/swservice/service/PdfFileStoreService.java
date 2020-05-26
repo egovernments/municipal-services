@@ -89,7 +89,8 @@ public class PdfFileStoreService {
 				.requestInfo(sewerageConnectionRequest.getRequestInfo()).isconnectionCalculation(false).build();
 		
 		String applicationStatus = workflowService.getApplicationStatus(sewerageConnectionRequest.getRequestInfo(),
-				sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+				sewerageConnectionRequest.getSewerageConnection().getApplicationNo(),
+				sewerageConnectionRequest.getSewerageConnection().getTenantId());
 		
 		try {
 			Object response = serviceRequestRepository.fetchResult(sewerageServiceUtil.getEstimationURL(), calRequest);

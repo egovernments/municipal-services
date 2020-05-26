@@ -97,7 +97,8 @@ public class WorkflowNotificationService {
 	public void process(WaterConnectionRequest request, String topic) {
 		try {
 			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
-					request.getWaterConnection().getApplicationNo());
+					request.getWaterConnection().getApplicationNo(),
+					request.getWaterConnection().getTenantId());
 			
 			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getProcessInstance().getAction()+"_"+applicationStatus)) {
 				log.info("Notification Disabled For State :" + applicationStatus);

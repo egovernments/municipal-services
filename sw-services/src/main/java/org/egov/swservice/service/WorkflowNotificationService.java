@@ -97,7 +97,8 @@ public class WorkflowNotificationService {
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
 			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
-					request.getSewerageConnection().getApplicationNo());
+					request.getSewerageConnection().getApplicationNo(),
+					request.getSewerageConnection().getTenantId());
 			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS
 					.contains(request.getSewerageConnection().getProcessInstance().getAction() + "_"
 							+ applicationStatus)) {

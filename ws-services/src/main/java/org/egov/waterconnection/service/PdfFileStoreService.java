@@ -84,7 +84,8 @@ public class PdfFileStoreService {
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
 				.requestInfo(waterConnectionRequest.getRequestInfo()).isconnectionCalculation(false).build();
 		String applicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
-				waterConnectionRequest.getWaterConnection().getApplicationNo());
+				waterConnectionRequest.getWaterConnection().getApplicationNo(),
+				waterConnectionRequest.getWaterConnection().getTenantId());
 		try {
 			Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
