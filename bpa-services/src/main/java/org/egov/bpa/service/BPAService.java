@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -260,6 +261,30 @@ public class BPAService {
 		if (CollectionUtils.isEmpty(searchResult)) {
 			throw new CustomException("UPDATE ERROR", "Failed to Update the Application");
 		}
+		
+		BPASearchCriteria criteria = new BPASearchCriteria();
+		criteria.setTenantId(bpaRequest.getBPA().getTenantId());
+		Map<String, String> additionalDetails = bpa.getAdditionalDetails() != null ? (Map)bpa.getAdditionalDetails()
+				: new HashMap<String, String>();
+		String applicationType = additionalDetails.get("applicationType");
+		if (applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
+			String approvalNo = additionalDetails.get("permitNumber");
+
+			criteria.setApprovalNo(approvalNo);
+			List<BPA> BPA = search(criteria, requestInfo);
+			String edcr = null;
+			String landId = null;
+
+			for (int i = 0; i < BPA.size(); i++) {
+				edcr = BPA.get(0).getEdcrNumber();
+				landId = BPA.get(0).getLandId();
+			}
+			
+			additionalDetails.put("landId", landId);
+			criteria.setEdcrNumber(edcr);
+			ocService.validateAdditionalData(bpaRequest, criteria);
+			bpaRequest.getBPA().setLandInfo(BPA.get(0).getLandInfo());
+		}
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
@@ -277,7 +302,9 @@ public class BPAService {
 				actionValidator.validateUpdateRequest(bpaRequest, businessService);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
-				landService.updateLandInfo(bpaRequest);
+				if (!applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
+					landService.updateLandInfo(bpaRequest);
+				}
 				bpaValidator.validateCheckList(mdmsData, bpaRequest,
 						workflowService.getCurrentState(bpa.getStatus(), businessService));
 			}
