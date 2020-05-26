@@ -275,12 +275,13 @@ public class WSCalculationUtil {
 		HashSet<String> propertyUUID = new HashSet<>();
 		propertyUUID.add(waterConnectionRequest.getWaterConnection().getPropertyId());
 		propertyCriteria.setUuids(propertyUUID);
-		propertyCriteria.setTenantId(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+		propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
-			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
+
+			throw new CustomException("INCORRECT PROPERTY ID", "PROPERTY SEARCH ERROR!");
 		}
 		return propertyList;
 	}
