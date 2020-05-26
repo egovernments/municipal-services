@@ -79,7 +79,7 @@ public class PaymentUpdateService {
 					searchCriteria.setTenantId(tenantId);
 //					List<String> codes = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNo(paymentDetail.getBill().getConsumerCode());
-					List<BPA> bpas = repository.getBPAData(searchCriteria);
+					List<BPA> bpas = repository.getBPAData(searchCriteria, null);
 					if (CollectionUtils.isEmpty(bpas)) {
 						throw new CustomException("INVALID RECEIPT",
 								"No Building Plan Application found for the comsumerCode "

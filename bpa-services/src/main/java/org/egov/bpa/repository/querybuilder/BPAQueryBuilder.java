@@ -37,7 +37,7 @@ public class BPAQueryBuilder {
 	 *            values to be replased on the query
 	 * @return Final Search Query
 	 */
-	public String getBPASearchQuery(BPASearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getBPASearchQuery(BPASearchCriteria criteria, List<Object> preparedStmtList, List<String> edcrNos) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
 
@@ -66,6 +66,12 @@ public class BPAQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.edcrNumber = ?");
 			preparedStmtList.add(criteria.getEdcrNumber());
+		}
+		
+		if(!CollectionUtils.isEmpty(edcrNos)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNos)).append(")");
+			addToPreparedStatement(preparedStmtList, edcrNos);
 		}
 
 		String applicationNo = criteria.getApplicationNo();

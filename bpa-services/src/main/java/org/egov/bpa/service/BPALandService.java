@@ -94,7 +94,8 @@ public class BPALandService {
 		LinkedHashMap responseMap = null;
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
+		if (responseMap != null && responseMap.get("LandInfo") != null)
+			landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
 		ArrayList<LandInfo> landData = new ArrayList<LandInfo>(); 
 		if(landInfo.size()>0){
 		for(int i=0; i<landInfo.size(); i++){
