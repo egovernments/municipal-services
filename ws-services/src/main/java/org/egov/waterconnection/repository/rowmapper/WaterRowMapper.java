@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.AuditDetails;
-import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Document;
 import org.egov.waterconnection.model.PlumberInfo;
@@ -41,7 +40,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 				currentWaterConnection.setId(rs.getString("connection_Id"));
 				currentWaterConnection.setApplicationNo(rs.getString("applicationNo"));
 				currentWaterConnection
-						.setApplicationStatus(ApplicationStatusEnum.fromValue(rs.getString("applicationstatus")));
+						.setApplicationStatus(rs.getString("applicationstatus"));
 				currentWaterConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
 				currentWaterConnection.setConnectionNo(rs.getString("connectionNo"));
 				currentWaterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));

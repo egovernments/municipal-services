@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
@@ -118,8 +117,8 @@ public class WorkflowIntegrator {
 		 */
 		processInstanceResponse.getProcessInstances().forEach(pInstance -> {
 			if (waterConnectionRequest.getWaterConnection().getApplicationNo().equals(pInstance.getBusinessId())) {
-				waterConnectionRequest.getWaterConnection().setApplicationStatus(
-						ApplicationStatusEnum.fromValue(pInstance.getState().getApplicationStatus()));
+				waterConnectionRequest.getWaterConnection()
+						.setApplicationStatus(pInstance.getState().getApplicationStatus());
 			}
 		});
 	}

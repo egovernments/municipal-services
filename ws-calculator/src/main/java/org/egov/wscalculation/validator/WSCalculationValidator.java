@@ -58,6 +58,7 @@ public class WSCalculationValidator {
 
 		// Future Billing Period Check
 		validateBillingPeriod(meterReading.getBillingPeriod());
+		
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
 				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand() && connection == null) {

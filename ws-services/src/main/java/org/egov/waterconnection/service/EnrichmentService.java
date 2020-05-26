@@ -14,7 +14,6 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.AuditDetails;
-import org.egov.waterconnection.model.Connection.ApplicationStatusEnum;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnection;
@@ -223,7 +222,7 @@ public class EnrichmentService {
 	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
 		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(WCConstants.ACTION_INITIATE)) {
-			waterConnectionRequest.getWaterConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
+			waterConnectionRequest.getWaterConnection().setApplicationStatus(WCConstants.STATUS_INITIATED);
 		}
 	}
 
