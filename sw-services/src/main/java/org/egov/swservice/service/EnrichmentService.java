@@ -4,21 +4,15 @@ package org.egov.swservice.service;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.AuditDetails;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.Connection.StatusEnum;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.PropertyCriteria;
-import org.egov.swservice.model.SearchCriteria;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Status;
@@ -27,7 +21,6 @@ import org.egov.swservice.repository.IdGenRepository;
 import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
-import org.egov.swservice.validator.ValidateProperty;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,9 +45,6 @@ public class EnrichmentService {
 
 	@Autowired
 	private SWConfiguration config;
-
-	@Autowired
-	private ValidateProperty validateProperty;
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -119,7 +109,7 @@ public class EnrichmentService {
 	private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest) {
 		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(SWConstants.ACTION_INITIATE)) {
-			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(ApplicationStatusEnum.INITIATED);
+			sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(SWConstants.STATUS_INITIATED);
 		}
 	}
 	

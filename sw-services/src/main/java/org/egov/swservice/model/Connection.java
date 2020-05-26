@@ -40,61 +40,8 @@ public class Connection {
 	@JsonProperty("applicationNo")
 	private String applicationNo = null;
 
-	/**
-	 * Gets or Sets applicationStatus
-	 */
-	public enum ApplicationStatusEnum {
-		INITIATED("INITIATED"),
-
-		REJECTED("REJECTED"),
-
-		PENDING_FOR_CITIZEN_ACTION("PENDING_FOR_CITIZEN_ACTION"),
-
-		PENDING_FOR_DOCUMENT_VERIFICATION("PENDING_FOR_DOCUMENT_VERIFICATION"),
-
-		PENDING_FOR_FIELD_INSPECTION("PENDING_FOR_FIELD_INSPECTION"),
-
-		PENDING_APPROVAL_FOR_CONNECTION("PENDING_APPROVAL_FOR_CONNECTION"),
-
-		PENDING_FOR_PAYMENT("PENDING_FOR_PAYMENT"),
-
-		PENDING_FOR_CONNECTION_ACTIVATION("PENDING_FOR_CONNECTION_ACTIVATION"),
-
-		CONNECTION_ACTIVATED("CONNECTION_ACTIVATED"),
-
-		APPLIED("Applied"),
-
-		APPROVED("Approved"),
-
-		CANCELED("Canceled"),
-
-		INPROGRESS("InProgress");
-
-		private String value;
-
-		ApplicationStatusEnum(String value) {
-			this.value = value;
-		}
-
-		@Override
-		@JsonValue
-		public String toString() {
-			return String.valueOf(value);
-		}
-
-		@JsonCreator
-		public static ApplicationStatusEnum fromValue(String text) {
-			for (ApplicationStatusEnum b : ApplicationStatusEnum.values()) {
-				if (String.valueOf(b.value).equals(text)) {
-					return b;
-				}
-			}
-			return null;
-		}
-	}
-
 	@JsonProperty("applicationStatus")
-	private ApplicationStatusEnum applicationStatus = null;
+	private String applicationStatus = null;
 
 	/**
 	 * Gets or Sets status
@@ -233,7 +180,7 @@ public class Connection {
 		this.applicationNo = applicationNo;
 	}
 
-	public Connection applicationStatus(ApplicationStatusEnum applicationStatus) {
+	public Connection applicationStatus(String applicationStatus) {
 		this.applicationStatus = applicationStatus;
 		return this;
 	}
@@ -245,11 +192,11 @@ public class Connection {
 	 **/
 	@ApiModelProperty(value = "")
 
-	public ApplicationStatusEnum getApplicationStatus() {
+	public String getApplicationStatus() {
 		return applicationStatus;
 	}
 
-	public void setApplicationStatus(ApplicationStatusEnum applicationStatus) {
+	public void setApplicationStatus(String applicationStatus) {
 		this.applicationStatus = applicationStatus;
 	}
 

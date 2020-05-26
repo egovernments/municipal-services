@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swservice.model.AuditDetails;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.Document;
 import org.egov.swservice.model.PlumberInfo;
-import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.Status;
 import org.egov.swservice.model.workflow.ProcessInstance;
@@ -36,7 +34,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 				sewarageConnection.setId(rs.getString("connection_Id"));
 				sewarageConnection.setApplicationNo(rs.getString("applicationNo"));
 				sewarageConnection
-						.setApplicationStatus(ApplicationStatusEnum.fromValue(rs.getString("applicationstatus")));
+						.setApplicationStatus(rs.getString("applicationstatus"));
 				sewarageConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
 				sewarageConnection.setConnectionNo(rs.getString("connectionNo"));
 				sewarageConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));

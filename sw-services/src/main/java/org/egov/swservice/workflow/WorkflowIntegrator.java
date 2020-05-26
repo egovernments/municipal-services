@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Connection.ApplicationStatusEnum;
 import org.egov.swservice.model.Property;
 import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
@@ -122,8 +121,8 @@ public class WorkflowIntegrator {
 		processInstanceResponse.getProcessInstances().forEach(pInstance -> {
 			if (sewerageConnectionRequest.getSewerageConnection().getApplicationNo()
 					.equals(pInstance.getBusinessId())) {
-				sewerageConnectionRequest.getSewerageConnection().setApplicationStatus(
-						ApplicationStatusEnum.fromValue(pInstance.getState().getApplicationStatus()));
+				sewerageConnectionRequest.getSewerageConnection()
+						.setApplicationStatus(pInstance.getState().getApplicationStatus());
 			}
 		});
 
