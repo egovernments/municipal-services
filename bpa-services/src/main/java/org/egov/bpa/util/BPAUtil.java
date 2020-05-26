@@ -106,7 +106,7 @@ public class BPAUtil {
 
 	}
 
-	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
+	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
 		List<ModuleDetail> moduleDetails = new LinkedList<>();

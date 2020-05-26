@@ -44,20 +44,27 @@ public class EnrichmentService {
 	@Autowired
 	private WorkflowService workflowService;
 
-	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData) {
+	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		bpaRequest.getBPA().setAuditDetails(auditDetails);
 		bpaRequest.getBPA().setId(UUID.randomUUID().toString());
-		bpaRequest.getBPA().setLandId(bpaRequest.getBPA().getLandInfo().getId()); 
+		
 		bpaRequest.getBPA().setAccountId(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
-
+		String applicationType = values.get("applicationType");
+		if(applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN)){
 		if(!bpaRequest.getBPA().getRiskType().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)){
 			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_MODULE_CODE);
 		}else{
 			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_LOW_MODULE_CODE);
 		}
-
+		}else{
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_OC_MODULE_CODE);
+			bpaRequest.getBPA().setLandId(values.get("landId"));
+		}
+		if(bpaRequest.getBPA().getLandInfo()!=null){
+			bpaRequest.getBPA().setLandId(bpaRequest.getBPA().getLandInfo().getId()); 
+		}
 		// BPA Documents
 		if (!CollectionUtils.isEmpty(bpaRequest.getBPA().getDocuments()))
 			bpaRequest.getBPA().getDocuments().forEach(document -> {

@@ -80,7 +80,11 @@ public class BPAService {
 
 	@Autowired
 	private BPALandService landService;
+
+	@Autowired
+	private OCService ocService;
 	
+	@SuppressWarnings("unused")
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
@@ -88,12 +92,34 @@ public class BPAService {
 		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
-		
+
 		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
+		String applicationType = values.get("applicationType");
+		BPASearchCriteria criteria = new BPASearchCriteria();
+		criteria.setTenantId(bpaRequest.getBPA().getTenantId());
+		if (applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
+			String approvalNo = values.get("permitNumber");
+
+			criteria.setApprovalNo(approvalNo);
+			List<BPA> BPA = search(criteria, requestInfo);
+			String edcr = null;
+			String landId = null;
+
+			for (int i = 0; i < BPA.size(); i++) {
+				edcr = BPA.get(0).getEdcrNumber();
+				landId = BPA.get(0).getLandId();
+			}
+			
+			values.put("landId", landId);
+			criteria.setEdcrNumber(edcr);
+			ocService.validateAdditionalData(bpaRequest, criteria);
+			bpaRequest.getBPA().setLandInfo(BPA.get(0).getLandInfo());
+		}
 		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
-		landService.addLandInfoToBPA(bpaRequest);
-		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData);
-		
+		if (!applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
+			landService.addLandInfoToBPA(bpaRequest);
+		}
+		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData, values);
 		wfIntegrator.callWorkFlow(bpaRequest);
 
 		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
@@ -101,7 +127,7 @@ public class BPAService {
 		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
 		}
-		
+
 		repository.save(bpaRequest);
 		return bpaRequest.getBPA();
 	}
@@ -159,6 +185,7 @@ public class BPAService {
 					data.add(bpa.get(i).getLandId());
 				}
 				landcriteria.setIds(data);
+				landcriteria.setTenantId(bpa.get(0).getTenantId());
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 				
 				for (int i = 0; i < bpa.size(); i++) {

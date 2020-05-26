@@ -68,10 +68,18 @@ public class EDCRService {
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		criteria.setEdcrNumber(bpa.getEdcrNumber());
 		List<BPA> bpas = bpaRepository.getBPAData(criteria, null);
-		if (!CollectionUtils.isEmpty(bpas)) {
+		if(bpas.size()>0){
+			for(int i=0; i<bpas.size(); i++){
+				if(!bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED)){
+					throw new CustomException(" Duplicate EDCR ",
+							" Application already exists with EDCR Number " + bpa.getEdcrNumber());
+				}
+			}
+		} 
+		/*if (!CollectionUtils.isEmpty(bpas)) {
 			throw new CustomException(" Duplicate EDCR ",
 					" Application already exists with EDCR Number " + bpa.getEdcrNumber());
-		}
+		}*/
 
 		uri.append(config.getGetPlanEndPoint());
 		uri.append("?").append("tenantId=").append(bpa.getTenantId());
@@ -106,8 +114,10 @@ public class EDCRService {
 		if(applicationType == null || applicationType.size() == 0){
 			applicationType.add("permit");
 		}
+		LinkedList<String> permitNumber = context.read("edcrDetail.*.permitNumber");
 		additionalDetails.put("serviceType", serviceType.get(0));
 		additionalDetails.put("applicationType", applicationType.get(0));
+		additionalDetails.put("permitNumber", permitNumber.get(0));
 		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area", typeRef);
 		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",
 				typeRef);

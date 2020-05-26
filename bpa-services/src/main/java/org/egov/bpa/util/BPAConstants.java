@@ -316,4 +316,16 @@ public class BPAConstants {
 	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
 
 	public static final String HIGH_RISKTYPE = "HIGH";
+
+	public static final String BUILDING_PLAN = "BUILDING_PLAN_SCRUTINY";
+	
+	public static final String BUILDING_PLAN_OC = "BUILDING_OC_PLAN_SCRUTINY";
+
+	public static final String BPA_OC_MODULE_CODE = "BPA_OC";
+
+	public static final String OC_OCCUPANCY = "$.edcrDetail[0].planDetail.planInformation.occupancy";
+
+	public static final String OC_KHATHANO = "$.edcrDetail[0].planDetail.planInformation.khataNo";
+
+	public static final String OC_PLOTNO = "$.edcrDetail[0].planDetail.planInformation.plotNo";
 }
