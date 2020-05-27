@@ -128,15 +128,23 @@ public class CalculationUtils {
     /**
      * identify the billingBusinessService matching to the calculation FeeType
      */
-	public String getBillingBusinessService(String feeType) {
+	public String getBillingBusinessService(String businessService, String feeType) {
 
 		String billingBusinessService;
 		switch (feeType) {
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE:
-			billingBusinessService = config.getApplFeeBusinessService();
+			if (businessService.equalsIgnoreCase(BPACalculatorConstants.MDMS_BPA)) {
+				billingBusinessService = config.getApplFeeBusinessService();
+			} else {
+				billingBusinessService = config.getOCApplBusinessservice();
+			}
 			break;
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE:
-			billingBusinessService = config.getSanclFeeBusinessService();
+			if (businessService.equalsIgnoreCase(BPACalculatorConstants.MDMS_BPA)) {
+				billingBusinessService = config.getSanclFeeBusinessService();
+			} else {
+				billingBusinessService = config.getOCSancBusinessservice();
+			}
 			break;
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE:
 			billingBusinessService = config.getLowRiskPermitFeeBusinessService();
@@ -157,15 +165,23 @@ public class CalculationUtils {
 	/**
 	* identify the billingBusinessService matching to the calculation FeeType
 	*/
-	public String getTaxHeadCode(String feeType) {
+	public String getTaxHeadCode(String businessService, String feeType) {
 
 		String billingTaxHead;
 		switch (feeType) {
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE:
+			if(businessService.equalsIgnoreCase(BPACalculatorConstants.MDMS_BPA)){
 			billingTaxHead = config.getBaseApplFeeHead();
+			}else{
+				billingTaxHead = config.getOCApplFee();
+			}
 			break;
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_SANC_FEETYPE:
+			if(businessService.equalsIgnoreCase(BPACalculatorConstants.MDMS_BPA)){
 			billingTaxHead = config.getBaseSancFeeHead();
+			}else{
+			billingTaxHead = config.getOCSancFee();
+			}
 			break;
 		case BPACalculatorConstants.MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE:
 			billingTaxHead = config.getBaseLowApplFeeHead();

@@ -149,7 +149,7 @@ public class CalculationService {
 			estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
 			estimates.addAll(estimatesAndSlabs.getEstimates());
 		}
-		
+
 		estimatesAndSlabs.setEstimates(estimates);
 
 		return estimatesAndSlabs;
@@ -186,7 +186,7 @@ public class CalculationService {
 	      estimate.setEstimateAmount(totalTax);
 	      estimate.setCategory(Category.FEE);
 	      
-	      String taxHeadCode = utils.getTaxHeadCode(calulationCriteria.getFeeType());
+	      String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
 	      estimate.setTaxHeadCode(taxHeadCode);
 
 	      estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));
