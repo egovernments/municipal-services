@@ -183,6 +183,7 @@ public class BPAConstants {
 	
 	public static final String ACTION_STATUS_APPROVED = "PAY_APPROVED";
 	
+	public static final String ACTION_STATUS_APPROVED_LOW = "APPROVE_APPROVED";
 	
 	
 	public static final String ACTION_STATUS_APPLIED = "APPLIED";
