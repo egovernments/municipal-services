@@ -59,7 +59,7 @@ public class EnrichmentService {
 			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_LOW_MODULE_CODE);
 		}
 		}else{
-			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_OC_MODULE_CODE);
+			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_MODULE_CODE); //just for testing in dev need to change later
 			bpaRequest.getBPA().setLandId(values.get("landId"));
 		}
 		if(bpaRequest.getBPA().getLandInfo()!=null){
