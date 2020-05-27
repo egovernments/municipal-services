@@ -154,6 +154,11 @@ public class NotificationUtil {
 //				message = getPaymentMsg(requestInfo,bpa, messageTemplate);
 				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
+			case BPAConstants.ACTION_STATUS_APPROVED_LOW:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.APPROVE_PERMIT_GENERATED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
+				break;		
 				
 			case BPAConstants.ACTION_STATUS_APPROVED:
 				messageTemplate = getMessageTemplate(
@@ -262,6 +267,12 @@ public class NotificationUtil {
 						BPAConstants.M_APPROVE_PERMIT_GENERATED, localizationMessage);
 				message = getInitiatedMsg(bpa, messageTemplate);
 
+				break;
+					
+			case BPAConstants.ACTION_STATUS_APPROVED_LOW:
+				messageTemplate = getMessageTemplate(
+						BPAConstants.M_APPROVE_PERMIT_GENERATED, localizationMessage);
+				message = getInitiatedMsg(bpa, messageTemplate);
 				break;
 		}
 			
