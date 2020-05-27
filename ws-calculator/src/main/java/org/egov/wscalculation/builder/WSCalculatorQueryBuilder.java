@@ -19,19 +19,19 @@ public class WSCalculatorQueryBuilder {
 
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String Query = "SELECT mr.id, mr.connectionNo as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, mr.lastReadingDate, mr.currentReading, "
-			+ "mr.currentReadingDate FROM meterreading mr";
+			+ "mr.currentReadingDate FROM eg_ws_meterreading mr";
 
-	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM meterreading WHERE";
+	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_ws_meterreading WHERE";
     
-	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from meterreading mr";
+	private final static String noOfConnectionSearchQueryForCurrentMeterReading= "select mr.currentReading from eg_ws_meterreading mr";
 	
-	private final static String tenentIdWaterConnectionSearchQuery="select DISTINCT tenantid from connection";
+	private final static String tenentIdWaterConnectionSearchQuery="select DISTINCT tenantid from eg_ws_connection";
 	
-	private final static String connectionNoWaterConnectionSearchQuery = "SELECT conn.connectionNo as conn_no FROM water_service_connection wc INNER JOIN connection conn ON wc.connection_id = conn.id";
+	private final static String connectionNoWaterConnectionSearchQuery = "SELECT conn.connectionNo as conn_no FROM eg_ws_service wc INNER JOIN eg_ws_connection conn ON wc.connection_id = conn.id";
 	
-	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM connection conn INNER JOIN water_service_connection ws ON conn.id = ws.connection_id";
+	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id";
 
-	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM connection ws";
+	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_ws_connection ws";
 
 
 	public String getDistinctTenantIds() {

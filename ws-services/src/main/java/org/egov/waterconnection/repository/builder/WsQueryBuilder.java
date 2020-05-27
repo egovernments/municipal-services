@@ -37,15 +37,15 @@ public class WsQueryBuilder {
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id,"
 			+ " plumber.name as plumber_name, plumber.licenseno,"
 			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress,"
-			+ " plumber.relationship FROM connection conn "
+			+ " plumber.relationship FROM eg_ws_connection conn "
 			+  INNER_JOIN_STRING 
-			+" water_service_connection wc ON wc.connection_id = conn.id"
+			+" eg_ws_service wc ON wc.connection_id = conn.id"
 			+  LEFT_OUTER_JOIN_STRING
 			+ "eg_ws_applicationdocument document ON document.wsid = conn.id" 
 			+  LEFT_OUTER_JOIN_STRING
 			+ "eg_ws_plumberinfo plumber ON plumber.wsid = conn.id";
 	
-	private static final String NO_OF_CONNECTION_SEARCH_QUERY = "SELECT count(*) FROM connection WHERE";
+	private static final String NO_OF_CONNECTION_SEARCH_QUERY = "SELECT count(*) FROM eg_ws_connection WHERE";
 	
 	private static final String PAGINATION_WRAPPER = "SELECT * FROM " +
             "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
