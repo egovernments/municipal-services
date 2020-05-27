@@ -1,14 +1,16 @@
 package org.egov.waterconnection.model;
 
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.Size;
+
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * PlumberInfo
@@ -74,6 +76,9 @@ public class PlumberInfo {
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails = null;
 
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
+
 	public PlumberInfo name(String name) {
 		this.name = name;
 		return this;
@@ -81,6 +86,7 @@ public class PlumberInfo {
 
 	/**
 	 * The name of the user.
+	 * 
 	 * @return name
 	 **/
 	@ApiModelProperty(value = "The name of the user.")
@@ -101,6 +107,7 @@ public class PlumberInfo {
 
 	/**
 	 * Plumber unique license number.
+	 * 
 	 * @return licenseNo
 	 **/
 	@ApiModelProperty(value = "Plumber unique license number.")
@@ -121,6 +128,7 @@ public class PlumberInfo {
 
 	/**
 	 * MobileNumber of the user.
+	 * 
 	 * @return mobileNumber
 	 **/
 	@ApiModelProperty(value = "MobileNumber of the user.")
@@ -141,6 +149,7 @@ public class PlumberInfo {
 
 	/**
 	 * Gender of the user.
+	 * 
 	 * @return gender
 	 **/
 	@ApiModelProperty(value = "Gender of the user.")
@@ -161,6 +170,7 @@ public class PlumberInfo {
 
 	/**
 	 * Father or Husband name of the user.
+	 * 
 	 * @return fatherOrHusbandName
 	 **/
 	@ApiModelProperty(value = "Father or Husband name of the user.")
@@ -181,6 +191,7 @@ public class PlumberInfo {
 
 	/**
 	 * The current address of the owner for correspondence.
+	 * 
 	 * @return correspondenceAddress
 	 **/
 	@ApiModelProperty(value = "The current address of the owner for correspondence.")
@@ -201,6 +212,7 @@ public class PlumberInfo {
 
 	/**
 	 * The relationship of gaurdian.
+	 * 
 	 * @return relationship
 	 **/
 	@ApiModelProperty(value = "The relationship of gaurdian.")
@@ -221,6 +233,7 @@ public class PlumberInfo {
 	/**
 	 * Json object to capture any extra information which is not accommodated of
 	 * model
+	 * 
 	 * @return additionalDetails
 	 **/
 	@ApiModelProperty(value = "Json object to capture any extra information which is not accommodated of model")
@@ -240,6 +253,7 @@ public class PlumberInfo {
 
 	/**
 	 * The id of the user.
+	 * 
 	 * @return name
 	 **/
 	@ApiModelProperty(value = "The id of the user.")
@@ -251,6 +265,25 @@ public class PlumberInfo {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public PlumberInfo auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 
 	@Override

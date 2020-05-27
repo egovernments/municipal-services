@@ -2,17 +2,17 @@ package org.egov.waterconnection.model;
 
 import java.util.Objects;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.*;
-
-import org.springframework.validation.annotation.Validated;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -100,6 +100,10 @@ public class MeterReading {
 	
 	@JsonProperty("generateDemand")
 	private Boolean generateDemand = Boolean.TRUE;
+	
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
+
 	
 
 	public MeterReading id(String id) {
@@ -296,6 +300,25 @@ public class MeterReading {
 
 	public void setGenerateDemand(Boolean generateDemand) {
 		this.generateDemand = generateDemand;
+	}
+	
+	public MeterReading auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 	
 	@Override

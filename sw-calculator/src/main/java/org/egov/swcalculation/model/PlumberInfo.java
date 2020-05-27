@@ -76,6 +76,9 @@ public class PlumberInfo {
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails = null;
 
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
+
 	public PlumberInfo name(String name) {
 		this.name = name;
 		return this;
@@ -262,6 +265,25 @@ public class PlumberInfo {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public PlumberInfo auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 
 	@Override

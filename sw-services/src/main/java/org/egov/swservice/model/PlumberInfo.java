@@ -2,6 +2,7 @@ package org.egov.swservice.model;
 
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
@@ -75,6 +76,9 @@ public class PlumberInfo {
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails = null;
+
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
 
 	public PlumberInfo name(String name) {
 		this.name = name;
@@ -262,6 +266,26 @@ public class PlumberInfo {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public PlumberInfo auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+	@Valid
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 
 	@Override

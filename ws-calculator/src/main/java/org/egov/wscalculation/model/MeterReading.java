@@ -99,6 +99,10 @@ public class MeterReading {
 	@JsonProperty("generateDemand")
 	private Boolean generateDemand = Boolean.TRUE;
 	
+	@JsonProperty("auditDetails")
+	private AuditDetails auditDetails = null;
+
+	
 
 	public MeterReading id(String id) {
 		this.id = id;
@@ -294,6 +298,25 @@ public class MeterReading {
 
 	public void setGenerateDemand(Boolean generateDemand) {
 		this.generateDemand = generateDemand;
+	}
+	
+	public MeterReading auditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+		return this;
+	}
+
+	/**
+	 * Get auditDetails
+	 * 
+	 * @return auditDetails
+	 **/
+	@ApiModelProperty(value = "")
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
 	}
 	
 	@Override

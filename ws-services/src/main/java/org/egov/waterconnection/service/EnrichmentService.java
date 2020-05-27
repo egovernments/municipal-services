@@ -144,8 +144,8 @@ public class EnrichmentService {
 					document.setId(UUID.randomUUID().toString());
 					document.setDocumentUid(UUID.randomUUID().toString());
 					document.setStatus(Status.ACTIVE);
-					document.setAuditDetails(auditDetails);
 				}
+				document.setAuditDetails(auditDetails);
 			});
 		}
 		if (!CollectionUtils.isEmpty(connection.getPlumberInfo())) {
@@ -153,6 +153,7 @@ public class EnrichmentService {
 				if (plumberInfo.getId() == null) {
 					plumberInfo.setId(UUID.randomUUID().toString());
 				}
+				plumberInfo.setAuditDetails(auditDetails);
 			});
 		}
 		enrichingAdditionalDetails(waterConnectionRequest);
