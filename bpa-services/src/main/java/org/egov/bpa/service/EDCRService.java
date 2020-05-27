@@ -117,7 +117,9 @@ public class EDCRService {
 		LinkedList<String> permitNumber = context.read("edcrDetail.*.permitNumber");
 		additionalDetails.put("serviceType", serviceType.get(0));
 		additionalDetails.put("applicationType", applicationType.get(0));
+		if(permitNumber.size()>0){
 		additionalDetails.put("permitNumber", permitNumber.get(0));
+		}
 		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area", typeRef);
 		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",
 				typeRef);
