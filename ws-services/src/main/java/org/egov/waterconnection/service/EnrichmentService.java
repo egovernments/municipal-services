@@ -81,8 +81,9 @@ public class EnrichmentService {
 		} else {
 			HashMap<String, Object> addDetail = mapper
 					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY,
-					WCConstants.ADHOC_REBATE, WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE);
+			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY, WCConstants.ADHOC_REBATE,
+					WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE,
+					WCConstants.ESTIMATION_DATE_CONST);
 			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
 				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
@@ -91,9 +92,12 @@ public class EnrichmentService {
 					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
+			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
+				addDetail.put(WCConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
+			}
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
-		enrichFileStoreIds(waterConnectionRequest);
 	}
 	
 
@@ -206,7 +210,9 @@ public class EnrichmentService {
 	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
 		try {
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION)) {
+					.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)
+					|| waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+							.equalsIgnoreCase(WCConstants.ACTION_PAY)) {
 				waterDao.enrichFileStoreIds(waterConnectionRequest);
 			}
 		} catch (Exception ex) {

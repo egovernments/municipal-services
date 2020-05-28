@@ -70,6 +70,10 @@ public class PdfFileStoreService {
 	String pdfApplicationKey = "$applicationkey";
 	String sla = "sla";
 	String slaDate = "slaDate";
+	String sanctionLetterDate = "sanctionLetterDate";
+
+	
+	
 
 	/**
 	 * Get fileStroe Id's
@@ -98,9 +102,10 @@ public class PdfFileStoreService {
 			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			waterobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			waterobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
-			waterobject.put(slaDate, slaDays.add(new BigDecimal(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())));
+			waterobject.put(slaDate, slaDays.add(new BigDecimal(System.currentTimeMillis())));
 			String tenantId = property.getTenantId().split("\\.")[0];
 			return getFielStoreIdFromPDFService(waterobject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
 		} catch (Exception ex) {
@@ -146,20 +151,22 @@ public class PdfFileStoreService {
 
 	@SuppressWarnings("unchecked")
 	public void process(WaterConnectionRequest waterConnectionRequest, String topic) {
-		
+
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 
 		HashMap<String, Object> addDetail = mapper
 				.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-		if (addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)
+				&& addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest, property,
-							WCConstants.PDF_ESTIMATION_KEY));
+					getFileStroeId(waterConnectionRequest, property, WCConstants.PDF_ESTIMATION_KEY));
 		}
-		if (addDetail.getOrDefault(WCConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
+		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(WCConstants.ACTION_PAY)
+				&& addDetail.getOrDefault(WCConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest, property,
-							WCConstants.PDF_SANCTION_KEY));
+					getFileStroeId(waterConnectionRequest, property, WCConstants.PDF_SANCTION_KEY));
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);
 		waterDao.saveFileStoreIds(waterConnectionRequest);
