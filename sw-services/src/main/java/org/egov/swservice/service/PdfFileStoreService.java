@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.model.Calculation;
 import org.egov.swservice.model.CalculationCriteria;
 import org.egov.swservice.model.CalculationReq;
 import org.egov.swservice.model.CalculationRes;
@@ -104,11 +106,19 @@ public class PdfFileStoreService {
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
-			sewerageobject.put(totalAmount, calResponse.getCalculation().get(0).getTotalAmount());
-			sewerageobject.put(applicationFee, calResponse.getCalculation().get(0).getFee());
-			sewerageobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
-			sewerageobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
-			sewerageobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			Optional<Calculation> calculationList = calResponse.getCalculation().stream().findFirst();
+			if(calculationList.isPresent()) {
+				Calculation cal = calculationList.get();
+				sewerageobject.put(totalAmount, cal.getTotalAmount());
+				sewerageobject.put(applicationFee, cal.getFee());
+				sewerageobject.put(serviceFee, cal.getCharge());
+				sewerageobject.put(tax, cal.getTaxAmount());
+				cal.getTaxHeadEstimates().forEach(item -> {
+					//We need to remove SW_ --> So that PDF configuration refers the common for both Water & Sewerage
+					item.setTaxHeadCode(item.getTaxHeadCode().substring(3));
+				});
+				sewerageobject.put(pdfTaxhead, cal);
+			}
 			sewerageobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(
 					sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),

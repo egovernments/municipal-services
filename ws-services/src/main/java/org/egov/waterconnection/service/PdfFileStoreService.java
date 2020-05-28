@@ -4,11 +4,13 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.model.Calculation;
 import org.egov.waterconnection.model.CalculationCriteria;
 import org.egov.waterconnection.model.CalculationReq;
 import org.egov.waterconnection.model.CalculationRes;
@@ -98,11 +100,20 @@ public class PdfFileStoreService {
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
-			waterobject.put(totalAmount, calResponse.getCalculation().get(0).getTotalAmount());
-			waterobject.put(applicationFee, calResponse.getCalculation().get(0).getFee());
-			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
-			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
-			waterobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			
+			Optional<Calculation> calculationList = calResponse.getCalculation().stream().findFirst();
+			if(calculationList.isPresent()) {
+				Calculation cal = calculationList.get();
+				waterobject.put(totalAmount, cal.getTotalAmount());
+				waterobject.put(applicationFee, cal.getFee());
+				waterobject.put(serviceFee, cal.getCharge());
+				waterobject.put(tax, cal.getTaxAmount());
+				cal.getTaxHeadEstimates().forEach(item -> {
+					//We need to remove WS_ --> So that PDF configuration refers the common for both Water & Sewerage
+					item.setTaxHeadCode(item.getTaxHeadCode().substring(3));
+				});
+				waterobject.put(pdfTaxhead, cal);
+			}
 			waterobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
