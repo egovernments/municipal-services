@@ -112,7 +112,7 @@ public class PdfFileStoreService {
 					//We need to remove WS_ --> So that PDF configuration refers the common for both Water & Sewerage
 					item.setTaxHeadCode(item.getTaxHeadCode().substring(3));
 				});
-				waterobject.put(pdfTaxhead, cal);
+				waterobject.put(pdfTaxhead, cal.getTaxHeadEstimates());
 			}
 			waterobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
