@@ -320,7 +320,7 @@ public class PropertyService {
 			propertyCriteria.setUuids(new HashSet<>(uuids));
 		}
 		propertyCriteria.setLimit(criteria.getLimit());
-		List<Property> properties = repository.getProperties(propertyCriteria,false);
+		List<Property> properties = repository.getPropertiesForBulkSearch(propertyCriteria);
 		if(properties.isEmpty())
 			return Collections.emptyList();
 		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)

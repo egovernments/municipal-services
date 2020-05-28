@@ -70,6 +70,12 @@ public class PropertyRepository {
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
+	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+	}
+
 	public List<String> fetchIds(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String basequery = "select id from eg_pt_property";
