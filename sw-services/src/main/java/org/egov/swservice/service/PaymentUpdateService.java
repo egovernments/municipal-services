@@ -57,6 +57,9 @@ public class PaymentUpdateService {
 	
 	@Autowired
 	private ValidateProperty validateProperty;
+	
+	@Autowired
+	private EnrichmentService enrichmentService;
 
 	/**
 	 * After payment change the application status
@@ -105,6 +108,7 @@ public class PaymentUpdateService {
 					
 					Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
 					wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
+					enrichmentService.enrichFileStoreIds(sewerageConnectionRequest);
 					repo.updateSewerageConnection(sewerageConnectionRequest, false);
 				}
 			}

@@ -169,4 +169,7 @@ public class SWConstants {
 	
 	public static final long DAYS_CONST= 86400000l;
 	
+	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
+
+	
 }

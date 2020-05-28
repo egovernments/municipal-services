@@ -85,7 +85,7 @@ public class EnrichmentService {
 			HashMap<String, Object> addDetail = mapper.convertValue(
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
-					SWConstants.ADHOC_REBATE,SWConstants.APP_CREATED_DATE);
+					SWConstants.ADHOC_REBATE,SWConstants.APP_CREATED_DATE, SWConstants.ESTIMATION_DATE_CONST);
 			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
 				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
@@ -94,9 +94,12 @@ public class EnrichmentService {
 					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
+			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)) {
+				addDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
+			}
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
-		enrichFileStoreIds(sewerageConnectionRequest);
 	}
 	
 	
@@ -217,7 +220,9 @@ public class EnrichmentService {
 	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION)) {
+					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)
+					|| sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+							.equalsIgnoreCase(SWConstants.ACTION_PAY)) {
 				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);
 			}
 		} catch (Exception ex) {

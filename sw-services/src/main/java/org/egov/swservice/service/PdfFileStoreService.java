@@ -70,6 +70,7 @@ public class PdfFileStoreService {
 	String pdfApplicationKey = "$applicationkey";
 	String sla = "sla";
 	String slaDate = "slaDate";
+	String sanctionLetterDate = "sanctionLetterDate";
 
 	/**
 	 * Get fileStroe Id's
@@ -105,12 +106,13 @@ public class PdfFileStoreService {
 			sewerageobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			sewerageobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			sewerageobject.put(pdfTaxhead, calResponse.getCalculation().get(0).getTaxHeadEstimates());
+			sewerageobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(
 					sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
 					sewerageConnectionRequest.getRequestInfo(), applicationStatus);
 			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
 			sewerageobject.put(slaDate, slaDays.add(
-					new BigDecimal(sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate())));
+					new BigDecimal(System.currentTimeMillis())));
 			String tenantId = property.getTenantId().split("\\.")[0];
 			return getFielStoreIdFromPDFService(sewerageobject, sewerageConnectionRequest.getRequestInfo(), tenantId,
 					applicationKey);
@@ -163,11 +165,15 @@ public class PdfFileStoreService {
 
 		HashMap<String, Object> addDetail = mapper
 				.convertValue(sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
-		if (addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)
+				&& addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
 					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_ESTIMATION_KEY));
 		}
-		if (addDetail.getOrDefault(SWConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(SWConstants.ACTION_PAY)
+				&& addDetail.getOrDefault(SWConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
 					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_SANCTION_KEY));
 		}
