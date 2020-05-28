@@ -71,8 +71,9 @@ public class PdfFileStoreService {
 	String sla = "sla";
 	String slaDate = "slaDate";
 	String sanctionLetterDate = "sanctionLetterDate";
-
-	
+	String tenantName = "tenantName";
+	String service = "service";
+	String propertyKey = "property";
 	
 
 	/**
@@ -106,7 +107,14 @@ public class PdfFileStoreService {
 			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
 			waterobject.put(slaDate, slaDays.add(new BigDecimal(System.currentTimeMillis())));
-			String tenantId = property.getTenantId().split("\\.")[0];
+			String[] tenantDetails = property.getTenantId().split("\\."); 
+			String tenantId = tenantDetails[0];
+			if(tenantDetails.length > 1)
+			{
+				waterobject.put(tenantName, tenantDetails[1].toUpperCase());
+			}
+			waterobject.put(propertyKey, property);
+			waterobject.put(service, "WATER");
 			return getFielStoreIdFromPDFService(waterobject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);

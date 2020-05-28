@@ -71,7 +71,10 @@ public class PdfFileStoreService {
 	String sla = "sla";
 	String slaDate = "slaDate";
 	String sanctionLetterDate = "sanctionLetterDate";
-
+	String tenantName = "tenantName";
+	String service = "service";
+	String propertyKey = "property";
+	
 	/**
 	 * Get fileStroe Id's
 	 * 
@@ -113,7 +116,14 @@ public class PdfFileStoreService {
 			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
 			sewerageobject.put(slaDate, slaDays.add(
 					new BigDecimal(System.currentTimeMillis())));
-			String tenantId = property.getTenantId().split("\\.")[0];
+			String[] tenantDetails = property.getTenantId().split("\\."); 
+			String tenantId = tenantDetails[0];
+			if(tenantDetails.length > 1)
+			{
+				sewerageobject.put(tenantName, tenantDetails[1].toUpperCase());
+			}
+			sewerageobject.put(propertyKey, property);
+			sewerageobject.put(service, "WATER");
 			return getFielStoreIdFromPDFService(sewerageobject, sewerageConnectionRequest.getRequestInfo(), tenantId,
 					applicationKey);
 		} catch (Exception ex) {
