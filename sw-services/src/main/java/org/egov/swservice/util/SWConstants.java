@@ -138,9 +138,11 @@ public class SWConstants {
 	public static final String ESTIMATION_FILESTORE_ID = "estimationFileStoreId";
 
 	public static final String SANCTION_LETTER_FILESTORE_ID = "sanctionFileStoreId";
+	
+	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
 
 	public static final List<String> ADHOC_PENALTY_REBATE = Collections.unmodifiableList(Arrays.asList(ADHOC_PENALTY,
-			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT,DETAILS_PROVIDED_BY,APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID));
+			ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT, ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT,DETAILS_PROVIDED_BY,APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID, ESTIMATION_DATE_CONST));
 	
 	public static final String ACTIVATE_CONNECTION_CONST = "ACTIVATE_CONNECTION";
 	
@@ -168,8 +170,5 @@ public class SWConstants {
 	public static final String PDF_SANCTION_KEY = "ws-sanctionletter";
 	
 	public static final long DAYS_CONST= 86400000l;
-	
-	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
-
 	
 }

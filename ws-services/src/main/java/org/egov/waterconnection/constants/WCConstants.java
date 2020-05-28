@@ -167,10 +167,12 @@ public class WCConstants {
 	
 	public static final String SANCTION_LETTER_FILESTORE_ID = "sanctionFileStoreId";
 	
+	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
+	
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections
 			.unmodifiableList(Arrays.asList(ADHOC_PENALTY, ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT,
 					ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST, DETAILS_PROVIDED_BY,
-					APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID));
+					APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID, ESTIMATION_DATE_CONST));
 
 	public static final List<String> EDIT_NOTIFICATION_STATE = Collections.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
 	
@@ -199,7 +201,5 @@ public class WCConstants {
 	public static final String MONTHLY_BILLING_CONST = "monthly";
 
 	public static final String BILLING_CYCLE_STRING = "billingCycle";
-	
-	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
 	
 }
