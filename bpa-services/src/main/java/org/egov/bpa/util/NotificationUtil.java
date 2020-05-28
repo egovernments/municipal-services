@@ -18,6 +18,7 @@ import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.SMSRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,160 +59,52 @@ public class NotificationUtil {
 	 *            The messages from localization
 	 * @return customized message based on bpa
 	 */
+	@SuppressWarnings("unchecked")
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
+		String applicationType = ((Map<String, String>) bpa.getAdditionalDetails()).get("applicationType");
+		String serviceType = ((Map<String, String>) bpa.getAdditionalDetails()).get("serviceType");
+
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
-			messageTemplate = getMessageTemplate(BPAConstants.APP_REJECTED, localizationMessage);
+			messageTemplate = getMessageTemplate(
+					applicationType + "_" + serviceType + "_" + BPAConstants.STATUS_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {
-			String ACTION_STATUS = bpa.getWorkflow().getAction() + "_" + bpa.getStatus();
-			switch (ACTION_STATUS) {
 
-			case BPAConstants.ACTION_STATUS_INITIATED:
-				messageTemplate = getMessageTemplate(BPAConstants.APP_CREATE, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
+			String messageCode = applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction() + "_"
+					+ bpa.getStatus();
 
-			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
-				messageTemplate = getMessageTemplate(BPAConstants.SEND_TO_CITIZEN, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_SEND_TO_ARCHITECT:
-				messageTemplate = getMessageTemplate(BPAConstants.SEND_TO_ARCHITECT, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_CITIZEN_APPROVE:
-				messageTemplate = getMessageTemplate(BPAConstants.CITIZEN_APPROVED, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
-				messageTemplate = getMessageTemplate(BPAConstants.APP_FEE_PENDNG, localizationMessage);
-				// message = getPaymentMsg(requestInfo,bpa, messageTemplate);
+			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
+			if (!StringUtils.isEmpty(messageTemplate)) {
 				message = getInitiatedMsg(bpa, messageTemplate);
 
-				break;
-
-			case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.PAYMENT_RECEIVE, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.DOC_VERIFICATION, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.NOC_VERIFICATION, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
-				messageTemplate = getMessageTemplate(BPAConstants.NOC_APPROVE, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
-				messageTemplate = getMessageTemplate(BPAConstants.PERMIT_FEE_GENERATED, localizationMessage);
-				// message = getPaymentMsg(requestInfo,bpa, messageTemplate);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_APPROVED:
-				messageTemplate = getMessageTemplate(BPAConstants.APPROVE_PERMIT_GENERATED, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-			}
-
-			if (message.contains("<4>")) {
-				BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
-				message = message.replace("<4>", amount.toString());
+				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
+					BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
+					message = message.replace("<AMOUNT_TO_BE_PAID>", amount.toString());
+				}
 			}
 		}
 		return message;
 	}
 
+	@SuppressWarnings("unchecked")
 	public String getEventsCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
+		String applicationType = ((Map<String, String>) bpa.getAdditionalDetails()).get("applicationType");
+		String serviceType = ((Map<String, String>) bpa.getAdditionalDetails()).get("serviceType");
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.M_APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {
-			String ACTION_STATUS = bpa.getWorkflow().getAction() + "_" + bpa.getStatus();
-			switch (ACTION_STATUS) {
-
-			case BPAConstants.ACTION_STATUS_INITIATED:
-				messageTemplate = getMessageTemplate(BPAConstants.M_APP_CREATE, localizationMessage);
+			String messageCode = "M" + "_" + applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction()
+					+ "_" + bpa.getStatus();
+			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
+			if (!StringUtils.isEmpty(messageTemplate)) {
 				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_SEND_TO_CITIZEN:
-				messageTemplate = getMessageTemplate(
-
-				BPAConstants.M_SEND_TO_CITIZEN, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_SEND_TO_ARCHITECT:
-				messageTemplate = getMessageTemplate(BPAConstants.M_SEND_TO_ARCHITECT, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_CITIZEN_APPROVE:
-				messageTemplate = getMessageTemplate(BPAConstants.M_CITIZEN_APPROVED, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_PENDING_APPL_FEE:
-				messageTemplate = getMessageTemplate(BPAConstants.M_APP_FEE_PENDNG, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_DOC_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.M_PAYMENT_RECEIVE, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_FI_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.M_DOC_VERIFICATION, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_NOC_VERIFICATION:
-				messageTemplate = getMessageTemplate(BPAConstants.M_NOC_VERIFICATION, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-
-			case BPAConstants.ACTION_STATUS_PENDING_APPROVAL:
-				messageTemplate = getMessageTemplate(BPAConstants.M_NOC_APPROVE, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-			case BPAConstants.ACTION_STATUS_PENDING_SANC_FEE:
-				messageTemplate = getMessageTemplate(BPAConstants.M_PERMIT_FEE_GENERATED, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-				break;
-
-			case BPAConstants.ACTION_STATUS_APPROVED:
-				messageTemplate = getMessageTemplate(BPAConstants.M_APPROVE_PERMIT_GENERATED, localizationMessage);
-				message = getInitiatedMsg(bpa, messageTemplate);
-
-				break;
-			}
-
-			if (message.contains("<4>")) {
-				BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
-				message = message.replace("<4>", amount.toString());
+				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
+					BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
+					message = message.replace("<AMOUNT_TO_BE_PAID>", amount.toString());
+				}
 			}
 		}
 		return message;
@@ -234,7 +127,10 @@ public class NotificationUtil {
 		String message = null;
 		try {
 			List data = JsonPath.parse(localizationMessage).read(path);
-			message = data.get(0).toString();
+			if (!CollectionUtils.isEmpty(data))
+				message = data.get(0).toString();
+			else
+				log.error("Fetching from localization failed with code " + notificationCode);
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);
 		}
@@ -250,19 +146,33 @@ public class NotificationUtil {
 	 *            The TradeLicense object for which
 	 * @return
 	 */
-
-	@SuppressWarnings("rawtypes")
 	private BigDecimal getAmountToBePaid(RequestInfo requestInfo, BPA bpa) {
+
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getBillUri(bpa),
 				new RequestInfoWrapper(requestInfo));
-		String jsonString = new JSONObject(responseMap).toString();
-
-		BigDecimal amountToBePaid = null;
+		JSONObject jsonObject = new JSONObject(responseMap);
+		BigDecimal amountToBePaid;
+		double amount = 0.0;
 		try {
-			Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT);
-			amountToBePaid = new BigDecimal(obj.toString());
+			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
+			if (demandArray != null) {
+				JSONObject firstElement = (JSONObject) demandArray.get(0);
+				if (firstElement != null) {
+					JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+					if (demandDetails != null) {
+						for (int i = 0; i < demandDetails.length(); i++) {
+							JSONObject object = (JSONObject) demandDetails.get(i);
+							Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+							amount = amount + taxAmt;
+						}
+					}
+				}
+			}
+			amountToBePaid = BigDecimal.valueOf(amount);
 		} catch (Exception e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse the response using jsonPath: " + BILL_AMOUNT);
+			throw new CustomException("PARSING ERROR",
+					"Failed to parse the response using jsonPath: "
+							+ BILL_AMOUNT);
 		}
 		return amountToBePaid;
 	}
@@ -281,6 +191,10 @@ public class NotificationUtil {
 			code = "BPA.NC_APP_FEE";
 		} else {
 			code = "BPA.NC_SAN_FEE";
+		}
+		
+		if(status.equalsIgnoreCase("PENDING_FEE")){
+			code= "BPA.LOW_RISK_PERMIT_FEE";
 		}
 		StringBuilder builder = new StringBuilder(config.getBillingHost());
 		builder.append(config.getDemandSearchEndpoint());
