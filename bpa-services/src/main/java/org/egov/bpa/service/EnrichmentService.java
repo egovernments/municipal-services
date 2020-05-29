@@ -185,7 +185,14 @@ public class EnrichmentService {
 
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
-			Map<String, Object> additionalDetail = (Map) bpa.getAdditionalDetails();
+			Map<String, Object> additionalDetail = null;
+			if(bpa.getAdditionalDetails() != null) {
+				additionalDetail = (Map) bpa.getAdditionalDetails();
+			} else {
+				additionalDetail = new HashMap<String, Object>();
+				bpa.setAdditionalDetails(additionalDetail);
+			}
+			
 			additionalDetail.put("validityDate", calendar.getTimeInMillis());
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
