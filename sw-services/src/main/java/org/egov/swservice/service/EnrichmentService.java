@@ -96,7 +96,7 @@ public class EnrichmentService {
 			}
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)) {
-				addDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
+				additionalDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			}
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);

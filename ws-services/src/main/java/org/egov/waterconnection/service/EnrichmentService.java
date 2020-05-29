@@ -94,7 +94,7 @@ public class EnrichmentService {
 			}
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
 					.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)) {
-				addDetail.put(WCConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
+				additionalDetail.put(WCConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			}
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
