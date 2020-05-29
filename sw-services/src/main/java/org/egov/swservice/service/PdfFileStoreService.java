@@ -133,7 +133,7 @@ public class PdfFileStoreService {
 				sewerageobject.put(tenantName, tenantDetails[1].toUpperCase());
 			}
 			sewerageobject.put(propertyKey, property);
-			sewerageobject.put(service, "WATER");
+			sewerageobject.put(service, "SEWERAGE");
 			return getFielStoreIdFromPDFService(sewerageobject, sewerageConnectionRequest.getRequestInfo(), tenantId,
 					applicationKey);
 		} catch (Exception ex) {
