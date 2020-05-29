@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.swservice.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
