@@ -287,10 +287,13 @@ public class MasterDataService {
 	@SuppressWarnings("unchecked")
 	public Map<String, Object> enrichBillingPeriod(CalculationCriteria criteria, ArrayList<?> mdmsResponse,
 			Map<String, Object> masterMap) {
-		log.info("Billing Frequency Map" + mdmsResponse.toString());
+
+		log.info("Billing Frequency Map {}", mdmsResponse.toString());
+
+		int size = mdmsResponse.size();
 
 		Map<String, Object> master = new HashMap<>();
-		for (int i = 0; i < mdmsResponse.size(); i++) {
+		for (int i = 0; i < size; i++) {
 			if ((((Map<String, Object>) mdmsResponse.get(i)).get(SWCalculationConstant.ConnectionType).toString())
 					.equalsIgnoreCase(criteria.getSewerageConnection().getConnectionType())) {
 				master = (Map<String, Object>) mdmsResponse.get(i);
@@ -298,18 +301,29 @@ public class MasterDataService {
 			}
 		}
 		Map<String, Object> billingPeriod = new HashMap<>();
+		if (SWCalculationConstant.Monthly_Billing_Period
+				.equalsIgnoreCase(master.get(SWCalculationConstant.BILLING_CYCLE_CONST).toString())) {
+			estimationService.getMonthStartAndEndDate(billingPeriod);
+		}
+		if (SWCalculationConstant.Quaterly_Billing_Period
+				.equalsIgnoreCase(master.get(SWCalculationConstant.BILLING_CYCLE_CONST).toString())) {
+			estimationService.getQuaterStartAndEndDate(billingPeriod);
+		} else {
+			LocalDateTime demandEndDate = LocalDateTime.now();
+			demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
 
-		LocalDateTime demandEndDate = LocalDateTime.now();
-		demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
+			billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES,
+					Timestamp.valueOf(demandEndDate).getTime()
+							- (Long) master.get(SWCalculationConstant.Demand_End_Date_String));
+			billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES,
+					Timestamp.valueOf(demandEndDate).getTime());
+		}
 
-		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, Timestamp.valueOf(demandEndDate).getTime()
-				- (Long) master.get(SWCalculationConstant.Demand_End_Date_String));
-		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, Timestamp.valueOf(demandEndDate).getTime());
 		log.info("Demand Expiry Date : " + master.get(SWCalculationConstant.Demand_Expiry_Date_String));
 		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String,
 				new BigInteger(String.valueOf(master.get(SWCalculationConstant.Demand_Expiry_Date_String)))
 						.longValue());
-		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
+		masterMap.put(SWCalculationConstant.BILLING_PERIOD, billingPeriod);
 		return masterMap;
 	}
 
@@ -437,7 +451,7 @@ public class MasterDataService {
 		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, System.currentTimeMillis());
 		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, System.currentTimeMillis() + SWCalculationConstant.APPLICATION_FEE_DEMAND_END_DATE);
 		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String, SWCalculationConstant.APPLICATION_FEE_DEMAND_EXP_DATE);
-		masterMap.put(SWCalculationConstant.BillingPeriod, billingPeriod);
+		masterMap.put(SWCalculationConstant.BILLING_PERIOD, billingPeriod);
 		return masterMap;
 	}
 }

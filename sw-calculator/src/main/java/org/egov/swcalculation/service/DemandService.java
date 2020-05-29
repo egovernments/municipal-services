@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
-import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.model.Calculation;
@@ -111,7 +110,7 @@ public class DemandService {
 			Map<String, Object> masterMap, boolean isForConnectionNo) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
-				.get(SWCalculationConstant.BillingPeriod);
+				.get(SWCalculationConstant.BILLING_PERIOD);
 		Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 		Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
 		
@@ -198,7 +197,7 @@ public class DemandService {
 			
 			@SuppressWarnings("unchecked")
 			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
-					.get(SWCalculationConstant.BillingPeriod);
+					.get(SWCalculationConstant.BILLING_PERIOD);
 
 			Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 			Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
@@ -657,12 +656,8 @@ public class DemandService {
 	 */
 	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
-		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getBillingFrequency(requestInfo, tenantId);
-		Object res = repository.fetchResult(calculatorUtils.getMdmsSearchUrl(), mdmsCriteriaReq);
-		if (res == null) {
-			throw new CustomException("MDMS ERROR FOR BILLING FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
-		}
-		generateDemandForULB(JsonPath.read(res, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod), requestInfo,
+		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
+		generateDemandForULB(JsonPath.read(billingMasterData, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod), requestInfo,
 				tenantId);
 	}
 	
@@ -673,11 +668,10 @@ public class DemandService {
 	 * @param tenantId
 	 */
 	@SuppressWarnings("unchecked")
-	public void generateDemandForULB(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenantId) {
-		log.info("Billing Frequency Map" + mdmsResponse.toString());
-		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
+	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
+		log.info("Billing master data values for non metered connecton:: {}", master);
 		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.Billing_Cycle_String), startDay)) {
+		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (String connectionNo : connectionNos) {

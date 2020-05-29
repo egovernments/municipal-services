@@ -129,7 +129,7 @@ public class SWCalculationConstant {
 
 	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.sw-services-calculation.billingPeriod";
 
-	public static final String BillingPeriod = "billingPeriod";
+	public static final String BILLING_PERIOD = "billingPeriod";
 
 	public static final String ConnectionType = "connectionType";
 
@@ -141,7 +141,7 @@ public class SWCalculationConstant {
 
 	public static final String Monthly_Billing_Period = "monthly";
 
-	public static final String Billing_Cycle_String = "billingCycle";
+	public static final String BILLING_CYCLE_CONST = "billingCycle";
 
 	public static final String MODULE = "rainmaker-ws";
 

@@ -3,6 +3,7 @@ package org.egov.swcalculation.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.Getter;
 
@@ -32,10 +34,10 @@ import lombok.Getter;
 public class CalculatorUtils {
 
 	@Autowired
-	SWCalculationConfiguration configurations;
+	private SWCalculationConfiguration configurations;
 
 	@Autowired
-	ServiceRequestRepository serviceRequestRepository;
+	private ServiceRequestRepository serviceRequestRepository;
 
 	/**
 	 * Prepares and returns Mdms search request with financial master criteria
@@ -136,7 +138,7 @@ public class CalculatorUtils {
 
 	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BillingPeriod)
+		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
 				.filter("[?(@.active== " + true + ")]").build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.SW_MODULE)
 				.masterDetails(Arrays.asList(mstrDetail)).build();
@@ -246,5 +248,41 @@ public class CalculatorUtils {
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return MdmsCriteria
+	 */
+	private MdmsCriteriaReq getBillingFrequencyForScheduler(RequestInfo requestInfo, String tenantId) {
+
+		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
+				.filter("[?(@.active== " + true + " && @.connectionType== '" + SWCalculationConstant.nonMeterdConnection
+						+ "')]")
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.SW_MODULE)
+				.masterDetails(Arrays.asList(mstrDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionType
+	 * @param tenantId
+	 * @return Master For Billing Period
+	 */
+	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getBillingFrequencyForScheduler(requestInfo, tenantId);
+		Object res = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+		if (res == null) {
+			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		List<Map<String, Object>> jsonOutput = JsonPath.read(res, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
+		return jsonOutput.get(0);
 	}
 }
