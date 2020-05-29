@@ -85,7 +85,6 @@ public class BPAService {
 	@Autowired
 	private OCService ocService;
 	
-	@SuppressWarnings("unused")
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
@@ -153,14 +152,6 @@ public class BPAService {
 		bpaValidator.validateSearch(requestInfo, criteria);
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
-		List<String> edcrNos = null;
-		if (!StringUtils.isEmpty(criteria.getApplicationType())
-				|| !StringUtils.isEmpty(criteria.getServiceType())) {
-			edcrNos = edcrService.getEDCRNos(criteria, requestInfo);
-			if(CollectionUtils.isEmpty(edcrNos)) {
-				return bpa;
-			}
-		}
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
@@ -171,7 +162,7 @@ public class BPAService {
 				});
 				criteria.setLandId(landId);
 			}
-			bpa = getBPAFromLandId(criteria, requestInfo, edcrNos);
+			bpa = getBPAFromLandId(criteria, requestInfo);
 			if (landInfo.size() > 0) {
 				for (int i = 0; i < bpa.size(); i++) {
 					for (int j = 0; j < landInfo.size(); j++) {
@@ -183,7 +174,7 @@ public class BPAService {
 			}
 		} else {
 			
-			bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
+			bpa = getBPAFromCriteria(criteria, requestInfo);
 			ArrayList<String> data = new ArrayList<String>();
 			if (bpa.size() > 0) {
 				for(int i=0; i<bpa.size(); i++){
@@ -208,9 +199,9 @@ public class BPAService {
 	
 
 
-	private List<BPA> getBPAFromLandId(BPASearchCriteria criteria, RequestInfo requestInfo, List<String> edcrNos) {
+	private List<BPA> getBPAFromLandId(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa = new LinkedList<>();
-		bpa = repository.getBPAData(criteria, edcrNos);
+		bpa = repository.getBPAData(criteria);
 		if (bpa.size() == 0) {
 			return Collections.emptyList();
 		}
@@ -227,8 +218,8 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
-	public List<BPA> getBPAFromCriteria(BPASearchCriteria criteria, RequestInfo requestInfo, List<String> edcrNos) {
-		List<BPA> bpa = repository.getBPAData(criteria, edcrNos);
+	public List<BPA> getBPAFromCriteria(BPASearchCriteria criteria, RequestInfo requestInfo) {
+		List<BPA> bpa = repository.getBPAData(criteria);
 		if (bpa.isEmpty())
 			return Collections.emptyList();
 		return bpa;
@@ -248,6 +239,7 @@ public class BPAService {
 	 *            The update Request
 	 * @return Updated bpa
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public BPA update(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
@@ -344,7 +336,7 @@ public class BPAService {
 		ids.add(request.getBPA().getId());
 		criteria.setTenantId(request.getBPA().getTenantId());
 		criteria.setIds(ids);
-		List<BPA> bpa = repository.getBPAData(criteria, null);
+		List<BPA> bpa = repository.getBPAData(criteria);
 		return bpa;
 	}
 
