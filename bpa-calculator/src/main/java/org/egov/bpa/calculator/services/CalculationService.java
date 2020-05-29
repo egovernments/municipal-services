@@ -207,7 +207,7 @@ public class CalculationService {
 				// PERMIT FEE
 				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal permitFee = BigDecimal
-						.valueOf(costPerSqmt * (Double.valueOf( areaData.get(BPACalculatorConstants.BUILDING_HEIGHT).toString())));
+						.valueOf(costPerSqmt * (Double.valueOf( areaData.get(BPACalculatorConstants.BUILT_UP_AREA).toString())));
 				if (permitFee.compareTo(BigDecimal.ZERO) == -1)
 					throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
 
