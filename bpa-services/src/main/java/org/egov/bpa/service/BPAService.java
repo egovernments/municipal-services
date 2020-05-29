@@ -99,11 +99,11 @@ public class BPAService {
 			bpaRequest.getBPA().setApprovalNo(null);
 
 		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
-		String applicationType = values.get("applicationType");
+		String applicationType = values.get(BPAConstants.APPLICATIONTYPE);
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		criteria.setTenantId(bpaRequest.getBPA().getTenantId());
 		if (applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
-			String approvalNo = values.get("permitNumber");
+			String approvalNo = values.get(BPAConstants.PERMIT_NO);
 
 			criteria.setApprovalNo(approvalNo);
 			List<BPA> BPA = search(criteria, requestInfo);
@@ -258,6 +258,9 @@ public class BPAService {
 			throw new CustomException("UPDATE ERROR", "Application Not found in the System" + bpa);
 		}
 
+		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
+		String applicationType = edcrResponse.get(BPAConstants.APPLICATIONTYPE);
+		log.info("applicationType is " + applicationType);
 		BusinessService businessService = workflowService.getBusinessService(bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 
@@ -270,9 +273,8 @@ public class BPAService {
 		criteria.setTenantId(bpaRequest.getBPA().getTenantId());
 		Map<String, String> additionalDetails = bpa.getAdditionalDetails() != null ? (Map)bpa.getAdditionalDetails()
 				: new HashMap<String, String>();
-		String applicationType = additionalDetails.get("applicationType");
 		if (applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
-			String approvalNo = additionalDetails.get("permitNumber");
+			String approvalNo = edcrResponse.get(BPAConstants.PERMIT_NO);
 
 			criteria.setApprovalNo(approvalNo);
 			List<BPA> BPA = search(criteria, requestInfo);
@@ -305,7 +307,7 @@ public class BPAService {
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
 				actionValidator.validateUpdateRequest(bpaRequest, businessService);
 				bpaValidator.validateUpdate(bpaRequest, searchResult, mdmsData,
-						workflowService.getCurrentState(bpa.getStatus(), businessService));
+						workflowService.getCurrentState(bpa.getStatus(), businessService), edcrResponse);
 				if (!applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 					landService.updateLandInfo(bpaRequest);
 				}

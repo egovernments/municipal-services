@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.bpa.service.EDCRService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -37,6 +38,9 @@ public class BPAValidator {
 
 	@Autowired
 	private BPAConfiguration config;
+	
+	@Autowired
+	private EDCRService edcrService;
 
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
@@ -52,8 +56,8 @@ public class BPAValidator {
 				&& !bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_ADHOC)
 				&& !bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_PAY)) {
 
-			String applicationType = values.get("applicationType");
-			String serviceType = values.get("serviceType");
+			String applicationType = values.get(BPAConstants.APPLICATIONTYPE);
+			String serviceType = values.get(BPAConstants.SERVICETYPE);
 			
 			String filterExp = "$.[?(@.applicationType=='" + applicationType + "' && @.ServiceType=='"
 					+ serviceType + "' && @.RiskType=='" + bpa.getRiskType() + "' && @.WFState=='"
@@ -211,11 +215,10 @@ public class BPAValidator {
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Permit Order Genarated date cannot be a future date");
 	}
 
-	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState) {
+	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {
 
 		BPA bpa = bpaRequest.getBPA();
-		Map<String, String> values = (Map<String, String>) bpa.getAdditionalDetails();
-		validateApplicationDocuments(bpaRequest, mdmsData, currentState, values);
+		validateApplicationDocuments(bpaRequest, mdmsData, currentState, edcrResponse);
 		validateAllIds(searchResult, bpa);
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateDuplicateDocuments(bpaRequest);
@@ -268,20 +271,24 @@ public class BPAValidator {
 
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
-		validateQuestions(mdmsData, bpa, wfState);
-		validateDocTypes(mdmsData, bpa, wfState);
+		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
+		log.info("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+        log.info("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+        
+		validateQuestions(mdmsData, bpa, wfState, edcrResponse);
+		validateDocTypes(mdmsData, bpa, wfState, edcrResponse);
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateQuestions(Object mdmsData, BPA bpa, String wfState) {
+	private void validateQuestions(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsQns = null;
 
 		log.info("Fetching MDMS result for the state " + wfState);
 
 		try {
 			String questionsPath = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
-					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
-					.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());;
+					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
+					.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));;
 
 			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, questionsPath);
 
@@ -342,15 +349,15 @@ public class BPAValidator {
 	}
 
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState) {
+	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsDocs = null;
 
 		log.info("Fetching MDMS result for the state " + wfState);
 
 		try {
 			String docTypesPath = BPAConstants.DOCTYPES_MAP.replace("{1}", wfState)
-					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
-					.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());;
+					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
+					.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));;
 
 			List<Object> docTypesArray = (List<Object>) JsonPath.read(mdmsData, docTypesPath);
 

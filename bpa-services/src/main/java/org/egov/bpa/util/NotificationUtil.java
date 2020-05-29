@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.producer.Producer;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.service.EDCRService;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.EventRequest;
 import org.egov.bpa.web.model.RequestInfoWrapper;
@@ -37,13 +38,16 @@ public class NotificationUtil {
 	private ServiceRequestRepository serviceRequestRepository;
 
 	private Producer producer;
+	
+	private EDCRService edcrService;
 
 	@Autowired
 	public NotificationUtil(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			Producer producer) {
+			Producer producer, EDCRService edcrService) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.producer = producer;
+		this.edcrService = edcrService;
 	}
 
 	final String receiptNumberKey = "receiptNumber";
@@ -62,8 +66,10 @@ public class NotificationUtil {
 	@SuppressWarnings("unchecked")
 	public String getCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
-		String applicationType = ((Map<String, String>) bpa.getAdditionalDetails()).get("applicationType");
-		String serviceType = ((Map<String, String>) bpa.getAdditionalDetails()).get("serviceType");
+		Map<String, String> edcrResponse = edcrService.getEDCRDetails(requestInfo, bpa);
+		
+		String applicationType = edcrResponse.get(BPAConstants.APPLICATIONTYPE);
+		String serviceType = edcrResponse.get(BPAConstants.SERVICETYPE);
 
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(
@@ -93,8 +99,10 @@ public class NotificationUtil {
 	// so it will be same as the getCustomizedMsg
 	public String getEventsCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
-		String applicationType = ((Map<String, String>) bpa.getAdditionalDetails()).get("applicationType");
-		String serviceType = ((Map<String, String>) bpa.getAdditionalDetails()).get("serviceType");
+		Map<String, String> edcrResponse = edcrService.getEDCRDetails(requestInfo, bpa);		
+		String applicationType = edcrResponse.get(BPAConstants.APPLICATIONTYPE);
+		String serviceType = edcrResponse.get(BPAConstants.SERVICETYPE);
+		
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.M_APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);

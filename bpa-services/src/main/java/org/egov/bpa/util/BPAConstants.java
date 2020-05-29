@@ -328,4 +328,10 @@ public class BPAConstants {
 	public static final String OC_KHATHANO = "$.edcrDetail[0].planDetail.planInformation.khataNo";
 
 	public static final String OC_PLOTNO = "$.edcrDetail[0].planDetail.planInformation.plotNo";
+	
+	public static final String SERVICETYPE = "serviceType";
+	
+	public static final String APPLICATIONTYPE = "applicationType";
+	
+	public static final String PERMIT_NO = "permitNumber";
 }

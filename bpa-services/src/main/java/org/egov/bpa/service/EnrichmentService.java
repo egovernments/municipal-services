@@ -27,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
 @Service
 @Slf4j
@@ -43,6 +44,9 @@ public class EnrichmentService {
 
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private EDCRService edcrService;
 
 	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -51,7 +55,7 @@ public class EnrichmentService {
 		bpaRequest.getBPA().setId(UUID.randomUUID().toString());
 		
 		bpaRequest.getBPA().setAccountId(bpaRequest.getBPA().getAuditDetails().getCreatedBy());
-		String applicationType = values.get("applicationType");
+		String applicationType = values.get(BPAConstants.APPLICATIONTYPE);
 		if(applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN)){
 		if(!bpaRequest.getBPA().getRiskType().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)){
 			bpaRequest.getBPA().setBusinessService(BPAConstants.BPA_MODULE_CODE);
@@ -163,6 +167,14 @@ public class EnrichmentService {
 			bpa.setApplicationDate(Calendar.getInstance().getTimeInMillis());
 		}
 		
+		if (StringUtils.isEmpty(bpa.getRiskType())) {
+			if (bpa.getBusinessService().equals(BPAConstants.BPA_LOW_MODULE_CODE)) {
+				bpa.setRiskType(BPAConstants.LOW_RISKTYPE);
+			} else {
+				bpa.setRiskType(BPAConstants.HIGH_RISKTYPE);
+			}
+		}
+		
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
@@ -182,10 +194,14 @@ public class EnrichmentService {
 					&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)) {
 				
 				Object mdmsData = bpaUtil.mDMSCall(bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
+				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
+				log.info("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+	            log.info("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+	            
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
 						.replace("{2}", bpa.getRiskType().toString())
-						.replace("{3}", ((Map)bpa.getAdditionalDetails()).get("serviceType").toString())
-						.replace("{4}", ((Map)bpa.getAdditionalDetails()).get("applicationType").toString());
+						.replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
+						.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));
 				log.info(condeitionsPath);
 
 				try {
