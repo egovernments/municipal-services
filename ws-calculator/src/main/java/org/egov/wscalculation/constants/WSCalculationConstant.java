@@ -175,7 +175,7 @@ public class WSCalculationConstant {
 
 	public static final String pipeSizeConst = "Pipe Size";
 
-	public static final String BillingPeriod = "billingPeriod";
+	public static final String BILLING_PERIOD = "billingPeriod";
 
 	public static final String ConnectionType = "connectionType";
 

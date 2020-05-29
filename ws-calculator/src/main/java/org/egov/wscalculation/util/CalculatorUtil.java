@@ -4,15 +4,16 @@ package org.egov.wscalculation.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.model.RequestInfoWrapper;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.Getter;
 
@@ -33,10 +35,10 @@ import lombok.Getter;
 public class CalculatorUtil {
 
 	@Autowired
-	WSCalculationConfiguration calculationConfig;
+	private WSCalculationConfiguration calculationConfig;
 	
 	@Autowired
-	ServiceRequestRepository serviceRequestRepository;
+	private ServiceRequestRepository serviceRequestRepository;
 	/**
 	 * Methods provides all the usage category master for Water Service module
 	 */
@@ -89,7 +91,7 @@ public class CalculatorUtil {
 	
 	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.BillingPeriod)
+		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.BILLING_PERIOD)
 				.filter("[?(@.active== "+true+")]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.WS_MODULE)
@@ -238,5 +240,41 @@ public class CalculatorUtil {
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+	
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return MdmsCriteria
+	 */
+	private MdmsCriteriaReq getBillingFrequencyForScheduler(RequestInfo requestInfo, String tenantId) {
+
+		MasterDetail mstrDetail = MasterDetail.builder().name(WSCalculationConstant.BILLING_PERIOD)
+				.filter("[?(@.active== " + true + " && @.connectionType== '" + WSCalculationConstant.nonMeterdConnection
+						+ "')]")
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.WS_MODULE)
+				.masterDetails(Arrays.asList(mstrDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
+
+	/**
+	 * 
+	 * @param requestInfo
+	 * @param connectionType
+	 * @param tenantId
+	 * @return Master For Billing Period
+	 */
+	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getBillingFrequencyForScheduler(requestInfo, tenantId);
+		Object res = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+		if (res == null) {
+			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+		}
+		List<Map<String, Object>> jsonOutput = JsonPath.read(res, WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
+		return jsonOutput.get(0);
 	}
 }
