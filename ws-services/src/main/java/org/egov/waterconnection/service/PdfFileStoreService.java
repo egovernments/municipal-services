@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.swservice.util.SWConstants;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
@@ -178,6 +179,7 @@ public class PdfFileStoreService {
 		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)
 				&& addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+			addDetail.put(WCConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
 					getFileStroeId(waterConnectionRequest, property, WCConstants.PDF_ESTIMATION_KEY));
 		}

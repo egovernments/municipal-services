@@ -188,6 +188,7 @@ public class PdfFileStoreService {
 		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)
 				&& addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
+			addDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
 					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_ESTIMATION_KEY));
 		}
