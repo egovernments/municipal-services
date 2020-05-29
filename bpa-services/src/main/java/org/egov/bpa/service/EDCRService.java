@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
@@ -66,7 +67,7 @@ public class EDCRService {
 
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		criteria.setEdcrNumber(bpa.getEdcrNumber());
-		List<BPA> bpas = bpaRepository.getBPAData(criteria);
+		List<BPA> bpas = bpaRepository.getBPAData(criteria, null);
 		if(bpas.size()>0){
 			for(int i=0; i<bpas.size(); i++){
 				if(!bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED)){
@@ -183,31 +184,31 @@ public class EDCRService {
 		return CollectionUtils.isEmpty(planReports) ? null : planReports.get(0);
 	}
 
-//	@SuppressWarnings("rawtypes")
-//	public List<String> getEDCRNos(BPASearchCriteria searchCriteria, org.egov.common.contract.request.RequestInfo requestInfo) {
-//
-//		StringBuilder uri = new StringBuilder(config.getEdcrHost());
-//		uri.append(config.getGetPlanEndPoint());
-//		uri.append("?").append("tenantId=").append(searchCriteria.getTenantId());
-//		if (!StringUtils.isEmpty(searchCriteria.getApplicationType()))
-//			uri.append("&").append("appliactionType=").append(searchCriteria.getApplicationType());
-//		if (!StringUtils.isEmpty(searchCriteria.getServiceType()))
-//			uri.append("&").append("applicationSubType=").append(searchCriteria.getServiceType());
-//		RequestInfo edcrRequestInfo = new RequestInfo();
-//		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
-//		LinkedHashMap responseMap = null;
-//		try {
-//			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
-//					new RequestInfoWrapper(edcrRequestInfo));
-//		} catch (ServiceCallException se) {
-//			throw new CustomException("EDCR ERROR", " Invalid search criteria");
-//		}
-//
-//		String jsonString = new JSONObject(responseMap).toString();
-//		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
-//		List<String> edcrNos = context.read("edcrDetail.*.edcrNumber");
-//
-//		return CollectionUtils.isEmpty(edcrNos) ? null : edcrNos;
-//	}
+	@SuppressWarnings("rawtypes")
+	public List<String> getEDCRNos(BPASearchCriteria searchCriteria, org.egov.common.contract.request.RequestInfo requestInfo) {
+
+		StringBuilder uri = new StringBuilder(config.getEdcrHost());
+		uri.append(config.getGetPlanEndPoint());
+		uri.append("?").append("tenantId=").append(searchCriteria.getTenantId());
+		if (!StringUtils.isEmpty(searchCriteria.getApplicationType()))
+			uri.append("&").append("appliactionType=").append(searchCriteria.getApplicationType());
+		if (!StringUtils.isEmpty(searchCriteria.getServiceType()))
+			uri.append("&").append("applicationSubType=").append(searchCriteria.getServiceType());
+		RequestInfo edcrRequestInfo = new RequestInfo();
+		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
+		LinkedHashMap responseMap = null;
+		try {
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new RequestInfoWrapper(edcrRequestInfo));
+		} catch (ServiceCallException se) {
+			throw new CustomException("EDCR ERROR", " Invalid search criteria");
+		}
+
+		String jsonString = new JSONObject(responseMap).toString();
+		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+		List<String> edcrNos = context.read("edcrDetail.*.edcrNumber");
+
+		return CollectionUtils.isEmpty(edcrNos) ? null : edcrNos;
+	}
 
 }

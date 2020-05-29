@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
-
 @Component
 public class BPAQueryBuilder {
 
@@ -39,7 +37,7 @@ public class BPAQueryBuilder {
 	 *            values to be replased on the query
 	 * @return Final Search Query
 	 */
-	public String getBPASearchQuery(BPASearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getBPASearchQuery(BPASearchCriteria criteria, List<Object> preparedStmtList, List<String> edcrNos) {
 
 		StringBuilder builder = new StringBuilder(QUERY);
 
@@ -70,16 +68,10 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(criteria.getEdcrNumber());
 		}
 		
-		if(!StringUtils.isEmpty(criteria.getApplicationType())) {
+		if(!CollectionUtils.isEmpty(edcrNos)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.additionalDetails ->> 'applicationType' = ?");
-			preparedStmtList.add(criteria.getApplicationType());
-		}
-		
-		if(!StringUtils.isEmpty(criteria.getServiceType())) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.additionalDetails ->> 'serviceType' = ?");
-			preparedStmtList.add(criteria.getServiceType());
+			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNos)).append(")");
+			addToPreparedStatement(preparedStmtList, edcrNos);
 		}
 
 		String applicationNo = criteria.getApplicationNo();

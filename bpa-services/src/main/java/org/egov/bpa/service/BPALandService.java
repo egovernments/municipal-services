@@ -86,20 +86,21 @@ public class BPALandService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList<LandInfo> searchLandInfoToBPA(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
 		// TODO Auto-generated method stub
-
+		
+	
 		StringBuilder url = getLandSerchURLWithParams(requestInfo, landcriteria);
-
+		
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		LinkedHashMap responseMap = null;
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		if (responseMap != null && responseMap.get("LandInfo") != null)
 			landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
-		ArrayList<LandInfo> landData = new ArrayList<LandInfo>();
-		if (landInfo.size() > 0) {
-			for (int i = 0; i < landInfo.size(); i++) {
-				landData.add(mapper.convertValue(landInfo.get(i), LandInfo.class));
-			}
+		ArrayList<LandInfo> landData = new ArrayList<LandInfo>(); 
+		if(landInfo.size()>0){
+		for(int i=0; i<landInfo.size(); i++){
+			landData.add(mapper.convertValue(landInfo.get(i), LandInfo.class));
+		}
 		}
 		return landData;
 	}
