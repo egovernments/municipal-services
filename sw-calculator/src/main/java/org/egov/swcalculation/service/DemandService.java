@@ -657,7 +657,7 @@ public class DemandService {
 	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		generateDemandForULB(JsonPath.read(billingMasterData, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod), requestInfo,
+		generateDemandForULB(billingMasterData, requestInfo,
 				tenantId);
 	}
 	
