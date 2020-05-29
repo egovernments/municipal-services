@@ -526,6 +526,8 @@ public class PaymentNotificationService {
         String url = builder.toString();
         url = url.replace("$consumerCode", valMap.get("propertyId"));
         url = url.replace("$tenantId", valMap.get("tenantId"));
+        url = url.replace("$businessService",PT_BUSINESSSERVICE);
+
         url = util.getShortenedUrl(url);
         return url;
     }

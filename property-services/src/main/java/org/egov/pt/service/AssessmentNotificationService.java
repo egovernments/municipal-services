@@ -155,9 +155,16 @@ public class AssessmentNotificationService {
             messageTemplate = messageTemplate.replace(NOTIFICATION_FINANCIALYEAR, assessment.getFinancialYear());
 
         if(messageTemplate.contains(NOTIFICATION_PAYMENT_LINK)){
-             URIBuilder uriBuilder = new URIBuilder().setHost(config.getUiAppHost()).setPath(config.getPayLinkSMS()).setParameter("consumerCode",property.getPropertyId())
-                .setParameter("tenantId",property.getTenantId()).setParameter("businessService",PT_BUSINESSSERVICE);
-             messageTemplate = messageTemplate.replace(NOTIFICATION_PAYMENT_LINK,uriBuilder.toString());
+
+            String UIHost = config.getUiAppHost();
+            String paymentPath = config.getPayLinkSMS();
+            paymentPath = paymentPath.replace("$consumercode",property.getPropertyId());
+            paymentPath = paymentPath.replace("$tenantId",property.getTenantId());
+            paymentPath = paymentPath.replace("$businessservice",PT_BUSINESSSERVICE);
+
+            String finalPath = UIHost + paymentPath;
+
+            messageTemplate = messageTemplate.replace(NOTIFICATION_PAYMENT_LINK,util.getShortenedUrl(finalPath));
         }
 
         return messageTemplate;
