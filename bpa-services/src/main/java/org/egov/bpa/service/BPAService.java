@@ -85,7 +85,6 @@ public class BPAService {
 	@Autowired
 	private OCService ocService;
 	
-	@SuppressWarnings("unused")
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
@@ -234,13 +233,6 @@ public class BPAService {
 		return bpa;
 	}
 
-	/**
-	 * Updates the bpa
-	 * 
-	 * @param bpaRequest
-	 *            The update Request
-	 * @return Updated bpa
-	 */
 	/**
 	 * Updates the bpa
 	 * 
