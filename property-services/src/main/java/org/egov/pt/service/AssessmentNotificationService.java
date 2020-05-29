@@ -158,9 +158,9 @@ public class AssessmentNotificationService {
 
             String UIHost = config.getUiAppHost();
             String paymentPath = config.getPayLinkSMS();
-            paymentPath = paymentPath.replace("$consumercode",property.getPropertyId());
+            paymentPath = paymentPath.replace("$consumerCode",property.getPropertyId());
             paymentPath = paymentPath.replace("$tenantId",property.getTenantId());
-            paymentPath = paymentPath.replace("$businessservice",PT_BUSINESSSERVICE);
+            paymentPath = paymentPath.replace("$businessService",PT_BUSINESSSERVICE);
 
             String finalPath = UIHost + paymentPath;
 
