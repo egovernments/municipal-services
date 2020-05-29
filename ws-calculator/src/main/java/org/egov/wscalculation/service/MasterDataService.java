@@ -248,8 +248,7 @@ public class MasterDataService {
 			if (WSCalculationConstant.Monthly_Billing_Period
 					.equalsIgnoreCase(master.get(WSCalculationConstant.Billing_Cycle_String).toString())) {
 				estimationService.getMonthStartAndEndDate(billingPeriod);
-			}
-			if (WSCalculationConstant.Quaterly_Billing_Period
+			} else if (WSCalculationConstant.Quaterly_Billing_Period
 					.equalsIgnoreCase(master.get(WSCalculationConstant.Billing_Cycle_String).toString())) {
 				estimationService.getQuaterStartAndEndDate(billingPeriod);
 			} else {

@@ -304,8 +304,7 @@ public class MasterDataService {
 		if (SWCalculationConstant.Monthly_Billing_Period
 				.equalsIgnoreCase(master.get(SWCalculationConstant.BILLING_CYCLE_CONST).toString())) {
 			estimationService.getMonthStartAndEndDate(billingPeriod);
-		}
-		if (SWCalculationConstant.Quaterly_Billing_Period
+		} else if (SWCalculationConstant.Quaterly_Billing_Period
 				.equalsIgnoreCase(master.get(SWCalculationConstant.BILLING_CYCLE_CONST).toString())) {
 			estimationService.getQuaterStartAndEndDate(billingPeriod);
 		} else {
