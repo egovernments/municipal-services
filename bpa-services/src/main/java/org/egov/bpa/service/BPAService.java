@@ -93,6 +93,10 @@ public class BPAService {
 		if (bpaRequest.getBPA().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
 		}
+		
+		//Since approval number should be generated at approve stage
+		if(!StringUtils.isEmpty(bpaRequest.getBPA().getApprovalNo()))
+			bpaRequest.getBPA().setApprovalNo(null);
 
 		Map<String, String> values = edcrService.validateEdcrPlan(bpaRequest, mdmsData);
 		String applicationType = values.get("applicationType");

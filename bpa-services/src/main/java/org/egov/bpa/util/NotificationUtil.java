@@ -88,6 +88,9 @@ public class NotificationUtil {
 	}
 
 	@SuppressWarnings("unchecked")
+	// As per OAP-304, keeping the same messages for Events and SMS, so removed
+	// "M_" prefix for the localization codes.
+	// so it will be same as the getCustomizedMsg
 	public String getEventsCustomizedMsg(RequestInfo requestInfo, BPA bpa, String localizationMessage) {
 		String message = null, messageTemplate;
 		String applicationType = ((Map<String, String>) bpa.getAdditionalDetails()).get("applicationType");
@@ -96,7 +99,7 @@ public class NotificationUtil {
 			messageTemplate = getMessageTemplate(BPAConstants.M_APP_REJECTED, localizationMessage);
 			message = getInitiatedMsg(bpa, messageTemplate);
 		} else {
-			String messageCode = "M" + "_" + applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction()
+			String messageCode = applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction()
 					+ "_" + bpa.getStatus();
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
 			if (!StringUtils.isEmpty(messageTemplate)) {
