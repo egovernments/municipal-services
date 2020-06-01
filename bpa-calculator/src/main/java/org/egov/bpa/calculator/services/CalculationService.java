@@ -183,18 +183,14 @@ public class CalculationService {
 				calulationCriteria.getFeeType());
 		int calculatedAmout = 0;
 		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
-		TaxHeadEstimate estimate = new TaxHeadEstimate();
 		if (calculationTypeMap.containsKey("calsiLogic")) {
-
 			LinkedHashMap ocEdcr = edcrService.getEDCRDetails(requestInfo, bpa);
 			String jsonString = new JSONObject(ocEdcr).toString();
 			DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
 			JSONArray permitNumber = context.read("edcrDetail.*.permitNumber");
-
 			String jsonData = new JSONObject(calculationTypeMap).toString();
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
-
 			String bpaDcr = null;
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
@@ -205,7 +201,6 @@ public class CalculationService {
 					LinkedHashMap edcr = edcrService.getEDCRDetails(requestInfo, bpa);
 					String edcrData = new JSONObject(edcr).toString();
 					edcrContext = JsonPath.using(Configuration.defaultConfiguration()).parse(edcrData);
-
 				}
 			}
 			for (int i = 0; i < parameterPaths.size(); i++) {
@@ -226,12 +221,11 @@ public class CalculationService {
 							calculatedAmout = (int) (diffInBuildArea * mf * uom);
 							break;
 						}
-
 					}
 				} else {
 					calculatedAmout = 0;
 				}
-
+				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
 				if (totalTax.compareTo(BigDecimal.ZERO) == -1)
 					throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
@@ -241,11 +235,10 @@ public class CalculationService {
 
 				String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
 				estimate.setTaxHeadCode(taxHeadCode);
+				estimates.add(estimate);
 			}
-			estimates.add(estimate);
-		}
-
-		else {
+		} else {
+			TaxHeadEstimate estimate = new TaxHeadEstimate();
 			calculatedAmout = Integer
 					.parseInt(calculationTypeMap.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT).toString());
 
@@ -260,11 +253,8 @@ public class CalculationService {
 			estimate.setTaxHeadCode(taxHeadCode);
 			estimates.add(estimate);
 		}
-
 		estimatesAndSlabs.setEstimates(estimates);
-
 		return estimatesAndSlabs;
-
 	}
 
 }
