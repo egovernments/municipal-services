@@ -1,6 +1,7 @@
 package org.egov.bpa.calculator.services;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -171,8 +172,7 @@ public class CalculationService {
 	 * @return BaseTax taxHeadEstimate and billingSlabs used to calculate it
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria,
- RequestInfo requestInfo,
+	private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria, RequestInfo requestInfo,
 			Object mdmsData) {
 		BPA bpa = calulationCriteria.getBpa();
 		EstimatesAndSlabs estimatesAndSlabs = new EstimatesAndSlabs();
@@ -182,8 +182,9 @@ public class CalculationService {
 		Map calculationTypeMap = mdmsService.getCalculationType(requestInfo, bpa, mdmsData,
 				calulationCriteria.getFeeType());
 		int calculatedAmout = 0;
-		//List<TaxHeadEstimate> estimates= new ArrayList<TaxHeadEstimate>();
-			if (calculationTypeMap.containsKey("calsiLogic")) {
+		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
+		TaxHeadEstimate estimate = new TaxHeadEstimate();
+		if (calculationTypeMap.containsKey("calsiLogic")) {
 
 			LinkedHashMap ocEdcr = edcrService.getEDCRDetails(requestInfo, bpa);
 			String jsonString = new JSONObject(ocEdcr).toString();
@@ -193,14 +194,12 @@ public class CalculationService {
 			String jsonData = new JSONObject(calculationTypeMap).toString();
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
-			
-			//for(parameterPaths){
-			Double ocTotalBuitUpArea = context.read(buildupAreaPath.get(0).toString());
-			
+
 			String bpaDcr = null;
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
-				BPA permitBpa = bpaService.getBuildingPlan(requestInfo, bpa.getTenantId(), null, permitNumber.get(0).toString());
+				BPA permitBpa = bpaService.getBuildingPlan(requestInfo, bpa.getTenantId(), null,
+						permitNumber.get(0).toString());
 				bpaDcr = permitBpa.getEdcrNumber();
 				if (bpaDcr != null) {
 					LinkedHashMap edcr = edcrService.getEDCRDetails(requestInfo, bpa);
@@ -209,58 +208,59 @@ public class CalculationService {
 
 				}
 			}
-			
-			Double bpaTotalBuitUpArea = edcrContext.read(buildupAreaPath.get(0).toString());
-			Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
-			if (diffInBuildArea > 10) {
-				JSONArray data = calcContext.read("calsiLogic.*.deviation");
-				System.out.println(data.get(0));
-				JSONArray data1 = (JSONArray) data.get(0);
-				for (int i = 0; i < data1.size(); i++) {
-					LinkedHashMap diff = (LinkedHashMap) data1.get(i);
-					Integer from = (Integer) diff.get("from");
-					Integer to = (Integer) diff.get("to");
-					Integer uom = (Integer) diff.get("uom");
-					Integer mf = (Integer) diff.get("MF");
-					if (diffInBuildArea >= from && diffInBuildArea <= to) {
-						calculatedAmout = (int) (diffInBuildArea * mf * uom);
-						break;
-					}
+			for (int i = 0; i < parameterPaths.size(); i++) {
+				Double ocTotalBuitUpArea = context.read(parameterPaths.get(i).toString());
+				Double bpaTotalBuitUpArea = edcrContext.read(parameterPaths.get(i).toString());
+				Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
+				if (diffInBuildArea > 10) {
+					JSONArray data = calcContext.read("calsiLogic.*.deviation");
+					System.out.println(data.get(0));
+					JSONArray data1 = (JSONArray) data.get(0);
+					for (int j = 0; j < data1.size(); j++) {
+						LinkedHashMap diff = (LinkedHashMap) data1.get(j);
+						Integer from = (Integer) diff.get("from");
+						Integer to = (Integer) diff.get("to");
+						Integer uom = (Integer) diff.get("uom");
+						Integer mf = (Integer) diff.get("MF");
+						if (diffInBuildArea >= from && diffInBuildArea <= to) {
+							calculatedAmout = (int) (diffInBuildArea * mf * uom);
+							break;
+						}
 
+					}
+				} else {
+					calculatedAmout = 0;
 				}
-			}else{
-				calculatedAmout = 0;
+
+				BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
+				if (totalTax.compareTo(BigDecimal.ZERO) == -1)
+					throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
+
+				estimate.setEstimateAmount(totalTax);
+				estimate.setCategory(Category.FEE);
+
+				String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
+				estimate.setTaxHeadCode(taxHeadCode);
 			}
-		} else {
-			calculatedAmout = Integer
-					.parseInt(calculationTypeMap.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT).toString());
+			estimates.add(estimate);
 		}
 
-		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
-		if (totalTax.compareTo(BigDecimal.ZERO) == -1)
-			throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
+		else {
+			calculatedAmout = Integer
+					.parseInt(calculationTypeMap.get(BPACalculatorConstants.MDMS_CALCULATIONTYPE_AMOUNT).toString());
 
-		estimate.setEstimateAmount(totalTax);
-		estimate.setCategory(Category.FEE);
+			BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
+			if (totalTax.compareTo(BigDecimal.ZERO) == -1)
+				throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
 
-		String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
-		estimate.setTaxHeadCode(taxHeadCode);
-		//estimates.add(estimate);
-	//}else{
-// 	 TaxHeadEstimate estimate = new TaxHeadEstimate();
-// 	      BigDecimal totalTax = BigDecimal.valueOf(amountCalculationType);
-// 	      if(totalTax.compareTo(BigDecimal.ZERO)==-1)
-// 	          throw new CustomException("INVALID AMOUNT","Tax amount is negative");
+			estimate.setEstimateAmount(totalTax);
+			estimate.setCategory(Category.FEE);
 
-// 	      estimate.setEstimateAmount(totalTax);
-// 	      estimate.setCategory(Category.FEE);
-	      
-// 	      String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
-// 	      estimate.setTaxHeadCode(taxHeadCode);
-		//estimates.add(estimate);
-		//}
-		
+			String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
+			estimate.setTaxHeadCode(taxHeadCode);
+			estimates.add(estimate);
+		}
+
 		estimatesAndSlabs.setEstimates(estimates);
 
 		return estimatesAndSlabs;

@@ -7,6 +7,7 @@ import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
 import org.egov.bpa.calculator.web.models.RequestInfoWrapper;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
+import org.egov.bpa.calculator.web.models.bpa.BPAResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
@@ -46,20 +47,15 @@ public class BPAService {
 		LinkedHashMap responseMap = null;
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, new RequestInfoWrapper(requestInfo));
 
-		BPA bpaResponse = null;
+		BPAResponse bpaResponse = null;
 
-		String jsonString = new JSONObject(responseMap).toString();
-		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
-		ArrayList<BPA> bpa = context.read("Bpa");
-		if (CollectionUtils.isEmpty(bpa))
-			return null;
 		try {
-			bpaResponse = mapper.convertValue(bpa.get(0), BPA.class);
+			bpaResponse = mapper.convertValue(responseMap, BPAResponse.class);
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Error while parsing response of TradeLicense Search");
 		}
 
-		return bpaResponse;
+		return bpaResponse.getBpa().get(0);
 	}
 
 	private StringBuilder getBPASearchURL() {
