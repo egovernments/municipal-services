@@ -182,7 +182,8 @@ public class CalculationService {
 		Map calculationTypeMap = mdmsService.getCalculationType(requestInfo, bpa, mdmsData,
 				calulationCriteria.getFeeType());
 		int calculatedAmout = 0;
-		if (calculationTypeMap.containsKey("calsiLogic")) {
+		//List<TaxHeadEstimate> estimates= new ArrayList<TaxHeadEstimate>();
+			if (calculationTypeMap.containsKey("calsiLogic")) {
 
 			LinkedHashMap ocEdcr = edcrService.getEDCRDetails(requestInfo, bpa);
 			String jsonString = new JSONObject(ocEdcr).toString();
@@ -191,8 +192,9 @@ public class CalculationService {
 
 			String jsonData = new JSONObject(calculationTypeMap).toString();
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
-			JSONArray buildupAreaPath = calcContext.read("calsiLogic.*.paramPath");
+			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
 			
+			//for(parameterPaths){
 			Double ocTotalBuitUpArea = context.read(buildupAreaPath.get(0).toString());
 			
 			String bpaDcr = null;
@@ -244,8 +246,22 @@ public class CalculationService {
 
 		String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
 		estimate.setTaxHeadCode(taxHeadCode);
+		//estimates.add(estimate);
+	//}else{
+// 	 TaxHeadEstimate estimate = new TaxHeadEstimate();
+// 	      BigDecimal totalTax = BigDecimal.valueOf(amountCalculationType);
+// 	      if(totalTax.compareTo(BigDecimal.ZERO)==-1)
+// 	          throw new CustomException("INVALID AMOUNT","Tax amount is negative");
 
-		estimatesAndSlabs.setEstimates(Collections.singletonList(estimate));
+// 	      estimate.setEstimateAmount(totalTax);
+// 	      estimate.setCategory(Category.FEE);
+	      
+// 	      String taxHeadCode = utils.getTaxHeadCode(bpa.getBusinessService(), calulationCriteria.getFeeType());
+// 	      estimate.setTaxHeadCode(taxHeadCode);
+		//estimates.add(estimate);
+		//}
+		
+		estimatesAndSlabs.setEstimates(estimates);
 
 		return estimatesAndSlabs;
 
