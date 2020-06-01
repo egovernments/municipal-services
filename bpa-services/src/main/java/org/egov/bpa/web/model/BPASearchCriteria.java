@@ -57,6 +57,12 @@ public class BPASearchCriteria {
 	    @JsonProperty("serviceType")
 	    private String serviceType;
 	    
+	    @JsonProperty("fromDate")
+	    private Long fromDate;
+
+	    @JsonProperty("toDate")
+	    private Long toDate;
+	    
 	    @JsonIgnore
 	    private List<String> ownerIds;
 

@@ -125,6 +125,15 @@ public class BPAQueryBuilder {
 			.append(permitEndDate.getTimeInMillis());
 			
 		}
+		
+		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdtime BETWEEN ").append(criteria.getFromDate()).append(" AND ")
+					.append(criteria.getToDate());
+		} else if (criteria.getFromDate() != null && criteria.getToDate() == null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdtime >= ").append(criteria.getFromDate());
+		}
 
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 

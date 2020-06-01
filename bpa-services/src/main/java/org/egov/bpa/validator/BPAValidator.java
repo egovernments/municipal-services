@@ -213,6 +213,13 @@ public class BPAValidator {
 		
 		if (criteria.getApprovalDate() != null && (criteria.getApprovalDate() > new Date().getTime()))
 			throw new CustomException(BPAConstants.INVALID_SEARCH, "Permit Order Genarated date cannot be a future date");
+		
+		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "From date cannot be a future date");
+
+		if (criteria.getToDate() != null && criteria.getFromDate() != null
+				&& (criteria.getFromDate() > criteria.getToDate()))
+			throw new CustomException(BPAConstants.INVALID_SEARCH, "To date cannot be prior to from date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {
