@@ -1,4 +1,4 @@
-CREATE TABLE eg_sw_connection
+CREATE TABLE eg_sw_connection_audit
 (
 	id character varying(64) NOT NULL,
 	property_id character varying(64) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE eg_sw_connection
 	lastModifiedTime bigint
 );
 
-CREATE TABLE eg_sw_service
+CREATE TABLE eg_sw_service_audit
 (
 	connection_id character varying(64) NOT NULL,
 	connectionExecutionDate bigint,
