@@ -215,7 +215,9 @@ public class EDCRService {
 		List<String> approvalNo = context.read("edcrDetail.*.permitNumber");
 		edcrDetails.put(BPAConstants.SERVICETYPE, serviceType.get(0).toString());
 		edcrDetails.put(BPAConstants.APPLICATIONTYPE, applicationType.get(0).toString());
+		if(approvalNo.size()>0 && approvalNo!=null){
 		edcrDetails.put(BPAConstants.PERMIT_NO, approvalNo.get(0).toString());
+		}
 		return edcrDetails;
 	}
 
