@@ -31,24 +31,6 @@ public class CalculationUtils {
 
 
     /**
-     * Creates tradeLicense search url based on tenantId and applicationNumber
-     * @return tradeLicense search url
-     */
-  private String getBPASearchURL(){
-      StringBuilder url = new StringBuilder(config.getBpaHost());
-      url.append(config.getBpaContextPath());
-      url.append(config.getBpaSearchEndpoint());
-      url.append("?");
-      url.append("tenantId=");
-      url.append("{1}");
-      url.append("&");
-      url.append("applicationNumber=");
-      url.append("{2}");
-      return url.toString();
-  }
-
-
-    /**
      * Creates demand Search url based on tenanatId,businessService and ConsumerCode
      * @return demand search url
      */
@@ -96,34 +78,6 @@ public class CalculationUtils {
             return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
     }
 
-
-    /**
-     * Call bpa-services to get BPA for the given applicationNumber and tenantID
-     * @param requestInfo The RequestInfo of the incoming request
-     * @param applicationNo The applicationNo whose BPA has to be fetched
-     * @param tenantId The tenantId of the tradeLicense
-     * @return The tradeLicense fo the particular applicationNumber
-     */
-    public BPA getBuildingPlan(RequestInfo requestInfo, String applicationNumber, String tenantId){
-        String url = getBPASearchURL();
-        url = url.replace("{1}",tenantId).replace("{2}",applicationNumber);
-
-        Object result =serviceRequestRepository.fetchResult(new StringBuilder(url),RequestInfoWrapper.builder().
-                requestInfo(requestInfo).build());
-
-        BPAResponse response =null;
-        try {
-                response = mapper.convertValue(result,BPAResponse.class);
-        }
-        catch (IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Error while parsing response of TradeLicense Search");
-        }
-
-        if(response==null || CollectionUtils.isEmpty(response.getBpa()))
-            return null;
-
-        return response.getBpa().get(0);
-    }
     
     /**
      * identify the billingBusinessService matching to the calculation FeeType

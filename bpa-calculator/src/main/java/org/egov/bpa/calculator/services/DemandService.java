@@ -55,16 +55,13 @@ public class DemandService {
 
     @Autowired
     private CalculationUtils utils;
-  
 
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
 
-   /* @Autowired
-    private CalculationRepository calculationRepository;
-
     @Autowired
-    private CalculationQueryBuilder calculationQueryBuilder;*/
+    private BPAService bpaService;
+    
 	
     /**
      * Creates or updates Demand
@@ -233,7 +230,7 @@ public class DemandService {
             if(calculation.getBpa()!=null) {
             	 	bpa = calculation.getBpa();
             } else if(calculation.getApplicationNumber()!=null) {
-            		bpa = utils.getBuildingPlan(requestInfo, calculation.getApplicationNumber(), calculation.getTenantId());
+            		bpa = bpaService.getBuildingPlan(requestInfo, calculation.getTenantId(), calculation.getApplicationNumber(), null);
             }
             
             if (bpa == null)
