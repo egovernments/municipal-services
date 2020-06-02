@@ -74,7 +74,7 @@ public class NotificationUtil {
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(
 					applicationType + "_" + serviceType + "_" + BPAConstants.STATUS_REJECTED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);
+			message = getInitiatedMsg(bpa, messageTemplate, serviceType);
 		} else {
 
 			String messageCode = applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction() + "_"
@@ -82,7 +82,7 @@ public class NotificationUtil {
 
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
 			if (!StringUtils.isEmpty(messageTemplate)) {
-				message = getInitiatedMsg(bpa, messageTemplate);
+				message = getInitiatedMsg(bpa, messageTemplate, serviceType);
 
 				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
 					BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
@@ -105,13 +105,13 @@ public class NotificationUtil {
 		
 		if (bpa.getStatus().toString().toUpperCase().equals(BPAConstants.STATUS_REJECTED)) {
 			messageTemplate = getMessageTemplate(BPAConstants.M_APP_REJECTED, localizationMessage);
-			message = getInitiatedMsg(bpa, messageTemplate);
+			message = getInitiatedMsg(bpa, messageTemplate, serviceType);
 		} else {
 			String messageCode = applicationType + "_" + serviceType + "_" + bpa.getWorkflow().getAction()
 					+ "_" + bpa.getStatus();
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
 			if (!StringUtils.isEmpty(messageTemplate)) {
-				message = getInitiatedMsg(bpa, messageTemplate);
+				message = getInitiatedMsg(bpa, messageTemplate, serviceType);
 				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
 					BigDecimal amount = getAmountToBePaid(requestInfo, bpa);
 					message = message.replace("<AMOUNT_TO_BE_PAID>", amount.toString());
@@ -269,9 +269,7 @@ public class NotificationUtil {
 	 * @return customized message for initiate
 	 */
 	@SuppressWarnings("unchecked")
-	private String getInitiatedMsg(BPA bpa, String message) {
-		Map<String, String> data = (Map<String, String>) bpa.getAdditionalDetails();
-		String serviceType = data.get("serviceType");
+	private String getInitiatedMsg(BPA bpa, String message, String serviceType) {
 		message = message.replace("<2>", serviceType);
 		message = message.replace("<3>", bpa.getApplicationNo());
 		return message;
