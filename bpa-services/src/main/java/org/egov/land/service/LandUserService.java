@@ -71,7 +71,6 @@ public class LandUserService {
 					owner.setOwnerType(BPAConstants.CITIZEN);
 					userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
 					log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
-					owner.setOwnerId(null);
 				}
 				if (userDetailResponse != null)
 					setOwnerFields(owner, userDetailResponse, requestInfo);
