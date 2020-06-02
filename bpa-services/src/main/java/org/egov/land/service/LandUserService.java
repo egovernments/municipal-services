@@ -3,6 +3,7 @@ package org.egov.land.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -22,6 +23,7 @@ import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.land.web.models.OwnerInfo;
+import org.egov.land.web.models.Role;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class LandUserService {
 			UserDetailResponse userDetailResponse = null;
 			if (owner.getMobileNumber() != null) {
 				if (owner.getTenantId() == null) {
-					addUserDefaultFields(landInfo.getTenantId().split("\\.")[0], owner);
+					owner.setTenantId(landInfo.getTenantId().split("\\.")[0]);
 				}
 
 				userDetailResponse = userExists(owner, requestInfo);
@@ -61,6 +63,8 @@ public class LandUserService {
 						|| !owner.equals(userDetailResponse.getUser().get(0))) {
 					// if no user found with mobileNo or details were changed,
 					// creating new one..
+					Role role = getCitizenRole();
+					addUserDefaultFields(owner.getTenantId(), role, owner);
 					StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
 							.append(config.getUserCreateEndpoint());
 					setUserName(owner);
@@ -76,6 +80,18 @@ public class LandUserService {
 				throw new CustomException("INVALID_ONWER_ERROR", "MobileNo is mandatory for ownerInfo");
 			}
 		});
+	}
+
+	/**
+	 * Creates citizen role
+	 * 
+	 * @return Role object for citizen
+	 */
+	private Role getCitizenRole() {
+		Role role = new Role();
+		role.setCode(BPAConstants.CITIZEN);
+		role.setName("Citizen");
+		return role;
 	}
 
 	/**
@@ -133,13 +149,17 @@ public class LandUserService {
 	 * 
 	 * @param tenantId
 	 *            TenantId of the property
+	 * @param role 
 	 * @param role
 	 *            The role of the user set in this case to CITIZEN
 	 * @param owner
 	 *            The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, OwnerInfo owner) {
+	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo owner) {
+		owner.setActive(true);
 		owner.setTenantId(tenantId);
+		owner.setRoles(Collections.singletonList(role));
+		owner.setType(BPAConstants.CITIZEN);
 	}
 
 	public UserDetailResponse getUsersForLandInfos(List<LandInfo> landInfos) {
