@@ -177,7 +177,7 @@ public class User {
                     Objects.equals(mobileNumber, user.mobileNumber) &&
                     Objects.equals(gender, user.gender) &&
                     Objects.equals(emailId, user.emailId) &&
-                    Objects.equals(dob, user.dob) &&
+//                    Objects.equals(dob, user.dob) && //Epoch format not converting properly from UI
                     Objects.equals(fatherOrHusbandName, user.fatherOrHusbandName) &&
                     Objects.equals(correspondenceAddress, user.correspondenceAddress);
     }
