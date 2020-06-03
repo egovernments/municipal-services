@@ -79,16 +79,26 @@ export const searchApiResponse = async (request, next = {}) => {
       envVariables.EGOV_DEFAULT_STATE_ID
     );
     // console.log(userSearchResponse);
-    let searchUserUUID = get(userSearchResponse, "user.0.uuid");
+    let users= get(userSearchResponse, "user");
+    let searchUserUUID='';
+    
+    if(users.length>1){
+      users.forEach((user,i)=>{
+        if(i!=users.length-1){
+          searchUserUUID=`'${user.uuid}',`
+        }else{
+          searchUserUUID=`'${user.uuid}'`
+        }   
+      })
+
+    }else{
+      searchUserUUID=`'${users[0].uuid}'`;
+    }
     // if (searchUserUUID) {
     //   // console.log(searchUserUUID);
-    if (isUser) {
-      sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
-        queryObj.mobileNumber}') AND`;
-    } else {
-      sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
-        queryObj.mobileNumber}' AND`;
-    }
+   
+      sqlQuery = `${sqlQuery} FO.useruuid='${queryObj.mobileNumber}') or FO.useruuid in (${searchUserUUID})  AND`;
+   
     // }
   }
   if (queryObj.hasOwnProperty("ids")) {
@@ -163,7 +173,7 @@ if(queryObj.hasOwnProperty("subDistrict"))
   } else if (!isEmpty(queryObj)) {
     sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
   }
-  //console.log("SQL QUery:" +sqlQuery);
+  console.log("SQL Query:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
   //console.log("dbResponse"+JSON.stringify(dbResponse));
   if (dbResponse.err) {
