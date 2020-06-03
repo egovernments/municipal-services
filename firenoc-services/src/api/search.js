@@ -80,12 +80,13 @@ export const searchApiResponse = async (request, next = {}) => {
     );
     // console.log(userSearchResponse);
     let users= get(userSearchResponse, "user");
+
     let searchUserUUID='';
     
     if(users.length>1){
       users.forEach((user,i)=>{
         if(i!=users.length-1){
-          searchUserUUID=`'${user.uuid}',`
+          searchUserUUID=searchUserUUID+`'${user.uuid}',`
         }else{
           searchUserUUID=`'${user.uuid}'`
         }   
