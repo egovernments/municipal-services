@@ -97,7 +97,7 @@ export const searchApiResponse = async (request, next = {}) => {
     // if (searchUserUUID) {
     //   // console.log(searchUserUUID);
    
-      sqlQuery = `${sqlQuery} FO.useruuid='${queryObj.mobileNumber}') or FO.useruuid in (${searchUserUUID})  AND`;
+      sqlQuery = `${sqlQuery} FO.useruuid='${queryObj.mobileNumber}' or FO.useruuid in (${searchUserUUID})  AND`;
    
     // }
   }
