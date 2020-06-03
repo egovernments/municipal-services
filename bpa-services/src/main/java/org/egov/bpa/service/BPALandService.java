@@ -121,7 +121,12 @@ public class BPALandService {
 		} else {
 			landSearchCriteria.setIds(landcriteria.getIds());
 			uri.append("&").append("ids=");
-			uri.append(landcriteria.getIds().get(0));
+			for (int i = 0; i < landcriteria.getIds().size(); i++) {
+				if(i!=0){
+					uri.append(",");
+				}
+				uri.append(landcriteria.getIds().get(i));
+			}
 		}
 		return uri;
 	}
