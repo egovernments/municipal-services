@@ -88,7 +88,7 @@ export const searchApiResponse = async (request, next = {}) => {
         if(i!=users.length-1){
           searchUserUUID=searchUserUUID+`'${user.uuid}',`
         }else{
-          searchUserUUID=`'${user.uuid}'`
+          searchUserUUID=searchUserUUID+`'${user.uuid}'`
         }   
       })
 
