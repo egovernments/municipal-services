@@ -148,4 +148,21 @@ public class BPAUtil {
 			}
 		});
 	}
+
+	public String[] getBusinessService(String applicationType, String serviceType) {
+		final String BUSINESS_BPA_BPA_LOW = "BUILDING_PLAN_SCRUTINY#NEW_CONSTRUCTION";
+		// final String BUSINESS_BPA_OC = "BUILDING_OC_PLAN_SCRUTINY#NEW_CONSTRUCTION";
+		final String BPA_BPA_LOW = "BPA,BPA_LOW";
+		final String BPA_OC = "BPA_OC";
+		String[] data1 = BUSINESS_BPA_BPA_LOW.split("#");
+		String[] businessService = null;
+		if (data1[0].equalsIgnoreCase(applicationType)) {
+			businessService = BPA_BPA_LOW.split(",");
+		} else {
+			businessService = BPA_OC.split(",");
+		}
+		System.out.println("businessService for search" + businessService);
+
+		return businessService;
+	}
 }

@@ -147,19 +147,29 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
+	@SuppressWarnings("null")
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa = new LinkedList<>();
 		bpaValidator.validateSearch(requestInfo, criteria);
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
-		if (!StringUtils.isEmpty(criteria.getApplicationType())
+		/*if (!StringUtils.isEmpty(criteria.getApplicationType())
 				|| !StringUtils.isEmpty(criteria.getServiceType())) {
 			edcrNos = edcrService.getEDCRNos(criteria, requestInfo);
 			if(CollectionUtils.isEmpty(edcrNos)) {
 				return bpa;
 			}
+		}*/
+		ArrayList<String> businessService = new ArrayList<String>();
+		if(criteria.getApplicationType()!=null||criteria.getServiceType()!=null){
+			String[] business = util.getBusinessService(criteria.getApplicationType(), criteria.getServiceType());
+		for(int i=0; i<business.length; i++){
+			businessService.add(business[i]);
 		}
+		criteria.setBusinessService(businessService);
+		}
+		
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);

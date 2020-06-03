@@ -135,6 +135,13 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.createdtime >= ").append(criteria.getFromDate());
 		}
 
+		List<String> businessService = criteria.getBusinessService();
+		if (!CollectionUtils.isEmpty(businessService)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.businessService IN (").append(createQuery(businessService)).append(")");
+			addToPreparedStatement(preparedStmtList, businessService);
+		}
+		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}
