@@ -40,6 +40,7 @@ public class LandService {
 		}
 		
 		landValidator.validateLandInfo(landRequest);
+		userService.validateDuplicateUser(landRequest);
 		userService.manageUser(landRequest);
 		
 		enrichmentService.enrichLandInfoRequest(landRequest, false);		
