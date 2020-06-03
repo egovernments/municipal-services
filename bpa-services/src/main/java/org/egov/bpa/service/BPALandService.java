@@ -44,10 +44,14 @@ public class BPALandService {
 		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
 		LinkedHashMap responseMap = null;
 		try {
-			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,landRequest);
-			}catch(ServiceCallException se) {
-				throw new CustomException("LandInfo ERROR", " Invalid Land data");
-			}
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
+		}
+		catch (CustomException ex) {
+			throw ex;
+		}
+		catch (Exception se) {
+			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
+		} 
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
 		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
@@ -70,10 +74,12 @@ public class BPALandService {
 		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
 		LinkedHashMap responseMap = null;
 		try {
-			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,landRequest);
-			}catch(ServiceCallException se) {
-				throw new CustomException("LandInfo ERROR", " Invalid Land data");
-			}
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
+		} catch (CustomException ex) {
+			throw ex;
+		} catch (Exception se) {
+			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
+		}
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
 		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
