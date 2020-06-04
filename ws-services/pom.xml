@@ -5,7 +5,7 @@
 	<artifactId>ws-services</artifactId>
 	<packaging>jar</packaging>
 	<name>water-services</name>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -133,6 +133,35 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+		        <groupId>cz.habarta.typescript-generator</groupId>
+		        <artifactId>typescript-generator-maven-plugin</artifactId>
+		        <version>2.22.595</version>
+		        <executions>
+		          <execution>
+		            <id>generate</id>
+		            <goals>
+		              <goal>generate</goal>
+		            </goals>
+		            <phase>process-classes</phase>
+		          </execution>
+		        </executions>
+		        <configuration>
+		          <jsonLibrary>jackson2</jsonLibrary>
+		          <classes>
+			          <class>org.egov.waterconnection.model.Connection</class>
+			          <class>org.egov.waterconnection.model.WaterConnection</class>
+			          <class>org.egov.waterconnection.model.Document</class>
+			          <class>org.egov.waterconnection.model.PlumberInfo</class>
+			          <class>org.egov.waterconnection.model.RequestInfoWrapper</class>
+			          <class>org.egov.waterconnection.model.WaterConnectionRequest</class>
+			          <class>org.egov.waterconnection.model.WaterConnectionResponse</class>
+		          </classes>
+		          <namespace>Digit</namespace>
+		          <debug>true</debug>
+		          <outputKind>module</outputKind>
+	          	</configuration>
+          </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
