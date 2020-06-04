@@ -308,6 +308,15 @@ public class BPAValidator {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
 					if (!CollectionUtils.isEmpty(checkListFromReq)) {
 						for (int i = 0; i < checkListFromReq.size(); i++) {
+							// MultiItem framework adding isDeleted object to
+							// additionDetails object whenever report is being
+							// removed.
+							// So skipping that object validation.
+							if (((Map) checkListFromReq.get(i)).containsKey("isDeleted")) {
+								checkListFromReq.remove(i);
+								i--;
+								continue;
+							}
 							List<Map> requestCheckList = new ArrayList<Map>();
 							List<String> requestQns = new ArrayList<String>();
 							validateDateTime((Map)checkListFromReq.get(i));

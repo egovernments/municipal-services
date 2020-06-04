@@ -12,16 +12,12 @@ import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class BPALandService {
 
 	@Autowired
@@ -35,7 +31,6 @@ public class BPALandService {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void addLandInfoToBPA(BPARequest bpaRequest) {
-		// TODO Auto-generated method stub
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
 		uri.append(config.getLandInfoCreate());
 		
@@ -45,11 +40,7 @@ public class BPALandService {
 		LinkedHashMap responseMap = null;
 		try {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
-		}
-		catch (CustomException ex) {
-			throw ex;
-		}
-		catch (Exception se) {
+		} catch (Exception se) {
 			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
 		} 
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
@@ -65,7 +56,6 @@ public class BPALandService {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateLandInfo(BPARequest bpaRequest) {
-		// TODO Auto-generated method stub
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
 		uri.append(config.getLandInfoUpdate());
 		
@@ -75,8 +65,6 @@ public class BPALandService {
 		LinkedHashMap responseMap = null;
 		try {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
-		} catch (CustomException ex) {
-			throw ex;
 		} catch (Exception se) {
 			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
 		}
@@ -91,7 +79,6 @@ public class BPALandService {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList<LandInfo> searchLandInfoToBPA(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
-		// TODO Auto-generated method stub
 		
 	
 		StringBuilder url = getLandSerchURLWithParams(requestInfo, landcriteria);

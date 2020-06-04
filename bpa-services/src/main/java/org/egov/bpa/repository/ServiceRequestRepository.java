@@ -2,9 +2,6 @@ package org.egov.bpa.repository;
 
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,6 +9,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
@@ -33,8 +32,6 @@ public class ServiceRequestRepository {
 		try {
 			log.info("Request: " + mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
-		} catch (CustomException ex) {
-			throw ex;
 		} catch (HttpClientErrorException e) {
 			log.error("External Service threw an Exception: ", e);
 			throw new ServiceCallException(e.getResponseBodyAsString());
