@@ -141,7 +141,12 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.businessService IN (").append(createQuery(businessService)).append(")");
 			addToPreparedStatement(preparedStmtList, businessService);
 		}
-		
+		if (criteria.getCreatedBy() != null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" bpa.createdby = ? ");
+			preparedStmtList.add(criteria.getCreatedBy());
+		}
+
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}

@@ -35,6 +35,7 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -154,28 +155,20 @@ public class BPAService {
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
-		/*if (!StringUtils.isEmpty(criteria.getApplicationType())
-				|| !StringUtils.isEmpty(criteria.getServiceType())) {
-			edcrNos = edcrService.getEDCRNos(criteria, requestInfo);
-			if(CollectionUtils.isEmpty(edcrNos)) {
-				return bpa;
-			}
-		}*/
 		ArrayList<String> businessService = new ArrayList<String>();
-		if(criteria.getApplicationType()!=null||criteria.getServiceType()!=null){
+		if (criteria.getApplicationType() != null || criteria.getServiceType() != null) {
 			String[] business = util.getBusinessService(criteria.getApplicationType(), criteria.getServiceType());
-		for(int i=0; i<business.length; i++){
-			businessService.add(business[i]);
+			for (int i = 0; i < business.length; i++) {
+				businessService.add(business[i]);
+			}
+			criteria.setBusinessService(businessService);
 		}
-		criteria.setBusinessService(businessService);
-		}
-		
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 			ArrayList<String> landId = new ArrayList<String>();
-			if(landInfo.size()>0){
-				landInfo.forEach(land->{
+			if (landInfo.size() > 0) {
+				landInfo.forEach(land -> {
 					landId.add(land.getId());
 				});
 				criteria.setLandId(landId);
@@ -191,21 +184,48 @@ public class BPAService {
 				}
 			}
 		} else {
-			
-			bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
-			ArrayList<String> data = new ArrayList<String>();
-			if (bpa.size() > 0) {
-				for(int i=0; i<bpa.size(); i++){
-					data.add(bpa.get(i).getLandId());
+			List<String> roles = new ArrayList<>();
+			for (Role role : requestInfo.getUserInfo().getRoles()) {
+				roles.add(role.getCode());
+			}
+			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
+				if (criteria.getTenantId() != null) {
+					landcriteria.setTenantId(criteria.getTenantId());
 				}
-				landcriteria.setIds(data);
-				landcriteria.setTenantId(bpa.get(0).getTenantId());
+				landcriteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
-				
+				ArrayList<String> landId = new ArrayList<String>();
+				if (landInfo.size() > 0) {
+					landInfo.forEach(land -> {
+						landId.add(land.getId());
+					});
+					criteria.setLandId(landId);
+				}
+				criteria.setCreatedBy(requestInfo.getUserInfo().getUuid());
+				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
 				for (int i = 0; i < bpa.size(); i++) {
 					for (int j = 0; j < landInfo.size(); j++) {
 						if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
 							bpa.get(i).setLandInfo(landInfo.get(j));
+						}
+					}
+				}
+			} else {
+				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
+				ArrayList<String> data = new ArrayList<String>();
+				if (bpa.size() > 0) {
+					for (int i = 0; i < bpa.size(); i++) {
+						data.add(bpa.get(i).getLandId());
+					}
+					landcriteria.setIds(data);
+					landcriteria.setTenantId(bpa.get(0).getTenantId());
+					ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+
+					for (int i = 0; i < bpa.size(); i++) {
+						for (int j = 0; j < landInfo.size(); j++) {
+							if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
+								bpa.get(i).setLandInfo(landInfo.get(j));
+							}
 						}
 					}
 				}
