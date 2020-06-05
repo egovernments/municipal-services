@@ -1,3 +1,4 @@
+FROM egovio/alpine-maven-builder-jdk-8:11-master-6036091e AS build
 FROM egovio/flyway:4.1.2
 
 COPY ./migration/ddl /flyway/sql
