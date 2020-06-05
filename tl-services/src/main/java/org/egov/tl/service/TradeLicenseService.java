@@ -21,9 +21,11 @@ import org.egov.tl.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import static org.egov.tl.util.TLConstants.*;
+import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -158,9 +160,11 @@ public class TradeLicenseService {
      * @param requestInfo The search request's requestInfo
      * @return List of tradeLicense for the given criteria
      */
-    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath){
+    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath, HttpHeaders headers){
         List<TradeLicense> licenses;
-        tlValidator.validateSearch(requestInfo,criteria,serviceFromPath);
+        // allow mobileNumber based search by citizen if interserviceCall
+        boolean isInterServiceCall = isInterServiceCall(headers);
+        tlValidator.validateSearch(requestInfo,criteria,serviceFromPath, isInterServiceCall);
         criteria.setBusinessService(serviceFromPath);
         enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
          if(criteria.getMobileNumber()!=null){
