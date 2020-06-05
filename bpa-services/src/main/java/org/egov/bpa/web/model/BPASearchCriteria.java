@@ -66,11 +66,18 @@ public class BPASearchCriteria {
 	    @JsonIgnore
 	    private List<String> ownerIds;
 
+	    @JsonProperty("businessService")
+	    private List<String> businessService;
+	    
+	    @JsonProperty("requestor")
+	    private List<String> requestor;
+
 		
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
 	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
+	                && this.businessService == null && this.requestor == null
 	                
 	        );
 	    }
@@ -79,6 +86,7 @@ public class BPASearchCriteria {
 	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
 	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
+	                && this.businessService == null && this.requestor == null
 	        );
 	    }
 }

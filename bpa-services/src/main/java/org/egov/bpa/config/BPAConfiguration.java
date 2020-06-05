@@ -1,5 +1,6 @@
 package org.egov.bpa.config;
 
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
@@ -251,4 +252,8 @@ public class BPAConfiguration {
 	
 	@Value("${persister.update.landinfo.topic}")
 	private String updateLandInfoTopic;
+	
+	@Value("#{${appSrvTypeBussSrvCode}}")
+	private Map<String,Map<String,String>> appSrvTypeBussSrvCode;
+	
 }
