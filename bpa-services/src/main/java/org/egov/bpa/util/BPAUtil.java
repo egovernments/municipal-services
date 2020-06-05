@@ -2,9 +2,12 @@ package org.egov.bpa.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.egov.bpa.config.BPAConfiguration;
@@ -17,6 +20,7 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -149,20 +153,21 @@ public class BPAUtil {
 		});
 	}
 
-	public String[] getBusinessService(String applicationType, String serviceType) {
-		final String BUSINESS_BPA_BPA_LOW = "BUILDING_PLAN_SCRUTINY#NEW_CONSTRUCTION";
-		// final String BUSINESS_BPA_OC = "BUILDING_OC_PLAN_SCRUTINY#NEW_CONSTRUCTION";
-		final String BPA_BPA_LOW = "BPA,BPA_LOW";
-		final String BPA_OC = "BPA_OC";
-		String[] data1 = BUSINESS_BPA_BPA_LOW.split("#");
-		String[] businessService = null;
-		if (data1[0].equalsIgnoreCase(applicationType)) {
-			businessService = BPA_BPA_LOW.split(",");
-		} else {
-			businessService = BPA_OC.split(",");
+	public ArrayList<String> getBusinessService(String applicationType, String serviceType) {
+		Map<String, Map<String, String>> appSrvTypeBussSrvCode = config.getAppSrvTypeBussSrvCode();
+		String[] codes = null;
+		Map<String, String> serviceTypeMap = appSrvTypeBussSrvCode.get(applicationType);
+		if (!CollectionUtils.isEmpty(serviceTypeMap)) {
+			if (serviceType != null) {
+				String serviceCodes = serviceTypeMap.get(serviceType);
+				codes = serviceCodes.split(",");
+			} else {
+				codes = (String[]) serviceTypeMap.values().toArray(new String[serviceTypeMap.size()]);
+			}
+		}else{
+			codes = new String[0];
 		}
-		System.out.println("businessService for search" + businessService);
+		return  new ArrayList<String>(Arrays.asList(codes));
 
-		return businessService;
 	}
 }
