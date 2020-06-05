@@ -1,4 +1,4 @@
-FROM egovio/apline-jre:8u121
+FROM egovio/alpine-maven-builder-jdk-8:11-master-6036091e AS build
 
 # INSTRUCTIONS ON HOW TO BUILD JAR:
 # Move to the location where pom.xml is exist in project and build project using below command
