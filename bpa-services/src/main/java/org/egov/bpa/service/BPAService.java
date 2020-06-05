@@ -22,6 +22,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -30,11 +31,14 @@ import org.egov.bpa.validator.BPAValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
+import org.egov.bpa.web.model.user.UserDetailResponse;
+import org.egov.bpa.web.model.user.UserSearchRequest;
 import org.egov.bpa.web.model.workflow.BusinessService;
 import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -42,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import io.micrometer.core.instrument.MeterRegistry.Config;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
@@ -84,6 +89,12 @@ public class BPAService {
 
 	@Autowired
 	private OCService ocService;
+
+	@Autowired
+	private BPAConfiguration config;
+
+	@Autowired
+	private UserService userService;
 	
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -147,25 +158,25 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
+	@SuppressWarnings("null")
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa = new LinkedList<>();
 		bpaValidator.validateSearch(requestInfo, criteria);
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
-		if (!StringUtils.isEmpty(criteria.getApplicationType())
-				|| !StringUtils.isEmpty(criteria.getServiceType())) {
-			edcrNos = edcrService.getEDCRNos(criteria, requestInfo);
-			if(CollectionUtils.isEmpty(edcrNos)) {
-				return bpa;
+		if (criteria.getApplicationType() != null || criteria.getServiceType() != null) {
+			ArrayList<String> business = util.getBusinessService(criteria.getApplicationType(), criteria.getServiceType());
+			if(business.size()>0){
+			criteria.setBusinessService(business);
 			}
 		}
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 			ArrayList<String> landId = new ArrayList<String>();
-			if(landInfo.size()>0){
-				landInfo.forEach(land->{
+			if (landInfo.size() > 0) {
+				landInfo.forEach(land -> {
 					landId.add(land.getId());
 				});
 				criteria.setLandId(landId);
@@ -181,21 +192,48 @@ public class BPAService {
 				}
 			}
 		} else {
-			
-			bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
-			ArrayList<String> data = new ArrayList<String>();
-			if (bpa.size() > 0) {
-				for(int i=0; i<bpa.size(); i++){
-					data.add(bpa.get(i).getLandId());
+			if (criteria.getRequestor()!=null) {
+				if (criteria.getTenantId() != null) {
+					landcriteria.setTenantId(criteria.getTenantId());
 				}
-				landcriteria.setIds(data);
-				landcriteria.setTenantId(bpa.get(0).getTenantId());
-				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+				UserSearchRequest userSearchRequest = new UserSearchRequest();
+				userSearchRequest.setUuid(criteria.getRequestor());
 				
+				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
+//				userService.userCall(userSearchRequest, uri);
+				landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
+				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+				ArrayList<String> landId = new ArrayList<String>();
+				if (landInfo.size() > 0) {
+					landInfo.forEach(land -> {
+						landId.add(land.getId());
+					});
+					criteria.setLandId(landId);
+				}
+				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
 				for (int i = 0; i < bpa.size(); i++) {
 					for (int j = 0; j < landInfo.size(); j++) {
 						if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
 							bpa.get(i).setLandInfo(landInfo.get(j));
+						}
+					}
+				}
+			} else {
+				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
+				ArrayList<String> data = new ArrayList<String>();
+				if (bpa.size() > 0) {
+					for (int i = 0; i < bpa.size(); i++) {
+						data.add(bpa.get(i).getLandId());
+					}
+					landcriteria.setIds(data);
+					landcriteria.setTenantId(bpa.get(0).getTenantId());
+					ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+
+					for (int i = 0; i < bpa.size(); i++) {
+						for (int j = 0; j < landInfo.size(); j++) {
+							if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
+								bpa.get(i).setLandInfo(landInfo.get(j));
+							}
 						}
 					}
 				}

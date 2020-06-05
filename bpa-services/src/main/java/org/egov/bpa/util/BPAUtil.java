@@ -2,9 +2,12 @@ package org.egov.bpa.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.egov.bpa.config.BPAConfiguration;
@@ -17,6 +20,7 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -147,5 +151,23 @@ public class BPAUtil {
 				return EnumSet.noneOf(Option.class);
 			}
 		});
+	}
+
+	public ArrayList<String> getBusinessService(String applicationType, String serviceType) {
+		Map<String, Map<String, String>> appSrvTypeBussSrvCode = config.getAppSrvTypeBussSrvCode();
+		String[] codes = null;
+		Map<String, String> serviceTypeMap = appSrvTypeBussSrvCode.get(applicationType);
+		if (!CollectionUtils.isEmpty(serviceTypeMap)) {
+			if (serviceType != null) {
+				String serviceCodes = serviceTypeMap.get(serviceType);
+				codes = serviceCodes.split(",");
+			} else {
+				codes = (String[]) serviceTypeMap.values().toArray(new String[serviceTypeMap.size()]);
+			}
+		}else{
+			codes = new String[0];
+		}
+		return  new ArrayList<String>(Arrays.asList(codes));
+
 	}
 }
