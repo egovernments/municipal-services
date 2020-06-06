@@ -1,5 +1,6 @@
 package org.egov.land.validator;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.web.models.LandRequest;
 import org.egov.land.web.models.LandSearchCriteria;
+import org.egov.land.web.models.OwnerInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -23,6 +25,7 @@ public class LandValidator {
 		// mdmsValidator.validateMdmsData(landRequest, mdmsData);
 		validateApplicationDocuments(landRequest, null);
 		validateUser(landRequest);
+		validateDuplicateUser(landRequest);
 	}
 	
 	private void validateUser(@Valid LandRequest landRequest) {
@@ -42,6 +45,21 @@ public class LandValidator {
 				else
 					documentFileStoreIds.add(document.getFileStoreId());
 			});
+		}
+	}
+	
+	public void validateDuplicateUser(LandRequest landRequest) {
+		List<OwnerInfo> owners = landRequest.getLandInfo().getOwners();
+		if (owners.size() > 1) {
+			List<String> mobileNos = new ArrayList<String>();
+			for (OwnerInfo owner : owners) {
+				if (mobileNos.contains(owner.getMobileNumber())) {
+					throw new CustomException("DUPLICATE_MOBILENUMBER_EXCEPTION",
+							"Duplicate mobile numbers found for owners");
+				} else {
+					mobileNos.add(owner.getMobileNumber());
+				}
+			}
 		}
 	}
 

@@ -285,19 +285,4 @@ public class LandUserService {
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
 		return userSearchRequest;
 	}
-
-	public void validateDuplicateUser(LandRequest landRequest) {
-		List<OwnerInfo> owners = landRequest.getLandInfo().getOwners();
-		if (owners.size() > 1) {
-			List<String> mobileNos = new ArrayList<String>();
-			for (OwnerInfo owner : owners) {
-				if (mobileNos.contains(owner.getMobileNumber())) {
-					throw new CustomException("DUPLICATE_MOBILENUMBER_EXCEPTION",
-							"Duplicate mobile numbers found for owners");
-				} else {
-					mobileNos.add(owner.getMobileNumber());
-				}
-			}
-		}
-	}
 }
