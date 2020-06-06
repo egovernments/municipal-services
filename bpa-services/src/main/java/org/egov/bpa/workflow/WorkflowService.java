@@ -2,6 +2,7 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.workflow.BusinessService;
@@ -70,18 +71,17 @@ public class WorkflowService {
 		url.append("?tenantId=");
 		url.append(bpa.getTenantId());
 		if (businessService) {
-			if(bpa.getRiskType()!=null){
-			if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
-				url.append("&businessServices=");
-				url.append(config.getLowBusinessServiceValue());
-			} else {
-
-				url.append("&businessServices=");
-				url.append(config.getBusinessServiceValue());
-			}
-			}else{
+			if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
 				url.append("&businessServices=");
 				url.append(bpa.getBusinessService());
+			} else {
+				if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
+					url.append("&businessServices=");
+					url.append(config.getLowBusinessServiceValue());
+				} else {
+					url.append("&businessServices=");
+					url.append(config.getBusinessServiceValue());
+				}
 			}
 		} else {
 			url.append("&businessIds=");
