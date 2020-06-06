@@ -137,7 +137,7 @@ public class BPAService {
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData, values);
 		wfIntegrator.callWorkFlow(bpaRequest);
 
-		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE)) {
+		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE) && !applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
 			calculationService.addCalculation(bpaRequest, BPAConstants.APPLICATION_FEE_KEY);
