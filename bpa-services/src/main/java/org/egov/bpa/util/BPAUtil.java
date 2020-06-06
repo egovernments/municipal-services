@@ -163,6 +163,7 @@ public class BPAUtil {
 				codes = serviceCodes.split(",");
 			} else {
 				codes = (String[]) serviceTypeMap.values().toArray(new String[serviceTypeMap.size()]);
+				codes = codes[0].toString().split(",");
 			}
 		}else{
 			codes = new String[0];
