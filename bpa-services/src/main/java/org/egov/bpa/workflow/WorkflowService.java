@@ -71,18 +71,8 @@ public class WorkflowService {
 		url.append("?tenantId=");
 		url.append(bpa.getTenantId());
 		if (businessService) {
-			if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
 				url.append("&businessServices=");
 				url.append(bpa.getBusinessService());
-			} else {
-				if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
-					url.append("&businessServices=");
-					url.append(config.getLowBusinessServiceValue());
-				} else {
-					url.append("&businessServices=");
-					url.append(config.getBusinessServiceValue());
-				}
-			}
 		} else {
 			url.append("&businessIds=");
 			url.append(applicationNo);
