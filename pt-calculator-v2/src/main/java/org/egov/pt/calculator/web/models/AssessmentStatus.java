@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * status of the Property
+ * status of the Assesment
  */
-public enum Status {
+public enum AssessmentStatus {
 	
   ACTIVE("ACTIVE"),
   
@@ -16,7 +16,7 @@ public enum Status {
 
   private String value;
 
-  Status(String value) {
+  AssessmentStatus(String value) {
     this.value = value;
   }
 
@@ -27,8 +27,8 @@ public enum Status {
   }
 
   @JsonCreator
-  public static Status fromValue(String text) {
-    for (Status b : Status.values()) {
+  public static AssessmentStatus fromValue(String text) {
+    for (AssessmentStatus b : AssessmentStatus.values()) {
       if (String.valueOf(b.value).equalsIgnoreCase(text)) {
         return b;
       }

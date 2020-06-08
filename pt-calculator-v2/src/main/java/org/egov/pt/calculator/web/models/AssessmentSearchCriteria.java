@@ -24,7 +24,7 @@ public class AssessmentSearchCriteria {
 		
 	private Set<String> propertyIds;
 	
-	private Status status;
+	private AssessmentStatus status;
 	
 	private Long offset;
 
