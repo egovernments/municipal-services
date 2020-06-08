@@ -200,6 +200,7 @@ public class BPAService {
 				}
 				userSearchRequest.setMobileNumber(criteria.getRequestor());
 				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
+				System.out.println("user info in citizen search" + userInfo);
 				if(userInfo != null){
 					ArrayList<String> uuid = new ArrayList<String>();
 					for(int i=0; i<userInfo.getUser().size(); i++){
@@ -209,6 +210,7 @@ public class BPAService {
 				}
 				landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+				System.out.println("land info in citizen search" + userInfo);
 				ArrayList<String> landId = new ArrayList<String>();
 				if (landInfo.size() > 0) {
 					landInfo.forEach(land -> {
@@ -217,6 +219,7 @@ public class BPAService {
 					criteria.setLandId(landId);
 				}
 				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
+				System.out.println("bpa data in citizen search" + bpa);
 				if(bpa.size()>0){
 					for(int k=0; k<bpa.size(); k++){
 						landId.add(bpa.get(k).getLandId());
