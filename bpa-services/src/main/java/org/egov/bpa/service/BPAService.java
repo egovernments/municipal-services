@@ -166,9 +166,10 @@ public class BPAService {
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
 		if (criteria.getApplicationType() != null || criteria.getServiceType() != null) {
-			ArrayList<String> business = util.getBusinessService(criteria.getApplicationType(), criteria.getServiceType());
-			if(business.size()>0){
-			criteria.setBusinessService(business);
+			ArrayList<String> business = util.getBusinessService(criteria.getApplicationType(),
+					criteria.getServiceType());
+			if (business.size() > 0) {
+				criteria.setBusinessService(business);
 			}
 		}
 		if (criteria.getMobileNumber() != null) {
@@ -192,7 +193,7 @@ public class BPAService {
 				}
 			}
 		} else {
-			if (criteria.getRequestor()!=null) {
+			if (criteria.getRequestor() != null) {
 				UserSearchRequest userSearchRequest = new UserSearchRequest();
 				if (criteria.getTenantId() != null) {
 					landcriteria.setTenantId(criteria.getTenantId());
@@ -200,17 +201,15 @@ public class BPAService {
 				}
 				criteria.setMobileNumber(criteria.getRequestor());
 				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
-//				System.out.println("user info in citizen search" + userInfo.getUser().get(0).getMobileNumber());
-				if(userInfo != null){
+				if (userInfo != null) {
 					ArrayList<String> uuid = new ArrayList<String>();
-					for(int i=0; i<userInfo.getUser().size(); i++){
+					for (int i = 0; i < userInfo.getUser().size(); i++) {
 						uuid.add(userInfo.getUser().get(i).getUuid());
 					}
 					criteria.setCreatedBy(uuid);
 					landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				}
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
-//				System.out.println("land info in citizen search" + landInfo);
 				ArrayList<String> landId = new ArrayList<String>();
 				if (landInfo.size() > 0) {
 					landInfo.forEach(land -> {
@@ -219,15 +218,15 @@ public class BPAService {
 					criteria.setLandId(landId);
 				}
 				bpa = getBPAFromCriteria(criteria, requestInfo, edcrNos);
-//				System.out.println("bpa data in citizen search" + bpa);
-				if(bpa.size()>0){
-					for(int k=0; k<bpa.size(); k++){
+				if (bpa.size() > 0) {
+					for (int k = 0; k < bpa.size(); k++) {
 						landId.add(bpa.get(k).getLandId());
 					}
-					landcriteria.setIds(landId);
-					landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+					if (bpa.get(0).getLandId() != null && bpa.get(0).getLandInfo() == null) {
+						landcriteria.setIds(landId);
+						landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
+					}
 				}
-				
 				for (int i = 0; i < bpa.size(); i++) {
 					for (int j = 0; j < landInfo.size(); j++) {
 						if (landInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {

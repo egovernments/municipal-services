@@ -143,8 +143,8 @@ public class BPAQueryBuilder {
 		}
 		List<String> createdBy = criteria.getCreatedBy();
 		if (!CollectionUtils.isEmpty(createdBy)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.createdby IN (").append(createQuery(createdBy)).append(")");
+//			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" OR bpa.createdby IN (").append(createQuery(createdBy)).append(")");
 			addToPreparedStatement(preparedStmtList, createdBy);
 		}
 
