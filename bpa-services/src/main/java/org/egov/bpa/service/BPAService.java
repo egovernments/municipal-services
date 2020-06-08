@@ -198,7 +198,7 @@ public class BPAService {
 					landcriteria.setTenantId(criteria.getTenantId());
 					userSearchRequest.setTenantId(criteria.getTenantId());
 				}
-				userSearchRequest.setMobileNumber(criteria.getRequestor());
+				criteria.setMobileNumber(criteria.getRequestor());
 				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
 				System.out.println("user info in citizen search" + userInfo.getUser());
 				if(userInfo != null){
@@ -207,8 +207,8 @@ public class BPAService {
 						uuid.add(userInfo.getUser().get(i).getUuid());
 					}
 					criteria.setCreatedBy(uuid);
+					landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				}
-				landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 				System.out.println("land info in citizen search" + landInfo);
 				ArrayList<String> landId = new ArrayList<String>();

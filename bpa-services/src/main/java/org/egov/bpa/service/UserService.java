@@ -76,6 +76,7 @@ public class UserService {
 		else if (uri.toString().contains(config.getUserCreateEndpoint()))
 			dobFormat = "dd/MM/yyyy";
 		try {
+			System.out.println("user search url: " + uri);
 			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
 			parseResponse(responseMap, dobFormat);
 			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
@@ -158,7 +159,6 @@ public class UserService {
 		userSearchRequest.setRequestInfo(requestInfo);
 		userSearchRequest.setTenantId(criteria.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
-		userSearchRequest.setMobileNumber(criteria.getRequestor());
 		userSearchRequest.setActive(true);
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
 		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
