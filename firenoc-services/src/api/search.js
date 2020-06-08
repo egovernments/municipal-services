@@ -148,7 +148,7 @@ export const searchApiResponse = async (request, next = {}) => {
 if(queryObj.hasOwnProperty("fireNOCType"))
 {     
 
-  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.applicationType}' AND`;
+  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.fireNOCType}' AND`;
 
 }
 
