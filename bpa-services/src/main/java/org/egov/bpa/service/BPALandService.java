@@ -107,11 +107,7 @@ public class BPALandService {
 		LandSearchCriteria landSearchCriteria = new LandSearchCriteria();
 		LandRequest landRequest = new LandRequest();
 		landRequest.setRequestInfo(requestInfo);
-		if (landcriteria.getMobileNumber() != null) {
-			landSearchCriteria.setMobileNumber(landcriteria.getMobileNumber());
-			uri.append("&").append("&mobileNumber=");
-			uri.append(landcriteria.getMobileNumber());
-		} else {
+		if (landcriteria.getIds()!=null) {
 			landSearchCriteria.setIds(landcriteria.getIds());
 			uri.append("&").append("ids=");
 			for (int i = 0; i < landcriteria.getIds().size(); i++) {
@@ -120,6 +116,10 @@ public class BPALandService {
 				}
 				uri.append(landcriteria.getIds().get(i));
 			}
+		}else if (landcriteria.getMobileNumber() != null) {
+			landSearchCriteria.setMobileNumber(landcriteria.getMobileNumber());
+			uri.append("&").append("&mobileNumber=");
+			uri.append(landcriteria.getMobileNumber());
 		}
 		return uri;
 	}
