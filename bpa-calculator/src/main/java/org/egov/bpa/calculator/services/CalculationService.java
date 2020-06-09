@@ -191,6 +191,8 @@ public class CalculationService {
 			String jsonData = new JSONObject(calculationTypeMap).toString();
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
+			JSONArray tLimit = calcContext.read("calsiLogic.*.tolerancelimit");
+			System.out.println(tLimit.get(0));
 			String bpaDcr = null;
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
@@ -203,11 +205,14 @@ public class CalculationService {
 					edcrContext = JsonPath.using(Configuration.defaultConfiguration()).parse(edcrData);
 				}
 			}
+			
 			for (int i = 0; i < parameterPaths.size(); i++) {
 				Double ocTotalBuitUpArea = context.read(parameterPaths.get(i).toString());
 				Double bpaTotalBuitUpArea = edcrContext.read(parameterPaths.get(i).toString());
 				Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
-				if (diffInBuildArea > 10) {
+				for (int k = 0; k < tLimit.size(); k++) {
+				Double limit = Double.valueOf(tLimit.get(k).toString());
+				if (diffInBuildArea > limit) {
 					JSONArray data = calcContext.read("calsiLogic.*.deviation");
 					System.out.println(data.get(0));
 					JSONArray data1 = (JSONArray) data.get(0);
@@ -225,6 +230,7 @@ public class CalculationService {
 				} else {
 					calculatedAmout = 0;
 				}
+			}
 				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
 				if (totalTax.compareTo(BigDecimal.ZERO) == -1)
