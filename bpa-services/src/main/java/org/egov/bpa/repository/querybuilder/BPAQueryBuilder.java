@@ -88,14 +88,6 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(criteria.getApprovalNo());
 		}
 		
-		
-		List<String>landId  = criteria.getLandId();
-		if (!CollectionUtils.isEmpty(landId)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.landId IN (").append(createQuery(landId)).append(")");
-			addToPreparedStatement(preparedStmtList, landId);
-		}
-		
 		String status = criteria.getStatus();
 		if (status!=null) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -122,10 +114,8 @@ public class BPAQueryBuilder {
 			permitEndDate.set(year, month, day, 23, 59, 59);
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.approvalDate BETWEEN ").append(permitStrDate.getTimeInMillis()).append(" AND ")
-			.append(permitEndDate.getTimeInMillis());
-			
+			.append(permitEndDate.getTimeInMillis());	
 		}
-		
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" bpa.createdtime BETWEEN ").append(criteria.getFromDate()).append(" AND ")
@@ -141,13 +131,21 @@ public class BPAQueryBuilder {
 			builder.append(" bpa.businessService IN (").append(createQuery(businessService)).append(")");
 			addToPreparedStatement(preparedStmtList, businessService);
 		}
+		List<String>landId  = criteria.getLandId();
+		
+		if (!CollectionUtils.isEmpty(landId)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			if(criteria.getCreatedBy()!=null){
+				builder.append("(");
+			}
+			builder.append(" bpa.landId IN (").append(createQuery(landId)).append(")");
+			addToPreparedStatement(preparedStmtList, landId);
+		}
 		List<String> createdBy = criteria.getCreatedBy();
 		if (!CollectionUtils.isEmpty(createdBy)) {
-//			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" OR bpa.createdby IN (").append(createQuery(createdBy)).append(")");
+			builder.append(" OR bpa.createdby IN (").append(createQuery(createdBy)).append("))");
 			addToPreparedStatement(preparedStmtList, createdBy);
 		}
-
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}
