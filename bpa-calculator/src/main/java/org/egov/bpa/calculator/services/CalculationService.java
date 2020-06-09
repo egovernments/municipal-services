@@ -192,7 +192,7 @@ public class CalculationService {
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
 			JSONArray tLimit = calcContext.read("calsiLogic.*.tolerancelimit");
-			System.out.println(tLimit.get(0));
+			System.out.println("tolerance limit in: " + tLimit.get(0));
 			String bpaDcr = null;
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
@@ -210,6 +210,7 @@ public class CalculationService {
 				Double ocTotalBuitUpArea = context.read(parameterPaths.get(i).toString());
 				Double bpaTotalBuitUpArea = edcrContext.read(parameterPaths.get(i).toString());
 				Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
+				System.out.println("difference in area: " + diffInBuildArea);
 				for (int k = 0; k < tLimit.size(); k++) {
 				Double limit = Double.valueOf(tLimit.get(k).toString());
 				if (diffInBuildArea > limit) {
