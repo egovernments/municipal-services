@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -139,12 +140,14 @@
 						<goals>
 							<goal>generate</goal>
 						</goals>
-						<phase>process-classes</phase>
+						<phase>package</phase>
 					</execution>
 				</executions>
 				<configuration>
 					<jsonLibrary>jackson2</jsonLibrary>
 					<classes>
+						<class>org.egov.wscalculation.model.Demand$StatusEnum</class>
+						<class>org.egov.waterconnection.model.Connection$StatusEnum</class>
 						<class>org.egov.wscalculation.model.MeterConnectionRequest</class>
 						<class>org.egov.wscalculation.model.MeterReadingResponse</class>
 						<class>org.egov.wscalculation.model.MeterReadingSearchCriteria</class>
@@ -155,6 +158,10 @@
 						<class>org.egov.wscalculation.model.AdhocTaxReq</class>
 						<class>org.egov.wscalculation.model.RequestInfoWrapper</class>
 					</classes>
+					<customTypeNaming>
+						<typeNaming>org.egov.wscalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
+						<typeNaming>org.egov.waterconnection.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
+					</customTypeNaming>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
 					<outputKind>module</outputKind>
