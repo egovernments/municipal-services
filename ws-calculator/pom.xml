@@ -147,7 +147,7 @@
 					<jsonLibrary>jackson2</jsonLibrary>
 					<classes>
 						<class>org.egov.wscalculation.model.Demand$StatusEnum</class>
-						<class>org.egov.waterconnection.model.Connection$StatusEnum</class>
+						<class>org.egov.wscalculation.model.Connection$StatusEnum</class>
 						<class>org.egov.wscalculation.model.MeterConnectionRequest</class>
 						<class>org.egov.wscalculation.model.MeterReadingResponse</class>
 						<class>org.egov.wscalculation.model.MeterReadingSearchCriteria</class>
