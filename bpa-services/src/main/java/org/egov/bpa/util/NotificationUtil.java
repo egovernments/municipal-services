@@ -198,11 +198,22 @@ public class NotificationUtil {
 	private StringBuilder getBillUri(BPA bpa) {
 		String status = bpa.getStatus().toString();
 		String code = null;
-		if (status.equalsIgnoreCase("PENDING_APPL_FEE")) {
-			code = "BPA.NC_APP_FEE";
-		} else {
-			code = "BPA.NC_SAN_FEE";
-		}
+		if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_MODULE)) {
+			if (status.equalsIgnoreCase("PENDING_APPL_FEE")) {
+				code = "BPA.NC_APP_FEE";
+			} else {
+				code = "BPA.NC_SAN_FEE";
+			}
+		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)) {
+			if (status.equalsIgnoreCase("PENDING_FEE"))
+				code = "BPA.LOW_RISK_PERMIT_FEE";
+		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
+			if (status.equalsIgnoreCase("PENDING_APPL_FEE")) {
+				code = "BPA.NC_OC_APP_FEE";
+			} else {
+				code = "BPA.NC_OC_SAN_FEE";
+			}
+		}		
 		
 		if(status.equalsIgnoreCase("PENDING_FEE")){
 			code= "BPA.LOW_RISK_PERMIT_FEE";
