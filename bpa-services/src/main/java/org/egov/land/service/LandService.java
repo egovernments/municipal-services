@@ -120,7 +120,7 @@ public class LandService {
 		if (landInfos.isEmpty())
 			return Collections.emptyList();
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
-		log.info("final call", landInfos.get(0).getOwners().toString());
+		log.info("final call" + landInfos.get(0).getOwners().toString());
 		return landInfos;
 	}
 }

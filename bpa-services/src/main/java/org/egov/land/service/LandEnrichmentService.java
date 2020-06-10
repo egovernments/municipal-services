@@ -138,9 +138,9 @@ public class LandEnrichmentService {
 		}
 
 		UserDetailResponse userDetailResponse = userService.getUsersForLandInfos(landInfos);
-		log.info("Owners after userService by uuid call", userDetailResponse.getUser().get(0).toString());
+		log.info("Owners after userService by uuid call"+ userDetailResponse.getUser().get(0).toString());
 		enrichOwner(userDetailResponse, landInfos);
-		log.info("Owners after enrichment", landInfos.get(0).getOwners().toString());
+		log.info("Owners after enrichment"+ landInfos.get(0).getOwners().toString());
 		return landInfos;
 	}
 
@@ -155,7 +155,7 @@ public class LandEnrichmentService {
 		List<OwnerInfo> users = userDetailResponse.getUser();
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
 		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
-		log.info("userId map is", userIdToOwnerMap.toString());
+		log.info("userId map is"+ userIdToOwnerMap.toString());
 		landInfos.forEach(landInfo -> {
 			landInfo.getOwners().forEach(owner -> {
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
