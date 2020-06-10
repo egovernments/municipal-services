@@ -374,11 +374,9 @@ public class BPAService {
 			}
 		}
 
-//		wfIntegrator.callWorkFlow(bpaRequest);
+		wfIntegrator.callWorkFlow(bpaRequest);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
-
-		bpa.setStatus("PENDING_SANC_FEE_PAYMENT");
 		
 		log.info("Bpa status is : " + bpa.getStatus());
 
