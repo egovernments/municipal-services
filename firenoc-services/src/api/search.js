@@ -50,7 +50,7 @@ export const searchApiResponse = async (request, next = {}) => {
   const isUser = some(roles, { code: "CITIZEN" }) && userUUID;
   if (isUser) {
     const mobileNumber = get(request.body, "RequestInfo.userInfo.mobileNumber");
-    const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
+    const tenantId = get(request.body, "RequestInfo.userInfo.permanentCity");
     
     
     //text = `${text} where (FN.createdby = '${userUUID}' OR`;    
