@@ -193,13 +193,11 @@ public class CalculationService {
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
 			JSONArray tLimit = calcContext.read("calsiLogic.*.tolerancelimit");
 			System.out.println("tolerance limit in: " + tLimit.get(0));
-			String bpaDcr = null;
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
 				BPA permitBpa = bpaService.getBuildingPlan(requestInfo, bpa.getTenantId(), null,
 						permitNumber.get(0).toString());
-				bpaDcr = permitBpa.getEdcrNumber();
-				if (bpaDcr != null) {
+				if (permitBpa.getEdcrNumber() != null) {
 					LinkedHashMap edcr = edcrService.getEDCRDetails(requestInfo, permitBpa);
 					String edcrData = new JSONObject(edcr).toString();
 					edcrContext = JsonPath.using(Configuration.defaultConfiguration()).parse(edcrData);
@@ -211,8 +209,7 @@ public class CalculationService {
 				Double bpaTotalBuitUpArea = edcrContext.read(parameterPaths.get(i).toString());
 				Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
 				System.out.println("difference in area: " + diffInBuildArea);
-				for (int k = 0; k < tLimit.size(); k++) {
-				Double limit = Double.valueOf(tLimit.get(k).toString());
+				Double limit = Double.valueOf(tLimit.get(i).toString());
 				if (diffInBuildArea > limit) {
 					JSONArray data = calcContext.read("calsiLogic.*.deviation");
 					System.out.println(data.get(0));
@@ -231,7 +228,6 @@ public class CalculationService {
 				} else {
 					calculatedAmout = 0;
 				}
-			}
 				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
 				if (totalTax.compareTo(BigDecimal.ZERO) == -1)
