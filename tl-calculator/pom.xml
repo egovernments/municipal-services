@@ -147,42 +147,51 @@
         <configuration>
           <jsonLibrary>jackson2</jsonLibrary>
           <classes>
-            <class>org.egov.tl.web.models.TradeLicense</class>
-            <class>org.egov.tl.web.models.TradeLicenseDetail</class>
-            <class>org.egov.tl.web.models.TradeLicenseRequest</class>
-            <class>org.egov.tl.web.models.TradeLicenseResponse</class>
-            <class>org.egov.tl.web.models.TradeLicenseSearchCriteria</class>
-            <class>org.egov.tl.web.models.RequestInfoWrapper</class>
-            <class>org.egov.tl.web.models.calculation.CalculationReq</class>
-            <class>org.egov.tl.web.models.calculation.CalculationRes</class>
-            <class>org.egov.tl.web.models.calculation.CalulationCriteria</class>
-            <class>org.egov.tl.web.models.calculation.FeeAndBillingSlabIds</class>
-            <class>org.egov.tl.web.models.calculation.TaxHeadEstimate</class>
-            <class>org.egov.tl.web.models.collection.PaymentRequest</class>
-            <class>org.egov.tl.web.models.collection.PaymentDetail</class>
-            <class>org.egov.tl.web.models.collection.BillDetail</class>
-            <class>org.egov.tl.web.models.collection.Payment</class>
-            <class>org.egov.tl.web.models.collection.BillAccountDetail</class>
-            <class>org.egov.tl.web.models.workflow.BusinessService</class>
-            <class>org.egov.tl.web.models.workflow.BusinessServiceResponse</class>
-            <class>org.egov.tl.web.models.uservevents.EventDetails</class>
-            <class>org.egov.tl.web.models.uservevents.EventRequest</class>
-            <class>org.egov.tl.web.models.workflow.Action</class>
-            <class>org.egov.tl.web.models.uservevents.Action</class>
+
+            <class>org.egov.tlcalculator.web.models.RequestInfoWrapper</class>
+            <class>org.egov.tlcalculator.web.models.CalculationReq</class>
+            <class>org.egov.tlcalculator.web.models.CalculationRes</class>
+            <class>org.egov.tlcalculator.web.models.CalulationCriteria</class>
+            <class>org.egov.tlcalculator.web.models.CalulationSearchCriteria</class>
+            <class>org.egov.tlcalculator.web.models.FeeAndBillingSlabIds</class>
+            <class>org.egov.tlcalculator.web.models.BillAndCalculations</class>
+            <class>org.egov.tlcalculator.web.models.BillingSlabReq</class>
+            <class>org.egov.tlcalculator.web.models.BillingSlabRes</class>
+            <class>org.egov.tlcalculator.web.models.BillingSlabSearchCriteria</class>
+            <class>org.egov.tlcalculator.web.models.tradelicense.TradeLicense</class>
+            <class>org.egov.tlcalculator.web.models.tradelicense.TradeLicenseDetail</class>
+            <class>org.egov.tlcalculator.web.models.tradelicense.EstimatesAndSlabs</class>
+            <class>org.egov.tlcalculator.web.models.tradelicense.TradeLicenseResponse</class>
+            <class>org.egov.tlcalculator.web.models.demand.TaxHeadEstimate</class>
+            <class>org.egov.tlcalculator.web.models.demand.TaxAndPayment</class>
+            <class>org.egov.tlcalculator.web.models.demand.BillDetail</class>
+            <class>org.egov.tlcalculator.web.models.demand.BillAccountDetail</class>
+            <class>org.egov.tlcalculator.web.models.demand.BillRequest</class>
+            <class>org.egov.tlcalculator.web.models.demand.BillResponse</class>
+            <class>org.egov.tlcalculator.web.models.demand.GenerateBillCriteria</class>
+            <class>org.egov.tlcalculator.web.models.demand.DemandDetail</class>
+            <class>org.egov.tlcalculator.web.models.demand.DemandRequest</class>
+            <class>org.egov.tlcalculator.web.models.demand.DemandResponse</class>
+            <class>org.egov.tlcalculator.web.models.demand.CollectionType</class>
           </classes>
           <customTypeNaming>
-            <typeNaming>org.egov.tl.web.models.TradeLicense$LicenseTypeEnum:TradeLicenseType</typeNaming>
-            <typeNaming>org.egov.tl.web.models.TradeLicense$ApplicationTypeEnum:TradeLicenseApplicationType</typeNaming>
-            <typeNaming>org.egov.tl.web.models.collection.Bill$StatusEnum:BillStatus</typeNaming>
-            <typeNaming>org.egov.tl.web.models.collection.Bill$PurposeEnum:BillPurpose</typeNaming>
-            <typeNaming>org.egov.tl.web.models.calculation.Category$Category:CategoryEnum</typeNaming>
-            <typeNaming>org.egov.tl.web.models.TradeLicenseDetail$ChannelEnum:TradeLicenseChannel</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.enums.DemandStatus$DemandStatusEnum:DemandStatus</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.enums.CalculationType$CalculationTypeEnum:CalculationType</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.enums.Purpose$PurposeEnum:PurposeEnum</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.enums.Status:StatusEnum</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.BillingSlab$LicenseTypeEnum:TradeLicenseType</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicense$LicenseTypeEnum:LicenseType</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicense$ApplicationTypeEnum:ApplicationType</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicense$StatusEnum:LicenseStatus</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicense$ActionEnum:LicenseAction</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.demand.Demand$StatusEnum:DemandStatus</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.demand.Bill$StatusEnum:BillStatus</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicense$ApplicationTypeEnum:TradeLicenseApplicationType</typeNaming>
+            <typeNaming>org.egov.tlcalculator.web.models.tradelicense.TradeLicenseDetail$ChannelEnum:TradeLicenseChannel</typeNaming>
           </customTypeNaming>
           <customTypeMappings>
-            <customTypeMapping>org.egov.tl.web.models.AuditDetails:AuditDetails</customTypeMapping>
-            <customTypeMapping>org.egov.tl.web.models.workflow.Action:Action</customTypeMapping>
-            <customTypeMapping>org.egov.tl.web.models.uservevents.Action:Action</customTypeMapping>
-            <customTypeMapping>org.egov.tl.web.models.User:User</customTypeMapping>
+            <customTypeMapping>org.egov.tlcalculator.web.models.AuditDetails:AuditDetails</customTypeMapping>
+            <customTypeMapping>org.egov.tlcalculator.web.models.User:User</customTypeMapping>
           </customTypeMappings>
           <namespace>Digit</namespace>
           <debug>true</debug>
