@@ -51,14 +51,18 @@ export const searchApiResponse = async (request, next = {}) => {
   if (isUser) {
     const mobileNumber = get(request.body, "RequestInfo.userInfo.mobileNumber");
     const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
-    console.log("mobileNumber", mobileNumber);
-    console.log("tenedrIDD", tenantId);
-    text = `${text} where (FN.createdby = '${userUUID}' OR`;
+    
+    
+    //text = `${text} where (FN.createdby = '${userUUID}' OR`;    
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
       ? queryObj.mobileNumber
       : mobileNumber;
     queryObj.tenantId = queryObj.tenantId ? queryObj.tenantId : tenantId;
+    console.log("mobileNumber", mobileNumber);
+    console.log("tenedrIDD", tenantId);
+
+    text = `${text} where FN.tenantid = '${queryObj.tenantId}' AND`;
   } else {
     if (!isEmpty(queryObj)) {
       text = text + " where ";
@@ -87,6 +91,7 @@ export const searchApiResponse = async (request, next = {}) => {
     for(var i =0;i<userSearchResponseJson.user.length;i++){
       userUUIDArray.push(userSearchResponseJson.user[i].uuid);
     }
+    /*
     if (isUser) {
       sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
         queryObj.mobileNumber}') AND`;
@@ -104,7 +109,23 @@ export const searchApiResponse = async (request, next = {}) => {
           sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
 
         sqlQuery = `${sqlQuery}) AND`;  
-    }
+    }*/
+
+    sqlQuery = `${sqlQuery} FO.useruuid in (`;
+        if(userUUIDArray.length > 0){
+          for(var j =0;j<userUUIDArray.length;j++){
+            if(j==0)
+              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
+
+            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
+          }      
+        }
+        else
+          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
+
+        sqlQuery = `${sqlQuery}) AND`;  
+
+
     // }
   }
   if (queryObj.hasOwnProperty("ids")) {
