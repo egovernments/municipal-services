@@ -319,6 +319,13 @@ public class BPAService {
 		criteria.setTenantId(bpaRequest.getBPA().getTenantId());
 		Map<String, String> additionalDetails = bpa.getAdditionalDetails() != null ? (Map)bpa.getAdditionalDetails()
 				: new HashMap<String, String>();
+		
+		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.FI_STATUS)
+				&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
+			if (additionalDetails.get(BPAConstants.FI_ADDITIONALDETAILS) != null)
+				additionalDetails.remove(BPAConstants.FI_ADDITIONALDETAILS);
+		}
+		
 		if (applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			String approvalNo = edcrResponse.get(BPAConstants.PERMIT_NO);
 

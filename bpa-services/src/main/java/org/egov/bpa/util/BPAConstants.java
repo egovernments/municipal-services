@@ -201,6 +201,9 @@ public class BPAConstants {
 	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	public static final String USREVENTS_EVENT_NAME = "Building Plan";
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPA";
+	
+	public static final String FI_STATUS = "FIELDINSPECTION_INPROGRESS";
+	public static final String FI_ADDITIONALDETAILS = "fieldinspection_pending";
 
 	// OCCUPANCY TYPE
 
