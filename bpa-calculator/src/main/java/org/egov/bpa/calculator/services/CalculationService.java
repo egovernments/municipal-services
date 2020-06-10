@@ -200,7 +200,7 @@ public class CalculationService {
 						permitNumber.get(0).toString());
 				bpaDcr = permitBpa.getEdcrNumber();
 				if (bpaDcr != null) {
-					LinkedHashMap edcr = edcrService.getEDCRDetails(requestInfo, bpa);
+					LinkedHashMap edcr = edcrService.getEDCRDetails(requestInfo, permitBpa);
 					String edcrData = new JSONObject(edcr).toString();
 					edcrContext = JsonPath.using(Configuration.defaultConfiguration()).parse(edcrData);
 				}
