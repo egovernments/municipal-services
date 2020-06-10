@@ -116,11 +116,11 @@ public class LandService {
 	 */
 	public List<LandInfo> getLandWithOwnerInfo(LandSearchCriteria criteria, RequestInfo requestInfo) {
 		List<LandInfo> landInfos = repository.getLandInfoData(criteria);
-		log.info("Owners after repository call", landInfos.get(0).getOwners());
+		log.info("Owners after repository call", landInfos.get(0).getOwners().toString());
 		if (landInfos.isEmpty())
 			return Collections.emptyList();
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
-		log.info("final call", landInfos.get(0).getOwners());
+		log.info("final call", landInfos.get(0).getOwners().toString());
 		return landInfos;
 	}
 }
