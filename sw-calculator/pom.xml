@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -127,7 +128,7 @@
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
-		<plugin>
+			<plugin>
 				<groupId>cz.habarta.typescript-generator</groupId>
 				<artifactId>typescript-generator-maven-plugin</artifactId>
 				<version>2.22.595</version>
@@ -143,6 +144,8 @@
 				<configuration>
 					<jsonLibrary>jackson2</jsonLibrary>
 					<classes>
+						<class>org.egov.swcalculation.model.Demand$StatusEnum</class>
+						<class>org.egov.swcalculation.model.Connection$StatusEnum</class>
 						<class>org.egov.swcalculation.model.CalculationReq</class>
 						<class>org.egov.swcalculation.model.CalculationRes</class>
 						<class>org.egov.swcalculation.model.RequestInfoWrapper</class>
@@ -150,6 +153,10 @@
 						<class>org.egov.swcalculation.model.GetBillCriteria</class>
 						<class>org.egov.swcalculation.model.AdhocTaxReq</class>
 					</classes>
+					<customTypeNaming>
+						<typeNaming>org.egov.swcalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
+						<typeNaming>org.egov.swcalculation.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
+					</customTypeNaming>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
 					<outputKind>module</outputKind>
