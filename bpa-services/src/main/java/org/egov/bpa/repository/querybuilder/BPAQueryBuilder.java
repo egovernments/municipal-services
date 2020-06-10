@@ -68,11 +68,7 @@ public class BPAQueryBuilder {
 			preparedStmtList.add(criteria.getEdcrNumber());
 		}
 		
-		if(!CollectionUtils.isEmpty(edcrNos)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" bpa.edcrNumber IN (").append(createQuery(edcrNos)).append(")");
-			addToPreparedStatement(preparedStmtList, edcrNos);
-		}
+		
 
 		String applicationNo = criteria.getApplicationNo();
 		if (applicationNo!=null) {
@@ -132,16 +128,16 @@ public class BPAQueryBuilder {
 			addToPreparedStatement(preparedStmtList, businessService);
 		}
 		List<String>landId  = criteria.getLandId();
-		
+		List<String> createdBy = criteria.getCreatedBy();
 		if (!CollectionUtils.isEmpty(landId)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			if(criteria.getCreatedBy()!=null){
+			if(!CollectionUtils.isEmpty(createdBy)){
 				builder.append("(");
 			}
 			builder.append(" bpa.landId IN (").append(createQuery(landId)).append(")");
 			addToPreparedStatement(preparedStmtList, landId);
 		}
-		List<String> createdBy = criteria.getCreatedBy();
+		
 		if (!CollectionUtils.isEmpty(createdBy)) {
 			builder.append(" OR bpa.createdby IN (").append(createQuery(createdBy)).append("))");
 			addToPreparedStatement(preparedStmtList, createdBy);
