@@ -19,7 +19,10 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class LandService {
 
 	@Autowired
@@ -113,9 +116,11 @@ public class LandService {
 	 */
 	public List<LandInfo> getLandWithOwnerInfo(LandSearchCriteria criteria, RequestInfo requestInfo) {
 		List<LandInfo> landInfos = repository.getLandInfoData(criteria);
+		log.info("Owners after repository call", landInfos.get(0).getOwners());
 		if (landInfos.isEmpty())
 			return Collections.emptyList();
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
+		log.info("final call", landInfos.get(0).getOwners());
 		return landInfos;
 	}
 }
