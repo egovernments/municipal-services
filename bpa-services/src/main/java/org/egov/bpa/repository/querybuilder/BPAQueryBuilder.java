@@ -139,7 +139,15 @@ public class BPAQueryBuilder {
 		}
 		
 		if (!CollectionUtils.isEmpty(createdBy)) {
-			builder.append(" OR bpa.createdby IN (").append(createQuery(createdBy)).append("))");
+			if (!CollectionUtils.isEmpty(landId)) {
+				builder.append(" OR ");
+			} else {
+				addClauseIfRequired(preparedStmtList, builder);
+			}
+			builder.append(" bpa.createdby IN (").append(createQuery(createdBy)).append(")");
+			if (!CollectionUtils.isEmpty(landId)) {
+				builder.append(")");
+			}
 			addToPreparedStatement(preparedStmtList, createdBy);
 		}
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
