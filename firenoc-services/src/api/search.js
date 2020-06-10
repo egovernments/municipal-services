@@ -53,7 +53,7 @@ export const searchApiResponse = async (request, next = {}) => {
     const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
     console.log("mobileNumber", mobileNumber);
     console.log("tenedrIDD", tenantId);
-    text = `${text} where (FN.createdby = '${userUUID}' OR`;
+    //text = `${text} where (FN.createdby = '${userUUID}' OR`;
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
       ? queryObj.mobileNumber
