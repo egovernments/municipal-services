@@ -53,7 +53,7 @@ export const searchApiResponse = async (request, next = {}) => {
     const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
     console.log("mobileNumber", mobileNumber);
     console.log("tenedrIDD", tenantId);
-    //text = `${text} where (FN.createdby = '${userUUID}' OR`;
+    text = `${text} where (FN.createdby = '${userUUID}' OR`;
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
       ? queryObj.mobileNumber
@@ -147,7 +147,7 @@ export const searchApiResponse = async (request, next = {}) => {
   } else if (!isEmpty(queryObj)) {
     sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
   }
-  //console.log("SQL QUery:" +sqlQuery);
+  console.log("SQL QUery:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
   //console.log("dbResponse"+JSON.stringify(dbResponse));
   if (dbResponse.err) {
