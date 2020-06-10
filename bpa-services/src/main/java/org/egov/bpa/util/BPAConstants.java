@@ -144,6 +144,8 @@ public class BPAConstants {
 
 	public static final String STATUS_REJECTED = "REJECTED";
 
+	public static final String STATUS_REVOCATED = "REVOCATED";
+
 	public static final String STATUS_DOCUMENTVERIFICATION = "INPROGRESS";
 
 	public static final String STATUS_FIELDINSPECTION = "INPROGRESS";
