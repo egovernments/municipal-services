@@ -84,7 +84,7 @@ public class LandInfo {
 		if(this.ownerIds == null){
 			this.ownerIds = new ArrayList<String>();
 		}
-		if(!this.ownerIds.contains(ownersItem.getUuid())){
+		if(!this.ownerIds.contains(ownersItem.getOwnerId())){
 			this.owners.add(ownersItem);
 			this.ownerIds.add(ownersItem.getOwnerId());
 		}

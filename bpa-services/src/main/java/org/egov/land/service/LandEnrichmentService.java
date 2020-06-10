@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class LandEnrichmentService {
 
 	@Autowired
@@ -130,18 +127,15 @@ public class LandEnrichmentService {
 			RequestInfo requestInfo) {
 
 		List<LandRequest> landInfors = new ArrayList<LandRequest>();
-		landInfos.forEach(landInfo -> {
-			landInfors.add(new LandRequest(requestInfo, landInfo));
+		landInfos.forEach(bpa -> {
+			landInfors.add(new LandRequest(requestInfo, bpa));
 		});
 		if (criteria.getLimit() == null || !criteria.getLimit().equals(-1)) {
 			enrichBoundary(landInfors);
 		}
 
 		UserDetailResponse userDetailResponse = userService.getUsersForLandInfos(landInfos);
-		log.info("Owners after userService by uuid call"+ userDetailResponse.getUser().get(0));
 		enrichOwner(userDetailResponse, landInfos);
-		log.info("lndInfo after enrichment"+ landInfos);
-		log.info("Owners after enrichment"+ landInfos.get(0).getOwners());
 		return landInfos;
 	}
 
@@ -156,8 +150,6 @@ public class LandEnrichmentService {
 		List<OwnerInfo> users = userDetailResponse.getUser();
 		Map<String, OwnerInfo> userIdToOwnerMap = new HashMap<>();
 		users.forEach(user -> userIdToOwnerMap.put(user.getUuid(), user));
-		log.info("logInfo in enrich user is " + landInfos);
-		log.info("userId map is"+ userIdToOwnerMap);
 		landInfos.forEach(landInfo -> {
 			landInfo.getOwners().forEach(owner -> {
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
