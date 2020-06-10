@@ -160,7 +160,7 @@
 					</classes>
 					<customTypeNaming>
 						<typeNaming>org.egov.wscalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
-						<typeNaming>org.egov.waterconnection.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
+						<typeNaming>org.egov.wscalculation.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
 					</customTypeNaming>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
