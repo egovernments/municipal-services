@@ -102,7 +102,7 @@ public class OCService {
 			});
 
 
-			/*if (riskType.size() > 1) {
+			if (riskType.size() > 1) {
 				if(riskType.get(1).equalsIgnoreCase("LOW")){
 					if(!riskType.get(0).equalsIgnoreCase("LOW")){
 						throw new CustomException("INVALID CREATE",
@@ -115,7 +115,7 @@ public class OCService {
 								"Risk type from BPA edcr is not matching with the Risk type from occupancy certificate edcr. You cannot proceed with the application");
 					}
 				}
-			}*/
+			}
 				if (khathaNos.size() > 1) {
 					if (!khathaNos.get(0).equalsIgnoreCase(khathaNos.get(1))) {
 						throw new CustomException("INVALID CREATE",

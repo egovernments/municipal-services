@@ -125,7 +125,7 @@ public class EDCRService {
 		}
 		String expectedRiskType;
 		if (!CollectionUtils.isEmpty(OccupancyTypes) && !CollectionUtils.isEmpty(plotAreas)
-				&& !CollectionUtils.isEmpty(buildingHeights)) {
+				&& !CollectionUtils.isEmpty(buildingHeights) && !applicationType.get(0).equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			Double buildingHeight = Collections.max(buildingHeights);
 			String OccupancyType = OccupancyTypes.get(0); // Assuming
 															// OccupancyType
