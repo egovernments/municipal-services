@@ -125,7 +125,7 @@ public class EnrichmentService {
 	 */
 	private void setSewarageApplicationIdgenIds(SewerageConnectionRequest request) {
 		List<String> applicationNumbers = getIdList(request.getRequestInfo(), 
-				request.getRequestInfo().getUserInfo().getTenantId(), 
+				request.getSewerageConnection().getTenantId(), 
 				config.getSewerageApplicationIdGenName(),
 				config.getSewerageApplicationIdGenFormat(), 1);
 
@@ -198,7 +198,7 @@ public class EnrichmentService {
 	 */
 	private void setConnectionNO(SewerageConnectionRequest request) {
 		List<String> connectionNumbers = getIdList(request.getRequestInfo(), 
-				request.getRequestInfo().getUserInfo().getTenantId(), 
+				request.getSewerageConnection().getTenantId(), 
 				config.getSewerageIdGenName(),
 				config.getSewerageIdGenFormat(), 1);
 		

@@ -388,7 +388,7 @@ public class WorkflowNotificationService {
 			for (State state : businessService.getStates()) {
 				if (SWConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
 					resultSla = String.valueOf(
-							(state.getSla() == null ? config.getSlaDefaultValue() : state.getSla()) / 86400000);
+							(state.getSla() == null ? 0l : state.getSla()) / 86400000);
 				}
 			}
 		}
