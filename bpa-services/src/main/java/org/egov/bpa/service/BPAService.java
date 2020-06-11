@@ -117,9 +117,11 @@ public class BPAService {
 
 			criteria.setApprovalNo(approvalNo);
 			List<BPA> BPA = search(criteria, requestInfo);
-			
-			if (!BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_APPROVED)) {
-				throw new CustomException("CREATE ERROR", "This application can not be created as building permit is not approved.");
+			if (BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)) {
+				throw new CustomException("CREATE ERROR", "This permit number is revocated you cannot use this permit number");
+			}
+			else if (!BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_APPROVED)) {
+				throw new CustomException("CREATE ERROR", "The selected permit number still in workflow approval process, Please apply occupancy after completing approval process.");
 			}
 			String edcr = null;
 			String landId = null;
