@@ -118,8 +118,7 @@ public class BPAService {
 			criteria.setApprovalNo(approvalNo);
 			List<BPA> BPA = search(criteria, requestInfo);
 			
-			if (BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED)
-					|| BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)) {
+			if (!BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_APPROVED)) {
 				throw new CustomException("CREATE ERROR", "This application can not be created as building permit is not approved.");
 			}
 			String edcr = null;
