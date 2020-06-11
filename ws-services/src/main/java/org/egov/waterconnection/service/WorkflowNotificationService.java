@@ -1,5 +1,6 @@
 package org.egov.waterconnection.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -367,13 +368,12 @@ public class WorkflowNotificationService {
 
 	public String getSLAForState(WaterConnectionRequest connectionRequest, Property property) {
 		String resultSla = "";
-		BusinessService businessService = workflowService
-				.getBusinessService(property.getTenantId(), connectionRequest.getRequestInfo());
+		BusinessService businessService = workflowService.getBusinessService(property.getTenantId(),
+				connectionRequest.getRequestInfo());
 		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
 			for (State state : businessService.getStates()) {
 				if (WCConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
-					resultSla = String.valueOf(
-							(state.getSla() == null ? config.getSlaDefaultValue() : state.getSla()) / 86400000);
+					resultSla = String.valueOf((state.getSla() == null ? 0l : state.getSla()) / 86400000);
 				}
 			}
 		}

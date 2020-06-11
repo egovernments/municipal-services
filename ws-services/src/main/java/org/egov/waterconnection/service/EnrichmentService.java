@@ -108,10 +108,10 @@ public class EnrichmentService {
 	 *            WaterConnectionRequest which is to be created
 	 */
 	private void setApplicationIdgenIds(WaterConnectionRequest request) {
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
 		WaterConnection waterConnection = request.getWaterConnection();
-		List<String> applicationNumbers = getIdList(request.getRequestInfo(), tenantId,
-				config.getWaterApplicationIdGenName(), config.getWaterApplicationIdGenFormat());
+		List<String> applicationNumbers = getIdList(request.getRequestInfo(),
+				request.getWaterConnection().getTenantId(), config.getWaterApplicationIdGenName(),
+				config.getWaterApplicationIdGenFormat());
 		if (applicationNumbers.size() != 1) {
 			Map<String, String> errorMap = new HashMap<>();
 			errorMap.put("IDGEN_ERROR",
@@ -193,8 +193,7 @@ public class EnrichmentService {
      * @param request
      */
 	private void setConnectionNO(WaterConnectionRequest request) {
-		String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
-		List<String> connectionNumbers = getIdList(request.getRequestInfo(), tenantId,
+		List<String> connectionNumbers = getIdList(request.getRequestInfo(), request.getWaterConnection().getTenantId(),
 				config.getWaterConnectionIdGenName(), config.getWaterConnectionIdGenFormat());
 		if (connectionNumbers.size() != 1) {
 			throw new CustomException("IDGEN_ERROR",

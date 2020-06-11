@@ -94,10 +94,10 @@ public class WorkflowService {
 		return new BigDecimal(businessService.getStates().stream().filter(state -> state.getApplicationStatus() != null
 				&& state.getApplicationStatus().equalsIgnoreCase(stateCode)).map(state -> {
 					if (state.getSla() == null) {
-						return config.getSlaDefaultValue();
+						return 0l;
 					}
 					return state.getSla();
-				}).findFirst().orElse(config.getSlaDefaultValue()));
+				}).findFirst().orElse(0l));
 	}
 	
 	/**
