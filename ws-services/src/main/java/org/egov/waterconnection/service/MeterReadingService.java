@@ -57,7 +57,7 @@ public class MeterReadingService {
 							.currentReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
 							.meterStatus(MeterStatusEnum.WORKING)
 							.billingPeriod(getBillingPeriod(
-									request.getWaterConnection().getConnectionExecutionDate().longValue(), request.getRequestInfo()))
+									request.getWaterConnection().getConnectionExecutionDate().longValue()))
 							.generateDemand(Boolean.FALSE).lastReading(initialMeterReading.doubleValue())
 							.lastReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
 							.build()).requestInfo(request.getRequestInfo()).build();
@@ -74,27 +74,15 @@ public class MeterReadingService {
 		}
 	}
 
-	private String getBillingPeriod(Long connectionExcecutionDate, RequestInfo requestInfo) {
+	private String getBillingPeriod(Long connectionExcecutionDate) {
 		int noLength = (int) (Math.log10(connectionExcecutionDate) + 1);
 		LocalDate currentdate = Instant
 				.ofEpochMilli(noLength > 10 ? connectionExcecutionDate : connectionExcecutionDate * 1000)
 				.atZone(ZoneId.systemDefault()).toLocalDate();
 		LocalDate startingDate = currentdate, endDate = currentdate;
-		String billingCycyle = masterDataService.getBillingCycle(requestInfo, requestInfo.getUserInfo().getTenantId());
-		if (WCConstants.MONTHLY_BILLING_CONST.equalsIgnoreCase(billingCycyle)) {
-			startingDate = currentdate.with(TemporalAdjusters.firstDayOfMonth());
-			endDate = currentdate.with(TemporalAdjusters.lastDayOfMonth());
-		} else if (billingCycyle.equalsIgnoreCase(WCConstants.QUARTERLY_BILLING_CONST)) {
-			startingDate = currentdate.with(currentdate.getMonth().firstMonthOfQuarter())
-					.with(TemporalAdjusters.firstDayOfMonth());
-			endDate = startingDate.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
-		}
-
 		StringBuilder builder = new StringBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return builder.append(startingDate.format(formatter)).append(" - ").append(endDate.format(formatter))
 				.toString();
 	}
-	
-	
 }
