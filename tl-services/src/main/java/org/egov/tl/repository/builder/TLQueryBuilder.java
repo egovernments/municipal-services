@@ -131,7 +131,7 @@ public class TLQueryBuilder {
             if (criteria.getApplicationNumber() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append("  tl.applicationnumber = ? ");
-                preparedStmtList.add(criteria.getApplicationNumber());
+                preparedStmtList.add(criteria.getApplicationNumber().toUpperCase());
             }
 
             if (criteria.getStatus() != null) {
@@ -146,7 +146,11 @@ public class TLQueryBuilder {
                 preparedStmtList.add(criteria.getApplicationType());
             }
 
-            List<String> licenseNumbers = criteria.getLicenseNumbers();
+            List<String> licenseNumbers = new ArrayList<String>();
+            
+            criteria.getLicenseNumbers().forEach(licenceNumber ->{ 
+                licenseNumbers.add(licenceNumber.toUpperCase());
+            });
             if (!CollectionUtils.isEmpty(licenseNumbers)) {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append(" tl.licensenumber IN (").append(createQuery(licenseNumbers)).append(")");
@@ -162,7 +166,7 @@ public class TLQueryBuilder {
             if (criteria.getOldLicenseNumber() != null) {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append("  tl.oldlicensenumber = ? ");
-                preparedStmtList.add(criteria.getOldLicenseNumber());
+                preparedStmtList.add(criteria.getOldLicenseNumber().toUpperCase());
             }
 
             if (criteria.getFromDate() != null) {
