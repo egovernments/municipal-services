@@ -169,7 +169,7 @@ public class BPANotificationService {
 		userSearchRequest.put("tenantId", tenantId);
 		userSearchRequest.put("userType", "CITIZEN");
 		for (String mobileNo : mobileNumbers) {
-			userSearchRequest.put("mobileNumber", mobileNo);
+			userSearchRequest.put("userName", mobileNo);
 			try {
 				Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
 				if (null != user) {
