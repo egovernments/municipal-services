@@ -44,7 +44,7 @@ public class BPACalculatorConfig {
   
 
     //tradelicense Registry
-    @Value("${egov.bpa.host}")
+    @Value("${egov.tradelicense.host}")
     private String bpaHost;
 
     @Value("${egov.bpa.context.path}")
