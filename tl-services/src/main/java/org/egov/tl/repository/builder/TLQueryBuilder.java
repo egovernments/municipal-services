@@ -147,11 +147,13 @@ public class TLQueryBuilder {
             }
 
             List<String> licenseNumbers = new ArrayList<String>();
-            
-            if (!CollectionUtils.isEmpty(licenseNumbers)) {
-                criteria.getLicenseNumbers().forEach(licenceNumber ->{
+            if (!CollectionUtils.isEmpty(criteria.getLicenseNumbers())) {
+                criteria.getLicenseNumbers().forEach(licenceNumber -> {
                     licenseNumbers.add(licenceNumber.toUpperCase());
                 });
+            }
+            if (!CollectionUtils.isEmpty(licenseNumbers)) {
+  
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append(" tl.licensenumber IN (").append(createQuery(licenseNumbers)).append(")");
                 addToPreparedStatement(preparedStmtList, licenseNumbers);
