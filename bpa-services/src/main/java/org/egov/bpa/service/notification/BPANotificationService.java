@@ -137,7 +137,7 @@ public class BPANotificationService {
 			events.add(Event.builder().tenantId(bpaApplication.getTenantId()).description(mobileNumberToMsg.get(mobile))
 					.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
 					.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY)
-//					.source(Source.WEBAPP)
+					.source("WEBAPP")
 					.recepient(recepient)
 					.eventDetails(null).actions(action).build());
 		}
