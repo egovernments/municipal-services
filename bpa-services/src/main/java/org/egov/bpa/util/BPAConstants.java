@@ -310,7 +310,7 @@ public class BPAConstants {
 
 	public static final String LOW_RISKTYPE = "LOW";
 
-	public static final String EDCR_PDF = "EdcrReport.pdf";
+	public static final String EDCR_PDF = "ScrutinyReport.pdf";
 
 	public static final String PERMIT_ORDER_NO = "BPA_PDF_PLANPERMISSION_NO";
 

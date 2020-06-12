@@ -22,7 +22,6 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -38,7 +37,6 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -46,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import io.micrometer.core.instrument.MeterRegistry.Config;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
@@ -91,9 +88,6 @@ public class BPAService {
 	private OCService ocService;
 
 	@Autowired
-	private BPAConfiguration config;
-
-	@Autowired
 	private UserService userService;
 	
 	public BPA create(BPARequest bpaRequest) {
@@ -116,25 +110,25 @@ public class BPAService {
 			String approvalNo = values.get(BPAConstants.PERMIT_NO);
 
 			criteria.setApprovalNo(approvalNo);
-			List<BPA> BPA = search(criteria, requestInfo);
-			if (BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)) {
+			List<BPA> ocBpa = search(criteria, requestInfo);
+			if (ocBpa.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)) {
 				throw new CustomException("CREATE ERROR", "This permit number is revocated you cannot use this permit number");
 			}
-			else if (!BPA.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_APPROVED)) {
+			else if (!ocBpa.get(0).getStatus().equalsIgnoreCase(BPAConstants.STATUS_APPROVED)) {
 				throw new CustomException("CREATE ERROR", "The selected permit number still in workflow approval process, Please apply occupancy after completing approval process.");
 			}
 			String edcr = null;
 			String landId = null;
 
-			for (int i = 0; i < BPA.size(); i++) {
-				edcr = BPA.get(0).getEdcrNumber();
-				landId = BPA.get(0).getLandId();
+			for (int i = 0; i < ocBpa.size(); i++) {
+				edcr = ocBpa.get(0).getEdcrNumber();
+				landId = ocBpa.get(0).getLandId();
 			}
 			
 			values.put("landId", landId);
 			criteria.setEdcrNumber(edcr);
 			ocService.validateAdditionalData(bpaRequest, criteria);
-			bpaRequest.getBPA().setLandInfo(BPA.get(0).getLandInfo());
+			bpaRequest.getBPA().setLandInfo(ocBpa.get(0).getLandInfo());
 		}
 		bpaValidator.validateCreate(bpaRequest, mdmsData, values);
 		if (!applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
@@ -164,7 +158,6 @@ public class BPAService {
 	 *            The search request's requestInfo
 	 * @return List of bpa for the given criteria
 	 */
-	@SuppressWarnings("null")
 	public List<BPA> search(BPASearchCriteria criteria, RequestInfo requestInfo) {
 		List<BPA> bpa = new LinkedList<>();
 		bpaValidator.validateSearch(requestInfo, criteria);
@@ -300,6 +293,7 @@ public class BPAService {
 	 *            The update Request
 	 * @return Updated bpa
 	 */
+	@SuppressWarnings("unchecked")
 	public BPA update(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
@@ -419,7 +413,7 @@ public class BPAService {
 		BPA bpa = bpaRequest.getBPA();
 
 		if (StringUtils.isEmpty(bpa.getApprovalNo())) {
-			throw new CustomException("INVALID_REQUEST", "Permit Order No is required.");
+			throw new CustomException("INVALID_REQUEST", "Approval Number is required.");
 		}
 
 		try {
@@ -470,15 +464,15 @@ public class BPAService {
 				@SuppressWarnings("deprecation")
 				PDPageContentStream contentStream = new PDPageContentStream(doc, page, true, true, true);
 				PDFont font = PDType1Font.TIMES_ROMAN;
-				float fontSize = 12.0f;
+				float fontSize = 10.0f;
 				contentStream.beginText();
 				// set font and font size
 				contentStream.setFont(font, fontSize);
 
 				PDRectangle mediabox = page.getMediaBox();
-				float margin = 20;
+				float margin = 32;
 				float startX = mediabox.getLowerLeftX() + margin;
-				float startY = mediabox.getUpperRightY() - margin;
+				float startY = mediabox.getUpperRightY() - (margin/2);
 				contentStream.newLineAtOffset(startX, startY);
 
 				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getApprovalNo());
@@ -486,10 +480,10 @@ public class BPAService {
 					Date date = new Date(bpa.getApprovalDate());
 					DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 					String formattedDate = format.format(date);
-					contentStream.newLineAtOffset(400, 4.5f);
+					contentStream.newLineAtOffset(436, 0);
 					contentStream.showText(generatedOn + " : " + formattedDate);
 				} else {
-					contentStream.newLineAtOffset(400, 4.5f);
+					contentStream.newLineAtOffset(436, 0);
 					contentStream.showText(generatedOn + " : " + "NA");
 				}
 
