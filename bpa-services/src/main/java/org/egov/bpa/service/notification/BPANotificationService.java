@@ -22,6 +22,7 @@ import org.egov.bpa.web.model.Event;
 import org.egov.bpa.web.model.EventRequest;
 import org.egov.bpa.web.model.Recepient;
 import org.egov.bpa.web.model.SMSRequest;
+import org.egov.bpa.web.model.Source;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.Action;
 import org.egov.common.contract.request.RequestInfo;
@@ -137,7 +138,7 @@ public class BPANotificationService {
 			events.add(Event.builder().tenantId(bpaApplication.getTenantId()).description(mobileNumberToMsg.get(mobile))
 					.eventType(BPAConstants.USREVENTS_EVENT_TYPE).name(BPAConstants.USREVENTS_EVENT_NAME)
 					.postedBy(BPAConstants.USREVENTS_EVENT_POSTEDBY)
-					.source("WEBAPP")
+					.source(Source.WEBAPP)
 					.recepient(recepient)
 					.eventDetails(null).actions(action).build());
 		}
@@ -168,7 +169,7 @@ public class BPANotificationService {
 		userSearchRequest.put("tenantId", tenantId);
 		userSearchRequest.put("userType", "CITIZEN");
 		for (String mobileNo : mobileNumbers) {
-			userSearchRequest.put("userName", mobileNo);
+			userSearchRequest.put("mobileNumber", mobileNo);
 			try {
 				Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
 				if (null != user) {

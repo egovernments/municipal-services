@@ -2,7 +2,8 @@ package org.egov.bpa.web.model;
 
 public enum Source {
 	MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
-	  FIELD_SURVEY("FIELD_SURVEY");
+	  FIELD_SURVEY("FIELD_SURVEY"), 
+	  WEBAPP("WEBAPP");
 
 	  private String value;
 
