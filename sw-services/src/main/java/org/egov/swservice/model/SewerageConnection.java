@@ -25,6 +25,9 @@ public class SewerageConnection extends Connection {
 	@JsonProperty("noOfWaterClosets")
 	private Integer noOfWaterClosets = null;
 
+	@JsonProperty("floorNumber")
+	private Integer floorNumber = null;
+
 	@JsonProperty("noOfToilets")
 	private Integer noOfToilets = null;
 
