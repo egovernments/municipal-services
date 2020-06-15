@@ -1,0 +1,21 @@
+CREATE TABLE eg_noc(
+    id character varying(256) NOT NULL,
+    applicationno character varying(64),
+    tenantid character varying(256),
+    status character varying(64),
+    landid character varying(256),
+    additionaldetails jsonb,
+    createdby character varying(256),
+    lastmodifiedby character varying(256),
+    createdtime bigint,
+    lastmodifiedtime bigint,
+    nocNo character varying(64) DEFAULT NULL,
+    description character varying(256) NOT NULL,
+    applicationType character varying(64) NOT NULL,
+    nocType character varying(64) NOT NULL,
+    accountid character varying(256) DEFAULT NULL,
+    source character varying(64) NOT NULL,
+    sourcerefid character varying(256) NOT NULL,
+    applicationstatus character varying(64) NOT NULL,
+    CONSTRAINT pk_eg_noc PRIMARY KEY (id)
+);
