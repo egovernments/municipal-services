@@ -3,11 +3,7 @@ package org.egov.waterconnection.controller;
 import java.util.List;
 import javax.validation.Valid;
 
-import org.egov.waterconnection.model.RequestInfoWrapper;
-import org.egov.waterconnection.model.SearchCriteria;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.WaterConnectionResponse;
+import org.egov.waterconnection.model.*;
 import org.egov.waterconnection.service.WaterService;
 import org.egov.waterconnection.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +41,14 @@ public class WaterController {
 				.responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(waterConnectionRequest.getRequestInfo(), true))
 				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/_demoendpoint", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<WaterConnectionResponse> createWaterConnection(
+			@Valid @RequestBody DemoInput demoInput) {
+		DemoModel demoModel = waterService.getDemoFunction(demoInput);
+		DemoConnectionResponse response = DemoConnectionResponse.builder().demoModel(demoModel).build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

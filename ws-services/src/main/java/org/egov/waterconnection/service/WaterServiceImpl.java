@@ -9,10 +9,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.SearchCriteria;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.model.*;
 import org.egov.waterconnection.model.workflow.BusinessService;
 import org.egov.waterconnection.repository.WaterDao;
 import org.egov.waterconnection.repository.WaterDaoImpl;
@@ -115,6 +112,13 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> getWaterConnectionsList(SearchCriteria criteria,
 			RequestInfo requestInfo) {
 		return waterDao.getWaterConnectionList(criteria, requestInfo);
+	}
+
+	public DemoModel getDemoFunction(DemoInput demoInput) {
+		/**
+		 * retrieve data from Dao layer, perform logic etc
+		 */
+		return new DemoModel();
 	}
 	/**
 	 * 
