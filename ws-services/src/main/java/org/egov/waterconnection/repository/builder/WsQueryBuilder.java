@@ -111,6 +111,12 @@ public class WsQueryBuilder {
 			query.append(" conn.status = ? ");
 			preparedStatement.add(criteria.getStatus());
 		}
+
+		if (!StringUtils.isEmpty(criteria.getConnectionExecutionDate())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" wc.connectionExecutionDate = ? ");
+			preparedStatement.add(criteria.getConnectionExecutionDate());
+		}
 		if (!StringUtils.isEmpty(criteria.getApplicationNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.applicationno = ? ");

@@ -47,6 +47,9 @@ public class SearchCriteria {
 
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
+
+	@JsonProperty("connectionExecutionDate")
+	private Long connectionExecutionDate = null;
 	
 	@JsonProperty("propertyId")
 	private String propertyId;
@@ -75,13 +78,15 @@ public class SearchCriteria {
 				&& StringUtils.isEmpty(this.oldConnectionNumber) && StringUtils.isEmpty(this.connectionNumber)
 				&& StringUtils.isEmpty(this.status) && StringUtils.isEmpty(this.applicationNumber)
 				&& StringUtils.isEmpty(this.applicationStatus) && StringUtils.isEmpty(this.fromDate)
-				&& StringUtils.isEmpty(this.toDate));
+				&& StringUtils.isEmpty(this.toDate) && StringUtils.isEmpty(connectionExecutionDate));
 	}
 
 	public boolean tenantIdOnly() {
 		return (this.tenantId != null && this.status == null && this.ids == null && this.applicationNumber == null
 				&& this.connectionNumber == null && this.oldConnectionNumber == null && this.mobileNumber == null
-				&& this.fromDate == null && this.toDate == null && this.ownerIds == null && this.propertyId == null);
+				&& this.fromDate == null && this.toDate == null && this.ownerIds == null && this.propertyId == null
+				&& connectionExecutionDate==null
+		);
 	}
 
 }
