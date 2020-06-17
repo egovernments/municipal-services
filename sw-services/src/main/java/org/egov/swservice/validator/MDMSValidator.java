@@ -46,10 +46,10 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_Connection_Type));
 		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
-		Map<String, List<String>> codes = getAttributeValues(request.getRequestInfo().getUserInfo().getTenantId(), 
+		Map<String, List<String>> codes = getAttributeValues(request.getSewerageConnection().getTenantId(), 
 				SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
 				SWConstants.JSONPATH_ROOT, request.getRequestInfo());
-		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getRequestInfo().getUserInfo().getTenantId(), 
+		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getSewerageConnection().getTenantId(), 
 				SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code", 
 				SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
 		// merge codes

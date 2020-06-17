@@ -132,7 +132,7 @@ public class WaterServiceImpl implements WaterService {
 		}
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
-		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo());
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),

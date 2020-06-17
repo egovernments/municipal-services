@@ -115,7 +115,7 @@ public class PdfFileStoreService {
 				waterobject.put(pdfTaxhead, cal.getTaxHeadEstimates());
 			}
 			waterobject.put(sanctionLetterDate, System.currentTimeMillis());
-			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
+			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
 			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
 			waterobject.put(slaDate, slaDays.add(new BigDecimal(System.currentTimeMillis())));
 			String[] tenantDetails = property.getTenantId().split("\\."); 
