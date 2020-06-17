@@ -97,7 +97,7 @@ public class WaterServicesUtil {
 		propertyCriteria.setUuids(propertyUUID);
 		if (waterConnectionRequest.getRequestInfo().getUserInfo() != null
 				&& "EMPLOYEE".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
-			propertyCriteria.setTenantId(waterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+			propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
 		}
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),

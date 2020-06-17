@@ -51,7 +51,7 @@ public class MDMSValidator {
 		if (request.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION_CONST)) {
 			String jsonPath = WCConstants.JSONPATH_ROOT;
 			String taxjsonPath = WCConstants.TAX_JSONPATH_ROOT;
-			String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
+			String tenantId = request.getWaterConnection().getTenantId();
 			List<String> names = new ArrayList<>(Arrays.asList(WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
 					WCConstants.MDMS_WC_Water_Source));
 			List<String> taxModelnames = new ArrayList<>(Arrays.asList(WCConstants.WC_ROADTYPE_MASTER));

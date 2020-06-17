@@ -121,7 +121,7 @@ public class PdfFileStoreService {
 			}
 			sewerageobject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(
-					sewerageConnectionRequest.getRequestInfo().getUserInfo().getTenantId(),
+					sewerageConnectionRequest.getSewerageConnection().getTenantId(),
 					sewerageConnectionRequest.getRequestInfo(), applicationStatus);
 			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
 			sewerageobject.put(slaDate, slaDays.add(
