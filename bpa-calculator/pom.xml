@@ -156,9 +156,6 @@
 			      <class>org.egov.bpa.calculator.web.models.CalculationReq</class>
 			      <class>org.egov.bpa.calculator.web.models.CalculationRes</class>
 			    </classes>
-			    <customTypeNaming>
-			      <customTypeNaming>org.egov.collection.model.enums.Purpose:BillDetailPurpose</customTypeNaming>
-			    </customTypeNaming>
 			    <customTypeMappings>
 			      <customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
 			      <customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
