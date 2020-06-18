@@ -245,6 +245,8 @@ public class WSCalculationConstant {
 	public static final String WS_METER_CHARGE = "WS_METER_CHARGE";
 	
 	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
+
+	public static final String WS_DEMO_FEE = "WS_DEMO_FEE";
 	
 	public static final String WS_OTHER_CHARGE = "WS_OTHER_CHARGE";
 	
@@ -261,8 +263,11 @@ public class WSCalculationConstant {
 	public static final String METER_COST_CONST = "meterCost";
 	
 	public static final String OTHER_CHARGE_CONST = "other";
-	
+
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
+
+
+	public static final String TAX_DEMO_FEE = "demoFee";
 	
 	public static final String ROAD_NAME_CONST = "name";
 	

@@ -417,6 +417,13 @@ public class EstimationService {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
+
+		BigDecimal demoFee = BigDecimal.ZERO;
+		if (feeObj.get(WSCalculationConstant.TAX_DEMO_FEE) != null) {
+			taxAndCessPercentage = new BigDecimal(
+					feeObj.getAsNumber(WSCalculationConstant.TAX_DEMO_FEE).toString());
+		}
+
 		BigDecimal meterCost = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null
 				&& criteria.getWaterConnection().getConnectionType() != null && criteria.getWaterConnection()
@@ -463,6 +470,9 @@ public class EstimationService {
 		if (!(roadPlotCharge.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
 					.estimateAmount(roadPlotCharge.setScale(2, 2)).build());
+		if (!(demoFee.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_DEMO_FEE)
+					.estimateAmount(demoFee.setScale(2, 2)).build());
 		if (!(tax.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_TAX_AND_CESS)
 					.estimateAmount(tax.setScale(2, 2)).build());
