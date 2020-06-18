@@ -632,6 +632,7 @@ public class DemandService {
 
 		BigDecimal penalty = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
+		BigDecimal charges = interestPenaltyEstimates.get(WSCalculationConstant.WC_CHARGES_MASTER);
 
 		DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
 
@@ -662,7 +663,11 @@ public class DemandService {
 					DemandDetail.builder().taxAmount(interest.setScale(2, 2)).taxHeadMasterCode(WSCalculationConstant.WS_TIME_INTEREST)
 							.demandId(demandId).tenantId(tenantId).build());
 		}
-
+		if(charges)
+		{
+			add to demand
+		}
+		//
 		return isCurrentDemand;
 	}
 

@@ -151,6 +151,8 @@ public class WSCalculationConstant {
 
 	public static final String WC_PENANLTY_MASTER = "Penalty";
 
+	public static final String WC_CHARGES_MASTER = "Charges";
+
 	public static final String WC_WATER_CESS_MASTER = "WaterCess";
 
 	public static final String WC_INTEREST_MASTER = "Interest";

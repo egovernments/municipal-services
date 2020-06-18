@@ -80,6 +80,8 @@ public class PayService {
 		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
 		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
 		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER));
+		charge = getCharge(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_CHARGES_MASTER));
+		estimates.put(WSCalculationConstant.WC_CHARGES_MASTER, penalty.setScale(2, 2));
 		estimates.put(WSCalculationConstant.WS_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, interest.setScale(2, 2));
 		return estimates;
