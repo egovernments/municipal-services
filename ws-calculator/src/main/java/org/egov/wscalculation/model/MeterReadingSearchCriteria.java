@@ -27,6 +27,10 @@ public class MeterReadingSearchCriteria {
 	@JsonProperty("offset")
 	private Integer offset;
 
+
+	@JsonProperty("billingPeriod")
+	private String billingPeriod;
+
 	@JsonProperty("limit")
 	private Integer limit;
 }

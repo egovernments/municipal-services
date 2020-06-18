@@ -176,7 +176,7 @@ public class WSCalculationValidator {
 	}
 
 	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
-		if (criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
+		if (StringUtils.isEmpty(criteria.getBillingPeriod())&&(criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty())) {
 			throw new CustomException("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
 		}
 	}

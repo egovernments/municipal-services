@@ -50,6 +50,11 @@ public class WSCalculatorQueryBuilder {
 		if (CollectionUtils.isEmpty(criteria.getConnectionNos())) {
 			return null;
 		}
+		if(!StringUtils.isEmpty(criteria.getBillingPeriod()))
+		{
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" mr.billingPeriod = "+criteria.getBillingPeriod());
+		}
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" mr.connectionNo IN (").append(createQuery(criteria.getConnectionNos())).append(" )");
 		addToPreparedStatement(preparedStatement, criteria.getConnectionNos());
