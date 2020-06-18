@@ -251,7 +251,11 @@ public class MasterDataService {
 			} else if (WSCalculationConstant.Quaterly_Billing_Period
 					.equalsIgnoreCase(master.get(WSCalculationConstant.Billing_Cycle_String).toString())) {
 				estimationService.getQuaterStartAndEndDate(billingPeriod);
-			} else {
+			}else if("anually")
+			{
+				//// logic
+			}
+			else {
 				LocalDateTime demandEndDate = LocalDateTime.now();
 				demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
 				Long endDaysMillis = (Long) master.get(WSCalculationConstant.Demand_End_Date_String);
