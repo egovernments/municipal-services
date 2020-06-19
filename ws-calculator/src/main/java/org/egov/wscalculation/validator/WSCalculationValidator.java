@@ -60,7 +60,7 @@ public class WSCalculationValidator {
 		validateBillingPeriod(meterReading.getBillingPeriod());
 		
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
-				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+				meterReading.getConnectionNo(), meterReading.getTenantId());
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand() && connection == null) {
 			errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER", "Invalid water connection number");
 		}

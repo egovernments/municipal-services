@@ -61,7 +61,7 @@ public class MeterServicesImpl implements MeterService {
 		List<CalculationCriteria> criterias = new ArrayList<>();
 		meterReadingsList.forEach(reading -> {
 			CalculationCriteria criteria = new CalculationCriteria();
-			criteria.setTenantId(requestInfo.getUserInfo().getTenantId());
+			criteria.setTenantId(reading.getTenantId());
 			criteria.setAssessmentYear(estimationService.getAssessmentYear());
 			criteria.setCurrentReading(reading.getCurrentReading());
 			criteria.setLastReading(reading.getLastReading());

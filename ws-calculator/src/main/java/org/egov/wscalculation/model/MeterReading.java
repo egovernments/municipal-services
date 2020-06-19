@@ -101,6 +101,9 @@ public class MeterReading {
 	
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
+	
+	@JsonProperty("tenantId")
+	private String tenantId = null;
 
 	
 
@@ -319,6 +322,20 @@ public class MeterReading {
 		this.auditDetails = auditDetails;
 	}
 	
+	public MeterReading tenantId(String tenantId) {
+		this.tenantId = tenantId;
+		return this;
+	}
+	
+	@ApiModelProperty(value = "")
+	public String getTenantId() {
+		return tenantId;
+	}
+	
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -335,13 +352,14 @@ public class MeterReading {
 				&& Objects.equals(this.lastReadingDate, meterReading.lastReadingDate)
 				&& Objects.equals(this.currentReading, meterReading.currentReading)
 				&& Objects.equals(this.currentReadingDate, meterReading.currentReadingDate)
-				&& Objects.equals(this.consumption, meterReading.consumption);
+				&& Objects.equals(this.consumption, meterReading.consumption)
+				&& Objects.equals(this.tenantId, meterReading.tenantId);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, billingPeriod, meterStatus, lastReading, lastReadingDate, currentReading,
-				currentReadingDate);
+				currentReadingDate, tenantId);
 	}
 
 	@Override
@@ -357,6 +375,7 @@ public class MeterReading {
 		sb.append("    currentReading: ").append(toIndentedString(currentReading)).append("\n");
 		sb.append("    currentReadingDate: ").append(toIndentedString(currentReadingDate)).append("\n");
 		sb.append("    consumption: ").append(toIndentedString(consumption)).append("\n");
+		sb.append("	   tenantId: ").append(toIndentedString(tenantId)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
