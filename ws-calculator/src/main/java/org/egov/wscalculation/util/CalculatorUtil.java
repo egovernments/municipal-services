@@ -148,12 +148,10 @@ public class CalculatorUtil {
 	/**
 	 * 
 	 * @param requestInfo
-	 * @param connectionNo
-	 * @param tenantId
+	 * @param searchCriteria
 	 * @return water connection
 	 */
-	public WaterConnection getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
-			String tenantId) {
+	public WaterConnection getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria) {
 		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(searchCriteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());

@@ -71,10 +71,9 @@ public class EstimationService {
 	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo,
 			Map<String, Object> masterData) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
-		String tenantId = requestInfo.getUserInfo().getTenantId();
 		if (criteria.getWaterConnection() == null && !StringUtils.isEmpty(criteria.getConnectionNo())) {
 			criteria.setWaterConnection(
-					calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), tenantId));
+					calculatorUtil.getWaterConnection(requestInfo, criteria.getConnectionNo(), criteria.getTenantId()));
 		}
 		if (criteria.getWaterConnection() == null || StringUtils.isEmpty(criteria.getConnectionNo())) {
 			StringBuilder builder = new StringBuilder();
@@ -366,7 +365,7 @@ public class EstimationService {
 			SearchCriteria searchCriteria = new SearchCriteria();
 			searchCriteria.setApplicationNumber(criteria.getApplicationNo());
 			searchCriteria.setTenantId(criteria.getTenantId());
-			waterConnection = calculatorUtil.getWaterConnectionOnApplicationNO(requestInfo, searchCriteria, requestInfo.getUserInfo().getTenantId());
+			waterConnection = calculatorUtil.getWaterConnectionOnApplicationNO(requestInfo, searchCriteria);
 			criteria.setWaterConnection(waterConnection);
 		}
 		if (StringUtils.isEmpty(criteria.getWaterConnection())) {
