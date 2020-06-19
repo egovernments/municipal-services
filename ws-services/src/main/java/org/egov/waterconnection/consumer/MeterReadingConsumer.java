@@ -35,6 +35,7 @@ public class MeterReadingConsumer {
 	@KafkaListener(topics = { "${ws.meterreading.create}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
+			log.info("Received request to add Meter Reading on topic - " + topic);
 			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
 			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())
 					&& WCConstants.METERED_CONNECTION

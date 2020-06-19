@@ -83,6 +83,7 @@ public class WaterDaoImpl implements WaterDao {
 	 * @param waterConnectionRequest
 	 */
 	public void postForMeterReading(WaterConnectionRequest waterConnectionRequest) {
+		log.info("Posting request to kafka topic - " + wsConfiguration.getCreateMeterReading());
 		waterConnectionProducer.push(wsConfiguration.getCreateMeterReading(), waterConnectionRequest);
 	}
 
