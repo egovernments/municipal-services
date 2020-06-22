@@ -621,7 +621,7 @@ public class PropertyValidator {
     private Boolean isMobileNumberValid(String mobileNumber){
         if(mobileNumber.length()!=10)
             return false;
-        if(Character.getNumericValue(mobileNumber.charAt(0))<5)
+        if(Character.getNumericValue(mobileNumber.charAt(0))<3)
             return false;
         return true;
     }
