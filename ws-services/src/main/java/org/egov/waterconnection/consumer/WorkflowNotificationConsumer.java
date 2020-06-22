@@ -31,7 +31,8 @@ public class WorkflowNotificationConsumer {
 	 * @param topic
 	 */
 	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterconnection}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
-	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+	public void listen(final HashMap<String, Object> record) {
+		String topic = "NotificationService";
 		try {
 			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
 			workflowNotificationService.process(waterConnectionRequest, topic);
