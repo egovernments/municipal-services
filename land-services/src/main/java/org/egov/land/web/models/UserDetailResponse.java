@@ -1,8 +1,7 @@
-package org.egov.bpa.web.model.user;
+package org.egov.land.web.models;
 
 import java.util.List;
 
-import org.egov.bpa.web.model.landInfo.OwnerInfo;
 import org.egov.common.contract.response.ResponseInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

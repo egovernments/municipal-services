@@ -1,4 +1,4 @@
-package org.egov.bpa;
+package org.egov.land;
 
 import org.egov.tracer.config.TracerConfiguration;
 import org.springframework.boot.SpringApplication;
@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
 @Import({ TracerConfiguration.class })
-public class BPAApplication {
+public class LandServicesApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BPAApplication.class, args);
+		SpringApplication.run(LandServicesApplication.class, args);
 	}
 
 }
