@@ -97,14 +97,15 @@ public class MeterReading {
 
 	@JsonProperty("consumption")
 	private Double consumption = null;
-	
+
 	@JsonProperty("generateDemand")
 	private Boolean generateDemand = Boolean.TRUE;
-	
+
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-	
+	@JsonProperty("tenantId")
+	private String tenantId = null;
 
 	public MeterReading id(String id) {
 		this.id = id;
@@ -113,7 +114,7 @@ public class MeterReading {
 
 	/**
 	 * Unique Identifier of the meterreading for internal reference.
-	 * 
+	 *
 	 * @return id
 	 **/
 	@ApiModelProperty(readOnly = true, value = "Unique Identifier of the meterreading for internal reference.")
@@ -139,7 +140,7 @@ public class MeterReading {
 
 	/**
 	 * Formatted billingPeriod
-	 * 
+	 *
 	 * @return billingPeriod
 	 **/
 	@ApiModelProperty(required = true, readOnly = true, value = "Formatted billingPeriod")
@@ -155,7 +156,7 @@ public class MeterReading {
 
 	/**
 	 * Formatted billingPeriod
-	 * 
+	 *
 	 * @return billingPeriod
 	 **/
 	@ApiModelProperty(required = true, readOnly = true, value = "Formatted billingPeriod")
@@ -177,7 +178,7 @@ public class MeterReading {
 
 	/**
 	 * Get meterStatus
-	 * 
+	 *
 	 * @return meterStatus
 	 **/
 	@ApiModelProperty(required = true, readOnly = true, value = "")
@@ -198,7 +199,7 @@ public class MeterReading {
 
 	/**
 	 * Last Reading
-	 * 
+	 *
 	 * @return lastReading
 	 **/
 	@ApiModelProperty(required = true, value = "Last Reading")
@@ -219,7 +220,7 @@ public class MeterReading {
 
 	/**
 	 * The date of meter last reading date.
-	 * 
+	 *
 	 * @return lastReadingDate
 	 **/
 	@ApiModelProperty(required = true, value = "The date of meter last reading date.")
@@ -253,7 +254,7 @@ public class MeterReading {
 
 	/**
 	 * Current Reading
-	 * 
+	 *
 	 * @return currentReading
 	 **/
 	@ApiModelProperty(required = true, value = "Current Reading")
@@ -274,7 +275,7 @@ public class MeterReading {
 
 	/**
 	 * The date of meter current reading date.
-	 * 
+	 *
 	 * @return currentReadingDate
 	 **/
 	@ApiModelProperty(required = true, value = "The date of meter current reading date.")
@@ -288,12 +289,11 @@ public class MeterReading {
 		this.currentReadingDate = currentReadingDate;
 	}
 
-	
 	public MeterReading generateDemand(Boolean generateDemand) {
 		this.generateDemand = generateDemand;
 		return this;
 	}
-	
+
 	public Boolean getGenerateDemand() {
 		return generateDemand;
 	}
@@ -301,7 +301,7 @@ public class MeterReading {
 	public void setGenerateDemand(Boolean generateDemand) {
 		this.generateDemand = generateDemand;
 	}
-	
+
 	public MeterReading auditDetails(AuditDetails auditDetails) {
 		this.auditDetails = auditDetails;
 		return this;
@@ -309,7 +309,7 @@ public class MeterReading {
 
 	/**
 	 * Get auditDetails
-	 * 
+	 *
 	 * @return auditDetails
 	 **/
 	@ApiModelProperty(value = "")
@@ -320,7 +320,21 @@ public class MeterReading {
 	public void setAuditDetails(AuditDetails auditDetails) {
 		this.auditDetails = auditDetails;
 	}
-	
+
+	public MeterReading tenantId(String tenantId) {
+		this.tenantId = tenantId;
+		return this;
+	}
+
+	@ApiModelProperty(value = "")
+	public String getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -337,13 +351,14 @@ public class MeterReading {
 				&& Objects.equals(this.lastReadingDate, meterReading.lastReadingDate)
 				&& Objects.equals(this.currentReading, meterReading.currentReading)
 				&& Objects.equals(this.currentReadingDate, meterReading.currentReadingDate)
-				&& Objects.equals(this.consumption, meterReading.consumption);
+				&& Objects.equals(this.consumption, meterReading.consumption)
+				&& Objects.equals(this.tenantId, meterReading.tenantId);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, billingPeriod, meterStatus, lastReading, lastReadingDate, currentReading,
-				currentReadingDate);
+				currentReadingDate, tenantId);
 	}
 
 	@Override
@@ -359,6 +374,7 @@ public class MeterReading {
 		sb.append("    currentReading: ").append(toIndentedString(currentReading)).append("\n");
 		sb.append("    currentReadingDate: ").append(toIndentedString(currentReadingDate)).append("\n");
 		sb.append("    consumption: ").append(toIndentedString(consumption)).append("\n");
+		sb.append("	   tenantId: ").append(toIndentedString(tenantId)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

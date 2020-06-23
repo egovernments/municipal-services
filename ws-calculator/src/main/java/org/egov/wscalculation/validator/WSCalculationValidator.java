@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
@@ -60,7 +59,7 @@ public class WSCalculationValidator {
 		validateBillingPeriod(meterReading.getBillingPeriod());
 		
 		WaterConnection connection = calculationUtil.getWaterConnection(meterConnectionRequest.getRequestInfo(),
-				meterReading.getConnectionNo(), meterConnectionRequest.getRequestInfo().getUserInfo().getTenantId());
+				meterReading.getConnectionNo(), meterConnectionRequest.getMeterReading().getTenantId());
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand() && connection == null) {
 			errorMap.put("INVALID_METER_READING_CONNECTION_NUMBER", "Invalid water connection number");
 		}
