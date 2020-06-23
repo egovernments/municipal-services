@@ -282,6 +282,8 @@ public class PaymentNotificationService {
             valMap.put("mobileNumber",paymentDetail.getBill().getMobileNumber());
 
             valMap.put("module",paymentDetail.getBusinessService());
+
+            valMap.put("receiptNumber",paymentDetail.getReceiptNumber());
         }
         catch (Exception e)
         {
@@ -384,6 +386,17 @@ public class PaymentNotificationService {
         return customMessage;
     }
 
+    private String getReceiptLink(Map<String,String> valMap){
+        StringBuilder builder = new StringBuilder(propertyConfiguration.getUiAppHost());
+        builder.append(propertyConfiguration.getReceiptDownloadLink());
+        String link = builder.toString();
+        link = link.replace("$consumerCode", valMap.get("propertyId"));
+        link = link.replace("$tenantId", valMap.get("tenantId"));
+        link = link.replace("$receiptNumber", valMap.get("receiptNumber"));
+        link = link.replace("$businessService",PT_BUSINESSSERVICE);
+        return  link;
+    }
+
     /**
      * @param message The message template from localization
      * @param valMap The map of the required values
@@ -394,6 +407,8 @@ public class PaymentNotificationService {
         message = message.replace("< insert payment transaction id from PG>",valMap.get("transactionId"));
         message = message.replace("<insert Property Tax Assessment ID>",valMap.get("propertyId"));
         message = message.replace("<pt due>.",valMap.get("amountDue"));
+        String receiptLink = getReceiptLink(valMap);
+        message = message.replace("<receipt download link>",receiptLink);
     //    message = message.replace("<FY>",valMap.get("financialYear"));
         return message;
     }
@@ -409,6 +424,8 @@ public class PaymentNotificationService {
         message = message.replace("<insert mode of payment>",valMap.get("paymentMode"));
         message = message.replace("<Enter pending amount>",valMap.get("amountDue"));
         message = message.replace("<insert inactive citizen application web URL>.",propertyConfiguration.getNotificationURL());
+        String receiptLink = getReceiptLink(valMap);
+        message = message.replace("<receipt download link>",receiptLink);
 //        message = message.replace("<Insert FY>",valMap.get("financialYear"));
         return message;
     }

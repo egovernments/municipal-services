@@ -170,6 +170,9 @@ public class PropertyConfiguration {
 	
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
+
+    @Value("${egov.msg.download.receipt.link}")
+    private String receiptDownloadLink;
 	
 	//Assessments V2
 	@Value("${egov.pt.assessment.create.topic}")
