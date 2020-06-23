@@ -516,7 +516,7 @@ public class PropertyValidator {
                 if(!propertyDetail.getOwnershipCategory().contains("INSTITUTIONAL"))
                 {
                     propertyDetail.getOwners().forEach(owner -> {
-                        if(owner.getMobileNumber()==null || !isMobileNumberValid(owner.getMobileNumber()))
+                        if(owner.getMobileNumber()==null || !isMobileNumberValid(owner.getMobileNumber(), propertyDetail.getSource().toString()))
                             errorMap.put("INVALID OWNER","MobileNumber is not valid");
                     });
                 }
@@ -621,8 +621,14 @@ public class PropertyValidator {
     private Boolean isMobileNumberValid(String mobileNumber){
         if(mobileNumber.length()!=10)
             return false;
-        if(Character.getNumericValue(mobileNumber.charAt(0))<3)
-            return false;
+        if(source== "LEGACY_RECORD"){
+        	if(Character.getNumericValue(mobileNumber.charAt(0))<3)
+                return false;
+        }
+        else{
+        	if(Character.getNumericValue(mobileNumber.charAt(0))<5)
+                return false;
+        }
         return true;
     }
 
