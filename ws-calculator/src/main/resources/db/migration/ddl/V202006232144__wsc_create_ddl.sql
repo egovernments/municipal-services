@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS meterreading;
+DROP TABLE IF EXISTS eg_ws_meterreading;
 CREATE TABLE eg_ws_meterreading
 (
   id character varying(64),
@@ -10,5 +10,10 @@ CREATE TABLE eg_ws_meterreading
   currentReading decimal NOT NULL,
   currentReadingDate bigint NOT NULL,
   consumption decimal,
+  createdBy character varying(64),
+  lastModifiedBy character varying(64),
+  createdTime bigint,
+  lastModifiedTime bigint,
+  tenantid character varying(64),
   CONSTRAINT uk_eg_ws_meterreading UNIQUE (id)
 );
