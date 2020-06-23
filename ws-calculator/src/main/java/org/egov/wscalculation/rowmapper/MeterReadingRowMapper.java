@@ -29,6 +29,7 @@ public class MeterReadingRowMapper implements ResultSetExtractor<List<MeterReadi
 			meterReading.setLastReading(rs.getDouble("lastReading"));
 			meterReading.setLastReadingDate(rs.getLong("lastReadingDate"));
 			meterReading.setMeterStatus(MeterStatusEnum.fromValue(rs.getString("meterStatus")));
+			meterReading.setTenantId(rs.getString("tenantid"));
 			AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("mr_createdBy"))
 					.createdTime(rs.getLong("mr_createdTime")).lastModifiedBy(rs.getString("mr_lastModifiedBy"))
 					.lastModifiedTime(rs.getLong("mr_lastModifiedTime")).build();
