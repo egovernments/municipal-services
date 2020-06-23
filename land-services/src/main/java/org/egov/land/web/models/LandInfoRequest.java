@@ -21,6 +21,6 @@ public class LandInfoRequest {
 	@JsonProperty("RequestInfo")
 	  private RequestInfo requestInfo;
 
-	  @JsonProperty("landInfo")
+	  @JsonProperty("LandInfo")
 	  private LandInfo landInfo;
 }
