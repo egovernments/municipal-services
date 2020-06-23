@@ -117,7 +117,7 @@ public class BillingSlabController {
 	 */
 	@PostMapping("/mutation/_update")
 	@ResponseBody
-	private ResponseEntity<?> update(@RequestBody @Valid MutationBillingSlabReq billingSlabReq) {
+	private ResponseEntity<?> updateMutation(@RequestBody @Valid MutationBillingSlabReq billingSlabReq) {
 
 		long startTime = System.currentTimeMillis();
 		mutationbillingSlabValidator.validateUpdate(billingSlabReq);
@@ -135,7 +135,7 @@ public class BillingSlabController {
 	 */
 	@PostMapping("/mutation/_search")
 	@ResponseBody
-	private ResponseEntity<?> search(@RequestBody @Valid RequestInfo requestInfo,
+	private ResponseEntity<?> searchMutation(@RequestBody @Valid RequestInfo requestInfo,
 									 @ModelAttribute @Valid MutationBillingSlabSearchCriteria billingSlabSearcCriteria) {
 		long startTime = System.currentTimeMillis();
 		MutationBillingSlabRes billingSlabRes = mutationService.searchBillingSlabs(requestInfo, billingSlabSearcCriteria);

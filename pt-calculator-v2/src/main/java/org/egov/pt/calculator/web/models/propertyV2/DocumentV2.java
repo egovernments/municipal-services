@@ -25,7 +25,6 @@ public class DocumentV2 {
   private String fileStoreId ;
 
   @JsonProperty("documentUid")
-  @NotNull
   private String documentUid ;
 
   @JsonProperty("auditDetails")

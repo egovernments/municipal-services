@@ -52,6 +52,14 @@ public class CalculatorConstants {
 //	public static final String PT_DECIMAL_CEILING_DEBIT = "PT_DECIMAL_CEILING_DEBIT";
 
 	public static final String PT_ROUNDOFF = "PT_ROUNDOFF";
+
+	public static final String ADHOC_PENALTY_KEY = "adhocPenalty";
+
+	public static final String ADHOC_PENALTY_REASON_KEY = "adhocPenaltyReason";
+
+	public static final String ADHOC_REBATE_KEY = "adhocExemption";
+
+	public static final String ADHOC_REBATE_REASON_KEY = "adhocExemptionReason";
 	
 	public static final String ALLOWED_RECEIPT_STATUS = "APPROVED,REMITTED";
 
@@ -148,6 +156,8 @@ public class CalculatorConstants {
 	public static final String DEMAND_STATUS_PARAM = "status=";
 
 	public static final String DEMAND_STATUS_ACTIVE = DemandStatus.ACTIVE.toString();
+
+	public static final String OWNER_STATUS_ACTIVE = "ACTIVE";
 
 	/*
 	 * special characters

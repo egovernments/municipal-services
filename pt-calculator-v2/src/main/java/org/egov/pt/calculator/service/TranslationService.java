@@ -13,9 +13,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.egov.pt.calculator.util.CalculatorConstants.*;
 
 @Service
 public class TranslationService {
@@ -144,6 +147,32 @@ public class TranslationService {
                 units.add(unitMap);
 
             });
+
+        if(assessment.getAdditionalDetails()!=null){
+            // propertyDetail.put("adhocPenalty",);
+            try{
+                if(assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY)!=null){
+                    BigDecimal adhocExemption = new BigDecimal(assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY).doubleValue());
+                    propertyDetail.put("adhocExemption",adhocExemption);
+                }
+
+                if(assessment.getAdditionalDetails().get(ADHOC_REBATE_REASON_KEY)!=null)
+                    propertyDetail.put("adhocExemptionReason",assessment.getAdditionalDetails().get(ADHOC_REBATE_REASON_KEY).asText());
+
+
+                if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY)!=null){
+                    BigDecimal adhocPenalty = new BigDecimal(assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY).doubleValue());
+                    propertyDetail.put("adhocPenalty",adhocPenalty);
+                }
+
+                if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON_KEY)!=null)
+                    propertyDetail.put("adhocPenaltyReason", assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON_KEY).asText());
+            } catch (Exception e){
+                e.printStackTrace();
+                throw new CustomException("PARSING_ERROR","Failed to parse additional details in translation");
+            }
+
+        }
 
 
         propertyDetail.put("owners", owners);

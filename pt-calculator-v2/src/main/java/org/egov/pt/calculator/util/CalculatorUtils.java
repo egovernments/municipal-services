@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -724,6 +726,32 @@ public class CalculatorUtils {
         url.append("applicationNumber=");
         url.append("{2}");
         return url.toString();
+    }
+
+    public User getCommonContractUser(OwnerInfo owner){
+        org.egov.common.contract.request.User user = new org.egov.common.contract.request.User();
+        user.setTenantId(owner.getTenantId());
+        user.setId(owner.getId());
+        user.setName(owner.getName());
+        user.setType(owner.getType());
+        user.setMobileNumber(owner.getMobileNumber());
+        user.setEmailId(owner.getEmailId());
+        user.setRoles(addRoles(owner.getRoles()));
+        user.setUuid(owner.getUuid());
+
+        return user;
+    }
+
+    private List<Role> addRoles(List<org.egov.common.contract.request.Role> Roles){
+        LinkedList<Role> addroles = new LinkedList<>();
+        Roles.forEach(role -> {
+            Role addrole = new Role();
+            addrole.setId(role.getId());
+            addrole.setName(role.getName());
+            addrole.setCode(role.getCode());
+            addroles.add(addrole);
+        });
+        return addroles;
     }
 
 

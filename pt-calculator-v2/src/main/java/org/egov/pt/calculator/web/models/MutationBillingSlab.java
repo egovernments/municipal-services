@@ -34,7 +34,6 @@ public class MutationBillingSlab   {
     @JsonProperty("propertySubType")
     private String propertySubType;
 
-    @NotNull
     @JsonProperty("usageCategoryMajor")
     private String usageCategoryMajor;
 
