@@ -3,29 +3,32 @@ package org.egov.bpa.web.model.landInfo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * status of the Property
+ */
 public enum Status {
-	 ACTIVE("ACTIVE"),
-	  INACTIVE("INACTIVE");
-	
-	private String value;
+  ACTIVE("ACTIVE"),
+    INACTIVE("INACTIVE");
 
-	Status(String value) {
-		this.value = value;
-	}
+  private String value;
 
-	@Override
-	@JsonValue
-    public String toString() {
-        return name();
+  Status(String value) {
+    this.value = value;
+  }
+
+  @Override
+  @JsonValue
+  public String toString() {
+    return String.valueOf(value);
+  }
+
+  @JsonCreator
+  public static Status fromValue(String text) {
+    for (Status b : Status.values()) {
+      if (String.valueOf(b.value).equals(text)) {
+        return b;
+      }
     }
-
-	@JsonCreator
-	public static Status fromValue(String passedValue) {
-		for (Status obj : Status.values()) {
-			if (String.valueOf(obj.value).equals(passedValue.toUpperCase())) {
-				return obj;
-			}
-		}
-		return null;
-	}
+    return null;
+  }
 }

@@ -1,30 +1,34 @@
 package org.egov.land.web.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+/**
+ * The relationship of gaurdian.
+ */
 public enum Relationship {
-	FATHER("FATHER"), HUSBAND("HUSBAND");
+  FATHER("FATHER"),
+    HUSBAND("HUSBAND");
 
-	private String value;
+  private String value;
 
-	Relationship(String value) {
-		this.value = value;
-	}
+  Relationship(String value) {
+    this.value = value;
+  }
 
-	public String getValue() {
-		return value;
-	}
+  @Override
+  @JsonValue
+  public String toString() {
+    return String.valueOf(value);
+  }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
-
-	public static Relationship fromValue(String text) {
-		for (Relationship b : Relationship.values()) {
-			if (String.valueOf(b.value).equals(text)) {
-				return b;
-			}
-		}
-		return null;
-	}
-
+  @JsonCreator
+  public static Relationship fromValue(String text) {
+    for (Relationship b : Relationship.values()) {
+      if (String.valueOf(b.value).equals(text)) {
+        return b;
+      }
+    }
+    return null;
+  }
 }

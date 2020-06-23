@@ -1,6 +1,5 @@
-package org.egov.bpa.web.model.landInfo;
+package org.egov.land.web.models;	
 
-import java.util.List;
 import java.util.Objects;
 
 import javax.validation.Valid;
@@ -12,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 
 /**
  * Contains the ResponseHeader and the created/updated property
@@ -20,15 +18,14 @@ import lombok.Builder;
 @ApiModel(description = "Contains the ResponseHeader and the created/updated property")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
-@Builder
-public class LandInfoResponse   {
+public class BPAResponse   {
   @JsonProperty("ResponseInfo")
   private ResponseInfo responseInfo = null;
 
-  @JsonProperty("LandInfo")
-  private List<LandInfo> landInfo = null;
+  @JsonProperty("BPA")
+  private BPA BPA = null;
 
-  public LandInfoResponse responseInfo(ResponseInfo responseInfo) {
+  public BPAResponse responseInfo(ResponseInfo responseInfo) {
     this.responseInfo = responseInfo;
     return this;
   }
@@ -48,24 +45,24 @@ public class LandInfoResponse   {
     this.responseInfo = responseInfo;
   }
 
-  public LandInfoResponse landInfo(List<LandInfo> landInfo) {
-    this.landInfo = landInfo;
+  public BPAResponse BPA(BPA BPA) {
+    this.BPA = BPA;
     return this;
   }
 
   /**
-   * Get landInfo
-   * @return landInfo
+   * Get BPA
+   * @return BPA
   **/
   @ApiModelProperty(value = "")
   
     @Valid
-    public List<LandInfo> getLandInfo() {
-    return landInfo;
+    public BPA getBPA() {
+    return BPA;
   }
 
-  public void setLandInfo(List<LandInfo> landInfo) {
-    this.landInfo = landInfo;
+  public void setBPA(BPA BPA) {
+    this.BPA = BPA;
   }
 
 
@@ -77,23 +74,23 @@ public class LandInfoResponse   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LandInfoResponse landInfoResponse = (LandInfoResponse) o;
-    return Objects.equals(this.responseInfo, landInfoResponse.responseInfo) &&
-        Objects.equals(this.landInfo, landInfoResponse.landInfo);
+    BPAResponse bpAResponse = (BPAResponse) o;
+    return Objects.equals(this.responseInfo, bpAResponse.responseInfo) &&
+        Objects.equals(this.BPA, bpAResponse.BPA);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(responseInfo, landInfo);
+    return Objects.hash(responseInfo, BPA);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LandInfoResponse {\n");
+    sb.append("class BPAResponse {\n");
     
     sb.append("    responseInfo: ").append(toIndentedString(responseInfo)).append("\n");
-    sb.append("    landInfo: ").append(toIndentedString(landInfo)).append("\n");
+    sb.append("    BPA: ").append(toIndentedString(BPA)).append("\n");
     sb.append("}");
     return sb.toString();
   }

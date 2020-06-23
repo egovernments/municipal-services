@@ -26,8 +26,8 @@ public class LandSearchCriteria {
 	@JsonProperty("ids")
 	private List<String> ids;
 
-	@JsonProperty("landUid")
-	private String landUid;
+	@JsonProperty("landUId")
+	private String landUId;
 
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
@@ -39,10 +39,10 @@ public class LandSearchCriteria {
     private Integer limit;
 
 	public boolean isEmpty() {
-		return (this.tenantId == null && this.ids == null && this.landUid == null && this.mobileNumber == null);
+		return (this.tenantId == null && this.ids == null && this.landUId == null && this.mobileNumber == null);
 	}
 
 	public boolean tenantIdOnly() {
-		return (this.tenantId != null && this.ids == null && this.landUid == null && this.mobileNumber == null);
+		return (this.tenantId != null && this.ids == null && this.landUId == null && this.mobileNumber == null);
 	}
 }

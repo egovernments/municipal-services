@@ -1,5 +1,6 @@
 package org.egov.land.repository.rowmapper;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -59,7 +60,9 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 
 				Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
-				GeoLocation geoLocation = GeoLocation.builder().id(rs.getString("landInfo_geo_loc")).latitude(latitude)
+				GeoLocation geoLocation = GeoLocation.builder()
+						.id(rs.getString("landInfo_geo_loc"))
+						.latitude(latitude)
 						.longitude(longitude).build();
 
 				Address address = Address.builder().buildingName(rs.getString("buildingName"))
@@ -69,7 +72,7 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 						.pincode(rs.getString("pincode")).doorNo(rs.getString("doorno")).street(rs.getString("street"))
 						.tenantId(tenantId).locality(locality).build();
 
-				currentLandInfo = LandInfo.builder().id(id).landUid(rs.getString("landuid"))
+				currentLandInfo = LandInfo.builder().id(id).landUId(rs.getString("landuid"))
 						.landUniqueRegNo(rs.getString("land_regno")).tenantId(tenantId)
 						.status(rs.getString("status") != null ? Status.fromValue(rs.getString("status")) : null).address(address)
 						.ownershipCategory(rs.getString("ownershipcategory"))
@@ -99,14 +102,16 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 					.unitType(rs.getString("unittype")).usageCategory(rs.getString("usageCategory"))
 					.occupancyType(rs.getString("occupancytype") != null
 							? OccupancyType.fromValue(rs.getString("occupancytype")) : null)
-					.occupancyDate(rs.getLong("occupancydate")).auditDetails(auditdetails).tenantId(tenantId).build();
+					.occupancyDate(rs.getLong("occupancydate"))
+//					.auditDetails(auditdetails)
+					.tenantId(tenantId).build();
 			landInfo.addUnitsItem(unit);
 		}
 
 		String ownerId = rs.getString("landInfoowner_id");
 		if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
-			Double ownerShipPercentage = (Double) rs.getObject("ownershippercentage");
+			BigDecimal ownerShipPercentage = (BigDecimal) rs.getObject("ownershippercentage");
 
 			OwnerInfo owner = OwnerInfo.builder().tenantId(tenantId).ownerId(ownerId)
 					.uuid(rs.getString("landInfoowner_uuid")).mobileNumber(rs.getString("mobilenumber"))

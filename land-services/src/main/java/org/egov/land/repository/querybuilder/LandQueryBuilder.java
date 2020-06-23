@@ -78,10 +78,10 @@ public class LandQueryBuilder {
 
 		}
 		
-		if (criteria.getLandUid() != null) {
+		if (criteria.getLandUId() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" landInfo.landuid = ? ");
-			preparedStmtList.add(criteria.getLandUid());
+			preparedStmtList.add(criteria.getLandUId());
 		}
 		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);

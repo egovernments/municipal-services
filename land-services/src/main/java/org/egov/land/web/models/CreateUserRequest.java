@@ -1,6 +1,5 @@
 package org.egov.land.web.models;
 
-
 import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

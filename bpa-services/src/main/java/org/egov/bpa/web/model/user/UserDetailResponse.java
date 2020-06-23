@@ -18,7 +18,7 @@ public class UserDetailResponse {
 
 	@JsonProperty("responseInfo")
     ResponseInfo responseInfo;
-
+	
     @JsonProperty("user")
     List<OwnerInfo> user;
 }

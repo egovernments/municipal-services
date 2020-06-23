@@ -1,4 +1,4 @@
-package org.egov.land.web.models;
+package org.egov.bpa.web.model.landInfo;
 
 import org.egov.common.contract.request.RequestInfo;
 

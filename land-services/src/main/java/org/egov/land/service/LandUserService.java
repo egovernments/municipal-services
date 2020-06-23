@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.config.LandConfiguration;
@@ -48,7 +50,7 @@ public class LandUserService {
 
 	public void manageUser(LandInfoRequest landRequest) {
 		LandInfo landInfo = landRequest.getLandInfo();
-		RequestInfo requestInfo = landRequest.getRequestInfo();
+		 @Valid RequestInfo requestInfo = landRequest.getRequestInfo();
 
 		landInfo.getOwners().forEach(owner -> {
 			UserDetailResponse userDetailResponse = null;
@@ -102,7 +104,7 @@ public class LandUserService {
 	 *            The requestInfo of the request
 	 * @return The search response from the user service
 	 */
-	private UserDetailResponse userExists(OwnerInfo owner, RequestInfo requestInfo) {
+	private UserDetailResponse userExists(OwnerInfo owner, @Valid RequestInfo requestInfo) {
 
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);

@@ -40,10 +40,10 @@ public class LandValidator {
 		if (landRequest.getLandInfo().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			landRequest.getLandInfo().getDocuments().forEach(document -> {
-				if (documentFileStoreIds.contains(document.getFileStoreId()))
+				if (documentFileStoreIds.contains(document.getfileStoreId()))
 					throw new CustomException("BPA_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
 				else
-					documentFileStoreIds.add(document.getFileStoreId());
+					documentFileStoreIds.add(document.getfileStoreId());
 			});
 		}
 	}

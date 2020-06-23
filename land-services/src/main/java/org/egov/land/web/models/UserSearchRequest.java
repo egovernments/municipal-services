@@ -1,15 +1,14 @@
 package org.egov.land.web.models;
 
-
 import java.util.Collections;
 import java.util.List;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
