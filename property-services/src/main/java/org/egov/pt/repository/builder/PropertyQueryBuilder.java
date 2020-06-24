@@ -261,7 +261,7 @@ public class PropertyQueryBuilder {
 
 	private void addToPreparedStatement(List<Object> preparedStmtList, Set<String> ids) {
 		ids.forEach(id -> {
-			preparedStmtList.add(id);
+			preparedStmtList.add(id.toUpperCase());
 		});
 	}
 
