@@ -344,7 +344,9 @@ public class BPAService {
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-
+		
+		bpaValidator.validateWorkflowActions(bpaRequest);
+		
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
 
@@ -375,6 +377,13 @@ public class BPAService {
 		// Generate the sanction Demand
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+		}
+
+		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)
+				|| bpa.getStatus().equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)
+				|| bpa.getStatus().equalsIgnoreCase(BPAConstants.BPA_LOW_APPL_FEE_STATE)) {
+			enrichmentService.skipPayment(bpaRequest);
+			enrichmentService.postStatusEnrichment(bpaRequest);
 		}
 		
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));

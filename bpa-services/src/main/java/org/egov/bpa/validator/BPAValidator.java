@@ -1,5 +1,6 @@
 package org.egov.bpa.validator;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.EDCRService;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
@@ -42,6 +44,9 @@ public class BPAValidator {
 	@Autowired
 	private EDCRService edcrService;
 
+	@Autowired
+	private BPAUtil bpaUtil;
+	
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
 		validateApplicationDocuments(bpaRequest, mdmsData, null, values);
@@ -481,6 +486,15 @@ public class BPAValidator {
 	}
 
 
+	public void validateWorkflowActions(BPARequest bpaRequest) {
+		BPA bpa = bpaRequest.getBPA();
+		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SKIP_PAY))) {
+			BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
+			if ((demandAmount.compareTo(BigDecimal.ZERO) > 0)) {
+				throw new CustomException("BPA_INVALID_ACTION", "Payment can't be skipped once demand is generated.");
+			}
+		}
+	}
 	
 
 

@@ -1,5 +1,6 @@
 package org.egov.bpa.service;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,10 @@ import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.Workflow;
 import org.egov.bpa.web.model.idgen.IdResponse;
 import org.egov.bpa.web.model.workflow.BusinessService;
+import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -47,6 +50,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private EDCRService edcrService;
+	
+	@Autowired
+	private WorkflowIntegrator wfIntegrator;
 
 	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -228,5 +234,13 @@ public class EnrichmentService {
 		
 	}
 
-
+	public void skipPayment(BPARequest bpaRequest) {
+		BPA bpa = bpaRequest.getBPA();
+		BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
+		if (!(demandAmount.compareTo(BigDecimal.ZERO) > 0)) {
+			Workflow workflow = Workflow.builder().action(BPAConstants.ACTION_SKIP_PAY).build();
+			bpa.setWorkflow(workflow);
+			wfIntegrator.callWorkFlow(bpaRequest);
+		}
+	}
 }
