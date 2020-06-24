@@ -5,18 +5,23 @@ import java.util.Objects;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
+import org.egov.bpa.web.model.AuditDetails.AuditDetailsBuilder;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Unit
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:52:32.717Z[GMT]")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Unit   {
   @JsonProperty("id")
@@ -39,6 +44,9 @@ public class Unit   {
 
   @JsonProperty("occupancyDate")
   private Long occupancyDate = null;
+
+  @JsonProperty("constructionDetail")
+  private ConstructionDetail constructionDetail = null;
 
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
@@ -177,6 +185,25 @@ public class Unit   {
     this.occupancyDate = occupancyDate;
   }
 
+  public Unit constructionDetail(ConstructionDetail constructionDetail) {
+    this.constructionDetail = constructionDetail;
+    return this;
+  }
+
+  /**
+   * Get constructionDetail
+   * @return constructionDetail
+  **/
+  @ApiModelProperty(value = "")
+  
+    @Valid
+    public ConstructionDetail getConstructionDetail() {
+    return constructionDetail;
+  }
+
+  public void setConstructionDetail(ConstructionDetail constructionDetail) {
+    this.constructionDetail = constructionDetail;
+  }
 
   public Unit additionalDetails(Object additionalDetails) {
     this.additionalDetails = additionalDetails;
@@ -214,12 +241,13 @@ public class Unit   {
         Objects.equals(this.usageCategory, unit.usageCategory) &&
         Objects.equals(this.occupancyType, unit.occupancyType) &&
         Objects.equals(this.occupancyDate, unit.occupancyDate) &&
+        Objects.equals(this.constructionDetail, unit.constructionDetail) &&
         Objects.equals(this.additionalDetails, unit.additionalDetails);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, tenantId, floorNo, unitType, usageCategory, occupancyType, occupancyDate, additionalDetails);
+    return Objects.hash(id, tenantId, floorNo, unitType, usageCategory, occupancyType, occupancyDate, constructionDetail, additionalDetails);
   }
 
   @Override
@@ -234,6 +262,7 @@ public class Unit   {
     sb.append("    usageCategory: ").append(toIndentedString(usageCategory)).append("\n");
     sb.append("    occupancyType: ").append(toIndentedString(occupancyType)).append("\n");
     sb.append("    occupancyDate: ").append(toIndentedString(occupancyDate)).append("\n");
+    sb.append("    constructionDetail: ").append(toIndentedString(constructionDetail)).append("\n");
     sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
     sb.append("}");
     return sb.toString();

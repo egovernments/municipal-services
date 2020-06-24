@@ -1,26 +1,38 @@
 package org.egov.bpa.web.model.landInfo;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.egov.bpa.web.model.landInfo.Address;
+import org.egov.bpa.web.model.AuditDetails;
+import org.egov.bpa.web.model.landInfo.Channel;
+import org.egov.bpa.web.model.Document;
+import org.egov.bpa.web.model.landInfo.Institution;
+import org.egov.bpa.web.model.landInfo.OwnerInfo;
+import org.egov.bpa.web.model.landInfo.Source;
+import org.egov.bpa.web.model.landInfo.Status;
+import org.egov.bpa.web.model.landInfo.Unit;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
+import org.egov.bpa.web.model.AuditDetails.AuditDetailsBuilder;
 import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import net.minidev.json.annotate.JsonIgnore;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * LandInfo
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:52:32.717Z[GMT]")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class LandInfo   {
   @JsonProperty("id")
@@ -452,24 +464,4 @@ public class LandInfo   {
     }
     return o.toString().replace("\n", "\n    ");
   }
-  
-  @JsonIgnore
-	private ArrayList<String> unitIds;
-	
-	
-
-	public LandInfo addUnitsItem(Unit unitsItem) {
-		if (this.unit == null)
-			this.unit = new ArrayList<>();
-		
-		if(this.unitIds == null){
-			this.unitIds = new ArrayList<String>();
-		}
-		if(!this.unitIds.contains(unitsItem.getId())){
-			this.unit.add(unitsItem);
-			this.unitIds.add(unitsItem.getId());			
-		}
-		return this;
-	}
-
 }
