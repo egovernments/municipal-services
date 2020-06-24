@@ -131,6 +131,8 @@ public class BPAConstants {
 	public static final String ACTION_CANCEL = "CANCEL";
 
 	public static final String ACTION_PAY = "PAY";
+	
+	public static final String ACTION_SKIP_PAY = "SKIP_PAYMENT";
 
 	public static final String ACTION_ADHOC = "ADHOC";
 
@@ -217,6 +219,8 @@ public class BPAConstants {
 	public static final String LOW_RISK_PERMIT_FEE_KEY = "LOW_RISK_PERMIT_FEE";
 
 	public static final String SANC_FEE_STATE = "PENDING_SANC_FEE_PAYMENT";
+	public static final String APPL_FEE_STATE = "PENDING_APPL_FEE";
+	public static final String BPA_LOW_APPL_FEE_STATE = "PENDING_FEE";
 	public static final String APPROVED_STATE = "APPROVED";
 	public static final String DOCVERIFICATION_STATE = "DOC_VERIFICATION_PENDING";
 

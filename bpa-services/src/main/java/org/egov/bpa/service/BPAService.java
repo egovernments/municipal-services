@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -90,6 +92,9 @@ public class BPAService {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private BPAConfiguration config;
 	
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -344,7 +349,9 @@ public class BPAService {
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-
+		
+		bpaValidator.validateWorkflowActions(bpaRequest);
+		
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
 
@@ -375,6 +382,11 @@ public class BPAService {
 		// Generate the sanction Demand
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+		}
+
+		if (Arrays.asList(config.getSkipPaymentStatuses().split(",")).contains(bpa.getStatus())) {
+			enrichmentService.skipPayment(bpaRequest);
+			enrichmentService.postStatusEnrichment(bpaRequest);
 		}
 		
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
