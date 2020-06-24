@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class NOCConstants {
 
-	public static final String SEARCH_MODULE = "rainmaker-noc";
+	public static final String SEARCH_MODULE = "rainmaker-nocsrv";
 	
 	public static final String NOC_MODULE = "NOC";
 	
