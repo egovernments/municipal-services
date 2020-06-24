@@ -37,6 +37,7 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -164,13 +165,6 @@ public class BPAService {
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
-		if (criteria.getApplicationType() != null || criteria.getServiceType() != null) {
-			ArrayList<String> business = util.getBusinessService(criteria.getApplicationType(),
-					criteria.getServiceType());
-			if (business.size() > 0) {
-				criteria.setBusinessService(business);
-			}
-		}
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
@@ -192,20 +186,23 @@ public class BPAService {
 				}
 			}
 		} else {
-			if (criteria.getRequestor() != null) {
+			List<String> roles = new ArrayList<>();
+			for (Role role : requestInfo.getUserInfo().getRoles()) {
+				roles.add(role.getCode());
+			}
+			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
 				UserSearchRequest userSearchRequest = new UserSearchRequest();
 				if (criteria.getTenantId() != null) {
-					landcriteria.setTenantId(criteria.getTenantId());
 					userSearchRequest.setTenantId(criteria.getTenantId());
 				}
-				criteria.setMobileNumber(criteria.getRequestor());
+				List<String> uuids = new ArrayList<String>();
+				if (requestInfo.getUserInfo() != null && !StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
+					uuids.add(requestInfo.getUserInfo().getUuid());
+					criteria.setOwnerIds(uuids);
+					criteria.setCreatedBy(uuids);
+				}
 				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
 				if (userInfo != null) {
-					ArrayList<String> uuid = new ArrayList<String>();
-					for (int i = 0; i < userInfo.getUser().size(); i++) {
-						uuid.add(userInfo.getUser().get(i).getUuid());
-					}
-					criteria.setCreatedBy(uuid);
 					landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				}
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
@@ -227,10 +226,6 @@ public class EDCRService {
 		StringBuilder uri = new StringBuilder(config.getEdcrHost());
 		uri.append(config.getGetPlanEndPoint());
 		uri.append("?").append("tenantId=").append(searchCriteria.getTenantId());
-		if (!StringUtils.isEmpty(searchCriteria.getApplicationType()))
-			uri.append("&").append("appliactionType=").append(searchCriteria.getApplicationType());
-		if (!StringUtils.isEmpty(searchCriteria.getServiceType()))
-			uri.append("&").append("applicationSubType=").append(searchCriteria.getServiceType());
 		RequestInfo edcrRequestInfo = new RequestInfo();
 		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
 		LinkedHashMap responseMap = null;
