@@ -1,10 +1,10 @@
 package org.egov.pt.service;
 
-import static org.egov.pt.util.PTConstants.CREATE_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.MUTATION_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.UPDATE_PROCESS_CONSTANT;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -79,8 +79,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled())
-			wfService.updateWorkflow(request, CREATE_PROCESS_CONSTANT);
-		util.setdataForNotification(request, CREATE_PROCESS_CONSTANT);
+			wfService.updateWorkflow(request);
 		producer.push(config.getSavePropertyTopic(), request);
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
@@ -125,7 +124,6 @@ public class PropertyService {
 		request.getProperty().setOwners(propertyFromSearch.getOwners());
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		
-		util.setdataForNotification(request, UPDATE_PROCESS_CONSTANT);
 		PropertyRequest OldPropertyRequest = PropertyRequest.builder()
 				.requestInfo(request.getRequestInfo())
 				.property(propertyFromSearch)
@@ -135,7 +133,7 @@ public class PropertyService {
 		
 		if(config.getIsWorkflowEnabled()) {
 			
-			State state = wfService.updateWorkflow(request, UPDATE_PROCESS_CONSTANT);
+			State state = wfService.updateWorkflow(request);
 
 			if (state.getIsStartState() == true
 					&& state.getApplicationStatus().equalsIgnoreCase(Status.INWORKFLOW.toString())
@@ -180,7 +178,6 @@ public class PropertyService {
 		calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
 		
 		// TODO FIX ME block property changes FIXME
-		util.setdataForNotification(request, MUTATION_PROCESS_CONSTANT);
 		util.mergeAdditionalDetails(request, propertyFromSearch);
 		PropertyRequest oldPropertyRequest = PropertyRequest.builder()
 				.requestInfo(request.getRequestInfo())
@@ -189,7 +186,7 @@ public class PropertyService {
 		
 		if (config.getIsMutationWorkflowEnabled()) {
 
-			State state = wfService.updateWorkflow(request, MUTATION_PROCESS_CONSTANT);
+			State state = wfService.updateWorkflow(request);
 			/*
 			 * updating property from search to INACTIVE status
 			 * 

@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.event.Event;
 import org.egov.pt.models.event.EventRequest;
@@ -101,7 +102,7 @@ public class NotificationService {
 		String createOrUpdate = null;
 		String msg = null;
 		
-		Boolean isCreate =  CREATE_PROCESS_CONSTANT.equalsIgnoreCase(wf.getNotificationAction());
+		Boolean isCreate =  CreationReason.CREATE.equals(property.getCreationReason());
 		String state = getStateFromWf(wf, configs.getIsWorkflowEnabled());
 		String completeMsgs = notifUtil.getLocalizationMessages(property.getTenantId(), propertyRequest.getRequestInfo());
 		String localisedState = getLocalisedState(wf.getState().getState(), completeMsgs);

@@ -3,9 +3,6 @@ package org.egov.pt.util;
 import static org.egov.pt.util.PTConstants.ASMT_MODULENAME;
 import static org.egov.pt.util.PTConstants.BILL_AMOUNT_PATH;
 import static org.egov.pt.util.PTConstants.BILL_NODEMAND_ERROR_CODE;
-import static org.egov.pt.util.PTConstants.CREATE_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.MUTATION_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.UPDATE_PROCESS_CONSTANT;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,7 +119,7 @@ public class PropertyUtil extends CommonUtils {
 					.build();
 	}
 	
-	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, String process) {
+	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request) {
 		
 		Property property = request.getProperty();
 		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
@@ -131,19 +128,19 @@ public class PropertyUtil extends CommonUtils {
 		wf.setTenantId(property.getTenantId());
 	
 		
-		switch (process) {
+		switch (property.getCreationReason()) {
 		
-		case CREATE_PROCESS_CONSTANT :
+		case CREATE :
 
 			wf.setBusinessService(configs.getCreatePTWfName());
 			wf.setModuleName(configs.getPropertyModuleName());
 			wf.setAction("OPEN");
 			break;
 
-		case MUTATION_PROCESS_CONSTANT:
+		case MUTATION:
 			break;
 
-		case UPDATE_PROCESS_CONSTANT:
+		case UPDATE:
 			break;
 			
 		default:
@@ -227,19 +224,6 @@ public class PropertyUtil extends CommonUtils {
 		return false;
 	}
 
-
-public void setdataForNotification(PropertyRequest request, String notificationAction) {
-
-		ProcessInstance workflow = request.getProperty().getWorkflow();
-
-		if (workflow != null) {
-
-			workflow.setNotificationAction(notificationAction);
-		} else {
-			workflow = ProcessInstance.builder().notificationAction(notificationAction).build();
-		}
-		request.getProperty().setWorkflow(workflow);
-	}
 
 	/**
 	 * Public method to infer whether the search is for open or authenticated user
