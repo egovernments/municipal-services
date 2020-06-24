@@ -1,7 +1,6 @@
 package org.egov.noc.web.model;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,18 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Validated
+
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class NOCRequest {
-	
-	  @JsonProperty("RequestInfo")
-	  private RequestInfo requestInfo;
+public class RequestInfoWrapper {
 
-	  @JsonProperty("Noc")
-	  private NOC noc;
-	  
+	@JsonProperty("RequestInfo")
+	private RequestInfo requestInfo;
 }

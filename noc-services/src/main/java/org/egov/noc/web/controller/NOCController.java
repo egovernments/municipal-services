@@ -39,11 +39,39 @@
  */
 package org.egov.noc.web.controller;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.egov.noc.config.ResponseInfoFactory;
+import org.egov.noc.service.NOCService;
+import org.egov.noc.web.model.NOC;
+import org.egov.noc.web.model.NOCRequest;
+import org.egov.noc.web.model.NOCResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 	
 @RestController
-@RequestMapping("/noc")
+@RequestMapping("v1/noc")
 public class NOCController {
+	
+	@Autowired
+	private ResponseInfoFactory responseInfoFactory;
+	
+	@Autowired
+	private NOCService nocService;
 
+	@PostMapping(value = "/_create")
+	public ResponseEntity<NOCResponse> create(@Valid @RequestBody NOCRequest nocRequest) {
+		List<NOC> nocList = nocService.create(nocRequest);
+		NOCResponse response = NOCResponse.builder().noc(nocList)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(nocRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

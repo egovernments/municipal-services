@@ -1,10 +1,15 @@
 package org.egov.noc.web.model;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
+
 import org.egov.noc.web.model.enums.ApplicationType;
 import org.egov.noc.web.model.enums.Status;
 import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,15 +33,18 @@ public class NOC {
 	@JsonProperty("nocNo")
 	private String nocNo;
 	
+	@NotNull
 	@JsonProperty("applicationType")
 	private ApplicationType applicationType;
 	
+	@NotNull
 	@JsonProperty("nocType")
 	private String nocType;
 	
 	@JsonProperty("accountId")
 	private String accountId;
 	
+	@NotNull
 	@JsonProperty("source")
 	private String source;
 	
@@ -54,7 +62,10 @@ public class NOC {
 	
 	@NotNull
 	@JsonProperty("tenantId")
-	private String tenantId;
+	private String tenantId;	
+
+	@JsonProperty("documents")
+	private List<Document> documents;
 	
 	@JsonProperty("workflow")
 	private Workflow workflow;
