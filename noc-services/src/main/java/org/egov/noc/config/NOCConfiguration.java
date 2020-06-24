@@ -1,18 +1,17 @@
 package org.egov.noc.config;
 
-import java.util.Map;
 import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
@@ -59,5 +58,38 @@ public class NOCConfiguration {
 
 	@Value("${egov.localization.statelevel}")
 	private Boolean isLocalizationStateLevel;
+	
+	@Value("${egov.idgen.host}")
+	private String idGenHost;
+
+	@Value("${egov.idgen.path}")
+	private String idGenPath;
+
+	@Value("${egov.idgen.noc.application.id}")
+	private String applicationNoIdgenName;
+	
+	@Value("${workflow.context.path}")
+	private String wfHost;
+
+	@Value("${workflow.transition.path}")
+	private String wfTransitionPath;
+
+	@Value("${workflow.businessservice.search.path}")
+	private String wfBusinessServiceSearchPath;
+
+	@Value("${workflow.process.path}")
+	private String wfProcessPath;
+	
+	@Value("${workflow.noc.businessservice.name}")
+	private String businessServiceValue;
+	
+	@Value("${egov.mdms.host}")
+	private String mdmsHost;
+
+	@Value("${egov.mdms.search.endpoint}")
+	private String mdmsEndPoint;
+	
+	@Value("${persister.save.noc.topic}")
+	private String saveTopic;
 
 }
