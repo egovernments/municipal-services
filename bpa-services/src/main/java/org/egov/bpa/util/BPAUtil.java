@@ -218,7 +218,7 @@ public class BPAUtil {
 				code = "BPA.NC_SAN_FEE";
 			}
 		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)) {
-			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE))
+			if (status.equalsIgnoreCase(BPAConstants.BPA_LOW_APPL_FEE_STATE))
 				code = "BPA.LOW_RISK_PERMIT_FEE";
 		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
 			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)) {
