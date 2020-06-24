@@ -256,4 +256,7 @@ public class BPAConfiguration {
 	@Value("#{${appSrvTypeBussSrvCode}}")
 	private Map<String,Map<String,String>> appSrvTypeBussSrvCode;
 	
+	@Value("${egov.bpa.skippayment.status}")
+	private String skipPaymentStatuses;
+	
 }
