@@ -12,7 +12,7 @@ public class ReceiptConsumer {
 	@Autowired
 	private PaymentUpdateService paymentUpdateService;
 	
-	@KafkaListener(topics = {"${kafka.topics.receipt.create}"})
+	@KafkaListener(topics = {"${kafka.topics.receipt.create}"}, containerFactory = "kafkaListenerContainerFactory")
     public void listenPayments(final HashMap<String, Object> record) {
         paymentUpdateService.process(record);
     }

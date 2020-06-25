@@ -35,7 +35,7 @@ public class EditWorkflowNotificationConsumer {
 	 * @param record
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${sw.editnotification.topic}" })
+	@KafkaListener(topics = { "${sw.editnotification.topic}" }, containerFactory = "kafkaListenerContainerFactory")
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			SewerageConnectionRequest sewerageConnectionRequest = mapper.convertValue(record,
