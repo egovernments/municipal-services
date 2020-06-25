@@ -3,6 +3,7 @@ package org.egov.waterconnection.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +14,8 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer2;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
 public class KafkaConfiguration {
@@ -30,7 +33,11 @@ public class KafkaConfiguration {
 
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    	JsonDeserializer<Map> deserializer = new JsonDeserializer<>(Map.class);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+        
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), new StringDeserializer(), new ErrorHandlingDeserializer2(deserializer));
     }
 
     @Bean("kafkaListenerContainerFactory")
