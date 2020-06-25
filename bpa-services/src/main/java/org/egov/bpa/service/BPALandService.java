@@ -80,7 +80,7 @@ public class BPALandService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList<LandInfo> searchLandInfoToBPA(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
 		
-	
+		System.out.println("Searching with the params::" + landcriteria.getIds() +  "with mobileNo" + landcriteria.getMobileNumber() + "with landUid" + landcriteria.getLandUId() + "with Ids" + landcriteria.getIds());
 		StringBuilder url = getLandSerchURLWithParams(requestInfo, landcriteria);
 		
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();

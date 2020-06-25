@@ -171,6 +171,7 @@ public class BPAService {
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
 		if (criteria.getMobileNumber() != null) {
+			log.info("Call with mobile number to Land::" + criteria.getMobileNumber());
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 			ArrayList<String> landId = new ArrayList<String>();
@@ -210,6 +211,7 @@ public class BPAService {
 				if (userInfo != null) {
 					landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				}
+				log.info("Call with multiple to Land::" + landcriteria.getTenantId() + landcriteria.getMobileNumber());
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 				ArrayList<String> landId = new ArrayList<String>();
 				if (landInfo.size() > 0) {
@@ -232,6 +234,7 @@ public class BPAService {
 						missingLandIds.add(bpa.get(i).getLandId());
 						missingLandcriteria.setTenantId(bpa.get(0).getTenantId());
 						missingLandcriteria.setIds(missingLandIds);
+						log.info("Call with land ids to Land::" + missingLandcriteria.getTenantId() + missingLandcriteria.getIds());
 						List<LandInfo> newLandInfo = landService.searchLandInfoToBPA(requestInfo, missingLandcriteria);
 						for (int j = 0; j < newLandInfo.size(); j++) {
 							if (newLandInfo.get(j).getId().equalsIgnoreCase(bpa.get(i).getLandId())) {
@@ -249,6 +252,7 @@ public class BPAService {
 					}
 					landcriteria.setIds(data);
 					landcriteria.setTenantId(bpa.get(0).getTenantId());
+					log.info("Call with tenantId to Land::" + landcriteria.getTenantId());
 					ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 
 					for (int i = 0; i < bpa.size(); i++) {
