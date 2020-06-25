@@ -40,6 +40,7 @@ public class BPASearchCriteria {
 	    private String mobileNumber;
 
 	    @JsonProperty("landId")
+	    @JsonIgnore
 	    private List<String> landId;
 
 	    @JsonProperty("offset")
@@ -61,12 +62,11 @@ public class BPASearchCriteria {
 	    private List<String> ownerIds;
 
 	    @JsonProperty("businessService")
+	    @JsonIgnore
 	    private List<String> businessService;
 	    
-	    @JsonProperty("requestor")
-	    private String requestor;
-	    
 	    @JsonProperty("createdBy")
+	    @JsonIgnore
 	    private List<String> createdBy;
 
 		
@@ -74,7 +74,7 @@ public class BPASearchCriteria {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
 	                && this.approvalDate == null && this.ownerIds == null
-	                && this.businessService == null && this.requestor == null
+	                && this.businessService == null
 	        );
 	    }
 
@@ -82,7 +82,7 @@ public class BPASearchCriteria {
 	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
 	                && this.approvalDate == null && this.ownerIds == null
-	                && this.businessService == null && this.requestor == null
+	                && this.businessService == null
 	        );
 	    }
 }
