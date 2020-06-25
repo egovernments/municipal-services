@@ -32,7 +32,9 @@ public class DemandNotificationConsumer {
 		this.notificationService = notificationService;
 	}
 
-	@KafkaListener(topics = { "${sw.calculator.demand.successful}", "${sw.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${sw.calculator.demand.successful}", 
+			"${sw.calculator.demand.failed}" }, 
+			containerFactory = "kafkaListenerContainerFactoryBatch")
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			log.info("Consuming record: " + record);

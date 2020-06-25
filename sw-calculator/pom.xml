@@ -57,11 +57,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.egov.services</groupId>
-			<artifactId>tracer</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.egov.services</groupId>
 			<artifactId>services-common</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
@@ -165,6 +160,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<excludes>
 						<exclude>
@@ -177,17 +179,6 @@
 						</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

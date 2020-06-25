@@ -32,7 +32,7 @@ public class KakfaConfiguration {
             return new DefaultKafkaConsumerFactory<>(consumerConfigs());
         }
 
-        @Bean
+        @Bean("kafkaListenerContainerFactory")
         public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
             ConcurrentKafkaListenerContainerFactory<String, Object> factory =
                     new ConcurrentKafkaListenerContainerFactory<>();

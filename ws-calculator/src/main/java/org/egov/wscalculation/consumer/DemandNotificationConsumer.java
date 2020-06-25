@@ -29,7 +29,9 @@ public class DemandNotificationConsumer {
 	 * @param request
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${ws.calculator.demand.successful}", "${ws.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${ws.calculator.demand.successful}",
+			"${ws.calculator.demand.failed}" },
+			containerFactory = "kafkaListenerContainerFactory")
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		DemandNotificationObj notificationObj = null;
 		try {

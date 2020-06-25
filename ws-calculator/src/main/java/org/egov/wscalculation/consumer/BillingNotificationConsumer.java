@@ -23,7 +23,7 @@ public class BillingNotificationConsumer {
 	 * @param request bill Object
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${kafka.topics.billgen.topic}" })
+	@KafkaListener(topics = { "${kafka.topics.billgen.topic}"}, containerFactory = "kafkaListenerContainerFactory")
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 			log.info("Consuming record: " + record);
 			paymentService.process(record, topic);
