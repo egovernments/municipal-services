@@ -1,12 +1,11 @@
 package org.egov.pt.models.oldProperty;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.log4j.Category;
-
-import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -18,5 +17,4 @@ public class TaxHeadEstimate {
 
     private BigDecimal estimateAmount;
 
-    private Category category;
 }
