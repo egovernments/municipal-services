@@ -138,7 +138,7 @@ public class Unit   {
   **/
   @ApiModelProperty(value = "This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)")
   
-  @Size(min=1,max=64)   public String getUsageCategory() {
+  @Size(min=0,max=64)   public String getUsageCategory() {
     return usageCategory;
   }
 
