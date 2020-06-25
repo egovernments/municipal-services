@@ -386,7 +386,7 @@ public class PaymentNotificationService {
         return customMessage;
     }
 
-    private String getReceiptLink(Map<String,String> valMap){
+    private String getReceiptLink(Map<String,String> valMap,String mobileNumber){
         StringBuilder builder = new StringBuilder(propertyConfiguration.getUiAppHost());
         builder.append(propertyConfiguration.getReceiptDownloadLink());
         String link = builder.toString();
@@ -394,7 +394,8 @@ public class PaymentNotificationService {
         link = link.replace("$tenantId", valMap.get("tenantId"));
         link = link.replace("$receiptNumber", valMap.get("receiptNumber"));
         link = link.replace("$businessService",PT_BUSINESSSERVICE);
-        //link = util.getShortenedUrl(link);
+        link = link.replace("$mobile", mobileNumber);
+        link = util.getShortenedUrl(link);
         return  link;
     }
 
@@ -408,8 +409,6 @@ public class PaymentNotificationService {
         message = message.replace("< insert payment transaction id from PG>",valMap.get("transactionId"));
         message = message.replace("<insert Property Tax Assessment ID>",valMap.get("propertyId"));
         message = message.replace("<pt due>.",valMap.get("amountDue"));
-        String receiptLink = getReceiptLink(valMap);
-        message = message.replace("<receipt download link>",receiptLink);
     //    message = message.replace("<FY>",valMap.get("financialYear"));
         return message;
     }
@@ -425,8 +424,6 @@ public class PaymentNotificationService {
         message = message.replace("<insert mode of payment>",valMap.get("paymentMode"));
         message = message.replace("<Enter pending amount>",valMap.get("amountDue"));
         message = message.replace("<insert inactive citizen application web URL>.",propertyConfiguration.getNotificationURL());
-        String receiptLink = getReceiptLink(valMap);
-        message = message.replace("<receipt download link>",receiptLink);
 //        message = message.replace("<Insert FY>",valMap.get("financialYear"));
         return message;
     }
@@ -471,6 +468,10 @@ public class PaymentNotificationService {
                 if(customizedMessage.contains("<payLink>")){
                     finalMessage = finalMessage.replace("<payLink>", getPaymentLink(valMap));
                 }
+                if(customizedMessage.contains("<receipt download link>")){
+                    String receiptDownloadLink = getReceiptLink(valMap, mobileNumber);
+                    finalMessage = finalMessage.replace("<receipt download link>", receiptDownloadLink);
+                }                
                 SMSRequest smsRequest = new SMSRequest(mobileNumber,finalMessage);
                 smsRequests.add(smsRequest);
             }
