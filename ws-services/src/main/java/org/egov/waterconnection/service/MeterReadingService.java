@@ -69,6 +69,7 @@ public class MeterReadingService {
 									request.getWaterConnection().getConnectionExecutionDate().longValue()))
 							.generateDemand(Boolean.FALSE).lastReading(initialMeterReading.doubleValue())
 							.lastReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
+							.tenantId(request.getWaterConnection().getTenantId())
 							.build()).requestInfo(request.getRequestInfo()).build();
 					Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getMeterReadingCreateURL(),
 							req);
