@@ -153,11 +153,8 @@
 						<class>org.egov.pt.web.contracts.PropertyRequest</class>
 						<class>org.egov.pt.web.contracts.PropertyResponse</class>
 					</classes>
-					<customTypeNaming>
-						<customTypeNaming>org.egov.pt.models.Assessment.Source:AssessmentSource</customTypeNaming>
-						<customTypeNaming>org.egov.pt.models.enums.Source:Source</customTypeNaming>
-					</customTypeNaming>
 					<customTypeMappings>
+						<customTypeMapping>org.egov.pt.models.enums.Source:PropertySource</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
