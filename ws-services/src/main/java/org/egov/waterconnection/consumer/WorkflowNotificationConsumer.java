@@ -33,6 +33,7 @@ public class WorkflowNotificationConsumer {
 		workflowNotificationService.process(record, topic);
 	}
 
+	/*
 	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}",
 			"${egov.waterservice.updatewaterconnection}", 
 			"${egov.waterservice.updatewaterconnection.workflow.topic}"},
@@ -41,4 +42,5 @@ public class WorkflowNotificationConsumer {
 		log.info("Consuming record without topic");
 		workflowNotificationService.process(record);
 	}
+	*/
 }
