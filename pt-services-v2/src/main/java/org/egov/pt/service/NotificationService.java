@@ -261,10 +261,8 @@ public class NotificationService {
 			if(isActionReq) {
 				List<ActionItem> items = new ArrayList<>();
 				String actionLink = propertyConfiguration.getPayLink().replace("$mobile", mobile)
-							.replace("$assessmentId", property.getPropertyDetails().get(0).getAssessmentNumber())
-							.replace("$propertyId", property.getPropertyId())
-							.replace("$tenantId", property.getTenantId())
-							.replace("$financialYear", property.getPropertyDetails().get(0).getFinancialYear());
+							.replace("$consumerCode", property.getPropertyId())
+							.replace("$tenantId", property.getTenantId());
 				
 				actionLink = propertyConfiguration.getUiAppHost() + actionLink;
 				
@@ -274,7 +272,9 @@ public class NotificationService {
 				action = Action.builder().actionUrls(items).build();
 				
 			}
-			
+			if(customizedMessage.contains("$paylink")) {
+				customizedMessage = customizedMessage.replace("$paylink", "");
+			}
 			events.add(Event.builder().tenantId(property.getTenantId()).description(customizedMessage)
 					.eventType(PTConstants.USREVENTS_EVENT_TYPE).name(PTConstants.USREVENTS_EVENT_NAME)
 					.postedBy(PTConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
@@ -330,6 +330,7 @@ public class NotificationService {
      * @param request
      */
     public void sendEventNotification(EventRequest request) {
+    	log.info("Pushing notification to user-events.....");
         producer.push(propertyConfiguration.getSaveUserEventsTopic(), request);
     }
     
