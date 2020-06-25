@@ -32,15 +32,4 @@ public class WorkflowNotificationConsumer {
 		log.info("Consuming record with topic");
 		workflowNotificationService.process(record, topic);
 	}
-
-	/*
-	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}",
-			"${egov.waterservice.updatewaterconnection}", 
-			"${egov.waterservice.updatewaterconnection.workflow.topic}"},
-			containerFactory = "kafkaListenerContainerFactory")
-	public void listen(final HashMap<String, Object> record) {
-		log.info("Consuming record without topic");
-		workflowNotificationService.process(record);
-	}
-	*/
 }

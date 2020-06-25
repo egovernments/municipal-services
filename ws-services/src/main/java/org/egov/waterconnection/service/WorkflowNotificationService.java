@@ -1,6 +1,5 @@
 package org.egov.waterconnection.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,17 +86,6 @@ public class WorkflowNotificationService {
 	String connectionNoReplacer = "$connectionNumber";
 	String mobileNoReplacer = "$mobileNo";
 	String applicationKey = "$applicationkey";
-	
-	public void process(HashMap<String, Object> record) {
-		try {
-			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
-			process(waterConnectionRequest, "");
-		} catch (Exception ex) {
-			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
-					.append("on topic: ").append("");
-			log.error(builder.toString(), ex);
-		}
-	}
 	
 	public void process(HashMap<String, Object> record, String topic) {
 		try {

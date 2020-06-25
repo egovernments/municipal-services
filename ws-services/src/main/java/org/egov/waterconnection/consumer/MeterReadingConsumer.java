@@ -19,7 +19,7 @@ public class MeterReadingConsumer {
 	 * @param record
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${ws.meterreading.create}" })
+	@KafkaListener(topics = { "${ws.meterreading.create}"}, containerFactory = "kafkaListenerContainerFactory")
 	public void listen(final HashMap<String, Object> record) {
 		meterReadingService.process(record);
 	}
