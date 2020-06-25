@@ -2,28 +2,22 @@ package org.egov.waterconnection.consumer;
 
 import java.util.HashMap;
 
-import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.service.WorkflowNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Component
 @Slf4j
 public class WorkflowNotificationConsumer {
 	
 	@Autowired
 	WorkflowNotificationService workflowNotificationService;
 	
-	@Autowired
-	private ObjectMapper mapper;
-
 	/**
 	 * Consumes the water connection record and send notification
 	 * 
@@ -32,15 +26,13 @@ public class WorkflowNotificationConsumer {
 	 */
 	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterconnection}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-		try {
-			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
-			
-			workflowNotificationService.process(waterConnectionRequest, topic);
-		} catch (Exception ex) {
-			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
-					.append("on topic: ").append(topic);
-			log.error(builder.toString(), ex);
-		}
+		log.info("Consuming record with topic");
+		workflowNotificationService.process(record, topic);
 	}
 
+	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterconnection}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
+	public void listen(final HashMap<String, Object> record) {
+		log.info("Consuming record without topic");
+		workflowNotificationService.process(record);
+	}
 }

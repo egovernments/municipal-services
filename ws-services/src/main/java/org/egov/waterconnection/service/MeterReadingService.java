@@ -5,10 +5,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.MeterConnectionRequest;
 import org.egov.waterconnection.model.MeterReading;
@@ -38,11 +36,22 @@ public class MeterReadingService {
 	@Autowired
 	private WaterServicesUtil waterServiceUtil;
 	
-	@Autowired
-	private MasterDataService masterDataService;
+	public void process(HashMap<String, Object> record) {
+		try {
+			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
+			if (!StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())
+					&& WCConstants.METERED_CONNECTION
+							.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getConnectionType())) {
+				process(waterConnectionRequest);
+			}
+		} catch (Exception ex) {
+			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record);
+			log.error(builder.toString(), ex);
+		}
+	}
 
 	@SuppressWarnings("unchecked")
-	public void process(WaterConnectionRequest request, String topic) {
+	public void process(WaterConnectionRequest request) {
 		try {
 			BigDecimal initialMeterReading = BigDecimal.ZERO;
 			if (!StringUtils.isEmpty(request.getWaterConnection().getAdditionalDetails())) {
