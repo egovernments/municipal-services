@@ -222,7 +222,7 @@ public class PropertyQueryBuilder {
 			if(appendAndQuery)
 				builder.append(AND_QUERY);
 			builder.append("property.propertyid IN (").append(createQuery(propertyIds)).append(")");
-			addToPreparedStatement(preparedStmtList, propertyIds);
+			addToPreparedStatementWithUpperCase(preparedStmtList, propertyIds);
 			appendAndQuery= true;
 		}
 
@@ -260,6 +260,12 @@ public class PropertyQueryBuilder {
 	}
 
 	private void addToPreparedStatement(List<Object> preparedStmtList, Set<String> ids) {
+		ids.forEach(id -> {
+			preparedStmtList.add(id);
+		});
+	}
+	
+	private void addToPreparedStatementWithUpperCase(List<Object> preparedStmtList, Set<String> ids) {
 		ids.forEach(id -> {
 			preparedStmtList.add(id.toUpperCase());
 		});
