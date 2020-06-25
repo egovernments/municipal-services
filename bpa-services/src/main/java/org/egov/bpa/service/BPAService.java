@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
@@ -39,6 +41,9 @@ import org.egov.bpa.workflow.ActionValidator;
 import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.bpa.workflow.WorkflowService;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.land.web.models.LandInfo;
+import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,6 +94,9 @@ public class BPAService {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private BPAConfiguration config;
 	
 	public BPA create(BPARequest bpaRequest) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -164,13 +172,6 @@ public class BPAService {
 		LandSearchCriteria landcriteria = new LandSearchCriteria();
 		landcriteria.setTenantId(criteria.getTenantId());
 		List<String> edcrNos = null;
-		if (criteria.getApplicationType() != null || criteria.getServiceType() != null) {
-			ArrayList<String> business = util.getBusinessService(criteria.getApplicationType(),
-					criteria.getServiceType());
-			if (business.size() > 0) {
-				criteria.setBusinessService(business);
-			}
-		}
 		if (criteria.getMobileNumber() != null) {
 			landcriteria.setMobileNumber(criteria.getMobileNumber());
 			ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
@@ -192,20 +193,23 @@ public class BPAService {
 				}
 			}
 		} else {
-			if (criteria.getRequestor() != null) {
+			List<String> roles = new ArrayList<>();
+			for (Role role : requestInfo.getUserInfo().getRoles()) {
+				roles.add(role.getCode());
+			}
+			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
 				UserSearchRequest userSearchRequest = new UserSearchRequest();
 				if (criteria.getTenantId() != null) {
-					landcriteria.setTenantId(criteria.getTenantId());
 					userSearchRequest.setTenantId(criteria.getTenantId());
 				}
-				criteria.setMobileNumber(criteria.getRequestor());
+				List<String> uuids = new ArrayList<String>();
+				if (requestInfo.getUserInfo() != null && !StringUtils.isEmpty(requestInfo.getUserInfo().getUuid())) {
+					uuids.add(requestInfo.getUserInfo().getUuid());
+					criteria.setOwnerIds(uuids);
+					criteria.setCreatedBy(uuids);
+				}
 				UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
 				if (userInfo != null) {
-					ArrayList<String> uuid = new ArrayList<String>();
-					for (int i = 0; i < userInfo.getUser().size(); i++) {
-						uuid.add(userInfo.getUser().get(i).getUuid());
-					}
-					criteria.setCreatedBy(uuid);
 					landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 				}
 				ArrayList<LandInfo> landInfo = landService.searchLandInfoToBPA(requestInfo, landcriteria);
@@ -347,7 +351,9 @@ public class BPAService {
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-
+		
+		bpaValidator.validateWorkflowActions(bpaRequest);
+		
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
 
@@ -378,6 +384,11 @@ public class BPAService {
 		// Generate the sanction Demand
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.SANC_FEE_STATE)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.SANCTION_FEE_KEY);
+		}
+
+		if (Arrays.asList(config.getSkipPaymentStatuses().split(",")).contains(bpa.getStatus())) {
+			enrichmentService.skipPayment(bpaRequest);
+			enrichmentService.postStatusEnrichment(bpaRequest);
 		}
 		
 		repository.update(bpaRequest, workflowService.isStateUpdatable(bpa.getStatus(), businessService));
