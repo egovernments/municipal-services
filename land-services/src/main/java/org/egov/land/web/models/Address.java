@@ -88,6 +88,7 @@ public class Address   {
   **/
   @ApiModelProperty(value = "Unique Identifier of the tenant to which user primarily belongs")
 
+
     public String getTenantId() {
     return tenantId;
   }
