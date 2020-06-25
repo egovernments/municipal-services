@@ -187,6 +187,7 @@ public class PropertyService {
 		if (config.getIsMutationWorkflowEnabled()) {
 
 			State state = wfService.updateWorkflow(request, CreationReason.MUTATION);
+      
 			/*
 			 * updating property from search to INACTIVE status
 			 * 
