@@ -120,7 +120,7 @@ public class PropertyUtil extends CommonUtils {
 					.build();
 	}
 	
-	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, Boolean isCreate) {
+	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, CreationReason creationReasonForWorkflow) {
 		
 		Property property = request.getProperty();
 		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
@@ -128,9 +128,7 @@ public class PropertyUtil extends CommonUtils {
 		wf.setBusinessId(property.getAcknowldgementNumber());
 		wf.setTenantId(property.getTenantId());
 	
-		CreationReason process = isCreate ? CreationReason.CREATE : property.getCreationReason();
-		
-		switch (process) {
+		switch (creationReasonForWorkflow) {
 		
 		case CREATE :
 
