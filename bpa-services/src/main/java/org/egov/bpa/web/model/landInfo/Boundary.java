@@ -78,7 +78,7 @@ public class Boundary   {
    * @return name
   **/
   @ApiModelProperty(required = true, value = "name of the boundary.")
-      @NotNull
+   
 
     public String getName() {
     return name;

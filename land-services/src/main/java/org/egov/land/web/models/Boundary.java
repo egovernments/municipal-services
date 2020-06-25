@@ -12,7 +12,9 @@ import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Boundary
@@ -20,6 +22,8 @@ import lombok.Builder;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Boundary   {
   @JsonProperty("code")
   private String code = null;
@@ -73,7 +77,7 @@ public class Boundary   {
    * @return name
   **/
   @ApiModelProperty(required = true, value = "name of the boundary.")
-      @NotNull
+    
 
     public String getName() {
     return name;

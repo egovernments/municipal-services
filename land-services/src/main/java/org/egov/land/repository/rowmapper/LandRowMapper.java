@@ -101,21 +101,23 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 			Unit unit = Unit.builder().id(rs.getString("landInfo_un_id")).floorNo(rs.getString("floorno"))
 					.unitType(rs.getString("unittype")).usageCategory(rs.getString("usageCategory"))
 					.occupancyType(rs.getString("occupancytype") != null
-							? OccupancyType.fromValue(rs.getString("occupancytype")) : null)
+							? rs.getString("occupancytype") : null)
 					.occupancyDate(rs.getLong("occupancydate"))
 //					.auditDetails(auditdetails)
 					.tenantId(tenantId).build();
 			landInfo.addUnitsItem(unit);
 		}
-
+		
 		String ownerId = rs.getString("landInfoowner_id");
 		if (ownerId != null) {
 			Boolean isPrimaryOwner = (Boolean) rs.getObject("isprimaryowner");
-			BigDecimal ownerShipPercentage = (BigDecimal) rs.getObject("ownershippercentage");
+			Double val =  (Double) rs.getObject("ownershippercentage");
+			BigDecimal ownerShipPercentage = new BigDecimal(val);
 
 			OwnerInfo owner = OwnerInfo.builder().tenantId(tenantId).ownerId(ownerId)
 					.uuid(rs.getString("landInfoowner_uuid")).mobileNumber(rs.getString("mobilenumber"))
-					.isPrimaryOwner(isPrimaryOwner).ownerShipPercentage(ownerShipPercentage)
+					.isPrimaryOwner(isPrimaryOwner)
+					.ownerShipPercentage(ownerShipPercentage)
 					.institutionId(rs.getString("institutionid")).relationship(rs.getString("relationship") != null
 							? Relationship.fromValue(rs.getString("relationship")) : null)
 					.build();

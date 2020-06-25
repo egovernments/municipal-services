@@ -6,19 +6,26 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.egov.bpa.web.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. 
  */
 @ApiModel(description = "Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. ")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:52:32.717Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Address   {
   @JsonProperty("tenantId")
   private String tenantId = null;
@@ -67,6 +74,9 @@ public class Address   {
 
   @JsonProperty("geoLocation")
   private GeoLocation geoLocation = null;
+
+  @JsonProperty("auditDetails")
+  private AuditDetails auditDetails = null;
 
   public Address tenantId(String tenantId) {
     this.tenantId = tenantId;
@@ -377,6 +387,28 @@ public class Address   {
   }
 
 
+  public Address auditDetails(AuditDetails auditDetails) {
+    this.auditDetails = auditDetails;
+    return this;
+  }
+
+  /**
+   * Get geoLocation
+   * @return geoLocation
+  **/
+  @ApiModelProperty(value = "")
+  
+    @Valid
+    public AuditDetails getAuditDetails() {
+    return auditDetails;
+  }
+
+  public void setAuditDetails(AuditDetails auditDetails) {
+    this.auditDetails = auditDetails;
+  }
+
+  
+
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
@@ -401,12 +433,13 @@ public class Address   {
         Objects.equals(this.buildingName, address.buildingName) &&
         Objects.equals(this.street, address.street) &&
         Objects.equals(this.locality, address.locality) &&
-        Objects.equals(this.geoLocation, address.geoLocation);
+        Objects.equals(this.geoLocation, address.geoLocation) &&
+        Objects.equals(this.auditDetails, address.auditDetails);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionDetails, buildingName, street, locality, geoLocation);
+    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionDetails, buildingName, street, locality, geoLocation, auditDetails);
   }
 
   @Override
@@ -430,6 +463,7 @@ public class Address   {
     sb.append("    street: ").append(toIndentedString(street)).append("\n");
     sb.append("    locality: ").append(toIndentedString(locality)).append("\n");
     sb.append("    geoLocation: ").append(toIndentedString(geoLocation)).append("\n");
+    sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
     sb.append("}");
     return sb.toString();
   }

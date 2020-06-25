@@ -43,19 +43,6 @@ public class User {
     @JsonProperty("salutation")
     private String salutation;
 
-    @NotNull
-    @Size(max=100)
-    @JsonProperty("name")
-    private String name;
-
-    @JsonProperty("gender")
-    private String gender;
-
-    @NotNull
-    @Pattern(regexp = "^[0-9]{10}$", message = "MobileNumber should be 10 digit number")
-    @JsonProperty("mobileNumber")
-    private String mobileNumber;
-
     @Size(max=128)
     @JsonProperty("emailId")
     private String emailId;
@@ -92,10 +79,6 @@ public class User {
     @JsonProperty("correspondencePinCode")
     private String correspondencePincode;
 
-    @Size(max=300)
-    @JsonProperty("correspondenceAddress")
-    private String correspondenceAddress;
-
     @JsonProperty("active")
     private Boolean active;
 
@@ -122,11 +105,6 @@ public class User {
     @JsonProperty("roles")
     @Valid
     private List<Role> roles;
-
-    @Size(max=100)
-    @NotNull
-    @JsonProperty("fatherOrHusbandName")
-    private String fatherOrHusbandName;
 
     @Size(max=32)
     @JsonProperty("bloodGroup")
@@ -155,10 +133,6 @@ public class User {
     @JsonProperty("otpReference")
     private String otpReference;
 
-    @Size(max=256)
-    @JsonProperty("tenantId")
-    private String tenantId;
-
 
     public User addRolesItem(Role rolesItem) {
             if (this.roles == null) {
@@ -173,18 +147,14 @@ public class User {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             User user = (User) o;
-            return  Objects.equals(name, user.name) &&
-                    Objects.equals(mobileNumber, user.mobileNumber) &&
-                    Objects.equals(gender, user.gender) &&
-                    Objects.equals(emailId, user.emailId) &&
+            return  Objects.equals(emailId, user.emailId);
 //                    Objects.equals(dob, user.dob) && //Epoch format not converting properly from UI
-                    Objects.equals(fatherOrHusbandName, user.fatherOrHusbandName) &&
-                    Objects.equals(correspondenceAddress, user.correspondenceAddress);
+                   
     }
 
     @Override
     public int hashCode() {
 
-            return Objects.hash(uuid, name, mobileNumber);
+            return Objects.hash(uuid);
     }
 }

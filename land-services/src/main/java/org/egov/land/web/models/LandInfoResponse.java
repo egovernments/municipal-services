@@ -12,7 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * Contains the ResponseHeader and the created/updated property
@@ -21,11 +23,13 @@ import lombok.Builder;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LandInfoResponse   {
   @JsonProperty("ResponseInfo")
   private ResponseInfo responseInfo = null;
 
-  @JsonProperty("LandInfo")
+  @JsonProperty("landInfo")
   private List<LandInfo> landInfo = null;
 
   public LandInfoResponse responseInfo(ResponseInfo responseInfo) {

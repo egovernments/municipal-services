@@ -2,20 +2,19 @@ package  org.egov.bpa.web.model;
 
 import java.util.List;
 import java.util.Objects;
+
+import javax.validation.Valid;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import  org.egov.bpa.web.model.BPA;
-import org.egov.bpa.web.model.AuditDetails.AuditDetailsBuilder;
-import org.egov.common.contract.response.ResponseInfo;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Contains the ResponseHeader and the created/updated property

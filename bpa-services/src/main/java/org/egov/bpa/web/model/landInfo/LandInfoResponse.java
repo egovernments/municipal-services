@@ -29,7 +29,7 @@ public class LandInfoResponse   {
   @JsonProperty("ResponseInfo")
   private ResponseInfo responseInfo = null;
 
-  @JsonProperty("LandInfo")
+  @JsonProperty("landInfo")
   private List<LandInfo> landInfo = null;
 
   public LandInfoResponse responseInfo(ResponseInfo responseInfo) {

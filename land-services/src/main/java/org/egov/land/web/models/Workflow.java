@@ -13,6 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * BPA application object to capture the details of land, land owners, and address of the land.
@@ -20,6 +23,9 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "BPA application object to capture the details of land, land owners, and address of the land.")
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Workflow   {
   @JsonProperty("action")
   private String action = null;

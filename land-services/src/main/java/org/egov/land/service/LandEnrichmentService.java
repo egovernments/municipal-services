@@ -72,10 +72,10 @@ public class LandEnrichmentService {
 			if (StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getId()))
 				landRequest.getLandInfo().getAddress().setId(UUID.randomUUID().toString());
 			landRequest.getLandInfo().getAddress().setTenantId(landRequest.getLandInfo().getTenantId());
-//			landRequest.getLandInfo().getAddress().setAuditDetails(auditDetails);
-//			if (landRequest.getLandInfo().getAddress().getGeoLocation() != null
-//					&& StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getGeoLocation().getId()))
-//				landRequest.getLandInfo().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
+			landRequest.getLandInfo().getAddress().setAuditDetails(auditDetails);
+			if (landRequest.getLandInfo().getAddress().getGeoLocation() != null
+					&& StringUtils.isEmpty(landRequest.getLandInfo().getAddress().getGeoLocation().getId()))
+				landRequest.getLandInfo().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
 		}
 		// units
 		if (!CollectionUtils.isEmpty(landRequest.getLandInfo().getUnit())) {
@@ -84,7 +84,7 @@ public class LandEnrichmentService {
 					unit.setId(UUID.randomUUID().toString());
 				}
 				unit.setTenantId(landRequest.getLandInfo().getTenantId());
-//				unit.setAuditDetails(auditDetails);
+				unit.setAuditDetails(auditDetails);
 			});
 		}
 
@@ -94,7 +94,7 @@ public class LandEnrichmentService {
 				if (StringUtils.isEmpty(document.getId())) {
 					document.setId(UUID.randomUUID().toString());
 				}
-//				document.setAuditDetails(auditDetails);
+				document.setAuditDetails(auditDetails);
 			});
 		}
 
@@ -103,7 +103,7 @@ public class LandEnrichmentService {
 			landRequest.getLandInfo().getOwners().forEach(owner -> {
 				if (StringUtils.isEmpty(owner.getOwnerId()))
 					owner.setOwnerId(UUID.randomUUID().toString());
-//				owner.setAuditDetails(auditDetails);
+				owner.setAuditDetails(auditDetails);
 			});
 		}
 	}

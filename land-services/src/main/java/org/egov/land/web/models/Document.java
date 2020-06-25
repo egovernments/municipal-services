@@ -2,6 +2,7 @@ package org.egov.land.web.models;
 
 import java.util.Objects;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.springframework.validation.annotation.Validated;
@@ -10,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * This object holds list of documents attached during the transaciton for a property
@@ -19,6 +22,8 @@ import lombok.Builder;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Document   {
   @JsonProperty("id")
   private String id = null;
@@ -34,6 +39,9 @@ public class Document   {
 
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
+  
+  @JsonProperty("auditDetails")
+  private AuditDetails auditDetails = null;
 
   public Document id(String id) {
     this.id = id;
@@ -84,11 +92,11 @@ public class Document   {
   **/
   @ApiModelProperty(value = "File store reference key.")
   
-    public String getfileStoreId() {
+    public String getFileStoreId() {
     return fileStoreId;
   }
 
-  public void setfileStoreId(String fileStoreId) {
+  public void setFileStoreId(String fileStoreId) {
     this.fileStoreId = fileStoreId;
   }
 
@@ -130,6 +138,26 @@ public class Document   {
     this.additionalDetails = additionalDetails;
   }
 
+  public Document auditDetails(AuditDetails auditDetails) {
+    this.auditDetails = auditDetails;
+    return this;
+  }
+
+  /**
+   * Get geoLocation
+   * @return geoLocation
+  **/
+  @ApiModelProperty(value = "")
+  
+    @Valid
+    public AuditDetails getAuditDetails() {
+    return auditDetails;
+  }
+
+  public void setAuditDetails(AuditDetails geoLocation) {
+    this.auditDetails = auditDetails;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -144,12 +172,13 @@ public class Document   {
         Objects.equals(this.documentType, document.documentType) &&
         Objects.equals(this.fileStoreId, document.fileStoreId) &&
         Objects.equals(this.documentUid, document.documentUid) &&
-        Objects.equals(this.additionalDetails, document.additionalDetails);
+        Objects.equals(this.additionalDetails, document.additionalDetails) &&
+        Objects.equals(this.auditDetails, document.auditDetails);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, documentType, fileStoreId, documentUid, additionalDetails);
+    return Objects.hash(id, documentType, fileStoreId, documentUid, additionalDetails, auditDetails);
   }
 
   @Override
@@ -162,6 +191,7 @@ public class Document   {
     sb.append("    fileStoreId: ").append(toIndentedString(fileStoreId)).append("\n");
     sb.append("    documentUid: ").append(toIndentedString(documentUid)).append("\n");
     sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
+    sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
     sb.append("}");
     return sb.toString();
   }

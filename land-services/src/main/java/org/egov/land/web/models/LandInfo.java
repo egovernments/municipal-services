@@ -13,7 +13,9 @@ import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
 
 /**
@@ -22,6 +24,8 @@ import net.minidev.json.annotate.JsonIgnore;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LandInfo   {
   @JsonProperty("id")
   private String id = null;
@@ -213,11 +217,42 @@ public class LandInfo   {
     return this;
   }
 
-  public LandInfo addOwnersItem(OwnerInfo ownersItem) {
-    this.owners.add(ownersItem);
-    return this;
-  }
+  @JsonIgnore
+	private ArrayList<String> docIds ;
+	@JsonIgnore
+	private ArrayList<String> ownerIds;
+	
+	public LandInfo addOwnersItem(OwnerInfo ownersItem) {
+		if (this.owners == null)
+			this.owners = new ArrayList<>();
+		
+		if(this.ownerIds == null){
+			this.ownerIds = new ArrayList<String>();
+		}
+		if(!this.ownerIds.contains(ownersItem.getOwnerId())){
+			this.owners.add(ownersItem);
+			this.ownerIds.add(ownersItem.getOwnerId());
+		}
+		
+		return this;
+	}
 
+
+	public LandInfo addDocumentsItem(Document documentsItem) {
+		if (this.documents == null) {
+			this.documents = new ArrayList<>();
+		}
+		if(this.docIds == null){
+			this.docIds = new ArrayList<String>();
+		}
+		
+		if(!this.docIds.contains(documentsItem.getId())){
+			this.documents.add(documentsItem);
+			this.docIds.add(documentsItem.getId());
+		}
+			
+		return this;
+	}
   /**
    * Property owners, these will be citizen users in system.
    * @return owners
@@ -295,14 +330,6 @@ public class LandInfo   {
 
   public LandInfo documents(List<Document> documents) {
     this.documents = documents;
-    return this;
-  }
-
-  public LandInfo addDocumentsItem(Document documentsItem) {
-    if (this.documents == null) {
-      this.documents = new ArrayList<Document>();
-    }
-    this.documents.add(documentsItem);
     return this;
   }
 
