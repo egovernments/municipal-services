@@ -7,10 +7,10 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.RequestInfoWrapper;
+import org.egov.bpa.web.model.landInfo.LandInfo;
+import org.egov.bpa.web.model.landInfo.LandInfoRequest;
+import org.egov.bpa.web.model.landInfo.LandSearchCriteria;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.land.web.models.LandInfo;
-import org.egov.land.web.models.LandRequest;
-import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class BPALandService {
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
 		uri.append(config.getLandInfoCreate());
 		
-		LandRequest landRequest = new LandRequest();
+		LandInfoRequest landRequest = new LandInfoRequest();
 		landRequest.setRequestInfo(bpaRequest.getRequestInfo());
 		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
 		LinkedHashMap responseMap = null;
@@ -45,7 +45,7 @@ public class BPALandService {
 		} 
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
+		landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
 		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
 		bpaRequest.getBPA().setLandInfo(landData);
 		bpaRequest.getBPA().setLandId(landData.getId());
@@ -59,7 +59,7 @@ public class BPALandService {
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
 		uri.append(config.getLandInfoUpdate());
 		
-		LandRequest landRequest = new LandRequest();
+		LandInfoRequest landRequest = new LandInfoRequest();
 		landRequest.setRequestInfo(bpaRequest.getRequestInfo());
 		landRequest.setLandInfo(bpaRequest.getBPA().getLandInfo());
 		LinkedHashMap responseMap = null;
@@ -70,7 +70,7 @@ public class BPALandService {
 		}
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
+		landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
 		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
 		bpaRequest.getBPA().setLandInfo(landData);
 		bpaRequest.getBPA().setLandId(landData.getId());
@@ -87,8 +87,8 @@ public class BPALandService {
 		LinkedHashMap responseMap = null;
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		if (responseMap != null && responseMap.get("LandInfo") != null)
-			landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
+		if (responseMap != null && responseMap.get("landInfo") != null)
+			landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
 		ArrayList<LandInfo> landData = new ArrayList<LandInfo>(); 
 		if(landInfo.size()>0){
 		for(int i=0; i<landInfo.size(); i++){
@@ -105,7 +105,7 @@ public class BPALandService {
 		uri.append("?tenantId=");
 		uri.append(landcriteria.getTenantId());
 		LandSearchCriteria landSearchCriteria = new LandSearchCriteria();
-		LandRequest landRequest = new LandRequest();
+		LandInfoRequest landRequest = new LandInfoRequest();
 		landRequest.setRequestInfo(requestInfo);
 		if (landcriteria.getIds()!=null) {
 			landSearchCriteria.setIds(landcriteria.getIds());

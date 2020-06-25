@@ -1,28 +1,34 @@
 package org.egov.bpa.calculator.web.models.landinfo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+/**
+ * Value denoting if the unit is rented or occupied by owner
+ */
 public enum OccupancyType {
-	OWNER("OWNER"), TENANT("TENANT");
-	private String value;
+  OWNER("OWNER"),
+    TENANT("TENANT");
 
-	OccupancyType(String value) {
-		this.value = value;
-	}
+  private String value;
 
-	public String getValue() {
-		return value;
-	}
+  OccupancyType(String value) {
+    this.value = value;
+  }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+  @Override
+  @JsonValue
+  public String toString() {
+    return String.valueOf(value);
+  }
 
-	public static OccupancyType fromValue(String text) {
-		for (OccupancyType b : OccupancyType.values()) {
-			if (String.valueOf(b.value).equals(text)) {
-				return b;
-			}
-		}
-		return null;
-	}
+  @JsonCreator
+  public static OccupancyType fromValue(String text) {
+    for (OccupancyType b : OccupancyType.values()) {
+      if (String.valueOf(b.value).equals(text)) {
+        return b;
+      }
+    }
+    return null;
+  }
 }

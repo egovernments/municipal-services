@@ -55,7 +55,7 @@ public class BPAService {
 			throw new CustomException("PARSING ERROR", "Error while parsing response of TradeLicense Search");
 		}
 
-		return bpaResponse.getBpa().get(0);
+		return bpaResponse.getBPA().get(0);
 	}
 
 	private StringBuilder getBPASearchURL() {
