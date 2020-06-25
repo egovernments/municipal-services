@@ -14,7 +14,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Contains the ResponseHeader and the created/updated property
@@ -25,12 +27,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class BPAResponse   {
   @JsonProperty("ResponseInfo")
-  private ResponseInfo responseInfo = null;
+  private ResponseInfo responseInfo;
 
   @JsonProperty("BPA")
-  private List<BPA> BPA = null;
+  private List<BPA> BPA;
 
   public BPAResponse responseInfo(ResponseInfo responseInfo) {
     this.responseInfo = responseInfo;
@@ -63,14 +67,14 @@ public class BPAResponse   {
   **/
   @ApiModelProperty(value = "")
   
-    @Valid
-    public List<BPA> getBPA() {
-    return BPA;
-  }
+//    @Valid
+//    public List<BPA> getBPA() {
+//    return BPAR;
+//  }
 
-  public void setBPA(List<BPA> BPA) {
-    this.BPA = BPA;
-  }
+//  public void setBPA(List<BPA> BPA) {
+//    this.BPAR = BPA;
+//  }
 
 
   @Override
