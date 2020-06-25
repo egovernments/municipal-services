@@ -107,11 +107,11 @@ public class WorkflowService {
 	 * 
 	 * @param request
 	 */
-	public State updateWorkflow(PropertyRequest request) {
+	public State updateWorkflow(PropertyRequest request, Boolean isCreate) {
 
 		Property property = request.getProperty();
 		
-		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request);
+		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, isCreate);
 		State state = callWorkFlow(workflowReq);
 		
 		if (state.getApplicationStatus().equalsIgnoreCase(configs.getWfStatusActive()) && property.getPropertyId() == null) {
