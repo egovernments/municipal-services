@@ -19,17 +19,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Workflow {
-	
-	  @JsonProperty("action")
-	  private String action;
 
-	  @JsonProperty("assignes")
-	  private List<String> assignes;
+	@JsonProperty("action")
+	private String action;
 
-	  @JsonProperty("comments")
-	  private String comments;
+	@JsonProperty("assignes")
+	private List<String> assignes;
 
-	  @JsonProperty("documents")
-	  private List<Document> documents;
+	@JsonProperty("comment")
+	private String comment;
+
+	@JsonProperty("documents")
+    private List<Document> documents;
 
 }

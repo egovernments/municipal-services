@@ -91,5 +91,14 @@ public class NOCConfiguration {
 	
 	@Value("${persister.save.noc.topic}")
 	private String saveTopic;
+	
+	@Value("${egov.noc.pagination.default.limit}")
+	private Integer defaultLimit;
+
+	@Value("${egov.noc.pagination.default.offset}")
+	private Integer defaultOffset;
+
+	@Value("${egov.noc.pagination.max.limit}")
+	private Integer maxSearchLimit;
 
 }
