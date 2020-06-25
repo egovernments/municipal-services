@@ -48,6 +48,7 @@ public class KafkaConfiguration {
         return factory;
     }
     
+    /*
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>(
@@ -65,4 +66,6 @@ public class KafkaConfiguration {
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(kafkaProducerFactory());
     }
+    */
 }
+
