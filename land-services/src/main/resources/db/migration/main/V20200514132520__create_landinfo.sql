@@ -1,4 +1,4 @@
-CREATE TABLE eg_land_landInfo(
+ CREATE TABLE IF NOT EXISTS eg_land_landInfo(
 	id character varying(64),
 	landUid character varying(64),
 	landUniqueRegNo character varying(64),
@@ -18,7 +18,7 @@ CREATE TABLE eg_land_landInfo(
 	CONSTRAINT pk_eg_land_landInfo PRIMARY KEY (id)
 );
 
-CREATE TABLE eg_land_Address(
+CREATE TABLE IF NOT EXISTS eg_land_Address(
 	id character varying(64),
 	tenantId character varying(256) NOT NULL,
 	doorNo character varying(64),
@@ -45,7 +45,7 @@ CREATE TABLE eg_land_Address(
 	CONSTRAINT fk_eg_land_Address FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
-CREATE TABLE eg_land_GeoLocation(
+CREATE TABLE IF NOT EXISTS eg_land_GeoLocation(
 
 	id character varying(64),
 	latitude double precision,
@@ -56,7 +56,7 @@ CREATE TABLE eg_land_GeoLocation(
 	CONSTRAINT fk_eg_bpa_GeoLocation FOREIGN KEY (addressId) REFERENCES eg_land_Address (id)
 );
 
-CREATE TABLE eg_land_ownerInfo(
+CREATE TABLE IF NOT EXISTS eg_land_ownerInfo(
 	id character varying(64),
 	uuid character varying(64),
 	mobileNumber character varying(256) NOT NULL,
@@ -78,7 +78,7 @@ CREATE TABLE eg_land_ownerInfo(
 );
 
 
-CREATE TABLE eg_land_institution(
+CREATE TABLE IF NOT EXISTS eg_land_institution(
 	id character varying(64),
 	tenantId character varying(256),
 	type character varying(64),
@@ -94,7 +94,7 @@ CREATE TABLE eg_land_institution(
 );
 
 
-CREATE TABLE eg_land_document(
+CREATE TABLE IF NOT EXISTS eg_land_document(
 	id character varying(64),
 	documentType character varying(256),
 	fileStoreId character varying(256),
@@ -112,7 +112,7 @@ CREATE TABLE eg_land_document(
 	CONSTRAINT fk_eg_land_document FOREIGN KEY (landInfoId) REFERENCES eg_land_landInfo (id)
 );
 
-CREATE TABLE eg_land_unit(
+CREATE TABLE IF NOT EXISTS eg_land_unit(
 
 	id character varying(64),
 	tenantId character varying(256),
@@ -135,7 +135,7 @@ CREATE TABLE eg_land_unit(
 
 );
 
-CREATE TABLE public.eg_land_auditdetails
+CREATE TABLE IF NOT EXISTS public.eg_land_auditdetails
 (
     id character varying(256) COLLATE pg_catalog."default" NOT NULL,
     landUid character varying(64) COLLATE pg_catalog."default",
