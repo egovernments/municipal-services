@@ -275,9 +275,9 @@ public class PropertyService {
 			if (shouldReturnEmptyList)
 				return Collections.emptyList();
 
-			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo);
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
 		} else {
-			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo);
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
 		}
 
 		properties.forEach(property -> {

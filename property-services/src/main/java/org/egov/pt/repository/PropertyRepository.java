@@ -98,11 +98,11 @@ public class PropertyRepository {
 	 * @param requestInfo RequestInfo object of the request
 	 * @return properties with owner information added from user service
 	 */
-	public List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo) {
+	public List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo, Boolean isInternal) {
 
 		List<Property> properties;
 		
-		Boolean isOpenSearch = util.isPropertySearchOpen(requestInfo.getUserInfo());
+		Boolean isOpenSearch = isInternal ? false : util.isPropertySearchOpen(requestInfo.getUserInfo());
 
 		if (criteria.isAudit() && !isOpenSearch) {
 			properties = getPropertyAudit(criteria);
