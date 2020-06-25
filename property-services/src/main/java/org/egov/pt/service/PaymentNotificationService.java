@@ -394,7 +394,7 @@ public class PaymentNotificationService {
         link = link.replace("$tenantId", valMap.get("tenantId"));
         link = link.replace("$receiptNumber", valMap.get("receiptNumber"));
         link = link.replace("$businessService",PT_BUSINESSSERVICE);
-        link = util.getShortenedUrl(link);
+        //link = util.getShortenedUrl(link);
         return  link;
     }
 
