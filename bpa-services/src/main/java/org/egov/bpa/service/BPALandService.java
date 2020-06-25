@@ -45,7 +45,7 @@ public class BPALandService {
 		} 
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
+		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
 		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
 		bpaRequest.getBPA().setLandInfo(landData);
 		bpaRequest.getBPA().setLandId(landData.getId());
@@ -70,7 +70,7 @@ public class BPALandService {
 		}
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
-		landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
+		landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
 		LandInfo landData = mapper.convertValue(landInfo.get(0), LandInfo.class);
 		bpaRequest.getBPA().setLandInfo(landData);
 		bpaRequest.getBPA().setLandId(landData.getId());
@@ -87,8 +87,8 @@ public class BPALandService {
 		LinkedHashMap responseMap = null;
 		responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
-		if (responseMap != null && responseMap.get("landInfo") != null)
-			landInfo = (ArrayList<LandInfo>) responseMap.get("landInfo");
+		if (responseMap != null && responseMap.get("LandInfo") != null)
+			landInfo = (ArrayList<LandInfo>) responseMap.get("LandInfo");
 		ArrayList<LandInfo> landData = new ArrayList<LandInfo>(); 
 		if(landInfo.size()>0){
 		for(int i=0; i<landInfo.size(); i++){
