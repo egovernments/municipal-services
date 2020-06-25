@@ -79,7 +79,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled())
-			wfService.updateWorkflow(request);
+			wfService.updateWorkflow(request, true);
 		producer.push(config.getSavePropertyTopic(), request);
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
@@ -133,7 +133,7 @@ public class PropertyService {
 		
 		if(config.getIsWorkflowEnabled()) {
 			
-			State state = wfService.updateWorkflow(request);
+			State state = wfService.updateWorkflow(request, false);
 
 			if (state.getIsStartState() == true
 					&& state.getApplicationStatus().equalsIgnoreCase(Status.INWORKFLOW.toString())
@@ -186,7 +186,7 @@ public class PropertyService {
 		
 		if (config.getIsMutationWorkflowEnabled()) {
 
-			State state = wfService.updateWorkflow(request);
+			State state = wfService.updateWorkflow(request, false);
 			/*
 			 * updating property from search to INACTIVE status
 			 * 

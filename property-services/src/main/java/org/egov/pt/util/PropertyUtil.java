@@ -16,6 +16,7 @@ import org.egov.common.contract.request.User;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.workflow.ProcessInstance;
 import org.egov.pt.models.workflow.ProcessInstanceRequest;
@@ -119,7 +120,7 @@ public class PropertyUtil extends CommonUtils {
 					.build();
 	}
 	
-	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request) {
+	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, Boolean isCreate) {
 		
 		Property property = request.getProperty();
 		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
@@ -127,8 +128,9 @@ public class PropertyUtil extends CommonUtils {
 		wf.setBusinessId(property.getAcknowldgementNumber());
 		wf.setTenantId(property.getTenantId());
 	
+		CreationReason process = isCreate ? CreationReason.CREATE : property.getCreationReason();
 		
-		switch (property.getCreationReason()) {
+		switch (process) {
 		
 		case CREATE :
 
@@ -137,10 +139,10 @@ public class PropertyUtil extends CommonUtils {
 			wf.setAction("OPEN");
 			break;
 
-		case MUTATION:
+		case UPDATE :
 			break;
 
-		case UPDATE:
+		case MUTATION :
 			break;
 			
 		default:
