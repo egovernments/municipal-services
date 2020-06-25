@@ -1,16 +1,18 @@
-
+serviceMaps:
+ serviceName: land-services
+ mappings:
  - version: 1.0
    description: Persists landinfo details in EG_LandInfo_BuildingPlan  table
    fromTopic: save-landinfo
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO eg_land_landInfo(id, landUid,landUniqueRegNo,tenantId, status, ownershipCategory, source, channel, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+       - query: INSERT INTO eg_land_landInfo(id, landUId,landUniqueRegNo,tenantId, status, ownershipCategory, source, channel, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?); 
          basePath: landInfo
          jsonMaps:
           - jsonPath: $.landInfo.id
 
-          - jsonPath: $.landInfo.landUid
+          - jsonPath: $.landInfo.landUId
           
           - jsonPath: $.landInfo.landUniqueRegNo
           
@@ -224,10 +226,10 @@
    fromTopic: update-landinfo
    isTransaction: true
    queryMaps:
-       - query: UPDATE eg_land_landInfo SET landUid =? ,landUniqueRegNo =?,tenantId =?, status =?, ownershipCategory =?, source =? , channel =?, additionalDetails =?, lastmodifiedby =?, lastmodifiedtime =? WHERE id=?;
+       - query: UPDATE eg_land_landInfo SET landUId =? ,landUniqueRegNo =?,tenantId =?, status =?, ownershipCategory =?, source =? , channel =?, additionalDetails =?, lastmodifiedby =?, lastmodifiedtime =? WHERE id=?;
          basePath: landInfo
          jsonMaps:
-          - jsonPath: $.landInfo.landUid
+          - jsonPath: $.landInfo.landUId
           
           - jsonPath: $.landInfo.landUniqueRegNo
           
