@@ -13,8 +13,12 @@ import org.egov.land.web.models.LandSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
+@Slf4j
 public class LandRepository {
 
 	@Autowired
@@ -57,6 +61,9 @@ public class LandRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getLandInfoSearchQuery(criteria, preparedStmtList);
 		List<LandInfo> landInfoData = jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		if(!CollectionUtils.isEmpty(landInfoData)) {
+			log.info("Received data from Query..");
+		}
 		return landInfoData;
 	}
 }

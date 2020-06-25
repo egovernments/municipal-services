@@ -28,7 +28,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class LandEnrichmentService {
 
 	@Autowired
@@ -138,6 +141,9 @@ public class LandEnrichmentService {
 
 		UserDetailResponse userDetailResponse = userService.getUsersForLandInfos(landInfos);
 		enrichOwner(userDetailResponse, landInfos);
+		if(!CollectionUtils.isEmpty(landInfos) && !CollectionUtils.isEmpty(landInfos.get(0).getOwners())){
+			log.info("In enrich service...... ");
+		}
 		return landInfos;
 	}
 

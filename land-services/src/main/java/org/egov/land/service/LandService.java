@@ -18,8 +18,12 @@ import org.egov.land.web.models.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class LandService {
 
 	@Autowired
@@ -80,6 +84,10 @@ public class LandService {
 			
 			landInfo = getLandWithOwnerInfo(criteria, requestInfo);
 		}
+
+		if(!CollectionUtils.isEmpty(landInfo)){
+			log.info("Received final landInfo response in service call..");			
+		}
 		return landInfo;
 	}
 	
@@ -115,7 +123,15 @@ public class LandService {
 		List<LandInfo> landInfos = repository.getLandInfoData(criteria);
 		if (landInfos.isEmpty())
 			return Collections.emptyList();
+		
+		if(!CollectionUtils.isEmpty(landInfos)){
+			log.info("Received final landInfo response..");
+		}
+		
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
+		if(!CollectionUtils.isEmpty(landInfos)){
+			log.info("Received final landInfo response after enrichment..");
+		}
 		return landInfos;
 	}
 }
