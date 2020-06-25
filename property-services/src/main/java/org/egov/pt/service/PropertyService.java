@@ -79,7 +79,7 @@ public class PropertyService {
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		if (config.getIsWorkflowEnabled())
-			wfService.updateWorkflow(request, true);
+			wfService.updateWorkflow(request, CreationReason.CREATE);
 		producer.push(config.getSavePropertyTopic(), request);
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
@@ -133,7 +133,7 @@ public class PropertyService {
 		
 		if(config.getIsWorkflowEnabled()) {
 			
-			State state = wfService.updateWorkflow(request, false);
+			State state = wfService.updateWorkflow(request, CreationReason.UPDATE);
 
 			if (state.getIsStartState() == true
 					&& state.getApplicationStatus().equalsIgnoreCase(Status.INWORKFLOW.toString())
@@ -186,7 +186,8 @@ public class PropertyService {
 		
 		if (config.getIsMutationWorkflowEnabled()) {
 
-			State state = wfService.updateWorkflow(request, false);
+			State state = wfService.updateWorkflow(request, CreationReason.MUTATION);
+      
 			/*
 			 * updating property from search to INACTIVE status
 			 * 
@@ -275,9 +276,9 @@ public class PropertyService {
 			if (shouldReturnEmptyList)
 				return Collections.emptyList();
 
-			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo);
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
 		} else {
-			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo);
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
 		}
 
 		properties.forEach(property -> {

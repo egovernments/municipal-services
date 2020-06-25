@@ -6,6 +6,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.workflow.BusinessService;
 import org.egov.pt.models.workflow.BusinessServiceResponse;
@@ -107,11 +108,11 @@ public class WorkflowService {
 	 * 
 	 * @param request
 	 */
-	public State updateWorkflow(PropertyRequest request, Boolean isCreate) {
+	public State updateWorkflow(PropertyRequest request, CreationReason creationReasonForWorkflow) {
 
 		Property property = request.getProperty();
 		
-		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, isCreate);
+		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, creationReasonForWorkflow);
 		State state = callWorkFlow(workflowReq);
 		
 		if (state.getApplicationStatus().equalsIgnoreCase(configs.getWfStatusActive()) && property.getPropertyId() == null) {
