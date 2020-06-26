@@ -55,6 +55,7 @@ public class MeterReadingService {
 							.connectionNo(request.getWaterConnection().getConnectionNo())
 							.currentReading(initialMeterReading.doubleValue())
 							.currentReadingDate(request.getWaterConnection().getConnectionExecutionDate().longValue())
+							.tenantId(request.getWaterConnection().getTenantId())
 							.meterStatus(MeterStatusEnum.WORKING)
 							.billingPeriod(getBillingPeriod(
 									request.getWaterConnection().getConnectionExecutionDate().longValue()))
