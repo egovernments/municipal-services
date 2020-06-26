@@ -62,7 +62,7 @@ public class LandUserService {
 				userDetailResponse = userExists(owner, requestInfo);
 
 				if (userDetailResponse == null || CollectionUtils.isEmpty(userDetailResponse.getUser())
-						|| !owner.equals(userDetailResponse.getUser().get(0))) {
+						|| !owner.compareWithExistingUser(userDetailResponse.getUser().get(0))) {
 					// if no user found with mobileNo or details were changed,
 					// creating new one..
 					Role role = getCitizenRole();
