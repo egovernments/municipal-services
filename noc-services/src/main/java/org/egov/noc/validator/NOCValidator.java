@@ -1,6 +1,6 @@
 package org.egov.noc.validator;
 
-import org.egov.noc.web.model.NOCRequest;
+import org.egov.noc.web.model.NocRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ public class NOCValidator {
 	private MDMSValidator mdmsValidator;
 
 	
-	public void validateCreate(NOCRequest nocRequest, Object mdmsData) {
+	public void validateCreate(NocRequest nocRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(nocRequest, mdmsData);
 	}
 	

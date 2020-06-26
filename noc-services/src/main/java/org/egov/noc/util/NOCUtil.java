@@ -73,7 +73,7 @@ public class NOCUtil {
 
 		List<MasterDetail> nocMasterDtls = new ArrayList<>();
 
-		final String filterCode = "$.[?(@.active==true)].code";
+		final String filterCode = "$.[?(@.isActive==true)].code";
 
 		nocMasterDtls.add(MasterDetail.builder().name(NOCConstants.NOC_TYPE).filter(filterCode).build());
 

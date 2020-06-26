@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.util.NOCConstants;
-import org.egov.noc.web.model.NOC;
-import org.egov.noc.web.model.NOCRequest;
+import org.egov.noc.web.model.Noc;
+import org.egov.noc.web.model.NocRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,17 +75,17 @@ public class WorkflowIntegrator {
 	 *
 	 * @param nocRequest
 	 */
-	public void callWorkFlow(NOCRequest nocRequest) {
+	public void callWorkFlow(NocRequest nocRequest) {
 		String wfTenantId = nocRequest.getNoc().getTenantId();
 		JSONArray array = new JSONArray();
-		NOC noc = nocRequest.getNoc();
+		Noc noc = nocRequest.getNoc();
 		JSONObject obj = new JSONObject();
 		obj.put(BUSINESSIDKEY, noc.getApplicationNo());
 		obj.put(TENANTIDKEY, wfTenantId);
 		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 		obj.put(MODULENAMEKEY, NOCConstants.NOC_MODULE);
 		obj.put(ACTIONKEY, noc.getWorkflow().getAction());
-		obj.put(COMMENTKEY, noc.getWorkflow().getComments());
+		obj.put(COMMENTKEY, noc.getWorkflow().getComment());
 		
 		if (!CollectionUtils.isEmpty(noc.getWorkflow().getAssignes())) {
 			List<Map<String, String>> uuidmaps = new LinkedList<>();

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.noc.util.NOCConstants;
-import org.egov.noc.web.model.NOCRequest;
+import org.egov.noc.web.model.NocRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -24,7 +24,7 @@ public class MDMSValidator {
 	 *
 	 * @param nocRequest
 	 */
-	public void validateMdmsData(NOCRequest nocRequest, Object mdmsData) {
+	public void validateMdmsData(NocRequest nocRequest, Object mdmsData) {
 
 		Map<String, List<String>> masterData = getAttributeValues(mdmsData);
 		String[] masterArray = { NOCConstants.NOC_TYPE};

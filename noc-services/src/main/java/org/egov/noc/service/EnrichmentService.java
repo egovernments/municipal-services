@@ -12,8 +12,8 @@ import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.IdGenRepository;
 import org.egov.noc.util.NOCUtil;
 import org.egov.noc.web.model.AuditDetails;
-import org.egov.noc.web.model.NOC;
-import org.egov.noc.web.model.NOCRequest;
+import org.egov.noc.web.model.Noc;
+import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.idgen.IdResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class EnrichmentService {
 	@Autowired
 	private IdGenRepository idGenRepository;
 	
-	public void enrichCreateRequest(NOCRequest nocRequest, Object mdmsData) {
+	public void enrichCreateRequest(NocRequest nocRequest, Object mdmsData) {
 		RequestInfo requestInfo = nocRequest.getRequestInfo();
 		AuditDetails auditDetails = nocUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		nocRequest.getNoc().setAuditDetails(auditDetails);
@@ -42,10 +42,10 @@ public class EnrichmentService {
 		setIdgenIds(nocRequest);
 	}
 	
-	private void setIdgenIds(NOCRequest request) {
+	private void setIdgenIds(NocRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getNoc().getTenantId();
-		NOC noc = request.getNoc();
+		Noc noc = request.getNoc();
 
 		List<String> applicationNumbers = getIdList(requestInfo, tenantId, config.getApplicationNoIdgenName(), 1);
 		ListIterator<String> itr = applicationNumbers.listIterator();

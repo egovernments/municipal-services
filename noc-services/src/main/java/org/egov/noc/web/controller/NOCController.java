@@ -45,12 +45,15 @@ import javax.validation.Valid;
 
 import org.egov.noc.config.ResponseInfoFactory;
 import org.egov.noc.service.NOCService;
-import org.egov.noc.web.model.NOC;
-import org.egov.noc.web.model.NOCRequest;
-import org.egov.noc.web.model.NOCResponse;
+import org.egov.noc.web.model.Noc;
+import org.egov.noc.web.model.NocRequest;
+import org.egov.noc.web.model.NocResponse;
+import org.egov.noc.web.model.NocSearchCriteria;
+import org.egov.noc.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,10 +70,22 @@ public class NOCController {
 	private NOCService nocService;
 
 	@PostMapping(value = "/_create")
-	public ResponseEntity<NOCResponse> create(@Valid @RequestBody NOCRequest nocRequest) {
-		List<NOC> nocList = nocService.create(nocRequest);
-		NOCResponse response = NOCResponse.builder().noc(nocList)
+	public ResponseEntity<NocResponse> create(@Valid @RequestBody NocRequest nocRequest) {
+		List<Noc> nocList = nocService.create(nocRequest);
+		NocResponse response = NocResponse.builder().noc(nocList)
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(nocRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/_search")
+	public ResponseEntity<NocResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute NocSearchCriteria criteria) {
+
+		List<Noc> nocList = nocService.search(criteria);
+
+		NocResponse response = NocResponse.builder().noc(nocList).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
