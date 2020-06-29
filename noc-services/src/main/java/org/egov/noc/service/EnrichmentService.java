@@ -10,15 +10,21 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.IdGenRepository;
+import org.egov.noc.util.NOCConstants;
 import org.egov.noc.util.NOCUtil;
 import org.egov.noc.web.model.AuditDetails;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.idgen.IdResponse;
+import org.egov.noc.web.model.workflow.BusinessService;
+import org.egov.noc.web.model.workflow.State;
+import org.egov.noc.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
 @Service
 public class EnrichmentService {
@@ -32,6 +38,9 @@ public class EnrichmentService {
 
 	@Autowired
 	private IdGenRepository idGenRepository;
+	
+	@Autowired
+	private WorkflowService workflowService;
 	
 	public void enrichCreateRequest(NocRequest nocRequest, Object mdmsData) {
 		RequestInfo requestInfo = nocRequest.getRequestInfo();
@@ -67,5 +76,61 @@ public class EnrichmentService {
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}	
+	
+	public void enrichNocUpdateRequest(NocRequest nocRequest, Noc searchResult) {
+
+		RequestInfo requestInfo = nocRequest.getRequestInfo();
+		AuditDetails auditDetails = nocUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);		
+		nocRequest.getNoc().setAuditDetails(auditDetails);
+		nocRequest.getNoc().getAuditDetails().setLastModifiedTime(auditDetails.getLastModifiedTime());
+		
+		// Noc Documents
+		if (!CollectionUtils.isEmpty(nocRequest.getNoc().getDocuments()))
+			nocRequest.getNoc().getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+			});
+		if (!CollectionUtils.isEmpty(nocRequest.getNoc().getWorkflow().getDocuments())) {
+			nocRequest.getNoc().getWorkflow().getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+			});
+		}
+		nocRequest.getNoc().setApplicationNo(searchResult.getApplicationNo());
+		nocRequest.getNoc().getAuditDetails()
+				.setCreatedBy(searchResult.getAuditDetails().getCreatedBy());
+		nocRequest.getNoc().getAuditDetails()
+				.setCreatedTime(searchResult.getAuditDetails().getCreatedTime());
+
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void postStatusEnrichment(NocRequest nocRequest) {
+		Noc noc = nocRequest.getNoc();
+
+		BusinessService businessService = workflowService.getBusinessService(noc, nocRequest.getRequestInfo());
+		
+		State stateObj = workflowService.getCurrentState(noc.getApplicationStatus(), businessService);
+		String state = stateObj!=null ? stateObj.getState() : StringUtils.EMPTY;
+		
+		
+		if (state.equalsIgnoreCase(NOCConstants.APPROVED_STATE)) {
+			
+			Map<String, Object> additionalDetail = null;
+			if(noc.getAdditionalDetails() != null) {
+				additionalDetail = (Map) noc.getAdditionalDetails();
+			} else {
+				additionalDetail = new HashMap<String, Object>();
+				noc.setAdditionalDetails(additionalDetail);
+			}
+
+			List<IdResponse> idResponses = idGenRepository.getId(nocRequest.getRequestInfo(), noc.getTenantId(),
+					config.getApplicationNoIdgenName(), 1).getIdResponses();
+			noc.setNocNo(idResponses.get(0).getId());
+		}
+	  }
+		
 
 }

@@ -78,6 +78,15 @@ public class NOCController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/_update")
+	public ResponseEntity<NocResponse> update(@Valid @RequestBody NocRequest nocRequest) {
+		List<Noc> nocList = nocService.update(nocRequest);
+		NocResponse response = NocResponse.builder().noc(nocList)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(nocRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
 	@PostMapping(value = "/_search")
 	public ResponseEntity<NocResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute NocSearchCriteria criteria) {

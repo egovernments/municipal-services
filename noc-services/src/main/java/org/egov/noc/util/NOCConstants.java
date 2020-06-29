@@ -21,6 +21,8 @@ public class NOCConstants {
 
 	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
 
+	public static final String APPROVED_STATE = "APPROVED";	
 	
+	public static final String ACTION_APPROVE = "APPROVE";	
 
 }

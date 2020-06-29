@@ -92,6 +92,12 @@ public class NOCConfiguration {
 	@Value("${persister.save.noc.topic}")
 	private String saveTopic;
 	
+	@Value("${persister.update.noc.topic}")
+	private String updateTopic;
+	
+	@Value("${persister.update.noc.workflow.topic}")
+	private String updateWorkflowTopic;
+	
 	@Value("${egov.noc.pagination.default.limit}")
 	private Integer defaultLimit;
 
