@@ -141,6 +141,5 @@ public class WorkflowIntegrator {
 		});
 		// setting the status back to NOC object from wf response
 		noc.setApplicationStatus(idStatusMap.get(noc.getApplicationNo()));
-
 	}
 }

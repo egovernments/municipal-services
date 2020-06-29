@@ -36,6 +36,14 @@ public class NOCRepository {
 		producer.push(config.getSaveTopic(), nocRequest);
 	}
 	
+	public void update(NocRequest nocRequest, boolean isStateUpdatable) {		
+		if (isStateUpdatable) {
+			producer.push(config.getUpdateTopic(), nocRequest);
+		} else {
+		    producer.push(config.getUpdateWorkflowTopic(), nocRequest);
+		}
+	}
+	
 	public List<Noc> getNocData(NocSearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getNocSearchQuery(criteria, preparedStmtList);
