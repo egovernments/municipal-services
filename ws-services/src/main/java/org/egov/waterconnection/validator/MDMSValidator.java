@@ -1,14 +1,7 @@
 package org.egov.waterconnection.validator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
@@ -23,9 +16,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.jayway.jsonpath.JsonPath;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -48,22 +41,31 @@ public class MDMSValidator {
 	 * @param request
 	 */
 	public void validateMasterData(WaterConnectionRequest request) {
-		if (request.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION_CONST)) {
+		if (request.getWaterConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION_CONST)) {
 			String jsonPath = WCConstants.JSONPATH_ROOT;
 			String taxjsonPath = WCConstants.TAX_JSONPATH_ROOT;
 			String tenantId = request.getWaterConnection().getTenantId();
-			List<String> names = new ArrayList<>(Arrays.asList(WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
-					WCConstants.MDMS_WC_Water_Source));
-			List<String> taxModelnames = new ArrayList<>(Arrays.asList(WCConstants.WC_ROADTYPE_MASTER));
+			List<String> names = new ArrayList<>(Arrays.asList(WCConstants.MDMS_WC_CONNECTION_TYPE,
+					WCConstants.MDMS_WC_CONNECTION_CATEGORY, WCConstants.MDMS_WC_WATER_SOURCE));
 			Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names,
 					"$.*.code", jsonPath, request.getRequestInfo());
+			List<String> taxModelnames = new ArrayList<>(Arrays.asList(WCConstants.WC_ROADTYPE_MASTER));
 			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(tenantId, WCConstants.WS_TAX_MODULE,
 					taxModelnames, "$.*.code", taxjsonPath, request.getRequestInfo());
-			
-			//merge codes
-			String[] finalmasterNames = { WCConstants.MDMS_WC_Connection_Type, WCConstants.MDMS_WC_Connection_Category,
-					WCConstants.MDMS_WC_Water_Source, WCConstants.WC_ROADTYPE_MASTER };
-			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+
+			// calling property related master
+			List<String> propertyModuleMasters = new ArrayList<>(Arrays.asList(WCConstants.PROPERTY_OWNERTYPE));
+			Map<String, List<String>> codesFromPropetyMasters = getAttributeValues(tenantId,
+					WCConstants.PROPERTY_MASTER_MODULE, propertyModuleMasters, "$.*.code",
+					WCConstants.PROPERTY_JSONPATH_ROOT, request.getRequestInfo());
+			// merge codes
+			String[] finalmasterNames = { WCConstants.MDMS_WC_CONNECTION_TYPE, WCConstants.MDMS_WC_CONNECTION_CATEGORY,
+					WCConstants.MDMS_WC_WATER_SOURCE, WCConstants.WC_ROADTYPE_MASTER, WCConstants.PROPERTY_OWNERTYPE};
+			Map<String, List<String>> wscodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+			Map<String, List<String>> finalcodes = Stream.of(wscodes, codesFromPropetyMasters).map(Map::entrySet)
 					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 			validateMDMSData(finalmasterNames, finalcodes);
 			validateCodes(request.getWaterConnection(), finalcodes);
@@ -97,26 +99,24 @@ public class MDMSValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-	
+
 	/**
 	 * validateCodes will validate for given fields and return error map if codes are not matching
-	 * 
+	 *
 	 * @param waterConnection
 	 * @param codes
-	 * @param errorMap
-	 * @return error map for given fields
 	 */
 	private void validateCodes(WaterConnection waterConnection, Map<String, List<String>> codes) {
 		Map<String, String> errorMap = new HashMap<>();
 		StringBuilder messageBuilder = new StringBuilder();
 		if (!StringUtils.isEmpty(waterConnection.getConnectionType())
-				&& !codes.get(WCConstants.MDMS_WC_Connection_Type).contains(waterConnection.getConnectionType())) {
+				&& !codes.get(WCConstants.MDMS_WC_CONNECTION_TYPE).contains(waterConnection.getConnectionType())) {
 			messageBuilder = new StringBuilder();
 			messageBuilder.append("Connection type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_CONNECTION_TYPE", messageBuilder.toString());
 		}
 		if (!StringUtils.isEmpty(waterConnection.getWaterSource())
-				&& !codes.get(WCConstants.MDMS_WC_Water_Source).contains(waterConnection.getWaterSource())) {
+				&& !codes.get(WCConstants.MDMS_WC_WATER_SOURCE).contains(waterConnection.getWaterSource())) {
 			messageBuilder = new StringBuilder();
 			messageBuilder.append("Water Source / Water Sub Source value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_CONNECTION_SOURCE", messageBuilder.toString());
@@ -127,7 +127,15 @@ public class MDMSValidator {
 			messageBuilder.append("Road type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_ROAD_TYPE", messageBuilder.toString());
 		}
-
+		if (!CollectionUtils.isEmpty(waterConnection.getConnectionHolders())) {
+			waterConnection.getConnectionHolders().forEach(holderDetail -> {
+				if (!StringUtils.isEmpty(holderDetail.getOwnerType())
+						&& !codes.get(WCConstants.PROPERTY_OWNERTYPE).contains(holderDetail.getOwnerType())) {
+					errorMap.put("INVALID CONNECTION HOLDER TYPE",
+							"The OwnerType '" + holderDetail.getOwnerType() + "' does not exists");
+				}
+			});
+		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
