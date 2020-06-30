@@ -5,16 +5,14 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.MeterConnectionRequest;
-import org.egov.waterconnection.model.MeterReading;
-import org.egov.waterconnection.model.MeterReading.MeterStatusEnum;
-import org.egov.waterconnection.model.MeterReadingResponse;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.MeterConnectionRequest;
+import org.egov.waterconnection.web.models.MeterReading;
+import org.egov.waterconnection.web.models.MeterReading.MeterStatusEnum;
+import org.egov.waterconnection.web.models.MeterReadingResponse;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,15 +73,14 @@ public class MeterReadingService {
 		}
 	}
 
-	private String getBillingPeriod(Long connectionExcecutionDate) {
-		int noLength = (int) (Math.log10(connectionExcecutionDate) + 1);
-		LocalDate currentdate = Instant
-				.ofEpochMilli(noLength > 10 ? connectionExcecutionDate : connectionExcecutionDate * 1000)
+	private String getBillingPeriod(Long connectionExecutionDate) {
+		int noLength = (int) (Math.log10(connectionExecutionDate) + 1);
+		LocalDate currentDate = Instant
+				.ofEpochMilli(noLength > 10 ? connectionExecutionDate : connectionExecutionDate * 1000)
 				.atZone(ZoneId.systemDefault()).toLocalDate();
-		LocalDate startingDate = currentdate, endDate = currentdate;
 		StringBuilder builder = new StringBuilder();
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		return builder.append(startingDate.format(formatter)).append(" - ").append(endDate.format(formatter))
+		return builder.append(currentDate.format(formatter)).append(" - ").append(currentDate.format(formatter))
 				.toString();
 	}
 }

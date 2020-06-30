@@ -13,8 +13,8 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,14 +71,14 @@ public class MDMSValidator {
 	}
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
-			String filter, String jsonpath, RequestInfo requestInfo) {
+			String filter, String jsonPath, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
 		MdmsCriteriaReq criteriaReq = waterServicesUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
 				requestInfo);
 		try {
 
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
-			return JsonPath.read(result, jsonpath);
+			return JsonPath.read(result, jsonPath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(WCConstants.INVALID_CONNECTION_TYPE, WCConstants.INVALID_CONNECTION_TYPE);
@@ -101,9 +101,8 @@ public class MDMSValidator {
 	/**
 	 * validateCodes will validate for given fields and return error map if codes are not matching
 	 * 
-	 * @param waterConnection
-	 * @param codes
-	 * @param errorMap
+	 * @param waterConnection WaterConnection Object
+	 * @param codes List of codes
 	 * @return error map for given fields
 	 */
 	private void validateCodes(WaterConnection waterConnection, Map<String, List<String>> codes) {

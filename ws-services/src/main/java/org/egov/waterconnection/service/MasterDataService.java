@@ -32,8 +32,8 @@ public class MasterDataService {
 
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param tenantId
+	 * @param requestInfo RequestInfo Object
+	 * @param tenantId Tenant Id
 	 * @return MdmsCriteria
 	 */
 	private MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
@@ -50,9 +50,8 @@ public class MasterDataService {
 	
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param connectionType
-	 * @param tenantId
+	 * @param requestInfo RequestInfo Object
+	 * @param tenantId Tenant Id
 	 * @return Master For Billing Period
 	 */
 	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId) {

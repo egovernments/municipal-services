@@ -9,13 +9,13 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.AuditDetails;
-import org.egov.waterconnection.model.Connection.StatusEnum;
-import org.egov.waterconnection.model.Document;
-import org.egov.waterconnection.model.PlumberInfo;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.enums.Status;
-import org.egov.waterconnection.model.workflow.ProcessInstance;
+import org.egov.waterconnection.web.models.AuditDetails;
+import org.egov.waterconnection.web.models.Connection.StatusEnum;
+import org.egov.waterconnection.web.models.Document;
+import org.egov.waterconnection.web.models.PlumberInfo;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.enums.Status;
+import org.egov.waterconnection.web.models.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -97,7 +97,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
 			applicationDocument.setFileStoreId(rs.getString("filestoreid"));
 			applicationDocument.setDocumentUid(rs.getString("doc_Id"));
-			applicationDocument.setStatus(org.egov.waterconnection.model.Status.fromValue(isActive));
+			applicationDocument.setStatus(org.egov.waterconnection.web.models.Status.fromValue(isActive));
 			waterConnection.addDocumentsItem(applicationDocument);
 		}
 		String plumber_id = rs.getString("plumber_id");

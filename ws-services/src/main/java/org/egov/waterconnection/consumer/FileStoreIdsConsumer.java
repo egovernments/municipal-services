@@ -2,7 +2,7 @@ package org.egov.waterconnection.consumer;
 
 import java.util.HashMap;
 
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.service.PdfFileStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -27,10 +27,10 @@ public class FileStoreIdsConsumer {
 	/**
 	 * Water connection object
 	 * 
-	 * @param record
-	 * @param topic
+	 * @param record Received Topic Record in HashMap format
+	 * @param topic Name of the Topic
 	 */
-	@KafkaListener(topics = { "${ws.consume.filestoreids}" })
+	@KafkaListener(topics = { "${ws.consume.filestoreids.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);

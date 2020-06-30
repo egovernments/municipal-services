@@ -3,7 +3,7 @@ package org.egov.waterconnection.consumer;
 import java.util.HashMap;
 
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.service.MeterReadingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -32,7 +32,7 @@ public class MeterReadingConsumer {
 	 * @param record
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${ws.meterreading.create}" })
+	@KafkaListener(topics = { "${ws.meterreading.create.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			log.info("Received request to add Meter Reading on topic - " + topic);

@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.CalculationCriteria;
-import org.egov.waterconnection.model.CalculationReq;
-import org.egov.waterconnection.model.CalculationRes;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.CalculationCriteria;
+import org.egov.waterconnection.web.models.CalculationReq;
+import org.egov.waterconnection.web.models.CalculationRes;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;

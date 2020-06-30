@@ -2,7 +2,7 @@ package org.egov.waterconnection.consumer;
 
 import java.util.HashMap;
 
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.service.WorkflowNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,7 +30,7 @@ public class WorkflowNotificationConsumer {
 	 * @param record
 	 * @param topic
 	 */
-	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection}" ,"${egov.waterservice.updatewaterconnection}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
+	@KafkaListener(topics = { "${egov.waterservice.createwaterconnection.topic}" ,"${egov.waterservice.updatewaterconnection.topic}", "${egov.waterservice.updatewaterconnection.workflow.topic}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);

@@ -3,8 +3,8 @@ package org.egov.waterconnection.validator;
 import java.util.Optional;
 
 import org.egov.tracer.model.CustomException;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,11 @@ public class ValidateProperty {
 	
 	/**
 	 * 
-	 * @param waterConnectionRequest WaterConnectionRequest is request to be validated against property
+	 * @param property Property Objects
 	 */
 	public void validatePropertyCriteria(Property property) {
 		if (StringUtils.isEmpty(property.getPropertyId())) {
-			throw new CustomException("INVALID PROPERTY", "WaterConnection cannot be updated without propertyId");
+			throw new CustomException("INVALID_PROPERTY", "WaterConnection cannot be updated without PropertyId");
 		}
 	}
 
@@ -33,12 +33,12 @@ public class ValidateProperty {
 	public Property getOrValidateProperty(WaterConnectionRequest waterConnectionRequest) {
 		Optional<Property> propertyList = waterServiceUtil.propertySearch(waterConnectionRequest).stream().findFirst();
 		if (!propertyList.isPresent()) {
-			throw new CustomException("INVALID WATER CONNECTION PROPERTY",
-					"Water connection cannot be enriched without property");
+			throw new CustomException("INVALID_PROPERTY",
+					"Water connection cannot be enriched without PropertyId");
 		}
 		Property property = propertyList.get();
 		if (StringUtils.isEmpty(property.getUsageCategory())) {
-			throw new CustomException("INVALID WATER CONNECTION PROPERTY USAGE TYPE",
+			throw new CustomException("INVALID_PROPERTY_USAGE_TYPE",
 					"Water connection cannot be enriched without property usage type");
 		}
 		return property;

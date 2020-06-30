@@ -13,14 +13,14 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.AuditDetails;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.PropertyCriteria;
-import org.egov.waterconnection.model.PropertyResponse;
-import org.egov.waterconnection.model.RequestInfoWrapper;
-import org.egov.waterconnection.model.SearchCriteria;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.workflow.BusinessService;
+import org.egov.waterconnection.web.models.AuditDetails;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.PropertyCriteria;
+import org.egov.waterconnection.web.models.PropertyResponse;
+import org.egov.waterconnection.web.models.RequestInfoWrapper;
+import org.egov.waterconnection.web.models.SearchCriteria;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.workflow.BusinessService;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +104,7 @@ public class WaterServicesUtil {
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
-			throw new CustomException("INCORRECT PROPERTY ID", "WATER CONNECTION CAN NOT BE CREATED");
+			throw new CustomException("INCORRECT_PROPERTY_ID", "Incorrect Property Id. Water Connection cannot be created.");
 		}
 		return propertyList;
 	}
@@ -139,10 +139,9 @@ public class WaterServicesUtil {
 	}
 	
 	/**
-	 * 
-	 * @param tenantId
-	 * @param propertyId
-	 * @param requestInfo
+	 *
+	 * @param criteria PropertyCriteria object with Search params
+	 * @param requestInfo RequestInfo Object
 	 * @return List of Property
 	 */
 	public List<Property> searchPropertyOnId(PropertyCriteria criteria, RequestInfo requestInfo) {
@@ -162,7 +161,7 @@ public class WaterServicesUtil {
 			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
 			return propertyResponse.getProperties();
 		} catch (Exception ex) {
-			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}
 
@@ -224,8 +223,8 @@ public class WaterServicesUtil {
 	
 	/**
 	 *
-	 * @param businessService
-	 * @param searchresult
+	 * @param businessService BusinessService Object
+	 * @param applicationStatus ApplicationStatus
 	 * @return true if state updatable is true else false
 	 */
 	public boolean getStatusForUpdate(BusinessService businessService, String applicationStatus) {
@@ -264,7 +263,7 @@ public class WaterServicesUtil {
 		obj.put(URL, actualURL);
 		String url = config.getNotificationUrl() + config.getShortenerURL();
 		
-		Object response = serviceRequestRepository.getShortningURL(new StringBuilder(url), obj);
+		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
 		return response.toString();
 	}
 }

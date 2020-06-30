@@ -10,12 +10,12 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.Calculation;
-import org.egov.waterconnection.model.CalculationCriteria;
-import org.egov.waterconnection.model.CalculationReq;
-import org.egov.waterconnection.model.CalculationRes;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.Calculation;
+import org.egov.waterconnection.web.models.CalculationCriteria;
+import org.egov.waterconnection.web.models.CalculationReq;
+import org.egov.waterconnection.web.models.CalculationRes;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -79,13 +79,14 @@ public class PdfFileStoreService {
 	
 
 	/**
-	 * Get fileStroe Id's
+	 * Get fileStore Id's
 	 * 
-	 * @param waterConnection
-	 * @param requestInfo
+	 * @param waterConnectionRequest WaterConnectionRequest Object
+	 * @param property Property Object
+	 * @param applicationKey ApplicationKey
 	 * @return file store id
 	 */
-	public String getFileStroeId(WaterConnectionRequest waterConnectionRequest, Property property, String applicationKey) {
+	public String getFileStoreId(WaterConnectionRequest waterConnectionRequest, Property property, String applicationKey) {
 		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(waterConnectionRequest.getWaterConnection().getApplicationNo())
 				.waterConnection(waterConnectionRequest.getWaterConnection()).tenantId(property.getTenantId()).build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
@@ -96,7 +97,7 @@ public class PdfFileStoreService {
 		try {
 			Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
-			JSONObject waterobject = mapper.convertValue(waterConnectionRequest.getWaterConnection(), JSONObject.class);
+			JSONObject waterObject = mapper.convertValue(waterConnectionRequest.getWaterConnection(), JSONObject.class);
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
@@ -104,29 +105,29 @@ public class PdfFileStoreService {
 			Optional<Calculation> calculationList = calResponse.getCalculation().stream().findFirst();
 			if(calculationList.isPresent()) {
 				Calculation cal = calculationList.get();
-				waterobject.put(totalAmount, cal.getTotalAmount());
-				waterobject.put(applicationFee, cal.getFee());
-				waterobject.put(serviceFee, cal.getCharge());
-				waterobject.put(tax, cal.getTaxAmount());
+				waterObject.put(totalAmount, cal.getTotalAmount());
+				waterObject.put(applicationFee, cal.getFee());
+				waterObject.put(serviceFee, cal.getCharge());
+				waterObject.put(tax, cal.getTaxAmount());
 				cal.getTaxHeadEstimates().forEach(item -> {
 					//We need to remove WS_ --> So that PDF configuration refers the common for both Water & Sewerage
 					item.setTaxHeadCode(item.getTaxHeadCode().substring(3));
 				});
-				waterobject.put(pdfTaxhead, cal.getTaxHeadEstimates());
+				waterObject.put(pdfTaxhead, cal.getTaxHeadEstimates());
 			}
-			waterobject.put(sanctionLetterDate, System.currentTimeMillis());
+			waterObject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo(),applicationStatus);
-			waterobject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
-			waterobject.put(slaDate, slaDays.add(new BigDecimal(System.currentTimeMillis())));
+			waterObject.put(sla, slaDays.divide(BigDecimal.valueOf(WCConstants.DAYS_CONST)));
+			waterObject.put(slaDate, slaDays.add(new BigDecimal(System.currentTimeMillis())));
 			String[] tenantDetails = property.getTenantId().split("\\."); 
 			String tenantId = tenantDetails[0];
 			if(tenantDetails.length > 1)
 			{
-				waterobject.put(tenantName, tenantDetails[1].toUpperCase());
+				waterObject.put(tenantName, tenantDetails[1].toUpperCase());
 			}
-			waterobject.put(propertyKey, property);
-			waterobject.put(service, "WATER");
-			return getFielStoreIdFromPDFService(waterobject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
+			waterObject.put(propertyKey, property);
+			waterObject.put(service, "WATER");
+			return getFileStoreIdFromPDFService(waterObject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
@@ -136,18 +137,19 @@ public class PdfFileStoreService {
 	/**
 	 * Get file store id from PDF service
 	 * 
-	 * @param waterobject
-	 * @param requestInfo
-	 * @param tenantId
+	 * @param waterObject WaterConnection Json Object
+	 * @param requestInfo RequestInfo
+	 * @param tenantId Tenant Id
+	 * @param applicationKey Application Key String
 	 * @return file store id
 	 */
-	private String getFielStoreIdFromPDFService(JSONObject waterobject, RequestInfo requestInfo, String tenantId,
-			String applicationKey) {
-		JSONArray waterconnectionlist = new JSONArray();
-		waterconnectionlist.add(waterobject);
+	private String getFileStoreIdFromPDFService(JSONObject waterObject, RequestInfo requestInfo, String tenantId,
+												String applicationKey) {
+		JSONArray waterConnectionList = new JSONArray();
+		waterConnectionList.add(waterObject);
 		JSONObject requestPayload = new JSONObject();
 		requestPayload.put(requestInfoReplacer, requestInfo);
-		requestPayload.put(WaterConnectionReplacer, waterconnectionlist);
+		requestPayload.put(WaterConnectionReplacer, waterConnectionList);
 		try {
 			StringBuilder builder = new StringBuilder();
 			builder.append(config.getPdfServiceHost());
@@ -180,13 +182,13 @@ public class PdfFileStoreService {
 				&& addDetail.getOrDefault(WCConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			addDetail.put(WCConstants.ESTIMATION_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest, property, WCConstants.PDF_ESTIMATION_KEY));
+					getFileStoreId(waterConnectionRequest, property, WCConstants.PDF_ESTIMATION_KEY));
 		}
 		if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(WCConstants.ACTION_PAY)
 				&& addDetail.getOrDefault(WCConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(WCConstants.SANCTION_LETTER_FILESTORE_ID,
-					getFileStroeId(waterConnectionRequest, property, WCConstants.PDF_SANCTION_KEY));
+					getFileStoreId(waterConnectionRequest, property, WCConstants.PDF_SANCTION_KEY));
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(addDetail);
 		waterDao.saveFileStoreIds(waterConnectionRequest);

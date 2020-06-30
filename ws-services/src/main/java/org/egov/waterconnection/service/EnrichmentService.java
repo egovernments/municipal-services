@@ -13,12 +13,12 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.AuditDetails;
-import org.egov.waterconnection.model.Connection.StatusEnum;
-import org.egov.waterconnection.model.Status;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.Idgen.IdResponse;
+import org.egov.waterconnection.web.models.AuditDetails;
+import org.egov.waterconnection.web.models.Connection.StatusEnum;
+import org.egov.waterconnection.web.models.Status;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.Idgen.IdResponse;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -55,7 +55,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich water connection
 	 * 
-	 * @param waterConnectionRequest
+	 * @param waterConnectionRequest WaterConnection Object
 	 */
 	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		AuditDetails auditDetails = waterServicesUtil
@@ -67,7 +67,7 @@ public class EnrichmentService {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 	    additionalDetail.put(WCConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
 	    waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
-		setApplicationIdgenIds(waterConnectionRequest);
+		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
 		
 	}
@@ -107,7 +107,7 @@ public class EnrichmentService {
 	 * @param request
 	 *            WaterConnectionRequest which is to be created
 	 */
-	private void setApplicationIdgenIds(WaterConnectionRequest request) {
+	private void setApplicationIdGenIds(WaterConnectionRequest request) {
 		WaterConnection waterConnection = request.getWaterConnection();
 		List<String> applicationNumbers = getIdList(request.getRequestInfo(),
 				request.getWaterConnection().getTenantId(), config.getWaterApplicationIdGenName(),
@@ -115,14 +115,14 @@ public class EnrichmentService {
 		if (applicationNumbers.size() != 1) {
 			Map<String, String> errorMap = new HashMap<>();
 			errorMap.put("IDGEN_ERROR",
-					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+					"The Id of WaterConnection returned by IdGen is not equal to number of WaterConnection");
 			throw new CustomException(errorMap);
 		}
 		waterConnection.setApplicationNo(applicationNumbers.get(0));
 	}
 
-	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat) {
-		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, 1)
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idFormat) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idFormat, 1)
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
@@ -135,7 +135,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich update water connection
 	 * 
-	 * @param waterConnectionRequest
+	 * @param waterConnectionRequest WaterConnectionRequest Object
 	 */
 	public void enrichUpdateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		AuditDetails auditDetails = waterServicesUtil
@@ -166,45 +166,45 @@ public class EnrichmentService {
 	/**
 	 * Enrich water connection request and add connection no if status is approved
 	 * 
-	 * @param waterConnectionrequest 
+	 * @param waterConnectionRequest WaterConnectionRequest Object
 	 */
-	public void postStatusEnrichment(WaterConnectionRequest waterConnectionrequest) {
+	public void postStatusEnrichment(WaterConnectionRequest waterConnectionRequest) {
 		if (WCConstants.ACTIVATE_CONNECTION
-				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
-			setConnectionNO(waterConnectionrequest);
+				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			setConnectionNO(waterConnectionRequest);
 		}
 	}
 	
 	/**
 	 * Create meter reading for meter connection
 	 * 
-	 * @param waterConnectionrequest
+	 * @param waterConnectionRequest WaterConnectionRequest Object
 	 */
-	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest) {
+	public void postForMeterReading(WaterConnectionRequest waterConnectionRequest) {
 		if (WCConstants.ACTIVATE_CONNECTION
-				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
-			waterDao.postForMeterReading(waterConnectionrequest);
+				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			waterDao.postForMeterReading(waterConnectionRequest);
 		}
 	}
     
     
     /**
      * Enrich water connection request and set water connection no
-     * @param request
+     * @param request WaterConnectionRequest Object
      */
 	private void setConnectionNO(WaterConnectionRequest request) {
 		List<String> connectionNumbers = getIdList(request.getRequestInfo(), request.getWaterConnection().getTenantId(),
 				config.getWaterConnectionIdGenName(), config.getWaterConnectionIdGenFormat());
 		if (connectionNumbers.size() != 1) {
 			throw new CustomException("IDGEN_ERROR",
-					"The Id of WaterConnection returned by idgen is not equal to number of WaterConnection");
+					"The Id of WaterConnection returned by IdGen is not equal to number of WaterConnection");
 		}
 		request.getWaterConnection().setConnectionNo(connectionNumbers.get(0));
 	}
 	/**
 	 * Enrich fileStoreIds
 	 * 
-	 * @param waterConnectionRequest
+	 * @param waterConnectionRequest WaterConnectionRequest Object
 	 */
 	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
 		try {
@@ -222,7 +222,7 @@ public class EnrichmentService {
 	/**
 	 * Sets status for create request
 	 * 
-	 * @param WaterConnectionRequest
+	 * @param waterConnectionRequest
 	 *            The create request
 	 */
 	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {

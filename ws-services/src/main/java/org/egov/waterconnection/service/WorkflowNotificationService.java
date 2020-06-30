@@ -1,6 +1,5 @@
 package org.egov.waterconnection.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,21 +14,21 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.Action;
-import org.egov.waterconnection.model.ActionItem;
-import org.egov.waterconnection.model.CalculationCriteria;
-import org.egov.waterconnection.model.CalculationReq;
-import org.egov.waterconnection.model.CalculationRes;
-import org.egov.waterconnection.model.Event;
-import org.egov.waterconnection.model.EventRequest;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.Recepient;
-import org.egov.waterconnection.model.SMSRequest;
-import org.egov.waterconnection.model.Source;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.workflow.BusinessService;
-import org.egov.waterconnection.model.workflow.State;
+import org.egov.waterconnection.web.models.Action;
+import org.egov.waterconnection.web.models.ActionItem;
+import org.egov.waterconnection.web.models.CalculationCriteria;
+import org.egov.waterconnection.web.models.CalculationReq;
+import org.egov.waterconnection.web.models.CalculationRes;
+import org.egov.waterconnection.web.models.Event;
+import org.egov.waterconnection.web.models.EventRequest;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.Recepient;
+import org.egov.waterconnection.web.models.SMSRequest;
+import org.egov.waterconnection.web.models.Source;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.workflow.BusinessService;
+import org.egov.waterconnection.web.models.workflow.State;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.NotificationUtil;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -73,7 +72,6 @@ public class WorkflowNotificationService {
 	private ValidateProperty validateProperty;
 	
 	String tenantIdReplacer = "$tenantId";
-	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
 	String WaterConnectionReplacer = "WaterConnection";
@@ -92,7 +90,7 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param record record is bill response.
+	 * @param request record is bill response.
 	 * @param topic topic is bill generation topic for water.
 	 */
 	public void process(WaterConnectionRequest request, String topic) {
@@ -126,9 +124,10 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param waterConnection
-	 * @param topic
-	 * @param requestInfo
+	 * @param request Water Connection Request
+	 * @param topic Topic Name
+	 * @param property Property Object
+	 * @param applicationStatus Application Status
 	 * @return EventRequest Object
 	 */
 	private EventRequest getEventRequest(WaterConnectionRequest request, String topic, Property property, String applicationStatus) {
@@ -145,30 +144,30 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, request,
+		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames, request,
 				message, property);
-		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), property.getTenantId());
+		Set<String> mobileNumbers = mobileNumberAndMessage.keySet().stream().collect(Collectors.toSet());
+		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), property.getTenantId());
 //		Map<String, String> mapOfPhnoAndUUIDs = waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
 
-		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+		if (CollectionUtils.isEmpty(mapOfPhoneNoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
 		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
-			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
+			if (null == mapOfPhoneNoAndUUIDs.get(mobile) || null == mobileNumberAndMessage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
 				continue;
 			}
 			List<String> toUsers = new ArrayList<>();
-			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+			toUsers.add(mapOfPhoneNoAndUUIDs.get(mobile));
 			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
 			// List<String> payTriggerList =
 			// Arrays.asList(config.getPayTriggers().split("[,]"));
 
-			Action  action = getActionForEventNotification(mobileNumberAndMesssage, mobile, request, property);
+			Action  action = getActionForEventNotification(mobileNumberAndMessage, mobile, request, property);
 			events.add(Event.builder().tenantId(property.getTenantId())
-					.description(mobileNumberAndMesssage.get(mobile)).eventType(WCConstants.USREVENTS_EVENT_TYPE)
+					.description(mobileNumberAndMessage.get(mobile)).eventType(WCConstants.USREVENTS_EVENT_TYPE)
 					.name(WCConstants.USREVENTS_EVENT_NAME).postedBy(WCConstants.USREVENTS_EVENT_POSTEDBY)
 					.source(Source.WEBAPP).recepient(recepient).eventDetails(null).actions(action).build());
 		}
@@ -181,13 +180,15 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param messageTemplate
-	 * @param connection
+	 * @param mobileNumberAndMessage List of Mobile Numbers and messages
+	 * @param mobileNumber MobileNumber
+	 * @param connectionRequest Connection Request
+	 * @param property Property
 	 * @return return action link
 	 */
-	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
+	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMessage,
 			String mobileNumber, WaterConnectionRequest connectionRequest, Property property) {
-		String messageTemplate = mobileNumberAndMesssage.get(mobileNumber);
+		String messageTemplate = mobileNumberAndMessage.get(mobileNumber);
 		List<ActionItem> items = new ArrayList<>();
 		if (messageTemplate.contains("<Action Button>")) {
 			String code = StringUtils.substringBetween(messageTemplate, "<Action Button>", "</Action Button>");
@@ -215,18 +216,18 @@ public class WorkflowNotificationService {
 			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
-			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
+			mobileNumberAndMessage.replace(mobileNumber, messageTemplate);
 		}
 		return Action.builder().actionUrls(items).build();
 	}
 	
 	/**
 	 * 
-	 * @param mappedRecord
-	 * @param waterConnection
-	 * @param topic
-	 * @param requestInfo
-	 * @return
+	 * @param waterConnectionRequest Water Connection Request
+	 * @param topic Topic Name
+	 * @param property Property Object
+	 * @param applicationStatus Application Status
+	 * @return Returns list of SMSRequest
 	 */
 	private List<SMSRequest> getSmsRequest(WaterConnectionRequest waterConnectionRequest, String topic,
 			Property property, String applicationStatus) {
@@ -256,76 +257,75 @@ public class WorkflowNotificationService {
 	
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,
 			WaterConnectionRequest waterConnectionRequest, String message, Property property) {
-		Map<String, String> messagetoreturn = new HashMap<>();
-		String messageToreplace = message;
+		Map<String, String> messageToReturn = new HashMap<>();
 		for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
-			messageToreplace = message;
-			if (messageToreplace.contains("<Owner Name>"))
-				messageToreplace = messageToreplace.replace("<Owner Name>", mobileAndName.getValue());
-			if (messageToreplace.contains("<Service>"))
-				messageToreplace = messageToreplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_NOTIFICATION);
+			String messageToReplace = message;
+			if (messageToReplace.contains("<Owner Name>"))
+				messageToReplace = messageToReplace.replace("<Owner Name>", mobileAndName.getValue());
+			if (messageToReplace.contains("<Service>"))
+				messageToReplace = messageToReplace.replace("<Service>", WCConstants.SERVICE_FIELD_VALUE_NOTIFICATION);
 
-			if (messageToreplace.contains("<Plumber Info>"))
-				messageToreplace = getMessageForPlumberInfo(waterConnectionRequest.getWaterConnection(), messageToreplace);
+			if (messageToReplace.contains("<Plumber Info>"))
+				messageToReplace = getMessageForPlumberInfo(waterConnectionRequest.getWaterConnection(), messageToReplace);
 			
-			if (messageToreplace.contains("<SLA>"))
-				messageToreplace = messageToreplace.replace("<SLA>", getSLAForState(waterConnectionRequest, property));
+			if (messageToReplace.contains("<SLA>"))
+				messageToReplace = messageToReplace.replace("<SLA>", getSLAForState(waterConnectionRequest, property));
 
-			if (messageToreplace.contains("<Application number>"))
-				messageToreplace = messageToreplace.replace("<Application number>", waterConnectionRequest.getWaterConnection().getApplicationNo());
+			if (messageToReplace.contains("<Application number>"))
+				messageToReplace = messageToReplace.replace("<Application number>", waterConnectionRequest.getWaterConnection().getApplicationNo());
 
-			if (messageToreplace.contains("<Application download link>"))
-				messageToreplace = messageToreplace.replace("<Application download link>",
-						waterServiceUtil.getShortnerURL(getApplicationDownlonadLink(waterConnectionRequest, property)));
+			if (messageToReplace.contains("<Application download link>"))
+				messageToReplace = messageToReplace.replace("<Application download link>",
+						waterServiceUtil.getShortnerURL(getApplicationDownloadLink(waterConnectionRequest, property)));
 
-			if (messageToreplace.contains("<mseva URL>"))
-				messageToreplace = messageToreplace.replace("<mseva URL>",
+			if (messageToReplace.contains("<mseva URL>"))
+				messageToReplace = messageToReplace.replace("<mseva URL>",
 						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));
 
-			if (messageToreplace.contains("<mseva app link>"))
-				messageToreplace = messageToreplace.replace("<mseva app link>",
+			if (messageToReplace.contains("<mseva app link>"))
+				messageToReplace = messageToReplace.replace("<mseva app link>",
 						waterServiceUtil.getShortnerURL(config.getMSevaAppLink()));
 
-			if (messageToreplace.contains("<View History Link>")) {
+			if (messageToReplace.contains("<View History Link>")) {
 				String historyLink = config.getNotificationUrl() + config.getViewHistoryLink();
 				historyLink = historyLink.replace(mobileNoReplacer, mobileAndName.getKey());
 				historyLink = historyLink.replace(applicationNumberReplacer, waterConnectionRequest.getWaterConnection().getApplicationNo());
 				historyLink = historyLink.replace(tenantIdReplacer, property.getTenantId());
-				messageToreplace = messageToreplace.replace("<View History Link>",
+				messageToReplace = messageToReplace.replace("<View History Link>",
 						waterServiceUtil.getShortnerURL(historyLink));
 			}
-			if (messageToreplace.contains("<payment link>")) {
+			if (messageToReplace.contains("<payment link>")) {
 				String paymentLink = config.getNotificationUrl() + config.getApplicationPayLink();
 				paymentLink = paymentLink.replace(mobileNoReplacer, mobileAndName.getKey());
 				paymentLink = paymentLink.replace(consumerCodeReplacer, waterConnectionRequest.getWaterConnection().getApplicationNo());
 				paymentLink = paymentLink.replace(tenantIdReplacer, property.getTenantId());
-				messageToreplace = messageToreplace.replace("<payment link>",
+				messageToReplace = messageToReplace.replace("<payment link>",
 						waterServiceUtil.getShortnerURL(paymentLink));
 			}
-			if (messageToreplace.contains("<receipt download link>"))
-				messageToreplace = messageToreplace.replace("<receipt download link>",
+			if (messageToReplace.contains("<receipt download link>"))
+				messageToReplace = messageToReplace.replace("<receipt download link>",
 						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));
 
-			if (messageToreplace.contains("<connection details page>")) {
+			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
 				connectionDetaislLink = connectionDetaislLink.replace(connectionNoReplacer,
 						waterConnectionRequest.getWaterConnection().getConnectionNo());
 				connectionDetaislLink = connectionDetaislLink.replace(tenantIdReplacer,
 						property.getTenantId());
-				messageToreplace = messageToreplace.replace("<connection details page>",
+				messageToReplace = messageToReplace.replace("<connection details page>",
 						waterServiceUtil.getShortnerURL(connectionDetaislLink));
 			}
-			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
+			messageToReturn.put(mobileAndName.getKey(), messageToReplace);
 		}
-		return messagetoreturn;
+		return messageToReturn;
 	}
 
 	/**
 	 * This method returns message to replace for plumber info depending upon
 	 * whether the plumber info type is either SELF or ULB
 	 * 
-	 * @param waterConnection
-	 * @param messageTemplate
+	 * @param waterConnection Water Connection Object
+	 * @param messageTemplate Message Template
 	 * @return updated messageTemplate
 	 */
 	 
@@ -343,13 +343,13 @@ public class WorkflowNotificationService {
 			} else {
 				messageTemplate = messageTemplate.replace("<Plumber Info>", "").replace("</Plumber Info>", "");
 				messageTemplate = messageTemplate.replace("<Plumber name>",
-						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getName()) == true ? ""
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getName()) ? ""
 								: waterConnection.getPlumberInfo().get(0).getName());
 				messageTemplate = messageTemplate.replace("<Plumber Licence No.>",
-						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getLicenseNo()) == true ? ""
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getLicenseNo()) ? ""
 								: waterConnection.getPlumberInfo().get(0).getLicenseNo());
 				messageTemplate = messageTemplate.replace("<Plumber Mobile No.>",
-						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getMobileNumber()) == true ? ""
+						StringUtils.isEmpty(waterConnection.getPlumberInfo().get(0).getMobileNumber()) ? ""
 								: waterConnection.getPlumberInfo().get(0).getMobileNumber());
 			}
 		  
@@ -359,10 +359,10 @@ public class WorkflowNotificationService {
 	}
 	
 	/**
-	 * Fetches SLA of CITIZENs based on the phone number.
+	 * Fetches SLA of CITIZEN based on the phone number.
 	 * 
-	 * @param waterConnection
-	 * @param requestInfo
+	 * @param connectionRequest Water Connection Request
+	 * @param property Property
 	 * @return string consisting SLA
 	 */
 
@@ -373,7 +373,7 @@ public class WorkflowNotificationService {
 		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
 			for (State state : businessService.getStates()) {
 				if (WCConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
-					resultSla = String.valueOf((state.getSla() == null ? 0l : state.getSla()) / 86400000);
+					resultSla = String.valueOf((state.getSla() == null ? 0L : state.getSla()) / 86400000);
 				}
 			}
 		}
@@ -382,15 +382,15 @@ public class WorkflowNotificationService {
 	
 	
 	/**
-     * Fetches UUIDs of CITIZENs based on the phone number.
+     * Fetches UUIDs of CITIZEN based on the phone number.
      * 
-     * @param mobileNumbers
-     * @param requestInfo
-     * @param tenantId
-     * @return
+     * @param mobileNumbers - List of Mobile Numbers
+     * @param requestInfo - Request Information
+     * @param tenantId - Tenant Id
+     * @return Returns List of MobileNumbers and UUIDs
      */
     public Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
-    	Map<String, String> mapOfPhnoAndUUIDs = new HashMap<>();
+    	Map<String, String> mapOfPhoneNoAndUUIDs = new HashMap<>();
     	StringBuilder uri = new StringBuilder();
     	uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
     	Map<String, Object> userSearchRequest = new HashMap<>();
@@ -403,27 +403,26 @@ public class WorkflowNotificationService {
     			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
     			if(null != user) {
     				String uuid = JsonPath.read(user, "$.user[0].uuid");
-    				mapOfPhnoAndUUIDs.put(mobileNo, uuid);
+    				mapOfPhoneNoAndUUIDs.put(mobileNo, uuid);
     			}else {
         			log.error("Service returned null while fetching user for username - "+mobileNo);
     			}
     		}catch(Exception e) {
     			log.error("Exception while fetching user for username - "+mobileNo);
     			log.error("Exception trace: ",e);
-    			continue;
     		}
     	}
-    	return mapOfPhnoAndUUIDs;
+    	return mapOfPhoneNoAndUUIDs;
     }
     
     /**
      * Fetch URL for application download link
      * 
-     * @param waterConnection
-     * @param requestInfo
+     * @param waterConnectionRequest Water Connection Request
+     * @param property Property
      * @return application download link
      */
-	private String getApplicationDownlonadLink(WaterConnectionRequest waterConnectionRequest, Property property) {
+	private String getApplicationDownloadLink(WaterConnectionRequest waterConnectionRequest, Property property) {
 		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(waterConnectionRequest.getWaterConnection().getApplicationNo())
 				.waterConnection(waterConnectionRequest.getWaterConnection()).tenantId(property.getTenantId()).build();
 		CalculationReq calRequest = CalculationReq.builder().calculationCriteria(Arrays.asList(criteria))
@@ -431,16 +430,16 @@ public class WorkflowNotificationService {
 		try {
 			Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
-			JSONObject waterobject = mapper.convertValue(waterConnectionRequest.getWaterConnection(), JSONObject.class);
+			JSONObject waterObject = mapper.convertValue(waterConnectionRequest.getWaterConnection(), JSONObject.class);
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
 			}
-			waterobject.put(totalAmount, calResponse.getCalculation().get(0).getTotalAmount());
-			waterobject.put(applicationFee, calResponse.getCalculation().get(0).getFee());
-			waterobject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
-			waterobject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
+			waterObject.put(totalAmount, calResponse.getCalculation().get(0).getTotalAmount());
+			waterObject.put(applicationFee, calResponse.getCalculation().get(0).getFee());
+			waterObject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
+			waterObject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
 			String tenantId = property.getTenantId().split("\\.")[0];
-			String fileStoreId = getFielStoreIdFromPDFService(waterobject, waterConnectionRequest.getRequestInfo(), tenantId);
+			String fileStoreId = getFielStoreIdFromPDFService(waterObject, waterConnectionRequest.getRequestInfo(), tenantId);
 			return getApplicationDownloadLink(tenantId, fileStoreId);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);
@@ -450,17 +449,17 @@ public class WorkflowNotificationService {
 	/**
 	 * Get file store id from PDF service
 	 * 
-	 * @param waterobject
-	 * @param requestInfo
-	 * @param tenantId
+	 * @param waterObject Water Connection Object
+	 * @param requestInfo Request Information
+	 * @param tenantId Tenant Id
 	 * @return file store id
 	 */
-	private String getFielStoreIdFromPDFService(JSONObject waterobject, RequestInfo requestInfo, String tenantId) {
-		JSONArray waterconnectionlist = new JSONArray();
-		waterconnectionlist.add(waterobject);
+	private String getFielStoreIdFromPDFService(JSONObject waterObject, RequestInfo requestInfo, String tenantId) {
+		JSONArray waterConnectionList = new JSONArray();
+		waterConnectionList.add(waterObject);
 		JSONObject requestPayload = new JSONObject();
 		requestPayload.put(requestInfoReplacer, requestInfo);
-		requestPayload.put(WaterConnectionReplacer, waterconnectionlist);
+		requestPayload.put(WaterConnectionReplacer, waterConnectionList);
 		try {
 			StringBuilder builder = new StringBuilder();
 			builder.append(config.getPdfServiceHost());
@@ -471,7 +470,7 @@ public class WorkflowNotificationService {
 			DocumentContext responseContext = JsonPath.parse(response);
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
 			if(CollectionUtils.isEmpty(fileStoreIds)) {
-				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "NO file store id found from pdf service");
+				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "File Store Id doesn't exist in pdf service");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
@@ -482,8 +481,8 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param tenantId
-	 * @param fileStoreId
+	 * @param tenantId TenantId
+	 * @param fileStoreId File Store Id
 	 * @return file store id
 	 */
 	private String getApplicationDownloadLink(String tenantId, String fileStoreId) {

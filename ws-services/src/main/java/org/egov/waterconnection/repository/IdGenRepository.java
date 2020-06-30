@@ -5,9 +5,9 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.Idgen.IdGenerationRequest;
-import org.egov.waterconnection.model.Idgen.IdGenerationResponse;
-import org.egov.waterconnection.model.Idgen.IdRequest;
+import org.egov.waterconnection.web.models.Idgen.IdGenerationRequest;
+import org.egov.waterconnection.web.models.Idgen.IdGenerationResponse;
+import org.egov.waterconnection.web.models.Idgen.IdRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
@@ -38,12 +38,12 @@ public class IdGenRepository {
 
     /**
      * Call iDgen to generateIds
-     * @param requestInfo The rquestInfo of the request
-     * @param tenantId The tenantiD of the tradeLicense
-     * @param name Name of the foramt
+     * @param requestInfo The requestInfo of the request
+     * @param tenantId The tenantId of the tradeLicense
+     * @param name Name of the format
      * @param format Format of the ids
      * @param count Total Number of idGen ids required
-     * @return
+     * @return Returns IdGen Service Response
      */
     public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId, String name, String format, int count) {
 

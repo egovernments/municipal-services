@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
@@ -29,8 +29,7 @@ public class DiffService {
 	 * Creates a list of Difference object between the update and search
 	 * 
 	 * @param request The water connection request for update
-	 * @param searchResult The searched result 
-	 * @return List of Difference object
+	 * @param searchResult The searched result
 	 */
 	public void checkDifferenceAndSendEditNotification(WaterConnectionRequest request, WaterConnection searchResult) {
 		try {
@@ -48,8 +47,8 @@ public class DiffService {
 	/**
 	 * Check updated fields
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection WaterConnection Object
+	 * @param searchResult WaterConnection Object
 	 * @return List of updated fields
 	 */
 	private List<String> getUpdateFields(WaterConnection updateConnection, WaterConnection searchResult) {
@@ -70,8 +69,8 @@ public class DiffService {
 	/**
 	 * Check for added new object
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection WaterConnection Object
+	 * @param searchResult WaterConnection Object
 	 * @return list of added object
 	 */
 	@SuppressWarnings("unchecked")
@@ -95,8 +94,8 @@ public class DiffService {
 	
 	/**
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection WaterConnection Object
+	 * @param searchResult WaterConnection Object
 	 * @return List of added or removed object
 	 */
     private List<String> getObjectsRemoved(WaterConnection updateConnection, WaterConnection searchResult) {

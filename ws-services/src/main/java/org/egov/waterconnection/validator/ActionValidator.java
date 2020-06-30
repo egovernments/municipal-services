@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.workflow.BusinessService;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.workflow.BusinessService;
 import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,8 +23,8 @@ public class ActionValidator {
 	/**
 	 * Validate update request
 	 * 
-	 * @param request
-	 * @param businessService
+	 * @param request Water Connection Request
+	 * @param businessService BusinessService
 	 */
 	public void validateUpdateRequest(WaterConnectionRequest request, BusinessService businessService, String applicationStatus) {
 		validateDocumentsForUpdate(request);
@@ -39,16 +39,16 @@ public class ActionValidator {
 	private void validateDocumentsForUpdate(WaterConnectionRequest request) {
 		if (request.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTION_INITIATE)
 				&& request.getWaterConnection().getDocuments() != null) {
-			throw new CustomException("INVALID STATUS",
+			throw new CustomException("INVALID_STATUS",
 					"Status cannot be INITIATE when application document are provided");
 		}
 	}
 	
 	/**
-	 * Validate Id's if update is not in updateable state
+	 * Validate Id's if update is not in update-able state
 	 * 
-	 * @param request
-	 * @param businessService
+	 * @param request WaterConnectionRequest
+	 * @param businessService BusinessService
 	 */
 	private void validateIds(WaterConnectionRequest request, BusinessService businessService, String applicationStatus) {
 		WaterConnection connection = request.getWaterConnection();

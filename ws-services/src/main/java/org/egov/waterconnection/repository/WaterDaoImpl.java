@@ -7,9 +7,9 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.SearchCriteria;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.SearchCriteria;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.producer.WaterConnectionProducer;
 import org.egov.waterconnection.repository.builder.WsQueryBuilder;
 import org.egov.waterconnection.repository.rowmapper.WaterRowMapper;
@@ -39,10 +39,10 @@ public class WaterDaoImpl implements WaterDao {
 	@Autowired
 	private WSConfiguration wsConfiguration;
 
-	@Value("${egov.waterservice.createwaterconnection}")
+	@Value("${egov.waterservice.createwaterconnection.topic}")
 	private String createWaterConnection;
 
-	@Value("${egov.waterservice.updatewaterconnection}")
+	@Value("${egov.waterservice.updatewaterconnection.topic}")
 	private String updateWaterConnection;
 	
 	@Override

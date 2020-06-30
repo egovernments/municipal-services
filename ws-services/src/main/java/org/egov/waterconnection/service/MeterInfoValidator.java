@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.ValidatorResult;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.ValidatorResult;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -43,8 +43,7 @@ public class MeterInfoValidator implements WaterActionValidator {
 						|| addDetail.getOrDefault(WCConstants.INITIAL_METER_READING_CONST, null) == null) {
 					errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be null");
 				} else {
-					BigDecimal initialMeterReading = BigDecimal.ZERO;
-					initialMeterReading = new BigDecimal(
+					BigDecimal initialMeterReading = new BigDecimal(
 							String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
 					if (initialMeterReading.compareTo(BigDecimal.ZERO) == 0) {
 						errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");

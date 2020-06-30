@@ -1,10 +1,10 @@
 package org.egov.waterconnection.service;
 
-import org.egov.waterconnection.model.ValidatorResult;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.ValidatorResult;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 
 public interface WaterActionValidator {
 
-	public ValidatorResult validate(WaterConnectionRequest waterConnectionRequest, boolean isUpdate);
+	ValidatorResult validate(WaterConnectionRequest waterConnectionRequest, boolean isUpdate);
 
 }

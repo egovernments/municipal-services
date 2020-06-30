@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.EventRequest;
-import org.egov.waterconnection.model.SMSRequest;
+import org.egov.waterconnection.web.models.EventRequest;
+import org.egov.waterconnection.web.models.SMSRequest;
 import org.egov.waterconnection.producer.WaterConnectionProducer;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.json.JSONObject;
@@ -109,7 +109,7 @@ public class NotificationUtil {
 			}
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				log.info("Messages: " + smsRequest.getMessage());
 			}
 		}
 	}
@@ -140,19 +140,18 @@ public class NotificationUtil {
 	
 	/**
 	 * 
-	 * @param applicationStatus
-	 * @param localizationMessage
+	 * @param code Code name to fetch the localisation value
+	 * @param localizationMessage Localisation message
 	 * @return In app message template
 	 */
 	public String getCustomizedMsg(String code, String localizationMessage) {
-		String messageString = getMessageTemplate(code, localizationMessage);
-		return messageString;
+		return getMessageTemplate(code, localizationMessage);
 	}
 	
 	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
-	 * @param request
+	 * @param request EventRequest Object
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);

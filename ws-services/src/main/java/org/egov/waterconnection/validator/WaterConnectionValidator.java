@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
-import org.egov.waterconnection.model.ValidatorResult;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.ValidatorResult;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.service.MeterInfoValidator;
 import org.egov.waterconnection.service.PropertyValidator;
 import org.egov.waterconnection.service.WaterFieldValidator;
@@ -110,7 +110,7 @@ public class WaterConnectionValidator {
 			List<String> documentFileStoreIds = new LinkedList<>();
 			request.getWaterConnection().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
-					throw new CustomException("DUPLICATE_DOCUMENT ERROR",
+					throw new CustomException("DUPLICATE_DOCUMENT_ERROR",
 							"Same document cannot be used multiple times");
 				else
 					documentFileStoreIds.add(document.getFileStoreId());

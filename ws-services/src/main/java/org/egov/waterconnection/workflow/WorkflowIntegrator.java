@@ -6,11 +6,11 @@ import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.WaterConnectionRequest;
-import org.egov.waterconnection.model.workflow.ProcessInstance;
-import org.egov.waterconnection.model.workflow.ProcessInstanceRequest;
-import org.egov.waterconnection.model.workflow.ProcessInstanceResponse;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.workflow.ProcessInstance;
+import org.egov.waterconnection.web.models.workflow.ProcessInstanceRequest;
+import org.egov.waterconnection.web.models.workflow.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

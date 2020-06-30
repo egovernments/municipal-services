@@ -6,12 +6,12 @@ import java.util.Optional;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.RequestInfoWrapper;
-import org.egov.waterconnection.model.workflow.BusinessService;
-import org.egov.waterconnection.model.workflow.BusinessServiceResponse;
-import org.egov.waterconnection.model.workflow.ProcessInstance;
-import org.egov.waterconnection.model.workflow.ProcessInstanceResponse;
-import org.egov.waterconnection.model.workflow.State;
+import org.egov.waterconnection.web.models.RequestInfoWrapper;
+import org.egov.waterconnection.web.models.workflow.BusinessService;
+import org.egov.waterconnection.web.models.workflow.BusinessServiceResponse;
+import org.egov.waterconnection.web.models.workflow.ProcessInstance;
+import org.egov.waterconnection.web.models.workflow.ProcessInstanceResponse;
+import org.egov.waterconnection.web.models.workflow.State;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class WorkflowService {
         try {
             response = mapper.convertValue(result,BusinessServiceResponse.class);
         } catch (IllegalArgumentException e) {
-            throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
+            throw new CustomException("PARSING_ERROR", "Failed to parse response of calculate");
         }
         return response.getBusinessServices().get(0);
     }
@@ -117,7 +117,7 @@ public class WorkflowService {
 		try {
 			response = mapper.convertValue(result, ProcessInstanceResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response of process instance");
+			throw new CustomException("PARSING_ERROR", "Failed to parse response of process instance");
 		}
 		Optional<ProcessInstance> processInstance = response.getProcessInstances().stream().findFirst();
 		return processInstance.get();

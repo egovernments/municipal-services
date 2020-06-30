@@ -2,8 +2,8 @@ package org.egov.waterconnection.consumer;
 
 import java.util.HashMap;
 
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.WaterConnection;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.service.DiffService;
 import org.egov.waterconnection.service.WaterServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +33,8 @@ public class EditWorkFlowNotificationConsumer {
 	/**
 	 * Consumes the water connection record and send the edit notification
 	 * 
-	 * @param record
-	 * @param topic
+	 * @param record Received Topic Record
+	 * @param topic Name of the Topic
 	 */
 	@KafkaListener(topics = { "${ws.editnotification.topic}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {

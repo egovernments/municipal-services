@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.SearchCriteria;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.SearchCriteria;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,9 +44,7 @@ public class WsQueryBuilder {
 			+ "eg_ws_applicationdocument document ON document.wsid = conn.id" 
 			+  LEFT_OUTER_JOIN_STRING
 			+ "eg_ws_plumberinfo plumber ON plumber.wsid = conn.id";
-	
-	private static final String NO_OF_CONNECTION_SEARCH_QUERY = "SELECT count(*) FROM eg_ws_connection WHERE";
-	
+
 	private static final String PAGINATION_WRAPPER = "SELECT * FROM " +
             "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
             "({})" +
@@ -155,18 +153,17 @@ public class WsQueryBuilder {
 	}
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
-		ids.forEach(id -> {
-			preparedStatement.add(id);
-		});
+		preparedStatement.addAll(ids);
 	}
 
 
 	/**
 	 * 
 	 * @param query
-	 *            The
+	 *            Query String
 	 * @param preparedStmtList
 	 *            Array of object for preparedStatement list
+	 * @param criteria SearchCriteria
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
@@ -188,12 +185,4 @@ public class WsQueryBuilder {
 		preparedStmtList.add(limit + offset);
 		return PAGINATION_WRAPPER.replace("{}",query);
 	}
-
-	public String getNoOfWaterConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
-		StringBuilder query = new StringBuilder(NO_OF_CONNECTION_SEARCH_QUERY);
-		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
-		addToPreparedStatement(preparedStatement, connectionIds);
-		return query.toString();
-	}
-	
 }

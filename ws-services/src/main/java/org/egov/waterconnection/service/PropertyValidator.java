@@ -3,8 +3,8 @@ package org.egov.waterconnection.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.egov.waterconnection.model.ValidatorResult;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.ValidatorResult;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 

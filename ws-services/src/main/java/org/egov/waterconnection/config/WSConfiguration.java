@@ -99,10 +99,10 @@ public class WSConfiguration {
 	private String saveUserEventsTopic;
 
 	// Water Topic
-	@Value("${egov.waterservice.createwaterconnection}")
+	@Value("${egov.waterservice.createwaterconnection.topic}")
 	private String onWaterSaved;
 
-	@Value("${egov.waterservice.updatewaterconnection}")
+	@Value("${egov.waterservice.updatewaterconnection.topic}")
 	private String onWaterUpdated;
 
 	@Value("${egov.user.event.notification.enabled}")
@@ -128,7 +128,7 @@ public class WSConfiguration {
     @Value("${egov.receipt.businessservice}")
     private String receiptBusinessservice;
     
-    @Value("${ws.meterreading.create}")
+    @Value("${ws.meterreading.create.topic}")
     private String createMeterReading;
     
     @Value("${ws.meterreading.create.endpoint}")
@@ -167,7 +167,7 @@ public class WSConfiguration {
     @Value("${ws.editnotification.topic}")
     private String editNotificationTopic;
     
-	@Value("${ws.consume.filestoreids}")
+	@Value("${ws.consume.filestoreids.topic}")
 	private String fileStoreIdsTopic;
 
 	@Value("${egov.waterservice.savefilestoreIds}")

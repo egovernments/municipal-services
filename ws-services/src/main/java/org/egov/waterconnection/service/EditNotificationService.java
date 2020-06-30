@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
 
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.Action;
-import org.egov.waterconnection.model.Event;
-import org.egov.waterconnection.model.EventRequest;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.Recepient;
-import org.egov.waterconnection.model.SMSRequest;
-import org.egov.waterconnection.model.Source;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.Action;
+import org.egov.waterconnection.web.models.Event;
+import org.egov.waterconnection.web.models.EventRequest;
+import org.egov.waterconnection.web.models.Property;
+import org.egov.waterconnection.web.models.Recepient;
+import org.egov.waterconnection.web.models.SMSRequest;
+import org.egov.waterconnection.web.models.Source;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.util.NotificationUtil;
 import org.egov.waterconnection.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +56,12 @@ public class EditNotificationService {
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 				EventRequest eventRequest = getEventRequest(request, property);
 				if (eventRequest != null) {
-					log.debug("IN APP NOTIFICATION FOR EDIT APPLICATION :: -> "
-							+ mapper.writeValueAsString(eventRequest));
 					notificationUtil.sendEventNotification(eventRequest);
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 				List<SMSRequest> smsRequests = getSmsRequest(request, property);
 				if (!CollectionUtils.isEmpty(smsRequests)) {
-					log.debug("SMS NOTIFICATION FOR EDIT APPLICATION :: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
 				}
 			}
@@ -86,30 +83,27 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
+		Map<String, String> mobileNumberAndMessage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property);
-		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-		Map<String, String> mapOfPhnoAndUUIDs = workflowNotificationService.fetchUserUUIDs(mobileNumbers, waterConnectionRequest.getRequestInfo(),
+		Set<String> mobileNumbers = mobileNumberAndMessage.keySet().stream().collect(Collectors.toSet());
+		Map<String, String> mapOfPhoneNoAndUUIDs = workflowNotificationService.fetchUserUUIDs(mobileNumbers, waterConnectionRequest.getRequestInfo(),
 				property.getTenantId());
-//		 Map<String, String> mapOfPhnoAndUUIDs =
-//		 waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber,
-//		 OwnerInfo::getUuid));
-		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+		if (CollectionUtils.isEmpty(mapOfPhoneNoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
 		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
-			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
+			if (null == mapOfPhoneNoAndUUIDs.get(mobile) || null == mobileNumberAndMessage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
 				continue;
 			}
 			List<String> toUsers = new ArrayList<>();
-			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+			toUsers.add(mapOfPhoneNoAndUUIDs.get(mobile));
 			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
-			Action action = workflowNotificationService.getActionForEventNotification(mobileNumberAndMesssage, mobile,
+			Action action = workflowNotificationService.getActionForEventNotification(mobileNumberAndMessage, mobile,
 					waterConnectionRequest, property);
 			events.add(Event.builder().tenantId(property.getTenantId())
-					.description(mobileNumberAndMesssage.get(mobile)).eventType(WCConstants.USREVENTS_EVENT_TYPE)
+					.description(mobileNumberAndMessage.get(mobile)).eventType(WCConstants.USREVENTS_EVENT_TYPE)
 					.name(WCConstants.USREVENTS_EVENT_NAME).postedBy(WCConstants.USREVENTS_EVENT_POSTEDBY)
 					.source(Source.WEBAPP).recepient(recepient).eventDetails(null).actions(action).build());
 		}
@@ -134,11 +128,11 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
+		Map<String, String> mobileNumberAndMessage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			SMSRequest req = new SMSRequest(mobileNumber, messg);
+		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			SMSRequest req = new SMSRequest(mobileNumber, msg);
 			smsRequest.add(req);
 		});
 		return smsRequest;

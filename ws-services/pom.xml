@@ -104,7 +104,7 @@
 			<url>https://nexus-repo.egovernments.org/nexus/content/repositories/releases/</url>
 		</repository>
 		<repository>
-			<id>repo.egovernmen"src/main/java/org/egov/waterConnection/consumer"ts.org.snapshots</id>
+			<id>repo.egovernments.org.snapshots</id>
 			<name>eGov ERP Releases Repository</name>
 			<url>https://nexus-repo.egovernments.org/nexus/content/repositories/snapshots/</url>
 		</repository>
@@ -120,6 +120,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<excludes>
 						<exclude>
@@ -149,30 +156,19 @@
 		        <configuration>
 		          <jsonLibrary>jackson2</jsonLibrary>
 		          <classes>
-			          <class>org.egov.waterconnection.model.Connection</class>
-			          <class>org.egov.waterconnection.model.WaterConnection</class>
-			          <class>org.egov.waterconnection.model.Document</class>
-			          <class>org.egov.waterconnection.model.PlumberInfo</class>
-			          <class>org.egov.waterconnection.model.RequestInfoWrapper</class>
-			          <class>org.egov.waterconnection.model.WaterConnectionRequest</class>
-			          <class>org.egov.waterconnection.model.WaterConnectionResponse</class>
+			          <class>org.egov.waterconnection.web.models.Connection</class>
+			          <class>org.egov.waterconnection.web.models.WaterConnection</class>
+			          <class>org.egov.waterconnection.web.models.Document</class>
+			          <class>org.egov.waterconnection.web.models.PlumberInfo</class>
+			          <class>org.egov.waterconnection.web.models.RequestInfoWrapper</class>
+			          <class>org.egov.waterconnection.web.models.WaterConnectionRequest</class>
+			          <class>org.egov.waterconnection.web.models.WaterConnectionResponse</class>
 		          </classes>
 		          <namespace>Digit</namespace>
 		          <debug>true</debug>
 		          <outputKind>module</outputKind>
 	          	</configuration>
           </plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 </project>
