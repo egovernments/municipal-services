@@ -32,7 +32,7 @@ public class PropertyNotificationConsumer {
     private PaymentNotificationService paymentNotificationService;
 
 
-    @KafkaListener(topics = {"${persister.save.property.topic}","${persister.update.property.topic}"})
+    @KafkaListener(topics = {"${persister.update.property.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         ObjectMapper mapper = new ObjectMapper();
         PropertyRequest propertyRequest = new PropertyRequest();
