@@ -69,6 +69,7 @@ public class EDCRService {
 		List<BPA> bpas = bpaRepository.getBPAData(criteria, null);
 		if(bpas.size()>0){
 			for(int i=0; i<bpas.size(); i++){
+				System.out.println(bpas.get(i).getStatus());
 				if(!bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED) || !bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)){
 					throw new CustomException(" Duplicate EDCR ",
 							" Application already exists with EDCR Number " + bpa.getEdcrNumber());
