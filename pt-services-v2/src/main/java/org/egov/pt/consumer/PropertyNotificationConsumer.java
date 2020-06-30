@@ -44,10 +44,7 @@ public class PropertyNotificationConsumer {
         }
         log.info("property Received: "+propertyRequest.getProperties().get(0).getPropertyId());
 
-        PropertyDetail.SourceEnum source = propertyRequest.getProperties().get(0).getPropertyDetails().get(0).getSource();
-
-        if (source == null || !source.equals(PropertyDetail.SourceEnum.LEGACY_RECORD))
-            notificationService.process(propertyRequest,topic);
+        notificationService.process(propertyRequest,topic);
     }
 
 
