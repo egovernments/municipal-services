@@ -181,6 +181,7 @@ public class EnrichmentService {
 			}
 		}
 		
+		log.info("Application status is : " + state);
 		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
 				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
