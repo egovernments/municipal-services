@@ -85,7 +85,9 @@ public class WorkflowIntegrator {
 		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
 		obj.put(MODULENAMEKEY, NOCConstants.NOC_MODULE);
 		obj.put(ACTIONKEY, noc.getWorkflow().getAction());
-		obj.put(COMMENTKEY, noc.getWorkflow().getComment());
+		
+		if(noc.getWorkflow().getComment() != null)
+		  obj.put(COMMENTKEY, noc.getWorkflow().getComment());
 		
 		if (!CollectionUtils.isEmpty(noc.getWorkflow().getAssignes())) {
 			List<Map<String, String>> uuidmaps = new LinkedList<>();

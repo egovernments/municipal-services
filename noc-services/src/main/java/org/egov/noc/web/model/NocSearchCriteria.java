@@ -32,6 +32,12 @@ public class NocSearchCriteria {
 	    @JsonProperty("nocNo")
 	    private String nocNo;
 	    
+	    @JsonProperty("source")
+	    private String source;
+	    
+	    @JsonProperty("sourceRefId")
+	    private String sourceRefId;
+	    
 	    @JsonProperty("offset")
 	    private Integer offset;
 

@@ -64,6 +64,20 @@ public class NocQueryBuilder {
 			preparedStmtList.add(criteria.getNocNo());
 		}
 		
+		String source = criteria.getSource();
+		if (source!=null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" noc.source = ?");
+			preparedStmtList.add(criteria.getSource());
+		}
+		
+		String sourceRefId = criteria.getSourceRefId();
+		if (sourceRefId!=null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" noc.sourceRefId = ?");
+			preparedStmtList.add(criteria.getSourceRefId());
+		}
+		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}
