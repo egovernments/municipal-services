@@ -74,6 +74,9 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private ObjectMapper mapper;
+
+	@Autowired
+	private UserService userService;
 	
 	
 	
@@ -87,7 +90,9 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
 		enrichmentService.enrichWaterConnection(waterConnectionRequest);
+		userService.createUser(waterConnectionRequest);
 		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
@@ -104,6 +109,7 @@ public class WaterServiceImpl implements WaterService {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
 		waterConnectionValidator.validatePropertyForConnection(waterConnectionList);
+		enrichmentService.enrichConnectionHolderDeatils(waterConnectionList, criteria, requestInfo);
 		return waterConnectionList;
 	}
 	/**
@@ -142,15 +148,14 @@ public class WaterServiceImpl implements WaterService {
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
 		validateProperty.validatePropertyCriteria(property);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
+		//call calculator service to generate the demand for one time fee
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
-		
 		//check for edit and send edit notification
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
 		//Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(waterConnectionRequest);
-		
 		//Call workflow
-		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);

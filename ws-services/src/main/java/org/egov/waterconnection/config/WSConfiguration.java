@@ -172,5 +172,11 @@ public class WSConfiguration {
 
 	@Value("${egov.waterservice.savefilestoreIds}")
 	private String saveFileStoreIdsTopic;
+
+	@Value("${egov.user.create.path}")
+	private String userCreateEndPoint;
+
+	@Value("${egov.user.update.path}")
+	private String userUpdateEndPoint;
    
 }

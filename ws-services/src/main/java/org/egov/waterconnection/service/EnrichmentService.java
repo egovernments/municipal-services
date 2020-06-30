@@ -1,24 +1,18 @@
 package org.egov.waterconnection.service;
 
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.AuditDetails;
+import org.egov.waterconnection.model.*;
 import org.egov.waterconnection.model.Connection.StatusEnum;
-import org.egov.waterconnection.model.Status;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.Idgen.IdResponse;
+import org.egov.waterconnection.model.users.UserDetailResponse;
+import org.egov.waterconnection.model.users.UserSearchRequest;
+import org.egov.waterconnection.model.workflow.ConnectionHolderInfo;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -26,9 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -49,8 +43,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private WaterDaoImpl waterDao;
-	
 
+	@Autowired
+	private UserService userService;
 
 	/**
 	 * Enrich water connection
@@ -222,7 +217,7 @@ public class EnrichmentService {
 	/**
 	 * Sets status for create request
 	 * 
-	 * @param WaterConnectionRequest
+	 * @param waterConnectionRequest
 	 *            The create request
 	 */
 	private void setStatusForCreate(WaterConnectionRequest waterConnectionRequest) {
@@ -231,5 +226,44 @@ public class EnrichmentService {
 			waterConnectionRequest.getWaterConnection().setApplicationStatus(WCConstants.STATUS_INITIATED);
 		}
 	}
+
+	/**
+	 * Enrich
+	 * 
+	 * @param waterConnectionList
+	 * @param requestInfo
+	 */
+	public void enrichConnectionHolderDeatils(List<WaterConnection> waterConnectionList, SearchCriteria criteria,
+			RequestInfo requestInfo) {
+		if (CollectionUtils.isEmpty(waterConnectionList))
+			return;
+		Set<String> connectionHolderIds = waterConnectionList.stream().map(WaterConnection::getConnectionHolders)
+				.flatMap(List::stream).map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
+		userSearchRequest.setUuid(connectionHolderIds);
+		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+		enrichConnectionHolderInfo(userDetailResponse, waterConnectionList);
+	}
+
+	/**
+	 *Populates the owner fields inside of the waterconnection objects from the response got from calling user api
+	 * @param userDetailResponse
+	 * @param waterConnectionList List of water connection whose owner's are to be populated from userDetailsResponse
+	 */
+	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse, List<WaterConnection> waterConnectionList) {
+		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
+		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
+		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
+		waterConnectionList.forEach(waterConnection -> {
+			waterConnection.getConnectionHolders().forEach(holderInfo -> {
+				if (userIdToConnectionHolderMap.get(holderInfo.getUuid()) == null)
+					throw new CustomException("OWNER SEARCH ERROR", "The owner of the water application"
+							+ waterConnection.getApplicationNo() + " is not coming in user search");
+				else
+					holderInfo.addUserDetail(userIdToConnectionHolderMap.get(holderInfo.getUuid()));
+			});
+		});
+	}
+
 
 }

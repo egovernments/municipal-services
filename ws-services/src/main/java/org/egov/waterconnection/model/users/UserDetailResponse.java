@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.waterconnection.model.OwnerInfo;
+import org.egov.waterconnection.model.workflow.ConnectionHolderInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,5 +20,5 @@ public class UserDetailResponse {
     ResponseInfo responseInfo;
 
     @JsonProperty("user")
-    List<OwnerInfo> user;
+    List<ConnectionHolderInfo> user;
 }

@@ -53,19 +53,10 @@ public class MDMSValidator {
 			List<String> taxModelnames = new ArrayList<>(Arrays.asList(WCConstants.WC_ROADTYPE_MASTER));
 			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(tenantId, WCConstants.WS_TAX_MODULE,
 					taxModelnames, "$.*.code", taxjsonPath, request.getRequestInfo());
-
-			// calling property related master
-			List<String> propertyModuleMasters = new ArrayList<>(Arrays.asList(WCConstants.PROPERTY_OWNERTYPE));
-			Map<String, List<String>> codesFromPropetyMasters = getAttributeValues(tenantId,
-					WCConstants.PROPERTY_MASTER_MODULE, propertyModuleMasters, "$.*.code",
-					WCConstants.PROPERTY_JSONPATH_ROOT, request.getRequestInfo());
 			// merge codes
-			String[] finalmasterNames = { WCConstants.MDMS_WC_CONNECTION_TYPE, WCConstants.MDMS_WC_CONNECTION_CATEGORY,
-					WCConstants.MDMS_WC_WATER_SOURCE, WCConstants.WC_ROADTYPE_MASTER, WCConstants.PROPERTY_OWNERTYPE};
-			Map<String, List<String>> wscodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
-					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-			Map<String, List<String>> finalcodes = Stream.of(wscodes, codesFromPropetyMasters).map(Map::entrySet)
+			String[] finalmasterNames = {WCConstants.MDMS_WC_CONNECTION_TYPE, WCConstants.MDMS_WC_CONNECTION_CATEGORY,
+					WCConstants.MDMS_WC_WATER_SOURCE, WCConstants.WC_ROADTYPE_MASTER};
+			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
 					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 			validateMDMSData(finalmasterNames, finalcodes);
 			validateCodes(request.getWaterConnection(), finalcodes);
@@ -127,12 +118,40 @@ public class MDMSValidator {
 			messageBuilder.append("Road type value is invalid, please enter proper value! ");
 			errorMap.put("INVALID_WATER_ROAD_TYPE", messageBuilder.toString());
 		}
-		if (!CollectionUtils.isEmpty(waterConnection.getConnectionHolders())) {
-			waterConnection.getConnectionHolders().forEach(holderDetail -> {
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+
+	/**
+	 * Validate master data of water connection request
+	 *
+	 * @param request waterconnection request
+	 */
+	public void validateMasterForCreateRequest(WaterConnectionRequest request) {
+		// calling property related master
+		List<String> propertyModuleMasters = new ArrayList<>(Arrays.asList(WCConstants.PROPERTY_OWNERTYPE));
+		Map<String, List<String>> codesFromPropetyMasters = getAttributeValues(request.getWaterConnection().getTenantId(),
+				WCConstants.PROPERTY_MASTER_MODULE, propertyModuleMasters, "$.*.code",
+				WCConstants.PROPERTY_JSONPATH_ROOT, request.getRequestInfo());
+		// merge codes
+		String[] finalmasterNames = {WCConstants.PROPERTY_OWNERTYPE};
+		validateMDMSData(finalmasterNames, codesFromPropetyMasters);
+		validateCodesForCreateRequest(request, codesFromPropetyMasters);
+	}
+
+	/**
+	 *
+	 * @param request Water connection request
+	 * @param codes list of master data codes to varify against the water connection request
+	 */
+	public void validateCodesForCreateRequest(WaterConnectionRequest request, Map<String, List<String>> codes) {
+		Map<String, String> errorMap = new HashMap<>();
+		if (!CollectionUtils.isEmpty(request.getWaterConnection().getConnectionHolders())) {
+			request.getWaterConnection().getConnectionHolders().forEach(holderDetail -> {
 				if (!StringUtils.isEmpty(holderDetail.getOwnerType())
 						&& !codes.get(WCConstants.PROPERTY_OWNERTYPE).contains(holderDetail.getOwnerType())) {
-					errorMap.put("INVALID CONNECTION HOLDER TYPE",
-							"The OwnerType '" + holderDetail.getOwnerType() + "' does not exists");
+					errorMap.put("INVALID_CONNECTION_HOLDER_TYPE",
+							"The Connection holder type '" + holderDetail.getOwnerType() + "' does not exists");
 				}
 			});
 		}
