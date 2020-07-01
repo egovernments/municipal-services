@@ -14,12 +14,14 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.EDCRService;
+import org.egov.bpa.service.NocService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.Document;
+import org.egov.bpa.web.model.NOC.Noc;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,9 @@ public class BPAValidator {
 
 	@Autowired
 	private BPAUtil bpaUtil;
+	
+	@Autowired
+	private NocService nocService;
 	
 	public void validateCreate(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		mdmsValidator.validateMdmsData(bpaRequest, mdmsData);
@@ -300,7 +305,7 @@ public class BPAValidator {
 		try {
 			String questionsPath = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
 					.replace("{2}", bpa.getRiskType().toString()).replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
-					.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));;
+					.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));
 
 			List<Object> mdmsQuestionsArray = (List<Object>) JsonPath.read(mdmsData, questionsPath);
 
@@ -485,8 +490,12 @@ public class BPAValidator {
 		}
 	}
 
-
-	public void validateWorkflowActions(BPARequest bpaRequest) {
+	public void validatePreEnrichData(BPARequest bpaRequest, Object mdmsRes) {		
+		validateWorkflowActions(bpaRequest);
+		validateNocApprove(bpaRequest, mdmsRes);
+	}
+	
+	private void validateWorkflowActions(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SKIP_PAY))) {
 			BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
@@ -497,6 +506,47 @@ public class BPAValidator {
 	}
 	
 
+	@SuppressWarnings("unchecked")
+	private void validateNocApprove(BPARequest bpaRequest, Object mdmsRes) {
+		BPA bpa = bpaRequest.getBPA();
+		if (config.getValidateRequiredNoc()) {
+			if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
+					&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
+				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
+						bpaRequest.getBPA());
+				String nocPath = BPAConstants.NOCTYPE_REQUIRED_MAP
+						.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
+						.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}",
+								(StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
+										? "ALL" : bpa.getRiskType().toString());
 
-	
+				List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsRes, nocPath);
+				List<String> nocTypes = new ArrayList<String>();
+				if (!CollectionUtils.isEmpty(nocMappingResponse)) {
+					List<Object> nocMappingArray = (List<Object>) nocMappingResponse.get(0);
+					if (!CollectionUtils.isEmpty(nocMappingArray)) {
+						for (int i = 0; i < nocMappingArray.size(); i++) {
+							if (((Map<String, Boolean>) nocMappingArray.get(i)).get("required")) {
+								nocTypes.add(((Map<String, String>) nocMappingArray.get(i)).get("type").toString());
+							}
+						}
+					}
+				}
+
+				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
+				if(!nocs.isEmpty()) {
+					for (Noc noc : nocs) {
+						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())
+								&& !noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
+							log.info("Noc is not approved for applicationNo :" + noc.getApplicationNo());
+							throw new CustomException("NOC_EXCEPTION",
+									" You can't approve the application without NOC approval");
+						}
+					}
+				} else {
+					log.info("No NOC record found to validate..");
+				}
+			}
+		}
+	}
 }

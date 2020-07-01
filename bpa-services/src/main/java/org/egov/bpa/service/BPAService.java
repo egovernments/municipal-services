@@ -94,6 +94,9 @@ public class BPAService {
 	private UserService userService;
 	
 	@Autowired
+	private NocService nocService;
+	
+	@Autowired
 	private BPAConfiguration config;
 	
 	public BPA create(BPARequest bpaRequest) {
@@ -357,9 +360,9 @@ public class BPAService {
 		}
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
+		nocService.approveOfflineNoc(bpaRequest, mdmsData);
+		bpaValidator.validatePreEnrichData(bpaRequest, mdmsData);
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-		
-		bpaValidator.validateWorkflowActions(bpaRequest);
 		
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
@@ -383,7 +386,7 @@ public class BPAService {
 		}
 
 		wfIntegrator.callWorkFlow(bpaRequest);
-
+		nocService.createNocRequest(bpaRequest, mdmsData);
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		
 		log.info("Bpa status is : " + bpa.getStatus());

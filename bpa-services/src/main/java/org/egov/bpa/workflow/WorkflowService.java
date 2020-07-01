@@ -2,7 +2,6 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
-import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.workflow.BusinessService;

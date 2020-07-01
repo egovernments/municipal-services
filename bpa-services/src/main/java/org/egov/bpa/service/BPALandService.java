@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class BPALandService {
 
 	@Autowired
@@ -80,7 +83,7 @@ public class BPALandService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ArrayList<LandInfo> searchLandInfoToBPA(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
 		
-		System.out.println("Searching with the params::" + landcriteria.getIds() +  "with mobileNo" + landcriteria.getMobileNumber() + "with landUid" + landcriteria.getLandUId() + "with Ids" + landcriteria.getIds());
+		log.info("Searching with the params::" + landcriteria.getIds() +  "with mobileNo" + landcriteria.getMobileNumber() + "with landUid" + landcriteria.getLandUId() + "with Ids" + landcriteria.getIds());
 		StringBuilder url = getLandSerchURLWithParams(requestInfo, landcriteria);
 		
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
@@ -99,7 +102,6 @@ public class BPALandService {
 	}
 	
 	private StringBuilder getLandSerchURLWithParams(RequestInfo requestInfo, LandSearchCriteria landcriteria) {
-		// TODO Auto-generated method stub
 		StringBuilder uri = new StringBuilder(config.getLandInfoHost());
 		uri.append(config.getLandInfoSearch());
 		uri.append("?tenantId=");

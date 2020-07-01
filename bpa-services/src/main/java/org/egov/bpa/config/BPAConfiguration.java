@@ -259,4 +259,18 @@ public class BPAConfiguration {
 	@Value("${egov.bpa.skippayment.status}")
 	private String skipPaymentStatuses;
 	
+	@Value("${egov.noc.service.host}")
+	private String nocServiceHost;
+	
+	@Value("${egov.noc.create.endpoint}")
+	private String nocCreateEndpoint;
+	
+	@Value("${egov.noc.update.endpoint}")
+	private String nocUpdateEndpoint;
+	
+	@Value("${egov.noc.search.endpoint}")
+	private String nocSearchEndpoint;
+	
+	@Value("${validate.required.nocs}")
+	private Boolean validateRequiredNoc;
 }
