@@ -1,18 +1,20 @@
 package org.egov.waterconnection.repository.builder;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.SearchCriteria;
+import org.egov.waterconnection.service.UserService;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -23,6 +25,9 @@ public class WsQueryBuilder {
 
 	@Autowired
 	private WSConfiguration config;
+
+	@Autowired
+	private UserService userService;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
@@ -83,7 +88,14 @@ public class WsQueryBuilder {
 				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 				addToPreparedStatement(preparedStatement, propertyIds);
 			}
-
+		}
+		if(!StringUtils.isEmpty(criteria.getMobileNumber())) {
+			Set<String> uuids = userService.getUUIDForUsers(criteria.getMobileNumber(), criteria.getTenantId(), requestInfo);
+			if (!CollectionUtils.isEmpty(uuids)) {
+				addORClauseIfRequired(preparedStatement, query);
+				query.append(" connectionholder.userid in (").append(createQuery(uuids)).append(" )");
+				addToPreparedStatement(preparedStatement, uuids);
+			}
 		}
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
 			addClauseIfRequired(preparedStatement, query);
@@ -145,6 +157,14 @@ public class WsQueryBuilder {
 			queryString.append(" WHERE ");
 		else {
 			queryString.append(" AND");
+		}
+	}
+
+	private void addORClauseIfRequired(List<Object> values, StringBuilder queryString){
+		if (values.isEmpty())
+			queryString.append(" WHERE ");
+		else {
+			queryString.append(" OR");
 		}
 	}
 

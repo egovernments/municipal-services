@@ -297,4 +297,33 @@ public class UserService {
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
 		return userDetailResponse;
 	}
+
+	/**
+	 * Get user based on given property
+	 * @param userSearchRequest
+	 * @return combination of uuid given in search criteria
+	 */
+	private Set<String> getUsersUUID(UserSearchRequest userSearchRequest) {
+		StringBuilder uri = new StringBuilder(configuration.getUserHost())
+				.append(configuration.getUserSearchEndpoint());
+		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
+		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
+			return null;
+		return userDetailResponse.getUser().stream().map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+	}
+
+	/**
+	 *
+	 * @param mobileNumber
+	 * @param tenantId
+	 * @param requestInfo
+	 * @return
+	 */
+	public Set<String> getUUIDForUsers(String mobileNumber, String tenantId, RequestInfo requestInfo) {
+		UserSearchRequest userSearchRequest = UserSearchRequest.builder()
+				.requestInfo(requestInfo).userType("CITIZEN")
+				.tenantId(tenantId).mobileNumber(mobileNumber).build();
+		return getUsersUUID(userSearchRequest);
+	}
+
 }
