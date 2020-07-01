@@ -157,6 +157,13 @@
 			          <class>org.egov.waterconnection.model.WaterConnectionRequest</class>
 			          <class>org.egov.waterconnection.model.WaterConnectionResponse</class>
 		          </classes>
+					<customTypeMappings>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.waterconnection.model.users.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
+					</customTypeMappings>
 		          <namespace>Digit</namespace>
 		          <debug>true</debug>
 		          <outputKind>module</outputKind>
