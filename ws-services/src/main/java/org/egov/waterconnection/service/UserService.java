@@ -137,9 +137,8 @@ public class UserService {
 		else if (uri.toString().contains(configuration.getUserCreateEndPoint()))
 			dobFormat = "dd/MM/yyyy";
 		try {
-			Optional<Object> response = (Optional<Object>) serviceRequestRepository.fetchResult(uri, userRequest);
-			if (response.isPresent()) {
-				LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.get();
+			LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, userRequest);
+			if (!CollectionUtils.isEmpty(responseMap)) {
 				parseResponse(responseMap, dobFormat);
 				return mapper.convertValue(responseMap, UserDetailResponse.class);
 			} else {

@@ -139,7 +139,6 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
         ConnectionHolderInfo connectionHolderInfo = ConnectionHolderInfo.builder()
                 .relationship(Relationship.fromValue(rs.getString("holderrelationship")))
                 .status(org.egov.waterconnection.model.Status.fromValue(rs.getString("holderstatus")))
-                .institutionId(rs.getString("holderinstitutionid")).ownerShipPercentage(holderShipPercentage)
                 .tenantId(rs.getString("holdertenantid")).ownerType(rs.getString("connectionholdertype"))
                 .isPrimaryOwner(isPrimaryOwner).uuid(uuid).build();
         waterConnection.addConnectionHolderInfo(connectionHolderInfo);
