@@ -10,10 +10,10 @@ import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.NOC.Noc;
 import org.egov.bpa.web.model.NOC.NocRequest;
 import org.egov.bpa.web.model.NOC.NocResponse;
-import org.egov.bpa.web.model.NOC.RequestInfoWrapper;
 import org.egov.bpa.web.model.NOC.Workflow;
 import org.egov.bpa.web.model.NOC.enums.ApplicationType;
 import org.egov.bpa.web.model.workflow.BusinessService;
@@ -77,13 +77,16 @@ public class NocService {
 
 				if (!CollectionUtils.isEmpty(bpa.getDocuments())) {
 					bpa.getDocuments().forEach(doc -> {
-						NocRequest nocRequest = NocRequest
-								.builder().noc(
-										Noc.builder().tenantId(bpa.getTenantId())
-												.applicationType(
-														ApplicationType.valueOf(BPAConstants.NOC_APPLICATIONTYPE))
+						String docType = doc.getDocumentType();
+						int lastIndex = docType.lastIndexOf(".");
+						String documentType = "";
+						if (lastIndex > 1)
+							documentType = docType.substring(0, lastIndex);
+						NocRequest nocRequest = NocRequest.builder()
+								.noc(Noc.builder().tenantId(bpa.getTenantId())
+										.applicationType(ApplicationType.valueOf(BPAConstants.NOC_APPLICATIONTYPE))
 										.sourceRefId(bpa.getApplicationNo())
-										.nocType(nocTypeMap.get(doc.getDocumentType())).source(BPAConstants.NOC_SOURCE)
+										.nocType(nocTypeMap.get(documentType)).source(BPAConstants.NOC_SOURCE)
 										.workflow(Workflow.builder().action(BPAConstants.ACTION_INITIATE).build())
 										.build())
 								.requestInfo(bpaRequest.getRequestInfo()).build();
@@ -108,6 +111,7 @@ public class NocService {
 
 		LinkedHashMap<String, Object> responseMap = null;
 		try {
+			log.info("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
 			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
 			log.info("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
