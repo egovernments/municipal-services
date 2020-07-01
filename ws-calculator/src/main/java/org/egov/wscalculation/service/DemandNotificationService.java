@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
-import org.egov.wscalculation.model.DemandNotificationObj;
-import org.egov.wscalculation.model.EmailRequest;
-import org.egov.wscalculation.model.NotificationReceiver;
-import org.egov.wscalculation.model.SMSRequest;
+import org.egov.wscalculation.web.models.DemandNotificationObj;
+import org.egov.wscalculation.web.models.EmailRequest;
+import org.egov.wscalculation.web.models.NotificationReceiver;
+import org.egov.wscalculation.web.models.SMSRequest;
 import org.egov.wscalculation.util.NotificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,24 +35,24 @@ public class DemandNotificationService {
 	@Autowired
 	private WSCalculationConfiguration config;
 
-	public void process(DemandNotificationObj noiticationObj, String topic) {
+	public void process(DemandNotificationObj notificationObj, String topic) {
 		if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 			List<SMSRequest> smsRequests = new LinkedList<>();
-			enrichSMSRequest(noiticationObj, smsRequests, topic);
+			enrichSMSRequest(notificationObj, smsRequests, topic);
 			if (!CollectionUtils.isEmpty(smsRequests))
 				util.sendSMS(smsRequests);
 		}
 		if (config.getIsEmailEnabled() != null && config.getIsEmailEnabled()) {
 			List<EmailRequest> emailRequests = new LinkedList<>();
-			enrichEmailRequest(noiticationObj, emailRequests, topic);
+			enrichEmailRequest(notificationObj, emailRequests, topic);
 		}
 	}
 
 	@SuppressWarnings("unused")
 	private void enrichSMSRequest(DemandNotificationObj notificationObj, List<SMSRequest> smsRequest, String topic) {
 		String tenantId = notificationObj.getTenantId();
-		String loclizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
-		String messageTemplate = util.getCustomizedMsgForSMS(topic, loclizationMessage);
+		String localizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
+		String messageTemplate = util.getCustomizedMsgForSMS(topic, localizationMessage);
 		List<NotificationReceiver> receiverList = new ArrayList<>();
 		enrichNotificationReceivers(receiverList, notificationObj);
 		receiverList.forEach(receiver -> {
@@ -71,15 +71,18 @@ public class DemandNotificationService {
 			receiverList.addAll(mapper.readValue(receiver.toJSONString(),
 					mapper.getTypeFactory().constructCollectionType(List.class, NotificationReceiver.class)));
 		} catch (IOException e) {
-			throw new CustomException("Parsing Exception", " Notification Receiver List Can Not Be Parsed!!");
+			throw new CustomException("PARSING_ERROR", " Notification Receiver List Can Not Be Parsed!!");
 		}
 	}
 	
 	@SuppressWarnings("unused")
 	private void enrichEmailRequest(DemandNotificationObj notificationObj, List<EmailRequest> emailRequest, String topic) {
+		// Commenting out this method - As of now, egov-notification-mail service also reads from SMS Kafka Topic to
+		// send out the email notification - Will remove the implementation if this change is permanent.
+
 //		String tenantId = notificationObj.getTenantId();
-//		String loclizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
-//		String emailBody = util.getCustomizedMsg(topic, loclizationMessage);
+//		String localizationMessage = util.getLocalizationMessages(tenantId, notificationObj.getRequestInfo());
+//		String emailBody = util.getCustomizedMsg(topic, localizationMessage);
 //		List<NotificationReceiver> receiverList = new ArrayList<>();
 //		enrichNotificationReceivers(receiverList, notificationObj);
 //		receiverList.forEach(receiver -> {

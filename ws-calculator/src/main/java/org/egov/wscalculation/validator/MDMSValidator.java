@@ -11,8 +11,8 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.MRConstants;
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.util.MeterReadingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,27 +53,27 @@ public class MDMSValidator {
 		
 	}
 	
-	public Object validateMasterDataWithoutFilter(String tenentId) {
+	public Object validateMasterDataWithoutFilter(String tenantId) {
 		RequestInfo requestInfo = new RequestInfo();
 		User user = new User();
-		user.setTenantId(tenentId);
+		user.setTenantId(tenantId);
 		requestInfo.setUserInfo(user);
 		String[] masterNames = { MRConstants.MDMS_MS_BILLING_PERIOD };
 		List<String> names = new ArrayList<>(Arrays.asList(masterNames));
-		return getAttributeValuesWithoutFilter(tenentId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",
+		return getAttributeValuesWithoutFilter(tenantId, MRConstants.MDMS_WC_MOD_NAME, names, "$.*.connectionType",
 				MRConstants.JSONPATH_ROOT, requestInfo);
 	}
 	
 
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
-			String filter, String jsonpath, RequestInfo requestInfo) {
+			String filter, String jsonPath, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
 		MdmsCriteriaReq criteriaReq = meterReadingUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
 				requestInfo);
 		try {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
-			return JsonPath.read(result, jsonpath);
+			return JsonPath.read(result, jsonPath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
@@ -95,7 +95,7 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		if (!codes.get(MRConstants.MDMS_MS_BILLING_PERIOD).contains(meterReading.getBillingPeriod())
 				&& meterReading.getBillingPeriod() != null) {
-			errorMap.put("INVALID BILLING PERIOD",
+			errorMap.put("INVALID_BILLING_PERIOD",
 					"The Billing period" + meterReading.getBillingPeriod() + " does not exist");
 		}
 		if (!errorMap.isEmpty())

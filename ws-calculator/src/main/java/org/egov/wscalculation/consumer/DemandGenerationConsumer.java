@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.wscalculation.config.WSCalculationConfiguration;
-import org.egov.wscalculation.model.CalculationCriteria;
-import org.egov.wscalculation.model.CalculationReq;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
 import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.service.MasterDataService;
 import org.egov.wscalculation.service.WSCalculationServiceImpl;
@@ -48,7 +48,7 @@ public class DemandGenerationConsumer {
 	 *            would be calculation criteria.
 	 */
 	@KafkaListener(topics = {
-			"${egov.watercalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
+			"${egov.watercalculatorservice.createdemand.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	public void listen(final List<Message<?>> records) {
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
 		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
@@ -140,7 +140,6 @@ public class DemandGenerationConsumer {
 			log.info(str.toString());
 		} catch (Exception ex) {
 			log.error("Demand generation error: ", ex);
-			log.info("From Topic: " + errorTopic);
 			producer.push(errorTopic, request);
 		}
 

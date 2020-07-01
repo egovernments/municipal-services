@@ -95,7 +95,7 @@ public class WSCalculationConfiguration {
 	 private String waterConnectionSearchEndPoint;
 	 
 	 //Demand Topic
-	 @Value("${ws.calculator.demand.successful}")
+	 @Value("${ws.calculator.demand.successful.topic}")
 	 private String onDemandsSaved;
 
 	 @Value("${ws.calculator.demand.failed}")
@@ -167,7 +167,7 @@ public class WSCalculationConfiguration {
 	@Value("${kafka.topics.billgen.topic}")
    	private String payTriggers;
 	
-	@Value("${egov.watercalculatorservice.createdemand}")
+	@Value("${egov.watercalculatorservice.createdemand.topic}")
 	private String createDemand;
 	
     @Value("${ws.demand.based.batch.size}")

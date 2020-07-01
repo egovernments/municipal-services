@@ -10,9 +10,9 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
-import org.egov.wscalculation.model.MeterReadingResponse;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
+import org.egov.wscalculation.web.models.MeterReadingResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class MeterReadingUtil {
 			MeterReadingResponse meterReadingResponse = mapper.convertValue(result, MeterReadingResponse.class);
 			return meterReadingResponse.getMeterReadings();
 		} catch (Exception ex) {
-			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}
 	

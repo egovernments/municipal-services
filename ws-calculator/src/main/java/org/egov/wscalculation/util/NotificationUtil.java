@@ -8,11 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.DemandNotificationObj;
-import org.egov.wscalculation.model.EmailRequest;
-import org.egov.wscalculation.model.EventRequest;
-import org.egov.wscalculation.model.NotificationReceiver;
-import org.egov.wscalculation.model.SMSRequest;
+import org.egov.wscalculation.web.models.DemandNotificationObj;
+import org.egov.wscalculation.web.models.EmailRequest;
+import org.egov.wscalculation.web.models.EventRequest;
+import org.egov.wscalculation.web.models.NotificationReceiver;
+import org.egov.wscalculation.web.models.SMSRequest;
 import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;
@@ -122,23 +122,12 @@ public class NotificationUtil {
 		return messageString;
 	}
 	
-	public String getCustomizedMsgForEmail(String topic, String localizationMessage) {
-		String messageString = null;
-		if (topic.equalsIgnoreCase(config.getOnDemandsSaved())) {
-			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_SUCCESS_MESSAGE_EMAIL, localizationMessage);
-		}
-		if (topic.equalsIgnoreCase(config.getOnDemandsFailure())) {
-			messageString = getMessageTemplate(WSCalculationConstant.DEMAND_FAILURE_MESSAGE_EMAIL, localizationMessage);
-		}
-		return messageString;
-	}
-	
-	
 	/**
 	 * 
-	 * @param license
-	 * @param message
-	 * @return
+	 * @param receiver - Notification Receiver
+	 * @param message, - Notification Message
+	 * @param obj - Notification Demand Details
+	 * @return - Returns the proper message
 	 */
 	public String getAppliedMsg(NotificationReceiver receiver, String message, DemandNotificationObj obj) {
 		message = message.replace("<First Name>", receiver.getFirstName() == null ? "" : receiver.getFirstName());
@@ -160,13 +149,13 @@ public class NotificationUtil {
 				 log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				log.debug(" Messages: " + smsRequest.getMessage());
 			}
 		}
 	}
 	/**
 	 * Send the SMSRequest on the EmailNotification kafka topic
-	 * @param emailRequest The list of EmailRequest to be sent
+	 * @param emailRequestList The list of EmailRequest to be sent
 	 */
 	public void sendEmail(List<EmailRequest> emailRequestList) {
 		if (config.getIsSMSEnabled()) {
@@ -182,7 +171,7 @@ public class NotificationUtil {
 	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
-	 * @param request
+	 * @param request Event Request Object
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);

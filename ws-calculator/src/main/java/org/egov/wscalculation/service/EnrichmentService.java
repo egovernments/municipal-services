@@ -4,8 +4,8 @@ package org.egov.wscalculation.service;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.egov.wscalculation.model.AuditDetails;
-import org.egov.wscalculation.model.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.AuditDetails;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,8 +32,8 @@ public class EnrichmentService {
 	/**
      * Method to return auditDetails for create/update flows
      *
-     * @param by
-     * @param isCreate
+     * @param by - UUID of the User
+     * @param isCreate - TRUE in case of create scenario and FALSE for modify scenario.
      * @return AuditDetails
      */
     public AuditDetails getAuditDetails(String by, Boolean isCreate) {

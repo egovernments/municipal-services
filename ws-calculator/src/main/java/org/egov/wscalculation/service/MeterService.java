@@ -3,13 +3,13 @@ package org.egov.wscalculation.service;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
-import org.egov.wscalculation.model.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
+import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
 
 
 public interface MeterService {
-	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest);
+	List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest);
 	
-	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo);
+	List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo);
 }

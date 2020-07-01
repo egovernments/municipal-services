@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 
-import org.egov.wscalculation.model.DemandNotificationObj;
+import org.egov.wscalculation.web.models.DemandNotificationObj;
 import org.egov.wscalculation.service.DemandNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -26,23 +26,14 @@ public class DemandNotificationConsumer {
 
 	/**
 	 * 
-	 * @param request
-	 * @param topic
+	 * @param request Topic Message
+	 * @param topic - Topic Name
 	 */
-	@KafkaListener(topics = { "${ws.calculator.demand.successful}", "${ws.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${ws.calculator.demand.successful.topic}", "${ws.calculator.demand.failed}" })
 	public void listen(final HashMap<String, Object> request, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-		DemandNotificationObj notificationObj = null;
+		DemandNotificationObj notificationObj;
 		try {
-			log.info("Consuming record: " + request);
 			notificationObj = mapper.convertValue(request, DemandNotificationObj.class);
-			StringBuilder builder = new StringBuilder();
-			builder.append("Demand Notification Object Received: Billing Cycle ")
-					.append((notificationObj.getBillingCycle() == null ? "" : notificationObj.getBillingCycle()))
-					.append(" Demand Generated Successfully :  ")
-					.append(notificationObj.isSuccess() + " Water Connection List :")
-					.append((notificationObj.getWaterConnectionIds() == null ? ""
-							: notificationObj.getWaterConnectionIds().toString()));
-			log.info(builder.toString());
 			notificationService.process(notificationObj, topic);
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + request + " on topic: " + topic + ": " + e);

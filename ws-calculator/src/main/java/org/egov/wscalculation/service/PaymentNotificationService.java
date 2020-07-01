@@ -2,29 +2,23 @@ package org.egov.wscalculation.service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.Action;
-import org.egov.wscalculation.model.ActionItem;
-import org.egov.wscalculation.model.Event;
-import org.egov.wscalculation.model.EventRequest;
-import org.egov.wscalculation.model.Property;
-import org.egov.wscalculation.model.Recepient;
-import org.egov.wscalculation.model.SMSRequest;
-import org.egov.wscalculation.model.Source;
-import org.egov.wscalculation.model.WaterConnection;
-import org.egov.wscalculation.model.WaterConnectionRequest;
+import org.egov.wscalculation.web.models.Action;
+import org.egov.wscalculation.web.models.ActionItem;
+import org.egov.wscalculation.web.models.Event;
+import org.egov.wscalculation.web.models.EventRequest;
+import org.egov.wscalculation.web.models.Property;
+import org.egov.wscalculation.web.models.Recipient;
+import org.egov.wscalculation.web.models.SMSRequest;
+import org.egov.wscalculation.web.models.Source;
+import org.egov.wscalculation.web.models.WaterConnection;
+import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.NotificationUtil;
@@ -93,7 +87,7 @@ public class PaymentNotificationService {
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
 					if (waterConnection == null) {
-						throw new CustomException("Water Connection not found for given criteria ",
+						throw new CustomException("WATER_CONNECTION_NOT_FOUND",
 								"Water Connection are not present for " + mappedRecord.get(consumerCode)
 										+ " connection no");
 					}
@@ -107,12 +101,11 @@ public class PaymentNotificationService {
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
 					if (waterConnection == null) {
-						throw new CustomException("Water Connection not found for given criteria ",
+						throw new CustomException("WATER_CONNECTION_NOT_FOUND",
 								"Water Connection are not present for " + mappedRecord.get(consumerCode)
 										+ " connection no");
 					}
-					List<SMSRequest> smsRequests = null;
-					smsRequests = getSmsRequest(mappedRecord, waterConnectionRequest, topic, property);
+					List<SMSRequest> smsRequests = getSmsRequest(mappedRecord, waterConnectionRequest, topic, property);
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
@@ -121,17 +114,17 @@ public class PaymentNotificationService {
 			}
 
 		} catch (Exception ex) {
-			log.error("Error occured while processing the record: ", ex);
+			log.error("Error occurred while processing the record: ", ex);
 		}
 	}
 	
 	/**
 	 * 
-	 * @param mappedRecord
-	 * @param waterConnection
-	 * @param topic
-	 * @param requestInfo
-	 * @return
+	 * @param mappedRecord	List of events
+	 * @param waterConnectionRequest WaterConnectionRequest
+	 * @param topic Name of the Topic
+	 * @param property Property Object
+	 * @return returns the EventRequest
 	 */
 	private EventRequest getEventRequest(HashMap<String, String> mappedRecord, WaterConnectionRequest waterConnectionRequest, String topic,
 			Property property) {
@@ -146,28 +139,25 @@ public class PaymentNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
+		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
-		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-//		Map<String, String> mapOfPhnoAndUUIDs = waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
+		Set<String> mobileNumbers = new HashSet<>(mobileNumberAndMessage.keySet());
 		
-		Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobileNumbers, waterConnectionRequest.getRequestInfo(),
+		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, waterConnectionRequest.getRequestInfo(),
 				property.getTenantId());
 		
-		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+		if (CollectionUtils.isEmpty(mapOfPhoneNoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
 		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
-			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
+			if (null == mapOfPhoneNoAndUUIDs.get(mobile) || null == mobileNumberAndMessage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
 				continue;
 			}
 			List<String> toUsers = new ArrayList<>();
-			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
-			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
-		//	List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
-			Action action = null;
+			toUsers.add(mapOfPhoneNoAndUUIDs.get(mobile));
+			Recipient recepient = Recipient.builder().toUsers(toUsers).toRoles(null).build();
 			List<ActionItem> items = new ArrayList<>();
 			String actionLink = config.getPayLink().replace("$mobile", mobile)
 					.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getConnectionNo())
@@ -175,9 +165,9 @@ public class PaymentNotificationService {
 			actionLink = config.getNotificationUrl() + actionLink;
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
 			items.add(item);
-			action = Action.builder().actionUrls(items).build();
+			Action action = Action.builder().actionUrls(items).build();
 			events.add(Event.builder().tenantId(property.getTenantId())
-					.description(mobileNumberAndMesssage.get(mobile))
+					.description(mobileNumberAndMessage.get(mobile))
 					.eventType(WSCalculationConstant.USREVENTS_EVENT_TYPE)
 					.name(WSCalculationConstant.USREVENTS_EVENT_NAME)
 					.postedBy(WSCalculationConstant.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
@@ -192,11 +182,11 @@ public class PaymentNotificationService {
 	
 	/**
 	 * 
-	 * @param mappedRecord
-	 * @param waterConnection
-	 * @param topic
-	 * @param requestInfo
-	 * @return
+	 * @param mappedRecord List of MapperRecord
+	 * @param waterConnectionRequest WaterCs connectionRequest Object
+	 * @param topic Name of the Topic
+	 * @param property Property object
+	 * @return Returns theList of MSM[[ ss]
 	 */
 	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, WaterConnectionRequest waterConnectionRequest, String topic,
 			Property property) {
@@ -211,18 +201,18 @@ public class PaymentNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
+		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			if (messg.contains("<Link to Bill>")) {
+		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			if (msg.contains("<Link to Bill>")) {
 				String actionLink = config.getSmsNotificationLink()
 						.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getConnectionNo())
 						.replace("$tenantId", property.getTenantId());
 				actionLink = config.getNotificationUrl() + actionLink;
-				messg = messg.replace("<Link to Bill>", actionLink);
+				msg = msg.replace("<Link to Bill>", actionLink);
 			}
-			SMSRequest req = new SMSRequest(mobileNumber, messg);
+			SMSRequest req = new SMSRequest(mobileNumber, msg);
 			smsRequest.add(req);
 		});
 		return smsRequest;
@@ -230,28 +220,27 @@ public class PaymentNotificationService {
 	
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,
 			HashMap<String, String> mapRecords, String message) {
-		Map<String, String> messagetoreturn = new HashMap<>();
-		String messageToreplace = message;
+		Map<String, String> messageToReturn = new HashMap<>();
 		for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
-			messageToreplace = message;
-			if (messageToreplace.contains("<Owner Name>"))
-				messageToreplace = messageToreplace.replace("<Owner Name>", mobileAndName.getValue());
-			if (messageToreplace.contains("<Service>"))
-				messageToreplace = messageToreplace.replace("<Service>", WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
-			if (messageToreplace.contains("<bill amount>"))
-				messageToreplace = messageToreplace.replace("<bill amount>", mapRecords.get(totalBillAmount));
-			if (messageToreplace.contains("<Due Date>"))
-				messageToreplace = messageToreplace.replace("<Due Date>", mapRecords.get(dueDate));
-			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
+			String messageToReplace = message;
+			if (messageToReplace.contains("<Owner Name>"))
+				messageToReplace = messageToReplace.replace("<Owner Name>", mobileAndName.getValue());
+			if (messageToReplace.contains("<Service>"))
+				messageToReplace = messageToReplace.replace("<Service>", WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
+			if (messageToReplace.contains("<bill amount>"))
+				messageToReplace = messageToReplace.replace("<bill amount>", mapRecords.get(totalBillAmount));
+			if (messageToReplace.contains("<Due Date>"))
+				messageToReplace = messageToReplace.replace("<Due Date>", mapRecords.get(dueDate));
+			messageToReturn.put(mobileAndName.getKey(), messageToReplace);
 		}
-		return messagetoreturn;
+		return messageToReturn;
 	}
 	
 	
 	/**
 	 * 
-	 * @param context
-	 * @return
+	 * @param context - DocumentContext object
+	 * @return - Returns Map of records
 	 */
 	public HashMap<String, String> mapRecords(DocumentContext context) {
 		try {
@@ -264,33 +253,33 @@ public class PaymentNotificationService {
 			return mappedRecord;
 		} catch (Exception ex) {
 			log.error("", ex);
-			throw new CustomException("Bill Fetch Error","Unable to fetch values from bill");
+			throw new CustomException("BILLING_SERVER_ERROR","Unable to fetch values from billing service");
 		}
 	}
 	
-	private String getLatestBillDetails(String billdetails) {
+	private String getLatestBillDetails(String billDetails) {
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-		log.info("Bill Details : -> " + billdetails);
-		JSONArray jsonArray = new JSONArray(billdetails);
+		log.info("Bill Details : -> " + billDetails);
+		JSONArray jsonArray = new JSONArray(billDetails);
 		ArrayList<Long> billDates = new ArrayList<>();
 		for (int i = 0; i < jsonArray.length(); i++) {
 			JSONObject jsonObj = jsonArray.getJSONObject(i);
 			billDates.add((Long) jsonObj.get("expiryDate"));
 		}
-		Collections.sort(billDates, Collections.reverseOrder());
+		billDates.sort(Collections.reverseOrder());
 		
 		return formatter.format(billDates.get(0));
 	}
 	/**
-     * Fetches UUIDs of CITIZENs based on the phone number.
+     * Fetches UUIDs of CITIZEN based on the phone number.
      * 
-     * @param mobileNumbers
-     * @param requestInfo
-     * @param tenantId
-     * @return
+     * @param mobileNumbers - Mobile Number
+     * @param requestInfo - Request Info Object
+     * @param tenantId - Tenant Id
+     * @return - Returns map of User Details
      */
     private Map<String, String> fetchUserUUIDs(Set<String> mobileNumbers, RequestInfo requestInfo, String tenantId) {
-    	Map<String, String> mapOfPhnoAndUUIDs = new HashMap<>();
+    	Map<String, String> mapOfPhoneNoAndUUIDs = new HashMap<>();
     	StringBuilder uri = new StringBuilder();
     	uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
     	Map<String, Object> userSearchRequest = new HashMap<>();
@@ -303,17 +292,15 @@ public class PaymentNotificationService {
     			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
     			if(null != user) {
     				String uuid = JsonPath.read(user, "$.user[0].uuid");
-    				mapOfPhnoAndUUIDs.put(mobileNo, uuid);
+    				mapOfPhoneNoAndUUIDs.put(mobileNo, uuid);
     			}else {
-        			log.error("Service returned null while fetching user for username - "+mobileNo);
+        			log.error("Service returned null while fetching user");
     			}
     		}catch(Exception e) {
-    			log.error("Exception while fetching user for username - "+mobileNo);
     			log.error("Exception trace: ",e);
-    			continue;
     		}
     	}
-    	return mapOfPhnoAndUUIDs;
+    	return mapOfPhoneNoAndUUIDs;
     }
 
 }

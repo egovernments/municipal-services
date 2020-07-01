@@ -26,6 +26,12 @@ public class KafkaConfigBatch {
     @Autowired
     private WSCalculationConfiguration wSCalculationConfiguration;
 
+    /**
+     * Kafka Configuration method.
+     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * This method will provide configuration details for the BatchProcessing Topic Consumers.
+     * @return Returns the list of properties.
+     */
     @Bean("consumerConfigsBatch")
     public Map<String, Object> consumerConfigs() {
         Map<String, Object> props = new HashMap<>(
@@ -38,11 +44,23 @@ public class KafkaConfigBatch {
         return props;
     }
 
+    /**
+     * Kafka Configuration method.
+     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * This method will provide configuration details for the BatchProcessing Topic Consumers.
+     * @return Returns the Kafka ConsumerFactory object.
+     */
     @Bean("consumerFactoryBatch")
     public ConsumerFactory<String, Object> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
+    /**
+     * Kafka Configuration method.
+     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * This method will provide configuration details for the BatchProcessing Topic Consumers.
+     * @return Returns the Kafka ListenerContainerFactory object
+     */
     @Bean("kafkaListenerContainerFactoryBatch")
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory =

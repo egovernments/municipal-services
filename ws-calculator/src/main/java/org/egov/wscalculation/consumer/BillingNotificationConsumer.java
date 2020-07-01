@@ -20,8 +20,8 @@ public class BillingNotificationConsumer {
 
 	/**
 	 * 
-	 * @param request bill Object
-	 * @param topic
+	 * @param record bill Object
+	 * @param topic Topic Name
 	 */
 	@KafkaListener(topics = { "${kafka.topics.billgen.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {

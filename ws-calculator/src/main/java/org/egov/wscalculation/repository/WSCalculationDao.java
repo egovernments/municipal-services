@@ -3,28 +3,28 @@ package org.egov.wscalculation.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
-import org.egov.wscalculation.model.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
+import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
 
 public interface WSCalculationDao {
 
-	public void savemeterReading(MeterConnectionRequest meterConnectionRequest);
+	void saveMeterReading(MeterConnectionRequest meterConnectionRequest);
 	
-	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria);
+	List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria);
 	
-	public ArrayList<String> searchTenentIds();
+	ArrayList<String> searchTenantIds();
 
-	public ArrayList<String> searchConnectionNos(String connectionType, String tenentId);
+	ArrayList<String> searchConnectionNos(String connectionType, String tenantId);
 	
-	public List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria);
+	List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria);
 	
-	public int isMeterReadingConnectionExist(List<String> ids);
+	int isMeterReadingConnectionExist(List<String> ids);
 	
-	public List<String> getConnectionsNoList(String tenantId, String connectionType);
+	List<String> getConnectionsNoList(String tenantId, String connectionType);
 	
-	public List<String> getTenantId();
+	List<String> getTenantId();
 	
-	public int isBillingPeriodExists(String connectionNo, String billingPeriod);
+	int isBillingPeriodExists(String connectionNo, String billingPeriod);
 
 }

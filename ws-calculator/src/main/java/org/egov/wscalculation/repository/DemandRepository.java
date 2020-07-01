@@ -5,9 +5,9 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
-import org.egov.wscalculation.model.Demand;
-import org.egov.wscalculation.model.DemandRequest;
-import org.egov.wscalculation.model.DemandResponse;
+import org.egov.wscalculation.web.models.Demand;
+import org.egov.wscalculation.web.models.DemandRequest;
+import org.egov.wscalculation.web.models.DemandResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -38,15 +38,14 @@ public class DemandRepository {
         StringBuilder url = new StringBuilder(config.getBillingServiceHost());
         url.append(config.getDemandCreateEndPoint());
         DemandRequest request = new DemandRequest(requestInfo,demands);
-        Object result = serviceRequestRepository.fetchResult(url,request);
+        Object result = serviceRequestRepository.fetchResult(url, request);
         try{
            return  mapper.convertValue(result,DemandResponse.class).getDemands();
         }
         catch(IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response of create demand");
+            throw new CustomException("PARSING_ERROR","Failed to parse response of create demand");
         }
     }
-
 
     /**
      * Updates the demand
@@ -58,12 +57,12 @@ public class DemandRepository {
         StringBuilder url = new StringBuilder(config.getBillingServiceHost());
         url.append(config.getDemandUpdateEndPoint());
         DemandRequest request = new DemandRequest(requestInfo,demands);
-        Object result = serviceRequestRepository.fetchResult(url,request);
+        Object result = serviceRequestRepository.fetchResult(url, request);
         try{
             return mapper.convertValue(result,DemandResponse.class).getDemands();
         }
         catch(IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response of update demand");
+            throw new CustomException("PARSING_ERROR","Failed to parse response of update demand");
         }
     }
 

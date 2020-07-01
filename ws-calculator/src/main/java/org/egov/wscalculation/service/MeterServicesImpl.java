@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.wscalculation.model.CalculationCriteria;
-import org.egov.wscalculation.model.CalculationReq;
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
-import org.egov.wscalculation.model.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
+import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.validator.WSCalculationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,6 @@ public class MeterServicesImpl implements MeterService {
 	@Autowired
 	private EstimationService estimationService;
 
-
 	private EnrichmentService enrichmentService;
 
 	@Autowired
@@ -49,16 +48,15 @@ public class MeterServicesImpl implements MeterService {
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());
-		wSCalculationDao.savemeterReading(meterConnectionRequest);
+		wSCalculationDao.saveMeterReading(meterConnectionRequest);
 		if (meterConnectionRequest.getMeterReading().getGenerateDemand()) {
 			generateDemandForMeterReading(meterReadingsList, meterConnectionRequest.getRequestInfo());
 		}
 		return meterReadingsList;
 	}
-	
-	
+
 	private void generateDemandForMeterReading(List<MeterReading> meterReadingsList, RequestInfo requestInfo) {
-		List<CalculationCriteria> criterias = new ArrayList<>();
+		List<CalculationCriteria> criteriaList = new ArrayList<>();
 		meterReadingsList.forEach(reading -> {
 			CalculationCriteria criteria = new CalculationCriteria();
 			criteria.setTenantId(reading.getTenantId());
@@ -68,28 +66,24 @@ public class MeterServicesImpl implements MeterService {
 			criteria.setConnectionNo(reading.getConnectionNo());
 			criteria.setFrom(reading.getLastReadingDate());
 			criteria.setTo(reading.getCurrentReadingDate());
-			criterias.add(criteria);
-
+			criteriaList.add(criteria);
 		});
 		CalculationReq calculationRequest = CalculationReq.builder().requestInfo(requestInfo)
-				.calculationCriteria(criterias).isconnectionCalculation(true).build();
+				.calculationCriteria(criteriaList).isconnectionCalculation(true).build();
 		wSCalculationService.getCalculation(calculationRequest);
 	}
 	
 	/**
 	 * 
-	 * @param meterConnectionSearchCriteria
+	 * @param criteria
 	 *            MeterConnectionSearchCriteria contains meter reading
-	 *            connection criterias to be searched for in the meter
+	 *            connection criteria to be searched for in the meter
 	 *            connection table
 	 * @return List of MeterReading after search
 	 */
-
-
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
 		wsCalculationValidator.validateMeterReadingSearchCriteria(criteria);
-		List<MeterReading> meterReadings = wSCalculationDao.searchMeterReadings(criteria);
-		return meterReadings;
+		return wSCalculationDao.searchMeterReadings(criteria);
 	}
 }

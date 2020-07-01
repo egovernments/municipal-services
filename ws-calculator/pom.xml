@@ -56,11 +56,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.egov.services</groupId>
-			<artifactId>tracer</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.egov.services</groupId>
 			<artifactId>services-common</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
@@ -122,8 +117,8 @@
 			<url>https://nexus-repo.egovernments.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		<repository>
-			<id>repo.egovernments.org.public</id>
-			<name>eGov Public Repository Group</name>
+			<id>repo.egovernments.org.</id>
+			<name>eGov  Repository Group</name>
 			<url>https://nexus-repo.egovernments.org/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
@@ -146,41 +141,25 @@
 				<configuration>
 					<jsonLibrary>jackson2</jsonLibrary>
 					<classes>
-						<class>org.egov.wscalculation.model.Demand$StatusEnum</class>
-						<class>org.egov.wscalculation.model.Connection$StatusEnum</class>
-						<class>org.egov.wscalculation.model.MeterConnectionRequest</class>
-						<class>org.egov.wscalculation.model.MeterReadingResponse</class>
-						<class>org.egov.wscalculation.model.MeterReadingSearchCriteria</class>
-						<class>org.egov.wscalculation.model.CalculationReq</class>
-						<class>org.egov.wscalculation.model.CalculationRes</class>
-						<class>org.egov.wscalculation.model.GetBillCriteria</class>
-						<class>org.egov.wscalculation.model.DemandResponse</class>
-						<class>org.egov.wscalculation.model.AdhocTaxReq</class>
-						<class>org.egov.wscalculation.model.RequestInfoWrapper</class>
+						<class>org.egov.wscalculation.web.models.Demand$StatusEnum</class>
+						<class>org.egov.wscalculation.web.models.Connection$StatusEnum</class>
+						<class>org.egov.wscalculation.web.models.MeterConnectionRequest</class>
+						<class>org.egov.wscalculation.web.models.MeterReadingResponse</class>
+						<class>org.egov.wscalculation.web.models.MeterReadingSearchCriteria</class>
+						<class>org.egov.wscalculation.web.models.CalculationReq</class>
+						<class>org.egov.wscalculation.web.models.CalculationRes</class>
+						<class>org.egov.wscalculation.web.models.GetBillCriteria</class>
+						<class>org.egov.wscalculation.web.models.DemandResponse</class>
+						<class>org.egov.wscalculation.web.models.AdhocTaxReq</class>
+						<class>org.egov.wscalculation.web.models.RequestInfoWrapper</class>
 					</classes>
 					<customTypeNaming>
-						<typeNaming>org.egov.wscalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
-						<typeNaming>org.egov.wscalculation.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
+						<typeNaming>org.egov.wscalculation.web.models.Demand$StatusEnum:DemandStatus</typeNaming>
+						<typeNaming>org.egov.wscalculation.web.models.Connection$StatusEnum:ConnectionStatus</typeNaming>
 					</customTypeNaming>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
 					<outputKind>module</outputKind>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-						<exclude>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-devtools</artifactId>
-						</exclude>
-					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -193,6 +172,18 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-devtools</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

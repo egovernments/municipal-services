@@ -27,8 +27,8 @@ public class Repository {
 	/**
 	 * Fetches results from external services through rest call.
 	 * 
-	 * @param requestInfo
-	 * @param uri
+	 * @param uri URI
+	 * @param request Request
 	 * @return Object
 	 */
 	public Object fetchResult(StringBuilder uri, Object request) {
@@ -41,7 +41,7 @@ public class Repository {
 		} catch (ResourceAccessException e) {
 			
 			Map<String, String> map = new HashMap<>();
-			map.put("Exception Occured", e.getMessage());
+			map.put("Exception Occurred", e.getMessage());
 			throw new CustomException(map);
 		}  catch (HttpClientErrorException e) {
 

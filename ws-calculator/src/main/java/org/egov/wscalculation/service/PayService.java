@@ -1,17 +1,12 @@
 package org.egov.wscalculation.service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.TaxHeadEstimate;
+import org.egov.wscalculation.web.models.TaxHeadEstimate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +29,10 @@ public class PayService {
 	 * else if decimal is lesser than 0.5 lower bound is applied
 	 * 
 	 */
-
 	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount, boolean isConnectionFee) {
 		BigDecimal roundOffPos = BigDecimal.ZERO;
 		BigDecimal roundOffNeg = BigDecimal.ZERO;
-        String taxHead = isConnectionFee == true ? WSCalculationConstant.WS_Round_Off : WSCalculationConstant.WS_ONE_TIME_FEE_ROUND_OFF;
+        String taxHead = isConnectionFee ? WSCalculationConstant.WS_Round_Off : WSCalculationConstant.WS_ONE_TIME_FEE_ROUND_OFF;
 		BigDecimal result = creditAmount.add(debitAmount);
 		BigDecimal roundOffAmount = result.setScale(2, 2);
 		BigDecimal reminder = roundOffAmount.remainder(BigDecimal.ONE);
@@ -60,26 +54,24 @@ public class PayService {
 	
 	/**
 	 * 
-	 * @param waterCharge
-	 * @param assessmentYear
-	 * @param timeBasedExmeptionMasterMap
-	 * @param billingExpiryDate
+	 * @param waterCharge - Water Charge Amount
+	 * @param assessmentYear - Assessment Year
+	 * @param timeBasedExemptionMasterMap - Time Based Exemption Master Data
+	 * @param billingExpiryDate - Billing Expiry Date
 	 * @return estimation of time based exemption
 	 */
 	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal waterCharge,
-			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
+			String assessmentYear, Map<String, JSONArray> timeBasedExemptionMasterMap, Long billingExpiryDate) {
 
 		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
 			return null;
 		Map<String, BigDecimal> estimates = new HashMap<>();
-		BigDecimal penalty = BigDecimal.ZERO;
-		BigDecimal interest = BigDecimal.ZERO;
 		long currentUTC = System.currentTimeMillis();
-		long numberOfDaysInMillies = billingExpiryDate - currentUTC;
-		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
+		long numberOfDaysInMillis = billingExpiryDate - currentUTC;
+		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillis))));
 		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
-		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
-		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER));
+		BigDecimal penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExemptionMasterMap.get(WSCalculationConstant.WC_PENANLTY_MASTER));
+		BigDecimal interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExemptionMasterMap.get(WSCalculationConstant.WC_INTEREST_MASTER));
 		estimates.put(WSCalculationConstant.WS_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(WSCalculationConstant.WS_TIME_INTEREST, interest.setScale(2, 2));
 		return estimates;
@@ -88,8 +80,8 @@ public class PayService {
 	/**
 	 * Returns the Amount of penalty that has to be applied on the given tax amount for the given period
 	 * 
-	 * @param taxAmt
-	 * @param assessmentYear
+	 * @param taxAmt - Tax Amount
+	 * @param assessmentYear - Assessment Year
 	 * @return applicable penalty for given time
 	 */
 	public BigDecimal getPenalty(BigDecimal taxAmt, String assessmentYear, JSONArray penaltyMasterList, BigDecimal noOfDays) {
@@ -97,28 +89,14 @@ public class PayService {
 		BigDecimal penaltyAmt = BigDecimal.ZERO;
 		Map<String, Object> penalty = mDService.getApplicableMaster(assessmentYear, penaltyMasterList);
 		if (null == penalty) return penaltyAmt;
-			penaltyAmt = mDService.calculateApplicables(taxAmt, penalty);
+			penaltyAmt = mDService.calculateApplicable(taxAmt, penalty);
 		return penaltyAmt;
-	}
-
-
-	/**
-	 * Returns the current end of the day epoch time for the given epoch time
-	 * @param epoch The epoch time for which end of day time is required
-	 * @return End of day epoch time for the given time
-	 */
-	public static Long getEODEpoch(Long epoch){
-		LocalDate date =
-				Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get("IST"))).toLocalDate();
-		LocalDateTime endOfDay = LocalDateTime.of(date, LocalTime.MAX);
-		Long eodEpoch = endOfDay.atZone(ZoneId.of(ZoneId.SHORT_IDS.get("IST"))).toInstant().toEpochMilli();
-		return eodEpoch;
 	}
 	
 	/**
 	 * 
-	 * @param waterCharge
-	 * @param noOfDays
+	 * @param waterCharge - Water Charge amount
+	 * @param noOfDays - No.Of.Days
 	 * @param config
 	 *            master configuration
 	 * @return applicable penalty
@@ -156,8 +134,8 @@ public class PayService {
 	
 	/**
 	 * 
-	 * @param waterCharge
-	 * @param noOfDays
+	 * @param waterCharge - Water Charge
+	 * @param noOfDays - No.Of Days value
 	 * @param config
 	 *            master configuration
 	 * @return applicable Interest
@@ -192,9 +170,5 @@ public class PayService {
 		}
 		//applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
 		return applicableInterest;
-	}
-	
-	public Long convertDaysToMilliSecond(int days) {
-		return TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS); //gives 86400000
 	}
 }

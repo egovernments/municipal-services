@@ -14,16 +14,16 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.AdhocTaxReq;
-import org.egov.wscalculation.model.Calculation;
-import org.egov.wscalculation.model.CalculationCriteria;
-import org.egov.wscalculation.model.CalculationReq;
-import org.egov.wscalculation.model.Category;
-import org.egov.wscalculation.model.Property;
-import org.egov.wscalculation.model.TaxHeadEstimate;
-import org.egov.wscalculation.model.TaxHeadMaster;
-import org.egov.wscalculation.model.WaterConnection;
-import org.egov.wscalculation.model.WaterConnectionRequest;
+import org.egov.wscalculation.web.models.AdhocTaxReq;
+import org.egov.wscalculation.web.models.Calculation;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
+import org.egov.wscalculation.web.models.Category;
+import org.egov.wscalculation.web.models.Property;
+import org.egov.wscalculation.web.models.TaxHeadEstimate;
+import org.egov.wscalculation.web.models.TaxHeadMaster;
+import org.egov.wscalculation.web.models.WaterConnection;
+import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
@@ -62,30 +62,27 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private WSCalculationUtil wSCalculationUtil;
-	
-	
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge And Estimation Charge
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
-		List<Calculation> calculations = new ArrayList<>();
-		
+		List<Calculation> calculations;
+
+		Map<String, Object> masterMap;
 		if (request.getIsconnectionCalculation()) {
 			//Calculate and create demand for connection
-			Map<String, Object> masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
+			masterMap = masterDataService.loadMasterData(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getCalculations(request, masterMap);
-			demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, request.getIsconnectionCalculation());
-			unsetWaterConnection(calculations);
 		} else {
 			//Calculate and create demand for application
-			Map<String, Object> masterData = masterDataService.loadExemptionMaster(request.getRequestInfo(),
+			masterMap = masterDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
-			calculations = getFeeCalculation(request, masterData);
-			demandService.generateDemand(request.getRequestInfo(), calculations, masterData, request.getIsconnectionCalculation());
-			unsetWaterConnection(calculations);
+			calculations = getFeeCalculation(request, masterMap);
 		}
+		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, request.getIsconnectionCalculation());
+		unsetWaterConnection(calculations);
 		return calculations;
 	}
 	
@@ -93,7 +90,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	/**
 	 * 
 	 * 
-	 * @param request
+	 * @param request - Calculation Request Object
 	 * @return List of calculation.
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
@@ -104,7 +101,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 	/**
 	 * 
-	 * @param request
+	 * @param request - Calculation Request Object
 	 * @return list of calculation based on request
 	 */
 	public List<Calculation> getEstimation(CalculationReq request) {
@@ -117,10 +114,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	/**
 	 * It will take calculation and return calculation with tax head code 
 	 * 
-	 * @param requestInfo
+	 * @param requestInfo Request Info Object
 	 * @param criteria Calculation criteria on meter charge
 	 * @param estimatesAndBillingSlabs Billing Slabs
-	 * @param masterMap
+	 * @param masterMap Master MDMS Data
 	 * @return Calculation With Tax head
 	 */
 	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
@@ -218,17 +215,17 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 
 	@Override
-	public void jobscheduler() {
+	public void jobScheduler() {
 		// TODO Auto-generated method stub
-		ArrayList<String> tenentIds = wSCalculationDao.searchTenentIds();
+		ArrayList<String> tenantIds = wSCalculationDao.searchTenantIds();
 
-		for (String tenentId : tenentIds) {
+		for (String tenantId : tenantIds) {
 			RequestInfo requestInfo = new RequestInfo();
 			User user = new User();
-			user.setTenantId(tenentId);
+			user.setTenantId(tenantId);
 			requestInfo.setUserInfo(user);
 			String jsonPath = WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod;
-			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, tenentId);
+			MdmsCriteriaReq mdmsCriteriaReq = calculatorUtil.getBillingFrequency(requestInfo, tenantId);
 			StringBuilder url = calculatorUtil.getMdmsSearchUrl();
 			Object res = repository.fetchResult(url, mdmsCriteriaReq);
 			if (res == null) {
@@ -236,13 +233,13 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 						"ERROR IN FETCHING THE BILLING FREQUENCY");
 			}
 			ArrayList<?> mdmsResponse = JsonPath.read(res, jsonPath);
-			getBillingPeriod(mdmsResponse, requestInfo, tenentId);
+			getBillingPeriod(mdmsResponse, requestInfo, tenantId);
 		}
 	}
 	
 
 	@SuppressWarnings("unchecked")
-	public void getBillingPeriod(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenentId) {
+	public void getBillingPeriod(ArrayList<?> mdmsResponse, RequestInfo requestInfo, String tenantId) {
 		log.info("Billing Frequency Map" + mdmsResponse.toString());
 		Map<String, Object> master = (Map<String, Object>) mdmsResponse.get(0);
 		LocalDateTime demandStartingDate = LocalDateTime.now();
@@ -252,12 +249,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		if (demandStartingDate.getDayOfMonth() == (demandGenerateDateMillis) / 86400) {
 
-			ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenentId);
+			ArrayList<String> connectionNos = wSCalculationDao.searchConnectionNos(connectionType, tenantId);
 			for (String connectionNo : connectionNos) {
 
 				CalculationReq calculationReq = new CalculationReq();
 				CalculationCriteria calculationCriteria = new CalculationCriteria();
-				calculationCriteria.setTenantId(tenentId);
+				calculationCriteria.setTenantId(tenantId);
 				calculationCriteria.setConnectionNo(connectionNo);
 
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
@@ -290,8 +287,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	/**
 	 * 
-	 * @param request
-	 * @param masterMap
+	 * @param request - Calculation Request Object
+	 * @param masterMap - Master MDMS Data
 	 * @return list of calculation based on estimation criteria
 	 */
 	List<Calculation> getFeeCalculation(CalculationReq request, Map<String, Object> masterMap) {
@@ -312,7 +309,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	/**
 	 * Add adhoc tax to demand
-	 * @param adhocTaxReq
+	 * @param adhocTaxReq - Adhox Tax Request Object
 	 * @return List of Calculation
 	 */
 	public List<Calculation> applyAdhocTax(AdhocTaxReq adhocTaxReq) {
@@ -327,7 +324,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
 				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
 		List<Calculation> calculations = Collections.singletonList(calculation);
-		return demandService.updateDemandForAdhochTax(adhocTaxReq.getRequestInfo(), calculations);
+		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 	
 }

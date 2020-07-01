@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.model.MeterConnectionRequest;
-import org.egov.wscalculation.model.MeterReading;
-import org.egov.wscalculation.model.MeterReadingSearchCriteria;
-import org.egov.wscalculation.model.WaterConnection;
+import org.egov.wscalculation.web.models.MeterConnectionRequest;
+import org.egov.wscalculation.web.models.MeterReading;
+import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.service.MasterDataService;
 import org.egov.wscalculation.util.CalculatorUtil;
@@ -44,13 +44,12 @@ public class WSCalculationValidator {
 
 	/**
 	 * 
-	 * @param meterReadingConnectionRequest
+	 * @param meterConnectionRequest
 	 *            meterReadingConnectionRequest is request for create or update
 	 *            meter reading connection
 	 * @param isUpdate
 	 *            True for create
 	 */
-
 	public void validateMeterReading(MeterConnectionRequest meterConnectionRequest, boolean isUpdate) {
 		MeterReading meterReading = meterConnectionRequest.getMeterReading();
 		Map<String, String> errorMap = new HashMap<>();
@@ -120,7 +119,7 @@ public class WSCalculationValidator {
 	 */
 	private void validateBillingPeriod(String billingPeriod) {
 		if (StringUtils.isEmpty(billingPeriod))
-			 throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing can not empty!!");
+			 throw new CustomException("BILLING_PERIOD_PARSING_ISSUE", "Billing can not empty!!");
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 			ZoneId defaultZoneId = ZoneId.systemDefault();
@@ -130,17 +129,17 @@ public class WSCalculationValidator {
 			LocalDate localDateTime = LocalDate.now();
 			if ((billingLocalDate.getYear() == localDateTime.getYear())
 					&& (billingLocalDate.getMonthValue() > localDateTime.getMonthValue())) {
-				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+				throw new CustomException("BILLING_PERIOD_ISSUE", "Billing period can not be in future!!");
 			}
 			if ((billingLocalDate.getYear() > localDateTime.getYear())) {
-				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
+				throw new CustomException("BILLING_PERIOD_ISSUE", "Billing period can not be in future!!");
 			}
 
 		} catch (CustomException | ParseException ex) {
 			log.error("", ex);
 			if (ex instanceof CustomException)
-				throw new CustomException("BILLING PERIOD ISSUE", "Billing period can not be in future!!");
-			throw new CustomException("BILLING PERIOD PARSING ISSUE", "Billing period can not parsed!!");
+				throw new CustomException("BILLING_PERIOD_ISSUE", "Billing period can not be in future!!");
+			throw new CustomException("BILLING_PERIOD_PARSING_ISSUE", "Billing period can not parsed!!");
 		}
 	}
 
@@ -148,8 +147,7 @@ public class WSCalculationValidator {
 	 * validates for the required information needed to do the
 	 * calculation/estimation
 	 * 
-	 * @param detail
-	 *            property detail
+	 * @param waterConnection WaterConnection Object
 	 */
 	public void validateWaterConnectionForCalculation(WaterConnection waterConnection) {
 
@@ -175,7 +173,7 @@ public class WSCalculationValidator {
 
 	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
 		if (criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
-			throw new CustomException("INVALID SEARCH CRITERIA ", " Search can not be done without connection no");
+			throw new CustomException("INVALID_SEARCH_CRITERIA", " Search can not be done without connection no");
 		}
 	}
 

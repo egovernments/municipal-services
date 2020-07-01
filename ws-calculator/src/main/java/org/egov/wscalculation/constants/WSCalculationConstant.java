@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.egov.wscalculation.model.DemandStatus;
+import org.egov.wscalculation.web.models.DemandStatus;
 
 public class WSCalculationConstant {
 
@@ -24,14 +24,7 @@ public class WSCalculationConstant {
 	
 	public static final String ONE_TIME_FEE_SERVICE_FIELD = "WS.ONE_TIME_FEE";
 
-	public static final String WS_TAX = "WS_TAX";
-
 	public static final String WS_CONSUMER_CODE_SEPARATOR = ":";
-
-	public static final String EG_WS_DEPRECIATING_ASSESSMENT_ERROR = "EG_WS_DEPRECIATING_ASSESSMENT_ERROR";
-
-	public static final String EG_WS_DEPRECIATING_ASSESSMENT_ERROR_MSG = "Depreciating assessments are not allowed for the same assessment year,"
-			+ "please kindly update the values for the following properties with assessmentNumbers : ";
 
 	public static final String FINANCIAL_YEAR_MASTER = "FinancialYear";
 
@@ -55,24 +48,12 @@ public class WSCalculationConstant {
 
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
 
-	public static final String DEMAND_ID_SEARCH_FIELD_NAME = "demandId=";
-
 	public static final String DEMAND_CANCELLED_STATUS = DemandStatus.CANCELLED.toString();
 
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
 
 	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND = "EG_WS_FINANCIAL_MASTER_NOT_FOUND";
 	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
-
-	/*
-	 * queries
-	 */
-
-	public static final String QUERY_ASSESSMENT_INSERT = "INSERT INTO eg_pt_assessment (uuid, assessmentnumber, assessmentyear, demandid,"
-
-			+ " propertyid, tenantid, createdby, createdtime, lastmodifiedby, lastmodifiedtime)"
-
-			+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
 	public static final String WATER_TAX_SERVICE_CODE = "WS";
@@ -81,22 +62,17 @@ public class WSCalculationConstant {
 
 	public static final String EMPTY_DEMAND_ERROR_MESSAGE = "No demands found for the given bill generate criteria";
 
-	public static final String WATER_TAX_MODULE = "WaterTax";
-
 	/*
 	 * exceptions
 	 */
-	public static final String CONNECT_EXCEPTION_KEY = "CONNECTION_FAILED";
-
 	public static final String EG_WS_INVALID_DEMAND_ERROR = "EG_WS_INVALID_DEMAND_ERROR";
 	public static final String EG_WS_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 
-	public static final String Assesment_Year = "assessmentYear";
+	public static final String Assessment_Year = "assessmentYear";
 
 	/**
 	 * Time Taxes Config
 	 */
-	public static final String WS_TIME_REBATE = "WS_TIME_REBATE";
 
 	public static final String WS_TIME_INTEREST = "WS_TIME_INTEREST";
 
@@ -135,10 +111,6 @@ public class WSCalculationConstant {
 
 	public static final String FINANCIALYEAR_MASTER_KEY = "2019-20";
 
-	public static final String FINANCIAL_YEAR_STARTING_DATE = "startingDate";
-
-	public static final String FINANCIAL_YEAR_ENDING_DATE = "endingDate";
-
 	public static final String TAXHEADMASTER_MASTER_KEY = "WS_TAX";
 
 	public static final String WS_Round_Off = "WS_Round_Off";
@@ -157,12 +129,9 @@ public class WSCalculationConstant {
 
 	public static final String WC_BILLING_SLAB_MASTER = "WCBillingSlab";
 
-	public static final String CODE_FIELD_NAME = "code";
-
 	public static final List<String> WS_BILLING_SLAB_MASTERS = Collections
 			.unmodifiableList(Arrays.asList(WC_BILLING_SLAB_MASTER));
 
-	public static final Long TIMEZONE_OFFSET = 19800000l;
 	public static final List<String> TAX_APPLICABLE = Collections.unmodifiableList(Arrays.asList(WS_CHARGE));
 
 	public static final String flatRateCalculationAttribute = "Flat";
@@ -178,8 +147,6 @@ public class WSCalculationConstant {
 	public static final String BILLING_PERIOD = "billingPeriod";
 
 	public static final String ConnectionType = "connectionType";
-
-	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
 
 	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
 
@@ -263,14 +230,9 @@ public class WSCalculationConstant {
 	public static final String OTHER_CHARGE_CONST = "other";
 	
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
-	
-	public static final String ROAD_NAME_CONST = "name";
-	
+
 	public static final String UNIT_COST_CONST = "unitCost";
-	
-	
-	public static final Long expiryDateForOneTimeFee = 347126472000l;
-	
+
 	public static final String CALCULATION_ATTRIBUTE_CONST = "CalculationAttribute";
    
 	public static final String ATTRIBUTE = "attribute";
@@ -279,9 +241,9 @@ public class WSCalculationConstant {
 	
 	public static final String ADHOC_REBATE = "adhocRebate";
 	
-	public static final Long APPLICATION_FEE_DEMAND_END_DATE = 157784760000l;
+	public static final Long APPLICATION_FEE_DEMAND_END_DATE = 157784760000L;
 	
-	public static final Long APPLICATION_FEE_DEMAND_EXP_DATE = 220898664000l;
+	public static final Long APPLICATION_FEE_DEMAND_EXP_DATE = 220898664000L;
 	
 	public static final String WS_TIME_ADHOC_PENALTY = "WS_TIME_ADHOC_PENALTY";
 	
