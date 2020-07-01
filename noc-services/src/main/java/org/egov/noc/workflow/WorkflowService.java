@@ -26,8 +26,8 @@ public class WorkflowService {
 	@Autowired
 	private ObjectMapper mapper;
 	
-	public BusinessService getBusinessService(Noc noc, RequestInfo requestInfo) {
-		StringBuilder url = getSearchURLWithParams(noc.getTenantId());
+	public BusinessService getBusinessService(Noc noc, RequestInfo requestInfo, String bussinessServiceValue) {
+		StringBuilder url = getSearchURLWithParams(bussinessServiceValue, noc.getTenantId());
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		BusinessServiceResponse response = null;
@@ -39,13 +39,13 @@ public class WorkflowService {
 		return response.getBusinessServices().get(0);
 	}
 	
-	private StringBuilder getSearchURLWithParams(String tenantId) {
+	private StringBuilder getSearchURLWithParams(String bussinessServiceValue, String tenantId) {
         StringBuilder url = new StringBuilder(config.getWfHost());
         url.append(config.getWfBusinessServiceSearchPath());
         url.append("?tenantId=");
         url.append(tenantId);
         url.append("&businessservices=");
-        url.append(config.getBusinessServiceValue());
+        url.append(bussinessServiceValue);
         return url;
     }
 	

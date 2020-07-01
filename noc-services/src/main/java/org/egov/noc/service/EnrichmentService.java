@@ -49,6 +49,12 @@ public class EnrichmentService {
 		nocRequest.getNoc().setId(UUID.randomUUID().toString());	
 		nocRequest.getNoc().setAccountId(nocRequest.getNoc().getAuditDetails().getCreatedBy());		
 		setIdgenIds(nocRequest);
+		if (!CollectionUtils.isEmpty(nocRequest.getNoc().getDocuments()))
+			nocRequest.getNoc().getDocuments().forEach(document -> {
+				if (document.getId() == null) {
+					document.setId(UUID.randomUUID().toString());
+				}
+		});
 	}
 	
 	private void setIdgenIds(NocRequest request) {
@@ -107,10 +113,10 @@ public class EnrichmentService {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void postStatusEnrichment(NocRequest nocRequest) {
+	public void postStatusEnrichment(NocRequest nocRequest, String businessServiceValue) {
 		Noc noc = nocRequest.getNoc();
 
-		BusinessService businessService = workflowService.getBusinessService(noc, nocRequest.getRequestInfo());
+		BusinessService businessService = workflowService.getBusinessService(noc, nocRequest.getRequestInfo(), businessServiceValue);
 		
 		State stateObj = workflowService.getCurrentState(noc.getApplicationStatus(), businessService);
 		String state = stateObj!=null ? stateObj.getState() : StringUtils.EMPTY;

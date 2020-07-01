@@ -70,10 +70,9 @@ public class NOCUtil {
 	}
 	
 	public List<ModuleDetail> getNOCModuleRequest() {
-
 		List<MasterDetail> nocMasterDtls = new ArrayList<>();
 
-		final String filterCode = "$.[?(@.isActive==true)].code";
+		final String filterCode = "$.[?(@.isActive==true)]";
 
 		nocMasterDtls.add(MasterDetail.builder().name(NOCConstants.NOC_TYPE).filter(filterCode).build());
 
@@ -82,6 +81,8 @@ public class NOCUtil {
 
 		return Arrays.asList(nocModuleDtls);
 	}
+	
+
 
 	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);

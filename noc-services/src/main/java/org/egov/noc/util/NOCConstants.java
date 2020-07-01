@@ -24,5 +24,22 @@ public class NOCConstants {
 	public static final String APPROVED_STATE = "APPROVED";	
 	
 	public static final String ACTION_APPROVE = "APPROVE";	
+	
+	public static final String MODE = "mode";	
+	
+	public static final String ONLINE_MODE = "online";	
+	
+	public static final String OFFLINE_MODE = "offline";	
+	
+	public static final String ONLINE_WF = "onlineWF";	
 
+	public static final String OFFLINE_WF = "offlineWF";
+	
+	public static final String ACTION_REJECT = "REJECT";	
+	
+	public static final String WORKFLOWCODE = "workflowCode";	
+	
+    public static final String NOCTYPE_JSONPATH_CODE = "$.MdmsRes.NOC.NocType";
+
+	
 }
