@@ -3,8 +3,10 @@ package org.egov.noc.service;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.egov.noc.repository.NOCRepository;
+import org.egov.noc.util.NOCConstants;
 import org.egov.noc.util.NOCUtil;
 import org.egov.noc.validator.NOCValidator;
 import org.egov.noc.web.model.Noc;
@@ -17,6 +19,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 @Service
 public class NOCService {
@@ -43,22 +46,29 @@ public class NOCService {
 	public List<Noc> create(NocRequest nocRequest) {
 		String tenantId = nocRequest.getNoc().getTenantId().split("\\.")[0];
 		Object mdmsData = nocUtil.mDMSCall(nocRequest.getRequestInfo(), tenantId);
-		nocValidator.validateCreate(nocRequest, mdmsData);		
+		Map<String, String> additionalDetails = nocValidator.getOrValidateBussinessService(nocRequest.getNoc(), mdmsData);
 		enrichmentService.enrichCreateRequest(nocRequest, mdmsData);
-		wfIntegrator.callWorkFlow(nocRequest);
+		wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		nocRepository.save(nocRequest);
 		return Arrays.asList(nocRequest.getNoc());
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<Noc> update(NocRequest nocRequest) {
 		String tenantId = nocRequest.getNoc().getTenantId().split("\\.")[0];
 		Object mdmsData = nocUtil.mDMSCall(nocRequest.getRequestInfo(), tenantId);
-		BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(), nocRequest.getRequestInfo());
+		Map<String, String> additionalDetails  ;
+		if(!ObjectUtils.isEmpty(nocRequest.getNoc().getAdditionalDetails()))  {
+			additionalDetails = (Map) nocRequest.getNoc().getAdditionalDetails();
+		} else {
+			additionalDetails = nocValidator.getOrValidateBussinessService(nocRequest.getNoc(), mdmsData);
+		}
+		BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(), nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		Noc searchResult = getNocForUpdate(nocRequest);
-		nocValidator.validateUpdate(nocRequest, searchResult, mdmsData);
+		nocValidator.validateUpdate(nocRequest, searchResult, additionalDetails.get(NOCConstants.MODE), mdmsData);
 		enrichmentService.enrichNocUpdateRequest(nocRequest, searchResult);
-		wfIntegrator.callWorkFlow(nocRequest);
-		enrichmentService.postStatusEnrichment(nocRequest);
+		wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
+		enrichmentService.postStatusEnrichment(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
         nocRepository.update(nocRequest, workflowService.isStateUpdatable(nocRequest.getNoc().getApplicationStatus(), businessService));
 		return Arrays.asList(nocRequest.getNoc());
 	}

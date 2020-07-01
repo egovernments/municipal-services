@@ -79,10 +79,7 @@ public class NOCConfiguration {
 
 	@Value("${workflow.process.path}")
 	private String wfProcessPath;
-	
-	@Value("${workflow.noc.businessservice.name}")
-	private String businessServiceValue;
-	
+		
 	@Value("${egov.mdms.host}")
 	private String mdmsHost;
 
@@ -106,5 +103,8 @@ public class NOCConfiguration {
 
 	@Value("${egov.noc.pagination.max.limit}")
 	private Integer maxSearchLimit;
+	
+	@Value("${noc.offline.doc.required}")
+	private Boolean nocOfflineDocRequired;
 
 }

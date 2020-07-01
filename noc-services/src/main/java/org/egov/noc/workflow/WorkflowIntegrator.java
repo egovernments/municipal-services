@@ -75,14 +75,14 @@ public class WorkflowIntegrator {
 	 *
 	 * @param nocRequest
 	 */
-	public void callWorkFlow(NocRequest nocRequest) {
+	public void callWorkFlow(NocRequest nocRequest, String bussinessServiceValue) {
 		String wfTenantId = nocRequest.getNoc().getTenantId();
 		JSONArray array = new JSONArray();
 		Noc noc = nocRequest.getNoc();
 		JSONObject obj = new JSONObject();
 		obj.put(BUSINESSIDKEY, noc.getApplicationNo());
 		obj.put(TENANTIDKEY, wfTenantId);
-		obj.put(BUSINESSSERVICEKEY, config.getBusinessServiceValue());
+		obj.put(BUSINESSSERVICEKEY, bussinessServiceValue);
 		obj.put(MODULENAMEKEY, NOCConstants.NOC_MODULE);
 		obj.put(ACTIONKEY, noc.getWorkflow().getAction());
 		
