@@ -1,15 +1,13 @@
-package org.egov.waterconnection.model.users;
-
-import java.util.List;
-
-import org.egov.common.contract.response.ResponseInfo;
-import org.egov.waterconnection.model.ConnectionHolderInfo;
+package org.egov.wscalculation.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.waterconnection.model.ConnectionHolderInfo;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor

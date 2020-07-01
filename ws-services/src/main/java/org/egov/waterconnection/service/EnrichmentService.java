@@ -12,7 +12,7 @@ import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Idgen.IdResponse;
 import org.egov.waterconnection.model.users.UserDetailResponse;
 import org.egov.waterconnection.model.users.UserSearchRequest;
-import org.egov.waterconnection.model.workflow.ConnectionHolderInfo;
+import org.egov.waterconnection.model.ConnectionHolderInfo;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;

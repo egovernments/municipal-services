@@ -1,11 +1,8 @@
-package org.egov.waterconnection.model.workflow;
+package org.egov.waterconnection.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.egov.common.contract.request.Role;
-import org.egov.waterconnection.model.Document;
-import org.egov.waterconnection.model.Relationship;
-import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.users.User;
 
 import javax.validation.Valid;

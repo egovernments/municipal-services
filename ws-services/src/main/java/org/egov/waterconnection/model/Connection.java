@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.egov.waterconnection.model.workflow.ConnectionHolderInfo;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
 import org.springframework.validation.annotation.Validated;
 

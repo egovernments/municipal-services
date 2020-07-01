@@ -9,7 +9,7 @@ import org.egov.waterconnection.model.ConnectionUserRequest;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.model.users.UserDetailResponse;
 import org.egov.waterconnection.model.users.UserSearchRequest;
-import org.egov.waterconnection.model.workflow.ConnectionHolderInfo;
+import org.egov.waterconnection.model.ConnectionHolderInfo;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
