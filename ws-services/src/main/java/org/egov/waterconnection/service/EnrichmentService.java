@@ -228,7 +228,7 @@ public class EnrichmentService {
 	}
 
 	/**
-	 * Enrich
+	 * Enrich water connection list
 	 * 
 	 * @param waterConnectionList
 	 * @param requestInfo

@@ -1,10 +1,8 @@
 package org.egov.swservice.service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.Property;
@@ -28,10 +26,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Slf4j
@@ -40,16 +38,16 @@ public class SewarageServiceImpl implements SewarageService {
 	Logger logger = LoggerFactory.getLogger(SewarageServiceImpl.class);
 
 	@Autowired
-	SewerageServicesUtil sewerageServicesUtil;
+	private SewerageServicesUtil sewerageServicesUtil;
 
 	@Autowired
-	SewerageConnectionValidator sewerageConnectionValidator;
+	private SewerageConnectionValidator sewerageConnectionValidator;
 
 	@Autowired
-	ValidateProperty validateProperty;
+	private ValidateProperty validateProperty;
 
 	@Autowired
-	MDMSValidator mDMSValidator;
+	private MDMSValidator mDMSValidator;
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
@@ -58,10 +56,10 @@ public class SewarageServiceImpl implements SewarageService {
 	private SWConfiguration config;
 
 	@Autowired
-	EnrichmentService enrichmentService;
+	private EnrichmentService enrichmentService;
 
 	@Autowired
-	SewarageDao sewarageDao;
+	private SewarageDao sewarageDao;
 
 	@Autowired
 	private ActionValidator actionValidator;
@@ -71,7 +69,6 @@ public class SewarageServiceImpl implements SewarageService {
     
 	@Autowired
 	private SewarageDaoImpl sewarageDaoImpl;
-    
 
 	@Autowired
 	private CalculationService calculationService;
@@ -89,7 +86,7 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
-		mDMSValidator.validateMasterData(sewarageConnectionRequest);
+		mDMSValidator.validateMasterForCreateRequest(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
 		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
@@ -110,6 +107,7 @@ public class SewarageServiceImpl implements SewarageService {
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewarageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
 		validateProperty.validatePropertyForConnection(sewarageConnectionList);
+		enrichmentService.enrichConnectionHolderDeatils(sewarageConnectionList, criteria, requestInfo);
 		return sewarageConnectionList;
 	}
 

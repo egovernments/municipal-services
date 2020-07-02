@@ -115,6 +115,10 @@ public class Connection {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
+	@JsonProperty("connectionHolders")
+	@Valid
+	private List<ConnectionHolderInfo> connectionHolders;
+
 	public Connection id(String id) {
 		this.id = id;
 		return this;
@@ -486,6 +490,25 @@ public class Connection {
 		return this;
 	}
 
+	public Connection addConnectionHolderInfo(ConnectionHolderInfo connectionHolderInfo) {
+		if (this.connectionHolders == null) {
+			this.connectionHolders = new ArrayList<ConnectionHolderInfo>();
+		}
+		if (!this.connectionHolders.contains(connectionHolderInfo))
+			this.connectionHolders.add(connectionHolderInfo);
+		return this;
+	}
+
+	@ApiModelProperty(value = "The connection holder info will enter by employee or citizen")
+	@Valid
+	public List<ConnectionHolderInfo> getConnectionHolders() {
+		return connectionHolders;
+	}
+
+	public void setConnectionHolders(List<ConnectionHolderInfo> connectionHolders) {
+		this.connectionHolders = connectionHolders;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -510,14 +533,15 @@ public class Connection {
 				&& Objects.equals(this.connectionCategory, connection.connectionCategory)
 				&& Objects.equals(this.connectionType, connection.connectionType)
 				&& Objects.equals(this.additionalDetails, connection.additionalDetails)
-				&& Objects.equals(this.auditDetails, connection.auditDetails);
+				&& Objects.equals(this.auditDetails, connection.auditDetails)
+				&& Objects.equals(this.connectionHolders, connection.connectionHolders);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, tenantId, propertyId, applicationNo, applicationStatus, status, connectionNo,
 				oldConnectionNo, documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate,
-				connectionCategory, connectionType, additionalDetails, auditDetails);
+				connectionCategory, connectionType, additionalDetails, auditDetails, connectionHolders);
 	}
 
 	@Override
@@ -542,6 +566,7 @@ public class Connection {
 		sb.append("    connectionType: ").append(toIndentedString(connectionType)).append("\n");
 		sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
 		sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
+		sb.append("    connectionHolders: ").append(toIndentedString(connectionHolders)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -1,22 +1,15 @@
 package org.egov.swservice.service;
 
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.AuditDetails;
+import org.egov.swservice.model.*;
 import org.egov.swservice.model.Connection.StatusEnum;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Status;
 import org.egov.swservice.model.Idgen.IdResponse;
+import org.egov.swservice.model.users.UserDetailResponse;
+import org.egov.swservice.model.users.UserSearchRequest;
 import org.egov.swservice.repository.IdGenRepository;
 import org.egov.swservice.repository.SewarageDaoImpl;
 import org.egov.swservice.util.SWConstants;
@@ -26,9 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -38,7 +31,6 @@ public class EnrichmentService {
 	
 	@Autowired
 	private SewerageServicesUtil sewerageServicesUtil;
-
 
 	@Autowired
 	private IdGenRepository idGenRepository;
@@ -52,12 +44,14 @@ public class EnrichmentService {
 	@Autowired
 	private SewarageDaoImpl sewerageDao;
 
+	@Autowired
+	private UserService userService;
+
 
 	
 	/**
 	 * 
 	 * @param sewerageConnectionRequest
-	 * @param propertyList
 	 */
 
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
@@ -106,7 +100,7 @@ public class EnrichmentService {
 	/**
 	 * Sets status for create request
 	 * 
-	 * @param ConnectionRequest
+	 * @param sewerageConnectionRequest
 	 *            The create request
 	 */
 	private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest) {
@@ -151,7 +145,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich update sewarage connection
 	 * 
-	 * @param sewarageConnectionRequest
+	 * @param sewerageConnectionRequest
 	 */
 	public void enrichUpdateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		AuditDetails auditDetails = sewerageServicesUtil
@@ -182,7 +176,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich sewerage connection request and add connection no if status is approved
 	 * 
-	 * @param sewerageConnectionrequest 
+	 * @param sewerageConnectionRequest
 	 */
 	public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest) {
 		if (SWConstants.ACTIVATE_CONNECTION
@@ -228,5 +222,43 @@ public class EnrichmentService {
 		} catch (Exception ex) {
 			log.debug(ex.toString());
 		}
+	}
+
+	/**
+	 * Enrich sewerage connection list
+	 *
+	 * @param sewerageConnectionList
+	 * @param requestInfo
+	 */
+	public void enrichConnectionHolderDeatils(List<SewerageConnection> sewerageConnectionList, SearchCriteria criteria,
+											  RequestInfo requestInfo) {
+		if (CollectionUtils.isEmpty(sewerageConnectionList))
+			return;
+		Set<String> connectionHolderIds = sewerageConnectionList.stream().map(SewerageConnection::getConnectionHolders)
+				.flatMap(List::stream).map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
+		userSearchRequest.setUuid(connectionHolderIds);
+		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+		enrichConnectionHolderInfo(userDetailResponse, sewerageConnectionList);
+	}
+
+	/**
+	 *Populates the owner fields inside of the sewerage connection objects from the response got from calling user api
+	 * @param userDetailResponse
+	 * @param sewerageConnectionList List of water connection whose owner's are to be populated from userDetailsResponse
+	 */
+	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse, List<SewerageConnection> sewerageConnectionList) {
+		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
+		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
+		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
+		sewerageConnectionList.forEach(sewerageConnection -> {
+			sewerageConnection.getConnectionHolders().forEach(holderInfo -> {
+				if (userIdToConnectionHolderMap.get(holderInfo.getUuid()) == null)
+					throw new CustomException("OWNER_SEARCH_ERROR", "The owner of the sewerage application"
+							+ sewerageConnection.getApplicationNo() + " is not coming in user search");
+				else
+					holderInfo.addUserDetail(userIdToConnectionHolderMap.get(holderInfo.getUuid()));
+			});
+		});
 	}
 }

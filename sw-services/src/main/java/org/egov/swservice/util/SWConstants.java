@@ -14,11 +14,13 @@ public class SWConstants {
 
 	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.sw-services-calculation";
 
+	public static final String PROPERTY_JSONPATH_ROOT = "$.MdmsRes.PropertyTax";
+
 	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
 
 	public static final String MDMS_SW_MOD_NAME = "ws-services-masters";
 
-	public static final String MDMS_SW_Connection_Type = "connectionType";
+	public static final String MDMS_SW_CONNECTION_TYPE = "connectionType";
 
 	public static final String INVALID_CONNECTION_TYPE = "Invalid Connection Type";
 
@@ -108,6 +110,10 @@ public class SWConstants {
 	public static final String APPROVE_CONNECTION_CONST = "APPROVE_FOR_CONNECTION";
 
 	public static final String SC_ROADTYPE_MASTER = "RoadType";
+
+	public static final String PROPERTY_OWNERTYPE = "OwnerType";
+
+	public static final String PROPERTY_MASTER_MODULE = "PropertyTax";
 
 	public static final String SW_TAX_MODULE = "sw-services-calculation";
 
