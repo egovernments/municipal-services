@@ -1,5 +1,6 @@
 package org.egov.swservice.repository.rowmapper;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.swservice.model.*;
 import org.egov.swservice.model.Connection.StatusEnum;
 import org.egov.swservice.model.workflow.ProcessInstance;
@@ -117,7 +118,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
         List<ConnectionHolderInfo> connectionHolders = sewerageConnection.getConnectionHolders();
         if (!CollectionUtils.isEmpty(connectionHolders)) {
             for (ConnectionHolderInfo connectionHolderInfo : connectionHolders) {
-                if (connectionHolderInfo.getUuid().equals(uuid))
+                if (!StringUtils.isEmpty(connectionHolderInfo.getUuid()) && !StringUtils.isEmpty(uuid) && connectionHolderInfo.getUuid().equals(uuid))
                     return;
             }
         }

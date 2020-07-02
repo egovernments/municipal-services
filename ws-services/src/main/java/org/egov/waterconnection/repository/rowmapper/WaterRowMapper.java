@@ -5,7 +5,6 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.*;
 import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.enums.Status;
-import org.egov.waterconnection.model.ConnectionHolderInfo;
 import org.egov.waterconnection.model.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -125,7 +124,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
         List<ConnectionHolderInfo> connectionHolders = waterConnection.getConnectionHolders();
         if (!CollectionUtils.isEmpty(connectionHolders)) {
             for (ConnectionHolderInfo connectionHolderInfo : connectionHolders) {
-                if (connectionHolderInfo.getUuid().equals(uuid))
+                if (!StringUtils.isEmpty(connectionHolderInfo.getUuid()) && !StringUtils.isEmpty(uuid) && connectionHolderInfo.getUuid().equals(uuid))
                     return;
             }
         }
