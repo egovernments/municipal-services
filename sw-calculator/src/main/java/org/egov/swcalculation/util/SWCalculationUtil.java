@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,19 +12,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.DemandDetail;
-import org.egov.swcalculation.model.DemandDetailAndCollection;
-import org.egov.swcalculation.model.DemandNotificationObj;
-import org.egov.swcalculation.model.EmailRequest;
-import org.egov.swcalculation.model.EventRequest;
-import org.egov.swcalculation.model.GetBillCriteria;
-import org.egov.swcalculation.model.NotificationReceiver;
-import org.egov.swcalculation.model.Property;
-import org.egov.swcalculation.model.PropertyCriteria;
-import org.egov.swcalculation.model.PropertyResponse;
-import org.egov.swcalculation.model.RequestInfoWrapper;
-import org.egov.swcalculation.model.SMSRequest;
-import org.egov.swcalculation.model.SewerageConnectionRequest;
+import org.egov.swcalculation.web.models.DemandDetail;
+import org.egov.swcalculation.web.models.DemandDetailAndCollection;
+import org.egov.swcalculation.web.models.DemandNotificationObj;
+import org.egov.swcalculation.web.models.EventRequest;
+import org.egov.swcalculation.web.models.GetBillCriteria;
+import org.egov.swcalculation.web.models.NotificationReceiver;
+import org.egov.swcalculation.web.models.Property;
+import org.egov.swcalculation.web.models.PropertyCriteria;
+import org.egov.swcalculation.web.models.PropertyResponse;
+import org.egov.swcalculation.web.models.RequestInfoWrapper;
+import org.egov.swcalculation.web.models.SMSRequest;
+import org.egov.swcalculation.web.models.SewerageConnectionRequest;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
@@ -79,8 +76,8 @@ public class SWCalculationUtil {
 	 * Returns the tax head search Url with tenantId and SW service name
 	 * parameters
 	 *
-	 * @param tenantId
-	 * @return
+	 * @param tenantId - Tenant ID
+	 * @return - Returns TaxPeriod Search URL
 	 */
 	public StringBuilder getTaxPeriodSearchUrl(String tenantId, String serviceFieldValue) {
 
@@ -95,8 +92,8 @@ public class SWCalculationUtil {
 	 * Returns the tax head search Url with tenantId and SW service name
 	 * parameters
 	 *
-	 * @param tenantId
-	 * @return
+	 * @param tenantId - Tenant ID
+	 * @return - Returns TaxHead Search URL
 	 */
 	public StringBuilder getTaxHeadSearchUrl(String tenantId, String serviceFieldValue) {
 
@@ -108,31 +105,10 @@ public class SWCalculationUtil {
 	}
 
 	/**
-	 * Creates generate bill url using tenantId,consumerCode and businessService
-	 * 
-	 * @return Bill Generate url
-	 */
-	public String getBillGenerateURI() {
-		StringBuilder url = new StringBuilder(configurations.getBillingServiceHost());
-		url.append(configurations.getBillGenEndPoint());
-		url.append("?");
-		url.append("tenantId=");
-		url.append("{1}");
-		url.append("&");
-		url.append("consumerCode=");
-		url.append("{2}");
-		url.append("&");
-		url.append("businessService=");
-		url.append("{3}");
-
-		return url.toString();
-	}
-
-	/**
-	 * method to create demandsearch url with demand criteria
+	 * method to create demand search url with demand criteria
 	 *
-	 * @param getBillCriteria
-	 * @return
+	 * @param getBillCriteria - Bill Criteria to search
+	 * @return - Returns the Search URL
 	 */
 	public StringBuilder getDemandSearchUrl(GetBillCriteria getBillCriteria) {
 
@@ -142,8 +118,8 @@ public class SWCalculationUtil {
 					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(SWCalculationConstant.SEPARATER)
 					.append(SWCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
-					.append(getBillCriteria.getConnectionId() + SWCalculationConstant.SW_CONSUMER_CODE_SEPARATOR
-							+ getBillCriteria.getConnectionNumber());
+					.append(getBillCriteria.getConnectionId()).append(SWCalculationConstant.SW_CONSUMER_CODE_SEPARATOR)
+					.append(getBillCriteria.getConnectionNumber());
 
 		else
 			return new StringBuilder().append(configurations.getBillingServiceHost())
@@ -158,7 +134,7 @@ public class SWCalculationUtil {
 	/**
 	 * Returns url for demand update Api
 	 *
-	 * @return
+	 * @return - Returns Update Demand URL
 	 */
 	public StringBuilder getUpdateDemandUrl() {
 		return new StringBuilder().append(configurations.getBillingServiceHost())
@@ -176,7 +152,7 @@ public class SWCalculationUtil {
 		BigDecimal taxAmountForTaxHead = BigDecimal.ZERO;
 		BigDecimal collectionAmountForTaxHead = BigDecimal.ZERO;
 		DemandDetail latestDemandDetail = null;
-		long maxCreatedTime = 0l;
+		long maxCreatedTime = 0L;
 
 		for (DemandDetail detail : details) {
 			taxAmountForTaxHead = taxAmountForTaxHead.add(detail.getTaxAmount());
@@ -191,24 +167,6 @@ public class SWCalculationUtil {
 				.taxAmountForTaxHead(taxAmountForTaxHead).collectionAmountForTaxHead(collectionAmountForTaxHead)
 				.build();
 
-	}
-
-	/**
-	 * Creates sms request for the each owners
-	 * 
-	 * @param message
-	 *            The message for the specific sewerage connection
-	 * @param mobileNumberToOwnerName
-	 *            Map of mobileNumber to OwnerName
-	 * @return List of SMSRequest
-	 */
-	public List<SMSRequest> createSMSRequest(String message, Map<String, String> mobileNumberToOwnerName) {
-		List<SMSRequest> smsRequest = new LinkedList<>();
-		for (Map.Entry<String, String> entryset : mobileNumberToOwnerName.entrySet()) {
-			String customizedMsg = message.replace("<1>", entryset.getValue());
-			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
-		}
-		return smsRequest;
 	}
 
 	/**
@@ -317,9 +275,10 @@ public class SWCalculationUtil {
 
 	/**
 	 * 
-	 * @param license
-	 * @param messages
-	 * @return
+	 * @param receiver - Notification Receiver Object
+	 * @param message - Message
+	 * @param obj - Demand Notification Object
+	 * @return - Returns updated mesage
 	 */
 	public String getAppliedMsg(NotificationReceiver receiver, String message, DemandNotificationObj obj) {
 		message = message.replace("<First Name>", receiver.getFirstName() == null ? "" : receiver.getFirstName());
@@ -342,43 +301,15 @@ public class SWCalculationUtil {
 				 log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				log.info(" Messages: " + smsRequest.getMessage());
 			}
 		}
 	}
 	
 	/**
-	 * Send the SMSRequest on the EmailNotification kafka topic
-	 * @param emailRequest The list of EmailRequest to be sent
-	 */
-	public void sendEmail(List<EmailRequest> emailRequestList) {
-		if (config.getIsSMSEnabled()) {
-			if (CollectionUtils.isEmpty(emailRequestList))
-				log.info("Messages from localization couldn't be fetched!");
-			emailRequestList.forEach(emailRequest -> {
-				producer.push(config.getEmailNotifyTopic(), emailRequest);
-				log.info("Email To : " + emailRequest.getEmail() + " Body: " + emailRequest.getBody()+" Subject: "+ emailRequest.getSubject());
-			});
-		}
-	}
-	
-	
-	public String getCustomizedMsgForEmail(String topic, String localizationMessage) {
-		String messageString = null;
-		if (topic.equalsIgnoreCase(config.getOnDemandSuccess())) {
-			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_SUCCESS_MESSAGE_EMAIL, localizationMessage);
-		}
-		if (topic.equalsIgnoreCase(config.getOnDemandFailed())) {
-			messageString = getMessageTemplate(SWCalculationConstant.DEMAND_FAILURE_MESSAGE_EMAIL, localizationMessage);
-		}
-		return messageString;
-	}
-
-	
-	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
-	 * @param request
+	 * @param request - Event Request Object
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
@@ -387,7 +318,7 @@ public class SWCalculationUtil {
 	
 	/**
 	 * 
-	 * @param SewerageConnectionRequest
+	 * @param sewerageConnectionRequest
 	 *            SewerageConnectionRequest containing property
 	 * @return List of Property
 	 */
@@ -401,25 +332,25 @@ public class SWCalculationUtil {
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
-			throw new CustomException("INCORRECT PROPERTY ID", "SEWERAGE CONNECTION CAN NOT BE CREATED");
+			throw new CustomException("INVALID_PROPERTY_ID", "Failed to create Sewerage connection. Invalid Property Id");
 		}
 		return propertyList;
 	}
 
 	/**
 	 * 
-	 * @param SewerageConnectionRequest
+	 * @param sewerageConnectionRequest
 	 *            SewerageConnectionRequest
 	 */
 	public Property getProperty(SewerageConnectionRequest sewerageConnectionRequest) {
 		Optional<Property> propertyList = propertySearch(sewerageConnectionRequest).stream().findFirst();
 		if (!propertyList.isPresent()) {
-			throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY",
-					"Swerage connection cannot be enriched without property");
+			throw new CustomException("INVALID_PROPERTY_ID",
+					"Sewerage connection cannot be enriched without property");
 		}
 		Property property = propertyList.get();
 		if (StringUtils.isEmpty(property.getUsageCategory())) {
-			throw new CustomException("INVALID SEWERAGE CONNECTION PROPERTY USAGE TYPE",
+			throw new CustomException("INVALID_PROPERTY_USAGE_TYPE",
 					"Sewerage connection cannot be enriched without property usage type");
 		}
 		return property;
@@ -427,33 +358,33 @@ public class SWCalculationUtil {
 
 	/**
 	 * 
-	 * @param criteria
-	 * @return property URL
+	 * @param criteria - Property Search Criteria
+	 * @return URL to Search Property
 	 */
 	private StringBuilder getPropertyURL(PropertyCriteria criteria) {
 		StringBuilder url = new StringBuilder(getPropertyURL());
-		boolean isanyparametermatch = false;
+		boolean isAnyParameterMatch = false;
 		url.append("?");
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
-			isanyparametermatch = true;
+			isAnyParameterMatch = true;
 			url.append(tenantId).append(criteria.getTenantId());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getPropertyIds())) {
-			if (isanyparametermatch)
+			if (isAnyParameterMatch)
 				url.append("&");
-			isanyparametermatch = true;
+			isAnyParameterMatch = true;
 			String propertyIdsString = criteria.getPropertyIds().stream().map(propertyId -> propertyId)
 					.collect(Collectors.toSet()).stream().collect(Collectors.joining(","));
 			url.append(propertyIds).append(propertyIdsString);
 		}
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
-			if (isanyparametermatch)
+			if (isAnyParameterMatch)
 				url.append("&");
-			isanyparametermatch = true;
+			isAnyParameterMatch = true;
 			url.append(mobileNumber).append(criteria.getMobileNumber());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getUuids())) {
-			if (isanyparametermatch)
+			if (isAnyParameterMatch)
 				url.append("&");
 			String uuidString = criteria.getUuids().stream().map(uuid -> uuid).collect(Collectors.toSet()).stream()
 					.collect(Collectors.joining(","));
@@ -474,7 +405,7 @@ public class SWCalculationUtil {
 			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
 			return propertyResponse.getProperties();
 		} catch (Exception ex) {
-			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}
 

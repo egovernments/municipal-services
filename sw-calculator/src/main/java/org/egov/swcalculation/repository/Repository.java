@@ -26,29 +26,27 @@ public class Repository {
 
 	/**
 	 * Fetches results from external services through rest call.
-	 * 
-	 * @param requestInfo
-	 * @param uri
+	 *
+	 * @param uri - URI to send the request
+	 * @param request - Request Object
+	 *
 	 * @return Object
 	 */
 	public Object fetchResult(StringBuilder uri, Object request) {
 
 		Object response = null;
-		log.info("URI: " + uri.toString());
+		log.debug("URI: " + uri.toString());
 		try {
-			log.info(mapper.writeValueAsString(request));
+			log.debug(mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (ResourceAccessException e) {
-
 			Map<String, String> map = new HashMap<>();
-			map.put("Exception Occured", e.getMessage());
+			map.put("PARSING_ERROR", e.getMessage());
 			throw new CustomException(map);
 		} catch (HttpClientErrorException e) {
-
 			log.info("the error is : " + e.getResponseBodyAsString());
 			throw new ServiceCallException(e.getResponseBodyAsString());
 		} catch (Exception e) {
-
 			log.error("Exception while fetching from searcher: ", e);
 		}
 		return response;

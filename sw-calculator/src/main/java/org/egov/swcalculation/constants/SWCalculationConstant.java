@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.egov.swcalculation.model.DemandStatus;
+import org.egov.swcalculation.web.models.DemandStatus;
 
 public class SWCalculationConstant {
 

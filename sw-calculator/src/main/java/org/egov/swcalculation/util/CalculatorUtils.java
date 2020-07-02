@@ -14,10 +14,10 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.RequestInfoWrapper;
-import org.egov.swcalculation.model.SearchCriteria;
-import org.egov.swcalculation.model.SewerageConnection;
-import org.egov.swcalculation.model.SewerageConnectionResponse;
+import org.egov.swcalculation.web.models.RequestInfoWrapper;
+import org.egov.swcalculation.web.models.SearchCriteria;
+import org.egov.swcalculation.web.models.SewerageConnection;
+import org.egov.swcalculation.web.models.SewerageConnectionResponse;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,22 +40,22 @@ public class CalculatorUtils {
 	private ServiceRequestRepository serviceRequestRepository;
 
 	/**
-	 * Prepares and returns Mdms search request with financial master criteria
+	 * Prepares and returns MDMS search request with financial master criteria
 	 *
-	 * @param requestInfo
-	 * @param assesmentYears
-	 * @return
+	 * @param requestInfo - Request Info Object
+	 * @param assessmentYears - List of financial years
+	 * @return - Returns Criteria for MDMS
 	 */
-	public MdmsCriteriaReq getFinancialYearRequest(RequestInfo requestInfo, Set<String> assesmentYears,
+	public MdmsCriteriaReq getFinancialYearRequest(RequestInfo requestInfo, Set<String> assessmentYears,
 			String tenantId) {
 
-		String assessmentYearStr = StringUtils.join(assesmentYears, ",");
-		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.FINANCIAL_YEAR_MASTER)
+		String assessmentYearStr = StringUtils.join(assessmentYears, ",");
+		MasterDetail masterDetail = MasterDetail.builder().name(SWCalculationConstant.FINANCIAL_YEAR_MASTER)
 				.filter("[?(@." + SWCalculationConstant.FINANCIAL_YEAR_RANGE_FEILD_NAME + " IN [" + assessmentYearStr
 						+ "]" + " && @.module== '" + SWCalculationConstant.SERVICE_FIELD_VALUE_SW + "')]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.FINANCIAL_MODULE)
-				.masterDetails(Arrays.asList(mstrDetail)).build();
+				.masterDetails(Arrays.asList(masterDetail)).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
@@ -64,7 +64,7 @@ public class CalculatorUtils {
 	/**
 	 * Returns the url for mdms search endpoint
 	 *
-	 * @return
+	 * @return - Returns MDMS Search URL
 	 */
 	public StringBuilder getMdmsSearchUrl() {
 		return new StringBuilder().append(configurations.getMdmsHost()).append(configurations.getMdmsEndPoint());
@@ -91,7 +91,7 @@ public class CalculatorUtils {
 		try {
 			response = mapper.convertValue(result, SewerageConnectionResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Error while parsing response of Sewerage Search");
+			throw new CustomException("PARSING_ERROR", "Error while parsing response of Sewerage Search");
 		}
 
 		if (response == null || CollectionUtils.isEmpty(response.getSewerageConnections()))
@@ -138,10 +138,10 @@ public class CalculatorUtils {
 
 	public MdmsCriteriaReq getBillingFrequency(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
+		MasterDetail masterDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
 				.filter("[?(@.active== " + true + ")]").build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.SW_MODULE)
-				.masterDetails(Arrays.asList(mstrDetail)).build();
+				.masterDetails(Arrays.asList(masterDetail)).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
@@ -163,7 +163,7 @@ public class CalculatorUtils {
 
 	/**
 	 * 
-	 * @param tenantId
+	 * @param tenantId - Tenant ID
 	 * @return uri of fetch bill
 	 */
 	public StringBuilder getFetchBillURL(String tenantId, String consumerCode) {
@@ -179,9 +179,9 @@ public class CalculatorUtils {
 	
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param connectionNo
-	 * @param tenantId
+	 * @param requestInfo - Request Info Object
+	 * @param searchCriteria - Search Criteria Object
+	 * @param tenantId - Tenant ID
 	 * @return sewerage connection
 	 */
 	public SewerageConnection getSewerageConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
@@ -190,11 +190,11 @@ public class CalculatorUtils {
 		String url = getSewerageSearchURL(searchCriteria);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		SewerageConnectionResponse response = null;
+		SewerageConnectionResponse response;
 		try {
 			response = mapper.convertValue(result, SewerageConnectionResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Error while parsing response of Sewerage Connection Search");
+			throw new CustomException("PARSING_ERROR", "Error while parsing response of Sewerage Connection Search");
 		}
 
 		if (response == null || CollectionUtils.isEmpty(response.getSewerageConnections()))
@@ -213,24 +213,22 @@ public class CalculatorUtils {
 		StringBuilder url = new StringBuilder(configurations.getSewerageConnectionHost());
 		url.append(configurations.getSewerageConnectionSearchEndPoint());
 		url.append("?");
-		url.append("tenantId=" + searchCriteria.getTenantId());
+		url.append("tenantId=").append(searchCriteria.getTenantId());
 		if (searchCriteria.getConnectionNumber() != null) {
 			url.append("&");
-			url.append("connectionNumber=" + searchCriteria.getConnectionNumber());
+			url.append("connectionNumber=").append(searchCriteria.getConnectionNumber());
 		}
 		if (searchCriteria.getApplicationNumber() != null) {
 			url.append("&");
-			url.append("applicationNumber=" + searchCriteria.getApplicationNumber());
+			url.append("applicationNumber=").append(searchCriteria.getApplicationNumber());
 		}
 		return url.toString();
 	}
 	
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param tenantId
-	 * @param roadType
-	 * @param usageType
+	 * @param requestInfo - Request Info Object
+	 * @param tenantId - Tenant Id
 	 * @return mdms request for master data
 	 */
 	public MdmsCriteriaReq getEstimationMasterCriteria(RequestInfo requestInfo, String tenantId) {
@@ -252,18 +250,18 @@ public class CalculatorUtils {
 	
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param tenantId
+	 * @param requestInfo - Request Info Object
+	 * @param tenantId - Tenant Id
 	 * @return MdmsCriteria
 	 */
 	private MdmsCriteriaReq getBillingFrequencyForScheduler(RequestInfo requestInfo, String tenantId) {
 
-		MasterDetail mstrDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
+		MasterDetail masterDetail = MasterDetail.builder().name(SWCalculationConstant.BILLING_PERIOD)
 				.filter("[?(@.active== " + true + " && @.connectionType== '" + SWCalculationConstant.nonMeterdConnection
 						+ "')]")
 				.build();
 		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.SW_MODULE)
-				.masterDetails(Arrays.asList(mstrDetail)).build();
+				.masterDetails(Arrays.asList(masterDetail)).build();
 		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
@@ -271,16 +269,15 @@ public class CalculatorUtils {
 
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param connectionType
-	 * @param tenantId
+	 * @param requestInfo - Request Info Object
+	 * @param tenantId - Tenant ID
 	 * @return Master For Billing Period
 	 */
 	public Map<String, Object> loadBillingFrequencyMasterData(RequestInfo requestInfo, String tenantId) {
 		MdmsCriteriaReq mdmsCriteriaReq = getBillingFrequencyForScheduler(requestInfo, tenantId);
 		Object res = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 		if (res == null) {
-			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "ERROR IN FETCHING THE BILLING FREQUENCY");
+			throw new CustomException("MDMS_ERROR_FOR_BILLING_FREQUENCY", "Failed to get Billing Frequency details");
 		}
 		List<Map<String, Object>> jsonOutput = JsonPath.read(res, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
 		return jsonOutput.get(0);

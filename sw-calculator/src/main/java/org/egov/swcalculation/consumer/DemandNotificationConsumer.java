@@ -3,7 +3,7 @@ package org.egov.swcalculation.consumer;
 import java.util.HashMap;
 
 import org.egov.swcalculation.config.SWCalculationConfiguration;
-import org.egov.swcalculation.model.DemandNotificationObj;
+import org.egov.swcalculation.web.models.DemandNotificationObj;
 import org.egov.swcalculation.service.SewerageDemandNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -32,20 +32,10 @@ public class DemandNotificationConsumer {
 		this.notificationService = notificationService;
 	}
 
-	@KafkaListener(topics = { "${sw.calculator.demand.successful}", "${sw.calculator.demand.failed}" })
+	@KafkaListener(topics = { "${sw.calculator.demand.successful.topic}", "${sw.calculator.demand.failed.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
-			log.info("Consuming record: " + record);
 			DemandNotificationObj demandNotificationObj = mapper.convertValue(record, DemandNotificationObj.class);
-			StringBuilder builder = new StringBuilder();
-			builder.append("Demand Notification Object Received: Billing Cycle ")
-					.append((demandNotificationObj.getBillingCycle() == null ? ""
-							: demandNotificationObj.getBillingCycle()))
-					.append(" Demand Generated Successfully :  ").append(demandNotificationObj.isSuccess())
-					.append(" Sewerage Connection List :")
-					.append((demandNotificationObj.getSewerageConnetionIds() == null ? ""
-							: demandNotificationObj.getSewerageConnetionIds().toString()));
-			log.info(builder.toString());
 			notificationService.process(demandNotificationObj, topic);
 		} catch (final Exception e) {
 			StringBuilder builder = new StringBuilder();

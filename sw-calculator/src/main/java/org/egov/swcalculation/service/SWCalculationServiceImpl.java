@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.AdhocTaxReq;
-import org.egov.swcalculation.model.Calculation;
-import org.egov.swcalculation.model.CalculationCriteria;
-import org.egov.swcalculation.model.CalculationReq;
-import org.egov.swcalculation.model.Category;
-import org.egov.swcalculation.model.Property;
-import org.egov.swcalculation.model.SewerageConnection;
-import org.egov.swcalculation.model.SewerageConnectionRequest;
-import org.egov.swcalculation.model.TaxHeadEstimate;
-import org.egov.swcalculation.model.TaxHeadMaster;
+import org.egov.swcalculation.web.models.AdhocTaxReq;
+import org.egov.swcalculation.web.models.Calculation;
+import org.egov.swcalculation.web.models.CalculationCriteria;
+import org.egov.swcalculation.web.models.CalculationReq;
+import org.egov.swcalculation.web.models.Category;
+import org.egov.swcalculation.web.models.Property;
+import org.egov.swcalculation.web.models.SewerageConnection;
+import org.egov.swcalculation.web.models.SewerageConnectionRequest;
+import org.egov.swcalculation.web.models.TaxHeadEstimate;
+import org.egov.swcalculation.web.models.TaxHeadMaster;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +52,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Sewerage Charge
+	 * @param request  calculation request
+	 * @return Returns the list of Calculation objects
 	 */
 	public List<Calculation> getCalculation(CalculationReq request) {
-		List<Calculation> calculations = new ArrayList<>();
+		List<Calculation> calculations;
 
 		if (request.getIsconnectionCalculation()) {
 			// Calculate and create demand for connection
@@ -66,7 +68,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			unsetSewerageConnection(calculations);
 		} else {
 			// Calculate and create demand for application
-			Map<String, Object> masterData = mDataService.loadExcemptionMaster(request.getRequestInfo(),
+			Map<String, Object> masterData = mDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getFeeCalculation(request, masterData);
 			demandService.generateDemand(request.getRequestInfo(), calculations, masterData,
@@ -79,11 +81,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	/**
 	 * 
-	 * @param requestInfo
-	 * @param criteria
-	 * @param estimatesAndBillingSlabs
-	 * @param masterMap
-	 * @return
+	 * @param requestInfo - Request Info
+	 * @param criteria - Criteria
+	 * @param estimatesAndBillingSlabs - List of estimates
+	 * @param masterMap - MDMS Master Data
+	 * @return - Returns Calculation object
 	 * 
 	 */
 	public Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
@@ -175,9 +177,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
-		tenantIds.forEach(tenantId -> {
-			demandService.generateDemandForTenantId(tenantId, requestInfo);
-		});
+		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo));
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	/**
 	 * 
 	 * 
-	 * @param request
+	 * @param request - Calculation Request
 	 * @return List of calculation.
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
@@ -217,11 +217,11 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	/**
 	 * 
-	 * @param request
+	 * @param request - Calculation Request
 	 * @return list of calculation based on request
 	 */
 	public List<Calculation> getEstimation(CalculationReq request) {
-		Map<String, Object> masterData = mDataService.loadExcemptionMaster(request.getRequestInfo(),
+		Map<String, Object> masterData = mDataService.loadExemptionMaster(request.getRequestInfo(),
 				request.getCalculationCriteria().get(0).getTenantId());
 		List<Calculation> calculations = getFeeCalculation(request, masterData);
 		unsetSewerageConnection(calculations);
@@ -230,8 +230,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 	/**
 	 * 
-	 * @param request
-	 * @param masterMap
+	 * @param request - Calculation Request
+	 * @param masterMap - MDMS Master Data
 	 * @return list of calculation based on estimation criteria
 	 */
 	List<Calculation> getFeeCalculation(CalculationReq request, Map<String, Object> masterMap) {
@@ -253,7 +253,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	
 	/**
 	 * Add adhoc tax to demand
-	 * @param adhocTaxReq
+	 * @param adhocTaxReq - Adhoc Tax Request Object
 	 * @return List of Calculation
 	 */
 	public List<Calculation> applyAdhocTax(AdhocTaxReq adhocTaxReq) {
@@ -268,7 +268,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
 				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
 		List<Calculation> calculations = Collections.singletonList(calculation);
-		return demandService.updateDemandForAdhochTax(adhocTaxReq.getRequestInfo(), calculations);
+		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 
 }

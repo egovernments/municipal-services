@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.TaxHeadEstimate;
+import org.egov.swcalculation.web.models.TaxHeadEstimate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,61 +21,17 @@ public class PayService {
 	
 	@Autowired
 	private EstimationService estimationService;
-		
-	
-	/**
-	 * Returns the Amount of Rebate that can be applied on the given tax amount for
-	 * the given period
-	 * 
-	 * @param taxAmt
-	 * @param assessmentYear
-	 * @returnroundOfDecimals
-	 */
-	public BigDecimal getRebate(BigDecimal taxAmt, String assessmentYear, JSONArray rebateMasterList) {
 
-		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
-
-		if (null == rebate)
-			return BigDecimal.ZERO;
-
-		String[] time = ((String) rebate.get(SWCalculationConstant.ENDING_DATE_APPLICABLES)).split("/");
-		setDateToCalendar(assessmentYear, time, Calendar.getInstance());
-
-		if (Calendar.getInstance().getTimeInMillis() > System.currentTimeMillis()) {
-			return mDService.calculateApplicables(taxAmt, rebate);
-		}
-		return BigDecimal.ZERO;
-	}
-	
-	/**
-	 * Sets the date in to calendar based on the month and date value present in the
-	 * time array
-	 * 
-	 * @param assessmentYear
-	 * @param time
-	 * @param cal
-	 */
-	private void setDateToCalendar(String assessmentYear, String[] time, Calendar cal) {
-
-		cal.clear();
-		Integer day = Integer.valueOf(time[0]);
-		Integer month = Integer.valueOf(time[1]) - 1;
-		// One is subtracted because calender reads january as 0
-		Integer year = Integer.valueOf(assessmentYear.split("-")[0]);
-		if (month < 3)
-			year += 1;
-		cal.set(year, month, day);
-	}	
 	/**
 	 * 
-	 * @param creditAmount
-	 * @param debitAmount
+	 * @param creditAmount - Credit Amount
+	 * @param debitAmount - Debit Amount
 	 * @return TaxHead for SW round off
 	 */
 	public TaxHeadEstimate roundOfDecimals(BigDecimal creditAmount, BigDecimal debitAmount, boolean isConnectionFee) {
 		BigDecimal roundOffPos = BigDecimal.ZERO;
 		BigDecimal roundOffNeg = BigDecimal.ZERO;
-		String taxHead = isConnectionFee == true ? SWCalculationConstant.SW_Round_Off
+		String taxHead = isConnectionFee ? SWCalculationConstant.SW_Round_Off
 				: SWCalculationConstant.SW_ONE_TIME_FEE_ROUND_OFF;
 		BigDecimal result = creditAmount.add(debitAmount);
 		BigDecimal roundOffAmount = result.setScale(2, 2);
@@ -98,26 +54,24 @@ public class PayService {
 	
 	/**
 	 * 
-	 * @param waterCharge
-	 * @param assessmentYear
-	 * @param timeBasedExmeptionMasterMap
-	 * @param billingExpiryDate
+	 * @param sewerageCharge - Sewerage Charge
+	 * @param assessmentYear - Assessment Year
+	 * @param timeBasedExemptionMasterMap - List of time based exemption map
+	 * @param billingExpiryDate - Bill Expiry date
 	 * @return estimation of time based exemption
 	 */
-	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal waterCharge,
-			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
+	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal sewerageCharge,
+			String assessmentYear, Map<String, JSONArray> timeBasedExemptionMasterMap, Long billingExpiryDate) {
 
-		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
+		if (BigDecimal.ZERO.compareTo(sewerageCharge) >= 0)
 			return null;
 		Map<String, BigDecimal> estimates = new HashMap<>();
-		BigDecimal penalty = BigDecimal.ZERO;
-		BigDecimal interest = BigDecimal.ZERO;
 		long currentUTC = System.currentTimeMillis();
-		long numberOfDaysInMillies = billingExpiryDate - currentUTC;
-		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
+		long numberOfDaysInMillis = billingExpiryDate - currentUTC;
+		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillis))));
 		if(BigDecimal.ONE.compareTo(noOfDays) <= 0) noOfDays = noOfDays.add(BigDecimal.ONE);
-		penalty = getApplicablePenalty(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_PENANLTY_MASTER));
-		interest = getApplicableInterest(waterCharge, noOfDays, timeBasedExmeptionMasterMap.get(SWCalculationConstant.SW_INTEREST_MASTER));
+		BigDecimal penalty = getApplicablePenalty(sewerageCharge, noOfDays, timeBasedExemptionMasterMap.get(SWCalculationConstant.SW_PENANLTY_MASTER));
+		BigDecimal interest = getApplicableInterest(sewerageCharge, noOfDays, timeBasedExemptionMasterMap.get(SWCalculationConstant.SW_INTEREST_MASTER));
 		estimates.put(SWCalculationConstant.SW_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(SWCalculationConstant.SW_TIME_INTEREST, interest.setScale(2, 2));
 		return estimates;
@@ -126,10 +80,10 @@ public class PayService {
 	
 	/**
 	 * 
-	 * @param sewerageCharge
-	 * @param noOfDays
-	 * @param config
-	 * @return
+	 * @param sewerageCharge - Sewerage Charge
+	 * @param noOfDays - No of Days
+	 * @param config - Config object
+	 * @return - Returns Penalty details
 	 */
 	public BigDecimal getApplicablePenalty(BigDecimal sewerageCharge, BigDecimal noOfDays, JSONArray config) {
 		BigDecimal applicablePenalty = BigDecimal.ZERO;
@@ -155,8 +109,7 @@ public class PayService {
 
 		if (rate == null)
 			applicablePenalty = flatAmt.compareTo(sewerageCharge) > 0 ? BigDecimal.ZERO : flatAmt;
-		else if (rate != null) {
-			// rate of penalty
+		else {
 			applicablePenalty = sewerageCharge.multiply(rate.divide(SWCalculationConstant.HUNDRED));
 		}
 		return applicablePenalty;
@@ -164,10 +117,10 @@ public class PayService {
 	
 	/**
 	 * 
-	 * @param sewerageCharge
-	 * @param noOfDays
-	 * @param config
-	 * @return
+	 * @param sewerageCharge - Sewerage Charge
+	 * @param noOfDays - No of Days
+	 * @param config - Config object
+	 * @return - Returns applicable interest details
 	 */
 	public BigDecimal getApplicableInterest(BigDecimal sewerageCharge, BigDecimal noOfDays, JSONArray config) {
 		BigDecimal applicableInterest = BigDecimal.ZERO;
@@ -193,15 +146,11 @@ public class PayService {
 
 		if (rate == null)
 			applicableInterest = flatAmt.compareTo(sewerageCharge) > 0 ? BigDecimal.ZERO : flatAmt;
-		else if (rate != null) {
+		else {
 			// rate of interest
 			applicableInterest = sewerageCharge.multiply(rate.divide(SWCalculationConstant.HUNDRED));
 		}
 		//applicableInterest.multiply(noOfDays.divide(BigDecimal.valueOf(365), 6, 5));
 		return applicableInterest;
-	}
-	
-	public Long convertDaysToMilliSecond(int days) {
-		return TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS); //gives 86400000
 	}
 }

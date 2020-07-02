@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swcalculation.config.SWCalculationConfiguration;
-import org.egov.swcalculation.model.CalculationCriteria;
-import org.egov.swcalculation.model.CalculationReq;
+import org.egov.swcalculation.web.models.CalculationCriteria;
+import org.egov.swcalculation.web.models.CalculationReq;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.service.MasterDataService;
 import org.egov.swcalculation.service.SWCalculationServiceImpl;
@@ -46,7 +46,7 @@ public class DemandGenerationConsumer {
 	 *            would be calculation criteria.
 	 */
 	@KafkaListener(topics = {
-			"${egov.seweragecalculatorservice.createdemand}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
+			"${egov.seweragecalculatorservice.createdemand.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	@SuppressWarnings("unchecked")
 	public void listen(final List<Message<?>> records) {
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
@@ -80,7 +80,6 @@ public class DemandGenerationConsumer {
 	 */
 	@KafkaListener(topics = {
 			"${persister.demand.based.dead.letter.topic.batch}" }, containerFactory = "kafkaListenerContainerFactory")
-	@SuppressWarnings("unchecked")
 	public void listenDeadLetterTopic(final List<Message<?>> records) {
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
 		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),

@@ -3,14 +3,14 @@ package org.egov.swcalculation.service;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.swcalculation.model.Calculation;
-import org.egov.swcalculation.model.CalculationReq;
+import org.egov.swcalculation.web.models.Calculation;
+import org.egov.swcalculation.web.models.CalculationReq;
 
 public interface SWCalculationService {
 	
-	public List<Calculation> getCalculation(CalculationReq request);
+	List<Calculation> getCalculation(CalculationReq request);
 	
-	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
+	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
 	
-	public List<Calculation> getEstimation(CalculationReq request);
+	List<Calculation> getEstimation(CalculationReq request);
 }

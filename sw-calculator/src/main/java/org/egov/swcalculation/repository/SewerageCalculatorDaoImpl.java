@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.swcalculation.repository.builder.SWCalculatorQueryBuilder;
-import org.egov.swcalculation.rowMapper.DemandSchedulerRowMapper;
+import org.egov.swcalculation.repository.rowMapper.DemandSchedulerRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

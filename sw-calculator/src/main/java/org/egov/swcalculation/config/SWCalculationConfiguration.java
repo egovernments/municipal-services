@@ -110,10 +110,10 @@ public class SWCalculationConfiguration {
     @Value("${egov.localization.statelevel}")
     private Boolean isLocalizationStateLevel;
     
-    @Value("${sw.calculator.demand.successful}")
+    @Value("${sw.calculator.demand.successful.topic}")
     private String onDemandSuccess;
     
-    @Value("${sw.calculator.demand.failed}")
+    @Value("${sw.calculator.demand.failed.topic}")
     private String onDemandFailed;
     
     @Value("${sw.calculator.bill.successful}")
@@ -154,7 +154,7 @@ public class SWCalculationConfiguration {
     private Integer batchSize;
     
     
-	@Value("${egov.seweragecalculatorservice.createdemand}")
+	@Value("${egov.seweragecalculatorservice.createdemand.topic}")
 	private String createDemand;
 	
     @Value("${persister.demand.based.dead.letter.topic.batch}")
