@@ -12,7 +12,6 @@ import org.egov.waterconnection.model.Connection.StatusEnum;
 import org.egov.waterconnection.model.Idgen.IdResponse;
 import org.egov.waterconnection.model.users.UserDetailResponse;
 import org.egov.waterconnection.model.users.UserSearchRequest;
-import org.egov.waterconnection.model.ConnectionHolderInfo;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -237,8 +236,15 @@ public class EnrichmentService {
 			RequestInfo requestInfo) {
 		if (CollectionUtils.isEmpty(waterConnectionList))
 			return;
-		Set<String> connectionHolderIds = waterConnectionList.stream().map(WaterConnection::getConnectionHolders)
-				.flatMap(List::stream).map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		Set<String> connectionHolderIds = new HashSet<>();
+		for (WaterConnection waterConnection : waterConnectionList) {
+			if (!CollectionUtils.isEmpty(waterConnection.getConnectionHolders())) {
+				connectionHolderIds.addAll(waterConnection.getConnectionHolders().stream()
+						.map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet()));
+			}
+		}
+		if (CollectionUtils.isEmpty(connectionHolderIds))
+			return;
 		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
 		userSearchRequest.setUuid(connectionHolderIds);
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
@@ -246,11 +252,15 @@ public class EnrichmentService {
 	}
 
 	/**
-	 *Populates the owner fields inside of the waterconnection objects from the response got from calling user api
+	 * Populates the owner fields inside of the water connection objects from the
+	 * response got from calling user API
+	 * 
 	 * @param userDetailResponse
-	 * @param waterConnectionList List of water connection whose owner's are to be populated from userDetailsResponse
+	 * @param waterConnectionList List of water connection whose owner's are to be
+	 *                            populated from userDetailsResponse
 	 */
-	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse, List<WaterConnection> waterConnectionList) {
+	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse,
+			List<WaterConnection> waterConnectionList) {
 		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
 		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
 		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
@@ -264,6 +274,5 @@ public class EnrichmentService {
 			});
 		});
 	}
-
 
 }

@@ -231,11 +231,18 @@ public class EnrichmentService {
 	 * @param requestInfo
 	 */
 	public void enrichConnectionHolderDeatils(List<SewerageConnection> sewerageConnectionList, SearchCriteria criteria,
-											  RequestInfo requestInfo) {
+			RequestInfo requestInfo) {
 		if (CollectionUtils.isEmpty(sewerageConnectionList))
 			return;
-		Set<String> connectionHolderIds = sewerageConnectionList.stream().map(SewerageConnection::getConnectionHolders)
-				.flatMap(List::stream).map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		Set<String> connectionHolderIds = new HashSet<>();
+		for (SewerageConnection sewerageConnection : sewerageConnectionList) {
+			if (!CollectionUtils.isEmpty(sewerageConnection.getConnectionHolders())) {
+				connectionHolderIds.addAll(sewerageConnection.getConnectionHolders().stream()
+						.map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet()));
+			}
+		}
+		if (CollectionUtils.isEmpty(connectionHolderIds))
+			return;
 		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
 		userSearchRequest.setUuid(connectionHolderIds);
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
@@ -243,11 +250,15 @@ public class EnrichmentService {
 	}
 
 	/**
-	 *Populates the owner fields inside of the sewerage connection objects from the response got from calling user api
+	 * Populates the owner fields inside of the sewerage connection objects from the
+	 * response got from calling user API
+	 * 
 	 * @param userDetailResponse
-	 * @param sewerageConnectionList List of water connection whose owner's are to be populated from userDetailsResponse
+	 * @param sewerageConnectionList List of water connection whose owner's are to
+	 *                               be populated from userDetailsResponse
 	 */
-	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse, List<SewerageConnection> sewerageConnectionList) {
+	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse,
+			List<SewerageConnection> sewerageConnectionList) {
 		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
 		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
 		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
