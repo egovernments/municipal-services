@@ -37,7 +37,7 @@ Swagger API yaml [[ Swagger API ](https://app.swaggerhub.com/apis/egov-foundatio
  
 ### Resources
 - Granular details about the API's can be found in the [swagger api definition](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free)
-- Postman collection for all the API's can be found in the [postman collection](#resource)
+- Postman collection for all the API's can be found in the [postman collection](sw-calculator-postman.json)
 
 
 ## Build & Run
