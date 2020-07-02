@@ -19,32 +19,32 @@ This module created to manage WaterService connections against a Property in the
 ### Project Structure 
 *Packages*
  - config - Contains all the configuration properties related to module
- - service - Consists of all services containing the business logic.
- - util - Contains utility functions and constatns.
- - validator - Contains all validation code
+ - constants - Contains class which has constant information
+ - consumer - Contains all the kafka consumers
+ - producer - Contains kafka producer
  - repository - Fetch data from dependent micro services
  - repository/rowmapper - Rowmappers to convert db query results to object
  - repository/builder - Contains query builder for search
+ - service - Consists of all services containing the business logic.
+ - util - Contains utility functions and constatns.
+ - validator - Contains all validation code
  - web/controllers - Controllers for the app.
  - web/models - POJO for the module.
- - consumer - Contains all the kafka consumers
- - producer - Contains kafka producer
-
+ - workflow - contains workflow service helpers
+ 
 
 ### Resources
-- Granular details about the API's can be found in the [swagger api definition](https://raw.githubusercontent.com/egovernments/egov-services/master/docs/rainmaker/property-tax/property-service.yml)
-- Postman collection for all the API's can be found in the [postman collection](https://raw.githubusercontent.com/egovernments/egov-services/master/rainmaker/pt-services-v2/pt-services-v2-dev.postman_collection.json)
+- Granular details about the API's can be found in the [swagger api definition](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free)
+- Postman collection for all the API's can be found in the [postman collection](#resource)
 
 
 ## Build & Run
 
-
     mvn clean install
-    java -jar target/egov-ws-service-v2-0.0.1-SNAPSHOT.jar
+    java -jar target/ws-service-1.0.0-SNAPSHOT.jar
 
 
 ## Dependencies
-
 
 - Postgres database to store Water Connection data.
 
