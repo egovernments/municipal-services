@@ -91,7 +91,7 @@ public class NOCController {
 	public ResponseEntity<NocResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute NocSearchCriteria criteria) {
 
-		List<Noc> nocList = nocService.search(criteria);
+		List<Noc> nocList = nocService.search(criteria, requestInfoWrapper.getRequestInfo());
 
 		NocResponse response = NocResponse.builder().noc(nocList).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))

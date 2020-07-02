@@ -44,15 +44,18 @@ public class NocSearchCriteria {
 	    @JsonProperty("limit")
 	    private Integer limit; 
 
+	    @JsonProperty("accountId")
+	    private List<String> accountId; 
+
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.ids == null && this.applicationNo == null
-	                && this.nocNo == null	                
+	                && this.nocNo == null && this.accountId == null	                
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
 	        return (this.tenantId == null && this.ids == null && this.applicationNo == null
-	                && this.nocNo == null	     
+	                && this.nocNo == null && this.accountId == null  
 	        );
 	    }
 }

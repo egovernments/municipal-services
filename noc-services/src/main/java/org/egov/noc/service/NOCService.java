@@ -1,10 +1,12 @@
 package org.egov.noc.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.noc.repository.NOCRepository;
 import org.egov.noc.util.NOCConstants;
 import org.egov.noc.util.NOCUtil;
@@ -73,7 +75,11 @@ public class NOCService {
 		return Arrays.asList(nocRequest.getNoc());
 	}
 	
-	public List<Noc> search(NocSearchCriteria criteria) {
+	public List<Noc> search(NocSearchCriteria criteria, RequestInfo requestInfo) {
+		List<String> uuids = new ArrayList<String>();
+		uuids.add(requestInfo.getUserInfo().getUuid());
+//		criteria.setOwnerIds(uuids);
+		criteria.setAccountId(uuids);
 		List<Noc> noc = nocRepository.getNocData(criteria);
 		return noc.isEmpty() ? Collections.emptyList() : noc;
 	}	
@@ -82,7 +88,7 @@ public class NOCService {
 		List<String> ids = Arrays.asList(nocRequest.getNoc().getId());
 		NocSearchCriteria criteria = new NocSearchCriteria();
 		criteria.setIds(ids);
-		List<Noc> nocList = search(criteria);
+		List<Noc> nocList = search(criteria, nocRequest.getRequestInfo());
 		if (CollectionUtils.isEmpty(nocList)) {
 			StringBuilder builder = new StringBuilder();
 			builder.append("Noc Application not found for: ").append(nocRequest.getNoc().getId()).append(" :ID");
