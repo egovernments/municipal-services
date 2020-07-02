@@ -161,6 +161,10 @@
 					<customTypeNaming>
 						<typeNaming>org.egov.wscalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
 						<typeNaming>org.egov.wscalculation.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
+						<customTypeMapping>org.egov.wscalculation.model.users.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
 					</customTypeNaming>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
