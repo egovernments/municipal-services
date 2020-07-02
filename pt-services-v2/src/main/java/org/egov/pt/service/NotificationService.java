@@ -34,9 +34,18 @@ public class NotificationService {
 
     @Autowired
     private PropertyUtil util;
+    
+    @Autowired
+    private URLShorterService urlShorterService;
 
     @Value("${notification.url}")
     private String notificationURL;
+    
+    @Value("${egov.notify.domain}")
+    private String domainName;
+
+    @Value("${egov.notify.pt.url.format}")
+    private String urlFormat;
 
     /**
      * Processes the json and send the SMSRequest
@@ -177,9 +186,17 @@ public class NotificationService {
      */
     private String getCustomizedUpdateMessage(Property property,String message){
         PropertyDetail propertyDetail = property.getPropertyDetails().get(0);
-        message = message.replace("<insert ID>",property.getPropertyId());
-        message = message.replace("<FY>",propertyDetail.getFinancialYear());
-        message = message.replace("<insert no>",propertyDetail.getAssessmentNumber());
+        String longURL = String.format(urlFormat, domainName, property.getPropertyId(), property.getTenantId());
+        String url = urlShorterService.getUrl(longURL);
+        log.info("Shorth url: "+ url);
+        // message.replace("<ownername>", val.getOwnerName());
+        message = message.replace("<taxamount>",  propertyDetail.getCalculation().getTotalAmount().toString());
+        message = message.replace("<domain>", domainName);
+        message = message.replace("<url>", url);
+        message = message.replace("<propertyid>", property.getPropertyId());
+        message = message.replace("<tenantid>", property.getTenantId());
+        message = message.replace("<FY>", propertyDetail.getFinancialYear());
+        message = message.replace("<ulbname>", property.getTenantId().split(".")[1].toUpperCase());
        return message;
     }
 
@@ -192,9 +209,17 @@ public class NotificationService {
      */
     private String getCustomizedUpdateMessageEmployee(Property property,String message){
         PropertyDetail propertyDetail = property.getPropertyDetails().get(0);
-        message = message.replace("<insert Property Tax Assessment ID>",property.getPropertyId());
-        message = message.replace("<FY>",propertyDetail.getFinancialYear());
-      //message = message.replace("<insert inactive URL for Citizen Web application>.",notificationURL);
+        String longURL = String.format(urlFormat, domainName, property.getPropertyId(), property.getTenantId());
+        String url = urlShorterService.getUrl(longURL);
+        log.info("Shorth url: "+ url);
+        // message.replace("<ownername>", val.getOwnerName());
+        message = message.replace("<taxamount>",  propertyDetail.getCalculation().getTotalAmount().toString());
+        message = message.replace("<domain>", domainName);
+        message = message.replace("<url>", url);
+        message = message.replace("<propertyid>", property.getPropertyId());
+        message = message.replace("<tenantid>", property.getTenantId());
+        message = message.replace("<FY>", propertyDetail.getFinancialYear());
+        message = message.replace("<ulbname>", property.getTenantId().split(".")[1].toUpperCase());
         return message;
     }
 
