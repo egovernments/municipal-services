@@ -7,7 +7,4 @@ All notable changes to this module will be documented in this file.
 - Upgraded to `tracer:2.0.0-SNAPSHOT`
 - Upgraded to spring boot `2.2.6-RELEASE`
 - Removed `start.sh` and `Dockerfile`
-
-## 1.0.0
-
 - Base version
