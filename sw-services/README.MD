@@ -32,6 +32,7 @@ This module created to manage Sewerage Service connections against a Property in
  
 ### Resources
 - Swagger API Yaml [Swagger API](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free)
+- Postman collection for all the API's can be found in the [Postman Collection](sw-services-postman.json)
 
 
 ## Build & Run
