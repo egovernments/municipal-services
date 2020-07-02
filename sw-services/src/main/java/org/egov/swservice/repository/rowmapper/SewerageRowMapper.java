@@ -115,11 +115,12 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
     private void addHoldersDeatilsToSewerageConnection(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
         String uuid = rs.getString("userid");
         List<ConnectionHolderInfo> connectionHolders = sewerageConnection.getConnectionHolders();
-        if (!CollectionUtils.isEmpty(connectionHolders))
+        if (!CollectionUtils.isEmpty(connectionHolders)) {
             for (ConnectionHolderInfo connectionHolderInfo : connectionHolders) {
                 if (connectionHolderInfo.getUuid().equals(uuid))
                     return;
             }
+        }
         Double holderShipPercentage = rs.getDouble("holdershippercentage");
         if (rs.wasNull()) {
             holderShipPercentage = null;
