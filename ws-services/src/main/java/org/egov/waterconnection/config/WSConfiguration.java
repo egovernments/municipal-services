@@ -125,7 +125,7 @@ public class WSConfiguration {
     @Value("${egov.ws.calculation.endpoint}")
     private String calculateEndpoint;
     
-    @Value("${egov.receipt.businessservice}")
+    @Value("${egov.receipt.businessservice.topic}")
     private String receiptBusinessservice;
     
     @Value("${ws.meterreading.create.topic}")
@@ -170,7 +170,7 @@ public class WSConfiguration {
 	@Value("${ws.consume.filestoreids.topic}")
 	private String fileStoreIdsTopic;
 
-	@Value("${egov.waterservice.savefilestoreIds}")
+	@Value("${egov.waterservice.savefilestoreIds.topic}")
 	private String saveFileStoreIdsTopic;
    
 }
