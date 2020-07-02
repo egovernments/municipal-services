@@ -1,21 +1,17 @@
 package org.egov.swservice.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Action;
-import org.egov.swservice.model.Event;
-import org.egov.swservice.model.EventRequest;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.Recepient;
-import org.egov.swservice.model.SMSRequest;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Source;
+import org.egov.swservice.web.models.Action;
+import org.egov.swservice.web.models.Event;
+import org.egov.swservice.web.models.EventRequest;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.Recepient;
+import org.egov.swservice.web.models.SMSRequest;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.Source;
 import org.egov.swservice.util.NotificationUtil;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.validator.ValidateProperty;
@@ -86,23 +82,20 @@ public class EditNotificationService {
 		});
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
-		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
-		Map<String, String> mapOfPhnoAndUUIDs = workflowNotificationService.fetchUserUUIDs(mobileNumbers,
+		Set<String> mobileNumbers = new HashSet<>(mobileNumberAndMesssage.keySet());
+		Map<String, String> mapOfPhoneNoAndUUIDs = workflowNotificationService.fetchUserUUIDs(mobileNumbers,
 				sewerageConnectionRequest.getRequestInfo(), property.getTenantId());
-		// Map<String, String> mapOfPhnoAndUUIDs =
-		// waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber,
-		// OwnerInfo::getUuid));
-		if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet())) {
+		if (CollectionUtils.isEmpty(mapOfPhoneNoAndUUIDs.keySet())) {
 			log.info("UUID search failed!");
 		}
 		List<Event> events = new ArrayList<>();
 		for (String mobile : mobileNumbers) {
-			if (null == mapOfPhnoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
+			if (null == mapOfPhoneNoAndUUIDs.get(mobile) || null == mobileNumberAndMesssage.get(mobile)) {
 				log.error("No UUID/SMS for mobile {} skipping event", mobile);
 				continue;
 			}
 			List<String> toUsers = new ArrayList<>();
-			toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+			toUsers.add(mapOfPhoneNoAndUUIDs.get(mobile));
 			Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
 			Action action = workflowNotificationService.getActionForEventNotification(mobileNumberAndMesssage, mobile,
 					sewerageConnectionRequest, property);

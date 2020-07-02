@@ -8,14 +8,14 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Calculation;
-import org.egov.swservice.model.CalculationCriteria;
-import org.egov.swservice.model.CalculationReq;
-import org.egov.swservice.model.CalculationRes;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.Calculation;
+import org.egov.swservice.web.models.CalculationCriteria;
+import org.egov.swservice.web.models.CalculationReq;
+import org.egov.swservice.web.models.CalculationRes;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.repository.SewarageDaoImpl;
+import org.egov.swservice.repository.SewerageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
@@ -50,7 +50,7 @@ public class PdfFileStoreService {
 	private SWConfiguration config;
 
 	@Autowired
-	private SewarageDaoImpl sewerageDao;
+	private SewerageDaoImpl sewerageDao;
 
 	@Autowired
 	private WorkflowService workflowService;
@@ -80,13 +80,13 @@ public class PdfFileStoreService {
 	/**
 	 * Get fileStroe Id's
 	 * 
-	 * @param sewerageConnection
-	 * @param requestInfo
-	 * @param applicationKey
+	 * @param sewerageConnectionRequest - Sewerage connection Request
+	 * @param property - Property Object
+	 * @param applicationKey - ApplicationKey
 	 * @return file store id
 	 */
-	public String getFileStroeId(SewerageConnectionRequest sewerageConnectionRequest, Property property,
-			String applicationKey) {
+	public String getFileStoreId(SewerageConnectionRequest sewerageConnectionRequest, Property property,
+								 String applicationKey) {
 		CalculationCriteria criteria = CalculationCriteria.builder()
 				.applicationNo(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
 				.sewerageConnection(sewerageConnectionRequest.getSewerageConnection()).tenantId(property.getTenantId())
@@ -101,7 +101,7 @@ public class PdfFileStoreService {
 		try {
 			Object response = serviceRequestRepository.fetchResult(sewerageServiceUtil.getEstimationURL(), calRequest);
 			CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
-			JSONObject sewerageobject = mapper.convertValue(sewerageConnectionRequest.getSewerageConnection(),
+			JSONObject sewerageObject = mapper.convertValue(sewerageConnectionRequest.getSewerageConnection(),
 					JSONObject.class);
 			if (CollectionUtils.isEmpty(calResponse.getCalculation())) {
 				throw new CustomException("NO_ESTIMATION_FOUND", "Estimation not found!!!");
@@ -109,32 +109,32 @@ public class PdfFileStoreService {
 			Optional<Calculation> calculationList = calResponse.getCalculation().stream().findFirst();
 			if(calculationList.isPresent()) {
 				Calculation cal = calculationList.get();
-				sewerageobject.put(totalAmount, cal.getTotalAmount());
-				sewerageobject.put(applicationFee, cal.getFee());
-				sewerageobject.put(serviceFee, cal.getCharge());
-				sewerageobject.put(tax, cal.getTaxAmount());
+				sewerageObject.put(totalAmount, cal.getTotalAmount());
+				sewerageObject.put(applicationFee, cal.getFee());
+				sewerageObject.put(serviceFee, cal.getCharge());
+				sewerageObject.put(tax, cal.getTaxAmount());
 				cal.getTaxHeadEstimates().forEach(item -> {
 					//We need to remove SW_ --> So that PDF configuration refers the common for both Water & Sewerage
 					item.setTaxHeadCode(item.getTaxHeadCode().substring(3));
 				});
-				sewerageobject.put(pdfTaxhead, cal.getTaxHeadEstimates());
+				sewerageObject.put(pdfTaxhead, cal.getTaxHeadEstimates());
 			}
-			sewerageobject.put(sanctionLetterDate, System.currentTimeMillis());
+			sewerageObject.put(sanctionLetterDate, System.currentTimeMillis());
 			BigDecimal slaDays = workflowService.getSlaForState(
 					sewerageConnectionRequest.getSewerageConnection().getTenantId(),
 					sewerageConnectionRequest.getRequestInfo(), applicationStatus);
-			sewerageobject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
-			sewerageobject.put(slaDate, slaDays.add(
+			sewerageObject.put(sla, slaDays.divide(BigDecimal.valueOf(SWConstants.DAYS_CONST)));
+			sewerageObject.put(slaDate, slaDays.add(
 					new BigDecimal(System.currentTimeMillis())));
 			String[] tenantDetails = property.getTenantId().split("\\."); 
 			String tenantId = tenantDetails[0];
 			if(tenantDetails.length > 1)
 			{
-				sewerageobject.put(tenantName, tenantDetails[1].toUpperCase());
+				sewerageObject.put(tenantName, tenantDetails[1].toUpperCase());
 			}
-			sewerageobject.put(propertyKey, property);
-			sewerageobject.put(service, "SEWERAGE");
-			return getFielStoreIdFromPDFService(sewerageobject, sewerageConnectionRequest.getRequestInfo(), tenantId,
+			sewerageObject.put(propertyKey, property);
+			sewerageObject.put(service, "SEWERAGE");
+			return getFileStoreIdFromPDFService(sewerageObject, sewerageConnectionRequest.getRequestInfo(), tenantId,
 					applicationKey);
 		} catch (Exception ex) {
 			log.error("Calculation response error!!", ex);
@@ -145,19 +145,19 @@ public class PdfFileStoreService {
 	/**
 	 * Get file store id from PDF service
 	 * 
-	 * @param sewerageobject
-	 * @param requestInfo
-	 * @param tenantId
-	 * @param applicationKey
-	 * @return
+	 * @param sewerageObject - Sewerage connection JSON Object
+	 * @param requestInfo - Request Info Object
+	 * @param tenantId - Tenant ID
+	 * @param applicationKey - Application Key
+	 * @return Returns fileStore Id values
 	 */
-	private String getFielStoreIdFromPDFService(JSONObject sewerageobject, RequestInfo requestInfo, String tenantId,
-			String applicationKey) {
-		JSONArray sewerageconnectionlist = new JSONArray();
-		sewerageconnectionlist.add(sewerageobject);
+	private String getFileStoreIdFromPDFService(JSONObject sewerageObject, RequestInfo requestInfo, String tenantId,
+												String applicationKey) {
+		JSONArray sewerageConnectionList = new JSONArray();
+		sewerageConnectionList.add(sewerageObject);
 		JSONObject requestPayload = new JSONObject();
 		requestPayload.put(requestInfoReplacer, requestInfo);
-		requestPayload.put(WaterConnectionReplacer, sewerageconnectionlist);
+		requestPayload.put(WaterConnectionReplacer, sewerageConnectionList);
 		try {
 			StringBuilder builder = new StringBuilder();
 			builder.append(config.getPdfServiceHost());
@@ -169,7 +169,7 @@ public class PdfFileStoreService {
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
 			if (CollectionUtils.isEmpty(fileStoreIds)) {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
-						"NO file store id found from pdf service");
+						"No file store id found from pdf service");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
@@ -190,13 +190,13 @@ public class PdfFileStoreService {
 				&& addDetail.getOrDefault(SWConstants.ESTIMATION_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			addDetail.put(SWConstants.ESTIMATION_FILESTORE_ID,
-					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_ESTIMATION_KEY));
+					getFileStoreId(sewerageConnectionRequest, property, SWConstants.PDF_ESTIMATION_KEY));
 		}
 		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(SWConstants.ACTION_PAY)
 				&& addDetail.getOrDefault(SWConstants.SANCTION_LETTER_FILESTORE_ID, null) == null) {
 			addDetail.put(SWConstants.SANCTION_LETTER_FILESTORE_ID,
-					getFileStroeId(sewerageConnectionRequest, property, SWConstants.PDF_SANCTION_KEY));
+					getFileStoreId(sewerageConnectionRequest, property, SWConstants.PDF_SANCTION_KEY));
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(addDetail);
 		sewerageDao.saveFileStoreIds(sewerageConnectionRequest);

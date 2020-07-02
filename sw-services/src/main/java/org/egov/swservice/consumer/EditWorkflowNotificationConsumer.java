@@ -2,10 +2,10 @@ package org.egov.swservice.consumer;
 
 import java.util.HashMap;
 
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.service.DiffService;
-import org.egov.swservice.service.SewarageServiceImpl;
+import org.egov.swservice.service.SewerageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -24,7 +24,7 @@ public class EditWorkflowNotificationConsumer {
 	private ObjectMapper mapper;
 
 	@Autowired
-	private SewarageServiceImpl sewarageServiceImpl;
+	private SewerageServiceImpl sewarageServiceImpl;
 
 	@Autowired
 	private DiffService diffService;
@@ -32,8 +32,8 @@ public class EditWorkflowNotificationConsumer {
 	/**
 	 * Consumes the sewerage connection record and send the edit notification
 	 * 
-	 * @param record
-	 * @param topic
+	 * @param record - Received record from Kafka
+	 * @param topic - Received Topic Name
 	 */
 	@KafkaListener(topics = { "${sw.editnotification.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {

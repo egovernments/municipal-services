@@ -5,12 +5,12 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.RequestInfoWrapper;
-import org.egov.swservice.model.workflow.BusinessService;
-import org.egov.swservice.model.workflow.BusinessServiceResponse;
-import org.egov.swservice.model.workflow.ProcessInstance;
-import org.egov.swservice.model.workflow.ProcessInstanceResponse;
-import org.egov.swservice.model.workflow.State;
+import org.egov.swservice.web.models.RequestInfoWrapper;
+import org.egov.swservice.web.models.workflow.BusinessService;
+import org.egov.swservice.web.models.workflow.BusinessServiceResponse;
+import org.egov.swservice.web.models.workflow.ProcessInstance;
+import org.egov.swservice.web.models.workflow.ProcessInstanceResponse;
+import org.egov.swservice.web.models.workflow.State;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +47,11 @@ public class WorkflowService {
 	public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo) {
 		Object result = serviceRequestRepository.fetchResult(getSearchURLWithParams(tenantId), 
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		BusinessServiceResponse response = null;
+		BusinessServiceResponse response;
 		try {
 			response = mapper.convertValue(result, BusinessServiceResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
+			throw new CustomException("PARSING_ERROR", "Failed to parse response of calculate");
 		}
 		return response.getBusinessServices().get(0);
 	}
@@ -93,9 +93,9 @@ public class WorkflowService {
 	/**
 	    * Return sla based on state code
 	    * 
-	    * @param tenantId
-	    * @param requestInfo
-	    * @param stateCode
+	    * @param tenantId - Tenant Id
+	    * @param requestInfo - Request Info Object
+	    * @param stateCode - State Code
 	    * @return no of days for sla
 	    */
 		public BigDecimal getSlaForState(String tenantId, RequestInfo requestInfo, String stateCode) {
@@ -103,10 +103,10 @@ public class WorkflowService {
 			return new BigDecimal(businessService.getStates().stream().filter(state -> state.getApplicationStatus() != null
 					&& state.getApplicationStatus().equalsIgnoreCase(stateCode)).map(state -> {
 						if (state.getSla() == null) {
-							return 0l;
+							return 0L;
 						}
 						return state.getSla();
-					}).findFirst().orElse(0l));
+					}).findFirst().orElse(0L));
 		}
 		
 		/**
@@ -122,20 +122,20 @@ public class WorkflowService {
 			StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNo);
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 			Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-			ProcessInstanceResponse response = null;
+			ProcessInstanceResponse response;
 			try {
 				response = mapper.convertValue(result, ProcessInstanceResponse.class);
 			} catch (IllegalArgumentException e) {
-				throw new CustomException("PARSING ERROR", "Failed to parse response of process instance");
+				throw new CustomException("PARSING_ERROR", "Failed to parse response of process instance");
 			}
 			Optional<ProcessInstance> processInstance = response.getProcessInstances().stream().findFirst();
 			return processInstance.get();
 		}
 		/**
 		 * 
-		 * @param tenantId
-		 * @param applicationNo
-		 * @return
+		 * @param tenantId - Tenant Id
+		 * @param applicationNo - Application Number
+		 * @return - Returns URL to get the ProcessInstance
 		 */
 		private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNo) {
 			StringBuilder url = new StringBuilder(config.getWfHost());
@@ -150,9 +150,10 @@ public class WorkflowService {
 		}
 		/**
 		 * 
-		 * @param requestInfo
-		 * @param applicationNo
-		 * @return
+		 * @param requestInfo - Request Info Object
+		 * @param applicationNo - Application Number
+		 * @param tenantId  - Tenant Id
+		 * @return - Returns the Application Status value
 		 */
 		public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId) {
 			return getProcessInstance(requestInfo, applicationNo, tenantId).getState().getApplicationStatus();

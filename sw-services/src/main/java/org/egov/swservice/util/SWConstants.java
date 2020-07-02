@@ -169,6 +169,6 @@ public class SWConstants {
 
 	public static final String PDF_SANCTION_KEY = "ws-sanctionletter";
 	
-	public static final long DAYS_CONST= 86400000l;
+	public static final long DAYS_CONST= 86400000L;
 	
 }

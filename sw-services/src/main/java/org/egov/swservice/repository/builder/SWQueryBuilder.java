@@ -7,8 +7,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.SearchCriteria;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,8 +25,7 @@ public class SWQueryBuilder {
 	private SWConfiguration config;
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
-	 private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
-	//private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
+	private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 	
 	private final static String noOfConnectionSearchQuery = "SELECT count(*) FROM eg_sw_connection WHERE";
 	
@@ -46,22 +45,19 @@ public class SWQueryBuilder {
 	+  LEFT_OUTER_JOIN_STRING
 	+ "eg_sw_plumberinfo plumber ON plumber.swid = conn.id";
 
-	/**
-	 * 
-	 * @param criteria on search criteria
-	 * @param preparedStatement preparedStatement
-	 * @param requestInfo
-	 * @return
-	 */
-	
-	
 	private final String paginationWrapper = "SELECT * FROM " +
             "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
             "({})" +
             " result) result_offset " +
             "WHERE offset_ > ? AND offset_ <= ?";
-	
-	
+
+	/**
+	 *
+	 * @param criteria on search criteria
+	 * @param preparedStatement preparedStatement
+	 * @param requestInfo Request Info Object
+	 * @return Returns the created Query
+	 */
 	public String getSearchQueryString(SearchCriteria criteria, List<Object> preparedStatement,
 			RequestInfo requestInfo) {
 		if(criteria.isEmpty())
@@ -88,11 +84,6 @@ public class SWQueryBuilder {
 			addToPreparedStatement(preparedStatement, criteria.getIds());
 		}
 
-//		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
-//			addClauseIfRequired(preparedStatement, query);
-//			query.append(" conn.property_id = ? ");
-//			preparedStatement.add(criteria.getPropertyId());
-//		}
 		if (!StringUtils.isEmpty(criteria.getOldConnectionNumber())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.oldconnectionno = ? ");
@@ -132,7 +123,7 @@ public class SWQueryBuilder {
 		//Add OrderBy clause
 		query.append(" ORDER BY sc.appCreatedDate DESC");
 		
-		if (query.toString().indexOf("WHERE") > -1)
+		if (query.toString().contains("WHERE"))
 			 return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 		return query.toString();
 	}
@@ -157,22 +148,20 @@ public class SWQueryBuilder {
 	}
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
-		ids.forEach(id -> {
-			preparedStatement.add(id);
-		});
+		preparedStatement.addAll(ids);
 	}
 
 
 	/**
 	 * 
 	 * @param query
-	 *            The
+	 *            Query String
 	 * @param preparedStmtList
 	 *            Array of object for preparedStatement list
+	 * @param criteria Search Criteria
 	 * @return It's returns query
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
-//		query = query + " " + Offset_Limit_String;
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
 
@@ -189,14 +178,4 @@ public class SWQueryBuilder {
 		preparedStmtList.add(limit + offset);
 		return paginationWrapper.replace("{}",query);
 	}
-	
-	public String getNoOfSewerageConnectionQuery(Set<String> connectionIds, List<Object> preparedStatement) {
-		StringBuilder query = new StringBuilder(noOfConnectionSearchQuery);
-		Set<String> listOfIds = new HashSet<>();
-		connectionIds.forEach(id -> listOfIds.add(id));
-		query.append(" connectionno in (").append(createQuery(connectionIds)).append(" )");
-		addToPreparedStatement(preparedStatement, listOfIds);
-		return query.toString();
-	}
-
 }

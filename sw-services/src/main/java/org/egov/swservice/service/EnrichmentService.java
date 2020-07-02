@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.AuditDetails;
-import org.egov.swservice.model.Connection.StatusEnum;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Status;
-import org.egov.swservice.model.Idgen.IdResponse;
+import org.egov.swservice.web.models.AuditDetails;
+import org.egov.swservice.web.models.Connection.StatusEnum;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.Status;
+import org.egov.swservice.web.models.Idgen.IdResponse;
 import org.egov.swservice.repository.IdGenRepository;
-import org.egov.swservice.repository.SewarageDaoImpl;
+import org.egov.swservice.repository.SewerageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
@@ -50,16 +50,14 @@ public class EnrichmentService {
 	private ObjectMapper mapper;
 	
 	@Autowired
-	private SewarageDaoImpl sewerageDao;
+	private SewerageDaoImpl sewerageDao;
 
 
 	
 	/**
 	 * 
-	 * @param sewerageConnectionRequest
-	 * @param propertyList
+	 * @param sewerageConnectionRequest - Sewerage Connection Requst Object
 	 */
-
 	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
@@ -78,9 +76,7 @@ public class EnrichmentService {
 	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
-			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
-				additionalDetail.put(key, null);
-			});
+			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> additionalDetail.put(key, null));
 		} else {
 			HashMap<String, Object> addDetail = mapper.convertValue(
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
@@ -106,8 +102,8 @@ public class EnrichmentService {
 	/**
 	 * Sets status for create request
 	 * 
-	 * @param ConnectionRequest
-	 *            The create request
+	 * @param sewerageConnectionRequest Sewerage connection request
+	 *
 	 */
 	private void setStatusForCreate(SewerageConnectionRequest sewerageConnectionRequest) {
 		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
@@ -138,12 +134,12 @@ public class EnrichmentService {
 		request.getSewerageConnection().setApplicationNo(applicationNumbers.listIterator().next());
 	}
 
-	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idformat, int count) {
-		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idformat, count)
+	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, String idFormat, int count) {
+		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, idFormat, count)
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
-			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+			throw new CustomException("IDGEN_ERROR", "No ids returned from IdGen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
@@ -151,7 +147,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich update sewarage connection
 	 * 
-	 * @param sewarageConnectionRequest
+	 * @param sewerageConnectionRequest - Sewerage Connection Request Object
 	 */
 	public void enrichUpdateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		AuditDetails auditDetails = sewerageServicesUtil
@@ -182,7 +178,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich sewerage connection request and add connection no if status is approved
 	 * 
-	 * @param sewerageConnectionrequest 
+	 * @param sewerageConnectionRequest - Sewerage connection request object
 	 */
 	public void postStatusEnrichment(SewerageConnectionRequest sewerageConnectionRequest) {
 		if (SWConstants.ACTIVATE_CONNECTION
@@ -192,9 +188,9 @@ public class EnrichmentService {
 	}
     
 	/**
-	 * Enrich sewergae connection request and set sewerage connection no
+	 * Enrich sewerage connection request and set sewerage connection no
 	 * 
-	 * @param request
+	 * @param request Sewerage Connection Request Object
 	 */
 	private void setConnectionNO(SewerageConnectionRequest request) {
 		List<String> connectionNumbers = getIdList(request.getRequestInfo(), 
@@ -215,7 +211,7 @@ public class EnrichmentService {
 	/**
 	 * Enrich fileStoreIds
 	 * 
-	 * @param sewerageConnectionRequest
+	 * @param sewerageConnectionRequest - Sewerage Connection Request Object
 	 */
 	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {

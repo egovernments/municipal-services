@@ -3,11 +3,11 @@ package org.egov.swservice.service;
 import java.util.Arrays;
 import java.util.List;
 
-import org.egov.swservice.model.CalculationCriteria;
-import org.egov.swservice.model.CalculationReq;
-import org.egov.swservice.model.CalculationRes;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.CalculationCriteria;
+import org.egov.swservice.web.models.CalculationReq;
+import org.egov.swservice.web.models.CalculationRes;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
@@ -39,7 +39,6 @@ public class CalculationService {
 	 * 
 	 *            Estimate the fee for sewerage application and generate the
 	 *            demand
-	 * 
 	 */
 	public void calculateFeeAndGenerateDemand(SewerageConnectionRequest request, Property property) {
 		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase("APPROVE_FOR_CONNECTION")){

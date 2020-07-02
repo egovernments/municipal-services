@@ -13,14 +13,14 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.AuditDetails;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.PropertyCriteria;
-import org.egov.swservice.model.PropertyResponse;
-import org.egov.swservice.model.RequestInfoWrapper;
-import org.egov.swservice.model.SearchCriteria;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.workflow.BusinessService;
+import org.egov.swservice.web.models.AuditDetails;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.PropertyCriteria;
+import org.egov.swservice.web.models.PropertyResponse;
+import org.egov.swservice.web.models.RequestInfoWrapper;
+import org.egov.swservice.web.models.SearchCriteria;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.workflow.BusinessService;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
@@ -69,8 +69,8 @@ public class SewerageServicesUtil {
 
 	/**
 	 * 
-	 * @param sewarageConnectionRequest
-	 *            SewarageConnectionRequest containing property
+	 * @param sewerageConnectionRequest
+	 *            SewerageConnectionRequest containing property
 	 * @return List of Property
 	 */
 
@@ -88,7 +88,7 @@ public class SewerageServicesUtil {
 				RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build());
 		List<Property> propertyList = getPropertyDetails(result);
 		if (CollectionUtils.isEmpty(propertyList)) {
-			throw new CustomException("INCORRECT PROPERTY ID", "PROPERTY SEARCH ERROR!");
+			throw new CustomException("INCORRECT_PROPERTY_ID", "Failed to find Property for the given Id.");
 		}
 		return propertyList;
 	}
@@ -103,15 +103,15 @@ public class SewerageServicesUtil {
 		try {
 			return mapper.convertValue(result, PropertyResponse.class).getProperties();
 		} catch (Exception ex) {
-			throw new CustomException("PARSING ERROR", "The property json cannot be parsed");
+			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}
 	
 	/**
 	 * 
-	 * @param sewerageConnectionSearchCriteria
-	 * @param requestInfo
-	 * @return
+	 * @param sewerageConnectionSearchCriteria - Sewerage Connection Search Criteria
+	 * @param requestInfo - Request Info
+	 * @return - Returns list of Property
 	 */
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
@@ -158,10 +158,9 @@ public class SewerageServicesUtil {
 	}
 
 	/**
-	 * 
-	 * @param tenantId
-	 * @param propertyId
-	 * @param requestInfo
+	 *
+	 * @param criteria Property Search Criteria
+	 * @param requestInfo - Request Info Object
 	 * @return List of Property
 	 */
 	public List<Property> searchPropertyOnId(PropertyCriteria criteria, RequestInfo requestInfo) {
@@ -174,8 +173,8 @@ public class SewerageServicesUtil {
 	/**
 	 * Method to return auditDetails for create/update flows
 	 *
-	 * @param by
-	 * @param isCreate
+	 * @param by - Updated By user detail
+	 * @param isCreate - Boolean flag to identify create request
 	 * @return AuditDetails
 	 */
 	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
@@ -208,7 +207,7 @@ public class SewerageServicesUtil {
 		return builder.append(config.getCalculatorHost()).append(config.getEstimationEndpoint());
 	}
 
-	public String getShortnerURL(String actualURL) {
+	public String getShortenedURL(String actualURL) {
 		JSONObject obj = new JSONObject();
 		obj.put(URL, actualURL);
 		String url = config.getNotificationUrl() + config.getShortenerURL();
@@ -219,8 +218,8 @@ public class SewerageServicesUtil {
 	
 	/**
 	 * 
-	 * @return search url for property search
-	 * @param criteria
+	 * search url for property search
+	 * @param criteria - Property Search Criteria
 	 * @return property URL
 	 */
 	private StringBuilder getPropertyURL(PropertyCriteria criteria) {

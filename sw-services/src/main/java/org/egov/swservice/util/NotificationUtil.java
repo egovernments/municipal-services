@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.EventRequest;
-import org.egov.swservice.model.SMSRequest;
+import org.egov.swservice.web.models.EventRequest;
+import org.egov.swservice.web.models.SMSRequest;
 import org.egov.swservice.producer.SewarageConnectionProducer;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.json.JSONObject;
@@ -106,7 +106,7 @@ public class NotificationUtil {
 			for (SMSRequest smsRequest : smsRequestList) {
 				producer.push(config.getSmsNotifTopic(), smsRequest);
 				StringBuilder builder = new StringBuilder();
-				builder.append("MobileNumber: ").append(smsRequest.getMobileNumber()).append(" Messages: ")
+				builder.append(" Messages: ")
 						.append(smsRequest.getMessage());
 				log.info(builder.toString());
 			}
@@ -114,9 +114,9 @@ public class NotificationUtil {
 	}
 
 	/**
-	 * 
-	 * @param applicationStatus
-	 * @param localizationMessage
+	 * @param action - Action type
+	 * @param applicationStatus - Application Status
+	 * @param localizationMessage Localized message
 	 * @return message template
 	 */
 	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage) {
@@ -125,9 +125,9 @@ public class NotificationUtil {
 	}
 
 	/**
-	 * 
-	 * @param applicationStatus
-	 * @param localizationMessage
+	 * @param action - Action Type
+	 * @param applicationStatus - Application Status
+	 * @param localizationMessage - Localized Message
 	 * @return In app message template
 	 */
 	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage) {
@@ -138,16 +138,15 @@ public class NotificationUtil {
 	/**
 	 * Pushes the event request to Kafka Queue.
 	 * 
-	 * @param request
+	 * @param request - Event Request Object
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
 	}
 	
 	/**
-	 * 
-	 * @param applicationStatus
-	 * @param localizationMessage
+	 * @param code - Code value
+	 * @param localizationMessage - Localized Message
 	 * @return In app message template
 	 */
 	public String getCustomizedMsg(String code, String localizationMessage) {

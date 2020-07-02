@@ -10,14 +10,14 @@ import java.util.Optional;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.SearchCriteria;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.collection.PaymentDetail;
-import org.egov.swservice.model.collection.PaymentRequest;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.SearchCriteria;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.collection.PaymentDetail;
+import org.egov.swservice.web.models.collection.PaymentRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.repository.SewarageDao;
+import org.egov.swservice.repository.SewerageDao;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.workflow.WorkflowIntegrator;
@@ -44,13 +44,13 @@ public class PaymentUpdateService {
 	private SWConfiguration config;
 
 	@Autowired
-	private SewarageServiceImpl sewerageService;
+	private SewerageServiceImpl sewerageService;
 
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
 
 	@Autowired
-	private SewarageDao repo;
+	private SewerageDao repo;
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
@@ -73,12 +73,12 @@ public class PaymentUpdateService {
 			try {
 				log.info("payment Request " + mapper.writeValueAsString(paymentRequest));
 			} catch (Exception ex) {
-				log.error("Temp Catch Excption:", ex);
+				log.error("Temp Catch Exception:", ex);
 			}
 			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
 					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				log.info("Consuming Business Service", paymentDetail.getBusinessService());
+				log.info("Consuming Business Service: {}", paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
 					SearchCriteria criteria = SearchCriteria.builder()
 							.tenantId(paymentRequest.getPayment().getTenantId())
@@ -100,12 +100,7 @@ public class PaymentUpdateService {
 					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
 							.sewerageConnection(connection).requestInfo(paymentRequest.getRequestInfo())
 							.build();
-					try {
-						log.info("", "Sewerage Request " + mapper.writeValueAsString(sewerageConnectionRequest));
-					} catch (Exception ex) {
-						log.error("", ex);
-					}
-					
+
 					Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
 					wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 					enrichmentService.enrichFileStoreIds(sewerageConnectionRequest);
@@ -113,31 +108,30 @@ public class PaymentUpdateService {
 				}
 			}
 		} catch (Exception ex) {
-			log.error("", ex);
+			log.error("Failed to process Payment Update message.", ex);
 		}
 	}
 
 	/**
 	 * 
-	 * @param uuid
-	 * @param requestInfo
+	 * @param uuid - UUID for the User
+	 * @param requestInfo - RequestInfo Object
 	 * @return User
 	 */
 	private User fetchUser(String uuid, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
 		Map<String, Object> userSearchRequest = new HashMap<>();
-		List<String> uuids = Arrays.asList(uuid);
+		List<String> uuidList = Arrays.asList(uuid);
 		userSearchRequest.put("RequestInfo", requestInfo);
-		userSearchRequest.put("uuid", uuids);
+		userSearchRequest.put("uuid", uuidList);
 		Object response = serviceRequestRepository.fetchResult(uri, userSearchRequest);
 		List<Object> users = new ArrayList<>();
 		try {
-			log.info("user info response" + mapper.writeValueAsString(response));
 			DocumentContext context = JsonPath.parse(mapper.writeValueAsString(response));
 			users = context.read("$.user");
 		} catch (JsonProcessingException e) {
-			log.error("error occured while parsing user info", e);
+			log.error("error occurred while parsing user info", e);
 		}
 		if (CollectionUtils.isEmpty(users)) {
 			throw new CustomException("INVALID_SEARCH_ON_USER", "No user found on given criteria!!!");

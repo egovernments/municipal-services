@@ -151,7 +151,7 @@ public class SWConfiguration {
     @Value("${sw.editnotification.topic}")
     private String editNotificationTopic;
     
-    @Value("${sw.consume.filestoreids}")
+    @Value("${sw.consume.filestoreids.topic}")
 	private String fileStoreIdsTopic;
 
 	@Value("${egov.sewerageservice.savefilestoreIds}")

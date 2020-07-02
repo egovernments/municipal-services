@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.ValidatorResult;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.ValidatorResult;
 import org.egov.swservice.service.PropertyValidator;
 import org.egov.swservice.service.SewerageFieldValidator;
 import org.egov.tracer.model.CustomException;
@@ -66,7 +66,7 @@ public class SewerageConnectionValidator {
 	/**
 	 * Validates if all ids are same as obtained from search result
 	 * 
-	 * @param updatesewerageConnection The sewerage connection request from update request 
+	 * @param updateSewerageConnection The sewerage connection request from update request
 	 * @param searchResult The sewerage connection from search result
 	 */
 	private void validateAllIds(SewerageConnection updateSewerageConnection, SewerageConnection searchResult) {
@@ -76,7 +76,7 @@ public class SewerageConnectionValidator {
 			builder.append("The application number from search: ").append(searchResult.getApplicationNo())
 					.append(" and from update: ").append(updateSewerageConnection.getApplicationNo())
 					.append(" does not match");
-			errorMap.put("INVALID UPDATE", builder.toString());
+			errorMap.put("INVALID_UPDATE", builder.toString());
 		}
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
@@ -108,16 +108,4 @@ public class SewerageConnectionValidator {
 	private void setFieldsFromSearch(SewerageConnectionRequest request, SewerageConnection searchResult) {
 		request.getSewerageConnection().setConnectionNo(searchResult.getConnectionNo());
 	}
-	
-	public void validatePropertyForConnection(List<SewerageConnection> sewerageConnectionList) {
-		sewerageConnectionList.forEach(sewerageConnection -> {
-			if (StringUtils.isEmpty(sewerageConnection.getPropertyId())) {
-				throw new CustomException("INVALID SEARCH", "PROPERTY ID NOT FOUND FOR "
-						+ sewerageConnection.getConnectionNo() + " SEWERAGE CONNECTION NO");
-			}
-		});
-	}
-	
-
-
 }

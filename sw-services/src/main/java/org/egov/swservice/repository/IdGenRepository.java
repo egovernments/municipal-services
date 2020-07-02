@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Idgen.IdGenerationRequest;
-import org.egov.swservice.model.Idgen.IdGenerationResponse;
-import org.egov.swservice.model.Idgen.IdRequest;
+import org.egov.swservice.web.models.Idgen.IdGenerationRequest;
+import org.egov.swservice.web.models.Idgen.IdGenerationResponse;
+import org.egov.swservice.web.models.Idgen.IdRequest;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class IdGenRepository {
 	 *            Format of the ids
 	 * @param count
 	 *            Total Number of idGen ids required
-	 * @return
+	 * @return - Returns the Response object form IdGen Service
 	 */
 	public IdGenerationResponse getId(RequestInfo requestInfo, String tenantId, String name, String format, int count) {
 
@@ -55,7 +55,7 @@ public class IdGenRepository {
 			reqList.add(IdRequest.builder().idName(name).format(format).tenantId(tenantId).build());
 		}
 		IdGenerationRequest req = IdGenerationRequest.builder().idRequests(reqList).requestInfo(requestInfo).build();
-		IdGenerationResponse response = null;
+		IdGenerationResponse response;
 		try {
 			response = restTemplate.postForObject(config.getIdGenHost() + config.getIdGenPath(), req,
 					IdGenerationResponse.class);

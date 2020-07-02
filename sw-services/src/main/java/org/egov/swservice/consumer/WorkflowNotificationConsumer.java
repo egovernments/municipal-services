@@ -2,7 +2,7 @@ package org.egov.swservice.consumer;
 
 import java.util.HashMap;
 
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.service.WorkflowNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,13 +28,12 @@ public class WorkflowNotificationConsumer {
 	/**
 	 * Consumes the sewerage connection record and send notification
 	 * 
-	 * @param record
+	 * @param record - Received record from Kafka Topic
 	 *
-	 * @param topic
-	 * @throws JsonProcessingException
+	 * @param topic - Received Topic Name
 	 */
 
-	@KafkaListener(topics = { "${egov.sewarageservice.createconnection}", "${egov.sewarageservice.updateconnection}",
+	@KafkaListener(topics = { "${egov.sewarageservice.createconnection.topic}", "${egov.sewarageservice.updateconnection.topic}",
 			"${egov.sewerageservice.updatesewerageconnection.workflow.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {

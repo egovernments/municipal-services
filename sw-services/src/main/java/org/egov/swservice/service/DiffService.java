@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.util.SWConstants;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
@@ -31,7 +31,6 @@ public class DiffService {
 	 *            The sewerage connection request for update
 	 * @param searchResult
 	 *            The searched result
-	 * @return List of Difference object
 	 */
 	public void checkDifferenceAndSendEditNotification(SewerageConnectionRequest request,
 			SewerageConnection searchResult) {
@@ -43,16 +42,15 @@ public class DiffService {
 				editNotificationService.sendEditNotification(request);
 			}
 		} catch (Exception ex) {
-			StringBuilder builder = new StringBuilder("Edit Notification Error!!");
-			log.error(builder.toString(), ex);
+			log.error("Edit Notification Error!!", ex);
 		}
 	}
 
 	/**
 	 * Check updated fields
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection - Sewerage Connection Object
+	 * @param searchResult - Sewerage Connection Object
 	 * @return List of updated fields
 	 */
 	private List<String> getUpdateFields(SewerageConnection updateConnection, SewerageConnection searchResult) {
@@ -75,8 +73,8 @@ public class DiffService {
 	/**
 	 * Check for added new object
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection - Sewerage Connection Object
+	 * @param searchResult - Sewerage Connection Object
 	 * @return list of added object
 	 */
 	@SuppressWarnings("unchecked")
@@ -100,8 +98,8 @@ public class DiffService {
 
 	/**
 	 * 
-	 * @param updateConnection
-	 * @param searchResult
+	 * @param updateConnection - Sewerage Connection Object
+	 * @param searchResult - Sewerage Connection Object
 	 * @return List of added or removed object
 	 */
 	private List<String> getObjectsRemoved(SewerageConnection updateConnection, SewerageConnection searchResult) {
@@ -112,6 +110,13 @@ public class DiffService {
 		if (CollectionUtils.isEmpty(changes))
 			return Collections.emptyList();
 		List<String> classRemoved = new LinkedList<>();
+		for (Object object : changes) {
+			String className = object.getClass().toString()
+					.substring(object.getClass().toString().lastIndexOf('.') + 1);
+			if (!classRemoved.contains(className) && !SWConstants.IGNORE_CLASS_ADDED.contains(className))
+				classRemoved.add(className);
+		}
+		log.info("Class Modified :----->  "+ classRemoved.toString());
 		return classRemoved;
 	}
 }

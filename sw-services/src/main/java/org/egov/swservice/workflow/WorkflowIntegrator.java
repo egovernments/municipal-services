@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.workflow.ProcessInstance;
-import org.egov.swservice.model.workflow.ProcessInstanceRequest;
-import org.egov.swservice.model.workflow.ProcessInstanceResponse;
+import org.egov.swservice.web.models.Property;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.workflow.ProcessInstance;
+import org.egov.swservice.web.models.workflow.ProcessInstanceRequest;
+import org.egov.swservice.web.models.workflow.ProcessInstanceResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WorkflowIntegrator {
 
-	private static final String MODULENAMEVALUE = "SW";
+	private static final String MODULE_NAME_VALUE = "SW";
 
 	private RestTemplate rest;
 
@@ -52,7 +52,8 @@ public class WorkflowIntegrator {
 	 *
 	 * and sets the resultant status from wf-response back to sewerage object
 	 *
-	 * @param sewerageRequest
+	 * @param sewerageConnectionRequest - Sewerage Connection Request
+	 * @param property - Property Object
 	 */
 	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
 
@@ -60,7 +61,7 @@ public class WorkflowIntegrator {
 		ProcessInstance processInstance = ProcessInstance.builder()
 				.businessId(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
 				.tenantId(property.getTenantId())
-				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
+				.businessService(config.getBusinessServiceValue()).moduleName(MODULE_NAME_VALUE)
 				.action(connection.getProcessInstance().getAction()).build();
 
 		if (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())) {
@@ -83,7 +84,7 @@ public class WorkflowIntegrator {
 		}
 		List<ProcessInstance> processInstances = new ArrayList<>();
 		processInstances.add(processInstance);
-		ProcessInstanceResponse processInstanceResponse = null;
+		ProcessInstanceResponse processInstanceResponse;
 
 		try {
 			processInstanceResponse = mapper.convertValue(
@@ -97,21 +98,19 @@ public class WorkflowIntegrator {
 			 * extracting message from client error exception
 			 */
 			DocumentContext responseContext = JsonPath.parse(e.getResponseBodyAsString());
-			List<Object> errros = null;
+			List<Object> errorList;
 			try {
-				errros = responseContext.read("$.Errors");
-			} catch (PathNotFoundException pnfe) {
+				errorList = responseContext.read("$.Errors");
+			} catch (PathNotFoundException ex1) {
 				StringBuilder builder = new StringBuilder();
-				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
-				log.error("EG_SW_WF_ERROR_KEY_NOT_FOUND", builder.toString());
-				builder = new StringBuilder();
-				builder.append(" Unable to read the json path in error object : ").append(pnfe.getMessage());
+				builder.append(" Unable to read the json path in error object : ").append(ex1.getMessage());
+				log.error(builder.toString());
 				throw new CustomException("EG_SW_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
-			throw new CustomException("EG_WF_ERROR", errros.toString());
+			throw new CustomException("EG_WF_ERROR", errorList.toString());
 		} catch (Exception e) {
 			throw new CustomException("EG_WF_ERROR",
-					" Exception occured while integrating with workflow : " + e.getMessage());
+					" Exception occurred while integrating with workflow : " + e.getMessage());
 		}
 
 		/*

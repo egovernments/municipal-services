@@ -1,10 +1,9 @@
 package org.egov.swservice.service;
 
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.ValidatorResult;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.swservice.web.models.ValidatorResult;
 
 public interface SewerageActionValidator {
 
-	public ValidatorResult validate(SewerageConnectionRequest sewerageConnectionRequest, boolean isUpdate);
-
+	ValidatorResult validate(SewerageConnectionRequest sewerageConnectionRequest, boolean isUpdate);
 }

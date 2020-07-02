@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
@@ -45,19 +45,19 @@ public class MDMSValidator {
 		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION_CONST)){
 		Map<String, String> errorMap = new HashMap<>();
 		List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_Connection_Type));
-		List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
+		List<String> taxModelNames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
 		Map<String, List<String>> codes = getAttributeValues(request.getSewerageConnection().getTenantId(), 
 				SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
 				SWConstants.JSONPATH_ROOT, request.getRequestInfo());
 		Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getSewerageConnection().getTenantId(), 
-				SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code", 
+				SWConstants.SW_TAX_MODULE, taxModelNames, "$.*.code",
 				SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
 		// merge codes
 		
-		Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+		Map<String, List<String>> finalCodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
 				.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-		validateMDMSData(finalcodes);
-		validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
+		validateMDMSData(finalCodes);
+		validateCodes(request.getSewerageConnection(), finalCodes, errorMap);
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	     }
@@ -65,17 +65,17 @@ public class MDMSValidator {
 
 
 	private Map<String, List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names,
-			String filter, String jsonpath, RequestInfo requestInfo) {
+			String filter, String jsonPath, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
 		MdmsCriteriaReq criteriaReq = sewerageServicesUtil.prepareMdMsRequest(tenantId, moduleName, names, filter,
 				requestInfo);
 		try {
 
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
-			return JsonPath.read(result, jsonpath);
+			return JsonPath.read(result, jsonPath);
 		} catch (Exception e) {
 			log.error("Error while fetching MDMS data", e);
-			throw new CustomException(SWConstants.INVALID_CONNECTION_TYPE, SWConstants.INVALID_CONNECTION_TYPE);
+			throw new CustomException("INVALID_CONNECTION_TYPE", SWConstants.INVALID_CONNECTION_TYPE);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class MDMSValidator {
 		Map<String, String> errorMap = new HashMap<>();
 		for (String masterName : masterNames) {
 			if (CollectionUtils.isEmpty(codes.get(masterName))) {
-				errorMap.put("MDMS DATA ERROR ", "Unable to fetch " + masterName + " codes from MDMS");
+				errorMap.put("MDMS_DATA_ERROR ", "Unable to fetch " + masterName + " codes from MDMS");
 			}
 		}
 		if (!errorMap.isEmpty())
@@ -93,7 +93,7 @@ public class MDMSValidator {
 
 	private static Map<String, String> validateCodes(SewerageConnection sewerageConnection,
 			Map<String, List<String>> codes, Map<String, String> errorMap) {
-		StringBuilder messageBuilder = null;
+		StringBuilder messageBuilder;
 		if (sewerageConnection.getConnectionType() != null 
 				&& !codes.get(SWConstants.MDMS_SW_Connection_Type).contains(sewerageConnection.getConnectionType())) {
 			messageBuilder = new StringBuilder();

@@ -2,7 +2,7 @@ package org.egov.swservice.consumer;
 
 import java.util.HashMap;
 
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.service.PdfFileStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -27,10 +27,10 @@ public class FileStoreIdsConsumer {
 	/**
 	 * Sewerage connection object
 	 * 
-	 * @param record
-	 * @param topic
+	 * @param record - Received record from Kafka
+	 * @param topic - Received Topic Name
 	 */
-	@KafkaListener(topics = { "${sw.consume.filestoreids}" })
+	@KafkaListener(topics = { "${sw.consume.filestoreids.topic}" })
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			SewerageConnectionRequest sewerageConnectionRequest = mapper.convertValue(record,
