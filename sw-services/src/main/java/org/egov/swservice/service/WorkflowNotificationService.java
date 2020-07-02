@@ -150,6 +150,15 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
@@ -253,6 +262,14 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);

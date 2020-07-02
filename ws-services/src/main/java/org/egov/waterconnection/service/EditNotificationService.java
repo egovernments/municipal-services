@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.Action;
@@ -86,6 +87,14 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+			waterConnectionRequest.getWaterConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
@@ -134,6 +143,15 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+			waterConnectionRequest.getWaterConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();

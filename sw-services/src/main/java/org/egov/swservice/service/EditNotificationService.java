@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.Action;
 import org.egov.swservice.model.Event;
@@ -84,6 +85,14 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
@@ -133,6 +142,14 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
