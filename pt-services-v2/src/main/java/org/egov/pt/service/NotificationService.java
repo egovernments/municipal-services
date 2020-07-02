@@ -190,8 +190,6 @@ public class NotificationService {
         String url = urlShorterService.getUrl(longURL);
         log.info("Shorth url: "+ url);
         // message.replace("<ownername>", val.getOwnerName());
-        message = message.replace("<taxamount>",  propertyDetail.getCalculation().getTotalAmount().toString());
-        message = message.replace("<domain>", domainName);
         message = message.replace("<url>", url);
         message = message.replace("<propertyid>", property.getPropertyId());
         message = message.replace("<tenantid>", property.getTenantId());
@@ -213,8 +211,6 @@ public class NotificationService {
         String url = urlShorterService.getUrl(longURL);
         log.info("Shorth url: "+ url);
         // message.replace("<ownername>", val.getOwnerName());
-        message = message.replace("<taxamount>",  propertyDetail.getCalculation().getTotalAmount().toString());
-        message = message.replace("<domain>", domainName);
         message = message.replace("<url>", url);
         message = message.replace("<propertyid>", property.getPropertyId());
         message = message.replace("<tenantid>", property.getTenantId());
