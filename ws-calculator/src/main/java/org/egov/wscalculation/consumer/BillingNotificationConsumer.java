@@ -19,8 +19,8 @@ public class BillingNotificationConsumer {
 	PaymentNotificationService paymentService;
 
 	/**
-	 * 
-	 * @param request bill Object
+	 *
+	 * @param record bill Object
 	 * @param topic
 	 */
 	@KafkaListener(topics = { "${kafka.topics.billgen.topic}" })

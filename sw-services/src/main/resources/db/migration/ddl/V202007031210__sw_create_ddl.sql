@@ -1,4 +1,5 @@
-CREATE TABLE eg_ws_connectionholder (
+DROP TABLE IF EXISTS eg_sw_connectionholder;
+CREATE TABLE eg_sw_connectionholder (
   tenantId            CHARACTER VARYING (256) NOT NULL,
   connectionid      CHARACTER VARYING (128) NOT NULL,
   status              CHARACTER VARYING (128) NOT NULL,
@@ -11,6 +12,6 @@ CREATE TABLE eg_ws_connectionholder (
   createdtime         BIGINT NOT NULL,
   lastmodifiedby      CHARACTER VARYING (128),
   lastmodifiedtime    BIGINT,
-  CONSTRAINT pk_eg_ws_connectionholder PRIMARY KEY (userid, connectionid),
-  CONSTRAINT fk_eg_ws_connectionholder FOREIGN KEY (connectionid) REFERENCES eg_ws_connection (id)
+  CONSTRAINT pk_eg_sw_connectionholder PRIMARY KEY (userid, connectionid),
+  CONSTRAINT fk_eg_sw_connectionholder FOREIGN KEY (connectionid) REFERENCES eg_sw_connection (id)
   );

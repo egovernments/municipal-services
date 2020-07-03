@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -124,13 +125,13 @@ public class PaymentNotificationService {
 			log.error("Error occured while processing the record: ", ex);
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param mappedRecord
-	 * @param waterConnection
+	 * @param waterConnectionRequest
 	 * @param topic
-	 * @param requestInfo
+	 * @param property
 	 * @return
 	 */
 	private EventRequest getEventRequest(HashMap<String, String> mappedRecord, WaterConnectionRequest waterConnectionRequest, String topic,
@@ -146,6 +147,14 @@ public class PaymentNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if (!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+			waterConnectionRequest.getWaterConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		Set<String> mobileNumbers = mobileNumberAndMesssage.keySet().stream().collect(Collectors.toSet());
@@ -189,13 +198,13 @@ public class PaymentNotificationService {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param mappedRecord
-	 * @param waterConnection
+	 * @param waterConnectionRequest
 	 * @param topic
-	 * @param requestInfo
+	 * @param property
 	 * @return
 	 */
 	private List<SMSRequest> getSmsRequest(HashMap<String, String> mappedRecord, WaterConnectionRequest waterConnectionRequest, String topic,
@@ -211,6 +220,14 @@ public class PaymentNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if (!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+			waterConnectionRequest.getWaterConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames, mappedRecord,
 				message);
 		List<SMSRequest> smsRequest = new ArrayList<>();
