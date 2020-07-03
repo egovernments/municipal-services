@@ -62,6 +62,7 @@ public class BPANotificationService {
 	 *            The bpaRequest listenend on the kafka topic
 	 */
 	public void process(BPARequest bpaRequest) {
+		log.info("PROCESS NOTIFICATION :");
 		List<SMSRequest> smsRequests = new LinkedList<>();
 		if (null != config.getIsSMSEnabled()) {
 			if (config.getIsSMSEnabled()) {
@@ -201,6 +202,7 @@ public class BPANotificationService {
 		String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);
 		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+		log.info("enrichSMSRequest NOTIFICATION :");
 	}
 
 	/**
@@ -233,6 +235,7 @@ public class BPANotificationService {
 			});
 			
 		}
+		log.info("User Received: " + mobileNumberToOwner );
 		return mobileNumberToOwner;
 	}
 }
