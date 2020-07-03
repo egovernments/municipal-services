@@ -91,6 +91,23 @@ public class PropertyUtil {
                 .append("&module=").append(PTConstants.MODULE);
         return uri;
     }
+    
+    public StringBuilder getTenantUri(String tenantId, RequestInfo requestInfo){
+        if(config.getIsStateLevel())
+            tenantId = tenantId.split("\\.")[0];
+
+        String locale = NOTIFICATION_LOCALE;
+        if(!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("\\|").length>=2)
+            locale = requestInfo.getMsgId().split("\\|")[1];
+
+        StringBuilder uri = new StringBuilder();
+        uri.append(config.getLocalizationHost())
+                .append(config.getLocalizationContextPath()).append(config.getLocalizationSearchEndpoint());
+        uri.append("?").append("locale=").append(locale)
+                .append("&tenantId=").append(tenantId)
+                .append("&module=").append("rainmaker-common");
+        return uri;
+    }
 
 
 }

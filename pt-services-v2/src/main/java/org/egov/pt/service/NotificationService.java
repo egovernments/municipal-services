@@ -53,11 +53,15 @@ public class NotificationService {
      */
     public void process(PropertyRequest request,String topic){
         String tenantId = request.getProperties().get(0).getTenantId();
-        StringBuilder uri = util.getUri(tenantId,request.getRequestInfo());        
+        StringBuilder uri = util.getUri(tenantId,request.getRequestInfo()); 
+        StringBuilder tenantUri = util.getTenantUri(tenantId,request.getRequestInfo());
+        String tenantPath = "$..messages[?(@.code==\"{}\")].message";
+
         try{
             String citizenMobileNumber = request.getRequestInfo().getUserInfo().getMobileNumber();
             String path = getJsonPath(topic, request.getRequestInfo().getUserInfo().getType());
             Object messageObj = null;
+            Object tenantObj = null;
             try {
                 LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
                 String jsonString = new JSONObject(responseMap).toString();
@@ -65,7 +69,15 @@ public class NotificationService {
             }catch(Exception e) {
             	throw new CustomException("LOCALIZATION ERROR","Unable to get message from localization");
             }
-            String message = ((ArrayList<String>)messageObj).get(0);
+            try {
+                LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(tenantUri, request.getRequestInfo());
+                String jsonString = new JSONObject(responseMap).toString();
+                tenantObj = JsonPath.parse(jsonString).read(tenantPath.replace("{}", "TENANT_TENANTS_"+tenantId.replace(".", "_").toUpperCase()));
+            }catch(Exception e) {
+            	throw new CustomException("LOCALIZATION ERROR","Unable to get message from localization");
+            }
+            String tenantMessage = ((ArrayList<String>)tenantObj).get(0);
+            String message = ((ArrayList<String>)messageObj).get(0).replace("<ulbname>", tenantMessage);           
             List<Event> events = new ArrayList<>();
             request.getProperties().forEach(property -> {
                 String customMessage = getCustomizedMessage(property,message,path);
