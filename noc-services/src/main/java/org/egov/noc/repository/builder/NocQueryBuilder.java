@@ -78,12 +78,12 @@ public class NocQueryBuilder {
 			preparedStmtList.add(criteria.getSourceRefId());
 		}
 		
-		List<String> accountId = criteria.getAccountId();
+		/*List<String> accountId = criteria.getAccountId();
 		if (!CollectionUtils.isEmpty(accountId)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" noc.accountId IN (").append(createQuery(accountId)).append(")");
 			addToPreparedStatement(preparedStmtList, accountId);
-		}
+		}*/
 		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 

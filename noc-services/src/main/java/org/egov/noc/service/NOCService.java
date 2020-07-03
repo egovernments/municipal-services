@@ -77,10 +77,9 @@ public class NOCService {
 	}
 	
 	public List<Noc> search(NocSearchCriteria criteria, RequestInfo requestInfo) {
-		List<String> uuids = new ArrayList<String>();
+		/*List<String> uuids = new ArrayList<String>();
 		uuids.add(requestInfo.getUserInfo().getUuid());
-//		criteria.setOwnerIds(uuids);
-		criteria.setAccountId(uuids);
+		criteria.setAccountId(uuids);*/
 		List<Noc> noc = nocRepository.getNocData(criteria);
 		return noc.isEmpty() ? Collections.emptyList() : noc;
 	}	
