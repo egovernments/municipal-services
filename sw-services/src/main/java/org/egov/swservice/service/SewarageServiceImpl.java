@@ -76,6 +76,9 @@ public class SewarageServiceImpl implements SewarageService {
 	@Autowired
 	private ObjectMapper mapper;
 
+	@Autowired
+	private UserService userService;
+
 	/**
 	 * @param sewarageConnectionRequest
 	 *            SewarageConnectionRequest contains sewarage connection to be
@@ -88,6 +91,7 @@ public class SewarageServiceImpl implements SewarageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
 		mDMSValidator.validateMasterForCreateRequest(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
+		userService.createUser(sewarageConnectionRequest);
 		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		// call work-flow
