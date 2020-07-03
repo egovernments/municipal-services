@@ -198,10 +198,10 @@ public class PropertyConfiguration {
     
     
     //URL Shortener
-    @Value("${egov.url.shortener.host}")
+    @Value("${egov.url.shorter.host}")
     private String shortenerHost;
 
-    @Value("${egov.url.shortener.endpoint}")
+    @Value("${egov.url.shorter.endpoint}")
     private String shortenerEndpoint;
 
 
