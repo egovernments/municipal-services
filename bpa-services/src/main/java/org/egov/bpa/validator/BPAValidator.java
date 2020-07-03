@@ -536,11 +536,22 @@ public class BPAValidator {
 				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
 				if(!nocs.isEmpty()) {
 					for (Noc noc : nocs) {
-						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())
-								&& !noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.APPROVED_STATE)) {
-							log.info("Noc is not approved for applicationNo :" + noc.getApplicationNo());
-							throw new CustomException("NOC_EXCEPTION",
-									" You can't approve the application without NOC approval");
+						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())) {
+							List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
+							if (statuses.size() > 0) {
+								String nocForwardCondn = "";
+								for (int i = 0; i < statuses.size() - 1; i++) {
+									nocForwardCondn += noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i))
+											+ "||";
+								}
+								nocForwardCondn += noc.getApplicationStatus()
+										.equalsIgnoreCase(statuses.get(statuses.size() - 1));
+								if (!Boolean.valueOf(nocForwardCondn.trim())) {
+									log.info("Noc is not approved for applicationNo :" + noc.getApplicationNo());
+									throw new CustomException("NOC_EXCEPTION",
+											" You can't approve the application without NOC approval");
+								}
+							}
 						}
 					}
 				} else {

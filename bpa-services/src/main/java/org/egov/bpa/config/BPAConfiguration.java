@@ -273,4 +273,7 @@ public class BPAConfiguration {
 	
 	@Value("${validate.required.nocs}")
 	private Boolean validateRequiredNoc;
+	
+	@Value("${validate.required.nocs.status}")
+	private String nocValidationCheckStatuses;
 }
