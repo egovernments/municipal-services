@@ -72,7 +72,6 @@ public class WorkflowNotificationService {
 	private ValidateProperty validateProperty;
 
 	String tenantIdReplacer = "$tenantId";
-	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
 	String sewerageConnectionReplacer = "SewerageConnection";
@@ -87,18 +86,15 @@ public class WorkflowNotificationService {
 	String mobileNoReplacer = "$mobileNo";
 	String applicationKey = "$applicationkey";
 
+
 	/**
-	 * 
-	 * @param record
-	 *            record is bill response.
-	 * @param topic
-	 *            topic is bill generation topic for sewerage.
+	 *
+	 * @param request record is bill response.
+	 * @param topic opic is bill generation topic for sewerage.
 	 */
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
-			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
-					request.getSewerageConnection().getApplicationNo(),
-					request.getSewerageConnection().getTenantId());
+			String applicationStatus = request.getSewerageConnection().getApplicationStatus();
 			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS
 					.contains(request.getSewerageConnection().getProcessInstance().getAction() + "_"
 							+ applicationStatus)) {
@@ -128,11 +124,13 @@ public class WorkflowNotificationService {
 		}
 	}
 
+
 	/**
-	 * 
-	 * @param sewerageConnection
+	 *
+	 * @param sewerageConnectionRequest
 	 * @param topic
-	 * @param requestInfo
+	 * @param property
+	 * @param applicationStatus
 	 * @return EventRequest Object
 	 */
 	private EventRequest getEventRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
@@ -198,9 +196,11 @@ public class WorkflowNotificationService {
 	}
 
 	/**
-	 * 
-	 * @param messageTemplate
-	 * @param connection
+	 *
+	 * @param mobileNumberAndMesssage
+	 * @param mobileNumber
+	 * @param sewerageConnectionRequest
+	 * @param property
 	 * @return return action link
 	 */
 	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage, String mobileNumber,
@@ -239,12 +239,13 @@ public class WorkflowNotificationService {
 
 	}
 
+
 	/**
-	 * 
-	 * @param mappedRecord
-	 * @param sewerageConnection
+	 *
+	 * @param sewerageConnectionRequest
 	 * @param topic
-	 * @param requestInfo
+	 * @param property
+	 * @param applicationStatus
 	 * @return
 	 */
 	private List<SMSRequest> getSmsRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
@@ -280,6 +281,14 @@ public class WorkflowNotificationService {
 		return smsRequest;
 	}
 
+	/**
+	 *
+	 * @param mobileNumbersAndNames
+	 * @param sewerageConnectionRequest
+	 * @param message
+	 * @param property
+	 * @return
+	 */
 	public Map<String, String> getMessageForMobileNumber(Map<String, String> mobileNumbersAndNames,
 			SewerageConnectionRequest sewerageConnectionRequest, String message, Property property) {
 		Map<String, String> messagetoreturn = new HashMap<>();
@@ -391,12 +400,11 @@ public class WorkflowNotificationService {
 
 	/**
 	 * Fetches SLA of CITIZENs based on the phone number.
-	 * 
-	 * @param sewerageConnection
-	 * @param requestInfo
-	 * @return string consisting SLA
+	 *
+	 * @param sewerageConnectionRequest
+	 * @param property
+	 * @return
 	 */
-
 	public String getSLAForState(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
 		String resultSla = "";
 		BusinessService businessService = workflowService
@@ -447,12 +455,13 @@ public class WorkflowNotificationService {
 		return mapOfPhnoAndUUIDs;
 	}
 
+
 	/**
 	 * Fetch URL for application download link
-	 * 
-	 * @param waterConnection
-	 * @param requestInfo
-	 * @return application download link
+	 *
+	 * @param sewerageConnectionRequest
+	 * @param property
+	 * @return
 	 */
 	private String getApplicationDownloaderLink(SewerageConnectionRequest sewerageConnectionRequest,
 			Property property) {

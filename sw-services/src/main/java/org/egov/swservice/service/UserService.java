@@ -56,7 +56,7 @@ public class UserService {
 					 * then random uuid is assigned as user-name
 					 */
 					StringBuilder uri = new StringBuilder(configuration.getUserHost())
-							.append(configuration.getUserContextPath()).append(configuration.getUserSearchEndpoint());
+							.append(configuration.getUserContextPath()).append(configuration.getUserCreateEndPoint());
 					setUserName(holderInfo, listOfMobileNumbers);
 
 					ConnectionUserRequest userRequest = ConnectionUserRequest.builder()

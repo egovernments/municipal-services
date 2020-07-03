@@ -72,7 +72,6 @@ public class WorkflowNotificationService {
 	private ValidateProperty validateProperty;
 	
 	String tenantIdReplacer = "$tenantId";
-	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
 	String WaterConnectionReplacer = "WaterConnection";
@@ -91,14 +90,12 @@ public class WorkflowNotificationService {
 	
 	/**
 	 * 
-	 * @param record record is bill response.
+	 * @param request record is bill response.
 	 * @param topic topic is bill generation topic for water.
 	 */
 	public void process(WaterConnectionRequest request, String topic) {
 		try {
-			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
-					request.getWaterConnection().getApplicationNo(),
-					request.getWaterConnection().getTenantId());
+			String applicationStatus = request.getWaterConnection().getApplicationStatus();
 			
 			if (!WCConstants.NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWaterConnection().getProcessInstance().getAction()+"_"+applicationStatus)) {
 				log.info("Notification Disabled For State :" + applicationStatus);
@@ -123,12 +120,14 @@ public class WorkflowNotificationService {
 		}
 	}
 	
+
 	/**
-	 * 
-	 * @param waterConnection
+	 *
+	 * @param request
 	 * @param topic
-	 * @param requestInfo
-	 * @return EventRequest Object
+	 * @param property
+	 * @param applicationStatus
+	 * @return
 	 */
 	private EventRequest getEventRequest(WaterConnectionRequest request, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
@@ -188,10 +187,13 @@ public class WorkflowNotificationService {
 		}
 	}
 	
+
 	/**
-	 * 
-	 * @param messageTemplate
-	 * @param connection
+	 *
+	 * @param mobileNumberAndMesssage
+	 * @param mobileNumber
+	 * @param connectionRequest
+	 * @param property
 	 * @return return action link
 	 */
 	public Action getActionForEventNotification(Map<String, String> mobileNumberAndMesssage,
@@ -228,13 +230,13 @@ public class WorkflowNotificationService {
 		}
 		return Action.builder().actionUrls(items).build();
 	}
-	
+
 	/**
-	 * 
-	 * @param mappedRecord
-	 * @param waterConnection
+	 *
+	 * @param waterConnectionRequest
 	 * @param topic
-	 * @param requestInfo
+	 * @param property
+	 * @param applicationStatus
 	 * @return
 	 */
 	private List<SMSRequest> getSmsRequest(WaterConnectionRequest waterConnectionRequest, String topic,
@@ -375,14 +377,14 @@ public class WorkflowNotificationService {
 
 	}
 	
+
 	/**
 	 * Fetches SLA of CITIZENs based on the phone number.
-	 * 
-	 * @param waterConnection
-	 * @param requestInfo
-	 * @return string consisting SLA
+	 *
+	 * @param connectionRequest
+	 * @param property
+	 * @return
 	 */
-
 	public String getSLAForState(WaterConnectionRequest connectionRequest, Property property) {
 		String resultSla = "";
 		BusinessService businessService = workflowService.getBusinessService(property.getTenantId(),
@@ -433,13 +435,14 @@ public class WorkflowNotificationService {
     	return mapOfPhnoAndUUIDs;
     }
     
-    /**
-     * Fetch URL for application download link
-     * 
-     * @param waterConnection
-     * @param requestInfo
-     * @return application download link
-     */
+
+	/**
+	 * Fetch URL for application download link
+	 *
+	 * @param waterConnectionRequest
+	 * @param property
+	 * @return application download link
+	 */
 	private String getApplicationDownlonadLink(WaterConnectionRequest waterConnectionRequest, Property property) {
 		CalculationCriteria criteria = CalculationCriteria.builder().applicationNo(waterConnectionRequest.getWaterConnection().getApplicationNo())
 				.waterConnection(waterConnectionRequest.getWaterConnection()).tenantId(property.getTenantId()).build();
@@ -464,13 +467,14 @@ public class WorkflowNotificationService {
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 		}
 	}
+
 	/**
 	 * Get file store id from PDF service
-	 * 
+	 *
 	 * @param waterobject
 	 * @param requestInfo
 	 * @param tenantId
-	 * @return file store id
+	 * @return
 	 */
 	private String getFielStoreIdFromPDFService(JSONObject waterobject, RequestInfo requestInfo, String tenantId) {
 		JSONArray waterconnectionlist = new JSONArray();
