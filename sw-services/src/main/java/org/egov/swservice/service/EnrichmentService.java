@@ -263,13 +263,15 @@ public class EnrichmentService {
 		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
 		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
 		sewerageConnectionList.forEach(sewerageConnection -> {
-			sewerageConnection.getConnectionHolders().forEach(holderInfo -> {
-				if (userIdToConnectionHolderMap.get(holderInfo.getUuid()) == null)
-					throw new CustomException("OWNER_SEARCH_ERROR", "The owner of the sewerage application"
-							+ sewerageConnection.getApplicationNo() + " is not coming in user search");
-				else
-					holderInfo.addUserDetail(userIdToConnectionHolderMap.get(holderInfo.getUuid()));
-			});
+			if (!CollectionUtils.isEmpty(sewerageConnection.getConnectionHolders())) {
+				sewerageConnection.getConnectionHolders().forEach(holderInfo -> {
+					if (userIdToConnectionHolderMap.get(holderInfo.getUuid()) == null)
+						throw new CustomException("OWNER_SEARCH_ERROR", "The owner of the sewerage application"
+								+ sewerageConnection.getApplicationNo() + " is not coming in user search");
+					else
+						holderInfo.addUserDetail(userIdToConnectionHolderMap.get(holderInfo.getUuid()));
+				});
+			}
 		});
 	}
 }
