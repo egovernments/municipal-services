@@ -7,6 +7,7 @@ import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.ConnectionHolderInfo;
 import org.egov.swservice.model.ConnectionUserRequest;
 import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.model.Status;
 import org.egov.swservice.model.users.UserDetailResponse;
 import org.egov.swservice.model.users.UserSearchRequest;
 import org.egov.swservice.repository.ServiceRequestRepository;
@@ -199,17 +200,18 @@ public class UserService {
 	 *
 	 * @param tenantId  TenantId of the sewerage connection
 	 * @param role      The role of the user set in this case to CITIZEN
-	 * @param holerInfo The user whose fields are to be set
+	 * @param holderInfo The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, Role role, ConnectionHolderInfo holerInfo) {
-		holerInfo.setActive(true);
-		holerInfo.setTenantId(tenantId);
-		holerInfo.setRoles(Collections.singletonList(role));
-		holerInfo.setType("CITIZEN");
-		holerInfo.setCreatedDate(null);
-		holerInfo.setCreatedBy(null);
-		holerInfo.setLastModifiedDate(null);
-		holerInfo.setLastModifiedBy(null);
+	private void addUserDefaultFields(String tenantId, Role role, ConnectionHolderInfo holderInfo) {
+		holderInfo.setActive(true);
+		holderInfo.setStatus(Status.ACTIVE);
+		holderInfo.setTenantId(tenantId);
+		holderInfo.setRoles(Collections.singletonList(role));
+		holderInfo.setType("CITIZEN");
+		holderInfo.setCreatedDate(null);
+		holderInfo.setCreatedBy(null);
+		holderInfo.setLastModifiedDate(null);
+		holderInfo.setLastModifiedBy(null);
 	}
 
 	/**
