@@ -41,7 +41,7 @@ public class NotificationService {
     @Value("${notification.url}")
     private String notificationURL;
     
-    @Value("${egov.notify.domain}")
+    @Value("${egov.ui.app.host}")
     private String domainName;
 
     @Value("${egov.notify.pt.url.format}")
@@ -53,7 +53,7 @@ public class NotificationService {
      */
     public void process(PropertyRequest request,String topic){
         String tenantId = request.getProperties().get(0).getTenantId();
-        StringBuilder uri = util.getUri(tenantId,request.getRequestInfo());
+        StringBuilder uri = util.getUri(tenantId,request.getRequestInfo());        
         try{
             String citizenMobileNumber = request.getRequestInfo().getUserInfo().getMobileNumber();
             String path = getJsonPath(topic, request.getRequestInfo().getUserInfo().getType());
@@ -191,10 +191,6 @@ public class NotificationService {
         log.info("Shorth url: "+ url);
         // message.replace("<ownername>", val.getOwnerName());
         message = message.replace("<url>", url);
-        message = message.replace("<propertyid>", property.getPropertyId());
-        message = message.replace("<tenantid>", property.getTenantId());
-        message = message.replace("<FY>", propertyDetail.getFinancialYear());
-        message = message.replace("<ulbname>", property.getTenantId().split(".")[1].toUpperCase());
        return message;
     }
 
@@ -212,10 +208,6 @@ public class NotificationService {
         log.info("Shorth url: "+ url);
         // message.replace("<ownername>", val.getOwnerName());
         message = message.replace("<url>", url);
-        message = message.replace("<propertyid>", property.getPropertyId());
-        message = message.replace("<tenantid>", property.getTenantId());
-        message = message.replace("<FY>", propertyDetail.getFinancialYear());
-        message = message.replace("<ulbname>", property.getTenantId().split(".")[1].toUpperCase());
         return message;
     }
 

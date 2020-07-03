@@ -47,9 +47,9 @@ public class PTConstants {
 
     public static final String NOTIFICATION_CREATE_CODE = "pt.property.en.create";
 
-    public static final String NOTIFICATION_UPDATE_CODE = "pt.payment.bulk";
+    public static final String NOTIFICATION_UPDATE_CODE = "pt.property.en.update";
 
-    public static final String NOTIFICATION_EMPLOYEE_UPDATE_CODE = "pt.payment.bulk";
+    public static final String NOTIFICATION_EMPLOYEE_UPDATE_CODE = "pt.property.en.update.employee";
 
     public static final String NOTIFICATION_PAYMENT_ONLINE = "pt.payment.online";
 
