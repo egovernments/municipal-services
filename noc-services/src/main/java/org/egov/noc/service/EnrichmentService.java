@@ -122,7 +122,7 @@ public class EnrichmentService {
 		String state = stateObj!=null ? stateObj.getState() : StringUtils.EMPTY;
 		
 		
-		if (state.equalsIgnoreCase(NOCConstants.APPROVED_STATE)) {
+		if (state.equalsIgnoreCase(NOCConstants.APPROVED_STATE) || state.equalsIgnoreCase(NOCConstants.AUTOAPPROVED_STATE)) {
 			
 			Map<String, Object> additionalDetail = null;
 			if(noc.getAdditionalDetails() != null) {

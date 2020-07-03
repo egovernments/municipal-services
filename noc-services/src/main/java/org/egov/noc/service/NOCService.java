@@ -49,6 +49,7 @@ public class NOCService {
 		String tenantId = nocRequest.getNoc().getTenantId().split("\\.")[0];
 		Object mdmsData = nocUtil.mDMSCall(nocRequest.getRequestInfo(), tenantId);
 		Map<String, String> additionalDetails = nocValidator.getOrValidateBussinessService(nocRequest.getNoc(), mdmsData);
+		nocValidator.validateCreate(nocRequest,  mdmsData);
 		enrichmentService.enrichCreateRequest(nocRequest, mdmsData);
 		wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		nocRepository.save(nocRequest);

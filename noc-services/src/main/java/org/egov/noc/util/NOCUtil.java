@@ -72,16 +72,22 @@ public class NOCUtil {
 	public List<ModuleDetail> getNOCModuleRequest() {
 		List<MasterDetail> nocMasterDtls = new ArrayList<>();
 
-		final String filterCode = "$.[?(@.isActive==true)]";
+		final String nocFilterCode = "$.[?(@.isActive==true)]";
 
-		nocMasterDtls.add(MasterDetail.builder().name(NOCConstants.NOC_TYPE).filter(filterCode).build());
-
+		nocMasterDtls.add(MasterDetail.builder().name(NOCConstants.NOC_TYPE).filter(nocFilterCode).build());
+		nocMasterDtls.add(MasterDetail.builder().name(NOCConstants.NOC_DOC_TYPE_MAPPING).build());
 		ModuleDetail nocModuleDtls = ModuleDetail.builder().masterDetails(nocMasterDtls)
 				.moduleName(NOCConstants.NOC_MODULE).build();
+		
+		final String filterCode = "$.[?(@.active==true)]";
 
-		return Arrays.asList(nocModuleDtls);
-	}
-	
+		List<MasterDetail> commonMasterDetails = new ArrayList<>();
+			commonMasterDetails.add(MasterDetail.builder().name(NOCConstants.DOCUMENT_TYPE).filter(filterCode).build());
+		ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
+				.moduleName(NOCConstants.COMMON_MASTERS_MODULE).build();
+
+		return Arrays.asList(nocModuleDtls, commonMasterMDtl);
+	}	
 
 
 	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
