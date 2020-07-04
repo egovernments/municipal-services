@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -99,6 +100,9 @@ public class DemandService {
     
     @Autowired
     private SWCalculationUtil sWCalculationUtil;
+
+	@Autowired
+	private SWCalculationWorkflowValidator swCalulationWorkflowValidator;
 
 	/**
 	 * Creates or updates Demand
@@ -675,6 +679,9 @@ public class DemandService {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (String connectionNo : connectionNos) {
+				Boolean genratedemand = swCalulationWorkflowValidator.nonMeterconnectionValidation(requestInfo,tenantId,connectionNo);
+				if(!genratedemand)
+					continue;
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
