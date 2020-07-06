@@ -226,6 +226,10 @@ public class BPANotificationService {
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
 		log.info("User Received 2 : " + userDetailResponse.getUser().get(0).getMobileNumber() + userDetailResponse.getUser().get(0).getName());
+		log.info("bpaRequest Received 1: " + bpaRequest );
+		log.info("bpaRequest Received 2: " + !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen()));
+		log.info("bpaRequest Received 3: " + (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
+				|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove())) );
 		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
 				&& (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
 						|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove()))) {
