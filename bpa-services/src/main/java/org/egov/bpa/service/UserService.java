@@ -10,6 +10,7 @@ import java.util.List;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPASearchCriteria;
 import org.egov.bpa.web.model.user.UserDetailResponse;
@@ -22,6 +23,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UserService {
 
@@ -77,6 +81,7 @@ public class UserService {
 			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
 			parseResponse(responseMap, dobFormat);
 			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
+			log.info("userCall Received: ");
 			return userDetailResponse;
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("IllegalArgumentException", "ObjectMapper not able to convertValue in userCall");
@@ -104,6 +109,7 @@ public class UserService {
 					map.put("pwdExpiryDate", dateTolong((String) map.get("pwdExpiryDate"), format1));
 			});
 		}
+		log.info("parseResponse Received: ");
 	}
 
 	/**
@@ -139,6 +145,7 @@ public class UserService {
 		UserSearchRequest userSearchRequest = getUserSearchRequest(criteria, requestInfo);
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
+		log.info("UserDetailResponse Received: ");
 		return userDetailResponse;
 	}
 
@@ -160,6 +167,7 @@ public class UserService {
 		userSearchRequest.setUserType(BPAConstants.CITIZEN);
 		if (!CollectionUtils.isEmpty(criteria.getOwnerIds()))
 			userSearchRequest.setUuid(criteria.getOwnerIds());
+		log.info("UserSearchRequest Received: ");
 		return userSearchRequest;
 	}
 

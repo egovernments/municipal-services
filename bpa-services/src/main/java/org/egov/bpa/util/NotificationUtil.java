@@ -268,7 +268,7 @@ public class NotificationUtil {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
-		log.info("LocalizationMessages Received: " + jsonString );
+		log.info("LocalizationMessages Received: ");
 		return jsonString;
 	}
 
