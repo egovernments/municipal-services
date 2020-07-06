@@ -60,6 +60,8 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
                 sewarageConnection.setAdditionalDetails(addtionalDetails);
                 sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
                 sewarageConnection.setPropertyId(rs.getString("property_id"));
+                sewarageConnection.setApplicationType(rs.getString("applicationType"));
+                sewarageConnection.setDateEffectiveFrom(rs.getLong("dateEffectiveFrom"));
 
                 AuditDetails auditdetails = AuditDetails.builder()
                         .createdBy(rs.getString("sw_createdBy"))

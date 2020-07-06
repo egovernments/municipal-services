@@ -41,6 +41,7 @@ import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.validator.WSCalulationWorkflowValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -93,6 +94,8 @@ public class DemandService {
     @Autowired
     private WSCalculationUtil wsCalculationUtil;
 
+	@Autowired
+	private WSCalulationWorkflowValidator wsCalulationWorkflowValidator;
 
 	/**
 	 * Creates or updates Demand
@@ -420,9 +423,7 @@ public class DemandService {
 	/**
 	 * 
 	 * @param tenantId
-	 * @param consumerCodes
-	 * @param taxPeriodFrom
-	 * @param taxPeriodTo
+	 * @param demandId
 	 * @param requestInfo
 	 * @return List of Demand
 	 */
@@ -696,7 +697,7 @@ public class DemandService {
 
 	/**
 	 * 
-	 * @param mdmsResponse
+	 * @param master
 	 * @param requestInfo
 	 * @param tenantId
 	 */
@@ -709,6 +710,9 @@ public class DemandService {
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
 			for (String connectionNo : connectionNos) {
+				Boolean genratedemand = wsCalulationWorkflowValidator.nonMeterconnectionValidation(requestInfo,tenantId,connectionNo);
+				if(!genratedemand)
+					continue;
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();

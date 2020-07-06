@@ -11,6 +11,7 @@ import org.egov.wscalculation.model.MeterReading;
 import org.egov.wscalculation.model.MeterReadingSearchCriteria;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.validator.WSCalculationValidator;
+import org.egov.wscalculation.validator.WSCalulationWorkflowValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,9 @@ public class MeterServicesImpl implements MeterService {
 
 	@Autowired
 	private WSCalculationValidator wsCalculationValidator;
+
+	@Autowired
+	private WSCalulationWorkflowValidator wsCalulationWorkflowValidator;
 	
 	@Autowired
 	private WSCalculationService wSCalculationService;
@@ -46,6 +50,7 @@ public class MeterServicesImpl implements MeterService {
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
+		wsCalulationWorkflowValidator.meterconnectionValidation(meterConnectionRequest);
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
 		meterReadingsList.add(meterConnectionRequest.getMeterReading());

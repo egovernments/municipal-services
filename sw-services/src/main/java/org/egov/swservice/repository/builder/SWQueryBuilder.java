@@ -40,7 +40,7 @@ public class SWQueryBuilder {
 			+ "sc.noOfWaterClosets, sc.noOfToilets,sc.proposedWaterClosets, sc.proposedToilets, sc.connectionType, sc.connection_id as connection_Id, sc.appCreatedDate,"
 			+ "  sc.detailsprovidedby, sc.estimationfileStoreId , sc.sanctionfileStoreId , sc.estimationLetterDate,"
 			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id,"
-			+ " conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.createdBy as sw_createdBy,"
+			+ " conn.roadcuttingarea, conn.action, conn.adhocpenalty, conn.adhocrebate, conn.applicationType, conn.dateEffectiveFrom, conn.createdBy as sw_createdBy,"
 			+ " conn.lastModifiedBy as sw_lastModifiedBy, conn.createdTime as sw_createdTime, conn.lastModifiedTime as sw_lastModifiedTime, "
 			+ " conn.adhocpenaltyreason, conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment,"
 			+ " conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id, plumber.name as plumber_name, plumber.licenseno,"
@@ -144,6 +144,11 @@ public class SWQueryBuilder {
 			addClauseIfRequired(preparedStatement, query);
 			query.append("  sc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
+		}
+		if(!StringUtils.isEmpty(criteria.getApplicationType())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationType = ? ");
+			preparedStatement.add(criteria.getApplicationType());
 		}
 		//Add OrderBy clause
 		query.append(" ORDER BY sc.appCreatedDate DESC");

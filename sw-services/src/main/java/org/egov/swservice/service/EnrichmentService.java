@@ -64,6 +64,8 @@ public class EnrichmentService {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 	    additionalDetail.put(SWConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
 	    sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
+	    //Setting ApplicationType
+	    sewerageConnectionRequest.getSewerageConnection().setApplicationType("NEW_SEWERAGE_CONNECTION");
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
 	}

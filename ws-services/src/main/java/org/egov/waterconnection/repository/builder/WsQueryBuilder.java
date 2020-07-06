@@ -1,5 +1,9 @@
 package org.egov.waterconnection.repository.builder;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.Property;
@@ -10,11 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @Component
@@ -147,6 +146,11 @@ public class WsQueryBuilder {
 			addClauseIfRequired(preparedStatement, query);
 			query.append("  wc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
+		}
+		if(!StringUtils.isEmpty(criteria.getApplicationType())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationType = ? ");
+			preparedStatement.add(criteria.getApplicationType());
 		}
 		query.append(ORDER_BY_CLAUSE);
 		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
