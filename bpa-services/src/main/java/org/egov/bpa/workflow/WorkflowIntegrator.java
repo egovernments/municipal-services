@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.LinkedList;
 
 import org.egov.bpa.config.BPAConfiguration;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.tracer.model.CustomException;
@@ -117,14 +118,14 @@ public class WorkflowIntegrator {
 			try {
 				errros = responseContext.read("$.Errors");
 			} catch (PathNotFoundException pnfe) {
-				log.error("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
+				log.error(BPAErrorConstants.EG_BPA_WF_ERROR_KEY_NOT_FOUND,
 						" Unable to read the json path in error object : " + pnfe.getMessage());
-				throw new CustomException("EG_BPA_WF_ERROR_KEY_NOT_FOUND",
+				throw new CustomException(BPAErrorConstants.EG_BPA_WF_ERROR_KEY_NOT_FOUND,
 						" Unable to read the json path in error object : " + pnfe.getMessage());
 			}
-			throw new CustomException("EG_WF_ERROR", errros.toString());
+			throw new CustomException(BPAErrorConstants.EG_WF_ERROR, errros.toString());
 		} catch (Exception e) {
-			throw new CustomException("EG_WF_ERROR",
+			throw new CustomException(BPAErrorConstants.EG_WF_ERROR,
 					" Exception occured while integrating with workflow : " + e.getMessage());
 		}
 

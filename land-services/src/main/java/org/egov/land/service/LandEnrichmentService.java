@@ -13,6 +13,7 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.land.config.LandConfiguration;
+import org.egov.land.util.LandConstants;
 import org.egov.land.util.LandUtil;
 import org.egov.land.web.models.AuditDetails;
 import org.egov.land.web.models.Channel;
@@ -142,7 +143,7 @@ public class LandEnrichmentService {
 		UserDetailResponse userDetailResponse = userService.getUsersForLandInfos(landInfos);
 		enrichOwner(userDetailResponse, landInfos);
 		if(!CollectionUtils.isEmpty(landInfos) && !CollectionUtils.isEmpty(landInfos.get(0).getOwners())){
-			log.info("In enrich service...... ");
+			log.debug("In enrich service...... ");
 		}
 		return landInfos;
 	}
@@ -161,7 +162,7 @@ public class LandEnrichmentService {
 		landInfos.forEach(landInfo -> {
 			landInfo.getOwners().forEach(owner -> {
 				if (userIdToOwnerMap.get(owner.getUuid()) == null)
-					throw new CustomException("OWNER SEARCH ERROR",
+					throw new CustomException(LandConstants.OWNER_SEARCH_ERROR,
 							"The owner of the landInfo " + landInfo.getId() + " is not coming in user search");
 				else
 					owner.addUserWithoutAuditDetail(userIdToOwnerMap.get(owner.getUuid()));

@@ -117,7 +117,7 @@ public class DemandService {
                     , requestInfo,calculation);
 
             if(CollectionUtils.isEmpty(searchResult))
-                throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getBpa().getApplicationNo());
+                throw new CustomException(BPACalculatorConstants.INVALID_UPDATE,"No demand exists for applicationNumber: "+calculation.getBpa().getApplicationNo());
 
             Demand demand = searchResult.get(0);
             List<DemandDetail> demandDetails = demand.getDemandDetails();
@@ -205,7 +205,7 @@ public class DemandService {
              response = mapper.convertValue(result,DemandResponse.class);
         }
         catch (IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response from Demand Search");
+            throw new CustomException(BPACalculatorConstants.PARSING_ERROR,"Failed to parse response from Demand Search");
         }
 
         if(CollectionUtils.isEmpty(response.getDemands()))
@@ -234,7 +234,7 @@ public class DemandService {
             }
             
             if (bpa == null)
-                throw new CustomException("INVALID APPLICATIONNUMBER", "Demand cannot be generated for applicationNumber " +
+                throw new CustomException(BPACalculatorConstants.INVALID_APPLICATION_NUMBER, "Demand cannot be generated for applicationNumber " +
                         calculation.getApplicationNumber() + "  Building plan application with this number does not exist ");
 
             String tenantId = calculation.getTenantId();

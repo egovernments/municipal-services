@@ -231,7 +231,7 @@ public class CalculationService {
 				TaxHeadEstimate estimate = new TaxHeadEstimate();
 				BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
 				if (totalTax.compareTo(BigDecimal.ZERO) == -1)
-					throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
+					throw new CustomException(BPACalculatorConstants.INVALID_AMOUNT, "Tax amount is negative");
 
 				estimate.setEstimateAmount(totalTax);
 				estimate.setCategory(Category.FEE);
@@ -247,7 +247,7 @@ public class CalculationService {
 
 			BigDecimal totalTax = BigDecimal.valueOf(calculatedAmout);
 			if (totalTax.compareTo(BigDecimal.ZERO) == -1)
-				throw new CustomException("INVALID AMOUNT", "Tax amount is negative");
+				throw new CustomException(BPACalculatorConstants.INVALID_AMOUNT, "Tax amount is negative");
 
 			estimate.setEstimateAmount(totalTax);
 			estimate.setCategory(Category.FEE);

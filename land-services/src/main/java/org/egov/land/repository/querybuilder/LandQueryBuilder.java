@@ -71,12 +71,12 @@ public class LandQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
-		if (criteria.getMobileNumber() != null) {
+		/*if (criteria.getMobileNumber() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" landInfoowner.mobileNumber = ? ");
 			preparedStmtList.add(criteria.getMobileNumber());
 
-		}
+		}*/
 		
 		if (criteria.getLandUId() != null) {
 			addClauseIfRequired(preparedStmtList, builder);

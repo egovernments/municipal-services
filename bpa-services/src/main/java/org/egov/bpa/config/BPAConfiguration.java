@@ -259,4 +259,21 @@ public class BPAConfiguration {
 	@Value("${egov.bpa.skippayment.status}")
 	private String skipPaymentStatuses;
 	
+//	action and status constants
+	
+
+	@Value("${egov.sendtocitizen.action}")
+	private String actionsendtocitizen;
+	
+	@Value("${egov.inprogress.action}")
+	private String actioninprogress;
+	
+	@Value("${egov.approve.action}")
+	private String actionapprove;
+	
+	@Value("${egov.pendingapplfee.stsus}")
+	private String statuspendingapplfee;
+	
+	@Value("${egov.inprogress.stsus}")
+	private String statusinprogress;
 }

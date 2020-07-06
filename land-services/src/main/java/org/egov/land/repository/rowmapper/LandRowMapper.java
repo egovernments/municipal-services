@@ -103,7 +103,7 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 					.occupancyType(rs.getString("occupancytype") != null
 							? rs.getString("occupancytype") : null)
 					.occupancyDate(rs.getLong("occupancydate"))
-//					.auditDetails(auditdetails)
+					.auditDetails(auditdetails)
 					.tenantId(tenantId).build();
 			landInfo.addUnitsItem(unit);
 		}
@@ -115,11 +115,14 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 			BigDecimal ownerShipPercentage = val != null ? new BigDecimal(val) : null;
 
 			OwnerInfo owner = OwnerInfo.builder().tenantId(tenantId).ownerId(ownerId)
-					.uuid(rs.getString("landInfoowner_uuid")).mobileNumber(rs.getString("mobilenumber"))
+					.uuid(rs.getString("landInfoowner_uuid"))
+//					.mobileNumber(rs.getString("mobilenumber"))
 					.isPrimaryOwner(isPrimaryOwner)
 					.ownerShipPercentage(ownerShipPercentage)
-					.institutionId(rs.getString("institutionid")).relationship(rs.getString("relationship") != null
-							? Relationship.fromValue(rs.getString("relationship")) : null)
+					.institutionId(rs.getString("institutionid"))
+					.auditDetails(auditdetails)
+//					.relationship(rs.getString("relationship") != null
+//							? Relationship.fromValue(rs.getString("relationship")) : null)
 					.build();
 			landInfo.addOwnersItem(owner);
 		}
@@ -135,7 +138,8 @@ public class LandRowMapper implements ResultSetExtractor<List<LandInfo>> {
 		if (documentId != null) {
 			Document document = Document.builder().documentType(rs.getString("landInfo_doc_documenttype"))
 					.fileStoreId(rs.getString("landInfo_doc_filestore")).id(documentId)
-					.documentUid(rs.getString("documentUid")).build();
+					.documentUid(rs.getString("documentUid"))
+					.auditDetails(auditdetails).build();
 			landInfo.addDocumentsItem(document);
 		}
 	}

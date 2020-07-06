@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
+import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 import org.egov.bpa.calculator.web.models.RequestInfoWrapper;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
 import org.egov.bpa.calculator.web.models.bpa.BPAResponse;
@@ -52,7 +53,7 @@ public class BPAService {
 		try {
 			bpaResponse = mapper.convertValue(responseMap, BPAResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Error while parsing response of TradeLicense Search");
+			throw new CustomException(BPACalculatorConstants.PARSING_ERROR, "Error while parsing response of TradeLicense Search");
 		}
 
 		return bpaResponse.getBPA().get(0);

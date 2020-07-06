@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
 import org.egov.bpa.web.model.BPA;
@@ -88,7 +89,7 @@ public class BPAController {
 		try {
 			resource = new UrlResource(path.toUri());
 		} catch (Exception ex) {
-			throw new CustomException("UNABLE_TO_DOWNLOAD", "Unable to download the file");
+			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		}
 
 		return ResponseEntity.ok()

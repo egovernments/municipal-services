@@ -43,6 +43,21 @@ public class BPACalculatorConstants {
 	public static final String MDMS_CALCULATIONTYPE_LOW_SANC_FEETYPE = "Low_SanctionFee";
 
 	public static final String MDMS_CALCULATIONTYPE_LOW_APL_FEETYPE = "Low_ApplicationFee";
-
+	
+	// Error messages in BPA Calculator
+	
+	public static final String PARSING_ERROR = "PARSING ERROR";
+	
+	public static final String INVALID_AMOUNT = "INVALID AMOUNT";
+	
+	public static final String INVALID_UPDATE = "INVALID UPDATE";
+	
+	public static final String INVALID_ERROR = "INVALID ERROR";
+	
+	public static final String INVALID_APPLICATION_NUMBER = "INVALID APPLICATION NUMBER";
+	
+	public static final String EDCR_ERROR = "EDCR_ERROR";
+	
+	public static final String CALCULATION_ERROR = "CALCULATION ERROR";
 	
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.egov.bpa.calculator.config.BPACalculatorConfig;
+import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 
 @Repository
 public class DemandRepository {
@@ -44,7 +45,7 @@ public class DemandRepository {
             response = mapper.convertValue(result,DemandResponse.class);
         }
         catch(IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response of create demand");
+            throw new CustomException(BPACalculatorConstants.PARSING_ERROR,"Failed to parse response of create demand");
         }
         return response.getDemands();
     }
@@ -66,7 +67,7 @@ public class DemandRepository {
             response = mapper.convertValue(result,DemandResponse.class);
         }
         catch(IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response of update demand");
+            throw new CustomException(BPACalculatorConstants.PARSING_ERROR,"Failed to parse response of update demand");
         }
         return response.getDemands();
 

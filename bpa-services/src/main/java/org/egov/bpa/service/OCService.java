@@ -7,6 +7,7 @@ import java.util.List;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
@@ -105,33 +106,33 @@ public class OCService {
 			if (riskType.size() > 1) {
 				if(riskType.get(1).equalsIgnoreCase("LOW")){
 					if(!riskType.get(0).equalsIgnoreCase("LOW")){
-						throw new CustomException("INVALID CREATE",
+						throw new CustomException(BPAErrorConstants.INVALID_CREATE,
 								"Risk type from BPA edcr is not matching with the Risk type from occupancy certificate edcr. You cannot proceed with the application");
 					}
 
 				}else if(riskType.get(1).equalsIgnoreCase("MEDIUM")){
 					if(riskType.get(0).equalsIgnoreCase("HIGH")){
-						throw new CustomException("INVALID CREATE",
+						throw new CustomException(BPAErrorConstants.INVALID_CREATE,
 								"Risk type from BPA edcr is not matching with the Risk type from occupancy certificate edcr. You cannot proceed with the application");
 					}
 				}
 			}
 				if (khathaNos.size() > 1) {
 					if (!khathaNos.get(0).equalsIgnoreCase(khathaNos.get(1))) {
-						throw new CustomException("INVALID CREATE",
+						throw new CustomException(BPAErrorConstants.INVALID_CREATE,
 								"Khata number from BPA edcr is not matching with the khata number from occupancy certificate edcr. You cannot proceed with the application");
 					}
 
 				}
 				if (plotNos.size() > 1) {
 					if (!plotNos.get(0).equalsIgnoreCase(plotNos.get(1))) {
-							throw new CustomException("INVALID CREATE",
+							throw new CustomException(BPAErrorConstants.INVALID_CREATE,
 									"plot number from BPA edcr is not matching with the plot number from occupancy certificate edcr. You cannot proceed with the application");
 					}
 				}
 				if (occupancy.size() > 1) {
 					if (!occupancy.get(0).equalsIgnoreCase(occupancy.get(1))) {
-							throw new CustomException("INVALID CREATE",
+							throw new CustomException(BPAErrorConstants.INVALID_CREATE,
 									"occupancy from BPA edcr is not matching with the occupancy from occupancy certificate edcr. You cannot proceed with the application");
 					}
 				}

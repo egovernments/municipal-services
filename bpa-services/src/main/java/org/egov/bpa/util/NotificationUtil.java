@@ -298,11 +298,11 @@ public class NotificationUtil {
 	public void sendSMS(List<org.egov.bpa.web.model.SMSRequest> smsRequestList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
-				log.info("Messages from localization couldn't be fetched!");
+				log.debug("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
 				log.info("sendSMS : " + smsRequest + config.getSmsNotifTopic());
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				log.debug("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			}
 		}
 		log.info("PRODUCER : ");
@@ -337,7 +337,7 @@ public class NotificationUtil {
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
 
-		log.info("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
+		log.debug("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
 	}
 
 

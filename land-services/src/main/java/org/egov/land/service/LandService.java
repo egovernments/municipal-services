@@ -10,6 +10,8 @@ import javax.validation.Valid;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.land.repository.LandRepository;
+import org.egov.land.util.LandConstants;
+import org.egov.land.util.LandUtil;
 import org.egov.land.validator.LandValidator;
 import org.egov.land.web.models.LandInfo;
 import org.egov.land.web.models.LandInfoRequest;
@@ -38,12 +40,17 @@ public class LandService {
 	@Autowired
 	private LandRepository repository;
 
+	@Autowired
+	private LandUtil util;
+
 	public LandInfo create(@Valid LandInfoRequest landRequest) {
+				
+		Object mdmsData = util.mDMSCall(landRequest.getRequestInfo(), landRequest.getLandInfo().getTenantId());
 		if (landRequest.getLandInfo().getTenantId().split("\\.").length == 1) {
-			throw new CustomException(" Invalid Tenant ", " Application cannot be create at StateLevel");
+			throw new CustomException(LandConstants.INVALID_TENANT, " Application cannot be create at StateLevel");
 		}
 		
-		landValidator.validateLandInfo(landRequest);
+		landValidator.validateLandInfo(landRequest,mdmsData);
 		userService.manageUser(landRequest);
 		
 		enrichmentService.enrichLandInfoRequest(landRequest, false);		
@@ -54,8 +61,9 @@ public class LandService {
 	public LandInfo update(@Valid LandInfoRequest landRequest) {
 		LandInfo landInfo = landRequest.getLandInfo();
 
+		Object mdmsData = util.mDMSCall(landRequest.getRequestInfo(), landRequest.getLandInfo().getTenantId());
 		if (landInfo.getId() == null) {
-			throw new CustomException("UPDATE ERROR", "Id is mandatory to update ");
+			throw new CustomException(LandConstants.UPDATE_ERROR, "Id is mandatory to update ");
 		}
 
 		landInfo.getOwners().forEach(owner -> {
@@ -63,7 +71,7 @@ public class LandService {
 				owner.setOwnerType("NONE");
 			}
 		});
-		landValidator.validateLandInfo(landRequest);
+		landValidator.validateLandInfo(landRequest, mdmsData);
 		userService.manageUser(landRequest);
 		enrichmentService.enrichLandInfoRequest(landRequest, true);
 		repository.update(landRequest);
@@ -86,7 +94,7 @@ public class LandService {
 		}
 
 		if(!CollectionUtils.isEmpty(landInfo)){
-			log.info("Received final landInfo response in service call..");			
+			log.debug("Received final landInfo response in service call..");			
 		}
 		return landInfo;
 	}
@@ -125,12 +133,12 @@ public class LandService {
 			return Collections.emptyList();
 		
 		if(!CollectionUtils.isEmpty(landInfos)){
-			log.info("Received final landInfo response..");
+			log.debug("Received final landInfo response..");
 		}
 		
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
 		if(!CollectionUtils.isEmpty(landInfos)){
-			log.info("Received final landInfo response after enrichment..");
+			log.debug("Received final landInfo response after enrichment..");
 		}
 		return landInfos;
 	}

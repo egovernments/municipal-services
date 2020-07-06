@@ -12,36 +12,37 @@ import org.egov.land.web.models.LandInfoRequest;
 import org.egov.land.web.models.LandSearchCriteria;
 import org.egov.land.web.models.OwnerInfo;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 public class LandValidator {
 
-	// @Autowired
-	// private MDMSValidator mdmsValidator;
+	 @Autowired
+	 private LandMDMSValidator mdmsValidator;
 
-	public void validateLandInfo(@Valid LandInfoRequest landRequest) {
-		// mdmsValidator.validateMdmsData(landRequest, mdmsData);
+	public void validateLandInfo(@Valid LandInfoRequest landRequest,  Object mdmsData) {
+		mdmsValidator.validateMdmsData(landRequest, mdmsData);
 		validateApplicationDocuments(landRequest, null);
-		validateUser(landRequest);
+//		validateUser(landRequest);
 		validateDuplicateUser(landRequest);
 	}
 	
-	private void validateUser(@Valid LandInfoRequest landRequest) {
+	
+	/*private void validateUser(@Valid LandInfoRequest landRequest) {
 		landRequest.getLandInfo().getOwners().forEach(owner -> {
 			if (StringUtils.isEmpty(owner.getRelationship())) {
-				throw new CustomException("BPA.CREATE.USER", " Owner relation ship is mandatory " + owner.toString());
+				throw new CustomException(LandConstants.BPA_CREATE_USER, " Owner relation ship is mandatory " + owner.toString());
 			}
 		});
-	}
+	}*/
 
 	private void validateApplicationDocuments(@Valid LandInfoRequest landRequest, Object currentState) {
 		if (landRequest.getLandInfo().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			landRequest.getLandInfo().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
-					throw new CustomException("BPA_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
+					throw new CustomException(LandConstants.BPA_DUPLICATE_DOCUMENT, "Same document cannot be used multiple times");
 				else
 					documentFileStoreIds.add(document.getFileStoreId());
 			});
@@ -54,7 +55,7 @@ public class LandValidator {
 			List<String> mobileNos = new ArrayList<String>();
 			for (OwnerInfo owner : owners) {
 				if (mobileNos.contains(owner.getMobileNumber())) {
-					throw new CustomException("DUPLICATE_MOBILENUMBER_EXCEPTION",
+					throw new CustomException(LandConstants.DUPLICATE_MOBILENUMBER_EXCEPTION,
 							"Duplicate mobile numbers found for owners");
 				} else {
 					mobileNos.add(owner.getMobileNumber());
