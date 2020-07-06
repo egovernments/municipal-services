@@ -13,9 +13,9 @@ public class NOCConstants {
 	
 	// mdms path codes
 
-    public static final String NOC_JSONPATH_CODE = "$.MdmsRes.NOC";
+        public static final String NOC_JSONPATH_CODE = "$.MdmsRes.NOC";
 
-    // error constants
+       // error constants
 
 	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
 
@@ -41,15 +41,16 @@ public class NOCConstants {
 	
 	public static final String WORKFLOWCODE = "workflowCode";	
 	
-    public static final String NOCTYPE_JSONPATH_CODE = "$.MdmsRes.NOC.NocType";
+        public static final String NOCTYPE_JSONPATH_CODE = "$.MdmsRes.NOC.NocType";
     
-    public static final String NOC_DOC_TYPE_MAPPING = "DocumentTypeMapping";
+        public static final String NOC_DOC_TYPE_MAPPING = "DocumentTypeMapping";
     
 	public static final String DOCUMENT_TYPE = "DocumentType";
 	
 	public static final String COMMON_MASTERS_MODULE = "common-masters";
 	    
 	public static final String COMMON_MASTER_JSONPATH_CODE = "$.MdmsRes.common-masters";
-
+	
+        public static final String CREATED_STATUS = "CREATED";	
 	
 }
