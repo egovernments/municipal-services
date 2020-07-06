@@ -38,7 +38,7 @@ public class WSCalulationWorkflowValidator {
 
     public Boolean applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Boolean genratedemand){
         Map<String,String> errorMap = new HashMap<>();
-        WaterConnection waterConnection = util.getWaterConnection(requestInfo,tenantId,connectionNo);
+        WaterConnection waterConnection = util.getWaterConnection(requestInfo,connectionNo,tenantId);
         String waterApplicationNumber = waterConnection.getApplicationNo();
         Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
         waterConnectionValidation(requestInfo,tenantId,waterApplicationNumber,errorMap);
