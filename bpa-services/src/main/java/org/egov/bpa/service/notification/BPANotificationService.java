@@ -222,8 +222,10 @@ public class BPANotificationService {
 		bpaSearchCriteria.setOwnerIds(ownerId);
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
+		log.info("User Received 1 : " + userDetailResponse.getUser().get(0));
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
+		log.info("User Received 2 : " + userDetailResponse.getUser().get(0).getMobileNumber() + userDetailResponse.getUser().get(0).getName());
 		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
 				&& (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
 						|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove()))) {
@@ -233,6 +235,7 @@ public class BPANotificationService {
 						mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 					}
 			});
+			log.info("User Received 3 : " + bpaRequest.getBPA().getLandInfo().getOwners());
 			
 		}
 		log.info("User Received: " + mobileNumberToOwner );
