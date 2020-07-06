@@ -1,12 +1,14 @@
 package org.egov.waterconnection.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.egov.tracer.model.CustomException;
+import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.ValidatorResult;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class PropertyValidator implements WaterActionValidator {
@@ -21,5 +23,4 @@ public class PropertyValidator implements WaterActionValidator {
 			return new ValidatorResult(false, errorMap);
 		return new ValidatorResult(true, errorMap);
 	}
-
 }

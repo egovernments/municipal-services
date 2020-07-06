@@ -1,14 +1,15 @@
 package org.egov.waterconnection.validator;
 
-import java.util.Optional;
-
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.model.Property;
+import org.egov.waterconnection.model.Status;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 @Component
 public class ValidateProperty {
@@ -18,11 +19,14 @@ public class ValidateProperty {
 	
 	/**
 	 * 
-	 * @param waterConnectionRequest WaterConnectionRequest is request to be validated against property
+	 * @param property validate property fields
 	 */
-	public void validatePropertyCriteria(Property property) {
+	public void validatePropertyFields(Property property) {
 		if (StringUtils.isEmpty(property.getPropertyId())) {
-			throw new CustomException("INVALID PROPERTY", "WaterConnection cannot be updated without propertyId");
+			throw new CustomException("INVALID_PROPERTY", "WaterConnection cannot be updated without property Id");
+		}
+		if (StringUtils.isEmpty(property.getStatus()) || (!property.getStatus().equals(Status.ACTIVE))) {
+			throw new CustomException("INVALID_PROPERTY_STATUS", " Please enter a valid property ID");
 		}
 	}
 

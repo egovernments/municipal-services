@@ -89,10 +89,11 @@ public class SewarageServiceImpl implements SewarageService {
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
 		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, false);
+		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
+		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(sewarageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
 		userService.createUser(sewarageConnectionRequest);
-		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
@@ -149,11 +150,11 @@ public class SewarageServiceImpl implements SewarageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewerageConnectionRequest, true);
 		mDMSValidator.validateMasterData(sewerageConnectionRequest);
 		Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
+		validateProperty.validatePropertyFields(property);
 		String previousApplicationStatus = workflowService.getApplicationStatus(
 				sewerageConnectionRequest.getRequestInfo(),
 				sewerageConnectionRequest.getSewerageConnection().getApplicationNo(),
 				sewerageConnectionRequest.getSewerageConnection().getTenantId());
-		validateProperty.validatePropertyCriteriaForCreateSewerage(property);
 		BusinessService businessService = workflowService.getBusinessService(
 				sewerageConnectionRequest.getSewerageConnection().getTenantId(),
 				sewerageConnectionRequest.getRequestInfo());

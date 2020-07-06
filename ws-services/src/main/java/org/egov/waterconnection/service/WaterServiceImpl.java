@@ -90,6 +90,7 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
 		enrichmentService.enrichWaterConnection(waterConnectionRequest);
 		userService.createUser(waterConnectionRequest);
@@ -141,12 +142,12 @@ public class WaterServiceImpl implements WaterService {
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		validateProperty.validatePropertyFields(property);
 		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
 				waterConnectionRequest.getWaterConnection().getApplicationNo(),
 				waterConnectionRequest.getWaterConnection().getTenantId());
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
-		validateProperty.validatePropertyCriteria(property);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		//call calculator service to generate the demand for one time fee
