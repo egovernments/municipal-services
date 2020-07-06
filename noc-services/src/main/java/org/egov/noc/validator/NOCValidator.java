@@ -15,6 +15,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -30,7 +31,7 @@ public class NOCValidator {
 	
 	public void validateCreate(NocRequest nocRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(nocRequest, mdmsData);
-		if(!nocRequest.getNoc().getDocuments().isEmpty()) {
+		if(!ObjectUtils.isEmpty(nocRequest.getNoc().getDocuments())) {
 			validateAttachedDocumentTypes(nocRequest.getNoc(), mdmsData);
 		    validateDuplicateDocuments(nocRequest.getNoc());
 		}
@@ -54,7 +55,7 @@ public class NOCValidator {
 				|| (mode.equals(NOCConstants.OFFLINE_MODE) && nocConfiguration.getNocOfflineDocRequired()))) {
 			validateRequiredDocuments(noc, mdmsData);
 		}
-		else if (!noc.getDocuments().isEmpty()) {
+		else if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) && !ObjectUtils.isEmpty(noc.getDocuments())) {
 			validateAttachedDocumentTypes(noc, mdmsData);
 		}
 		
@@ -91,9 +92,7 @@ public class NOCValidator {
     }
 	
 	private void validateAttachedDocumentTypes(Noc noc, Object mdmsData) {
-		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
-		if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT)) {
-
+		    Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 			List<Document> documents = noc.getDocuments();
 			
 			String filterExp = "$.[?(@.applicationType=='" + noc.getApplicationType() + "' && @.nocType=='"
@@ -135,13 +134,12 @@ public class NOCValidator {
 						}
 					});
 			}
-		}
 	}
 
 
 	
 	private void validateDuplicateDocuments(Noc noc) {
-		if (noc.getDocuments() != null) {
+		if (!ObjectUtils.isEmpty(noc.getDocuments())) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			noc.getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStore()))
