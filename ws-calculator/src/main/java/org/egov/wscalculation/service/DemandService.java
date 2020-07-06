@@ -710,7 +710,8 @@ public class DemandService {
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
 			for (String connectionNo : connectionNos) {
-				Boolean genratedemand = wsCalulationWorkflowValidator.nonMeterconnectionValidation(requestInfo,tenantId,connectionNo);
+				    Boolean genratedemand = true;
+					wsCalulationWorkflowValidator.applicationValidation(requestInfo,tenantId,connectionNo,genratedemand);
 				if(!genratedemand)
 					continue;
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)

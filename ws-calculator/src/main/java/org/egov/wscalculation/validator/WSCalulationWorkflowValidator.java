@@ -9,6 +9,7 @@ import org.egov.wscalculation.model.*;
 import org.egov.wscalculation.model.workflow.ProcessInstance;
 import org.egov.wscalculation.model.workflow.ProcessInstanceResponse;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
+import org.egov.wscalculation.util.CalculatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -29,39 +30,37 @@ public class WSCalulationWorkflowValidator {
     private ServiceRequestRepository serviceRequestRepository;
 
     @Autowired
+    private CalculatorUtil util;
+
+    @Autowired
     private ObjectMapper mapper;
 
-    public void meterconnectionValidation(MeterConnectionRequest meterConnectionRequest){
-        String tenantId = meterConnectionRequest.getMeterReading().getTenantId();
-        RequestInfo requestInfo = meterConnectionRequest.getRequestInfo();
-        String connectionNo = meterConnectionRequest.getMeterReading().getConnectionNo();
-        Map<String,String> errorMap = new HashMap<>();
-        applicationValidation(requestInfo,tenantId,connectionNo,errorMap);
-        if(!CollectionUtils.isEmpty(errorMap))
-            throw new CustomException(errorMap);
-    }
-    public Boolean nonMeterconnectionValidation(RequestInfo requestInfo,String tenantId,String connectionNo){
-        Map<String,String> errorMap = new HashMap<>();
-        Boolean genratedemand = true;
-        applicationValidation(requestInfo,tenantId,connectionNo,errorMap);
-        if(!CollectionUtils.isEmpty(errorMap)){
-            log.error("DemandGeneartionError", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
-            genratedemand=false;
-        }
-        return genratedemand;
-    }
 
-    public Map<String,String> applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Map<String,String> errorMap){
-        WaterConnection waterConnection = getWaterConnection(requestInfo,tenantId,connectionNo);
+    public Boolean applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Boolean genratedemand){
+        Map<String,String> errorMap = new HashMap<>();
+        WaterConnection waterConnection = util.getWaterConnection(requestInfo,tenantId,connectionNo);
         String waterApplicationNumber = waterConnection.getApplicationNo();
         Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
         waterConnectionValidation(requestInfo,tenantId,waterApplicationNumber,errorMap);
+
+        String propertyId = waterConnection.getPropertyId();
+        Property property = util.getProperty(requestInfo,tenantId,propertyId);
+        String propertyApplicationNumber = property.getAcknowldgementNumber();
+        propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+
         if(!StringUtils.isEmpty(dateEffectiveFrom))
             dateValidation(dateEffectiveFrom,connectionNo,errorMap);
-        /*String propertyId = waterConnection.getPropertyId();
-        String propertyApplicationNumber = getPropertyApplicationNumber(requestInfo,tenantId,propertyId);
-        propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);*/
-        return  errorMap;
+
+        if(!CollectionUtils.isEmpty(errorMap)){
+            if(waterConnection.getConnectionType() == "Metered")
+                throw new CustomException(errorMap);
+            else{
+                log.error("DemandGeneartionError", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
+                genratedemand=false;
+            }
+
+        }
+        return genratedemand;
     }
 
     public void waterConnectionValidation(RequestInfo requestInfo,String tenantId, String waterApplicationNumber,Map<String,String> errorMap){
@@ -70,21 +69,6 @@ public class WSCalulationWorkflowValidator {
             errorMap.put("WaterApplicationError","Demand cannot be generated as water connection application with application number "+waterApplicationNumber+" is in workflow and not approved yet");
     }
 
-    public WaterConnection getWaterConnection(RequestInfo requestInfo, String tenantId, String connectionNo){
-        String waterConnectionSearchURL = getWaterConnectionSearchURL(connectionNo,tenantId);
-        Object connectionResult = serviceRequestRepository.fetchResult(new StringBuilder(waterConnectionSearchURL),
-                RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-        WaterConnectionResponse waterConnectionResponse = mapper.convertValue(connectionResult, WaterConnectionResponse.class);
-        return waterConnectionResponse.getWaterConnection().get(0);
-    }
-
-    public String getPropertyApplicationNumber(RequestInfo requestInfo,String tenantId,String propertyId){
-        String propertySearchURL = getPropertySearchURL(propertyId,tenantId);
-        Object propertyResult = serviceRequestRepository.fetchResult(new StringBuilder(propertySearchURL),
-                RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-        PropertyResponse properties = mapper.convertValue(propertyResult, PropertyResponse.class);
-        return properties.getProperties().get(0).getAcknowldgementNumber();
-    }
 
     public void propertyValidation(RequestInfo requestInfo,String tenantId, String propertyApplicationNumber,Map<String,String> errorMap){
         Boolean isApplicationApproved = workflowValidation(requestInfo,tenantId,propertyApplicationNumber);
@@ -92,34 +76,9 @@ public class WSCalulationWorkflowValidator {
             errorMap.put("PropertyApplicationError","Demand cannot be generated as property application with application number "+propertyApplicationNumber+" is in workflow and not approved yet");
     }
 
-    public String getWaterConnectionSearchURL(String connectionNo,String tenantId){
-        StringBuilder url = new StringBuilder(configs.getWaterConnectionHost());
-        url.append(configs.getWaterConnectionSearchEndPoint()).append("?");
-        url.append("tenantId=").append(tenantId).append("&");
-        url.append("connectionNumber=").append(connectionNo);
-        return url.toString();
-    }
-    public String getPropertySearchURL(String propertyId,String tenantId){
-        StringBuilder url = new StringBuilder(configs.getPropertyHost());
-        url.append(configs.getSearchPropertyEndPoint()).append("?");
-        url.append("tenantId=").append(tenantId).append("&");
-        url.append("uuids=").append(propertyId);
-        return url.toString();
-    }
-
-
 
     public Boolean workflowValidation(RequestInfo requestInfo,String tenantId, String businessIds){
-        StringBuilder url = new StringBuilder(configs.getWorkflowHost());
-        url.append(configs.getSearchWorkflowProcessEndPoint()).append("?");
-        url.append("tenantId=").append(tenantId).append("&");
-        url.append("businessIds=").append(businessIds);
-
-        Object result = serviceRequestRepository.fetchResult(new StringBuilder(url.toString()),
-                RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-
-        ProcessInstanceResponse processInstanceResponse = mapper.convertValue(result, ProcessInstanceResponse.class);
-        List<ProcessInstance> processInstancesList = processInstanceResponse.getProcessInstances();
+        List<ProcessInstance> processInstancesList = util.getWorkFlowProcessInstance(requestInfo,tenantId,businessIds);
         Boolean isApplicationApproved = false;
 
         for(ProcessInstance processInstances : processInstancesList){

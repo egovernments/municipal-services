@@ -14,10 +14,9 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.RequestInfoWrapper;
-import org.egov.swcalculation.model.SearchCriteria;
-import org.egov.swcalculation.model.SewerageConnection;
-import org.egov.swcalculation.model.SewerageConnectionResponse;
+import org.egov.swcalculation.model.*;
+import org.egov.swcalculation.model.workflow.ProcessInstance;
+import org.egov.swcalculation.model.workflow.ProcessInstanceResponse;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -284,5 +283,65 @@ public class CalculatorUtils {
 		}
 		List<Map<String, Object>> jsonOutput = JsonPath.read(res, SWCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
 		return jsonOutput.get(0);
+	}
+
+	public Property getProperty(RequestInfo requestInfo, String tenantId, String propertyId){
+		ObjectMapper mapper = new ObjectMapper();
+		String propertySearchURL = getPropertySearchURL(propertyId,tenantId);
+		Object propertyResult = serviceRequestRepository.fetchResult(new StringBuilder(propertySearchURL),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+
+		PropertyResponse properties = null;
+
+		try {
+			properties = mapper.convertValue(propertyResult, PropertyResponse.class);
+		}
+		catch (IllegalArgumentException e){
+			throw new CustomException("PARSING ERROR","Error while parsing response of Property Search");
+		}
+
+		if(properties==null || CollectionUtils.isEmpty(properties.getProperties()))
+			return null;
+
+
+		return properties.getProperties().get(0);
+	}
+
+	public String getPropertySearchURL(String propertyId,String tenantId){
+		StringBuilder url = new StringBuilder(configurations.getPropertyHost());
+		url.append(configurations.getSearchPropertyEndPoint()).append("?");
+		url.append("tenantId=").append(tenantId).append("&");
+		url.append("uuids=").append(propertyId);
+		return url.toString();
+	}
+
+
+	public List<ProcessInstance> getWorkFlowProcessInstance(RequestInfo requestInfo, String tenantId, String businessIds){
+		ObjectMapper mapper = new ObjectMapper();
+		String workflowProcessInstanceSearchURL = getWorkflowProcessInstanceSearchURL(tenantId,businessIds);
+		Object result = serviceRequestRepository.fetchResult(new StringBuilder(workflowProcessInstanceSearchURL),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+
+		ProcessInstanceResponse processInstanceResponse = null;
+
+		try {
+			processInstanceResponse =mapper.convertValue(result, ProcessInstanceResponse.class);
+		}
+		catch (IllegalArgumentException e){
+			throw new CustomException("PARSING ERROR","Error while parsing response of process Instance Search");
+		}
+
+		if(processInstanceResponse==null || CollectionUtils.isEmpty(processInstanceResponse.getProcessInstances()))
+			return null;
+
+		return processInstanceResponse.getProcessInstances();
+	}
+
+	public String getWorkflowProcessInstanceSearchURL(String tenantId, String businessIds){
+		StringBuilder url = new StringBuilder(configurations.getWorkflowHost());
+		url.append(configurations.getSearchWorkflowProcessEndPoint()).append("?");
+		url.append("tenantId=").append(tenantId).append("&");
+		url.append("businessIds=").append(businessIds);
+		return url.toString();
 	}
 }
