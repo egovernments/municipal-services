@@ -253,7 +253,8 @@ public class BPAConstants {
 	public static final String DOCTYPESS_PATH = "$.[?(@.required==true)].code";
 	public static final String NOCTYPE_MAP = "$.MdmsRes.BPA.NocTypeMapping[?(@.applicationType==\"{1}\" && @.serviceType==\"{2}\" && @.riskType==\"{3}\" && @.nocTriggerState==\"{4}\")].nocTypes";
 	public static final String NOCTYPE_REQUIRED_MAP = "$.MdmsRes.BPA.NocTypeMapping[?(@.applicationType==\"{1}\" && @.serviceType==\"{2}\" && @.riskType==\"{3}\")].nocTypes";
-	public static final String NOCTYPE_OFFLINE_MAP = "$.MdmsRes.NOC.NocType[?(@.mode==\"offline\")].code";
+	public static final String NOCTYPE_OFFLINE_MAP = "$.MdmsRes.NOC.NocType[?(@.mode==\"offline\")].code";	
+	public static final String NOC_TRIGGER_STATE_MAP = "$.MdmsRes.BPA.NocTypeMapping[?(@.applicationType==\"{1}\" && @.serviceType==\"{2}\" && @.riskType==\"{3}\")].nocTriggerState";
 
 	// SMS Notification messages
 	public static final String APP_CREATE = "APPLICATION_CREATE_MSG";
@@ -357,4 +358,6 @@ public class BPAConstants {
 	public static final String NOC_APPLICATIONTYPE = "PROVISIONAL";
 
 	public static final String NOC_SOURCE = "BPA";
+
+	public static final String NOC_WORKFLOW_ACTION = "INITIATE";
 }

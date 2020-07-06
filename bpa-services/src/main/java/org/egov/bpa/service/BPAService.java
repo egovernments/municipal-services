@@ -145,7 +145,7 @@ public class BPAService {
 		}
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData, values);
 		wfIntegrator.callWorkFlow(bpaRequest);
-
+		nocService.createNocRequest(bpaRequest, mdmsData);
 		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE) && !applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
@@ -360,7 +360,7 @@ public class BPAService {
 		}
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
-		nocService.approveOfflineNoc(bpaRequest, mdmsData);
+		nocService.manageNocWorkflowAction(bpaRequest, mdmsData);
 		bpaValidator.validatePreEnrichData(bpaRequest, mdmsData);
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		
@@ -386,7 +386,6 @@ public class BPAService {
 		}
 
 		wfIntegrator.callWorkFlow(bpaRequest);
-		nocService.createNocRequest(bpaRequest, mdmsData);
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		
 		log.info("Bpa status is : " + bpa.getStatus());

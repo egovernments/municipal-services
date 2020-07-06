@@ -534,7 +534,7 @@ public class BPAValidator {
 				}
 
 				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
-				if(!nocs.isEmpty()) {
+				if(!CollectionUtils.isEmpty(nocs)) {
 					for (Noc noc : nocs) {
 						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())) {
 							List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
