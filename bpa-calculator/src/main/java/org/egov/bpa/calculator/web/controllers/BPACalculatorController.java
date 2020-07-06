@@ -51,7 +51,7 @@ public class BPACalculatorController {
 	 */
 	@RequestMapping(value = "/_calculate", method = RequestMethod.POST)
 	public ResponseEntity<CalculationRes> calculate(@Valid @RequestBody CalculationReq calculationReq) {
-		log.info("CalculationReaquest:: " + calculationReq);
+		log.debug("CalculationReaquest:: " + calculationReq);
 		 List<Calculation> calculations = calculationService.calculate(calculationReq);
 		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);

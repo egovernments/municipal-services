@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 
 import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
+import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 import org.egov.bpa.calculator.web.models.RequestInfoWrapper;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
 import org.egov.common.contract.request.RequestInfo;
@@ -41,11 +42,11 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPACalculatorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+			throw new CustomException(BPACalculatorConstants.EDCR_ERROR, "The response from EDCR service is empty or null");
 
 		return responseMap;
 	}

@@ -27,12 +27,12 @@ public class BPAConsumer {
 		ObjectMapper mapper = new ObjectMapper();
 		BPARequest bpaRequest = new BPARequest();
 		try {
-			log.info("Consuming record: " + record);
+			log.debug("Consuming record: " + record);
 			bpaRequest = mapper.convertValue(record, BPARequest.class);
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
 		}
-		log.info("BPA Received: " + bpaRequest.getBPA().getApplicationNo());
+		log.debug("BPA Received: " + bpaRequest.getBPA().getApplicationNo());
 		notificationService.process(bpaRequest);
 	}
 }

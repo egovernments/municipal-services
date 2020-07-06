@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.landInfo.LandInfo;
@@ -41,7 +42,7 @@ public class BPALandService {
 		try {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
 		} catch (Exception se) {
-			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
+			throw new CustomException(BPAErrorConstants.LANDINFO_EXCEPTION, " LandInfo service call failed.");
 		} 
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		
@@ -66,7 +67,7 @@ public class BPALandService {
 		try {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, landRequest);
 		} catch (Exception se) {
-			throw new CustomException("LANDINFO_EXCEPTION", " LandInfo service call failed.");
+			throw new CustomException(BPAErrorConstants.LANDINFO_EXCEPTION, " LandInfo service call failed.");
 		}
 		ArrayList<LandInfo> landInfo = new ArrayList<LandInfo>();
 		

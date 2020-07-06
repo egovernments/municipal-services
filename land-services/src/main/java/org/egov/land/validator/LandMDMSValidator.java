@@ -1,13 +1,12 @@
-package org.egov.bpa.validator;
+package org.egov.land.validator;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.bpa.util.BPAConstants;
-import org.egov.bpa.util.BPAErrorConstants;
-import org.egov.bpa.web.model.BPARequest;
+import org.egov.land.util.LandConstants;
+import org.egov.land.web.models.LandInfoRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -18,54 +17,54 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class MDMSValidator {
-
+public class LandMDMSValidator {
 	/**
 	 * method to validate the mdms data in the request
 	 *
 	 * @param bpaRequest
 	 */
-	public void validateMdmsData(BPARequest bpaRequest, Object mdmsData) {
+	public void validateMdmsData(LandInfoRequest landRequest, Object mdmsData) {
+
+		Map<String, String> errorMap = new HashMap<>();
 
 		Map<String, List<String>> masterData = getAttributeValues(mdmsData);
-		String[] masterArray = { BPAConstants.SERVICE_TYPE, BPAConstants.APPLICATION_TYPE,
-				BPAConstants.OWNERSHIP_CATEGORY, BPAConstants.OWNER_TYPE, BPAConstants.OCCUPANCY_TYPE,
-				BPAConstants.SUB_OCCUPANCY_TYPE, BPAConstants.USAGES };
+		String[] masterArray = {
+				LandConstants.OWNERSHIP_CATEGORY};
 
 		validateIfMasterPresent(masterArray, masterData);
+
+		landRequest.getLandInfo().getOwners().forEach(owner -> {
+			if (owner.getOwnerType() == null) {
+				owner.setOwnerType("NONE");
+			}
+		});
+		if (!masterData.get(LandConstants.OWNERSHIP_CATEGORY).contains(landRequest.getLandInfo().getOwnershipCategory()))
+			errorMap.put("INVALID OWNERSHIPCATEGORY",
+					"The OwnerShipCategory '" + landRequest.getLandInfo().getOwnershipCategory() + "' does not exists");
+
+		if (!CollectionUtils.isEmpty(errorMap))
+			throw new CustomException(errorMap);
 	}
 
+	
 
-	/**
-	 * Fetches all the values of particular attribute as map of field name to
-	 * list
-	 *
-	 * takes all the masters from each module and adds them in to a single map
-	 *
-	 * note : if two masters from different modules have the same name then it
-	 *
-	 * will lead to overriding of the earlier one by the latest one added to the
-	 * map
-	 *
-	 * @return Map of MasterData name to the list of code in the MasterData
-	 *
-	 */
 	public Map<String, List<String>> getAttributeValues(Object mdmsData) {
 
-		List<String> modulepaths = Arrays.asList(BPAConstants.BPA_JSONPATH_CODE,
-				BPAConstants.COMMON_MASTER_JSONPATH_CODE);
+		List<String> modulepaths = Arrays.asList(LandConstants.COMMON_MASTER_JSONPATH_CODE);
 		final Map<String, List<String>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
 			} catch (Exception e) {
 				log.error("Error while fetvhing MDMS data", e);
-				throw new CustomException(BPAErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
-						BPAErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
+				throw new CustomException(LandConstants.INVALID_TENANT_ID_MDMS_KEY,
+						LandConstants.INVALID_TENANT_ID_MDMS_MSG);
 			}
 		});
 		return mdmsResMap;
 	}
+
+
 
 	/**
 	 * Validates if MasterData is properly fetched for the given MasterData
@@ -84,5 +83,4 @@ public class MDMSValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.BPASearchCriteria;
@@ -81,7 +82,7 @@ public class PaymentUpdateService {
 					searchCriteria.setApplicationNo(paymentDetail.getBill().getConsumerCode());
 					List<BPA> bpas = repository.getBPAData(searchCriteria, null);
 					if (CollectionUtils.isEmpty(bpas)) {
-						throw new CustomException("INVALID RECEIPT",
+						throw new CustomException(BPAErrorConstants.INVALID_RECEIPT,
 								"No Building Plan Application found for the comsumerCode "
 										+ searchCriteria.getApplicationNo());
 					}
@@ -101,7 +102,7 @@ public class PaymentUpdateService {
 					 */
 					wfIntegrator.callWorkFlow(updateRequest);
 
-					log.info(" the status of the application is : " + updateRequest.getBPA().getStatus());
+					log.debug(" the status of the application is : " + updateRequest.getBPA().getStatus());
 
 					/*
 					 * calling repository to update the object in eg_bpa_buildingpaln tables

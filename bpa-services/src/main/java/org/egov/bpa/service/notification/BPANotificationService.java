@@ -122,7 +122,7 @@ public class BPANotificationService {
 			if (payTriggerList.contains(bpaApplication.getStatus())) {
 				List<ActionItem> items = new ArrayList<>();
 				String busineService = null;
-				if (bpaApplication.getStatus().toString().equalsIgnoreCase("PENDING_APPL_FEE")) {
+				if (bpaApplication.getStatus().toString().equalsIgnoreCase(config.getStatuspendingapplfee())) {
 					busineService = "BPA.NC_APP_FEE";
 				} else {
 					busineService = "BPA.NC_SAN_FEE";
@@ -224,9 +224,9 @@ public class BPANotificationService {
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
-		if (!bpaRequest.getBPA().getWorkflow().getAction().equals("SEND_TO_ARCHITECT")
-				&& (!bpaRequest.getBPA().getStatus().equals("INPROGRESS")
-						|| !bpaRequest.getBPA().getWorkflow().getAction().equals("APPROVE"))) {
+		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
+				&& (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
+						|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove()))) {
 			
 			bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
 					if (owner.getMobileNumber() != null) {

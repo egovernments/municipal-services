@@ -154,7 +154,7 @@ public class Document   {
     return auditDetails;
   }
 
-  public void setAuditDetails(AuditDetails geoLocation) {
+  public void setAuditDetails(AuditDetails auditDetails) {
     this.auditDetails = auditDetails;
   }
 

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
@@ -129,7 +130,7 @@ public class EnrichmentService {
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
-			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+			throw new CustomException(BPAErrorConstants.IDGEN_ERROR, "No ids returned from idgen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
@@ -213,18 +214,18 @@ public class EnrichmentService {
 				Object mdmsData = bpaUtil.mDMSCall(bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
 				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
 						bpaRequest.getBPA());
-				log.info("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-				log.info("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
-
+				log.debug("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+	            log.debug("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+	            
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
 						.replace("{2}", bpa.getRiskType().toString())
 						.replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
 						.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-				log.info(condeitionsPath);
+				log.debug(condeitionsPath);
 
 				try {
 					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
-					log.info(conditions.toString());
+					log.debug(conditions.toString());
 					if (bpa.getAdditionalDetails() == null) {
 						bpa.setAdditionalDetails(new HashMap());
 					}

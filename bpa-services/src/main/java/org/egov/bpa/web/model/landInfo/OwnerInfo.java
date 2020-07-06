@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
 
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.Document;
+import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -462,8 +463,7 @@ public class OwnerInfo {
 	 * 
 	 * @return relationship
 	 **/
-	@ApiModelProperty(required = true, value = "")
-	@NotNull
+	@ApiModelProperty(value = "")
 
 	@Valid
 	public Relationship getRelationship() {

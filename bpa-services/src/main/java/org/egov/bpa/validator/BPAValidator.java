@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.EDCRService;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -89,14 +90,14 @@ public class BPAValidator {
 				allDocuments.forEach(document -> {
 
 					if (!validDocumentTypes.contains(document.getDocumentType())) {
-						throw new CustomException("BPA_UNKNOWN_DOCUMENTTYPE",
+						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCUMENTTYPE,
 								document.getDocumentType() + " is Unkown");
 					}
 				});
 
 				if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
 
-					throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+					throw new CustomException(BPAErrorConstants.BPA_MDNADATORY_DOCUMENTPYE_MISSING,
 							requiredDocTypes.size() + " Documents are requied ");
 				} else if (requiredDocTypes.size() > 0) {
 
@@ -109,7 +110,7 @@ public class BPAValidator {
 						if (lastIndex > 1) {
 							documentNs = docType.substring(0, lastIndex);
 						} else if (lastIndex == 1) {
-							throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+							throw new CustomException(BPAErrorConstants.BPA_INVALID_DOCUMENTTYPE,
 									document.getDocumentType() + " is Invalid");
 						} else {
 							documentNs = docType;
@@ -120,13 +121,13 @@ public class BPAValidator {
 					requiredDocTypes.forEach(docType -> {
 						String docType1 = docType.toString();
 						if (!addedDocTypes.contains(docType1)) {
-							throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+							throw new CustomException(BPAErrorConstants.BPA_MDNADATORY_DOCUMENTPYE_MISSING,
 									"Document Type " + docType1 + " is Missing");
 						}
 					});
 				}
 			} else if (requiredDocTypes.size() > 0) {
-				throw new CustomException("BPA_MDNADATORY_DOCUMENTPYE_MISSING",
+				throw new CustomException(BPAErrorConstants.BPA_MDNADATORY_DOCUMENTPYE_MISSING,
 						"Atleast " + requiredDocTypes.size() + " Documents are requied ");
 			}
 			bpa.setDocuments(allDocuments);
@@ -139,7 +140,7 @@ public class BPAValidator {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			request.getBPA().getDocuments().forEach(document -> {
 				if (documentFileStoreIds.contains(document.getFileStoreId()))
-					throw new CustomException("BPA_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
+					throw new CustomException(BPAErrorConstants.BPA_DUPLICATE_DOCUMENT, "Same document cannot be used multiple times");
 				else
 					documentFileStoreIds.add(document.getFileStoreId());
 			});
@@ -157,15 +158,15 @@ public class BPAValidator {
 //TODO need to make the changes in the data
 	public void validateSearch(RequestInfo requestInfo, BPASearchCriteria criteria) {
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && criteria.isEmpty())
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
 
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && !criteria.tenantIdOnly()
 				&& criteria.getTenantId() == null)
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
 
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.CITIZEN) && !criteria.isEmpty()
 				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
 
 		String allowedParamStr = null;
 
@@ -174,11 +175,11 @@ public class BPAValidator {
 		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(BPAConstants.EMPLOYEE))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
 		else
-			throw new CustomException(BPAConstants.INVALID_SEARCH,
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH,
 					"The userType: " + requestInfo.getUserInfo().getType() + " does not have any search config");
 
 		if (StringUtils.isEmpty(allowedParamStr) && !criteria.isEmpty())
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "No search parameters are expected");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "No search parameters are expected");
 		else {
 			List<String> allowedParams = Arrays.asList(allowedParamStr.split(","));
 			validateSearchParams(criteria, allowedParams);
@@ -196,35 +197,35 @@ public class BPAValidator {
 	private void validateSearchParams(BPASearchCriteria criteria, List<String> allowedParams) {
 
 		if (criteria.getApplicationNo() != null && !allowedParams.contains("applicationNo"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
 
 		if (criteria.getEdcrNumber() != null && !allowedParams.contains("edcrNumber"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on edcrNumber is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on edcrNumber is not allowed");
 
 		if (criteria.getStatus() != null && !allowedParams.contains("status"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on Status is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on Status is not allowed");
 
 		if (criteria.getIds() != null && !allowedParams.contains("ids"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on ids is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on ids is not allowed");
 
 		if (criteria.getMobileNumber() != null && !allowedParams.contains("mobileNumber"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on mobileNumber is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on mobileNumber is not allowed");
 
 		if (criteria.getOffset() != null && !allowedParams.contains("offset"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on offset is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on offset is not allowed");
 
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Search on limit is not allowed");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
 		
 		if (criteria.getApprovalDate() != null && (criteria.getApprovalDate() > new Date().getTime()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "Permit Order Genarated date cannot be a future date");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "Permit Order Genarated date cannot be a future date");
 		
 		if (criteria.getFromDate() != null && (criteria.getFromDate() > new Date().getTime()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "From date cannot be a future date");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "From date cannot be a future date");
 
 		if (criteria.getToDate() != null && criteria.getFromDate() != null
 				&& (criteria.getFromDate() > criteria.getToDate()))
-			throw new CustomException(BPAConstants.INVALID_SEARCH, "To date cannot be prior to from date");
+			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "To date cannot be prior to from date");
 	}
 
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {
@@ -284,8 +285,8 @@ public class BPAValidator {
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
 		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
-		log.info("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-        log.info("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+		log.debug("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+        log.debug("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
         
 		validateQuestions(mdmsData, bpa, wfState, edcrResponse);
 		validateDocTypes(mdmsData, bpa, wfState, edcrResponse);
@@ -295,7 +296,7 @@ public class BPAValidator {
 	private void validateQuestions(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsQns = null;
 
-		log.info("Fetching MDMS result for the state " + wfState);
+		log.debug("Fetching MDMS result for the state " + wfState);
 
 		try {
 			String questionsPath = BPAConstants.QUESTIONS_MAP.replace("{1}", wfState)
@@ -307,7 +308,7 @@ public class BPAValidator {
 			if (!CollectionUtils.isEmpty(mdmsQuestionsArray))
 				mdmsQns = JsonPath.read(mdmsQuestionsArray.get(0), BPAConstants.QUESTIONS_PATH);
 
-			log.info("MDMS questions " + mdmsQns);
+			log.debug("MDMS questions " + mdmsQns);
 			if (!CollectionUtils.isEmpty(mdmsQns)) {
 				if (bpa.getAdditionalDetails() != null) {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
@@ -338,11 +339,11 @@ public class BPAValidator {
 								}
 							}
 
-							log.info("Request questions " + requestQns);
+							log.debug("Request questions " + requestQns);
 
 							if (!CollectionUtils.isEmpty(requestQns)) {
 								if (requestQns.size() < mdmsQns.size())
-									throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+									throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
 											"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
 								else {
 									List<String> pendingQns = new ArrayList<String>();
@@ -352,20 +353,20 @@ public class BPAValidator {
 										}
 									}
 									if (pendingQns.size() > 0) {
-										throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
 												"Please answer " + StringUtils.join(pendingQns, ","));
 									}
 								}
 							} else {
-								throw new CustomException("BPA_UNKNOWN_QUESTIONS",
+								throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
 										"Please answer the required questions");
 							}
 						}
 					} else {
-						throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
+						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, "Please answer the required questions");
 					}
 				} else {
-					throw new CustomException("BPA_UNKNOWN_QUESTIONS", "Please answer the required questions");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, "Please answer the required questions");
 				}
 			}
 		} catch (PathNotFoundException ex) {
@@ -377,7 +378,7 @@ public class BPAValidator {
 	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsDocs = null;
 
-		log.info("Fetching MDMS result for the state " + wfState);
+		log.debug("Fetching MDMS result for the state " + wfState);
 
 		try {
 			String docTypesPath = BPAConstants.DOCTYPES_MAP.replace("{1}", wfState)
@@ -389,7 +390,7 @@ public class BPAValidator {
 			if (!CollectionUtils.isEmpty(docTypesArray))
 				mdmsDocs = JsonPath.read(docTypesArray.get(0), BPAConstants.DOCTYPESS_PATH);
 
-			log.info("MDMS DocTypes " + mdmsDocs);
+			log.debug("MDMS DocTypes " + mdmsDocs);
 			if (!CollectionUtils.isEmpty(mdmsDocs)) {
 				if (bpa.getAdditionalDetails() != null) {
 					List checkListFromReq = (List) ((Map) bpa.getAdditionalDetails()).get(wfState.toLowerCase());
@@ -412,24 +413,24 @@ public class BPAValidator {
 										if (lastIndex > 1) {
 											documentNs = docType.substring(0, lastIndex);
 										} else if (lastIndex == 1) {
-											throw new CustomException("BPA_INVALID_DOCUMENTTYPE",
+											throw new CustomException(BPAErrorConstants.BPA_INVALID_DOCUMENTTYPE,
 													(String) reqDoc.get(BPAConstants.CODE) + " is Invalid");
 										} else {
 											documentNs = docType;
 										}
 										requestDocs.add(documentNs);
 									} else {
-										throw new CustomException("BPA_UNKNOWN_DOCS",
+										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
 												"fileStoreId is not exists for the documents");
 									}
 								}
 							}
 
-							log.info("Request Docs " + requestDocs);
+							log.debug("Request Docs " + requestDocs);
 
 							if (!CollectionUtils.isEmpty(requestDocs)) {
 								if (requestDocs.size() < mdmsDocs.size())
-									throw new CustomException("BPA_UNKNOWN_DOCS",
+									throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
 											"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
 								else {
 									List<String> pendingDocs = new ArrayList<String>();
@@ -439,19 +440,19 @@ public class BPAValidator {
 										}
 									}
 									if (pendingDocs.size() > 0) {
-										throw new CustomException("BPA_UNKNOWN_DOCS",
+										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
 												"Please upload " + StringUtils.join(pendingDocs, ","));
 									}
 								}
 							} else {
-								throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
+								throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
 							}
 						}
 					} else {
-						throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
+						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
 					}
 				} else {
-					throw new CustomException("BPA_UNKNOWN_DOCS", "Please upload required Documents");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
 				}
 			}
 		} catch (PathNotFoundException ex) {
@@ -463,7 +464,7 @@ public class BPAValidator {
 
 		if (checkListFromRequest.get(BPAConstants.INSPECTION_DATE) == null
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_DATE).toString())) {
-			throw new CustomException("BPA_UNKNOWN_DATE", "Please mention the inspection date");
+			throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DATE, "Please mention the inspection date");
 		} else {
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			Date dt;
@@ -471,17 +472,17 @@ public class BPAValidator {
 				dt = sdf.parse(checkListFromRequest.get(BPAConstants.INSPECTION_DATE).toString());
 				long inspectionEpoch = dt.getTime();
 				if (inspectionEpoch > new Date().getTime()) {
-					throw new CustomException("BPA_UNKNOWN_DATE", "Inspection date cannot be a future date");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DATE, "Inspection date cannot be a future date");
 				} else if (inspectionEpoch < 0) {
-					throw new CustomException("BPA_UNKNOWN_DATE", "Provide the date in specified format 'yyyy-MM-dd'");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DATE, "Provide the date in specified format 'yyyy-MM-dd'");
 				}
 			} catch (ParseException e) {
-				throw new CustomException("BPA_UNKNOWN_DATE", "Unable to parase the inspection date");
+				throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DATE, "Unable to parase the inspection date");
 			}
 		}
 		if (checkListFromRequest.get(BPAConstants.INSPECTION_TIME) == null
 				|| StringUtils.isEmpty(checkListFromRequest.get(BPAConstants.INSPECTION_TIME).toString())) {
-			throw new CustomException("BPA_UNKNOWN_TIME", "Please mention the inspection time");
+			throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_TIME, "Please mention the inspection time");
 		}
 	}
 
@@ -491,7 +492,7 @@ public class BPAValidator {
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SKIP_PAY))) {
 			BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
 			if ((demandAmount.compareTo(BigDecimal.ZERO) > 0)) {
-				throw new CustomException("BPA_INVALID_ACTION", "Payment can't be skipped once demand is generated.");
+				throw new CustomException(BPAErrorConstants.BPA_INVALID_ACTION, "Payment can't be skipped once demand is generated.");
 			}
 		}
 	}
