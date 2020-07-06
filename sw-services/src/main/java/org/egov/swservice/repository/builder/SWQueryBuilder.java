@@ -145,6 +145,11 @@ public class SWQueryBuilder {
 			query.append("  sc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
 		}
+		if(!StringUtils.isEmpty(criteria.getApplicationType())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationType = ? ");
+			preparedStatement.add(criteria.getApplicationType());
+		}
 		//Add OrderBy clause
 		query.append(" ORDER BY sc.appCreatedDate DESC");
 		

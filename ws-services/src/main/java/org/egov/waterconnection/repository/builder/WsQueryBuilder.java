@@ -147,6 +147,11 @@ public class WsQueryBuilder {
 			query.append("  wc.appCreatedDate <= ? ");
 			preparedStatement.add(criteria.getToDate());
 		}
+		if(!StringUtils.isEmpty(criteria.getApplicationType())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.applicationType = ? ");
+			preparedStatement.add(criteria.getApplicationType());
+		}
 		query.append(ORDER_BY_CLAUSE);
 		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 	}
