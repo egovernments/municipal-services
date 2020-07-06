@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 @Service
 public class NOCService {
@@ -51,7 +52,11 @@ public class NOCService {
 		Map<String, String> additionalDetails = nocValidator.getOrValidateBussinessService(nocRequest.getNoc(), mdmsData);
 		nocValidator.validateCreate(nocRequest,  mdmsData);
 		enrichmentService.enrichCreateRequest(nocRequest, mdmsData);
-		wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
+		if(!ObjectUtils.isEmpty(nocRequest.getNoc().getWorkflow()) && !StringUtils.isEmpty(nocRequest.getNoc().getWorkflow().getAction())) {
+		  wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
+		}else{
+		  nocRequest.getNoc().setApplicationStatus(NOCConstants.CREATED_STATUS);
+		}
 		nocRepository.save(nocRequest);
 		return Arrays.asList(nocRequest.getNoc());
 	}
