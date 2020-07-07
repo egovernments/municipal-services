@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.tracer.model.CustomException;
+import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.ValidatorResult;
 import org.egov.waterconnection.model.WaterConnection;
 import org.egov.waterconnection.model.WaterConnectionRequest;
@@ -78,10 +79,10 @@ public class WaterConnectionValidator {
 	 * @param request water connection request
 	 * @param searchResult water connection search result
 	 */
-	public void validateUpdate(WaterConnectionRequest request, WaterConnection searchResult) {
+	public void validateUpdate(WaterConnectionRequest request, WaterConnection searchResult, int reqType) {
 		validateAllIds(request.getWaterConnection(), searchResult);
 		validateDuplicateDocuments(request);
-		setFieldsFromSearch(request,searchResult);
+		setFieldsFromSearch(request, searchResult, reqType);
 		
 	}
    
@@ -123,7 +124,9 @@ public class WaterConnectionValidator {
 	 * @param request Water connection request
 	 * @param searchResult water connection search result
 	 */
-	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult) {
-		request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
+	private void setFieldsFromSearch(WaterConnectionRequest request, WaterConnection searchResult, int reqType) {
+		if (reqType == WCConstants.UPDATE_APPLICATION) {
+			request.getWaterConnection().setConnectionNo(searchResult.getConnectionNo());
+		}
 	}
 }

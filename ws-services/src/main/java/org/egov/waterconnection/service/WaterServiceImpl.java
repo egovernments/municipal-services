@@ -148,10 +148,11 @@ public class WaterServiceImpl implements WaterService {
 		validateProperty.validatePropertyFields(property);
 		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
 				waterConnectionRequest.getWaterConnection().getApplicationNo(),
-				waterConnectionRequest.getWaterConnection().getTenantId());
+				waterConnectionRequest.getWaterConnection().getTenantId(),
+				config.getBusinessServiceValue());
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
-		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult, WCConstants.UPDATE_APPLICATION);
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		//call calculator service to generate the demand for one time fee
 		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
@@ -198,30 +199,25 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
 		
 		// TODO - MDMS validation 
-		mDMSValidator.validateMasterData(waterConnectionRequest);
+		//mDMSValidator.validateMasterData(waterConnectionRequest);
 		
-		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), 
+				waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property);
 		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
 				waterConnectionRequest.getWaterConnection().getApplicationNo(),
-				waterConnectionRequest.getWaterConnection().getTenantId());
+				waterConnectionRequest.getWaterConnection().getTenantId(),
+				config.getModifyWSBusinessServiceName());
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
-		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult, WCConstants.MODIFY_CONNECTION);
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
-		//call calculator service to generate the demand for one time fee
-		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
 		//check for edit and send edit notification
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
-		//Enrich file store Id After payment
-		enrichmentService.enrichFileStoreIds(waterConnectionRequest);
-		//Call workflow
-		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
-		enrichmentService.postForMeterReading(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 }

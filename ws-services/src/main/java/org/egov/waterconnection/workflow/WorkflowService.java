@@ -114,8 +114,8 @@ public class WorkflowService {
 	 *            The RequestInfo object of the request
 	 * @return BusinessService for the the given tenantId
 	 */
-	public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo, String tenantId) {
-		StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNo);
+	public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo, String tenantId, String businessServiceValue) {
+		StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNo, businessServiceValue);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		ProcessInstanceResponse response = null;
@@ -148,13 +148,13 @@ public class WorkflowService {
 	 * @param applicationNo
 	 * @return
 	 */
-	private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNo) {
+	private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNo, String businessServiceValue) {
 		StringBuilder url = new StringBuilder(config.getWfHost());
 		url.append(config.getWfProcessSearchPath());
 		url.append("?tenantId=");
 		url.append(tenantId);
 		url.append("&businessservices=");
-		url.append(config.getBusinessServiceValue());
+		url.append(businessServiceValue);
 		url.append("&businessIds=");
 		url.append(applicationNo);
 		return url;
@@ -181,8 +181,8 @@ public class WorkflowService {
 	 * @param applicationNo
 	 * @return
 	 */
-	public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId) {
-		return getProcessInstance(requestInfo, applicationNo, tenantId).getState().getApplicationStatus();
+	public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId, String businessServiceValue) {
+		return getProcessInstance(requestInfo, applicationNo, tenantId, businessServiceValue).getState().getApplicationStatus();
 	}
 	
 	public WaterConnection getInProgressWF(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
