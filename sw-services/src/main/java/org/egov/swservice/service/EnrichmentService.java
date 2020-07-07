@@ -60,12 +60,20 @@ public class EnrichmentService {
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
 		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
-		//Application created date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
-	    additionalDetail.put(SWConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
-	    sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
-	    //Setting ApplicationType
-	    sewerageConnectionRequest.getSewerageConnection().setApplicationType("NEW_SEWERAGE_CONNECTION");
+		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
+			for (String constValue : SWConstants.ADDITIONAL_OBJECT) {
+				additionalDetail.put(constValue, null);
+			}
+		} else {
+			additionalDetail = mapper
+					.convertValue(sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
+		}
+		//Application created date
+		additionalDetail.put(SWConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
+		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
+		//Setting ApplicationType
+		sewerageConnectionRequest.getSewerageConnection().setApplicationType(SWConstants.NEW_SEWERAGE_APP_STATUS);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
 	}
@@ -74,7 +82,7 @@ public class EnrichmentService {
 	public void enrichingAdditionalDetails(SewerageConnectionRequest sewerageConnectionRequest) {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
-			SWConstants.ADHOC_PENALTY_REBATE.forEach(key -> {
+			SWConstants.ADDITIONAL_OBJECT.forEach(key -> {
 				additionalDetail.put(key, null);
 			});
 		} else {
@@ -82,7 +90,7 @@ public class EnrichmentService {
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
 					SWConstants.ADHOC_REBATE,SWConstants.APP_CREATED_DATE, SWConstants.ESTIMATION_DATE_CONST);
-			for (String constKey : SWConstants.ADHOC_PENALTY_REBATE) {
+			for (String constKey : SWConstants.ADDITIONAL_OBJECT) {
 				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
 					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
 					additionalDetail.put(constKey, big);

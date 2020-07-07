@@ -35,25 +35,16 @@ public class MDMSValidator {
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
 
-	public void validateMasterData(SewerageConnectionRequest request) {
-		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION_CONST)) {
-			Map<String, String> errorMap = new HashMap<>();
-			List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_CONNECTION_TYPE));
-			List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
-			Map<String, List<String>> codes = getAttributeValues(request.getSewerageConnection().getTenantId(),
-					SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
-					SWConstants.JSONPATH_ROOT, request.getRequestInfo());
-			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getSewerageConnection().getTenantId(),
-					SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code",
-					SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
-			// merge codes
-			String[] masterNames = {SWConstants.MDMS_SW_CONNECTION_TYPE, SWConstants.SC_ROADTYPE_MASTER};
-			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
-					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-			validateMDMSData(masterNames, finalcodes);
-			validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
-			if (!errorMap.isEmpty())
-				throw new CustomException(errorMap);
+	public void validateMasterData(SewerageConnectionRequest request, int reqType) {
+		switch (reqType) {
+			case SWConstants.UPDATE_APPLICATION:
+				validateMasterDataForUpdateConnection(request);
+				break;
+			case SWConstants.MODIFY_CONNECTION:
+				validateMasterDataForModifyConnection(request);
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -136,5 +127,49 @@ public class MDMSValidator {
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+
+	public void validateMasterDataForUpdateConnection(SewerageConnectionRequest request) {
+		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION_CONST)) {
+			Map<String, String> errorMap = new HashMap<>();
+			List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_CONNECTION_TYPE));
+			List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
+			Map<String, List<String>> codes = getAttributeValues(request.getSewerageConnection().getTenantId(),
+					SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
+					SWConstants.JSONPATH_ROOT, request.getRequestInfo());
+			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getSewerageConnection().getTenantId(),
+					SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code",
+					SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
+			// merge codes
+			String[] masterNames = {SWConstants.MDMS_SW_CONNECTION_TYPE, SWConstants.SC_ROADTYPE_MASTER};
+			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+			validateMDMSData(masterNames, finalcodes);
+			validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		}
+	}
+
+	public  void validateMasterDataForModifyConnection(SewerageConnectionRequest request) {
+		if (request.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.APPROVE_CONNECTION)) {
+			Map<String, String> errorMap = new HashMap<>();
+			List<String> names = new ArrayList<>(Arrays.asList(SWConstants.MDMS_SW_CONNECTION_TYPE));
+			List<String> taxModelnames = new ArrayList<>(Arrays.asList(SWConstants.SC_ROADTYPE_MASTER));
+			Map<String, List<String>> codes = getAttributeValues(request.getSewerageConnection().getTenantId(),
+					SWConstants.MDMS_SW_MOD_NAME, names, "$.*.code",
+					SWConstants.JSONPATH_ROOT, request.getRequestInfo());
+			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(request.getSewerageConnection().getTenantId(),
+					SWConstants.SW_TAX_MODULE, taxModelnames, "$.*.code",
+					SWConstants.TAX_JSONPATH_ROOT, request.getRequestInfo());
+			// merge codes
+			String[] masterNames = {SWConstants.MDMS_SW_CONNECTION_TYPE, SWConstants.SC_ROADTYPE_MASTER};
+			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+			validateMDMSData(masterNames, finalcodes);
+			validateCodes(request.getSewerageConnection(), finalcodes, errorMap);
+			if (!errorMap.isEmpty())
+				throw new CustomException(errorMap);
+		}
 	}
 }

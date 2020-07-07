@@ -11,6 +11,7 @@ import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.workflow.ProcessInstance;
 import org.egov.swservice.model.workflow.ProcessInstanceRequest;
 import org.egov.swservice.model.workflow.ProcessInstanceResponse;
+import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,9 @@ public class WorkflowIntegrator {
 	private ObjectMapper mapper;
 
 	@Autowired
+	private SewerageServicesUtil servicesUtil;
+
+	@Autowired
 	public WorkflowIntegrator(RestTemplate rest, SWConfiguration config) {
 		this.rest = rest;
 		this.config = config;
@@ -52,15 +56,18 @@ public class WorkflowIntegrator {
 	 *
 	 * and sets the resultant status from wf-response back to sewerage object
 	 *
-	 * @param sewerageRequest
+	 * @param sewerageConnectionRequest
 	 */
 	public void callWorkFlow(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
-
+		String wfBusinessServiceName = config.getBusinessServiceValue();
+		if(servicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)){
+			wfBusinessServiceName = config.getModifySWBusinessServiceName();
+		}
 		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
 		ProcessInstance processInstance = ProcessInstance.builder()
 				.businessId(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
 				.tenantId(property.getTenantId())
-				.businessService(config.getBusinessServiceValue()).moduleName(MODULENAMEVALUE)
+				.businessService(wfBusinessServiceName).moduleName(MODULENAMEVALUE)
 				.action(connection.getProcessInstance().getAction()).build();
 
 		if (!StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getProcessInstance())) {

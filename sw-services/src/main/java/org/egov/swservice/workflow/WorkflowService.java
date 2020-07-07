@@ -1,22 +1,21 @@
 package org.egov.swservice.workflow;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.RequestInfoWrapper;
-import org.egov.swservice.model.workflow.BusinessService;
-import org.egov.swservice.model.workflow.BusinessServiceResponse;
-import org.egov.swservice.model.workflow.ProcessInstance;
-import org.egov.swservice.model.workflow.ProcessInstanceResponse;
-import org.egov.swservice.model.workflow.State;
+import org.egov.swservice.model.SewerageConnection;
+import org.egov.swservice.model.workflow.*;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkflowService {
@@ -44,8 +43,8 @@ public class WorkflowService {
 	 *            The RequestInfo object of the request
 	 * @return BusinessService for the the given tenantId
 	 */
-	public BusinessService getBusinessService(String tenantId, RequestInfo requestInfo) {
-		Object result = serviceRequestRepository.fetchResult(getSearchURLWithParams(tenantId), 
+	public BusinessService getBusinessService(String businessServiceId, String tenantId, RequestInfo requestInfo) {
+		Object result = serviceRequestRepository.fetchResult(getSearchURLWithParams(businessServiceId, tenantId),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		BusinessServiceResponse response = null;
 		try {
@@ -63,13 +62,13 @@ public class WorkflowService {
 	 *            The tenantId for which url is generated
 	 * @return The search url
 	 */
-	private StringBuilder getSearchURLWithParams(String tenantId) {
+	private StringBuilder getSearchURLWithParams(String businessServiceId, String tenantId) {
 		StringBuilder url = new StringBuilder(config.getWfHost());
 		url.append(config.getWfBusinessServiceSearchPath());
 		url.append("?tenantId=");
 		url.append(tenantId);
 		url.append("&businessservices=");
-		url.append(config.getBusinessServiceValue());
+		url.append(businessServiceId);
 		return url;
 	}
 
@@ -98,8 +97,8 @@ public class WorkflowService {
 	    * @param stateCode
 	    * @return no of days for sla
 	    */
-		public BigDecimal getSlaForState(String tenantId, RequestInfo requestInfo, String stateCode) {
-			BusinessService businessService = getBusinessService(tenantId, requestInfo);
+		public BigDecimal getSlaForState(String businessServiceId, String tenantId, RequestInfo requestInfo, String stateCode) {
+			BusinessService businessService = getBusinessService(businessServiceId, tenantId, requestInfo);
 			return new BigDecimal(businessService.getStates().stream().filter(state -> state.getApplicationStatus() != null
 					&& state.getApplicationStatus().equalsIgnoreCase(stateCode)).map(state -> {
 						if (state.getSla() == null) {
@@ -108,18 +107,19 @@ public class WorkflowService {
 						return state.getSla();
 					}).findFirst().orElse(0l));
 		}
-		
-		/**
-		 * Get the workflow processInstance for the given tenant
-		 * 
-		 * @param tenantId
-		 *            The tenantId for which businessService is requested
-		 * @param requestInfo
-		 *            The RequestInfo object of the request
-		 * @return BusinessService for the the given tenantId
-		 */
-		public ProcessInstance getProcessInstance(RequestInfo requestInfo, String applicationNo, String tenantId) {
-			StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNo);
+
+
+	/**
+	 * Get the workflow processInstance for the given tenant
+	 *
+	 * @param requestInfo The RequestInfo object of the request
+	 * @param applicationNos
+	 * @param tenantId
+	 * @param businessServiceValue
+	 * @return
+	 */
+		public List<ProcessInstance> getProcessInstance(RequestInfo requestInfo, String applicationNos, String tenantId, String businessServiceValue) {
+			StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNos, businessServiceValue);
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 			Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 			ProcessInstanceResponse response = null;
@@ -128,24 +128,25 @@ public class WorkflowService {
 			} catch (IllegalArgumentException e) {
 				throw new CustomException("PARSING ERROR", "Failed to parse response of process instance");
 			}
-			Optional<ProcessInstance> processInstance = response.getProcessInstances().stream().findFirst();
-			return processInstance.get();
+			return response.getProcessInstances();
 		}
-		/**
-		 * 
-		 * @param tenantId
-		 * @param applicationNo
-		 * @return
-		 */
-		private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNo) {
+
+	/**
+	 *
+	 * @param tenantId
+	 * @param applicationNos
+	 * @param businessServiceValue
+	 * @return
+	 */
+		private StringBuilder getProcessInstanceSearchURL(String tenantId, String applicationNos, String businessServiceValue) {
 			StringBuilder url = new StringBuilder(config.getWfHost());
 			url.append(config.getWfProcessSearchPath());
 			url.append("?tenantId=");
 			url.append(tenantId);
 			url.append("&businessservices=");
-			url.append(config.getBusinessServiceValue());
+			url.append(businessServiceValue);
 			url.append("&businessIds=");
-			url.append(applicationNo);
+			url.append(applicationNos);
 			return url;
 		}
 		/**
@@ -154,8 +155,27 @@ public class WorkflowService {
 		 * @param applicationNo
 		 * @return
 		 */
-		public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId) {
-			return getProcessInstance(requestInfo, applicationNo, tenantId).getState().getApplicationStatus();
+		public String getApplicationStatus(RequestInfo requestInfo, String applicationNo, String tenantId, String businessServiceValue) {
+			List<ProcessInstance> processInstanceList = getProcessInstance(requestInfo, applicationNo, tenantId, businessServiceValue);
+			Optional<ProcessInstance> processInstance = processInstanceList.stream().findFirst();
+			return processInstance.get().getState().getApplicationStatus();
 		}
-
+	/**
+	 *
+	 * @param sewerageConnectionList
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	public void validateInProgressWF(List<SewerageConnection> sewerageConnectionList, RequestInfo requestInfo,
+									 String tenantId) {
+		Set<String> applicationNos = sewerageConnectionList.stream().map(SewerageConnection::getApplicationNo).collect(Collectors.toSet());
+		String applicationNosURLConst = applicationNos.stream().collect(Collectors.joining(","));
+		List<ProcessInstance> processInstanceList = getProcessInstance(requestInfo, applicationNosURLConst, tenantId, config.getModifySWBusinessServiceName());
+		processInstanceList.forEach(processInstance -> {
+			if (!processInstance.getState().getIsTerminateState()) {
+				throw new CustomException("SW_APP_EXIST_IN_WF",
+						"Application already exist in WorkFlow. Cannot modify connection.");
+			}
+		});
+	}
 }

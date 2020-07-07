@@ -1,11 +1,7 @@
 package org.egov.swservice.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -13,13 +9,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.AuditDetails;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.PropertyCriteria;
-import org.egov.swservice.model.PropertyResponse;
-import org.egov.swservice.model.RequestInfoWrapper;
-import org.egov.swservice.model.SearchCriteria;
-import org.egov.swservice.model.SewerageConnectionRequest;
+import org.egov.swservice.model.*;
 import org.egov.swservice.model.workflow.BusinessService;
 import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.workflow.WorkflowService;
@@ -29,9 +19,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.minidev.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class SewerageServicesUtil {
@@ -252,4 +244,12 @@ public class SewerageServicesUtil {
 		return url;
 	}
 
+	/**
+	 *
+	 * @param sewerageConnectionRequest
+	 * @return
+	 */
+	public boolean isModifyConnectionRequest(SewerageConnectionRequest sewerageConnectionRequest) {
+		return !org.springframework.util.StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionNo());
+	}
 }

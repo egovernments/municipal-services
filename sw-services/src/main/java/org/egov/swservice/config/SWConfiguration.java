@@ -166,4 +166,6 @@ public class SWConfiguration {
 	@Value("${egov.user.update.path}")
 	private String userUpdateEndPoint;
 
+	@Value("${modify.sw.workflow.name}")
+	private String modifySWBusinessServiceName;
 }
