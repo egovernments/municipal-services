@@ -274,6 +274,15 @@ public class BPAConfiguration {
 	@Value("${validate.required.nocs}")
 	private Boolean validateRequiredNoc;
 	
-	@Value("${validate.required.nocs.status}")
+	@Value("${validate.required.nocs.statuses}")
 	private String nocValidationCheckStatuses;
+	
+	@Value("${egov.noc.initiate.action}")
+	private String nocInitiateAction;
+	
+	@Value("${egov.noc.void.action}")
+	private String nocVoidAction;
+	
+	@Value("${egov.noc.autoapprove.action}")
+	private String nocAutoApproveAction;
 }

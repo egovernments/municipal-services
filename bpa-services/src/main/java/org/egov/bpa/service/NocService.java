@@ -1,6 +1,5 @@
 package org.egov.bpa.service;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.RequestInfoWrapper;
-import org.egov.bpa.web.model.NOC.Document;
 import org.egov.bpa.web.model.NOC.Noc;
 import org.egov.bpa.web.model.NOC.NocRequest;
 import org.egov.bpa.web.model.NOC.NocResponse;
@@ -138,27 +136,28 @@ public class NocService {
 	}
 
 	public void manageNocWorkflowAction(BPARequest bpaRequest, Object mdmsData) {
-		triggerNocAction(bpaRequest, mdmsData);
-		approveOfflineNoc(bpaRequest, mdmsData);
+		List<Noc> nocs = fetchNocRecords(bpaRequest);
+		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
+		approveOfflineNoc(bpaRequest, mdmsData, nocs);
+		handleBPARejectedStateForNoc(bpaRequest, nocs);
 	}
 
 	@SuppressWarnings("unchecked")
-	private void approveOfflineNoc(BPARequest bpaRequest, Object mdmsData) {
+	private void approveOfflineNoc(BPARequest bpaRequest, Object mdmsData, List<Noc> nocs) {
 		BPA bpa = bpaRequest.getBPA();
 
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 				&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
-			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);
-			List<Noc> nocs = fetchNocRecords(bpaRequest);
+			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);			
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
 					if (offlneNocs.contains(noc.getNocType())) {
-						Workflow workflow = Workflow.builder().action(BPAConstants.ACTION_APPROVE).build();
+						Workflow workflow = Workflow.builder().action(config.getNocAutoApproveAction()).build();
 						noc.setWorkflow(workflow);
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 								.build();
 						updateNoc(nocRequest);
-						log.info("Offline NOC approved " + noc.getApplicationNo());
+						log.info("Offline NOC auto approved " + noc.getApplicationNo());
 					}
 				});
 			}
@@ -166,8 +165,9 @@ public class NocService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void triggerNocAction(BPARequest bpaRequest, Object mdmsData) {
+	private void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData, List<Noc> nocs) {
 		BPA bpa = bpaRequest.getBPA();
+		
 		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
 		String nocPath = BPAConstants.NOC_TRIGGER_STATE_MAP
 				.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
@@ -177,15 +177,30 @@ public class NocService {
 		List<Object> triggerActionStates = (List<Object>) JsonPath.read(mdmsData, nocPath);
 		if (!CollectionUtils.isEmpty(triggerActionStates)
 				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
-			List<Noc> nocs = fetchNocRecords(bpaRequest);
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
-					noc.setWorkflow(Workflow.builder().action(BPAConstants.NOC_WORKFLOW_ACTION).build());
+					noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
 					NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 							.build();
 					updateNoc(nocRequest);
+					log.info("Noc Initiated : " + noc.getApplicationNo());
 				});
 			}
+		}
+	}
+
+	private void handleBPARejectedStateForNoc(BPARequest bpaRequest, List<Noc> nocs) {
+		BPA bpa = bpaRequest.getBPA();
+
+		if (bpa.getWorkflow() != null && bpa.getWorkflow().getAction() != null
+				&& (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT))) {
+			nocs.forEach(noc -> {
+				noc.setWorkflow(Workflow.builder().action(config.getNocVoidAction())
+						.comment(bpa.getWorkflow().getComments()).build());
+				NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo()).build();
+				updateNoc(nocRequest);
+				log.info("Noc Voided : " + noc.getApplicationNo());
+			});
 		}
 	}
 }

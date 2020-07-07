@@ -549,7 +549,7 @@ public class BPAValidator {
 								if (!Boolean.valueOf(nocForwardCondn.trim())) {
 									log.info("Noc is not approved for applicationNo :" + noc.getApplicationNo());
 									throw new CustomException("NOC_EXCEPTION",
-											" You can't approve the application without NOC approval");
+											" You can't approve the application without NOC " + StringUtils.join(statuses, ","));
 								}
 							}
 						}
