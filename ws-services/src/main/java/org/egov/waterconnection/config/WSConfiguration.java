@@ -179,4 +179,6 @@ public class WSConfiguration {
 	@Value("${egov.user.update.path}")
 	private String userUpdateEndPoint;
    
+	@Value("${modify.ws.workflow.name}")
+	private String modifyWSBusinessServiceName;
 }
