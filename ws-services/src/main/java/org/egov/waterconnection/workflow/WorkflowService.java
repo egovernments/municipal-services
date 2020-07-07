@@ -128,7 +128,8 @@ public class WorkflowService {
 		return processInstance.get();
 	}
 	
-	private List<ProcessInstance> getProcessInstance(RequestInfo requestInfo, Set<String> applicationNos, String tenantId, String businessServiceValue) {
+	private List<ProcessInstance> getProcessInstance(RequestInfo requestInfo, Set<String> applicationNos, 
+			String tenantId, String businessServiceValue) {
 		StringBuilder url = getProcessInstanceSearchURL(tenantId, applicationNos, businessServiceValue);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
@@ -193,7 +194,7 @@ public class WorkflowService {
 		List<ProcessInstance> processInstanceList = getProcessInstance(requestInfo, applicationNos, tenantId,
 				config.getModifyWSBusinessServiceName());
 		for (ProcessInstance pi : processInstanceList) {
-			if (CollectionUtils.isEmpty(pi.getState().getActions())) {
+			if (!CollectionUtils.isEmpty(pi.getState().getActions())) {
 				if (waterConnectionWithWF != null) {
 					// There is more than one Object with WF
 					throw new CustomException("WS_APP_EXIST_IN_WF",
