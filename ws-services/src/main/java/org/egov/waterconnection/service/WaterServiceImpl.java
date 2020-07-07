@@ -85,7 +85,7 @@ public class WaterServiceImpl implements WaterService {
 
 			// Validate any process Instance exists with WF
 			WaterConnection waterConnectionWithWF = workflowService.getInProgressWF(previousConnectionsList,
-					waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
+					waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId());
 
 			if (waterConnectionWithWF != null) {
 				throw new CustomException("WS_APP_EXIST_IN_WF",
