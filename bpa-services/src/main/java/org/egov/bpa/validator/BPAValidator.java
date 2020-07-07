@@ -98,7 +98,7 @@ public class BPAValidator {
 				if (requiredDocTypes.size() > 0 && allDocuments.size() < requiredDocTypes.size()) {
 
 					throw new CustomException(BPAErrorConstants.BPA_MDNADATORY_DOCUMENTPYE_MISSING,
-							requiredDocTypes.size() + " Documents are requied ");
+							BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 				} else if (requiredDocTypes.size() > 0) {
 
 					List<String> addedDocTypes = new ArrayList<String>();
@@ -344,7 +344,7 @@ public class BPAValidator {
 							if (!CollectionUtils.isEmpty(requestQns)) {
 								if (requestQns.size() < mdmsQns.size())
 									throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
-											"Please answer all the questions " + StringUtils.join(mdmsQns, ","));
+											BPAErrorConstants.BPA_UNKNOWN_QUESTIONS_MSG);
 								else {
 									List<String> pendingQns = new ArrayList<String>();
 									for (String qn : mdmsQns) {
@@ -354,19 +354,19 @@ public class BPAValidator {
 									}
 									if (pendingQns.size() > 0) {
 										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
-												"Please answer " + StringUtils.join(pendingQns, ","));
+												BPAErrorConstants.BPA_UNKNOWN_QUESTIONS_MSG);
 									}
 								}
 							} else {
 								throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS,
-										"Please answer the required questions");
+										BPAErrorConstants.BPA_UNKNOWN_QUESTIONS_MSG);
 							}
 						}
 					} else {
-						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, "Please answer the required questions");
+						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, BPAErrorConstants.BPA_UNKNOWN_QUESTIONS_MSG);
 					}
 				} else {
-					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, "Please answer the required questions");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_QUESTIONS, BPAErrorConstants.BPA_UNKNOWN_QUESTIONS_MSG);
 				}
 			}
 		} catch (PathNotFoundException ex) {
@@ -421,7 +421,7 @@ public class BPAValidator {
 										requestDocs.add(documentNs);
 									} else {
 										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
-												"fileStoreId is not exists for the documents");
+												"Please upload all the mandetory Documents");
 									}
 								}
 							}
@@ -431,7 +431,7 @@ public class BPAValidator {
 							if (!CollectionUtils.isEmpty(requestDocs)) {
 								if (requestDocs.size() < mdmsDocs.size())
 									throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
-											"Please upload all the required docs " + StringUtils.join(mdmsDocs, ","));
+											BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 								else {
 									List<String> pendingDocs = new ArrayList<String>();
 									for (String doc : mdmsDocs) {
@@ -445,14 +445,14 @@ public class BPAValidator {
 									}
 								}
 							} else {
-								throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
+								throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 							}
 						}
 					} else {
-						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
+						throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 					}
 				} else {
-					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, "Please upload required Documents");
+					throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS, BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 				}
 			}
 		} catch (PathNotFoundException ex) {
