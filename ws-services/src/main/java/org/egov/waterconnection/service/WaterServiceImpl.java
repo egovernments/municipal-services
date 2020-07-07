@@ -1,11 +1,6 @@
 package org.egov.waterconnection.service;
 
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
@@ -27,6 +22,11 @@ import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class WaterServiceImpl implements WaterService {
@@ -83,14 +83,10 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
-
 			// Validate any process Instance exists with WF
-			WaterConnection waterConnectionWithWF = workflowService.getInProgressWF(previousConnectionsList,
-					waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId());
-
-			if (waterConnectionWithWF != null) {
-				throw new CustomException("WS_APP_EXIST_IN_WF",
-						"Application already exist in WorkFlow. Cannot modify connection.");
+			if (!CollectionUtils.isEmpty(previousConnectionsList)) {
+				workflowService.validateInProgressWF(previousConnectionsList,
+						waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId());
 			}
 		}
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.CREATE_APPLICATION);

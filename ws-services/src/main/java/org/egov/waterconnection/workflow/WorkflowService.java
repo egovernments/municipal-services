@@ -1,27 +1,21 @@
 package org.egov.waterconnection.workflow;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.model.RequestInfoWrapper;
 import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.workflow.BusinessService;
-import org.egov.waterconnection.model.workflow.BusinessServiceResponse;
-import org.egov.waterconnection.model.workflow.ProcessInstance;
-import org.egov.waterconnection.model.workflow.ProcessInstanceResponse;
-import org.egov.waterconnection.model.workflow.State;
+import org.egov.waterconnection.model.workflow.*;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -181,27 +175,23 @@ public class WorkflowService {
 		url.setLength(url.length()-1);
 		return url;
 	}
-	
-	public WaterConnection getInProgressWF(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
-			String tenantId) {
+
+	/**
+	 *
+	 * @param waterConnectionList
+	 * @param requestInfo
+	 * @param tenantId
+	 */
+	public void validateInProgressWF(List<WaterConnection> waterConnectionList, RequestInfo requestInfo,
+									 String tenantId) {
 		WaterConnection waterConnectionWithWF = null;
-		Set<String> applicationNos = new HashSet<String>();
-		waterConnectionList.forEach(waterConnection -> applicationNos.add(waterConnection.getApplicationNo()));
-		waterConnectionList.stream().forEach(waterConnection -> waterConnection.getApplicationNo());
-		List<ProcessInstance> processInstanceList = getProcessInstance(requestInfo, applicationNos, tenantId,
-				config.getModifyWSBusinessServiceName());
-		for (ProcessInstance pi : processInstanceList) {
-			if (!CollectionUtils.isEmpty(pi.getState().getActions())) {
-				if (waterConnectionWithWF != null) {
-					// There is more than one Object with WF
-					throw new CustomException("WS_APP_EXIST_IN_WF",
-							"Application already exist in WorkFlow. Cannot modify connection.");
-				}
-				waterConnectionWithWF = waterConnectionList.stream().filter(
-						waterConnection -> waterConnection.getApplicationNo().equalsIgnoreCase(pi.getBusinessId()))
-						.findFirst().orElse(null);
+		Set<String> applicationNos = waterConnectionList.stream().map(WaterConnection::getApplicationNo).collect(Collectors.toSet());
+		List<ProcessInstance> processInstanceList = getProcessInstance(requestInfo, applicationNos, tenantId, config.getModifyWSBusinessServiceName());
+		processInstanceList.forEach(processInstance -> {
+			if (!processInstance.getState().getIsTerminateState()) {
+				throw new CustomException("WS_APP_EXIST_IN_WF",
+						"Application already exist in WorkFlow. Cannot modify connection.");
 			}
-		}
-		return waterConnectionWithWF;
+		});
 	}
 }
