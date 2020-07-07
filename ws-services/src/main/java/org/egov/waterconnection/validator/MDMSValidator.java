@@ -40,9 +40,45 @@ public class MDMSValidator {
 	 * 
 	 * @param request
 	 */
-	public void validateMasterData(WaterConnectionRequest request) {
+	public void validateMasterData(WaterConnectionRequest request, int reqType) {
+		switch (reqType) {
+			case WCConstants.UPDATE_APPLICATION:
+				validateMasterDataForUpdateConnection(request);
+				break;
+			case WCConstants.MODIFY_CONNECTION:
+				validateMasterDataForModifyConnection(request);
+				break;
+			default:
+				break;
+		}
+	}
+
+	public void validateMasterDataForUpdateConnection(WaterConnectionRequest request) {
 		if (request.getWaterConnection().getProcessInstance().getAction()
 				.equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION_CONST)) {
+			String jsonPath = WCConstants.JSONPATH_ROOT;
+			String taxjsonPath = WCConstants.TAX_JSONPATH_ROOT;
+			String tenantId = request.getWaterConnection().getTenantId();
+			List<String> names = new ArrayList<>(Arrays.asList(WCConstants.MDMS_WC_CONNECTION_TYPE,
+					WCConstants.MDMS_WC_CONNECTION_CATEGORY, WCConstants.MDMS_WC_WATER_SOURCE));
+			Map<String, List<String>> codes = getAttributeValues(tenantId, WCConstants.MDMS_WC_MOD_NAME, names,
+					"$.*.code", jsonPath, request.getRequestInfo());
+			List<String> taxModelnames = new ArrayList<>(Arrays.asList(WCConstants.WC_ROADTYPE_MASTER));
+			Map<String, List<String>> codeFromCalculatorMaster = getAttributeValues(tenantId, WCConstants.WS_TAX_MODULE,
+					taxModelnames, "$.*.code", taxjsonPath, request.getRequestInfo());
+			// merge codes
+			String[] finalmasterNames = {WCConstants.MDMS_WC_CONNECTION_TYPE, WCConstants.MDMS_WC_CONNECTION_CATEGORY,
+					WCConstants.MDMS_WC_WATER_SOURCE, WCConstants.WC_ROADTYPE_MASTER};
+			Map<String, List<String>> finalcodes = Stream.of(codes, codeFromCalculatorMaster).map(Map::entrySet)
+					.flatMap(Collection::stream).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+			validateMDMSData(finalmasterNames, finalcodes);
+			validateCodes(request.getWaterConnection(), finalcodes);
+		}
+	}
+
+	public void validateMasterDataForModifyConnection(WaterConnectionRequest request) {
+		if (request.getWaterConnection().getProcessInstance().getAction()
+				.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION)) {
 			String jsonPath = WCConstants.JSONPATH_ROOT;
 			String taxjsonPath = WCConstants.TAX_JSONPATH_ROOT;
 			String tenantId = request.getWaterConnection().getTenantId();

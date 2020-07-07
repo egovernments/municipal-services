@@ -136,12 +136,12 @@ public class WaterServiceImpl implements WaterService {
 			return updateWaterConnectionForModifyFlow(waterConnectionRequest);
 		}
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.UPDATE_APPLICATION);
-		mDMSValidator.validateMasterData(waterConnectionRequest);
+		mDMSValidator.validateMasterData(waterConnectionRequest,WCConstants.UPDATE_APPLICATION );
+		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		validateProperty.validatePropertyFields(property);
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), 
 				waterConnectionRequest.getRequestInfo(), config.getBusinessServiceValue());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
-		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
-		validateProperty.validatePropertyFields(property);
 		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
 				waterConnectionRequest.getWaterConnection().getApplicationNo(),
 				waterConnectionRequest.getWaterConnection().getTenantId(),
@@ -193,11 +193,9 @@ public class WaterServiceImpl implements WaterService {
 
 	private List<WaterConnection> updateWaterConnectionForModifyFlow(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
-
-		// TODO - MDMS validation 
-		//mDMSValidator.validateMasterData(waterConnectionRequest);
-
-		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), 
+		// TODO - MDMS validation
+		mDMSValidator.validateMasterData(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(),
 				waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);

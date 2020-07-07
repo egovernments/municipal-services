@@ -59,13 +59,20 @@ public class EnrichmentService {
 		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
-	    additionalDetail.put(WCConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
-	    waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
+		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
+			for (String constValue : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
+				additionalDetail.put(constValue, null);
+			}
+		} else {
+			additionalDetail = mapper
+					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+		}
+		additionalDetail.put(WCConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
+		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 		//Setting ApplicationType
 		waterConnectionRequest.getWaterConnection().setApplicationType("NEW_WATER_CONNECTION");
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
-		
 	}
 	@SuppressWarnings("unchecked")
 	public void enrichingAdditionalDetails(WaterConnectionRequest waterConnectionRequest) {
