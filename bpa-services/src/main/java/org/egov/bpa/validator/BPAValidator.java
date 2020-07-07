@@ -421,7 +421,7 @@ public class BPAValidator {
 										requestDocs.add(documentNs);
 									} else {
 										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
-												"Please upload all the mandetory Documents");
+												BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 									}
 								}
 							}
@@ -441,7 +441,7 @@ public class BPAValidator {
 									}
 									if (pendingDocs.size() > 0) {
 										throw new CustomException(BPAErrorConstants.BPA_UNKNOWN_DOCS,
-												"Please upload " + StringUtils.join(pendingDocs, ","));
+												BPAErrorConstants.BPA_UNKNOWN_DOCS_MSG);
 									}
 								}
 							} else {
