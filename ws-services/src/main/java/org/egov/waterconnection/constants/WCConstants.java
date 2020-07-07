@@ -104,6 +104,8 @@ public class WCConstants {
 	public static final String APPROVE_CONNECTION_CONST = "APPROVE_FOR_CONNECTION";
 
 	public static final String ACTIVATE_CONNECTION_CONST = "ACTIVATE_CONNECTION";
+	
+	public static final String APPROVE_CONNECTION = "APPROVE_CONNECTION";
 
 	public static final List<String> NOTIFICATION_ENABLE_FOR_STATUS = Collections
 			.unmodifiableList(Arrays.asList(INITIATE_INITIATED, REJECT_REJECTED,
@@ -203,5 +205,10 @@ public class WCConstants {
 	public static final String MONTHLY_BILLING_CONST = "monthly";
 
 	public static final String BILLING_CYCLE_STRING = "billingCycle";
+	
+	// Used to differentiate the type of request which is processing
+	public static final int CREATE_APPLICATION = 0;
+	public static final int UPDATE_APPLICATION = 1;
+	public static final int MODIFY_CONNECTION =  2;
 
 }

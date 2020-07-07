@@ -267,4 +267,8 @@ public class WaterServicesUtil {
 		Object response = serviceRequestRepository.getShortningURL(new StringBuilder(url), obj);
 		return response.toString();
 	}
+	
+	public boolean isModifyConnectionRequest(WaterConnectionRequest waterConnectionRequest) {
+		return !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionNo());
+	}
 }

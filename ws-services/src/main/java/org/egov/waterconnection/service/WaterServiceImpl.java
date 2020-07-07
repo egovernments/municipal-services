@@ -9,6 +9,7 @@ import java.util.Set;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
+import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.model.Property;
 import org.egov.waterconnection.model.SearchCriteria;
 import org.egov.waterconnection.model.WaterConnection;
@@ -27,13 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class WaterServiceImpl implements WaterService {
 
 	@Autowired
@@ -71,15 +66,12 @@ public class WaterServiceImpl implements WaterService {
 	
 	@Autowired
 	private WaterDaoImpl waterDaoImpl;
-	
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Autowired
 	private UserService userService;
 	
-	
-	
+	@Autowired
+	private WaterServicesUtil wsUtil;
 	
 	/**
 	 * 
@@ -88,7 +80,19 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, false);
+		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
+
+			// Validate any process Instance exists with WF
+			WaterConnection waterConnectionWithWF = workflowService.getInProgressWF(previousConnectionsList,
+					waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
+
+			if (waterConnectionWithWF != null) {
+				throw new CustomException("WS_APP_EXIST_IN_WF",
+						"Application already exist in WorkFlow. Cannot modify connection.");
+			}
+		}
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.CREATE_APPLICATION);
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
@@ -130,16 +134,15 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
-		StringBuilder str = new StringBuilder();
-		try {
-			str.append("Water Connection Update Request: ").append(mapper.writeValueAsString(waterConnectionRequest));
-			log.info(str.toString());
-		} catch (JsonProcessingException e) {
-			log.debug(e.toString());
+		if(wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+			// Received request to update the connection for modifyConnection WF
+			return updateWaterConnectionForModifyFlow(waterConnectionRequest);
 		}
-		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, true);
+		
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.UPDATE_APPLICATION);
 		mDMSValidator.validateMasterData(waterConnectionRequest);
-		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo());
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), 
+				waterConnectionRequest.getRequestInfo(), config.getBusinessServiceValue());
 		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property);
@@ -183,5 +186,42 @@ public class WaterServiceImpl implements WaterService {
 		}
 			
 		return connections.get(0);
+	}
+	
+	private List<WaterConnection> getAllWaterApplications(WaterConnectionRequest waterConnectionRequest) {
+		SearchCriteria criteria = SearchCriteria.builder()
+				.connectionNumber(waterConnectionRequest.getWaterConnection().getConnectionNo()).build();
+		return search(criteria, waterConnectionRequest.getRequestInfo());
+	}
+	
+	private List<WaterConnection> updateWaterConnectionForModifyFlow(WaterConnectionRequest waterConnectionRequest) {
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
+		
+		// TODO - MDMS validation 
+		mDMSValidator.validateMasterData(waterConnectionRequest);
+		
+		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(), waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
+		WaterConnection searchResult = getConnectionForUpdateRequest(waterConnectionRequest.getWaterConnection().getId(), waterConnectionRequest.getRequestInfo());
+		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
+		validateProperty.validatePropertyFields(property);
+		String previousApplicationStatus = workflowService.getApplicationStatus(waterConnectionRequest.getRequestInfo(),
+				waterConnectionRequest.getWaterConnection().getApplicationNo(),
+				waterConnectionRequest.getWaterConnection().getTenantId());
+		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
+		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
+		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult);
+		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
+		//call calculator service to generate the demand for one time fee
+		calculationService.calculateFeeAndGenerateDemand(waterConnectionRequest, property);
+		//check for edit and send edit notification
+		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
+		//Enrich file store Id After payment
+		enrichmentService.enrichFileStoreIds(waterConnectionRequest);
+		//Call workflow
+		enrichmentService.postStatusEnrichment(waterConnectionRequest);
+		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
+		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
+		enrichmentService.postForMeterReading(waterConnectionRequest);
+		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 }

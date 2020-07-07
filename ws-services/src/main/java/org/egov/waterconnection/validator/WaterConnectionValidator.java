@@ -37,22 +37,22 @@ public class WaterConnectionValidator {
 	/**Used strategy pattern for avoiding multiple if else condition
 	 * 
 	 * @param waterConnectionRequest
-	 * @param isUpdate
+	 * @param reqType
 	 */
-	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isUpdate) {
+	public void validateWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType) {
 		Map<String, String> errorMap = new HashMap<>();
 		if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance())
 				|| StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
 			errorMap.put("INVALID_ACTION", "Workflow obj can not be null or action can not be empty!!");
 			throw new CustomException(errorMap);
 		}
-		ValidatorResult isPropertyValidated = propertyValidator.validate(waterConnectionRequest, isUpdate);
+		ValidatorResult isPropertyValidated = propertyValidator.validate(waterConnectionRequest, reqType);
 		if (!isPropertyValidated.isStatus())
 			errorMap.putAll(isPropertyValidated.getErrorMessage());
-		ValidatorResult isWaterFieldValidated = waterFieldValidator.validate(waterConnectionRequest, isUpdate);
+		ValidatorResult isWaterFieldValidated = waterFieldValidator.validate(waterConnectionRequest, reqType);
 		if (!isWaterFieldValidated.isStatus())
 			errorMap.putAll(isWaterFieldValidated.getErrorMessage());
-		ValidatorResult isMeterInfoValidated = meterInfoValidator.validate(waterConnectionRequest, isUpdate);
+		ValidatorResult isMeterInfoValidated = meterInfoValidator.validate(waterConnectionRequest, reqType);
 		if (!isMeterInfoValidated.isStatus())
 			errorMap.putAll(isMeterInfoValidated.getErrorMessage());
 

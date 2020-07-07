@@ -288,7 +288,7 @@ public class WorkflowNotificationService {
 				messageToreplace = getMessageForPlumberInfo(waterConnectionRequest.getWaterConnection(), messageToreplace);
 			
 			if (messageToreplace.contains("<SLA>"))
-				messageToreplace = messageToreplace.replace("<SLA>", getSLAForState(waterConnectionRequest, property));
+				messageToreplace = messageToreplace.replace("<SLA>", getSLAForState(waterConnectionRequest, property, config.getBusinessServiceValue()));
 
 			if (messageToreplace.contains("<Application number>"))
 				messageToreplace = messageToreplace.replace("<Application number>", waterConnectionRequest.getWaterConnection().getApplicationNo());
@@ -385,10 +385,10 @@ public class WorkflowNotificationService {
 	 * @param property
 	 * @return
 	 */
-	public String getSLAForState(WaterConnectionRequest connectionRequest, Property property) {
+	public String getSLAForState(WaterConnectionRequest connectionRequest, Property property, String businessServiceName) {
 		String resultSla = "";
 		BusinessService businessService = workflowService.getBusinessService(property.getTenantId(),
-				connectionRequest.getRequestInfo());
+				connectionRequest.getRequestInfo(), businessServiceName);
 		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
 			for (State state : businessService.getStates()) {
 				if (WCConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {
