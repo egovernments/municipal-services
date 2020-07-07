@@ -47,8 +47,8 @@ public class NocService {
 	public void createNocRequest(BPARequest bpaRequest, Object mdmsData) {
 		BPA bpa = bpaRequest.getBPA();
 		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
-		log.info("applicationType in NOC is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-		log.info("serviceType in NOC is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+		log.debug("applicationType in NOC is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+		log.debug("serviceType in NOC is " + edcrResponse.get(BPAConstants.SERVICETYPE));
 
 		String nocPath = BPAConstants.NOCTYPE_REQUIRED_MAP
 				.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
@@ -69,7 +69,7 @@ public class NocService {
 				createNoc(nocRequest);
 			}
 		} else {
-			log.info("No NOC Mapping has found!!");
+			log.debug("No NOC Mapping has found!!");
 		}
 
 	}
@@ -81,10 +81,10 @@ public class NocService {
 
 		LinkedHashMap<String, Object> responseMap = null;
 		try {
-			log.info("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
+			log.debug("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
 			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
-			log.info("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
+			log.debug("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
 		} catch (Exception se) {
 			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
 					" Failed to create NOC of Type " + nocRequest.getNoc().getNocType());
@@ -100,7 +100,7 @@ public class NocService {
 		try {
 			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
-			log.info("NOC updated with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
+			log.debug("NOC updated with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
 		} catch (Exception se) {
 			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
 					" Failed to update NOC of Type " + nocRequest.getNoc().getNocType());
@@ -158,7 +158,7 @@ public class NocService {
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 								.build();
 						updateNoc(nocRequest);
-						log.info("Offline NOC auto approved " + noc.getApplicationNo());
+						log.debug("Offline NOC auto approved " + noc.getApplicationNo());
 					}
 				});
 			}
@@ -184,7 +184,7 @@ public class NocService {
 					NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 							.build();
 					updateNoc(nocRequest);
-					log.info("Noc Initiated : " + noc.getApplicationNo());
+					log.debug("Noc Initiated : " + noc.getApplicationNo());
 				});
 			}
 		}
@@ -200,7 +200,7 @@ public class NocService {
 						.comment(bpa.getWorkflow().getComments()).build());
 				NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo()).build();
 				updateNoc(nocRequest);
-				log.info("Noc Voided : " + noc.getApplicationNo());
+				log.debug("Noc Voided : " + noc.getApplicationNo());
 			});
 		}
 	}
