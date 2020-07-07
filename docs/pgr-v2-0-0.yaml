@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "1.0.0"
+  version: 1.0.0
   title: DIGIT Public Grievance Redressal(PGR) V2
   description: |
     ### API specs for PGR ###
@@ -9,14 +9,12 @@ info:
     . Notifications will be provided on progress of the complaint in evevry step. 
     . Feedback can be provided by the citizen once the complint is resolved.
     . If not satisfied the citizen can reopen the complaint.
-    
   contact:
     name: Egovernments Foundation
     email: contact@egovernments.org
 x-module: BPA
-x-common-path: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml'
+x-common-path: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml'
 paths:
-  
   /requests/_search:
     post:
       summary: Get service requests
@@ -30,16 +28,16 @@ paths:
           schema:
             type: array
             items:
-             type: string
-             maxItems: 5
+              type: string
+              maxItems: 5
         - name: ids
           in: query
-          description: Search by list of UUID 
+          description: Search by list of UUID
           schema:
             type: array
             items:
               type: string
-              maxItems: 50
+              maxItems: 10
         - name: mobileNo
           in: query
           description: Search by mobile number of service requester
@@ -112,17 +110,15 @@ paths:
               $ref: '#/components/schemas/ServiceRequest'
         description: Request schema.
         required: true
-
 components:
   schemas:
-    
     Workflow:
       type: object
-      description: BPA application object to capture the details of land, land owners, and address of the land.
+      description: 'BPA application object to capture the details of land, land owners, and address of the land.'
       properties:
         action:
           type: string
-          description: Action on the application in certain  
+          description: Action on the application in certain
           minLength: 1
           maxLength: 64
         assignes:
@@ -135,10 +131,10 @@ components:
           minLength: 1
           maxLength: 64
         varificationDocuments:
-              description: Attach the workflow varification documents.
-              type: array
-              items:
-                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Document'
+          description: Attach the workflow varification documents.
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Document'
     Status:
       title: Status
       enum:
@@ -149,13 +145,13 @@ components:
     ServiceDef:
       type: object
       description: |
-  
+
         This will be the MDMS data.
-  
+
         Defines the structure of a service provided by the administration. This is based on Open311 standard, but extends it in follwoing important ways -
-  
+
         1. metadata is changed from boolean to strign and represents a valid swgger 2.0 definition url of the metadata definition. If this is null then it is assumed taht service does not have any metadata, else the metadata is defined in the OpenAPI definition. This allows for a well structured powerful metadata definition.
-  
+
         2. Due to this ServiceRequest object has been enhanced to include metadata values (aka attribute value in Open311) as an JSON object.
       properties:
         tenantId:
@@ -184,7 +180,7 @@ components:
       type: object
       description: |
         Instance of Service request raised for a particular service. As per extension propsed in the Service definition "attributes" carry the input values requried by metadata definition in the structure as described by the corresponding schema.
-  
+
         * Any one of 'address' or '(lat and lang)' or 'addressid' is mandatory
       properties:
         citizen:
@@ -197,7 +193,7 @@ components:
           maxLength: 64
         tenantId:
           type: string
-          description: Unique identifier of the tenant. 
+          description: Unique identifier of the tenant.
           minLength: 2
           maxLength: 64
         serviceCode:
@@ -224,22 +220,19 @@ components:
         additionalDetail:
           type: object
           description: This is the json object that will carry the actual input (whereever the metadata requries input). Structure should be same as the schema definition provided in the metadata of the service (schema compliance check to be performed at client/server)
-        status:
+        applicationStatus:
           type: string
           description: The current status of the service request.
-          enum:
-            - New
-            - InProgress
-            - Closed
-            - Cancelled
-            - Rejected
+          readOnly: true
         source:
           type: string
-          description: Source mdms master data. Which captures the source of the service request(ex:- whatsapp, ivr, Swachhata etc)
+          description: 'Source mdms master data. Which captures the source of the service request(ex:- whatsapp, ivr, Swachhata etc)'
           minLength: 2
           maxLength: 64
+          example: whatsapp, ivr etc
+        
         address:
-            $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Address'
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Address'
         auditDetails:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
       required:
@@ -249,13 +242,12 @@ components:
       type: object
       description: Request object to fetch the report data
       properties:
-        RequestInfo:
-          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestInfo'
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
         services:
-          type: array
-          maximum: 100
-          items:
-            $ref: '#/components/schemas/Service'
+          $ref: '#/components/schemas/Service'
+        workflow:
+          $ref: '#/components/schemas/Workflow'
       required:
         - RequestInfo
         - services
