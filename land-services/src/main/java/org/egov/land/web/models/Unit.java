@@ -220,7 +220,7 @@ public class Unit   {
     return auditDetails;
   }
 
-  public void setAuditDetails(AuditDetails geoLocation) {
+  public void setAuditDetails(AuditDetails auditDetails) {
     this.auditDetails = auditDetails;
   }
 

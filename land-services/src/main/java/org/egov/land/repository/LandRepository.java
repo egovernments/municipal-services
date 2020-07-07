@@ -62,7 +62,7 @@ public class LandRepository {
 		String query = queryBuilder.getLandInfoSearchQuery(criteria, preparedStmtList);
 		List<LandInfo> landInfoData = jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 		if(!CollectionUtils.isEmpty(landInfoData)) {
-			log.info("Received data from Query..");
+			log.debug("Received data from Query..");
 		}
 		return landInfoData;
 	}

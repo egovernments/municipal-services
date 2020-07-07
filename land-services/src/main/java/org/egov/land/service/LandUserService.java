@@ -72,13 +72,13 @@ public class LandUserService {
 					setUserName(owner);
 					owner.setOwnerType(LandConstants.CITIZEN);
 					userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-					log.info("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+					log.debug("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
 				}
 				if (userDetailResponse != null)
 					setOwnerFields(owner, userDetailResponse, requestInfo);
 			} else {
-				log.info("MobileNo is not existed in ownerInfo.");
-				throw new CustomException("INVALID_ONWER_ERROR", "MobileNo is mandatory for ownerInfo");
+				log.debug("MobileNo is not existed in ownerInfo.");
+				throw new CustomException(LandConstants.INVALID_ONWER_ERROR, "MobileNo is mandatory for ownerInfo");
 			}
 		});
 	}
@@ -206,7 +206,7 @@ public class LandUserService {
 			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
 			return userDetailResponse;
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("IllegalArgumentException", "ObjectMapper not able to convertValue in userCall");
+			throw new CustomException(LandConstants.ILLEGAL_ARGUMENT_EXCEPTION, "ObjectMapper not able to convertValue in userCall");
 		}
 	}
 

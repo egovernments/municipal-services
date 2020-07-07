@@ -11,6 +11,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.validator.MDMSValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -70,7 +71,7 @@ public class EDCRService {
 		if(bpas.size()>0){
 			for(int i=0; i<bpas.size(); i++){
 				if(!bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED) && !bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)){
-					throw new CustomException(" Duplicate EDCR ",
+					throw new CustomException(BPAErrorConstants.DUPLICATE_EDCR,
 							" Application already exists with EDCR Number " + bpa.getEdcrNumber());
 				}
 			}
@@ -87,11 +88,11 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, "The response from EDCR service is empty or null");
 
 		String jsonString = new JSONObject(responseMap).toString();
 		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
@@ -120,7 +121,7 @@ public class EDCRService {
 				typeRef);
 
 		if (CollectionUtils.isEmpty(edcrStatus) || !edcrStatus.get(0).equalsIgnoreCase("Accepted")) {
-			throw new CustomException("INVALID EDCR NUMBER", "The EDCR Number is not Accepted " + edcrNo);
+			throw new CustomException(BPAErrorConstants.INVALID_EDCR_NUMBER, "The EDCR Number is not Accepted " + edcrNo);
 		}
 		String expectedRiskType;
 		if (!CollectionUtils.isEmpty(OccupancyTypes) && !CollectionUtils.isEmpty(plotAreas)
@@ -142,10 +143,10 @@ public class EDCRService {
 				expectedRiskType = riskTypes.get(0);
 
 				if (expectedRiskType == null || !expectedRiskType.equals(riskType)) {
-					throw new CustomException("INVALID RISK TYPE", "The Risk Type is not valid " + riskType);
+					throw new CustomException(BPAErrorConstants.INVALID_RISK_TYPE, "The Risk Type is not valid " + riskType);
 				}
 			} else {
-				throw new CustomException("INVALID OccupancyType",
+				throw new CustomException(BPAErrorConstants.INVALID_OCCUPANCY,
 						"The OccupancyType " + OccupancyType + " is not supported! ");
 			}
 		}
@@ -168,7 +169,7 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		String jsonString = new JSONObject(responseMap).toString();
@@ -194,11 +195,11 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, "The response from EDCR service is empty or null");
 
 		String jsonString = new JSONObject(responseMap).toString();
 		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
@@ -233,7 +234,7 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " Invalid search criteria");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " Invalid search criteria");
 		}
 
 		String jsonString = new JSONObject(responseMap).toString();

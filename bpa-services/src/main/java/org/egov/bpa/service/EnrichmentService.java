@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.IdGenRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
@@ -129,7 +130,7 @@ public class EnrichmentService {
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
-			throw new CustomException("IDGEN ERROR", "No ids returned from idgen Service");
+			throw new CustomException(BPAErrorConstants.IDGEN_ERROR, "No ids returned from idgen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
@@ -166,7 +167,7 @@ public class EnrichmentService {
 
 		BusinessService businessService = workflowService.getBusinessService(bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
-
+		log.info("Application status is : " + bpa.getStatus());
 		String state = workflowService.getCurrentState(bpa.getStatus(), businessService);
 
 		if(state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)){
@@ -181,11 +182,14 @@ public class EnrichmentService {
 			}
 		}
 		
-		log.info("Application status is : " + state);
-		if ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
-				&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
-				|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
-						&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))) {
+		log.info("Application state is : " + state);
+		if ((bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)
+				&& bpa.getStatus().equalsIgnoreCase(BPAConstants.APPROVED_STATE))
+				|| (!bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)
+						&& ((!bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)
+								&& state.equalsIgnoreCase(BPAConstants.APPROVED_STATE))
+								|| (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE) && bpa.getRiskType()
+										.toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE))))) {
 			int vailidityInMonths = config.getValidityInMonths();
 			Calendar calendar = Calendar.getInstance();
 			bpa.setApprovalDate(Calendar.getInstance().getTimeInMillis());
@@ -193,34 +197,35 @@ public class EnrichmentService {
 			// Adding 3years (36 months) to Current Date
 			calendar.add(Calendar.MONTH, vailidityInMonths);
 			Map<String, Object> additionalDetail = null;
-			if(bpa.getAdditionalDetails() != null) {
+			if (bpa.getAdditionalDetails() != null) {
 				additionalDetail = (Map) bpa.getAdditionalDetails();
 			} else {
 				additionalDetail = new HashMap<String, Object>();
 				bpa.setAdditionalDetails(additionalDetail);
 			}
-			
+
 			additionalDetail.put("validityDate", calendar.getTimeInMillis());
 			List<IdResponse> idResponses = idGenRepository.getId(bpaRequest.getRequestInfo(), bpa.getTenantId(),
 					config.getPermitNoIdgenName(), config.getPermitNoIdgenFormat(), 1).getIdResponses();
 			bpa.setApprovalNo(idResponses.get(0).getId());
 			if (state.equalsIgnoreCase(BPAConstants.DOCVERIFICATION_STATE)
 					&& bpa.getRiskType().toString().equalsIgnoreCase(BPAConstants.LOW_RISKTYPE)) {
-				
+
 				Object mdmsData = bpaUtil.mDMSCall(bpaRequest.getRequestInfo(), bpaRequest.getBPA().getTenantId());
-				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
-				log.info("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-	            log.info("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
+						bpaRequest.getBPA());
+				log.debug("applicationType is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
+	            log.debug("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
 	            
 				String condeitionsPath = BPAConstants.CONDITIONS_MAP.replace("{1}", BPAConstants.PENDING_APPROVAL_STATE)
 						.replace("{2}", bpa.getRiskType().toString())
 						.replace("{3}", edcrResponse.get(BPAConstants.SERVICETYPE))
 						.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));
-				log.info(condeitionsPath);
+				log.debug(condeitionsPath);
 
 				try {
 					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
-					log.info(conditions.toString());
+					log.debug(conditions.toString());
 					if (bpa.getAdditionalDetails() == null) {
 						bpa.setAdditionalDetails(new HashMap());
 					}

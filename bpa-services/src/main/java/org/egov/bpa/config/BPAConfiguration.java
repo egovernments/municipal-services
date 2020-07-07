@@ -285,4 +285,20 @@ public class BPAConfiguration {
 	
 	@Value("${egov.noc.autoapprove.action}")
 	private String nocAutoApproveAction;
+  
+//	action and status constants
+	@Value("${egov.sendtocitizen.action}")
+	private String actionsendtocitizen;
+	
+	@Value("${egov.inprogress.action}")
+	private String actioninprogress;
+	
+	@Value("${egov.approve.action}")
+	private String actionapprove;
+	
+	@Value("${egov.pendingapplfee.stsus}")
+	private String statuspendingapplfee;
+	
+	@Value("${egov.inprogress.stsus}")
+	private String statusinprogress;
 }

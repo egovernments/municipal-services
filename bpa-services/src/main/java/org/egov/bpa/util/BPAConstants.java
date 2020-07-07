@@ -61,9 +61,9 @@ public class BPAConstants {
 
 	// error constants
 
-	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
-
-	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
+//	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
+//
+//	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
 
 	// mdms master names
 
@@ -311,7 +311,7 @@ public class BPAConstants {
 
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
 
-	public static final String INVALID_SEARCH = "INVALID SEARCH";
+//	public static final String INVALID_SEARCH = "INVALID SEARCH";
 
 	public static final String INVALID_UPDATE = "INVALID UPDATE";
 

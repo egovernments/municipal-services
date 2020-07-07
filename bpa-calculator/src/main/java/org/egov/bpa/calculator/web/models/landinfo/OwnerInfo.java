@@ -461,8 +461,7 @@ public class OwnerInfo {
 	 * 
 	 * @return relationship
 	 **/
-	@ApiModelProperty(required = true, value = "")
-	@NotNull
+	@ApiModelProperty(value = "")
 
 	@Valid
 	public Relationship getRelationship() {

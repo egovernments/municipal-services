@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.land.config.LandConfiguration;
 import org.egov.land.repository.ServiceRequestRepository;
+import org.egov.land.util.LandConstants;
 import org.egov.land.web.models.Boundary;
 import org.egov.land.web.models.LandInfoRequest;
 import org.egov.tracer.model.CustomException;
@@ -52,7 +53,7 @@ public class LandBoundaryService {
 		LinkedList<String> localities = new LinkedList<>();
 
 		if (request.getLandInfo().getAddress() == null || request.getLandInfo().getAddress().getLocality() == null)
-			throw new CustomException("INVALID ADDRESS", "The address or locality cannot be null");
+			throw new CustomException(LandConstants.INVALID_ADDRESS, "The address or locality cannot be null");
 		localities.add(request.getLandInfo().getAddress().getLocality().getCode());
 
 		StringBuilder uri = new StringBuilder(config.getLocationHost());
@@ -72,7 +73,7 @@ public class LandBoundaryService {
 		}
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("BOUNDARY ERROR", "The response from location service is empty or null");
+			throw new CustomException(LandConstants.BOUNDARY_ERROR, "The response from location service is empty or null");
 		String jsonString = new JSONObject(responseMap).toString();
 
 		Map<String, String> propertyIdToJsonPath = getJsonpath(request);
@@ -82,11 +83,11 @@ public class LandBoundaryService {
 		List<String> boundaryObject = context.read(propertyIdToJsonPath.get(request.getLandInfo().getId()));
 
 		if (boundaryObject != null && CollectionUtils.isEmpty((boundaryObject)))
-			throw new CustomException("BOUNDARY MDMS DATA ERROR", "The boundary data was not found");
+			throw new CustomException(LandConstants.BOUNDARY_MDMS_DATA_ERROR, "The boundary data was not found");
 
 		Boundary boundary = mapper.convertValue(boundaryObject.get(0), Boundary.class);
 		if (boundary.getName() == null)
-			throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
+			throw new CustomException(LandConstants.INVALID_BOUNDARY_DATA, "The boundary data for the code "
 					+ request.getLandInfo().getAddress().getLocality().getCode() + " is not available");
 		request.getLandInfo().getAddress().setLocality(boundary);
 

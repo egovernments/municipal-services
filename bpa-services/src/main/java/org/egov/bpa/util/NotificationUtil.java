@@ -90,6 +90,7 @@ public class NotificationUtil {
 				}
 			}
 		}
+		log.info("Messages Received: " + message );
 		return message;
 	}
 
@@ -267,6 +268,7 @@ public class NotificationUtil {
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
 				requestInfo);
 		String jsonString = new JSONObject(responseMap).toString();
+		log.info("LocalizationMessages Received: ");
 		return jsonString;
 	}
 
@@ -296,12 +298,14 @@ public class NotificationUtil {
 	public void sendSMS(List<org.egov.bpa.web.model.SMSRequest> smsRequestList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
-				log.info("Messages from localization couldn't be fetched!");
+				log.debug("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
+				log.info("sendSMS : " + smsRequest + config.getSmsNotifTopic());
 				producer.push(config.getSmsNotifTopic(), smsRequest);
-				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
+				log.debug("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			}
 		}
+		log.info("PRODUCER : ");
 	}
 
 	/**
@@ -320,6 +324,7 @@ public class NotificationUtil {
 			String customizedMsg = message.replace("<1>", entryset.getValue());
 			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
 		}
+		log.info("SMS Received: " + smsRequest );
 		return smsRequest;
 	}
 	
@@ -332,7 +337,7 @@ public class NotificationUtil {
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
 
-		log.info("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
+		log.debug("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
 	}
 
 

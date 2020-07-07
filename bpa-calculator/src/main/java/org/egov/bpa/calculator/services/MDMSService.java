@@ -116,8 +116,8 @@ public class MDMSService {
     		additionalDetails.put("applicationType", applicationType.get(0).toString());
             
     		
-            log.info("applicationType is " + additionalDetails.get("applicationType"));
-            log.info("serviceType is " + additionalDetails.get("serviceType"));
+            log.debug("applicationType is " + additionalDetails.get("applicationType"));
+            log.debug("serviceType is " + additionalDetails.get("serviceType"));
             String filterExp = "$.[?((@.applicationType == '"+ additionalDetails.get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
             List<Object> calTypes = JsonPath.read(jsonOutput, filterExp);
             
@@ -146,7 +146,7 @@ public class MDMSService {
             calculationType = (HashMap<String, Object>) obj;
         }
         catch (Exception e){
-            throw new CustomException("CALCULATION_ERROR", "Failed to get calculationType");
+            throw new CustomException(BPACalculatorConstants.CALCULATION_ERROR, "Failed to get calculationType");
         }
 
         return calculationType;
