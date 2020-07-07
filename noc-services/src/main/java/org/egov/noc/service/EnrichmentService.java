@@ -15,6 +15,7 @@ import org.egov.noc.util.NOCUtil;
 import org.egov.noc.web.model.AuditDetails;
 import org.egov.noc.web.model.Noc;
 import org.egov.noc.web.model.NocRequest;
+import org.egov.noc.web.model.enums.Status;
 import org.egov.noc.web.model.idgen.IdResponse;
 import org.egov.noc.web.model.workflow.BusinessService;
 import org.egov.noc.web.model.workflow.State;
@@ -136,6 +137,10 @@ public class EnrichmentService {
 					config.getApplicationNoIdgenName(), 1).getIdResponses();
 			noc.setNocNo(idResponses.get(0).getId());
 		}
+		if (state.equalsIgnoreCase(NOCConstants.VOIDED_STATUS)) {
+			noc.setStatus(Status.INACTIVE);
+		}
+		
 	  }
 		
 

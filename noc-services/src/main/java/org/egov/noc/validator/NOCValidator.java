@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -55,13 +56,15 @@ public class NOCValidator {
 				|| (mode.equals(NOCConstants.OFFLINE_MODE) && nocConfiguration.getNocOfflineDocRequired()))) {
 			validateRequiredDocuments(noc, mdmsData);
 		}
-		else if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) && !ObjectUtils.isEmpty(noc.getDocuments())) {
+		else if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) 
+				&& !noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_VOID)
+				&& !ObjectUtils.isEmpty(noc.getDocuments())) {
 			validateAttachedDocumentTypes(noc, mdmsData);
 		}
 		
 
-		if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) && 
-				(noc.getWorkflow().getComment() == null || noc.getWorkflow().getComment().isEmpty()))
+		if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT)
+				&& StringUtils.isEmpty(noc.getWorkflow().getComment()))
 	        errorMap.put("NOC_UPDATE_ERROR_COMMENT_REQUIRED", "Comment is mandaotory, please provide the comments ");
 
 		if (!CollectionUtils.isEmpty(errorMap))
@@ -153,7 +156,7 @@ public class NOCValidator {
 	private void validateRequiredDocuments(Noc noc, Object mdmsData) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		
-		if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT)) {			
+		if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) && !noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_VOID)) {			
 			List<Document> documents = noc.getDocuments();			
 			String filterExp = "$.[?(@.applicationType=='" + noc.getApplicationType() + "' && @.nocType=='"
 					+ noc.getNocType() + "')].docTypes";	

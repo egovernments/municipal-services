@@ -18,7 +18,7 @@ public class NocQueryBuilder {
 			+ "noc_createdTime,noc.additionalDetails,noc.landId as noc_landId, nocdoc.id as noc_doc_id, nocdoc.additionalDetails as doc_details, "
 			+ "nocdoc.documenttype as noc_doc_documenttype,nocdoc.filestoreid as noc_doc_filestore"
 			+ " FROM eg_noc noc  LEFT OUTER JOIN "
-			+ "eg_noc_document nocdoc ON nocdoc.nocid = noc.id";
+			+ "eg_noc_document nocdoc ON nocdoc.nocid = noc.id where noc.status='ACTIVE' ";
 
 	private final String paginationWrapper = "SELECT * FROM "
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY noc_lastModifiedTime DESC) offset_ FROM " + "({})"
@@ -38,42 +38,42 @@ public class NocQueryBuilder {
 		StringBuilder builder = new StringBuilder(QUERY);
 
 		if (criteria.getTenantId() != null) {
-	        addClauseIfRequired(preparedStmtList, builder);
+	        addClauseIfRequired(builder);
 	        builder.append(" noc.tenantid=? ");
 	        preparedStmtList.add(criteria.getTenantId());
 		}
 
 		List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
-			addClauseIfRequired(preparedStmtList, builder);
+			addClauseIfRequired(builder);
 			builder.append(" noc.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}		
 
 		String applicationNo = criteria.getApplicationNo();
 		if (applicationNo!=null) {
-			addClauseIfRequired(preparedStmtList, builder);
+			addClauseIfRequired(builder);
 			builder.append(" noc.applicationNo =?");
 			preparedStmtList.add(criteria.getApplicationNo());
 		}
 		
 		String approvalNo = criteria.getNocNo();
 		if (approvalNo!=null) {
-			addClauseIfRequired(preparedStmtList, builder);
+			addClauseIfRequired(builder);
 			builder.append(" noc.nocNo = ?");
 			preparedStmtList.add(criteria.getNocNo());
 		}
 		
 		String source = criteria.getSource();
 		if (source!=null) {
-			addClauseIfRequired(preparedStmtList, builder);
+			addClauseIfRequired(builder);
 			builder.append(" noc.source = ?");
 			preparedStmtList.add(criteria.getSource());
 		}
 		
 		String sourceRefId = criteria.getSourceRefId();
 		if (sourceRefId!=null) {
-			addClauseIfRequired(preparedStmtList, builder);
+			addClauseIfRequired(builder);
 			builder.append(" noc.sourceRefId = ?");
 			preparedStmtList.add(criteria.getSourceRefId());
 		}
@@ -126,12 +126,8 @@ public class NocQueryBuilder {
 
 	}
 
-	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
-		if (values.isEmpty())
-			queryString.append(" WHERE ");
-		else {
+	private void addClauseIfRequired(StringBuilder queryString) {
 			queryString.append(" AND");
-		}
 	}
 
 	private void addToPreparedStatement(List<Object> preparedStmtList, List<String> ids) {
