@@ -7,6 +7,7 @@ import java.util.Map;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.bpa.web.model.RequestInfoWrapper;
@@ -85,7 +86,7 @@ public class NocService {
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
 			log.info("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
 		} catch (Exception se) {
-			throw new CustomException("NOC_SERVICE_EXCEPTION",
+			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
 					" Failed to create NOC of Type " + nocRequest.getNoc().getNocType());
 		}
 	}
@@ -101,7 +102,7 @@ public class NocService {
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
 			log.info("NOC updated with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
 		} catch (Exception se) {
-			throw new CustomException("NOC_SERVICE_EXCEPTION",
+			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
 					" Failed to update NOC of Type " + nocRequest.getNoc().getNocType());
 		}
 	}
@@ -119,7 +120,7 @@ public class NocService {
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
 			return nocResponse.getNoc();
 		} catch (Exception e) {
-			throw new CustomException("NOC_SERVICE_EXCEPTION", " Unable to fetch the NOC records");
+			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION, " Unable to fetch the NOC records");
 		}
 	}
 
@@ -148,7 +149,7 @@ public class NocService {
 
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 				&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
-			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);			
+			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
 					if (offlneNocs.contains(noc.getNocType())) {
