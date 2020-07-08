@@ -157,7 +157,7 @@ public class SewarageServiceImpl implements SewarageService {
 				sewerageConnectionRequest.getRequestInfo(),
 				sewerageConnectionRequest.getSewerageConnection().getApplicationNo(),
 				sewerageConnectionRequest.getSewerageConnection().getTenantId(), config.getBusinessServiceValue());
-		BusinessService businessService = workflowService.getBusinessService(config.getModifySWBusinessServiceName(),
+		BusinessService businessService = workflowService.getBusinessService(config.getBusinessServiceValue(),
 				sewerageConnectionRequest.getSewerageConnection().getTenantId(),
 				sewerageConnectionRequest.getRequestInfo());
 		SewerageConnection searchResult = getConnectionForUpdateRequest(
