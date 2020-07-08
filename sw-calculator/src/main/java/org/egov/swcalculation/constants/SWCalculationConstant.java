@@ -21,7 +21,7 @@ public class SWCalculationConstant {
 
 	public static final String URL_PARAMS_SEPARATER = "?";
 
-	public static final String MDMS_ROUNDOFF_TAXHEAD = "SW_ROUNDOFF";
+	public static final String MDMS_ROUNDOFF_TAXHEAD = "SW_Round_Off";
 
 	public static final String TENANT_ID_FIELD_FOR_SEARCH_URL = "tenantId=";
 
