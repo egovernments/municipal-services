@@ -1,7 +1,6 @@
 package org.egov.pt.models;
 
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

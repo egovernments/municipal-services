@@ -81,22 +81,19 @@ public class BoundaryService {
 
 			DocumentContext context = JsonPath.parse(jsonString);
 			String localityJsonPath = "$..boundary[0].children.[?(@.code==\"{}\")]";
-			String wardJsonPath = "$..boundary[*][?(\"{}\" in @.children.*.code)]";
-			Object boundaryObject = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-			if (!(boundaryObject instanceof ArrayList) && CollectionUtils.isEmpty((ArrayList) boundaryObject)) 
+			 String wardJsonPath = "$..boundary[*][?(\"{}\" in @.children.*.code)]";
+			Object boundaryObject = context.read(localityJsonPath.replace("{}",
+                    property.getAddress().getLocality().getCode()));
+			if (!(boundaryObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList) boundaryObject)) 
 				return;
-			
-				ArrayList wardResponse = context
-						.read(wardJsonPath.replace("{}", property.getAddress().getLocality().getCode()));
-				Locality ward = mapper.convertValue(wardResponse.get(0), Locality.class);
-				// Only require ward information
-				ward.setChildren(null);
-				ArrayList boundaryResponse = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-				Locality boundary = mapper.convertValue(boundaryResponse.get(0), Locality.class);
+			ArrayList wardResponse = context.read(wardJsonPath.replace("{}",property.getAddress().getLocality().getCode()));
+			ArrayList boundaryResponse = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
+			 Locality ward = mapper.convertValue(wardResponse.get(0),Locality.class);
+			 ward.setChildren(null);
+			Locality boundary = mapper.convertValue(boundaryResponse.get(0), Locality.class);
 				if (boundary.getName() == null)
 					throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
 							+ property.getAddress().getLocality().getCode() + " is not available");
-				
 				property.getAddress().setWard(ward);
 				property.getAddress().setLocality(boundary);
 
