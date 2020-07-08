@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS eg_ws_meterreading;
-CREATE TABLE eg_ws_meterreading
+CREATE TABLE IF NOT EXISTS eg_ws_meterreading
 (
   id character varying(64),
   connectionNo character varying(64),
@@ -17,3 +16,6 @@ CREATE TABLE eg_ws_meterreading
   tenantid character varying(64),
   CONSTRAINT uk_eg_ws_meterreading UNIQUE (id)
 );
+
+CREATE INDEX IF NOT EXISTS index_eg_ws_meterreading_tenantId ON eg_ws_meterreading (tenantid);
+CREATE INDEX IF NOT EXISTS index_eg_ws_meterreading_connectionNo ON eg_ws_meterreading (connectionNo);
