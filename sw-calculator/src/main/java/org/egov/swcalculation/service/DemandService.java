@@ -40,15 +40,14 @@ import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
+import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
