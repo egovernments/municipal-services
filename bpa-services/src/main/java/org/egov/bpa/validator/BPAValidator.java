@@ -515,11 +515,16 @@ public class BPAValidator {
 					&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
 				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
 						bpaRequest.getBPA());
+				
+				String riskType = "ALL";
+				if (StringUtils.isEmpty(bpa.getRiskType()) || bpa.getRiskType().equalsIgnoreCase("LOW")) {
+					riskType = bpa.getRiskType();
+				}
+				log.debug("fetching NocTypeMapping record having riskType : " + riskType);
+
 				String nocPath = BPAConstants.NOCTYPE_REQUIRED_MAP
 						.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
-						.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}",
-								(StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
-										? "ALL" : bpa.getRiskType().toString());
+						.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}", riskType);
 
 				List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsRes, nocPath);
 				List<String> nocTypes = new ArrayList<String>();
@@ -548,16 +553,16 @@ public class BPAValidator {
 								nocForwardCondn += noc.getApplicationStatus()
 										.equalsIgnoreCase(statuses.get(statuses.size() - 1));
 								if (!Boolean.valueOf(nocForwardCondn.trim())) {
-									log.error("Noc is not approved for applicationNo :" + noc.getApplicationNo());
+									log.error("Noc is not approved having applicationNo :" + noc.getApplicationNo());
 									throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
-											" You can't approve the application without NOC "
+											" Application can't be forwarded without NOC "
 													+ StringUtils.join(statuses, " or "));
 								}
 							}
 						}
 					}
 				} else {
-					log.debug("No NOC record found to validate..");
+					log.debug("No NOC record found to validate with sourceRefId " + bpa.getApplicationNo());
 				}
 			}
 		}

@@ -49,12 +49,16 @@ public class NocService {
 		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
 		log.debug("applicationType in NOC is " + edcrResponse.get(BPAConstants.APPLICATIONTYPE));
 		log.debug("serviceType in NOC is " + edcrResponse.get(BPAConstants.SERVICETYPE));
+		
+		String riskType = "ALL";
+		if (StringUtils.isEmpty(bpa.getRiskType()) || bpa.getRiskType().equalsIgnoreCase("LOW")) {
+			riskType = bpa.getRiskType();
+		}
+		log.debug("Fetching NocTypeMapping record of riskType : " + riskType);
 
 		String nocPath = BPAConstants.NOCTYPE_REQUIRED_MAP
 				.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
-				.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE))
-				.replace("{3}", (StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
-						? "ALL" : bpa.getRiskType().toString());
+				.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}", riskType);
 
 		List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsData, nocPath);
 		List<String> nocTypes = JsonPath.read(nocMappingResponse, "$..type");
@@ -69,7 +73,7 @@ public class NocService {
 				createNoc(nocRequest);
 			}
 		} else {
-			log.debug("No NOC Mapping has found!!");
+			log.debug("NOC Mapping is not found!!");
 		}
 
 	}
@@ -158,7 +162,7 @@ public class NocService {
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 								.build();
 						updateNoc(nocRequest);
-						log.debug("Offline NOC auto approved " + noc.getApplicationNo());
+						log.debug("Offline NOC is Auto-Approved " + noc.getApplicationNo());
 					}
 				});
 			}
@@ -184,7 +188,7 @@ public class NocService {
 					NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 							.build();
 					updateNoc(nocRequest);
-					log.debug("Noc Initiated : " + noc.getApplicationNo());
+					log.debug("Noc Initiated with applicationNo : " + noc.getApplicationNo());
 				});
 			}
 		}
@@ -200,7 +204,7 @@ public class NocService {
 						.comment(bpa.getWorkflow().getComments()).build());
 				NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo()).build();
 				updateNoc(nocRequest);
-				log.debug("Noc Voided : " + noc.getApplicationNo());
+				log.debug("Noc Voided having applicationNo : " + noc.getApplicationNo());
 			});
 		}
 	}
