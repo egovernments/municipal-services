@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.model.*;
 import org.egov.wscalculation.model.workflow.ProcessInstance;
 import org.egov.wscalculation.model.workflow.ProcessInstanceResponse;
@@ -52,7 +53,7 @@ public class WSCalulationWorkflowValidator {
             dateValidation(dateEffectiveFrom,connectionNo,errorMap);
 
         if(!CollectionUtils.isEmpty(errorMap)){
-            if(waterConnection.getConnectionType() == "Metered")
+            if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
                 throw new CustomException(errorMap);
             else{
                 log.error("DemandGeneartionError", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");

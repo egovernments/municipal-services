@@ -1,12 +1,7 @@
 package org.egov.wscalculation.util;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -124,7 +119,16 @@ public class CalculatorUtil {
         if(response==null || CollectionUtils.isEmpty(response.getWaterConnection()))
             return null;
 
-        return response.getWaterConnection().get(0);
+		Collections.sort(response.getWaterConnection(), new Comparator<WaterConnection>() {
+			@Override
+			public int compare(WaterConnection wc1, WaterConnection wc2) {
+				return wc1.getAuditDetails().getLastModifiedTime().compareTo(wc2.getAuditDetails().getLastModifiedTime());
+			}
+		});
+
+		int size = response.getWaterConnection().size();
+
+        return response.getWaterConnection().get(size-1);
     }
     
     
@@ -148,7 +152,7 @@ public class CalculatorUtil {
 	/**
 	 * 
 	 * @param requestInfo
-	 * @param connectionNo
+	 * @param searchCriteria
 	 * @param tenantId
 	 * @return water connection
 	 */
@@ -225,8 +229,6 @@ public class CalculatorUtil {
 	 * 
 	 * @param requestInfo
 	 * @param tenantId
-	 * @param roadType
-	 * @param usageType
 	 * @return mdms request for master data
 	 */
 	public MdmsCriteriaReq getEstimationMasterCriteria(RequestInfo requestInfo, String tenantId) {
@@ -264,7 +266,6 @@ public class CalculatorUtil {
 	/**
 	 * 
 	 * @param requestInfo
-	 * @param connectionType
 	 * @param tenantId
 	 * @return Master For Billing Period
 	 */

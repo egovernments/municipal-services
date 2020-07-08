@@ -1,11 +1,6 @@
 package org.egov.swcalculation.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -97,7 +92,16 @@ public class CalculatorUtils {
 		if (response == null || CollectionUtils.isEmpty(response.getSewerageConnections()))
 			return null;
 
-		return response.getSewerageConnections().get(0);
+		Collections.sort(response.getSewerageConnections(), new Comparator<SewerageConnection>() {
+			@Override
+			public int compare(SewerageConnection sc1, SewerageConnection sc2) {
+				return sc1.getAuditDetails().getLastModifiedTime().compareTo(sc2.getAuditDetails().getLastModifiedTime());
+			}
+		});
+
+		int size = response.getSewerageConnections().size();
+
+		return response.getSewerageConnections().get(size-1);
 	}
 
 	/**
