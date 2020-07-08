@@ -1,5 +1,7 @@
 package org.egov.pt.models;
 
+
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -63,6 +65,9 @@ public class Address {
 
 	@JsonProperty("locality")
 	private Locality locality;
+	
+	@JsonProperty
+    private Locality ward;
 
 	@JsonProperty("geoLocation")
 	private GeoLocation geoLocation;

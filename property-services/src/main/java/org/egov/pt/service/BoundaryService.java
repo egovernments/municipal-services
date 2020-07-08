@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Locality;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.oldProperty.Boundary;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
@@ -64,11 +65,12 @@ public class BoundaryService {
 		if (hierarchyTypeCode != null)
 			uri.append("&").append("hierarchyTypeCode=").append(hierarchyTypeCode);
 
-		uri.append("&").append("boundaryType=").append("Locality").append("&").append("codes=")
+		uri.append("&").append("boundaryType=").append("Block").append("&").append("codes=")
 				.append(property.getAddress().getLocality().getCode());
 
-		Optional<Object> response = serviceRequestRepository.fetchResult(uri, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
-		
+		Optional<Object> response = serviceRequestRepository.fetchResult(uri,
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+
 		if (response.isPresent()) {
 			LinkedHashMap responseMap = (LinkedHashMap) response.get();
 			if (CollectionUtils.isEmpty(responseMap))
@@ -78,20 +80,33 @@ public class BoundaryService {
 			Map<String, String> propertyIdToJsonPath = getJsonpath(property);
 
 			DocumentContext context = JsonPath.parse(jsonString);
-
+			String localityJsonPath = "$..boundary[0].children.[?(@.code==\"{}\")]";
+			String wardJsonPath = "$..boundary[*][?(\"{}\" in @.children.*.code)]";
 			Object boundaryObject = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-			if (!(boundaryObject instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList) boundaryObject))
-				throw new CustomException("BOUNDARY MDMS DATA ERROR", "The boundary data was not found");
+			if (!(boundaryObject instanceof ArrayList) && CollectionUtils.isEmpty((ArrayList) boundaryObject)) {
+				// throw new CustomException("BOUNDARY MDMS DATA ERROR", "The
+				// boundary data was not found");
+				ArrayList wardResponse = context
+						.read(wardJsonPath.replace("{}", property.getAddress().getLocality().getCode()));
+				Locality ward = mapper.convertValue(wardResponse.get(0), Locality.class);
+				// Only require ward information
+				ward.setChildren(null);
+				ArrayList boundaryResponse = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
+				Locality boundary = mapper.convertValue(boundaryResponse.get(0), Locality.class);
+				if (boundary.getName() == null)
+					throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
+							+ property.getAddress().getLocality().getCode() + " is not available");
+				
+				property.getAddress().setWard(ward);
+				property.getAddress().setLocality(boundary);
 
-			ArrayList boundaryResponse = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-			Locality boundary = mapper.convertValue(boundaryResponse.get(0), Locality.class);
-			if (boundary.getName() == null)
-				throw new CustomException("INVALID BOUNDARY DATA", "The boundary data for the code "
-						+ property.getAddress().getLocality().getCode() + " is not available");
-			property.getAddress().setLocality(boundary);
-
+			} else {
+				Locality boundary = new Locality();
+				boundary.setCode("0000");
+				boundary.setName("Invalid Boundary");
+				property.getAddress().setLocality(boundary);
+			}
 		}
-
 		// $..boundary[?(@.code=="JLC476")].area
 
 	}
@@ -107,10 +122,9 @@ public class BoundaryService {
 	private Map<String, String> getJsonpath(Property property) {
 
 		Map<String, String> propertyIdToJsonPath = new LinkedHashMap<>();
-		String jsonpath = "$..boundary[?(@.code==\"{}\")]";
+		String jsonpath = "$..boundary[0].children.[?(@.code==\"{}\")]";
 		propertyIdToJsonPath.put(property.getPropertyId(),
 				jsonpath.replace("{}", property.getAddress().getLocality().getCode()));
 		return propertyIdToJsonPath;
 	}
-
 }
