@@ -74,7 +74,7 @@ public class NocRowMapper implements ResultSetExtractor<List<Noc>> {
 						Object.class);
 			applicationDocument.setId(documentId);
 			applicationDocument.setDocumentType(rs.getString("documenttype"));
-			applicationDocument.setFileStore(rs.getString("noc_doc_filestore"));
+			applicationDocument.setFileStoreId(rs.getString("noc_doc_filestore"));
 			applicationDocument.setDocumentUid(rs.getString("documentUid"));
 			applicationDocument.setAdditionalDetails(additionalDetails);
 			noc.addDocumentsItem(applicationDocument);

@@ -145,10 +145,10 @@ public class NOCValidator {
 		if (!ObjectUtils.isEmpty(noc.getDocuments())) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
 			noc.getDocuments().forEach(document -> {
-				if (documentFileStoreIds.contains(document.getFileStore()))
+				if (documentFileStoreIds.contains(document.getFileStoreId()))
 					throw new CustomException("NOC_DUPLICATE_DOCUMENT", "Same document cannot be used multiple times");
 				else
-					documentFileStoreIds.add(document.getFileStore());
+					documentFileStoreIds.add(document.getFileStoreId());
 			});
 		}
 	}
