@@ -1,9 +1,5 @@
-DROP TABLE IF EXISTS eg_ws_plumberinfo;
-DROP TABLE IF EXISTS eg_ws_applicationdocument;
-DROP TABLE IF EXISTS eg_ws_service;
-DROP TABLE IF EXISTS eg_ws_connection;
 
-CREATE TABLE eg_ws_connection
+CREATE TABLE IF NOT EXISTS eg_ws_connection
 (
   id character varying(64) NOT NULL,
   tenantid character varying(250) NOT NULL,
@@ -29,7 +25,14 @@ CREATE TABLE eg_ws_connection
   CONSTRAINT eg_ws_connection_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE eg_ws_service
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_tenantId ON eg_ws_connection (tenantid);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationNo ON eg_ws_connection (applicationno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_connectionNo ON eg_ws_connection (connectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_oldConnectionNo ON eg_ws_connection (oldconnectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_property_id ON eg_ws_connection (property_id);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationstatus ON eg_ws_connection (applicationstatus);
+
+CREATE TABLE IF NOT EXISTS eg_ws_service
 (
   connection_id character varying(64) NOT NULL,
   connectioncategory character varying(32),
@@ -53,7 +56,9 @@ CREATE TABLE eg_ws_service
   ON DELETE CASCADE
 );
 
-CREATE TABLE eg_ws_plumberinfo
+CREATE INDEX IF NOT EXISTS index_eg_ws_service_appCreatedDate ON eg_ws_service (appCreatedDate);
+
+CREATE TABLE IF NOT EXISTS eg_ws_plumberinfo
 (
   id character varying(256) NOT NULL,
   name character varying(256),
@@ -70,7 +75,8 @@ CREATE TABLE eg_ws_plumberinfo
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE eg_ws_applicationdocument
+
+CREATE TABLE IF NOT EXISTS eg_ws_applicationdocument
 (
   id character varying(64) NOT NULL,
   tenantid character varying(64),

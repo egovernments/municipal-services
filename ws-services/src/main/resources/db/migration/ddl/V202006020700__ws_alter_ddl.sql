@@ -1,4 +1,4 @@
-CREATE TABLE eg_ws_connection_audit
+CREATE TABLE IF NOT EXISTS eg_ws_connection_audit
 (
   id character varying(64) NOT NULL,
   tenantid character varying(250) NOT NULL,
@@ -23,7 +23,14 @@ CREATE TABLE eg_ws_connection_audit
   lastModifiedTime bigint
 );
 
-CREATE TABLE eg_ws_service_audit
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_tenantId ON eg_ws_connection (tenantid);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationNo ON eg_ws_connection (applicationno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_connectionNo ON eg_ws_connection (connectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_oldConnectionNo ON eg_ws_connection (oldconnectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_property_id ON eg_ws_connection (property_id);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationstatus ON eg_ws_connection (applicationstatus);
+
+CREATE TABLE IF NOT EXISTS eg_ws_service_audit
 (
   connection_id character varying(64) NOT NULL,
   connectioncategory character varying(32),
@@ -48,3 +55,5 @@ CREATE TABLE eg_ws_service_audit
   lastModifiedTime bigint,
   estimationLetterDate bigint
 );
+
+CREATE INDEX IF NOT EXISTS index_eg_ws_service_appCreatedDate ON eg_ws_service (appCreatedDate);
