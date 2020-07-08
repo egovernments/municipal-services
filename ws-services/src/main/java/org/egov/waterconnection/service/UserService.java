@@ -313,7 +313,7 @@ public class UserService {
 				.append(configuration.getUserSearchEndpoint());
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
 		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
-			return null;
+			return Collections.emptySet();
 		return userDetailResponse.getUser().stream().map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
 	}
 

@@ -2,6 +2,7 @@ package org.egov.waterconnection.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,7 +249,7 @@ public class WorkflowNotificationService {
 				localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
-			return null;
+			return Collections.emptyList();
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {

@@ -213,7 +213,7 @@ public class PaymentNotificationService {
 		String message = notificationUtil.getCustomizedMsgForSMS(topic, localizationMessage);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
-			return null;
+			return Collections.emptyList();
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {

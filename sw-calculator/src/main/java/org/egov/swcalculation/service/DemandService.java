@@ -323,7 +323,7 @@ public class DemandService {
 		try {
 			response = mapper.convertValue(result, DemandResponse.class);
 			if (CollectionUtils.isEmpty(response.getDemands()))
-				return null;
+				return Collections.emptyList();
 			return response.getDemands();
 		} catch (IllegalArgumentException e) {
 			throw new CustomException("PARSING ERROR", "Failed to parse response from Demand Search");
