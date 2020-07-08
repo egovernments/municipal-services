@@ -24,6 +24,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
@@ -98,7 +99,7 @@ public class EnrichmentService {
 					document.setId(UUID.randomUUID().toString());
 				}
 			});
-		if (!CollectionUtils.isEmpty(nocRequest.getNoc().getWorkflow().getDocuments())) {
+		if (!ObjectUtils.isEmpty(nocRequest.getNoc().getWorkflow()) && !CollectionUtils.isEmpty(nocRequest.getNoc().getWorkflow().getDocuments())) {
 			nocRequest.getNoc().getWorkflow().getDocuments().forEach(document -> {
 				if (document.getId() == null) {
 					document.setId(UUID.randomUUID().toString());

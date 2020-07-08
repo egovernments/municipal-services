@@ -52,20 +52,26 @@ public class NOCValidator {
 			errorMap.put("UPDATE ERROR", "Application Not found in the System" + noc);
 		}
 		
-		if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_APPROVE) && (mode.equals(NOCConstants.ONLINE_MODE) 
-				|| (mode.equals(NOCConstants.OFFLINE_MODE) && nocConfiguration.getNocOfflineDocRequired()))) {
-			validateRequiredDocuments(noc, mdmsData);
+		if(!ObjectUtils.isEmpty(noc.getWorkflow()) && !StringUtils.isEmpty(noc.getWorkflow().getAction())) {
+		
+			if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_APPROVE) && (mode.equals(NOCConstants.ONLINE_MODE) 
+					|| (mode.equals(NOCConstants.OFFLINE_MODE) && nocConfiguration.getNocOfflineDocRequired()))) {
+				validateRequiredDocuments(noc, mdmsData);
+			}
+			else if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) 
+					&& !noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_VOID)
+					&& !ObjectUtils.isEmpty(noc.getDocuments())) {
+				validateAttachedDocumentTypes(noc, mdmsData);
+			}
+			
+	
+			if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT)
+					&& StringUtils.isEmpty(noc.getWorkflow().getComment()))
+		        errorMap.put("NOC_UPDATE_ERROR_COMMENT_REQUIRED", "Comment is mandaotory, please provide the comments ");
 		}
-		else if (!noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT) 
-				&& !noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_VOID)
-				&& !ObjectUtils.isEmpty(noc.getDocuments())) {
+		else if (!ObjectUtils.isEmpty(noc.getDocuments())) {
 			validateAttachedDocumentTypes(noc, mdmsData);
 		}
-		
-
-		if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_REJECT)
-				&& StringUtils.isEmpty(noc.getWorkflow().getComment()))
-	        errorMap.put("NOC_UPDATE_ERROR_COMMENT_REQUIRED", "Comment is mandaotory, please provide the comments ");
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
@@ -115,6 +121,9 @@ public class NOCValidator {
 			if (!CollectionUtils.isEmpty(documents)) {
 				List<String> addedDocTypes = new ArrayList<String>();
 				documents.forEach(document -> {
+					if(StringUtils.isEmpty(document.getFileStoreId())) {
+						throw new CustomException("NOC_FILE_EMPTY","Filestore id is empty");
+					}
 					if (!validDocumentTypes.contains(document.getDocumentType())) {
 						throw new CustomException("NOC_UNKNOWN_DOCUMENTTYPE",
 								document.getDocumentType() + " is Unkown");
@@ -177,6 +186,9 @@ public class NOCValidator {
 
 			if (!CollectionUtils.isEmpty(documents)) {
 			  documents.forEach(document -> {
+				  if(StringUtils.isEmpty(document.getFileStoreId())) {
+						throw new CustomException("NOC_FILE_EMPTY","Filestore id is empty");
+					}
 				if (!validDocumentTypes.contains(document.getDocumentType())) {
 						throw new CustomException("NOC_UNKNOWN_DOCUMENTTYPE",
 								document.getDocumentType() + " is Unkown");
