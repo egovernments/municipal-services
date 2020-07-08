@@ -83,9 +83,9 @@ public class BoundaryService {
 			String localityJsonPath = "$..boundary[0].children.[?(@.code==\"{}\")]";
 			String wardJsonPath = "$..boundary[*][?(\"{}\" in @.children.*.code)]";
 			Object boundaryObject = context.read(propertyIdToJsonPath.get(property.getPropertyId()));
-			if (!(boundaryObject instanceof ArrayList) && CollectionUtils.isEmpty((ArrayList) boundaryObject)) {
-				// throw new CustomException("BOUNDARY MDMS DATA ERROR", "The
-				// boundary data was not found");
+			if (!(boundaryObject instanceof ArrayList) && CollectionUtils.isEmpty((ArrayList) boundaryObject)) 
+				return;
+			
 				ArrayList wardResponse = context
 						.read(wardJsonPath.replace("{}", property.getAddress().getLocality().getCode()));
 				Locality ward = mapper.convertValue(wardResponse.get(0), Locality.class);
@@ -100,12 +100,7 @@ public class BoundaryService {
 				property.getAddress().setWard(ward);
 				property.getAddress().setLocality(boundary);
 
-			} else {
-				Locality boundary = new Locality();
-				boundary.setCode("0000");
-				boundary.setName("Invalid Boundary");
-				property.getAddress().setLocality(boundary);
-			}
+			
 		}
 		// $..boundary[?(@.code=="JLC476")].area
 
