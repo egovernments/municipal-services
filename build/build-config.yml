@@ -139,3 +139,4 @@ config:
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "noc-services/src/main/resources/db"
         image-name: "noc-services-db"
+
