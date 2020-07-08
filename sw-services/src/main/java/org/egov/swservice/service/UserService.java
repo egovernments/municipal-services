@@ -1,6 +1,9 @@
 package org.egov.swservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.micrometer.core.instrument.util.StringUtils;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.swservice.config.SWConfiguration;
@@ -320,6 +323,8 @@ public class UserService {
 	 * @return
 	 */
 	public Set<String> getUUIDForUsers(String mobileNumber, String tenantId, RequestInfo requestInfo) {
+		//TenantId is not mandatory when Citizen searches. So it can be empty. Refer the value from UserInfo
+		tenantId = StringUtils.isEmpty(tenantId) ? requestInfo.getUserInfo().getTenantId() : tenantId;
 		UserSearchRequest userSearchRequest = UserSearchRequest.builder().requestInfo(requestInfo).userType("CITIZEN")
 				.tenantId(tenantId).mobileNumber(mobileNumber).build();
 		return getUsersUUID(userSearchRequest);
