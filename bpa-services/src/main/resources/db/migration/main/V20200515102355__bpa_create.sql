@@ -55,3 +55,14 @@ CREATE TABLE public.eg_bpa_document(
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
+
+CREATE INDEX bpa_index  ON eg_bpa_buildingplan 
+(
+    applicationno,
+    approvalno,
+    tenantid,
+    landid,
+    id,
+    status,
+    edcrnumber
+);
