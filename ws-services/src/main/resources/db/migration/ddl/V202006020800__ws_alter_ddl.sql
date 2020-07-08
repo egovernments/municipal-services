@@ -23,12 +23,12 @@ CREATE TABLE IF NOT EXISTS eg_ws_connection_audit
   lastModifiedTime bigint
 );
 
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_tenantId ON eg_ws_connection (tenantid);
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationNo ON eg_ws_connection (applicationno);
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_connectionNo ON eg_ws_connection (connectionno);
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_oldConnectionNo ON eg_ws_connection (oldconnectionno);
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_property_id ON eg_ws_connection (property_id);
-CREATE INDEX IF NOT EXISTS index_eg_ws_connection_applicationstatus ON eg_ws_connection (applicationstatus);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_tenantId ON eg_ws_connection_audit (tenantid);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_applicationNo ON eg_ws_connection_audit (applicationno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_connectionNo ON eg_ws_connection_audit (connectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_oldConnectionNo ON eg_ws_connection_audit (oldconnectionno);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_property_id ON eg_ws_connection_audit (property_id);
+CREATE INDEX IF NOT EXISTS index_eg_ws_connection_audit_applicationstatus ON eg_ws_connection_audit (applicationstatus);
 
 CREATE TABLE IF NOT EXISTS eg_ws_service_audit
 (
@@ -56,4 +56,4 @@ CREATE TABLE IF NOT EXISTS eg_ws_service_audit
   estimationLetterDate bigint
 );
 
-CREATE INDEX IF NOT EXISTS index_eg_ws_service_appCreatedDate ON eg_ws_service (appCreatedDate);
+CREATE INDEX IF NOT EXISTS index_eg_ws_service_audit_appCreatedDate ON eg_ws_service_audit (appCreatedDate);
