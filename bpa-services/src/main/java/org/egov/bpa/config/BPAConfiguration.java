@@ -285,6 +285,12 @@ public class BPAConfiguration {
 	
 	@Value("${egov.noc.autoapprove.action}")
 	private String nocAutoApproveAction;
+	
+	@Value("${egov.noc.autoapproved.state}")
+	private String nocAutoApprovedState;
+	
+	@Value("${egov.noc.approved.state}")
+	private String nocApprovedState;
   
 //	action and status constants
 	@Value("${egov.sendtocitizen.action}")
