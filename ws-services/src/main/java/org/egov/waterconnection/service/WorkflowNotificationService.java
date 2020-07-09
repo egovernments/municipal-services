@@ -14,11 +14,16 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.repository.ServiceRequestRepository;
+import org.egov.waterconnection.util.NotificationUtil;
+import org.egov.waterconnection.util.WaterServicesUtil;
+import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.web.models.Action;
 import org.egov.waterconnection.web.models.ActionItem;
 import org.egov.waterconnection.web.models.CalculationCriteria;
 import org.egov.waterconnection.web.models.CalculationReq;
 import org.egov.waterconnection.web.models.CalculationRes;
+import org.egov.waterconnection.web.models.Category;
 import org.egov.waterconnection.web.models.Event;
 import org.egov.waterconnection.web.models.EventRequest;
 import org.egov.waterconnection.web.models.Property;
@@ -29,10 +34,6 @@ import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.workflow.BusinessService;
 import org.egov.waterconnection.web.models.workflow.State;
-import org.egov.waterconnection.repository.ServiceRequestRepository;
-import org.egov.waterconnection.util.NotificationUtil;
-import org.egov.waterconnection.util.WaterServicesUtil;
-import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -245,11 +246,11 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
+		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			SMSRequest req = new SMSRequest(mobileNumber, messg);
+		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
 		return smsRequest;

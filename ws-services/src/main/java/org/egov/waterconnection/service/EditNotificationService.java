@@ -9,7 +9,10 @@ import java.util.stream.Collectors;
 
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.util.NotificationUtil;
+import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.web.models.Action;
+import org.egov.waterconnection.web.models.Category;
 import org.egov.waterconnection.web.models.Event;
 import org.egov.waterconnection.web.models.EventRequest;
 import org.egov.waterconnection.web.models.Property;
@@ -17,8 +20,6 @@ import org.egov.waterconnection.web.models.Recepient;
 import org.egov.waterconnection.web.models.SMSRequest;
 import org.egov.waterconnection.web.models.Source;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
-import org.egov.waterconnection.util.NotificationUtil;
-import org.egov.waterconnection.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -132,7 +133,7 @@ public class EditNotificationService {
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
-			SMSRequest req = new SMSRequest(mobileNumber, msg);
+			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
 		return smsRequest;
