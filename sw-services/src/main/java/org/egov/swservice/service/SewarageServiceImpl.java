@@ -169,6 +169,7 @@ public class SewarageServiceImpl implements SewarageService {
 		sewarageDaoImpl.pushForEditNotification(sewerageConnectionRequest);
 		// Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(sewerageConnectionRequest);
+		userService.createUser(sewerageConnectionRequest);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(sewerageConnectionRequest);
