@@ -7,11 +7,12 @@ import java.util.List;
 
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wscalculation.util.NotificationUtil;
+import org.egov.wscalculation.web.models.Category;
 import org.egov.wscalculation.web.models.DemandNotificationObj;
 import org.egov.wscalculation.web.models.EmailRequest;
 import org.egov.wscalculation.web.models.NotificationReceiver;
 import org.egov.wscalculation.web.models.SMSRequest;
-import org.egov.wscalculation.util.NotificationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -57,7 +58,7 @@ public class DemandNotificationService {
 		enrichNotificationReceivers(receiverList, notificationObj);
 		receiverList.forEach(receiver -> {
 			String message = util.getAppliedMsg(receiver, messageTemplate, notificationObj);
-			SMSRequest sms = new SMSRequest(receiver.getMobileNumber(), message);
+			SMSRequest sms = SMSRequest.builder().mobileNumber(receiver.getMobileNumber()).message(message).category(Category.TRANSACTION).build();
 			smsRequest.add(sms);
 		});
 	}

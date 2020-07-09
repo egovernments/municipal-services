@@ -19,7 +19,7 @@ public class TaxHeadMaster {
 	private String tenantId;
 	@Valid
 	@NotNull
-	private Category category;
+	private TaxHeadCategory category;
 	@NotNull
 	private String service;
 	@NotNull

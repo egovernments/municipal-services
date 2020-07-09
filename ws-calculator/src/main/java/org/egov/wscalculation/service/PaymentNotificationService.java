@@ -2,15 +2,26 @@ package org.egov.wscalculation.service;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.repository.ServiceRequestRepository;
+import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.util.NotificationUtil;
+import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.web.models.Action;
 import org.egov.wscalculation.web.models.ActionItem;
+import org.egov.wscalculation.web.models.Category;
 import org.egov.wscalculation.web.models.Event;
 import org.egov.wscalculation.web.models.EventRequest;
 import org.egov.wscalculation.web.models.Property;
@@ -19,10 +30,6 @@ import org.egov.wscalculation.web.models.SMSRequest;
 import org.egov.wscalculation.web.models.Source;
 import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionRequest;
-import org.egov.wscalculation.repository.ServiceRequestRepository;
-import org.egov.wscalculation.util.CalculatorUtil;
-import org.egov.wscalculation.util.NotificationUtil;
-import org.egov.wscalculation.util.WSCalculationUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,7 +219,7 @@ public class PaymentNotificationService {
 				actionLink = config.getNotificationUrl() + actionLink;
 				msg = msg.replace("<Link to Bill>", actionLink);
 			}
-			SMSRequest req = new SMSRequest(mobileNumber, msg);
+			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
 		return smsRequest;

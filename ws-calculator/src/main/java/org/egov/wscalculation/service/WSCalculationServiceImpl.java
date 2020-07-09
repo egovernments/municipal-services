@@ -18,7 +18,7 @@ import org.egov.wscalculation.web.models.AdhocTaxReq;
 import org.egov.wscalculation.web.models.Calculation;
 import org.egov.wscalculation.web.models.CalculationCriteria;
 import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.Category;
+import org.egov.wscalculation.web.models.TaxHeadCategory;
 import org.egov.wscalculation.web.models.Property;
 import org.egov.wscalculation.web.models.TaxHeadEstimate;
 import org.egov.wscalculation.web.models.TaxHeadMaster;
@@ -134,7 +134,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
-		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
+		Map<String, TaxHeadCategory> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(WSCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
 						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory, (OldValue, NewValue) -> NewValue));
 
@@ -147,7 +147,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		for (TaxHeadEstimate estimate : estimates) {
 
-			Category category = taxHeadCategoryMap.get(estimate.getTaxHeadCode());
+			TaxHeadCategory category = taxHeadCategoryMap.get(estimate.getTaxHeadCode());
 			estimate.setCategory(category);
 
 			switch (category) {
