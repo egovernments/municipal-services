@@ -223,13 +223,13 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
 			if (code.equalsIgnoreCase("View History Link")) {
-				String historyLink = config.getNotificationUrl() + config.getViewHistoryLink();
-				historyLink = historyLink.replace(mobileNoReplacer, mobileNumber);
-				historyLink = historyLink.replace(applicationNumberReplacer,
+				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
+				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
+				actionLink = actionLink.replace(applicationNumberReplacer,
 						sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
-				historyLink = historyLink.replace(tenantIdReplacer, property.getTenantId());
+				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 				actionLink = actionLink.replace("<View History Link>",
-						sewerageServicesUtil.getShortnerURL(historyLink));
+						sewerageServicesUtil.getShortnerURL(actionLink));
 			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);

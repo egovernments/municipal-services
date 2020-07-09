@@ -214,6 +214,15 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(applicationNumberReplacer, connectionRequest.getWaterConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
+			if (code.equalsIgnoreCase("View History Link")) {
+				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
+				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
+				actionLink = actionLink.replace(applicationNumberReplacer,
+						connectionRequest.getWaterConnection().getApplicationNo());
+				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
+				actionLink = actionLink.replace("<View History Link>",
+						waterServiceUtil.getShortnerURL(actionLink));
+			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
 			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
