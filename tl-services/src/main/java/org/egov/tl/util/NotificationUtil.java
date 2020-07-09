@@ -107,6 +107,11 @@ public class NotificationUtil {
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_CANCELLED, localizationMessage);
 			message = getCancelledMsg(license, messageTemplate);
 			break;
+			
+		case ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_SENDBACK_TO_INSPECTION, localizationMessage);
+			message = getSendBackToInspcetionMsg(license, messageTemplate);
+			break;
 		}
 
 		return message;
@@ -556,6 +561,13 @@ public class NotificationUtil {
 			return url;
 		}
 		else return res;
+	}
+	
+	private String getSendBackToInspcetionMsg(TradeLicense license, String message) {
+		message = message.replace("<2>", license.getTradeName());
+		message = message.replace("<3>", license.getApplicationNumber());
+
+		return message;
 	}
 
 }

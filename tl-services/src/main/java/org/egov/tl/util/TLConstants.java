@@ -74,8 +74,9 @@ public class TLConstants {
     public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
 
     public static final String NOTIFICATION_TL_REMINDER = "tl.en.reminder";
-
-
+    
+    public static final String NOTIFICATION_SENDBACK_TO_INSPECTION= "tl.en.sendback.to.inspection";
+    
     public static final List<String> NOTIFICATION_CODES = Collections.unmodifiableList(Arrays.asList(
             RENEWAL_NOTIFICATION_INITIATED, RENEWAL_NOTIFICATION_APPLIED, RENEWAL_NOTIFICATION_FIELD_INSPECTION, RENEWAL_NOTIFICATION_PENDINGAPPROVAL,
             RENEWAL_NOTIFICATION_REJECTED,RENEWAL_NOTIFICATION_APPROVED,NOTIFICATION_INITIATED,NOTIFICATION_APPLIED,NOTIFICATION_FIELD_INSPECTION,
@@ -217,6 +218,8 @@ public class TLConstants {
     public static final String ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION  = "SENDBACKTOCITIZEN_CITIZENACTIONREQUIRED";
 
     public static final String ACTION_FORWARD_CITIZENACTIONREQUIRED  = "FORWARDTOEMPLOYEE_FIELDINSPECTION";
+    
+    public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
 
 
     public static final String ACTION_STATUS_PAID  = "PAID";
