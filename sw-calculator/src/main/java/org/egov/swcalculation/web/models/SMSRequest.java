@@ -15,5 +15,6 @@ import lombok.ToString;
 public class SMSRequest {
     private String mobileNumber;
     private String message;
-
+    private Category category;
+    private Long expiryTime;
 }

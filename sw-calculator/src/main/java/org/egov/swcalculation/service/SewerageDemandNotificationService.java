@@ -6,11 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.egov.swcalculation.config.SWCalculationConfiguration;
+import org.egov.swcalculation.util.SWCalculationUtil;
+import org.egov.swcalculation.web.models.Category;
 import org.egov.swcalculation.web.models.DemandNotificationObj;
 import org.egov.swcalculation.web.models.EmailRequest;
 import org.egov.swcalculation.web.models.NotificationReceiver;
 import org.egov.swcalculation.web.models.SMSRequest;
-import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class SewerageDemandNotificationService {
 		enrichNotificationReceivers(receiverList, notificationObj);
 		receiverList.forEach(receiver -> {
 			String message = util.getAppliedMsg(receiver, messageTemplate, notificationObj);
-			SMSRequest sms = new SMSRequest(receiver.getMobileNumber(), message);
+			SMSRequest sms = SMSRequest.builder().mobileNumber(receiver.getMobileNumber()).message(message).category(Category.TRANSACTION).build();
 			smsRequest.add(sms);
 		});
 	}

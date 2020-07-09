@@ -15,7 +15,7 @@ import org.egov.swcalculation.web.models.AdhocTaxReq;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
-import org.egov.swcalculation.web.models.Category;
+import org.egov.swcalculation.web.models.TaxHeadCategory;
 import org.egov.swcalculation.web.models.Property;
 import org.egov.swcalculation.web.models.SewerageConnection;
 import org.egov.swcalculation.web.models.SewerageConnectionRequest;
@@ -103,7 +103,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
-		Map<String, Category> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
+		Map<String, TaxHeadCategory> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(SWCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
 						.collect(Collectors.toMap(TaxHeadMaster::getCode, TaxHeadMaster::getCategory, (OldValue, NewValue) -> NewValue));
 
@@ -116,7 +116,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 		for (TaxHeadEstimate estimate : estimates) {
 
-			Category category = taxHeadCategoryMap.get(estimate.getTaxHeadCode());
+			TaxHeadCategory category = taxHeadCategoryMap.get(estimate.getTaxHeadCode());
 			estimate.setCategory(category);
 
 			switch (category) {
