@@ -18,6 +18,9 @@ public class WaterFieldValidator implements WaterActionValidator {
 		if (reqType == WCConstants.UPDATE_APPLICATION) {
 			handleUpdateApplicationRequest(waterConnectionRequest, errorMap);
 		}
+		if(reqType == WCConstants.MODIFY_CONNECTION){
+			handleModifyConnectionRequest(waterConnectionRequest, errorMap);
+		}
 		if (!errorMap.isEmpty())
 			return new ValidatorResult(false, errorMap);
 		return new ValidatorResult(true, errorMap);
@@ -49,6 +52,22 @@ public class WaterFieldValidator implements WaterActionValidator {
 			if (waterConnectionRequest.getWaterConnection().getRoadCuttingArea() == null) {
 				errorMap.put("INVALID_ROAD_CUTTING_AREA", "Road cutting area should not be empty");
 			}
+		}
+	}
+
+	private void handleModifyConnectionRequest(WaterConnectionRequest waterConnectionRequest, Map<String, String> errorMap){
+		if (WCConstants.APPROVE_CONNECTION
+				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionType())) {
+				errorMap.put("INVALID_WATER_CONNECTION_TYPE", "Connection type should not be empty");
+			}
+			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getWaterSource())) {
+				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
+			}
+			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
+				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
+			}
+
 		}
 	}
 
