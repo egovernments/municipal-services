@@ -44,6 +44,7 @@ public class NocQueryBuilder {
 	        addClauseIfRequired(builder);
 	        builder.append(" noc.tenantid=? ");
 	        preparedStmtList.add(criteria.getTenantId());
+			log.info(criteria.getTenantId());
 		}
 
 		List<String> ids = criteria.getIds();
@@ -72,6 +73,7 @@ public class NocQueryBuilder {
 			addClauseIfRequired(builder);
 			builder.append(" noc.source = ?");
 			preparedStmtList.add(criteria.getSource());
+			log.info(criteria.getSource());
 		}
 		
 		String sourceRefId = criteria.getSourceRefId();
@@ -79,6 +81,7 @@ public class NocQueryBuilder {
 			addClauseIfRequired(builder);
 			builder.append(" noc.sourceRefId = ?");
 			preparedStmtList.add(criteria.getSourceRefId());
+			log.info(criteria.getSourceRefId());
 		}
 		
 		/*List<String> accountId = criteria.getAccountId();
@@ -127,6 +130,7 @@ public class NocQueryBuilder {
 			preparedStmtList.add(limit + offset);
 		}
 
+		log.info(finalQuery.toString());
 		return finalQuery;
 
 	}
