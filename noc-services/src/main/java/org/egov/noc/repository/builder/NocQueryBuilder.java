@@ -87,7 +87,7 @@ public class NocQueryBuilder {
 			builder.append(" noc.accountId IN (").append(createQuery(accountId)).append(")");
 			addToPreparedStatement(preparedStmtList, accountId);
 		}*/
-		log.info(criteria);
+		log.info(criteria.toString());
 		log.info("Final Query");
 		log.info(builder.toString());
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
