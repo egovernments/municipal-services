@@ -1,6 +1,7 @@
 package org.egov.noc.validator;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -95,6 +96,11 @@ public class NOCValidator {
 		    businessValues.put(NOCConstants.WORKFLOWCODE, (String)jsonOutput.get(0).get(NOCConstants.ONLINE_WF)); 
 		 else
 		    businessValues.put(NOCConstants.WORKFLOWCODE, (String)  jsonOutput.get(0).get(NOCConstants.OFFLINE_WF));
+		
+		if(!ObjectUtils.isEmpty(noc.getWorkflow()) && !StringUtils.isEmpty(noc.getWorkflow().getAction())
+				&& noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
+			businessValues.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
+		}
 		  
 	    noc.setAdditionalDetails(businessValues);		 
 	    return businessValues;

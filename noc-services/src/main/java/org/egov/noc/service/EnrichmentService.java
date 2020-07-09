@@ -57,6 +57,10 @@ public class EnrichmentService {
 					document.setId(UUID.randomUUID().toString());
 				}
 		});
+		if(!ObjectUtils.isEmpty(nocRequest.getNoc().getWorkflow()) && !StringUtils.isEmpty(nocRequest.getNoc().getWorkflow().getAction())
+				&& nocRequest.getNoc().getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
+		
+		}
 	}
 	
 	private void setIdgenIds(NocRequest request) {
@@ -140,6 +144,11 @@ public class EnrichmentService {
 		}
 		if (state.equalsIgnoreCase(NOCConstants.VOIDED_STATUS)) {
 			noc.setStatus(Status.INACTIVE);
+		}
+		if(noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
+			Map<String,String> details = (Map<String, String>) noc.getAdditionalDetails();
+			details.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
+			noc.setAdditionalDetails(details);			
 		}
 		
 	  }

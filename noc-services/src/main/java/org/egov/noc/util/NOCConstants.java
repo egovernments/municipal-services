@@ -57,4 +57,8 @@ public class NOCConstants {
 	
 	public static final String VOIDED_STATUS = "VOIDED";	
 	
+	public static final String ACTION_INITIATE = "INITIATE";	
+
+	public static final String INITIATED_TIME = "SubmittedOn";	
+
 }
