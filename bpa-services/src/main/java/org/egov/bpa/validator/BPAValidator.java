@@ -506,7 +506,6 @@ public class BPAValidator {
 		}
 	}
 	
-
 	@SuppressWarnings("unchecked")
 	private void validateNocApprove(BPARequest bpaRequest, Object mdmsRes) {
 		BPA bpa = bpaRequest.getBPA();
@@ -515,7 +514,7 @@ public class BPAValidator {
 					&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
 				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
 						bpaRequest.getBPA());
-				
+
 				String riskType = "ALL";
 				if (StringUtils.isEmpty(bpa.getRiskType()) || bpa.getRiskType().equalsIgnoreCase("LOW")) {
 					riskType = bpa.getRiskType();
@@ -540,19 +539,16 @@ public class BPAValidator {
 				}
 
 				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
-				if(!CollectionUtils.isEmpty(nocs)) {
+				if (!CollectionUtils.isEmpty(nocs)) {
 					for (Noc noc : nocs) {
 						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())) {
 							List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
 							if (statuses.size() > 0) {
-								String nocForwardCondn = "";
-								for (int i = 0; i < statuses.size() - 1; i++) {
-									nocForwardCondn += noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i))
-											+ "||";
+								Boolean nocForwardCondn = false;
+								for (int i = 0; i < statuses.size(); i++) {
+									nocForwardCondn |= noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i));
 								}
-								nocForwardCondn += noc.getApplicationStatus()
-										.equalsIgnoreCase(statuses.get(statuses.size() - 1));
-								if (!Boolean.valueOf(nocForwardCondn.trim())) {
+								if (!nocForwardCondn) {
 									log.error("Noc is not approved having applicationNo :" + noc.getApplicationNo());
 									throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
 											" Application can't be forwarded without NOC "
