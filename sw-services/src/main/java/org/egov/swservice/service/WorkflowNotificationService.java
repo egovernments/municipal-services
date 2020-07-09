@@ -1,17 +1,28 @@
 package org.egov.swservice.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.repository.ServiceRequestRepository;
+import org.egov.swservice.util.NotificationUtil;
+import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.util.SewerageServicesUtil;
+import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.web.models.Action;
 import org.egov.swservice.web.models.ActionItem;
 import org.egov.swservice.web.models.CalculationCriteria;
 import org.egov.swservice.web.models.CalculationReq;
 import org.egov.swservice.web.models.CalculationRes;
+import org.egov.swservice.web.models.Category;
 import org.egov.swservice.web.models.Event;
 import org.egov.swservice.web.models.EventRequest;
 import org.egov.swservice.web.models.Property;
@@ -22,11 +33,6 @@ import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.web.models.Source;
 import org.egov.swservice.web.models.workflow.BusinessService;
 import org.egov.swservice.web.models.workflow.State;
-import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.util.NotificationUtil;
-import org.egov.swservice.util.SWConstants;
-import org.egov.swservice.util.SewerageServicesUtil;
-import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,10 +253,10 @@ public class WorkflowNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
+		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
-		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			SMSRequest req = new SMSRequest(mobileNumber, messg);
+		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
 		return smsRequest;

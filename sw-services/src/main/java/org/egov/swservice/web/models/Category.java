@@ -3,46 +3,29 @@ package org.egov.swservice.web.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * Category of demand like tax, fee, rebate, penalty etc.
- */
 public enum Category {
+    OTP("OTP"), TRANSACTION("TRANSACTION"), PROMOTION("PROMOTION"),
+    NOTIFICATION("NOTIFICATION"), OTHERS("OTHERS");
 
-	TAX("TAX"),
+    private String value;
 
-	FEE("FEE"),
+    Category(String value) {
+        this.value = value;
+    }
 
-	REBATE("REBATE"),
+    @JsonCreator
+    public static Category fromValue(String passedValue) {
+        for (Category obj : Category.values()) {
+            if (String.valueOf(obj.value).equals(passedValue.toUpperCase())) {
+                return obj;
+            }
+        }
+        return null;
+    }
 
-	EXEMPTION("EXEMPTION"),
-
-	ADVANCE_COLLECTION("ADVANCE_COLLECTION"),
-
-	PENALTY("PENALTY"),
-
-	FINES("FINES"),
-
-	CHARGES("CHARGES");
-
-	private String value;
-
-	Category(String value) {
-		this.value = value;
-	}
-
-	@Override
-	@JsonValue
-	public String toString() {
-		return String.valueOf(value);
-	}
-
-	@JsonCreator
-	public static Category fromValue(String text) {
-		for (Category b : Category.values()) {
-			if (String.valueOf(b.value).equals(text)) {
-				return b;
-			}
-		}
-		return null;
-	}
+    @Override
+    @JsonValue
+    public String toString() {
+        return name();
+    }
 }

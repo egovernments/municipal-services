@@ -1,10 +1,18 @@
 package org.egov.swservice.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.egov.swservice.config.SWConfiguration;
+import org.egov.swservice.util.NotificationUtil;
+import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.web.models.Action;
+import org.egov.swservice.web.models.Category;
 import org.egov.swservice.web.models.Event;
 import org.egov.swservice.web.models.EventRequest;
 import org.egov.swservice.web.models.Property;
@@ -12,9 +20,6 @@ import org.egov.swservice.web.models.Recepient;
 import org.egov.swservice.web.models.SMSRequest;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.web.models.Source;
-import org.egov.swservice.util.NotificationUtil;
-import org.egov.swservice.util.SWConstants;
-import org.egov.swservice.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -126,11 +131,11 @@ public class EditNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
-		Map<String, String> mobileNumberAndMesssage = workflowNotificationService
+		Map<String, String> mobileNumberAndMessage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
-		mobileNumberAndMesssage.forEach((mobileNumber, messg) -> {
-			SMSRequest req = new SMSRequest(mobileNumber, messg);
+		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
+			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
 		});
 		return smsRequest;
