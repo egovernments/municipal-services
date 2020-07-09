@@ -1,33 +1,17 @@
 package org.egov.waterconnection.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.model.Action;
-import org.egov.waterconnection.model.ActionItem;
-import org.egov.waterconnection.model.CalculationCriteria;
-import org.egov.waterconnection.model.CalculationReq;
-import org.egov.waterconnection.model.CalculationRes;
-import org.egov.waterconnection.model.Event;
-import org.egov.waterconnection.model.EventRequest;
-import org.egov.waterconnection.model.Property;
-import org.egov.waterconnection.model.Recepient;
-import org.egov.waterconnection.model.SMSRequest;
-import org.egov.waterconnection.model.Source;
-import org.egov.waterconnection.model.WaterConnection;
-import org.egov.waterconnection.model.WaterConnectionRequest;
+import org.egov.waterconnection.model.*;
 import org.egov.waterconnection.model.workflow.BusinessService;
 import org.egov.waterconnection.model.workflow.State;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
@@ -39,13 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,7 +55,7 @@ public class WorkflowNotificationService {
 	
 	@Autowired
 	private ValidateProperty validateProperty;
-	
+
 	String tenantIdReplacer = "$tenantId";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
@@ -133,8 +117,13 @@ public class WorkflowNotificationService {
 	private EventRequest getEventRequest(WaterConnectionRequest request, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), request.getRequestInfo());
+		int reqType = WCConstants.UPDATE_APPLICATION;
+		if ((!request.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION))
+				&& waterServiceUtil.isModifyConnectionRequest(request)) {
+			reqType = WCConstants.MODIFY_CONNECTION;
+		}
 		String message = notificationUtil.getCustomizedMsgForInApp(request.getWaterConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -244,9 +233,14 @@ public class WorkflowNotificationService {
 			Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil.getLocalizationMessages(property.getTenantId(),
 				waterConnectionRequest.getRequestInfo());
+		int reqType = WCConstants.UPDATE_APPLICATION;
+		if ((!waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION))
+				&& waterServiceUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+			reqType = WCConstants.MODIFY_CONNECTION;
+		}
 		String message = notificationUtil.getCustomizedMsgForSMS(
 				waterConnectionRequest.getWaterConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return Collections.emptyList();
@@ -334,6 +328,19 @@ public class WorkflowNotificationService {
 						property.getTenantId());
 				messageToreplace = messageToreplace.replace("<connection details page>",
 						waterServiceUtil.getShortnerURL(connectionDetaislLink));
+			}
+			if (messageToreplace.contains("<Date effective from>")) {
+				if (waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() != null) {
+					LocalDate date = Instant
+							.ofEpochMilli(waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() > 10
+									? waterConnectionRequest.getWaterConnection().getDateEffectiveFrom()
+									: waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() * 1000)
+							.atZone(ZoneId.systemDefault()).toLocalDate();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					messageToreplace = messageToreplace.replace("<Date effective from>", date.format(formatter));
+				} else {
+					messageToreplace = messageToreplace.replace("<Date effective from>", "");
+				}
 			}
 			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
 		}

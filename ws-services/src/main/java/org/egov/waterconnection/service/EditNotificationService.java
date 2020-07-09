@@ -19,6 +19,7 @@ import org.egov.waterconnection.model.SMSRequest;
 import org.egov.waterconnection.model.Source;
 import org.egov.waterconnection.model.WaterConnectionRequest;
 import org.egov.waterconnection.util.NotificationUtil;
+import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,8 +47,9 @@ public class EditNotificationService {
 	
 	@Autowired
 	private ValidateProperty validateProperty;
-	
-	
+
+	@Autowired
+	private WaterServicesUtil waterServicesUtil;
 
 	public void sendEditNotification(WaterConnectionRequest request) {
 		try {
@@ -77,10 +79,17 @@ public class EditNotificationService {
 	private EventRequest getEventRequest(WaterConnectionRequest waterConnectionRequest, Property property) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), waterConnectionRequest.getRequestInfo());
-		String message = notificationUtil.getCustomizedMsg(WCConstants.WS_EDIT_IN_APP, localizationMessage);
+		String code = WCConstants.WS_EDIT_IN_APP;
+		if ((!waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION))
+				&& waterServicesUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+			   code = WCConstants.WS_MODIFY_IN_APP;
+		}
+		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = WCConstants.DEFAULT_OBJECT_MODIFIED_APP_MSG;
+			message = WCConstants.DEFAULT_OBJECT_EDIT_APP_MSG;
+			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_IN_APP))
+				message = WCConstants.DEFAULT_OBJECT_MODIFY_APP_MSG;
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
@@ -133,10 +142,17 @@ public class EditNotificationService {
 	private List<SMSRequest> getSmsRequest(WaterConnectionRequest waterConnectionRequest, Property property) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), waterConnectionRequest.getRequestInfo());
-		String message = notificationUtil.getCustomizedMsg(WCConstants.WS_EDIT_SMS, localizationMessage);
+		String code = WCConstants.WS_EDIT_SMS;
+		if ((!waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION))
+				&& waterServicesUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+			code = WCConstants.WS_MODIFY_SMS;
+		}
+		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = WCConstants.DEFAULT_OBJECT_MODIFIED_SMS_MSG;
+			message = WCConstants.DEFAULT_OBJECT_EDIT_SMS_MSG;
+			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_SMS))
+				message = WCConstants.DEFAULT_OBJECT_MODIFY_SMS_MSG;
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {

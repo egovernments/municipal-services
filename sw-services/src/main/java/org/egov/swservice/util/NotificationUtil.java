@@ -1,9 +1,7 @@
 package org.egov.swservice.util;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
@@ -16,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.jayway.jsonpath.JsonPath;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -119,8 +117,14 @@ public class NotificationUtil {
 	 * @param localizationMessage
 	 * @return message template
 	 */
-	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage) {
-		StringBuilder notificationCode = new StringBuilder("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_SMS_MESSAGE");
+	public String getCustomizedMsgForSMS(String action, String applicationStatus, String localizationMessage, int reqType) {
+		StringBuilder notificationCode = new StringBuilder();
+		if (reqType == SWConstants.UPDATE_APPLICATION) {
+			notificationCode = new StringBuilder("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_SMS_MESSAGE");
+		}
+		if(reqType == SWConstants.MODIFY_CONNECTION){
+			notificationCode = new StringBuilder("SW_MODIFY_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_SMS_MESSAGE");
+		}
 		return getMessageTemplate(notificationCode.toString(), localizationMessage);
 	}
 
@@ -130,9 +134,14 @@ public class NotificationUtil {
 	 * @param localizationMessage
 	 * @return In app message template
 	 */
-	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage) {
-		
-		StringBuilder notificationCode = new StringBuilder("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_APP_MESSAGE");
+	public String getCustomizedMsgForInApp(String action, String applicationStatus, String localizationMessage, int reqType) {
+		StringBuilder notificationCode = new StringBuilder();
+		if(reqType == SWConstants.UPDATE_APPLICATION){
+			notificationCode.append("SW_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_APP_MESSAGE");
+		}
+		if(reqType == SWConstants.MODIFY_CONNECTION){
+			notificationCode.append("SW_MODIFY_").append(action.toUpperCase()).append("_").append(applicationStatus.toUpperCase()).append("_APP_MESSAGE");
+		}
 		return getMessageTemplate(notificationCode.toString(), localizationMessage);
 	}
 	/**
@@ -146,7 +155,7 @@ public class NotificationUtil {
 	
 	/**
 	 * 
-	 * @param applicationStatus
+	 * @param code
 	 * @param localizationMessage
 	 * @return In app message template
 	 */

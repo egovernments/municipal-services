@@ -105,13 +105,17 @@ public class WCConstants {
 
 	public static final String ACTIVATE_CONNECTION_CONST = "ACTIVATE_CONNECTION";
 
+	public static final String SUBMIT_APPLICATION_STATUS_CODE = "SUBMIT_APPLICATION_PENDING_FOR_APPROVAL";
+
+	public static final String APPROVE_CONNECTION_STATUS_CODE = "APPROVE_CONNECTION_APPROVED";
+
 	public static final List<String> NOTIFICATION_ENABLE_FOR_STATUS = Collections
 			.unmodifiableList(Arrays.asList(INITIATE_INITIATED, REJECT_REJECTED,
 					SEND_BACK_TO_CITIZEN_PENDING_FOR_CITIZEN_ACTION, SEND_BACK_FOR_DO_PENDING_FOR_DOCUMENT_VERIFICATION,
 					SEND_BACK_PENDING_FOR_FIELD_INSPECTION, VERIFY_AND_FORWORD_PENDING_FOR_FIELD_INSPECTION,
 					VERIFY_AND_FORWARD_PENDING_APPROVAL_FOR_CONNECTION, APPROVE_FOR_CONNECTION_PENDING_FOR_PAYMENT,
 					PAY_PENDING_FOR_CONNECTION_ACTIVATION, ACTIVATE_CONNECTION_CONNECTION_ACTIVATED,
-					EDIT_PENDING_FOR_DOCUMENT_VERIFICATION, EDIT_PENDING_FOR_FIELD_INSPECTION));
+					EDIT_PENDING_FOR_DOCUMENT_VERIFICATION, EDIT_PENDING_FOR_FIELD_INSPECTION, SUBMIT_APPLICATION_STATUS_CODE, APPROVE_CONNECTION_STATUS_CODE));
 
 	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 
@@ -138,9 +142,17 @@ public class WCConstants {
 
 	public static final String WS_EDIT_IN_APP = "WS_EDIT_IN_APP_MESSAGE";
 
-	public static final String DEFAULT_OBJECT_MODIFIED_SMS_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>.";
+	public static final String DEFAULT_OBJECT_EDIT_SMS_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>.";
 
-	public static final String DEFAULT_OBJECT_MODIFIED_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
+	public static final String DEFAULT_OBJECT_EDIT_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
+
+	public static final String DEFAULT_OBJECT_MODIFY_SMS_MSG = "Dear <Owner Name>, Your Application <Application number> for Modification of the Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>";
+
+	public static final String DEFAULT_OBJECT_MODIFY_APP_MSG = "Dear Consumer, Your Application <Application number>  for Modification of the Connection has been edited. Click here for more details <View History Link>";
+
+	public static final String WS_MODIFY_SMS = "WS_MODIFY_SMS_MESSAGE";
+
+	public static final String WS_MODIFY_IN_APP = "WS_MODIFY_IN_APP_MESSAGE";
 
 	public static final String IDGEN_ERROR_CONST = "IDGEN ERROR";
 

@@ -1,31 +1,15 @@
 package org.egov.swservice.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Action;
-import org.egov.swservice.model.ActionItem;
-import org.egov.swservice.model.CalculationCriteria;
-import org.egov.swservice.model.CalculationReq;
-import org.egov.swservice.model.CalculationRes;
-import org.egov.swservice.model.Event;
-import org.egov.swservice.model.EventRequest;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.Recepient;
-import org.egov.swservice.model.SMSRequest;
-import org.egov.swservice.model.SewerageConnection;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Source;
+import org.egov.swservice.model.*;
 import org.egov.swservice.model.workflow.BusinessService;
 import org.egov.swservice.model.workflow.State;
 import org.egov.swservice.repository.ServiceRequestRepository;
@@ -39,13 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -137,9 +121,15 @@ public class WorkflowNotificationService {
 	private EventRequest getEventRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
+
+		int reqType = SWConstants.UPDATE_APPLICATION;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			reqType = SWConstants.MODIFY_CONNECTION;
+		}
 		String message = notificationUtil.getCustomizedMsgForInApp(
 				sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -232,6 +222,15 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(applicationNumberReplacer, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
+			if (code.equalsIgnoreCase("View History Link")) {
+				String historyLink = config.getNotificationUrl() + config.getViewHistoryLink();
+				historyLink = historyLink.replace(mobileNoReplacer, mobileNumber);
+				historyLink = historyLink.replace(applicationNumberReplacer,
+						sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+				historyLink = historyLink.replace(tenantIdReplacer, property.getTenantId());
+				actionLink = actionLink.replace("<View History Link>",
+						sewerageServicesUtil.getShortnerURL(historyLink));
+			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
 			mobileNumberAndMesssage.replace(mobileNumber, messageTemplate);
@@ -252,9 +251,14 @@ public class WorkflowNotificationService {
 	private List<SMSRequest> getSmsRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
+		int reqType = SWConstants.UPDATE_APPLICATION;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			reqType = SWConstants.MODIFY_CONNECTION;
+		}
 		String message = notificationUtil.getCustomizedMsgForSMS(
 				sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return Collections.emptyList();
@@ -354,6 +358,19 @@ public class WorkflowNotificationService {
 				connectionDetaislLink = connectionDetaislLink.replace(tenantIdReplacer, property.getTenantId());
 				messageToreplace = messageToreplace.replace("<connection details page>",
 						sewerageServicesUtil.getShortnerURL(connectionDetaislLink));
+			}
+			if(messageToreplace.contains("<Date effective from>")) {
+				if (sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() != null) {
+					LocalDate date = Instant
+							.ofEpochMilli(sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() > 10 ?
+									sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() :
+									sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() * 1000)
+							.atZone(ZoneId.systemDefault()).toLocalDate();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					messageToreplace = messageToreplace.replace("<Date effective from>", date.format(formatter));
+				} else {
+					messageToreplace = messageToreplace.replace("<Date effective from>", "");
+				}
 			}
 			messagetoreturn.put(mobileAndName.getKey(), messageToreplace);
 		}

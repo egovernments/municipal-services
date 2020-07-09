@@ -1,32 +1,20 @@
 package org.egov.swservice.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.model.Action;
-import org.egov.swservice.model.Event;
-import org.egov.swservice.model.EventRequest;
-import org.egov.swservice.model.Property;
-import org.egov.swservice.model.Recepient;
-import org.egov.swservice.model.SMSRequest;
-import org.egov.swservice.model.SewerageConnectionRequest;
-import org.egov.swservice.model.Source;
+import org.egov.swservice.model.*;
 import org.egov.swservice.util.NotificationUtil;
 import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,6 +34,9 @@ public class EditNotificationService {
 	
 	@Autowired
 	private ValidateProperty validateProperty;
+
+	@Autowired
+	private SewerageServicesUtil servicesUtil;
 
 	public void sendEditNotification(SewerageConnectionRequest request) {
 		try {
@@ -72,13 +63,20 @@ public class EditNotificationService {
 	}
 
 	private EventRequest getEventRequest(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
-		
+
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
-		String message = notificationUtil.getCustomizedMsg(SWConstants.SW_EDIT_IN_APP, localizationMessage);
+		String code = SWConstants.SW_EDIT_IN_APP;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& servicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			code = SWConstants.SW_MODIFY_IN_APP;
+		}
+		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = SWConstants.DEFAULT_OBJECT_MODIFIED_APP_MSG;
+			message = SWConstants.DEFAULT_OBJECT_EDIT_APP_MSG;
+			if (code.equalsIgnoreCase(SWConstants.SW_MODIFY_IN_APP))
+				message = SWConstants.DEFAULT_OBJECT_MODIFY_APP_MSG;
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
@@ -86,7 +84,7 @@ public class EditNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		//send the notification to the connection holders
-		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+		if (!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
 			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
 				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
 					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
@@ -129,13 +127,21 @@ public class EditNotificationService {
 	}
 
 	private List<SMSRequest> getSmsRequest(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
-		
+
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
-		String message = notificationUtil.getCustomizedMsg(SWConstants.SW_EDIT_SMS, localizationMessage);
+		String code = SWConstants.SW_EDIT_SMS;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& servicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			code = SWConstants.SW_MODIFY_SMS;
+		}
+		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = SWConstants.DEFAULT_OBJECT_MODIFIED_SMS_MSG;
+			message = SWConstants.DEFAULT_OBJECT_EDIT_SMS_MSG;
+			if (code.equalsIgnoreCase(SWConstants.SW_MODIFY_SMS)) {
+				message = SWConstants.DEFAULT_OBJECT_MODIFY_SMS_MSG;
+			}
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
@@ -143,7 +149,7 @@ public class EditNotificationService {
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
 		//send the notification to the connection holders
-		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+		if (!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
 			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
 				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
 					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
