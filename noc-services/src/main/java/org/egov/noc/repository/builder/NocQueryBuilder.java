@@ -7,8 +7,11 @@ import org.egov.noc.web.model.NocSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import lombok.extern.slf4j.Slf4j;
+import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
 @Component
+@Slf4j
 public class NocQueryBuilder {
 	@Autowired
 	private NOCConfiguration nocConfig;
@@ -84,7 +87,9 @@ public class NocQueryBuilder {
 			builder.append(" noc.accountId IN (").append(createQuery(accountId)).append(")");
 			addToPreparedStatement(preparedStmtList, accountId);
 		}*/
-		
+		log.info(criteria);
+		log.info("Final Query");
+		log.info(builder.toString());
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
 	}
