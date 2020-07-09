@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class PayService {
 			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
 
 		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
-			return null;
+			return Collections.emptyMap();
 		Map<String, BigDecimal> estimates = new HashMap<>();
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;

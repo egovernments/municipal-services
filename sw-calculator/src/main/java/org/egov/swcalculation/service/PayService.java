@@ -2,6 +2,7 @@ package org.egov.swcalculation.service;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -108,7 +109,7 @@ public class PayService {
 			String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap, Long billingExpiryDate) {
 
 		if (BigDecimal.ZERO.compareTo(waterCharge) >= 0)
-			return null;
+			return Collections.emptyMap();
 		Map<String, BigDecimal> estimates = new HashMap<>();
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;
