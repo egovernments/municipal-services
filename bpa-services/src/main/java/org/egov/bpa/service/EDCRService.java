@@ -11,6 +11,7 @@ import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.validator.MDMSValidator;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -66,12 +67,16 @@ public class EDCRService {
 
 		BPASearchCriteria criteria = new BPASearchCriteria();
 		criteria.setEdcrNumber(bpa.getEdcrNumber());
-		List<BPA> bpas = bpaRepository.getBPAData(criteria);
-		if (!CollectionUtils.isEmpty(bpas)) {
-			throw new CustomException(" Duplicate EDCR ",
-					" Application already exists with EDCR Number " + bpa.getEdcrNumber());
+		List<BPA> bpas = bpaRepository.getBPAData(criteria, null);
+		if(bpas.size()>0){
+			for(int i=0; i<bpas.size(); i++){
+				if(!bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REJECTED) && !bpas.get(i).getStatus().equalsIgnoreCase(BPAConstants.STATUS_REVOCATED)){
+					throw new CustomException(BPAErrorConstants.DUPLICATE_EDCR,
+							" Application already exists with EDCR Number " + bpa.getEdcrNumber());
+				}
+			}
 		}
-
+		
 		uri.append(config.getGetPlanEndPoint());
 		uri.append("?").append("tenantId=").append(bpa.getTenantId());
 		uri.append("&").append("edcrNumber=").append(edcrNo);
@@ -83,11 +88,11 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, "The response from EDCR service is empty or null");
 
 		String jsonString = new JSONObject(responseMap).toString();
 		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
@@ -105,18 +110,22 @@ public class EDCRService {
 		if(applicationType == null || applicationType.size() == 0){
 			applicationType.add("permit");
 		}
-		additionalDetails.put("serviceType", serviceType.get(0));
-		additionalDetails.put("applicationType", applicationType.get(0));
+		LinkedList<String> permitNumber = context.read("edcrDetail.*.permitNumber");
+		additionalDetails.put(BPAConstants.SERVICETYPE, serviceType.get(0));
+		additionalDetails.put(BPAConstants.APPLICATIONTYPE, applicationType.get(0));
+		if(permitNumber.size()>0){
+		additionalDetails.put(BPAConstants.PERMIT_NO, permitNumber.get(0));
+		}
 		List<Double> plotAreas = context.read("edcrDetail.*.planDetail.plot.area", typeRef);
 		List<Double> buildingHeights = context.read("edcrDetail.*.planDetail.blocks.*.building.buildingHeight",
 				typeRef);
 
 		if (CollectionUtils.isEmpty(edcrStatus) || !edcrStatus.get(0).equalsIgnoreCase("Accepted")) {
-			throw new CustomException("INVALID EDCR NUMBER", "The EDCR Number is not Accepted " + edcrNo);
+			throw new CustomException(BPAErrorConstants.INVALID_EDCR_NUMBER, "The EDCR Number is not Accepted " + edcrNo);
 		}
 		String expectedRiskType;
 		if (!CollectionUtils.isEmpty(OccupancyTypes) && !CollectionUtils.isEmpty(plotAreas)
-				&& !CollectionUtils.isEmpty(buildingHeights)) {
+				&& !CollectionUtils.isEmpty(buildingHeights) && !applicationType.get(0).equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			Double buildingHeight = Collections.max(buildingHeights);
 			String OccupancyType = OccupancyTypes.get(0); // Assuming
 															// OccupancyType
@@ -134,15 +143,14 @@ public class EDCRService {
 				expectedRiskType = riskTypes.get(0);
 
 				if (expectedRiskType == null || !expectedRiskType.equals(riskType)) {
-					throw new CustomException("INVALID RISK TYPE", "The Risk Type is not valid " + riskType);
+					throw new CustomException(BPAErrorConstants.INVALID_RISK_TYPE, "The Risk Type is not valid " + riskType);
 				}
 			} else {
-				throw new CustomException("INVALID OccupancyType",
+				throw new CustomException(BPAErrorConstants.INVALID_OCCUPANCY,
 						"The OccupancyType " + OccupancyType + " is not supported! ");
 			}
 		}
-		additionalDetails.put("riskType", bpa.getRiskType());
-		bpa.setAdditionalDetails(additionalDetails);
+		
 		return additionalDetails;
 	}
 
@@ -161,7 +169,7 @@ public class EDCRService {
 			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					new RequestInfoWrapper(edcrRequestInfo));
 		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
 		}
 
 		String jsonString = new JSONObject(responseMap).toString();
@@ -170,6 +178,70 @@ public class EDCRService {
 
 		return CollectionUtils.isEmpty(planReports) ? null : planReports.get(0);
 	}
+	
+	@SuppressWarnings("rawtypes")
+	public Map<String, String> getEDCRDetails(org.egov.common.contract.request.RequestInfo requestInfo, BPA bpa) {
 
+		String edcrNo = bpa.getEdcrNumber();
+		StringBuilder uri = new StringBuilder(config.getEdcrHost());
+
+		uri.append(config.getGetPlanEndPoint());
+		uri.append("?").append("tenantId=").append(bpa.getTenantId());
+		uri.append("&").append("edcrNumber=").append(edcrNo);
+		RequestInfo edcrRequestInfo = new RequestInfo();
+		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
+		LinkedHashMap responseMap = null;
+		try {
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new RequestInfoWrapper(edcrRequestInfo));
+		} catch (ServiceCallException se) {
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " EDCR Number is Invalid");
+		}
+
+		if (CollectionUtils.isEmpty(responseMap))
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, "The response from EDCR service is empty or null");
+
+		String jsonString = new JSONObject(responseMap).toString();
+		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+		Map<String, String> edcrDetails = new HashMap<String, String>();
+		List<String> serviceType = context.read("edcrDetail.*.planDetail.planInformation.serviceType");
+		if (CollectionUtils.isEmpty(serviceType)) {
+			serviceType.add("NEW_CONSTRUCTION");
+		}
+		List<String> applicationType = context.read("edcrDetail.*.appliactionType");
+		if (CollectionUtils.isEmpty(applicationType)) {
+			applicationType.add("permit");
+		}
+		List<String> approvalNo = context.read("edcrDetail.*.permitNumber");
+		edcrDetails.put(BPAConstants.SERVICETYPE, serviceType.get(0).toString());
+		edcrDetails.put(BPAConstants.APPLICATIONTYPE, applicationType.get(0).toString());
+		if(approvalNo.size()>0 && approvalNo!=null){
+		edcrDetails.put(BPAConstants.PERMIT_NO, approvalNo.get(0).toString());
+		}
+		return edcrDetails;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public List<String> getEDCRNos(BPASearchCriteria searchCriteria, org.egov.common.contract.request.RequestInfo requestInfo) {
+
+		StringBuilder uri = new StringBuilder(config.getEdcrHost());
+		uri.append(config.getGetPlanEndPoint());
+		uri.append("?").append("tenantId=").append(searchCriteria.getTenantId());
+		RequestInfo edcrRequestInfo = new RequestInfo();
+		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
+		LinkedHashMap responseMap = null;
+		try {
+			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new RequestInfoWrapper(edcrRequestInfo));
+		} catch (ServiceCallException se) {
+			throw new CustomException(BPAErrorConstants.EDCR_ERROR, " Invalid search criteria");
+		}
+
+		String jsonString = new JSONObject(responseMap).toString();
+		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+		List<String> edcrNos = context.read("edcrDetail.*.edcrNumber");
+
+		return CollectionUtils.isEmpty(edcrNos) ? null : edcrNos;
+	}
 
 }

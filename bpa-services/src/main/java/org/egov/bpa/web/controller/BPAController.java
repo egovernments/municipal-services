@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.BPAUtil;
 import org.egov.bpa.util.ResponseInfoFactory;
 import org.egov.bpa.web.model.BPA;
@@ -23,13 +24,13 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/v1/bpa")
 public class BPAController {
 
@@ -88,11 +89,11 @@ public class BPAController {
 		try {
 			resource = new UrlResource(path.toUri());
 		} catch (Exception ex) {
-			throw new CustomException("UNABLE_TO_DOWNLOAD", "Unable to download the file");
+			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		}
 
 		return ResponseEntity.ok()
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + BPAConstants.EDCR_PDF + "\"")
 				.body(resource);
 	}
 

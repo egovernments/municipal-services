@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.BPAService;
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.util.NotificationUtil;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -156,7 +157,7 @@ public class PaymentNotificationService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new CustomException("RECEIPT ERROR", "Unable to fetch values from receipt");
+			throw new CustomException(BPAErrorConstants.RECEIPT_ERROR, "Unable to fetch values from receipt");
 		}
 		return valMap;
 	}
@@ -178,14 +179,14 @@ public class PaymentNotificationService {
 		BPASearchCriteria searchCriteria = new BPASearchCriteria();
 		searchCriteria.setApplicationNo(consumerCode);
 		searchCriteria.setTenantId(tenantId);
-		List<BPA> bpas = bpaService.getBPAFromCriteria(searchCriteria, requestInfo);
+		List<BPA> bpas = bpaService.getBPAFromCriteria(searchCriteria, requestInfo, null);
 
 		if (CollectionUtils.isEmpty(bpas))
-			throw new CustomException("INVALID RECEIPT",
+			throw new CustomException(BPAErrorConstants.INVALID_RECEIPT,
 					"No Appllication found for the consumerCode: " + consumerCode + " and tenantId: " + tenantId);
 
 		if (bpas.size() != 1)
-			throw new CustomException("INVALID RECEIPT",
+			throw new CustomException(BPAErrorConstants.INVALID_RECEIPT,
 					"Multiple Application found for the consumerCode: " + consumerCode + " and tenantId: " + tenantId);
 
 		return bpas.get(0);

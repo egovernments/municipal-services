@@ -55,16 +55,13 @@ public class DemandService {
 
     @Autowired
     private CalculationUtils utils;
-  
 
     @Autowired
     private ServiceRequestRepository serviceRequestRepository;
 
-   /* @Autowired
-    private CalculationRepository calculationRepository;
-
     @Autowired
-    private CalculationQueryBuilder calculationQueryBuilder;*/
+    private BPAService bpaService;
+    
 	
     /**
      * Creates or updates Demand
@@ -85,7 +82,7 @@ public class DemandService {
             String tenantId = calculations.get(0).getTenantId();
             Set<String> applicationNos = calculations.stream().map(calculation -> calculation.getBpa().getApplicationNo()).collect(Collectors.toSet());
 //            Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getBPA().getApplicationNo()).collect(Collectors.toSet());
-            List<Demand> demands = searchDemand(tenantId,applicationNos,requestInfo,calculations.get(0).getFeeType());
+            List<Demand> demands = searchDemand(tenantId,applicationNos,requestInfo,calculations.get(0));
             Set<String> applicationNumbersFromDemands = new HashSet<>();
             if(!CollectionUtils.isEmpty(demands))
                 applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
@@ -117,10 +114,10 @@ public class DemandService {
         for(Calculation calculation : calculations) {
 
             List<Demand> searchResult = searchDemand(calculation.getTenantId(),Collections.singleton(calculation.getBpa().getApplicationNo())
-                    , requestInfo,calculation.getFeeType());
+                    , requestInfo,calculation);
 
             if(CollectionUtils.isEmpty(searchResult))
-                throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getBpa().getApplicationNo());
+                throw new CustomException(BPACalculatorConstants.INVALID_UPDATE,"No demand exists for applicationNumber: "+calculation.getBpa().getApplicationNo());
 
             Demand demand = searchResult.get(0);
             List<DemandDetail> demandDetails = demand.getDemandDetails();
@@ -193,10 +190,11 @@ public class DemandService {
      * @param requestInfo The RequestInfo of the incoming request
      * @return Lis to demands for the given consumerCode
      */
-    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo,String feeType){
+    private List<Demand> searchDemand(String tenantId,Set<String> consumerCodes,RequestInfo requestInfo,Calculation calculation){
+    	String feeType = calculation.getFeeType();
         String uri = utils.getDemandSearchURL();
         uri = uri.replace("{1}",tenantId);
-        uri = uri.replace("{2}",(utils.getBillingBusinessService(feeType)));
+        uri = uri.replace("{2}",(utils.getBillingBusinessService(calculation.getBpa().getBusinessService(), feeType)));
         uri = uri.replace("{3}",StringUtils.join(consumerCodes, ','));
 
         Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),RequestInfoWrapper.builder()
@@ -207,7 +205,7 @@ public class DemandService {
              response = mapper.convertValue(result,DemandResponse.class);
         }
         catch (IllegalArgumentException e){
-            throw new CustomException("PARSING ERROR","Failed to parse response from Demand Search");
+            throw new CustomException(BPACalculatorConstants.PARSING_ERROR,"Failed to parse response from Demand Search");
         }
 
         if(CollectionUtils.isEmpty(response.getDemands()))
@@ -232,11 +230,11 @@ public class DemandService {
             if(calculation.getBpa()!=null) {
             	 	bpa = calculation.getBpa();
             } else if(calculation.getApplicationNumber()!=null) {
-            		bpa = utils.getBuildingPlan(requestInfo, calculation.getApplicationNumber(), calculation.getTenantId());
+            		bpa = bpaService.getBuildingPlan(requestInfo, calculation.getTenantId(), calculation.getApplicationNumber(), null);
             }
             
             if (bpa == null)
-                throw new CustomException("INVALID APPLICATIONNUMBER", "Demand cannot be generated for applicationNumber " +
+                throw new CustomException(BPACalculatorConstants.INVALID_APPLICATION_NUMBER, "Demand cannot be generated for applicationNumber " +
                         calculation.getApplicationNumber() + "  Building plan application with this number does not exist ");
 
             String tenantId = calculation.getTenantId();
@@ -276,7 +274,7 @@ public class DemandService {
                     .taxPeriodFrom( startCal.getTimeInMillis())
                     .taxPeriodTo(endCal.getTimeInMillis())
                     .consumerType("BPA")
-                    .businessService(utils.getBillingBusinessService(calculation.getFeeType()))
+                    .businessService(utils.getBillingBusinessService(bpa.getBusinessService(),calculation.getFeeType()))
                     .build());
         }
         return demandRepository.saveDemand(requestInfo,demands);

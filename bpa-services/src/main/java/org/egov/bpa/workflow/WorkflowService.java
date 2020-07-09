@@ -2,6 +2,8 @@ package org.egov.bpa.workflow;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.bpa.web.model.workflow.BusinessService;
@@ -48,7 +50,7 @@ public class WorkflowService {
 		try {
 			response = mapper.convertValue(result, BusinessServiceResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse response of calculate");
+			throw new CustomException(BPAErrorConstants.PARSING_ERROR, "Failed to parse response of calculate");
 		}
 		return response.getBusinessServices().get(0);
 	}
@@ -70,19 +72,8 @@ public class WorkflowService {
 		url.append("?tenantId=");
 		url.append(bpa.getTenantId());
 		if (businessService) {
-			if(bpa.getRiskType()!=null){
-			if (bpa.getRiskType().toString().equalsIgnoreCase("LOW")) {
-				url.append("&businessServices=");
-				url.append(config.getLowBusinessServiceValue());
-			} else {
-
-				url.append("&businessServices=");
-				url.append(config.getBusinessServiceValue());
-			}
-			}else{
 				url.append("&businessServices=");
 				url.append(bpa.getBusinessService());
-			}
 		} else {
 			url.append("&businessIds=");
 			url.append(applicationNo);

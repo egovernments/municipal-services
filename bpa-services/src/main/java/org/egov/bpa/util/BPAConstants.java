@@ -61,9 +61,9 @@ public class BPAConstants {
 
 	// error constants
 
-	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
-
-	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
+//	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
+//
+//	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
 
 	// mdms master names
 
@@ -131,6 +131,8 @@ public class BPAConstants {
 	public static final String ACTION_CANCEL = "CANCEL";
 
 	public static final String ACTION_PAY = "PAY";
+	
+	public static final String ACTION_SKIP_PAY = "SKIP_PAYMENT";
 
 	public static final String ACTION_ADHOC = "ADHOC";
 
@@ -143,6 +145,8 @@ public class BPAConstants {
 	public static final String STATUS_APPROVED = "APPROVED";
 
 	public static final String STATUS_REJECTED = "REJECTED";
+
+	public static final String STATUS_REVOCATED = "PERMIT REVOCATION";
 
 	public static final String STATUS_DOCUMENTVERIFICATION = "INPROGRESS";
 
@@ -201,6 +205,9 @@ public class BPAConstants {
 	public static final String USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
 	public static final String USREVENTS_EVENT_NAME = "Building Plan";
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-BPA";
+	
+	public static final String FI_STATUS = "FIELDINSPECTION_INPROGRESS";
+	public static final String FI_ADDITIONALDETAILS = "fieldinspection_pending";
 
 	// OCCUPANCY TYPE
 
@@ -212,6 +219,8 @@ public class BPAConstants {
 	public static final String LOW_RISK_PERMIT_FEE_KEY = "LOW_RISK_PERMIT_FEE";
 
 	public static final String SANC_FEE_STATE = "PENDING_SANC_FEE_PAYMENT";
+	public static final String APPL_FEE_STATE = "PENDING_APPL_FEE";
+	public static final String BPA_LOW_APPL_FEE_STATE = "PENDING_FEE";
 	public static final String APPROVED_STATE = "APPROVED";
 	public static final String DOCVERIFICATION_STATE = "DOC_VERIFICATION_PENDING";
 
@@ -295,7 +304,7 @@ public class BPAConstants {
 
 	public static final String SEARCH_MODULE = "rainmaker-bpa";
 
-	public static final String INVALID_SEARCH = "INVALID SEARCH";
+//	public static final String INVALID_SEARCH = "INVALID SEARCH";
 
 	public static final String INVALID_UPDATE = "INVALID UPDATE";
 
@@ -305,7 +314,7 @@ public class BPAConstants {
 
 	public static final String LOW_RISKTYPE = "LOW";
 
-	public static final String EDCR_PDF = "EdcrReport.pdf";
+	public static final String EDCR_PDF = "ScrutinyReport.pdf";
 
 	public static final String PERMIT_ORDER_NO = "BPA_PDF_PLANPERMISSION_NO";
 
@@ -316,4 +325,22 @@ public class BPAConstants {
 	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
 
 	public static final String HIGH_RISKTYPE = "HIGH";
+
+	public static final String BUILDING_PLAN = "BUILDING_PLAN_SCRUTINY";
+	
+	public static final String BUILDING_PLAN_OC = "BUILDING_OC_PLAN_SCRUTINY";
+
+	public static final String BPA_OC_MODULE_CODE = "BPA_OC";
+
+	public static final String OC_OCCUPANCY = "$.edcrDetail[0].planDetail.planInformation.occupancy";
+
+	public static final String OC_KHATHANO = "$.edcrDetail[0].planDetail.planInformation.khataNo";
+
+	public static final String OC_PLOTNO = "$.edcrDetail[0].planDetail.planInformation.plotNo";
+	
+	public static final String SERVICETYPE = "serviceType";
+	
+	public static final String APPLICATIONTYPE = "applicationType";
+	
+	public static final String PERMIT_NO = "permitNumber";
 }

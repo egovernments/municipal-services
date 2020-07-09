@@ -40,6 +40,7 @@ public class BPASearchCriteria {
 	    private String mobileNumber;
 
 	    @JsonProperty("landId")
+	    @JsonIgnore
 	    private List<String> landId;
 
 	    @JsonProperty("offset")
@@ -50,29 +51,38 @@ public class BPASearchCriteria {
 	      
 	    @JsonProperty("approvalDate")
 	    private Long approvalDate;
+	    
+	    @JsonProperty("fromDate")
+	    private Long fromDate;
 
-	    @JsonProperty("applicationType")
-	    private String applicationType;
-
-	    @JsonProperty("serviceType")
-	    private String serviceType;
+	    @JsonProperty("toDate")
+	    private Long toDate;
 	    
 	    @JsonIgnore
 	    private List<String> ownerIds;
+
+	    @JsonProperty("businessService")
+	    @JsonIgnore
+	    private List<String> businessService;
+	    
+	    @JsonProperty("createdBy")
+	    @JsonIgnore
+	    private List<String> createdBy;
 
 		
 	    public boolean isEmpty() {
 	        return (this.tenantId == null && this.status == null && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
-	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
-	                
+	                && this.approvalDate == null && this.ownerIds == null
+	                && this.businessService == null
 	        );
 	    }
 
 	    public boolean tenantIdOnly() {
 	        return (this.tenantId != null&& this.status == null  && this.ids == null && this.applicationNo == null
 	                && this.mobileNumber == null && this.landId == null && this.edcrNumber == null && this.approvalNo == null 
-	                && this.applicationType == null && this.serviceType == null && this.approvalDate == null && this.ownerIds == null
+	                && this.approvalDate == null && this.ownerIds == null
+	                && this.businessService == null
 	        );
 	    }
 }

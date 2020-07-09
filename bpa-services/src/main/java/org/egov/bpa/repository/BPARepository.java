@@ -71,9 +71,9 @@ public class BPARepository {
 	 *            The BPA Search criteria
 	 * @return List of BPA from search
 	 */
-	public List<BPA> getBPAData(BPASearchCriteria criteria) {
+	public List<BPA> getBPAData(BPASearchCriteria criteria, List<String> edcrNos) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getBPASearchQuery(criteria, preparedStmtList);
+		String query = queryBuilder.getBPASearchQuery(criteria, preparedStmtList, edcrNos);
 		List<BPA> BPAData = jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 		return BPAData;
 	}

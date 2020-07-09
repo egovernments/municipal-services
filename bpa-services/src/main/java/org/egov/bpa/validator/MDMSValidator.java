@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.bpa.util.BPAConstants;
+import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPARequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
@@ -59,8 +60,8 @@ public class MDMSValidator {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
 			} catch (Exception e) {
 				log.error("Error while fetvhing MDMS data", e);
-				throw new CustomException(BPAConstants.INVALID_TENANT_ID_MDMS_KEY,
-						BPAConstants.INVALID_TENANT_ID_MDMS_MSG);
+				throw new CustomException(BPAErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
+						BPAErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
 			}
 		});
 		return mdmsResMap;

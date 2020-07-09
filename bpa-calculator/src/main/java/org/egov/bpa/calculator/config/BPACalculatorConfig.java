@@ -44,7 +44,7 @@ public class BPACalculatorConfig {
   
 
     //tradelicense Registry
-    @Value("${egov.bpa.host}")
+    @Value("${egov.tradelicense.host}")
     private String bpaHost;
 
     @Value("${egov.bpa.context.path}")
@@ -85,6 +85,15 @@ public class BPACalculatorConfig {
 	@Value("${egov.low.sanc.fee}")
 	private String baseLowSancFeeHead;
 
+    @Value("${egov.oc.appl.fee}")
+    private String OCApplFee;
+    
+	@Value("${egov.oc.sanc.fee}")
+	private String OCSancFee;
+	
+	@Value("${egov.oc.appl.fee.defaultAmount}")
+	private String OCApplFeeDefaultAmount;
+
 
     //MDMS
     @Value("${egov.mdms.host}")
@@ -106,7 +115,13 @@ public class BPACalculatorConfig {
     
     @Value("${egov.demand.lowriskpermit.businessservice}")
     private String lowRiskPermitFeeBusinessService;
-
+    
+    @Value("${egov.demand.oc.appl.businessservice}")
+    private String OCApplBusinessservice;
+    
+    @Value("${egov.demand.oc.sanc.businessservice}")
+    private String OCSancBusinessservice;
+    
     //CalculaterType Default Values
 //    @Value("${egov.tl.calculationtype.tradetype.default}")
 //    private String defaultTradeUnitCalculationType;

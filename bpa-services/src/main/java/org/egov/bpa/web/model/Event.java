@@ -3,6 +3,8 @@ package org.egov.bpa.web.model;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import org.egov.bpa.web.model.landInfo.Source;
+import org.egov.bpa.web.model.landInfo.Status;
 import org.egov.bpa.web.model.workflow.Action;
 
 import lombok.AllArgsConstructor;

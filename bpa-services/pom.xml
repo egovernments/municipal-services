@@ -6,12 +6,11 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.22.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>2.2.6.RELEASE</version>
 	</parent>
 	<groupId>org.egov</groupId>
 	<artifactId>bpa-services</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>bpa-services</name>
 
 	<properties>
@@ -56,9 +55,9 @@
 			<version>3.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.egov.services</groupId>
-			<artifactId>tracer</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
+		  <groupId>org.egov.services</groupId>
+		  <artifactId>tracer</artifactId>
+		  <version>2.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.egov.services</groupId>
@@ -138,6 +137,38 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+			  <groupId>cz.habarta.typescript-generator</groupId>
+			  <artifactId>typescript-generator-maven-plugin</artifactId>
+			  <version>2.22.595</version>
+			  <executions>
+			    <execution>
+			      <id>generate</id>
+			      <goals>
+			        <goal>generate</goal>
+			      </goals>
+			      <phase>process-classes</phase>
+			    </execution>
+			  </executions>
+			  <configuration>
+			    <jsonLibrary>jackson2</jsonLibrary>
+			    <classes>
+			      <class>org.egov.bpa.web.model.BPAResponse</class>
+			      <class>org.egov.bpa.web.model.BPARequest</class>
+			      <class>org.egov.bpa.web.model.BPASearchCriteria</class>
+			    </classes>
+			    <customTypeMappings>
+			      <customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+			      <customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
+			      <customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>			      
+			      <customTypeMapping>org.egov.bpa.web.model.Document:Document</customTypeMapping>
+			      <customTypeMapping>org.egov.bpa.web.model.AuditDetails:AuditDetails</customTypeMapping>
+			    </customTypeMappings>
+			    <namespace>Digit</namespace>
+			    <debug>true</debug>
+			    <outputKind>module</outputKind>
+			  </configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,22 +1,34 @@
 package org.egov.bpa.util;
 
+import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.web.model.AuditDetails;
+import org.egov.bpa.web.model.BPA;
+import org.egov.bpa.web.model.BPARequest;
+import org.egov.bpa.web.model.RequestInfoWrapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
+import org.egov.tracer.model.CustomException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -106,7 +118,7 @@ public class BPAUtil {
 
 	}
 
-	private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
+	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
 		List<ModuleDetail> moduleDetails = new LinkedList<>();
@@ -148,4 +160,83 @@ public class BPAUtil {
 			}
 		});
 	}
+
+	public ArrayList<String> getBusinessService(String applicationType, String serviceType) {
+		Map<String, Map<String, String>> appSrvTypeBussSrvCode = config.getAppSrvTypeBussSrvCode();
+		String[] codes = null;
+		Map<String, String> serviceTypeMap = appSrvTypeBussSrvCode.get(applicationType);
+		if (!CollectionUtils.isEmpty(serviceTypeMap)) {
+			if (serviceType != null) {
+				String serviceCodes = serviceTypeMap.get(serviceType);
+				codes = serviceCodes.split(",");
+			} else {
+				codes = (String[]) serviceTypeMap.values().toArray(new String[serviceTypeMap.size()]);
+				codes = codes[0].toString().split(",");
+			}
+		}else{
+			codes = new String[0];
+		}
+		return  new ArrayList<String>(Arrays.asList(codes));
+	}
+
+	public BigDecimal getDemandAmount(BPARequest bpaRequest) {
+		BPA bpa = bpaRequest.getBPA();
+		RequestInfo requestInfo = bpaRequest.getRequestInfo();
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getBillUri(bpa),
+				new RequestInfoWrapper(requestInfo));
+		JSONObject jsonObject = new JSONObject(responseMap);
+		double amount = 0.0;
+		try {
+			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
+			if (demandArray != null && demandArray.length() > 0) {
+				JSONObject firstElement = (JSONObject) demandArray.get(0);
+				if (firstElement != null) {
+					JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+					if (demandDetails != null) {
+						for (int i = 0; i < demandDetails.length(); i++) {
+							JSONObject object = (JSONObject) demandDetails.get(i);
+							Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+							amount = amount + taxAmt;
+						}
+					}
+				}
+			}
+			return BigDecimal.valueOf(amount);
+		} catch (Exception e) {
+			throw new CustomException("PARSING ERROR", "Failed to parse the response using jsonPath: " + BILL_AMOUNT);
+		}
+	}
+
+	private StringBuilder getBillUri(BPA bpa) {
+		String status = bpa.getStatus().toString();
+		String code = null;
+
+		if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_MODULE)) {
+			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)) {
+				code = "BPA.NC_APP_FEE";
+			} else {
+				code = "BPA.NC_SAN_FEE";
+			}
+		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)) {
+			if (status.equalsIgnoreCase(BPAConstants.BPA_LOW_APPL_FEE_STATE))
+				code = "BPA.LOW_RISK_PERMIT_FEE";
+		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
+			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)) {
+				code = "BPA.NC_OC_APP_FEE";
+			} else {
+				code = "BPA.NC_OC_SAN_FEE";
+			}
+		}
+
+		StringBuilder builder = new StringBuilder(config.getBillingHost());
+		builder.append(config.getDemandSearchEndpoint());
+		builder.append("?tenantId=");
+		builder.append(bpa.getTenantId());
+		builder.append("&consumerCode=");
+		builder.append(bpa.getApplicationNo());
+		builder.append("&businessService=");
+		builder.append(code);
+		return builder;
+	}
+
 }

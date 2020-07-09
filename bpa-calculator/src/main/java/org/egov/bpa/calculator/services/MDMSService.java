@@ -11,7 +11,6 @@ import org.egov.bpa.calculator.config.BPACalculatorConfig;
 import org.egov.bpa.calculator.repository.ServiceRequestRepository;
 import org.egov.bpa.calculator.utils.BPACalculatorConstants;
 import org.egov.bpa.calculator.web.models.CalculationReq;
-import org.egov.bpa.calculator.web.models.RequestInfoWrapper;
 import org.egov.bpa.calculator.web.models.bpa.BPA;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -19,9 +18,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.ServiceCallException;
 import org.json.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +40,9 @@ public class MDMSService {
 
 	@Autowired
 	private BPACalculatorConfig config;
+
+	@Autowired
+	private EDCRService edcrService;
 	
     public Object mDMSCall(CalculationReq calculationReq,String tenantId){
         MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(calculationReq,tenantId);
@@ -94,31 +94,42 @@ public class MDMSService {
      * @param license The tradeLicense for which calculation is done
      * @return Map contianing the calculationType for TradeUnit and accessory
      */
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
 	public Map getCalculationType(RequestInfo requestInfo,BPA bpa,Object mdmsData, String feeType){
         HashMap<String,Object> calculationType = new HashMap<>();
         try {
-        	
-           
-
             List jsonOutput = JsonPath.read(mdmsData, BPACalculatorConstants.MDMS_CALCULATIONTYPE_PATH);
-            Map<String, String> edcrResponse = getEDCRDetails(requestInfo, bpa);
-            log.info("applicationType is " + edcrResponse.get("applicationType"));
-            log.info("serviceType is " + edcrResponse.get("serviceType"));
-            String filterExp = "$.[?((@.applicationType == '"+ edcrResponse.get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
+            LinkedHashMap responseMap = edcrService.getEDCRDetails(requestInfo, bpa);
+            
+            String jsonString = new JSONObject(responseMap).toString();
+    		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
+    		Map<String, String> additionalDetails = new HashMap<String, String>();
+    		JSONArray serviceType = context.read("edcrDetail.*.applicationSubType");
+    		if (CollectionUtils.isEmpty(serviceType)) {
+    			serviceType.add("NEW_CONSTRUCTION");
+    		}
+    		JSONArray applicationType = context.read("edcrDetail.*.appliactionType");
+    		if (StringUtils.isEmpty(applicationType)) {
+    			applicationType.add("permit");
+    		}
+    		additionalDetails.put("serviceType", serviceType.get(0).toString());
+    		additionalDetails.put("applicationType", applicationType.get(0).toString());
+            
+    		
+            log.debug("applicationType is " + additionalDetails.get("applicationType"));
+            log.debug("serviceType is " + additionalDetails.get("serviceType"));
+            String filterExp = "$.[?((@.applicationType == '"+ additionalDetails.get("applicationType")+"' || @.applicationType === 'ALL' ) &&  @.feeType == '"+feeType+"')]";
             List<Object> calTypes = JsonPath.read(jsonOutput, filterExp);
             
-            filterExp = "$.[?(@.serviceType == '"+ edcrResponse.get("serviceType")+"' || @.serviceType === 'ALL' )]";
+            filterExp = "$.[?(@.serviceType == '"+ additionalDetails.get("serviceType")+"' || @.serviceType === 'ALL' )]";
             calTypes = JsonPath.read(calTypes, filterExp);
             
             filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' || @.riskType === 'ALL' )]";
             calTypes = JsonPath.read(calTypes, filterExp);
             
             if(calTypes.size() > 1){
-            	
 	            	filterExp = "$.[?(@.riskType == '"+bpa.getRiskType()+"' )]";
 	            	calTypes  = JsonPath.read(calTypes, filterExp);
-	            	
             }
             
             if(calTypes.size() == 0) {
@@ -127,7 +138,6 @@ public class MDMSService {
             
              Object obj = calTypes.get(0);
            
-          
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
             
            String financialYear = currentYear + "-" + (currentYear + 1);
@@ -136,56 +146,16 @@ public class MDMSService {
             calculationType = (HashMap<String, Object>) obj;
         }
         catch (Exception e){
-            throw new CustomException("CALCULATION_ERROR", "Failed to get calculationType");
+            throw new CustomException(BPACalculatorConstants.CALCULATION_ERROR, "Failed to get calculationType");
         }
 
         return calculationType;
     }
    
-	@SuppressWarnings("rawtypes")
-	public Map<String, String> getEDCRDetails(RequestInfo requestInfo, BPA bpa) {
-
-		String edcrNo = bpa.getEdcrNumber();
-		StringBuilder uri = new StringBuilder(config.getEdcrHost());
-
-		uri.append(config.getGetPlanEndPoint());
-		uri.append("?").append("tenantId=").append(bpa.getTenantId());
-		uri.append("&").append("edcrNumber=").append(edcrNo);
-		RequestInfo edcrRequestInfo = new RequestInfo();
-		BeanUtils.copyProperties(requestInfo, edcrRequestInfo);
-		edcrRequestInfo.setUserInfo(null); //since EDCR service is not accepting userInfo
-		LinkedHashMap responseMap = null;
-		try {
-			responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
-					new RequestInfoWrapper(edcrRequestInfo));
-		} catch (ServiceCallException se) {
-			throw new CustomException("EDCR ERROR", " EDCR Number is Invalid");
-		}
-
-		if (CollectionUtils.isEmpty(responseMap))
-			throw new CustomException("EDCR ERROR", "The response from EDCR service is empty or null");
-
-		String jsonString = new JSONObject(responseMap).toString();
-		DocumentContext context = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonString);
-		Map<String, String> additionalDetails = new HashMap<String, String>();
-		JSONArray serviceType = context.read("edcrDetail.*.planDetail.planInformation.serviceType");
-		if (CollectionUtils.isEmpty(serviceType)) {
-			serviceType.add("NEW_CONSTRUCTION");
-		}
-		JSONArray applicationType = context.read("edcrDetail.*.appliactionType");
-		if (StringUtils.isEmpty(applicationType)) {
-			applicationType.add("permit");
-		}
-		additionalDetails.put("serviceType", serviceType.get(0).toString());
-		additionalDetails.put("applicationType", applicationType.get(0).toString());
-
-		return additionalDetails;
-	}
-	
     /**
      * Creates and return default calculationType values as map
      * @return default calculationType Map
-     */
+     */	
     private Map defaultMap(String feeType){
         Map defaultMap = new HashMap();
         String feeAmount = ( feeType.equalsIgnoreCase(BPACalculatorConstants.MDMS_CALCULATIONTYPE_APL_FEETYPE) ) ? config.getApplFeeDefaultAmount() : config.getSancFeeDefaultAmount();
@@ -193,29 +163,5 @@ public class MDMSService {
         return defaultMap;
     }
 
-
-    /**
-     * Gets the startDate and the endDate of the financialYear
-     * @param requestInfo The RequestInfo of the calculationRequest
-     * @param license The tradeLicense for which calculation is done
-     * @return Map containing the startDate and endDate
-     */
-   /* public Map<String,Long> getTaxPeriods(RequestInfo requestInfo,BPA bpa,Object mdmsData){
-        Map<String,Long> taxPeriods = new HashMap<>();
-        try {
-            String jsonPath = BPACalculatorConstants.MDMS_FINACIALYEAR_PATH.replace("{}","2019-20");
-            List<Map<String,Object>> jsonOutput =  JsonPath.read(mdmsData, jsonPath);
-            Map<String,Object> financialYearProperties = jsonOutput.get(0);
-            Object startDate = financialYearProperties.get(BPACalculatorConstants.MDMS_STARTDATE);
-            Object endDate = financialYearProperties.get(BPACalculatorConstants.MDMS_ENDDATE);
-            taxPeriods.put(BPACalculatorConstants.MDMS_STARTDATE,(Long) startDate);
-            taxPeriods.put(BPACalculatorConstants.MDMS_ENDDATE,(Long) endDate);
-
-        } catch (Exception e) {
-            log.error("Error while fetvhing MDMS data", e);
-            throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+"2019-20");
-        }
-        return taxPeriods;
-    }*/
 
 }
