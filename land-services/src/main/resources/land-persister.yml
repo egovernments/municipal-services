@@ -83,14 +83,12 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_land_ownerInfo( id, uuid, isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: LandInfo.owners.*
          jsonMaps:
           - jsonPath: $.LandInfo.owners.*.ownerId
 
           - jsonPath: $.LandInfo.owners.*.uuid
-
-          - jsonPath: $.LandInfo.owners.*.mobileNumber
 
           - jsonPath: $.LandInfo.owners.*.isPrimaryOwner
 
@@ -220,7 +218,6 @@ serviceMaps:
           - jsonPath: $.LandInfo.id
 
 
-
  - version: 1.0
    description: update LandInfo details in eg_land_landinfo table
    fromTopic: update-landinfo
@@ -317,14 +314,12 @@ serviceMaps:
           - jsonPath: $.LandInfo.address.geoLocation.id
 
 
-       - query: INSERT INTO eg_land_ownerInfo( id, uuid, mobilenumber,isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landInfoId) WHERE id IS NOT NULL DO UPDATE SET uuid = ?, mobilenumber=?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
+       - query: INSERT INTO eg_land_ownerInfo( id, uuid, isprimaryowner, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landInfoId) WHERE id IS NOT NULL DO UPDATE SET uuid = ?, isPrimaryOwner=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
          basePath: LandInfo.owners.*
          jsonMaps:
           - jsonPath: $.LandInfo.owners.*.ownerId
 
           - jsonPath: $.LandInfo.owners.*.uuid
-
-          - jsonPath: $.LandInfo.owners.*.mobileNumber
 
           - jsonPath: $.LandInfo.owners.*.isPrimaryOwner
 
@@ -349,8 +344,6 @@ serviceMaps:
           - jsonPath: $.LandInfo.owners.*.auditDetails.lastModifiedTime
 
           - jsonPath: $.LandInfo.owners.*.uuid
-
-          - jsonPath: $.LandInfo.owners.*.mobileNumber
 
           - jsonPath: $.LandInfo.owners.*.isPrimaryOwner
 
@@ -474,3 +467,4 @@ serviceMaps:
           - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedBy
 
           - jsonPath: $.LandInfo.unit.*.auditDetails.lastModifiedTime
+          
