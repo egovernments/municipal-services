@@ -75,22 +75,31 @@ public class SWQueryBuilder {
 		if(criteria.isEmpty())
 			return null;
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
+		boolean propertyIdsPresent = false;
 		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
-				query.append(" conn.property_id in (").append(createQuery(propertyIds)).append(" )");
+				query.append(" (conn.property_id in (").append(createQuery(propertyIds)).append(" )");
 				addToPreparedStatement(preparedStatement, propertyIds);
+				propertyIdsPresent = true;
 			}
 		}
 		if(!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> uuids = userService.getUUIDForUsers(criteria.getMobileNumber(), criteria.getTenantId(), requestInfo);
+			boolean userIdsPresent = false;
 			if (!CollectionUtils.isEmpty(uuids)) {
 				addORClauseIfRequired(preparedStatement, query);
-				query.append(" connectionholder.userid in (").append(createQuery(uuids)).append(" )");
+				if(!propertyIdsPresent)
+					query.append("(");
+				query.append(" connectionholder.userid in (").append(createQuery(uuids)).append(" ))");
 				addToPreparedStatement(preparedStatement, uuids);
+				userIdsPresent = true;
+			}
+			if(propertyIdsPresent && !userIdsPresent){
+				query.append(")");
 			}
 		}
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
