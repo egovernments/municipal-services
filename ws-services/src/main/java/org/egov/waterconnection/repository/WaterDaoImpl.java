@@ -59,7 +59,7 @@ public class WaterDaoImpl implements WaterDao {
 			return Collections.emptyList();
 //		if (log.isDebugEnabled()) {
 			StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
-			log.debug(str.toString());
+			log.info(str.toString());
 //		}
 		List<WaterConnection> waterConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
 				waterRowMapper);
