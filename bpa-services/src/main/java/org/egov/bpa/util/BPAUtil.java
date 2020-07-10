@@ -102,6 +102,7 @@ public class BPAUtil {
 		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.USAGES).filter(filterCode).build());
 		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CalculationType).build());
 		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.CHECKLIST_NAME).build());
+		bpaMasterDtls.add(MasterDetail.builder().name(BPAConstants.NOC_TYPE_MAPPING).build());
 		ModuleDetail bpaModuleDtls = ModuleDetail.builder().masterDetails(bpaMasterDtls)
 				.moduleName(BPAConstants.BPA_MODULE).build();
 
@@ -113,8 +114,15 @@ public class BPAUtil {
 		commonMasterDetails.add(MasterDetail.builder().name(BPAConstants.DOCUMENT_TYPE).filter(filterCode).build());
 		ModuleDetail commonMasterMDtl = ModuleDetail.builder().masterDetails(commonMasterDetails)
 				.moduleName(BPAConstants.COMMON_MASTERS_MODULE).build();
+		
+		// master details for NOC module
+		List<MasterDetail> nocMasterDetails = new ArrayList<>();
+		nocMasterDetails
+				.add(MasterDetail.builder().name(BPAConstants.NOC_TYPE).build());
+		ModuleDetail nocMDtl = ModuleDetail.builder().masterDetails(nocMasterDetails)
+				.moduleName(BPAConstants.NOC_MODULE).build();
 
-		return Arrays.asList(bpaModuleDtls, commonMasterMDtl);
+		return Arrays.asList(bpaModuleDtls, commonMasterMDtl, nocMDtl);
 
 	}
 
