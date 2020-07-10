@@ -70,7 +70,7 @@ public class EnrichmentService {
 		additionalDetail.put(WCConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 		//Setting ApplicationType
-		waterConnectionRequest.getWaterConnection().setApplicationType("NEW_WATER_CONNECTION");
+		waterConnectionRequest.getWaterConnection().setApplicationType(WCConstants.NEW_WATER_APP_STATUS);
 		setApplicationIdgenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
 	}

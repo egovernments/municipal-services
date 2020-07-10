@@ -198,5 +198,5 @@ public class SWConstants {
 
 	public static final String APPROVE_CONNECTION = "APPROVE_CONNECTION";
 
-	public static final String NEW_SEWERAGE_APP_STATUS ="NEW_SEWERAGE_CONNECTION";
+	public static final String NEW_SEWERAGE_APP_STATUS ="NEW_SEWERAGE_APPLICATION";
 }

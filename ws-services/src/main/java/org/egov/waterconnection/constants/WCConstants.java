@@ -223,4 +223,12 @@ public class WCConstants {
 	public static final int UPDATE_APPLICATION = 1;
 	public static final int MODIFY_CONNECTION =  2;
 
+	public static final String WATER_SERVICE_BUSINESS_ID = "WS";
+
+	public static final String NEW_WATER_APP_STATUS ="NEW_WATER_APPLICATION";
+
+	public static final String PAYMENT_NOTIFICATION_APP = "WS_PAYMENT_NOTIFICATION_APP";
+
+	public static final String PAYMENT_NOTIFICATION_SMS = "WS_PAYMENT_NOTIFICATION_SMS";
+
 }
