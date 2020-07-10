@@ -158,6 +158,7 @@ public class PaymentUpdateService {
 	 */
 	public void processRecieptRequest(HashMap<String, Object> record) {
 		try {
+			log.info("Payment Notification consumer :");
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {

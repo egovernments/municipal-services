@@ -199,4 +199,10 @@ public class SWConstants {
 	public static final String APPROVE_CONNECTION = "APPROVE_CONNECTION";
 
 	public static final String NEW_SEWERAGE_APP_STATUS ="NEW_SEWERAGE_APPLICATION";
+
+	public static final String SEWERAGE_SERVICE_BUSINESS_ID = "SW";
+
+	public static final String PAYMENT_NOTIFICATION_APP = "SW_PAYMENT_NOTIFICATION_APP";
+
+	public static final String PAYMENT_NOTIFICATION_SMS = "SW_PAYMENT_NOTIFICATION_SMS";
 }
