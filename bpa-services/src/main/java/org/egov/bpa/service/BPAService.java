@@ -95,6 +95,9 @@ public class BPAService {
 	private UserService userService;
 	
 	@Autowired
+	private NocService nocService;
+	
+	@Autowired
 	private BPAConfiguration config;
 	
 	public BPA create(BPARequest bpaRequest) {
@@ -143,7 +146,7 @@ public class BPAService {
 		}
 		enrichmentService.enrichBPACreateRequest(bpaRequest, mdmsData, values);
 		wfIntegrator.callWorkFlow(bpaRequest);
-
+		nocService.createNocRequest(bpaRequest, mdmsData);
 		if (bpaRequest.getBPA().getRiskType().equals(BPAConstants.LOW_RISKTYPE) && !applicationType.equalsIgnoreCase(BPAConstants.BUILDING_PLAN_OC)) {
 			calculationService.addCalculation(bpaRequest, BPAConstants.LOW_RISK_PERMIT_FEE_KEY);
 		} else {
@@ -358,9 +361,9 @@ public class BPAService {
 		}
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
+		nocService.manageNocWorkflowAction(bpaRequest, mdmsData);
+		bpaValidator.validatePreEnrichData(bpaRequest, mdmsData);
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
-		
-		bpaValidator.validateWorkflowActions(bpaRequest);
 		
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REJECT)
 				|| bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_REVOCATE))) {
@@ -369,6 +372,7 @@ public class BPAService {
 				throw new CustomException(BPAErrorConstants.BPA_UPDATE_ERROR_COMMENT_REQUIRED,
 						"Comment is mandaotory, please provide the comments ");
 			}
+			nocService.handleBPARejectedStateForNoc(bpaRequest);
 
 		} else {
 			if (!bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)) {
