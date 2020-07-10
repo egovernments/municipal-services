@@ -152,13 +152,15 @@
 						<class>org.egov.wscalculation.web.models.DemandResponse</class>
 						<class>org.egov.wscalculation.web.models.AdhocTaxReq</class>
 						<class>org.egov.wscalculation.web.models.RequestInfoWrapper</class>
+						<class>org.egov.wscalculation.web.models.users.User</class>
+					        <class>org.egov.common.contract.request.User</class>
 					</classes>
 					<customTypeNaming>
 						<typeNaming>org.egov.wscalculation.web.models.Demand$StatusEnum:DemandStatus</typeNaming>
 						<typeNaming>org.egov.wscalculation.web.models.Connection$StatusEnum:ConnectionStatus</typeNaming>
+						<typeNaming>org.egov.wscalculation.web.models.users.User:WaterUserStatus</typeNaming>
+						<typeNaming>org.egov.common.contract.request.User:User</typeNaming>
 					</customTypeNaming>
-					<customTypeMapping>org.egov.wscalculation.web.models.users.User:User</customTypeMapping>
-					<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
 					<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
 					<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
 					<namespace>Digit</namespace>
