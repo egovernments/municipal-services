@@ -1,7 +1,12 @@
 package org.egov.swservice.service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -73,7 +78,6 @@ public class WorkflowNotificationService {
 	private ValidateProperty validateProperty;
 
 	String tenantIdReplacer = "$tenantId";
-	String fileStoreIdsReplacer = "$.filestoreIds";
 	String urlReplacer = "url";
 	String requestInfoReplacer = "RequestInfo";
 	String sewerageConnectionReplacer = "SewerageConnection";
@@ -95,9 +99,7 @@ public class WorkflowNotificationService {
 	 */
 	public void process(SewerageConnectionRequest request, String topic) {
 		try {
-			String applicationStatus = workflowService.getApplicationStatus(request.getRequestInfo(),
-					request.getSewerageConnection().getApplicationNo(),
-					request.getSewerageConnection().getTenantId());
+			String applicationStatus = request.getSewerageConnection().getApplicationStatus();
 			if (!SWConstants.NOTIFICATION_ENABLE_FOR_STATUS
 					.contains(request.getSewerageConnection().getProcessInstance().getAction() + "_"
 							+ applicationStatus)) {
@@ -138,9 +140,15 @@ public class WorkflowNotificationService {
 	private EventRequest getEventRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
+		int reqType = SWConstants.UPDATE_APPLICATION;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			reqType = SWConstants.MODIFY_CONNECTION;
+		}
+		
 		String message = notificationUtil.getCustomizedMsgForInApp(
 				sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
 			return null;
@@ -150,6 +158,14 @@ public class WorkflowNotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
 		Set<String> mobileNumbers = new HashSet<>(mobileNumberAndMesssage.keySet());
@@ -221,6 +237,15 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(applicationNumberReplacer, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
+			if (code.equalsIgnoreCase("View History Link")) {
+				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
+				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
+				actionLink = actionLink.replace(applicationNumberReplacer,
+						sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
+				actionLink = actionLink.replace("<View History Link>",
+						sewerageServicesUtil.getShortenedURL(actionLink));
+			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);
 			mobileNumberAndMessage.replace(mobileNumber, messageTemplate);
@@ -240,18 +265,31 @@ public class WorkflowNotificationService {
 	private List<SMSRequest> getSmsRequest(SewerageConnectionRequest sewerageConnectionRequest, String topic, Property property, String applicationStatus) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
+		int reqType = SWConstants.UPDATE_APPLICATION;
+		if ((!sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(SWConstants.ACTIVATE_CONNECTION))
+				&& sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+			reqType = SWConstants.MODIFY_CONNECTION;
+		}
 		String message = notificationUtil.getCustomizedMsgForSMS(
 				sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction(), applicationStatus,
-				localizationMessage);
+				localizationMessage, reqType);
 		if (message == null) {
 			log.info("No message Found For Topic : " + topic);
-			return null;
+			return Collections.emptyList();
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
 			if (owner.getMobileNumber() != null)
 				mobileNumbersAndNames.put(owner.getMobileNumber(), owner.getName());
 		});
+		//send the notification to the connection holders
+		if(!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+			sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().forEach(holder -> {
+				if (!StringUtils.isEmpty(holder.getMobileNumber())) {
+					mobileNumbersAndNames.put(holder.getMobileNumber(), holder.getName());
+				}
+			});
+		}
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
@@ -326,6 +364,19 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<connection details page>",
 						sewerageServicesUtil.getShortenedURL(connectionDetaislLink));
 			}
+			if(messageToReplace.contains("<Date effective from>")) {
+				if (sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() != null) {
+					LocalDate date = Instant
+							.ofEpochMilli(sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() > 10 ?
+									sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() :
+									sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() * 1000)
+							.atZone(ZoneId.systemDefault()).toLocalDate();
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					messageToReplace = messageToReplace.replace("<Date effective from>", date.format(formatter));
+				} else {
+					messageToReplace = messageToReplace.replace("<Date effective from>", "");
+				}
+			}
 			messageToReturn.put(mobileAndName.getKey(), messageToReplace);
 		}
 		return messageToReturn;
@@ -381,7 +432,7 @@ public class WorkflowNotificationService {
 	public String getSLAForState(SewerageConnectionRequest sewerageConnectionRequest, Property property) {
 		String resultSla = "";
 		BusinessService businessService = workflowService
-				.getBusinessService(property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
+				.getBusinessService(config.getBusinessServiceValue(), property.getTenantId(), sewerageConnectionRequest.getRequestInfo());
 		if (businessService != null && businessService.getStates() != null && businessService.getStates().size() > 0) {
 			for (State state : businessService.getStates()) {
 				if (SWConstants.PENDING_FOR_CONNECTION_ACTIVATION.equalsIgnoreCase(state.getState())) {

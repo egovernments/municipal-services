@@ -149,9 +149,15 @@
 						<class>org.egov.swcalculation.web.models.AdhocTaxReq</class>
 					</classes>
 					<customTypeNaming>
-						<typeNaming>org.egov.swcalculation.web.models.Demand$StatusEnum:DemandStatus</typeNaming>
-						<typeNaming>org.egov.swcalculation.web.models.Connection$StatusEnum:ConnectionStatus</typeNaming>
+						<typeNaming>org.egov.swcalculation.model.Demand$StatusEnum:DemandStatus</typeNaming>
+						<typeNaming>org.egov.swcalculation.model.Connection$StatusEnum:ConnectionStatus</typeNaming>
 					</customTypeNaming>
+					<customTypeMappings>
+						<customTypeMapping>org.egov.swcalculation.web.models.users.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
+					</customTypeMappings>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
 					<outputKind>module</outputKind>

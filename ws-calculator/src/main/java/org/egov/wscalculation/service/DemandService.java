@@ -19,6 +19,13 @@ import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.producer.WSCalculationProducer;
+import org.egov.wscalculation.repository.DemandRepository;
+import org.egov.wscalculation.repository.ServiceRequestRepository;
+import org.egov.wscalculation.repository.WSCalculationDao;
+import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.validator.WSCalculationWorkflowValidator;
 import org.egov.wscalculation.web.models.Calculation;
 import org.egov.wscalculation.web.models.CalculationCriteria;
 import org.egov.wscalculation.web.models.CalculationReq;
@@ -35,12 +42,6 @@ import org.egov.wscalculation.web.models.TaxHeadEstimate;
 import org.egov.wscalculation.web.models.TaxPeriod;
 import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionRequest;
-import org.egov.wscalculation.producer.WSCalculationProducer;
-import org.egov.wscalculation.repository.DemandRepository;
-import org.egov.wscalculation.repository.ServiceRequestRepository;
-import org.egov.wscalculation.repository.WSCalculationDao;
-import org.egov.wscalculation.util.CalculatorUtil;
-import org.egov.wscalculation.util.WSCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -93,7 +94,9 @@ public class DemandService {
     @Autowired
     private WSCalculationUtil wsCalculationUtil;
 
-
+    @Autowired
+	private WSCalculationWorkflowValidator wsCalulationWorkflowValidator;
+    
 	/**
 	 * Creates or updates Demand
 	 * 
@@ -649,6 +652,10 @@ public class DemandService {
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
 			for (String connectionNo : connectionNos) {
+				Boolean genratedemand = true;
+				wsCalulationWorkflowValidator.applicationValidation(requestInfo,tenantId,connectionNo,genratedemand);
+				if(!genratedemand)
+					continue;
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
