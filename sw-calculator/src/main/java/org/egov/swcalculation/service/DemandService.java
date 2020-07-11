@@ -24,6 +24,7 @@ import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
+import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
@@ -48,7 +49,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import SWCalculationWorkflowValidator.SWCalculationWorkflowValidator;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 

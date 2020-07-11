@@ -1,4 +1,4 @@
-package SWCalculationWorkflowValidator;
+package org.egov.swcalculation.validator;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,22 +9,14 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.swcalculation.config.SWCalculationConfiguration;
-import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.web.models.Property;
-import org.egov.swcalculation.web.models.PropertyResponse;
-import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.SewerageConnection;
-import org.egov.swcalculation.web.models.SewerageConnectionResponse;
 import org.egov.swcalculation.web.models.workflow.ProcessInstance;
-import org.egov.swcalculation.web.models.workflow.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,15 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SWCalculationWorkflowValidator {
 
-    @Autowired
-    private SWCalculationConfiguration configs;
-
-    @Autowired
-    private ServiceRequestRepository serviceRequestRepository;
-
-    @Autowired
-    private ObjectMapper mapper;
-    
     @Autowired
     private CalculatorUtils util;
 
