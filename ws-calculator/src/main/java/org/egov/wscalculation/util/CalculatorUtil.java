@@ -133,16 +133,8 @@ public class CalculatorUtil {
 		if (response == null || CollectionUtils.isEmpty(response.getWaterConnection()))
 			return null;
 
-		Collections.sort(response.getWaterConnection(), new Comparator<WaterConnection>() {
-			@Override
-			public int compare(WaterConnection wc1, WaterConnection wc2) {
-				return wc1.getAuditDetails().getLastModifiedTime()
-						.compareTo(wc2.getAuditDetails().getLastModifiedTime());
-			}
-		});
-
+		Collections.sort(response.getWaterConnection(), Comparator.comparing(wc -> wc.getAuditDetails().getLastModifiedTime()));
 		int size = response.getWaterConnection().size();
-
 		return response.getWaterConnection().get(size - 1);
 	}
 
