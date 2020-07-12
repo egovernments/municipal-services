@@ -71,6 +71,9 @@ public class WaterDaoImpl implements WaterDao {
 
 	@Override
 	public void updateWaterConnection(WaterConnectionRequest waterConnectionRequest, boolean isStateUpdatable) {
+		if(log.isDebugEnabled()) {
+			log.debug("UpdateWaterConnection: isStateUpdatable ? {}, WaterConnection: {}",isStateUpdatable, waterConnectionRequest.getWaterConnection());
+		}
 		if (isStateUpdatable) {
 			waterConnectionProducer.push(updateWaterConnection, waterConnectionRequest);
 		} else {
