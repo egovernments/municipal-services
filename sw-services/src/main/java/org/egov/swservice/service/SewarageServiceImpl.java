@@ -169,7 +169,7 @@ public class SewarageServiceImpl implements SewarageService {
 		sewarageDaoImpl.pushForEditNotification(sewerageConnectionRequest);
 		// Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(sewerageConnectionRequest);
-		userService.createUser(sewerageConnectionRequest);
+		userService.updateUser(sewerageConnectionRequest, searchResult);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 		enrichmentService.postStatusEnrichment(sewerageConnectionRequest);
@@ -231,6 +231,7 @@ public class SewarageServiceImpl implements SewarageService {
 		enrichmentService.enrichUpdateSewerageConnection(sewerageConnectionRequest);
 		actionValidator.validateUpdateRequest(sewerageConnectionRequest, businessService, previousApplicationStatus);
 		sewerageConnectionValidator.validateUpdate(sewerageConnectionRequest, searchResult);
+		userService.updateUser(sewerageConnectionRequest, searchResult);
 		sewarageDaoImpl.pushForEditNotification(sewerageConnectionRequest);
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
