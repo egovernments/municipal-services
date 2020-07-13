@@ -73,11 +73,6 @@ public class PaymentUpdateService {
 	public void process(HashMap<String, Object> record) {
 		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
-			try {
-				log.info("payment Request " + mapper.writeValueAsString(paymentRequest));
-			} catch (Exception ex) {
-				log.error("Temp Catch Excption:", ex);
-			}
 			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
 					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
@@ -115,6 +110,7 @@ public class PaymentUpdateService {
 					repo.updateSewerageConnection(sewerageConnectionRequest, false);
 				}
 			}
+			sendNotificationForPayment(paymentRequest);
 		} catch (Exception ex) {
 			log.error("", ex);
 		}
@@ -148,15 +144,13 @@ public class PaymentUpdateService {
 		return mapper.convertValue(users.get(0), User.class);
 	}
 
-
 	/**
 	 * consume payment request for processing the notification of payment
-	 * @param record
+	 * @param paymentRequest
 	 */
-	public void processRecieptRequest(HashMap<String, Object> record) {
+	public void sendNotificationForPayment(PaymentRequest paymentRequest) {
 		try {
 			log.info("Payment Notification consumer :");
-			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
@@ -166,10 +160,7 @@ public class PaymentUpdateService {
 			}
 			if (!isServiceMatched)
 				return;
-			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
-					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				log.info("Consuming Business Service : {}", paymentDetail.getBusinessService());
 				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
 						config.getReceiptBusinessservice().equals(paymentDetail.getBusinessService())) {
 					SearchCriteria criteria = new SearchCriteria();

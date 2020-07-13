@@ -170,7 +170,6 @@ public class PaymentUpdateService {
 			if (!isServiceMatched)
 				return;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				log.info("Consuming Business Service : {}", paymentDetail.getBusinessService());
 				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
 						config.getReceiptBusinessservice().equals(paymentDetail.getBusinessService())) {
 					SearchCriteria criteria = new SearchCriteria();
