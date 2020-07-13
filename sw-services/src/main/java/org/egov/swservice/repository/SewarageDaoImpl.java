@@ -58,7 +58,7 @@ public class SewarageDaoImpl implements SewarageDao {
 			return Collections.emptyList();
 		// if (log.isDebugEnabled()) {
 		StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
-		log.debug(str.toString());
+//		log.debug(str.toString());
 		// }
 		List<SewerageConnection> sewarageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
 				sewarageRowMapper);

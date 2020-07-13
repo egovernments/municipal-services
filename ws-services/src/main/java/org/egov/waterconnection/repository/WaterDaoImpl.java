@@ -58,9 +58,9 @@ public class WaterDaoImpl implements WaterDao {
 		if (query == null)
 			return Collections.emptyList();
 //		if (log.isDebugEnabled()) {
-			StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
-			log.info(str.toString());
-		    log.info("Prepared Statement" + preparedStatement.toString());
+//			StringBuilder str = new StringBuilder("Constructed query is:: ").append(query);
+//			log.info(str.toString());
+//		    log.info("Prepared Statement" + preparedStatement.toString());
 //		}
 		List<WaterConnection> waterConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
 				waterRowMapper);
