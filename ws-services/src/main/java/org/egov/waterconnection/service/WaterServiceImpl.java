@@ -169,7 +169,7 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
-		enrichmentService.postForMeterReading(waterConnectionRequest);
+		enrichmentService.postForMeterReading(waterConnectionRequest, WCConstants.UPDATE_APPLICATION);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 	
@@ -202,7 +202,6 @@ public class WaterServiceImpl implements WaterService {
 
 	private List<WaterConnection> updateWaterConnectionForModifyFlow(WaterConnectionRequest waterConnectionRequest) {
 		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
-		// TODO - MDMS validation
 		mDMSValidator.validateMasterData(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
 		BusinessService businessService = workflowService.getBusinessService(waterConnectionRequest.getWaterConnection().getTenantId(),
 				waterConnectionRequest.getRequestInfo(), config.getModifyWSBusinessServiceName());
@@ -218,10 +217,11 @@ public class WaterServiceImpl implements WaterService {
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult, WCConstants.MODIFY_CONNECTION);
 		userService.updateUser(waterConnectionRequest, searchResult);
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
-		//check for edit and send edit notification
-		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
 		waterDao.updateWaterConnection(waterConnectionRequest, isStateUpdatable);
+		//check for edit and send edit notification
+		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
+		enrichmentService.postForMeterReading(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
 }

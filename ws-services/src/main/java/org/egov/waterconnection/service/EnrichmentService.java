@@ -18,6 +18,7 @@ import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -45,6 +46,9 @@ public class EnrichmentService {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private WaterServiceImpl waterService;
 
 	/**
 	 * Enrich water connection
@@ -185,10 +189,26 @@ public class EnrichmentService {
 	 * 
 	 * @param waterConnectionrequest
 	 */
-	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest) {
-		if (WCConstants.ACTIVATE_CONNECTION
-				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
-			waterDao.postForMeterReading(waterConnectionrequest);
+	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest, int reqType) {
+		if (!StringUtils.isEmpty(waterConnectionrequest.getWaterConnection().getConnectionType())
+				&& WCConstants.METERED_CONNECTION
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getConnectionType())) {
+			if (reqType == WCConstants.UPDATE_APPLICATION && WCConstants.ACTIVATE_CONNECTION
+					.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
+				waterDao.postForMeterReading(waterConnectionrequest);
+			} else if (WCConstants.MODIFY_CONNECTION == reqType && WCConstants.APPROVE_CONNECTION.
+					equals(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
+				SearchCriteria criteria = SearchCriteria.builder()
+						.tenantId(waterConnectionrequest.getWaterConnection().getTenantId())
+						.connectionNumber(waterConnectionrequest.getWaterConnection().getConnectionNo()).build();
+				List<WaterConnection> connections = waterService.search(criteria, waterConnectionrequest.getRequestInfo());
+				if (!CollectionUtils.isEmpty(connections)) {
+					WaterConnection connection = connections.get(connections.size() - 1);
+					if (!connection.getConnectionType().equals(WCConstants.METERED_CONNECTION)) {
+						waterDao.postForMeterReading(waterConnectionrequest);
+					}
+				}
+			}
 		}
 	}
     
