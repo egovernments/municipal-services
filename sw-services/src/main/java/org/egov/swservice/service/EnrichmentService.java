@@ -54,7 +54,7 @@ public class EnrichmentService {
 	 * @param sewerageConnectionRequest
 	 */
 
-	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
+	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, int reqType) {
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
@@ -73,7 +73,9 @@ public class EnrichmentService {
 		additionalDetail.put(SWConstants.APP_CREATED_DATE, BigDecimal.valueOf(System.currentTimeMillis()));
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 		//Setting ApplicationType
-		sewerageConnectionRequest.getSewerageConnection().setApplicationType(SWConstants.NEW_SEWERAGE_APP_STATUS);
+		sewerageConnectionRequest.getSewerageConnection()
+				.setApplicationType(reqType == SWConstants.MODIFY_CONNECTION ? SWConstants.MODIFY_SEWERAGE_CONNECTON
+						: SWConstants.NEW_SEWERAGE_CONNECTION);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
 	}

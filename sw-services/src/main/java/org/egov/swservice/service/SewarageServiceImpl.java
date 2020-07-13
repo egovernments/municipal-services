@@ -88,18 +88,20 @@ public class SewarageServiceImpl implements SewarageService {
 
 	@Override
 	public List<SewerageConnection> createSewarageConnection(SewerageConnectionRequest sewarageConnectionRequest) {
+		int reqType = SWConstants.CREATE_APPLICATION;
 		if (sewerageServicesUtil.isModifyConnectionRequest(sewarageConnectionRequest)) {
 			List<SewerageConnection> sewerageConnectionList = getAllSewerageApplications(sewarageConnectionRequest);
 			if (!CollectionUtils.isEmpty(sewerageConnectionList)) {
 				workflowService.validateInProgressWF(sewerageConnectionList, sewarageConnectionRequest.getRequestInfo(),
 						sewarageConnectionRequest.getSewerageConnection().getTenantId());
 			}
+			reqType = SWConstants.MODIFY_CONNECTION;
 		}
-		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, SWConstants.CREATE_APPLICATION);
+		sewerageConnectionValidator.validateSewerageConnection(sewarageConnectionRequest, reqType);
 		Property property = validateProperty.getOrValidateProperty(sewarageConnectionRequest);
 		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(sewarageConnectionRequest);
-		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest);
+		enrichmentService.enrichSewerageConnection(sewarageConnectionRequest, reqType);
 		userService.createUser(sewarageConnectionRequest);
 		sewarageDao.saveSewerageConnection(sewarageConnectionRequest);
 		// call work-flow

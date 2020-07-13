@@ -84,6 +84,7 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		int reqType = WCConstants.CREATE_APPLICATION;
 		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
 			// Validate any process Instance exists with WF
@@ -91,12 +92,13 @@ public class WaterServiceImpl implements WaterService {
 				workflowService.validateInProgressWF(previousConnectionsList,
 						waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId());
 			}
+			reqType = WCConstants.MODIFY_CONNECTION;
 		}
-		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.CREATE_APPLICATION);
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, reqType);
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
-		enrichmentService.enrichWaterConnection(waterConnectionRequest);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, reqType);
 		userService.createUser(waterConnectionRequest);
 		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
