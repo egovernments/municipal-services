@@ -1,6 +1,11 @@
 package org.egov.waterconnection.service;
 
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
@@ -23,12 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class WaterServiceImpl implements WaterService {
 
 	@Autowired
@@ -81,6 +84,7 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		int reqType = WCConstants.CREATE_APPLICATION;
 		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
 			// Validate any process Instance exists with WF
@@ -88,12 +92,13 @@ public class WaterServiceImpl implements WaterService {
 				workflowService.validateInProgressWF(previousConnectionsList,
 						waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId());
 			}
+			reqType = WCConstants.MODIFY_CONNECTION;
 		}
-		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, WCConstants.CREATE_APPLICATION);
+		waterConnectionValidator.validateWaterConnection(waterConnectionRequest, reqType);
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property);
 		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
-		enrichmentService.enrichWaterConnection(waterConnectionRequest);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, reqType);
 		userService.createUser(waterConnectionRequest);
 		// call work-flow
 		if (config.getIsExternalWorkFlowEnabled())
@@ -131,6 +136,9 @@ public class WaterServiceImpl implements WaterService {
 	 */
 	@Override
 	public List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+		if(log.isDebugEnabled()) {
+			log.debug("Update WaterConnection: {}", waterConnectionRequest.getWaterConnection());
+		}
 		if(wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
 			// Received request to update the connection for modifyConnection WF
 			return updateWaterConnectionForModifyFlow(waterConnectionRequest);
@@ -156,7 +164,7 @@ public class WaterServiceImpl implements WaterService {
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
 		//Enrich file store Id After payment
 		enrichmentService.enrichFileStoreIds(waterConnectionRequest);
-		userService.createUser(waterConnectionRequest);
+		userService.updateUser(waterConnectionRequest, searchResult);
 		//Call workflow
 		enrichmentService.postStatusEnrichment(waterConnectionRequest);
 		boolean isStateUpdatable = waterServiceUtil.getStatusForUpdate(businessService, previousApplicationStatus);
@@ -208,6 +216,7 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichUpdateWaterConnection(waterConnectionRequest);
 		actionValidator.validateUpdateRequest(waterConnectionRequest, businessService, previousApplicationStatus);
 		waterConnectionValidator.validateUpdate(waterConnectionRequest, searchResult, WCConstants.MODIFY_CONNECTION);
+		userService.updateUser(waterConnectionRequest, searchResult);
 		wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		//check for edit and send edit notification
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);

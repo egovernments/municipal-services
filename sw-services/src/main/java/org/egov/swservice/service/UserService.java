@@ -1,14 +1,22 @@
 package org.egov.swservice.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.micrometer.core.instrument.util.StringUtils;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.model.ConnectionHolderInfo;
 import org.egov.swservice.model.ConnectionUserRequest;
+import org.egov.swservice.model.SewerageConnection;
 import org.egov.swservice.model.SewerageConnectionRequest;
 import org.egov.swservice.model.Status;
 import org.egov.swservice.model.users.UserDetailResponse;
@@ -20,10 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.micrometer.core.instrument.util.StringUtils;
 
 @Service
 public class UserService {
@@ -89,6 +96,21 @@ public class UserService {
 				setOwnerFields(holderInfo, userDetailResponse, request.getRequestInfo());
 			});
 		}
+	}
+	
+	public void updateUser(SewerageConnectionRequest request, SewerageConnection existingSewerageConnection) {
+		if(!CollectionUtils.isEmpty(existingSewerageConnection.getConnectionHolders())) {
+			// We have connection holder in the existing application.
+			if(CollectionUtils.isEmpty(request.getSewerageConnection().getConnectionHolders())) {
+				// New update request removed the connectionHolder - need to clear the records.
+				ConnectionHolderInfo conHolder = new ConnectionHolderInfo();
+				request.getSewerageConnection().addConnectionHolderInfo(conHolder);
+				return;
+			}
+		}
+		
+		//Update connection holder.
+		createUser(request);
 	}
 
 	/**

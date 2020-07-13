@@ -565,7 +565,6 @@ public class Connection {
 	 * @return applicationType
 	 **/
 	@ApiModelProperty(required = true, value = "It is a master data, defined in MDMS.")
-	@Size(min = 2, max = 32)
 	public String getApplicationType() {
 		return applicationType;
 	}
