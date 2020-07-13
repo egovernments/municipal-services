@@ -184,6 +184,10 @@ public class DemandService {
 					: calculation.getApplicationNO();
 			User owner = property.getOwners().get(0).toCommonUser();
 
+			if (!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+				owner = waterConnectionRequest.getWaterConnection().getConnectionHolders().get(0).toCommonUser();
+			}
+
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
 				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())

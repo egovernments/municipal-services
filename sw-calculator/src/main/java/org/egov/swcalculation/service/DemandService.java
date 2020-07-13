@@ -1,39 +1,15 @@
 package org.egov.swcalculation.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
-import org.egov.swcalculation.model.Calculation;
-import org.egov.swcalculation.model.CalculationCriteria;
-import org.egov.swcalculation.model.CalculationReq;
-import org.egov.swcalculation.model.Demand;
+import org.egov.swcalculation.model.*;
 import org.egov.swcalculation.model.Demand.StatusEnum;
-import org.egov.swcalculation.model.DemandDetail;
-import org.egov.swcalculation.model.DemandDetailAndCollection;
-import org.egov.swcalculation.model.DemandRequest;
-import org.egov.swcalculation.model.DemandResponse;
-import org.egov.swcalculation.model.GetBillCriteria;
-import org.egov.swcalculation.model.Property;
-import org.egov.swcalculation.model.RequestInfoWrapper;
-import org.egov.swcalculation.model.SewerageConnection;
-import org.egov.swcalculation.model.SewerageConnectionRequest;
-import org.egov.swcalculation.model.TaxHeadEstimate;
-import org.egov.swcalculation.model.TaxPeriod;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.DemandRepository;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
@@ -47,10 +23,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -186,10 +163,13 @@ public class DemandService {
 					.sewerageConnection(connection).requestInfo(requestInfo).build();
 			
 			Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
-			
 			String consumerCode = isForConnectionNO == true ?  calculation.getConnectionNo() : calculation.getApplicationNO();
+
 			User owner = property.getOwners().get(0).toCommonUser();
-			
+			if (!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+				owner = sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().get(0).toCommonUser();
+			}
+
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
@@ -727,14 +707,13 @@ public class DemandService {
 		url.append("{3}");
 		return url;
 	}
+
 	/**
-	 * 
+	 *
 	 * @param tenantId
-	 * @param consumerCodes
-	 * @param taxPeriodFrom
-	 * @param taxPeriodTo
+	 * @param demandId
 	 * @param requestInfo
-	 * @return List of Demand
+	 * @return  List of Demand
 	 */
 	private List<Demand> searchDemandBasedOnDemandId(String tenantId, Set<String> demandId,
 			RequestInfo requestInfo) {
