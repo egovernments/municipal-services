@@ -84,6 +84,7 @@ public class LandService {
 		landValidator.validateSearch(requestInfo, criteria);
 		if (criteria.getMobileNumber() != null) {
 			landInfo = getLandFromMobileNumber(criteria, requestInfo);
+			landInfo = getMultiOwnerRecords(landInfo, requestInfo);
 		} else {
 			List<String> roles = new ArrayList<>();
 			for (Role role : requestInfo.getUserInfo().getRoles()) {
@@ -99,6 +100,18 @@ public class LandService {
 		return landInfo;
 	}
 	
+	private List<LandInfo> getMultiOwnerRecords(List<LandInfo> landInfos, RequestInfo requestInfo) {
+
+		List<String> landIds = new ArrayList<String>();
+		for (LandInfo li : landInfos) {
+			landIds.add(li.getId());
+		}
+		LandSearchCriteria criteria = LandSearchCriteria.builder().tenantId(landInfos.get(0).getTenantId()).ids(landIds)
+				.build();
+		landInfos = getLandWithOwnerInfo(criteria, requestInfo);
+		return landInfos;
+	}
+
 	private List<LandInfo> getLandFromMobileNumber(LandSearchCriteria criteria, RequestInfo requestInfo) {
 
 		List<LandInfo> landInfo = new LinkedList<>();
