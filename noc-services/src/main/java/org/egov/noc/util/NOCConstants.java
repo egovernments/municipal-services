@@ -60,5 +60,11 @@ public class NOCConstants {
 	public static final String ACTION_INITIATE = "INITIATE";	
 
 	public static final String INITIATED_TIME = "SubmittedOn";	
+	
+	//sms notification
+	
+	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
+	
+	public static final String ACTION_STATUS_APPROVED = "APPROVE_APPROVED";
 
 }
