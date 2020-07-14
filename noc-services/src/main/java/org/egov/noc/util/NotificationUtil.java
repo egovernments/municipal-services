@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import static org.egov.noc.util.NOCConstants.ACTION_STATUS_CREATED;
+import static org.egov.noc.util.NOCConstants.ACTION_STATUS_INITIATED;
 import static org.egov.noc.util.NOCConstants.ACTION_STATUS_REJECTED;
 import static org.egov.noc.util.NOCConstants.ACTION_STATUS_APPROVED;
 
@@ -27,16 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class NotificationUtil {
 
+	@Autowired
 	private NOCConfiguration config;
 
+	@Autowired
 	private Producer producer;
 
+	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
-	@Autowired
-	public NotificationUtil(NOCConfiguration config) {
-		this.config = config;
-	}
+	
 
 	/**
 	 * Send the SMSRequest on the SMSNotification kafka topic
@@ -67,8 +69,7 @@ public class NotificationUtil {
 	public List<SMSRequest> createSMSRequest(String message, Map<String, String> mobileNumberToOwner) {
 		List<SMSRequest> smsRequest = new LinkedList<>();
 		for (Map.Entry<String, String> entryset : mobileNumberToOwner.entrySet()) {
-			String customizedMsg = message.replace("<1>", entryset.getValue());
-			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
+			smsRequest.add(new SMSRequest(entryset.getKey(), message));
 		}
 		return smsRequest;
 	}
@@ -120,11 +121,20 @@ public class NotificationUtil {
 	 *            The messages from localization
 	 * @return customized message based on noc
 	 */
-	@SuppressWarnings("unchecked")
 	public String getCustomizedMsg(RequestInfo requestInfo, Noc noc, String localizationMessage) {
 		String message = null, messageTemplate;
 		String messageCode = noc.getWorkflow().getAction() + "_" + noc.getApplicationStatus();
 		switch (messageCode) {
+		case ACTION_STATUS_CREATED:
+			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
+			if (!StringUtils.isEmpty(messageTemplate))
+				message = getInitiatedMsg(noc, messageTemplate);
+			break;
+		case ACTION_STATUS_INITIATED:
+			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
+			if (!StringUtils.isEmpty(messageTemplate))
+				message = getInitiatedMsg(noc, messageTemplate);
+			break;
 		case ACTION_STATUS_APPROVED:
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
 			if (!StringUtils.isEmpty(messageTemplate))
@@ -174,10 +184,15 @@ public class NotificationUtil {
 	 *            Message from localization for initiate
 	 * @return customized message for initiate
 	 */
-	@SuppressWarnings("unchecked")
 	private String getInitiatedMsg(Noc noc, String message) {
-		message = message.replace("<2>", noc.getNocType());
-		message = message.replace("<3>", noc.getApplicationNo());
+		String type = null;
+		if(noc.getNocType().equalsIgnoreCase(NOCConstants.FIRE_NOC_TYPE)){
+			type = "Fire";
+		}else{
+			type = "AAI";
+		}
+		message = message.replace("<1>", type);
+		message = message.replace("<2>", noc.getApplicationNo());
 		return message;
 	}
 

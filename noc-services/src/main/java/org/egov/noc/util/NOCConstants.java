@@ -62,9 +62,17 @@ public class NOCConstants {
 	public static final String INITIATED_TIME = "SubmittedOn";	
 	
 	//sms notification
+
+	public static final String ACTION_STATUS_CREATED = "null_CREATED";
+	
+	public static final String ACTION_STATUS_INITIATED = "INITIATE_INPROGRESS";
 	
 	public static final String ACTION_STATUS_REJECTED = "REJECT_REJECTED";
 	
 	public static final String ACTION_STATUS_APPROVED = "APPROVE_APPROVED";
+	
+	public static final String FIRE_NOC_TYPE = "FIRE_NOC";
+	
+	public static final String AIRPORT_NOC_TYPE = "AIRPORT_AUTHORITY";
 
 }

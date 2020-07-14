@@ -10,6 +10,7 @@ import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.ServiceRequestRepository;
 import org.egov.noc.service.UserService;
 import org.egov.noc.util.NotificationUtil;
+import org.egov.noc.web.model.EventRequest;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
 import org.egov.noc.web.model.SMSRequest;
@@ -70,8 +71,11 @@ public class NOCNotificationService {
 		String tenantId = nocRequest.getNoc().getTenantId();
 		String localizationMessages = util.getLocalizationMessages(tenantId, nocRequest.getRequestInfo());
 		String message = util.getCustomizedMsg(nocRequest.getRequestInfo(), nocRequest.getNoc(), localizationMessages);
-		Map<String, String> mobileNumberToOwner = getUserList(nocRequest);
-		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+		if(message != null){
+			Map<String, String> mobileNumberToOwner = getUserList(nocRequest);
+			smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+		}
+		
 	}
 
 	/**
@@ -84,7 +88,7 @@ public class NOCNotificationService {
 	private Map<String, String> getUserList(NocRequest nocRequest) {
 		Map<String, String> mobileNumberToOwner = new HashMap<>();
 		String tenantId = nocRequest.getNoc().getTenantId();
-		String stakeUUID = nocRequest.getNoc().getAuditDetails().getCreatedBy();
+		String stakeUUID = nocRequest.getNoc().getAccountId();
 		List<String> ownerId = new ArrayList<String>();
 		ownerId.add(stakeUUID);
 		NocSearchCriteria nocSearchCriteria = new NocSearchCriteria();
