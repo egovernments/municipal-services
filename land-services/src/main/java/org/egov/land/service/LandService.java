@@ -79,24 +79,24 @@ public class LandService {
 	}
 	
 	public List<LandInfo> search(LandSearchCriteria criteria, RequestInfo requestInfo) {
-		List<LandInfo> landInfo;
+		List<LandInfo> landInfos;
 		landValidator.validateSearch(requestInfo, criteria);
 		if (criteria.getMobileNumber() != null) {
-			landInfo = getLandFromMobileNumber(criteria, requestInfo);
+			landInfos = getLandFromMobileNumber(criteria, requestInfo);
 			List<String> landIds = new ArrayList<String>();
-			for (LandInfo li : landInfo) {
+			for (LandInfo li : landInfos) {
 				landIds.add(li.getId());
 			}
 			criteria.setMobileNumber(null);
 			criteria.setIds(landIds);
 		}
 
-		landInfo = fetchLandInfoData(criteria, requestInfo);
+		landInfos = fetchLandInfoData(criteria, requestInfo);
 
-		if (!CollectionUtils.isEmpty(landInfo)) {
+		if (!CollectionUtils.isEmpty(landInfos)) {
 			log.debug("Received final landInfo response in service call..");
 		}
-		return landInfo;
+		return landInfos;
 	}
 	
 	private List<LandInfo> getLandFromMobileNumber(LandSearchCriteria criteria, RequestInfo requestInfo) {
