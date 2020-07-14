@@ -16,10 +16,7 @@ import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
-import org.egov.waterconnection.web.models.ConnectionHolderInfo;
-import org.egov.waterconnection.web.models.ConnectionUserRequest;
-import org.egov.waterconnection.web.models.Status;
-import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.*;
 import org.egov.waterconnection.web.models.users.UserDetailResponse;
 import org.egov.waterconnection.web.models.users.UserSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -328,5 +325,20 @@ public class UserService {
 				.requestInfo(requestInfo).userType("CITIZEN")
 				.tenantId(tenantId).mobileNumber(mobileNumber).build();
 		return getUsersUUID(userSearchRequest);
+	}
+
+	public void updateUser(WaterConnectionRequest request, WaterConnection existingWaterConnection) {
+		if(!CollectionUtils.isEmpty(existingWaterConnection.getConnectionHolders())) {
+			// We have connection holder in the existing application.
+			if(CollectionUtils.isEmpty(request.getWaterConnection().getConnectionHolders())) {
+				// New update request removed the connectionHolder - need to clear the records.
+				ConnectionHolderInfo conHolder = new ConnectionHolderInfo();
+				request.getWaterConnection().addConnectionHolderInfo(conHolder);
+				return;
+			}
+		}
+
+		//Update connection holder.
+		createUser(request);
 	}
 }

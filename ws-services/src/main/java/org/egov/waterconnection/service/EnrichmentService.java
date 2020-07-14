@@ -35,6 +35,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 
 @Service
@@ -58,6 +59,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private WaterServiceImpl waterService;
 
 	/**
 	 * Enrich water connection
@@ -85,7 +89,7 @@ public class EnrichmentService {
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 	    //Setting ApplicationType
 	  	waterConnectionRequest.getWaterConnection().setApplicationType(
-	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION : "");
+	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION :  WCConstants.NEW_WATER_CONNECTION);
 		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
 		
@@ -193,16 +197,32 @@ public class EnrichmentService {
 			setConnectionNO(waterConnectionRequest);
 		}
 	}
-	
+
 	/**
 	 * Create meter reading for meter connection
-	 * 
-	 * @param waterConnectionRequest WaterConnectionRequest Object
+	 *
+	 * @param waterConnectionrequest
 	 */
-	public void postForMeterReading(WaterConnectionRequest waterConnectionRequest) {
-		if (WCConstants.ACTIVATE_CONNECTION
-				.equalsIgnoreCase(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
-			waterDao.postForMeterReading(waterConnectionRequest);
+	public void postForMeterReading(WaterConnectionRequest waterConnectionrequest, int reqType) {
+		if (!StringUtils.isEmpty(waterConnectionrequest.getWaterConnection().getConnectionType())
+				&& WCConstants.METERED_CONNECTION
+				.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getConnectionType())) {
+			if (reqType == WCConstants.UPDATE_APPLICATION && WCConstants.ACTIVATE_CONNECTION
+					.equalsIgnoreCase(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
+				waterDao.postForMeterReading(waterConnectionrequest);
+			} else if (WCConstants.MODIFY_CONNECTION == reqType && WCConstants.APPROVE_CONNECTION.
+					equals(waterConnectionrequest.getWaterConnection().getProcessInstance().getAction())) {
+				SearchCriteria criteria = SearchCriteria.builder()
+						.tenantId(waterConnectionrequest.getWaterConnection().getTenantId())
+						.connectionNumber(waterConnectionrequest.getWaterConnection().getConnectionNo()).build();
+				List<WaterConnection> connections = waterService.search(criteria, waterConnectionrequest.getRequestInfo());
+				if (!CollectionUtils.isEmpty(connections)) {
+					WaterConnection connection = connections.get(connections.size() - 1);
+					if (!connection.getConnectionType().equals(WCConstants.METERED_CONNECTION)) {
+						waterDao.postForMeterReading(waterConnectionrequest);
+					}
+				}
+			}
 		}
 	}
     

@@ -62,6 +62,16 @@ public class SewerageFieldValidator implements SewerageActionValidator {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
 		}
+		if (SWConstants.SUBMIT_APPLICATION_CONST
+				.equals(sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())
+				|| SWConstants.APPROVE_CONNECTION.equalsIgnoreCase(
+				sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction())) {
+			if (sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() == null
+					|| sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() < 0
+					|| sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() == 0) {
+				errorMap.put("INVALID_DATE_EFFECTIVE_FROM", "Date effective from cannot be null or negative");
+			}
+		}
 	}
 
 }

@@ -70,13 +70,13 @@ public class PaymentUpdateService {
 
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
-	
+
 	@Autowired
 	private ValidateProperty validateProperty;
-	
+
 	@Autowired
 	private EnrichmentService enrichmentService;
-	
+
 	@Autowired
 	private NotificationUtil notificationUtil;
 
@@ -86,7 +86,7 @@ public class PaymentUpdateService {
 
 	/**
 	 * After payment change the application status
-	 * 
+	 *
 	 * @param record
 	 *            payment request
 	 */
@@ -133,13 +133,14 @@ public class PaymentUpdateService {
 					repo.updateSewerageConnection(sewerageConnectionRequest, false);
 				}
 			}
+			sendNotificationForPayment(paymentRequest);
 		} catch (Exception ex) {
 			log.error("Failed to process Payment Update message.", ex);
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * @param uuid - UUID for the User
 	 * @param requestInfo - RequestInfo Object
 	 * @return User
@@ -167,12 +168,11 @@ public class PaymentUpdateService {
 
 	/**
 	 * consume payment request for processing the notification of payment
-	 * @param record
+	 * @param paymentRequest
 	 */
-	public void processRecieptRequest(HashMap<String, Object> record) {
+	public void sendNotificationForPayment(PaymentRequest paymentRequest) {
 		try {
 			log.info("Payment Notification consumer :");
-			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
@@ -182,8 +182,6 @@ public class PaymentUpdateService {
 			}
 			if (!isServiceMatched)
 				return;
-			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
-					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service : {}", paymentDetail.getBusinessService());
 				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
@@ -353,8 +351,9 @@ public class PaymentUpdateService {
 						.ofEpochMilli(fromDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getFromPeriod() :
 								paymentDetail.getBill().getBillDetails().get(0).getFromPeriod() * 1000)
 						.atZone(ZoneId.systemDefault()).toLocalDate();
+				int toDateLength = (int) (Math.log10(paymentDetail.getBill().getBillDetails().get(0).getToPeriod()) + 1);
 				LocalDate toDate = Instant
-						.ofEpochMilli(fromDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getToPeriod() :
+						.ofEpochMilli(toDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getToPeriod() :
 								paymentDetail.getBill().getBillDetails().get(0).getToPeriod() * 1000)
 						.atZone(ZoneId.systemDefault()).toLocalDate();
 				StringBuilder builder = new StringBuilder();

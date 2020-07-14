@@ -141,5 +141,17 @@ public class ConnectionHolderInfo extends User {
         this.setPhoto(user.getPhoto());
         this.setTenantId(user.getTenantId());
     }
-
+    public org.egov.common.contract.request.User toCommonUser(){
+        org.egov.common.contract.request.User commonUser = new org.egov.common.contract.request.User();
+        commonUser.setId(this.getId());
+        commonUser.setUserName(this.getUserName());
+        commonUser.setName(this.getName());
+        commonUser.setType(this.getType());
+        commonUser.setMobileNumber(this.getMobileNumber());
+        commonUser.setEmailId(this.getEmailId());
+        commonUser.setRoles(this.getRoles());
+        commonUser.setTenantId(this.getTenantId());
+        commonUser.setUuid(this.getUuid());
+        return commonUser;
+    }
 }

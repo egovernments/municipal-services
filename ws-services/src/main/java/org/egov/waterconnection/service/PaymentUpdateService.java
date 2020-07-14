@@ -68,16 +68,16 @@ public class PaymentUpdateService {
 
 	@Autowired
 	private WaterDao repo;
-	
+
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
-	
+
 	@Autowired
 	private ValidateProperty validateProperty;
-	
+
 	@Autowired
 	private EnrichmentService enrichmentService;
-	
+
 	@Autowired
 	private NotificationUtil notificationUtil;
 
@@ -86,7 +86,7 @@ public class PaymentUpdateService {
 
 	/**
 	 * After payment change the application status
-	 * 
+	 *
 	 * @param record
 	 *            payment request
 	 */
@@ -130,25 +130,26 @@ public class PaymentUpdateService {
 					} catch (Exception ex) {
 						log.error("Temp Catch Excption:", ex);
 					}
-					
+
 					Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
-					
+
 					wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 					enrichmentService.enrichFileStoreIds(waterConnectionRequest);
 					repo.updateWaterConnection(waterConnectionRequest, false);
 				}
 			}
+			sendNotificationForPayment(paymentRequest);
 		} catch (Exception ex) {
 			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
 	}
-	
-	 /**
-	    * 
-	    * @param uuid
-	    * @param requestInfo
-	    * @return User
-	    */
+
+	/**
+	 *
+	 * @param uuid
+	 * @param requestInfo
+	 * @return User
+	 */
 	private User fetchUser(String uuid, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
@@ -173,12 +174,12 @@ public class PaymentUpdateService {
 	}
 
 	/**
-	 * consume payment request for processing the notification of payment
-	 * @param record
+	 *
+	 * @param paymentRequest
 	 */
-	public void processRecieptRequest(HashMap<String, Object> record) {
+	public void sendNotificationForPayment(PaymentRequest paymentRequest) {
 		try {
-			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
+			log.info("Payment Notification consumer :");
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
@@ -188,8 +189,6 @@ public class PaymentUpdateService {
 			}
 			if (!isServiceMatched)
 				return;
-			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
-					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service : {}", paymentDetail.getBusinessService());
 				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
@@ -357,8 +356,9 @@ public class PaymentUpdateService {
 						.ofEpochMilli(fromDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getFromPeriod() :
 								paymentDetail.getBill().getBillDetails().get(0).getFromPeriod() * 1000)
 						.atZone(ZoneId.systemDefault()).toLocalDate();
+				int toDateLength = (int) (Math.log10(paymentDetail.getBill().getBillDetails().get(0).getToPeriod()) + 1);
 				LocalDate toDate = Instant
-						.ofEpochMilli(fromDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getToPeriod() :
+						.ofEpochMilli(toDateLength > 10 ? paymentDetail.getBill().getBillDetails().get(0).getToPeriod() :
 								paymentDetail.getBill().getBillDetails().get(0).getToPeriod() * 1000)
 						.atZone(ZoneId.systemDefault()).toLocalDate();
 				StringBuilder builder = new StringBuilder();

@@ -15,10 +15,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.swservice.config.SWConfiguration;
 import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.web.models.ConnectionHolderInfo;
-import org.egov.swservice.web.models.ConnectionUserRequest;
-import org.egov.swservice.web.models.SewerageConnectionRequest;
-import org.egov.swservice.web.models.Status;
+import org.egov.swservice.web.models.*;
 import org.egov.swservice.web.models.users.UserDetailResponse;
 import org.egov.swservice.web.models.users.UserSearchRequest;
 import org.egov.tracer.model.CustomException;
@@ -333,6 +330,20 @@ public class UserService {
 		UserSearchRequest userSearchRequest = UserSearchRequest.builder().requestInfo(requestInfo).userType("CITIZEN")
 				.tenantId(tenantId).mobileNumber(mobileNumber).build();
 		return getUsersUUID(userSearchRequest);
+	}
+
+	public void updateUser(SewerageConnectionRequest request, SewerageConnection existingSewerageConnection) {
+		if(!CollectionUtils.isEmpty(existingSewerageConnection.getConnectionHolders())) {
+			// We have connection holder in the existing application.
+			if(CollectionUtils.isEmpty(request.getSewerageConnection().getConnectionHolders())) {
+				// New update request removed the connectionHolder - need to clear the records.
+				ConnectionHolderInfo conHolder = new ConnectionHolderInfo();
+				request.getSewerageConnection().addConnectionHolderInfo(conHolder);
+				return;
+			}
+		}
+		//Update connection holder.
+		createUser(request);
 	}
 
 }
