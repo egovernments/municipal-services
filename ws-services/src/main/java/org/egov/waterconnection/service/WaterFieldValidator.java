@@ -69,6 +69,16 @@ public class WaterFieldValidator implements WaterActionValidator {
 			}
 
 		}
+		if (WCConstants.SUBMIT_APPLICATION_CONST
+				.equals(waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())
+				|| WCConstants.APPROVE_CONNECTION.equalsIgnoreCase(
+						waterConnectionRequest.getWaterConnection().getProcessInstance().getAction())) {
+			if (waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() == null
+					|| waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() < 0
+					|| waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() == 0) {
+				errorMap.put("INVALID_DATE_EFFECTIVE_FROM", "Date effective from cannot be null or negative");
+			}
+		}
 	}
 
 }
