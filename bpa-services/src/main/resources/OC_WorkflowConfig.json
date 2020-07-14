@@ -229,7 +229,7 @@
             {
               "tenantId": "pb",
               "currentState": "DOC_VERIFICATION_PENDING",
-              "action": "SEND_BACK_TO_CITIZEN",
+              "action": "SENDBACKTOCITIZEN",
               "nextState": "BACK_FROM_DOC_VERIFICATION",
               "roles": [
                 "BPA_VERIFIER"
@@ -268,7 +268,7 @@
             {
               "tenantId": "pb",
               "currentState": "FIELDINSPECTION_PENDING",
-              "action": "SEND_BACK_TO_CITIZEN",
+              "action": "SENDBACKTOCITIZEN",
               "nextState": "BACK_FROM_FI_VERIFICATION",
               "roles": [
                 "BPA_FIELD_INSPECTOR"
@@ -307,7 +307,7 @@
             {
               "tenantId": "pb",
               "currentState": "NOC_VERIFICATION_PENDING",
-              "action": "SEND_BACK_TO_CITIZEN",
+              "action": "SENDBACKTOCITIZEN",
               "nextState": "BACK_FROM_NOC_VERIFICATION",
               "roles": [
                 "BPA_NOC_VERIFIER"
