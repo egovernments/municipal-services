@@ -43,7 +43,6 @@ public class SWCalculationWorkflowValidator {
         String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
         Long dateEffectiveFrom = sewerageConnection.getDateEffectiveFrom();
         sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
-        
         String propertyId = sewerageConnection.getPropertyId();
         Property property = util.getProperty(requestInfo,tenantId,propertyId);
         String propertyApplicationNumber = property.getAcknowldgementNumber();
@@ -79,10 +78,13 @@ public class SWCalculationWorkflowValidator {
         return isApplicationApproved;
     }
 
-    public Map<String,String> dateValidation(Long dateEffectiveFrom, String connectionNo, Map<String,String> errormap){
-        if(System.currentTimeMillis() < dateEffectiveFrom){
+    public Map<String, String> dateValidation(Long dateEffectiveFrom, String connectionNo,
+                                              Map<String, String> errormap) {
+        if ((System.currentTimeMillis() < dateEffectiveFrom
+                && (!getDate(System.currentTimeMillis()).equals(getDate(dateEffectiveFrom))))) {
             String effectiveDate = getDate(dateEffectiveFrom);
-            errormap.put("DateEffectiveFromError","Demand cannot be generated for the sewerage connection "+connectionNo+" ,the modified connection will be in effect from "+effectiveDate.toString());
+            errormap.put("DateEffectiveFromError", "Demand cannot be generated for the sewerage connection "
+                    + connectionNo + " ,the modified connection will be in effect from " + effectiveDate.toString());
         }
 
         return errormap;

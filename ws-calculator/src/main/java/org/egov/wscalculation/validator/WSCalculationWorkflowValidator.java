@@ -1,13 +1,6 @@
 package org.egov.wscalculation.validator;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
@@ -18,8 +11,11 @@ import org.egov.wscalculation.web.models.workflow.ProcessInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import lombok.extern.slf4j.Slf4j;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -32,12 +28,15 @@ public class WSCalculationWorkflowValidator {
 	        Map<String,String> errorMap = new HashMap<>();
 	        WaterConnection waterConnection = util.getWaterConnection(requestInfo,connectionNo,tenantId);
 		String waterApplicationNumber = waterConnection.getApplicationNo();
+		Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
 		waterConnectionValidation(requestInfo, tenantId, waterApplicationNumber, errorMap);
 		
 		String propertyId = waterConnection.getPropertyId();
         Property property = util.getProperty(requestInfo,tenantId,propertyId);
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+		 if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
+			 dateValidation(dateEffectiveFrom,connectionNo,errorMap);
         if(!CollectionUtils.isEmpty(errorMap)){
         	if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
                 throw new CustomException(errorMap);
@@ -82,13 +81,13 @@ public class WSCalculationWorkflowValidator {
 	}
 
 	public Map<String, String> dateValidation(Long dateEffectiveFrom, String connectionNo,
-			Map<String, String> errormap) {
-		if (System.currentTimeMillis() < dateEffectiveFrom) {
+											  Map<String, String> errormap) {
+		if ((System.currentTimeMillis() < dateEffectiveFrom)
+				&& (!getDate(System.currentTimeMillis()).equals(getDate(dateEffectiveFrom)))) {
 			String effectiveDate = getDate(dateEffectiveFrom);
 			errormap.put("DateEffectiveFromError", "Demand cannot be generated for the water connection " + connectionNo
 					+ " ,the modified connection will be in effect from " + effectiveDate.toString());
 		}
-
 		return errormap;
 	}
 
