@@ -10,7 +10,6 @@ import org.egov.noc.config.NOCConfiguration;
 import org.egov.noc.repository.ServiceRequestRepository;
 import org.egov.noc.service.UserService;
 import org.egov.noc.util.NotificationUtil;
-import org.egov.noc.web.model.EventRequest;
 import org.egov.noc.web.model.NocRequest;
 import org.egov.noc.web.model.NocSearchCriteria;
 import org.egov.noc.web.model.SMSRequest;
