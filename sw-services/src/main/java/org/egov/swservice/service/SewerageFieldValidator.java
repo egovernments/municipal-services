@@ -60,6 +60,21 @@ public class SewerageFieldValidator implements SewerageActionValidator {
 			if (StringUtils
 					.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate())) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
+
+			}
+			if (sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom() != null) {
+				if (System.currentTimeMillis() > sewerageConnectionRequest.getSewerageConnection().getDateEffectiveFrom()) {
+					errorMap.put("DATE_EFFECTIVE_FROM_IN_PAST", "Date effective from cannot be past");
+				}
+				if ((sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate() != null)
+						&& (sewerageConnectionRequest.getSewerageConnection()
+						.getConnectionExecutionDate() > sewerageConnectionRequest.getSewerageConnection()
+						.getDateEffectiveFrom())) {
+
+					errorMap.put("DATE_EFFECTIVE_FROM_LESS_THAN_EXCECUTION_DATE",
+							"Date effective from cannot be before connection execution date");
+				}
+
 			}
 		}
 		if (SWConstants.SUBMIT_APPLICATION_CONST
