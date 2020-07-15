@@ -68,7 +68,6 @@ public class BPANotificationService {
 	 *            The bpaRequest listenend on the kafka topic
 	 */
 	public void process(BPARequest bpaRequest) {
-		log.info("PROCESS NOTIFICATION :");
 		List<SMSRequest> smsRequests = new LinkedList<>();
 		if (null != config.getIsSMSEnabled()) {
 			if (config.getIsSMSEnabled()) {
@@ -208,7 +207,6 @@ public class BPANotificationService {
 		String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);
 		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
-		log.info("enrichSMSRequest NOTIFICATION :");
 	}
 
 	/**
@@ -234,23 +232,13 @@ public class BPANotificationService {
 		landcriteria.setIds(Arrays.asList(bpaRequest.getBPA().getLandId()));
 		List<LandInfo> landInfo = bpalandService.searchLandInfoToBPA(bpaRequest.getRequestInfo(), landcriteria);
 
-		log.info("User Received 1 : " + userDetailResponse.getUser().get(0));
 
 		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
 				userDetailResponse.getUser().get(0).getName());
 
-		log.info("User Received 2 : " + userDetailResponse.getUser().get(0).getMobileNumber()
-				+ userDetailResponse.getUser().get(0).getName());
-		log.info("bpaRequest Received 1: " + bpaRequest);
-		log.info("bpaRequest Received 2: "
-				+ !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen()));
-		log.info("bpaRequest Received 3: " + (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
-				|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove())));
-
 		if (bpaRequest.getBPA().getLandInfo() == null) {
 			for (int j = 0; j < landInfo.size(); j++)
 				bpaRequest.getBPA().setLandInfo(landInfo.get(j));
-			log.info("LANDINFO : " + bpaRequest);
 		}
 
 		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
@@ -262,9 +250,9 @@ public class BPANotificationService {
 					mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 				}
 			});
-			log.info("User Received 3 : " + bpaRequest.getBPA().getLandInfo().getOwners());
+
 		}
-		log.info("User Received: " + mobileNumberToOwner);
+
 		return mobileNumberToOwner;
 	}
 }
