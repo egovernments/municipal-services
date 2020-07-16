@@ -1,13 +1,13 @@
 package org.egov.waterconnection.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.web.models.ValidatorResult;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class WaterFieldValidator implements WaterActionValidator {
@@ -77,28 +77,27 @@ public class WaterFieldValidator implements WaterActionValidator {
 					|| waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() == 0) {
 				errorMap.put("INVALID_DATE_EFFECTIVE_FROM", "Date effective from cannot be null or negative");
 			}
-		}
-		if (waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() != null) {
-			if (System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getDateEffectiveFrom()) {
-				errorMap.put("DATE_EFFECTIVE_FROM_IN_PAST", "Date effective from cannot be past");
-			}
-			if ((waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() != null)
-					&& (waterConnectionRequest.getWaterConnection()
-					.getConnectionExecutionDate() > waterConnectionRequest.getWaterConnection()
-					.getDateEffectiveFrom())) {
+			if (waterConnectionRequest.getWaterConnection().getDateEffectiveFrom() != null) {
+				if (System.currentTimeMillis() > waterConnectionRequest.getWaterConnection().getDateEffectiveFrom()) {
+					errorMap.put("DATE_EFFECTIVE_FROM_IN_PAST", "Date effective from cannot be past");
+				}
+				if ((waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() != null)
+						&& (waterConnectionRequest.getWaterConnection()
+						.getConnectionExecutionDate() > waterConnectionRequest.getWaterConnection()
+						.getDateEffectiveFrom())) {
 
-				errorMap.put("DATE_EFFECTIVE_FROM_LESS_THAN_EXCECUTION_DATE",
-						"Date effective from cannot be before connection execution date");
-			}
-			if ((waterConnectionRequest.getWaterConnection().getMeterInstallationDate() != null)
-					&& (waterConnectionRequest.getWaterConnection()
-					.getMeterInstallationDate() > waterConnectionRequest.getWaterConnection()
-					.getDateEffectiveFrom())) {
+					errorMap.put("DATE_EFFECTIVE_FROM_LESS_THAN_EXCECUTION_DATE",
+							"Date effective from cannot be before connection execution date");
+				}
+				if ((waterConnectionRequest.getWaterConnection().getMeterInstallationDate() != null)
+						&& (waterConnectionRequest.getWaterConnection()
+						.getMeterInstallationDate() > waterConnectionRequest.getWaterConnection()
+						.getDateEffectiveFrom())) {
+					errorMap.put("DATE_EFFECTIVE_FROM_LESS_THAN_METER_INSTALLATION_DATE",
+							"Date effective from cannot be before meter installation date");
+				}
 
-				errorMap.put("DATE_EFFECTIVE_FROM_LESS_THAN_METER_INSTALLATION_DATE",
-						"Date effective from cannot be before meter installation date");
 			}
-
 		}
 	}
 }
