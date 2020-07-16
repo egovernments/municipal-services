@@ -36,6 +36,9 @@ public class NocSearchCriteria {
 	    @JsonProperty("source")
 	    private String source;
 	    
+	    @JsonProperty("nocType")
+	    private String nocType;
+	    
 	    @JsonProperty("sourceRefId")
 	    private String sourceRefId;
 	    

@@ -84,12 +84,14 @@ public class NocQueryBuilder {
 			log.info(criteria.getSourceRefId());
 		}
 		
-		/*List<String> accountId = criteria.getAccountId();
-		if (!CollectionUtils.isEmpty(accountId)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" noc.accountId IN (").append(createQuery(accountId)).append(")");
-			addToPreparedStatement(preparedStmtList, accountId);
-		}*/
+		String nocType = criteria.getNocType();
+		if (nocType!=null) {
+			addClauseIfRequired(builder);
+			builder.append(" noc.nocType = ?");
+			preparedStmtList.add(nocType);
+			log.info(nocType);
+		}
+		
 		log.info(criteria.toString());
 		log.info("Final Query");
 		log.info(builder.toString());
