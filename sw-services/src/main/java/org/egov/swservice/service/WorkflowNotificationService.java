@@ -112,14 +112,12 @@ public class WorkflowNotificationService {
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 				EventRequest eventRequest = getEventRequest(request, topic, property, applicationStatus);
 				if (eventRequest != null) {
-					log.info("In App Notification For WorkFlow :: -> " + mapper.writeValueAsString(eventRequest));
 					notificationUtil.sendEventNotification(eventRequest);
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 				List<SMSRequest> smsRequests = getSmsRequest(request, topic, property, applicationStatus);
 				if (!CollectionUtils.isEmpty(smsRequests)) {
-					log.info("SMS Notification For WorkFlow:: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
 				}
 			}

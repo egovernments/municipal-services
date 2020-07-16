@@ -60,15 +60,12 @@ public class EditNotificationService {
 			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
 				EventRequest eventRequest = getEventRequest(request, property);
 				if (eventRequest != null) {
-					log.debug("IN APP NOTIFICATION FOR EDIT APPLICATION :: -> "
-							+ mapper.writeValueAsString(eventRequest));
 					notificationUtil.sendEventNotification(eventRequest);
 				}
 			}
 			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
 				List<SMSRequest> smsRequests = getSmsRequest(request, property);
 				if (!CollectionUtils.isEmpty(smsRequests)) {
-					log.debug("SMS NOTIFICATION FOR EDIT APPLICATION :: -> " + mapper.writeValueAsString(smsRequests));
 					notificationUtil.sendSMS(smsRequests);
 				}
 			}
