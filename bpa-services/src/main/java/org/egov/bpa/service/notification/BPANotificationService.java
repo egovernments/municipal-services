@@ -232,7 +232,7 @@ public class BPANotificationService {
 		landcriteria.setIds(Arrays.asList(bpaRequest.getBPA().getLandId()));
 		List<LandInfo> landInfo = bpalandService.searchLandInfoToBPA(bpaRequest.getRequestInfo(), landcriteria);
 		
-		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
+		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getUserName(),
 				userDetailResponse.getUser().get(0).getName());
 		
 
