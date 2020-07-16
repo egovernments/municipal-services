@@ -131,21 +131,20 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
             }
         }
         if (!StringUtils.isEmpty(uuid)) {
-	        Double ownerShipPercentage = rs.getDouble("ownerShipPercentage");
-	        if (rs.wasNull()) {
-	        	ownerShipPercentage = null;
-	        }
-	        Boolean isPrimaryOwner = rs.getBoolean("isprimaryholder");
-	        if (rs.wasNull()) {
-	            isPrimaryOwner = null;
-	        }
-	        ConnectionHolderInfo connectionHolderInfo = ConnectionHolderInfo.builder()
-	                .relationship(Relationship.fromValue(rs.getString("holderrelationship")))
-	                .status(Status.fromValue(rs.getString("holderstatus")))
-	                .tenantId(rs.getString("holdertenantid")).ownerType(rs.getString("connectionholdertype"))
-	                .ownerShipPercentage(ownerShipPercentage)
-	                .isPrimaryOwner(isPrimaryOwner).uuid(uuid).build();
-	        sewerageConnection.addConnectionHolderInfo(connectionHolderInfo);
+            Double holderShipPercentage = rs.getDouble("holdershippercentage");
+            if (rs.wasNull()) {
+                holderShipPercentage = null;
+            }
+            Boolean isPrimaryOwner = rs.getBoolean("isprimaryholder");
+            if (rs.wasNull()) {
+                isPrimaryOwner = null;
+            }
+            ConnectionHolderInfo connectionHolderInfo = ConnectionHolderInfo.builder()
+                    .relationship(Relationship.fromValue(rs.getString("holderrelationship")))
+                    .status(Status.fromValue(rs.getString("holderstatus")))
+                    .tenantId(rs.getString("holdertenantid")).ownerType(rs.getString("connectionholdertype"))
+                    .isPrimaryOwner(isPrimaryOwner).uuid(uuid).build();
+            sewerageConnection.addConnectionHolderInfo(connectionHolderInfo);
         }
     }
 }
