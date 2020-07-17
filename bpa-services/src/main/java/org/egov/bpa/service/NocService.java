@@ -60,6 +60,8 @@ public class NocService {
 		String nocPath = BPAConstants.NOCTYPE_REQUIRED_MAP
 				.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
 				.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}", riskType);
+		
+		Map<String,String> nocSourceCnofig = config.getNocSourceCnofig();
 
 		List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsData, nocPath);
 		List<String> nocTypes = JsonPath.read(nocMappingResponse, "$..type");
@@ -68,7 +70,7 @@ public class NocService {
 				NocRequest nocRequest = NocRequest.builder()
 						.noc(Noc.builder().tenantId(bpa.getTenantId())
 								.applicationType(ApplicationType.valueOf(BPAConstants.NOC_APPLICATIONTYPE))
-								.sourceRefId(bpa.getApplicationNo()).nocType(nocType).source(BPAConstants.NOC_SOURCE)
+								.sourceRefId(bpa.getApplicationNo()).nocType(nocType).source(nocSourceCnofig.get(edcrResponse.get(BPAConstants.APPLICATIONTYPE)))
 								.build())
 						.requestInfo(bpaRequest.getRequestInfo()).build();
 				createNoc(nocRequest);

@@ -355,7 +355,7 @@ public class BPAConstants {
 
 	public static final String NOC_TYPE = "NocType";
 
-	public static final String NOC_APPLICATIONTYPE = "PROVISIONAL";
+	public static final String NOC_APPLICATIONTYPE = "NEW";
 
 	public static final String NOC_SOURCE = "BPA";
 }

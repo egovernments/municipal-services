@@ -307,4 +307,7 @@ public class BPAConfiguration {
 	
 	@Value("${egov.inprogress.stsus}")
 	private String statusinprogress;
+	
+	@Value("#{${nocSourceCnofig}}")
+	private Map<String,String> nocSourceCnofig;
 }
