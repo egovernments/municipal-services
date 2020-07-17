@@ -206,7 +206,6 @@ public class BPANotificationService {
 		String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);
 		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
-		log.info("enrichSMSRequest NOTIFICATION :");
 	}
 
 	/**
@@ -232,7 +231,7 @@ public class BPANotificationService {
 		landcriteria.setIds(Arrays.asList(bpaRequest.getBPA().getLandId()));
 		List<LandInfo> landInfo = bpalandService.searchLandInfoToBPA(bpaRequest.getRequestInfo(), landcriteria);
 		
-		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
+		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getUserName(),
 				userDetailResponse.getUser().get(0).getName());
 		
 
@@ -241,9 +240,10 @@ public class BPANotificationService {
 				bpaRequest.getBPA().setLandInfo(landInfo.get(j));
 		}
 		
-		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
-				&& (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
-						|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove()))) {
+		if (!(bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
+				&& bpaRequest.getBPA().getStatus().equals("INITIATED"))
+				&& !(bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove())
+						&& bpaRequest.getBPA().getStatus().equals("INPROGRESS"))) {
 			
 			bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
 					if (owner.getMobileNumber() != null) {
