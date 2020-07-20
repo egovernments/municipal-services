@@ -13,8 +13,9 @@ createdby           character varying(256)  NOT NULL,
 createdtime         bigint                  NOT NULL,
 lastmodifiedby      character varying(256),
 lastmodifiedtime    bigint,
+CONSTRAINT uk_eg_pgr_service_v2 UNIQUE (id),
 CONSTRAINT pk_eg_pgr_serviceReq PRIMARY KEY (tenantId,serviceRequestId)
-)
+);
 
 CREATE TABLE eg_pgr_address_v2 (
 
@@ -59,7 +60,7 @@ lastModifiedBy   CHARACTER VARYING (128),
 createdTime      BIGINT NOT NULL,
 lastModifiedTime BIGINT,
 
-CONSTRAINT pk_eg_pgr_document_id PRIMARY KEY(id)
+CONSTRAINT pk_eg_pgr_document_id PRIMARY KEY(id),
 CONSTRAINT fk_eg_pgr_document FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
 
 );
