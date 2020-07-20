@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.egov.pgr.web.models.RequestInfoWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -58,8 +60,9 @@ public class RequestsApiController{
     public ResponseEntity<String> requestsCreatePost() throws IOException {
         try{
             Resource resource = resourceLoader.getResource("classpath:mockData.json");
-            File mockDataFile = resource.getFile();
-            String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
+            InputStream mockDataFile = resource.getInputStream();
+            log.info("mock file: "+mockDataFile.toString());
+            String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
         catch (Exception e){
@@ -74,9 +77,9 @@ public class RequestsApiController{
                                                      @Valid @ModelAttribute RequestSearchCriteria criteria) {
      try{
          Resource resource = resourceLoader.getResource("classpath:mockData.json");
-         File mockDataFile = resource.getFile();
+         InputStream mockDataFile = resource.getInputStream();
          log.info("mock file: "+mockDataFile.toString());
-         String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
+         String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
          return new ResponseEntity<>(res, HttpStatus.OK);
      }
      catch (Exception e){
@@ -90,8 +93,9 @@ public class RequestsApiController{
     public ResponseEntity<String> requestsUpdatePost() throws IOException {
         try{
             Resource resource = resourceLoader.getResource("classpath:mockData.json");
-            File mockDataFile = resource.getFile();
-            String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
+            InputStream mockDataFile = resource.getInputStream();
+            log.info("mock file: "+mockDataFile.toString());
+            String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
         catch (Exception e){
