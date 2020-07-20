@@ -16,13 +16,8 @@ import org.egov.swservice.repository.IdGenRepository;
 import org.egov.swservice.repository.SewerageDaoImpl;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
-import org.egov.swservice.web.models.AuditDetails;
+import org.egov.swservice.web.models.*;
 import org.egov.swservice.web.models.Connection.StatusEnum;
-import org.egov.swservice.web.models.ConnectionHolderInfo;
-import org.egov.swservice.web.models.SearchCriteria;
-import org.egov.swservice.web.models.SewerageConnection;
-import org.egov.swservice.web.models.SewerageConnectionRequest;
-import org.egov.swservice.web.models.Status;
 import org.egov.swservice.web.models.Idgen.IdResponse;
 import org.egov.swservice.web.models.users.UserDetailResponse;
 import org.egov.swservice.web.models.users.UserSearchRequest;
@@ -258,7 +253,7 @@ public class EnrichmentService {
 		for (SewerageConnection sewerageConnection : sewerageConnectionList) {
 			if (!CollectionUtils.isEmpty(sewerageConnection.getConnectionHolders())) {
 				connectionHolderIds.addAll(sewerageConnection.getConnectionHolders().stream()
-						.map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet()));
+						.map(OwnerInfo::getUuid).collect(Collectors.toSet()));
 			}
 		}
 		if (CollectionUtils.isEmpty(connectionHolderIds))

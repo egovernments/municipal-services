@@ -117,7 +117,7 @@ public class Connection {
 	
 	@JsonProperty("connectionHolders")
 	@Valid
-	private List<ConnectionHolderInfo> connectionHolders;
+	private List<OwnerInfo> connectionHolders;
 	
 	@JsonProperty("applicationType")
 	private String applicationType = null;
@@ -496,9 +496,9 @@ public class Connection {
 		return this;
 	}
 	
-	public Connection addConnectionHolderInfo(ConnectionHolderInfo connectionHolderInfo) {
+	public Connection addConnectionHolderInfo(OwnerInfo connectionHolderInfo) {
 		if (this.connectionHolders == null) {
-			this.connectionHolders = new ArrayList<ConnectionHolderInfo>();
+			this.connectionHolders = new ArrayList<OwnerInfo>();
 		}
 		if (!this.connectionHolders.contains(connectionHolderInfo))
 			this.connectionHolders.add(connectionHolderInfo);
@@ -507,11 +507,11 @@ public class Connection {
 
 	@ApiModelProperty(value = "The connection holder info will enter by employee or citizen")
 	@Valid
-	public List<ConnectionHolderInfo> getConnectionHolders() {
+	public List<OwnerInfo> getConnectionHolders() {
 		return connectionHolders;
 	}
 
-	public void setConnectionHolders(List<ConnectionHolderInfo> connectionHolders) {
+	public void setConnectionHolders(List<OwnerInfo> connectionHolders) {
 		this.connectionHolders = connectionHolders;
 	}
 	

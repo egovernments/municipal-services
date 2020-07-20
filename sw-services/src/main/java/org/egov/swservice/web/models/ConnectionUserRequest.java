@@ -14,5 +14,5 @@ public class ConnectionUserRequest {
     private RequestInfo requestInfo;
 
     @JsonProperty("user")
-    private ConnectionHolderInfo user;
+    private OwnerInfo user;
 }

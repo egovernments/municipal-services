@@ -1,27 +1,21 @@
 package org.egov.swservice.repository.rowmapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.egov.swservice.util.SWConstants;
-import org.egov.swservice.web.models.AuditDetails;
+import org.egov.swservice.web.models.*;
 import org.egov.swservice.web.models.Connection.StatusEnum;
-import org.egov.swservice.web.models.ConnectionHolderInfo;
-import org.egov.swservice.web.models.Document;
-import org.egov.swservice.web.models.PlumberInfo;
-import org.egov.swservice.web.models.Relationship;
-import org.egov.swservice.web.models.SewerageConnection;
-import org.egov.swservice.web.models.Status;
 import org.egov.swservice.web.models.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
@@ -123,9 +117,9 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
 
     private void addHoldersDeatilsToSewerageConnection(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
         String uuid = rs.getString("userid");
-        List<ConnectionHolderInfo> connectionHolders = sewerageConnection.getConnectionHolders();
+        List<OwnerInfo> connectionHolders = sewerageConnection.getConnectionHolders();
         if (!CollectionUtils.isEmpty(connectionHolders)) {
-            for (ConnectionHolderInfo connectionHolderInfo : connectionHolders) {
+            for (OwnerInfo connectionHolderInfo : connectionHolders) {
                 if (!StringUtils.isEmpty(connectionHolderInfo.getUuid()) && !StringUtils.isEmpty(uuid) && connectionHolderInfo.getUuid().equals(uuid))
                     return;
             }
@@ -139,7 +133,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
             if (rs.wasNull()) {
                 isPrimaryOwner = null;
             }
-            ConnectionHolderInfo connectionHolderInfo = ConnectionHolderInfo.builder()
+            OwnerInfo connectionHolderInfo = OwnerInfo.builder()
                     .relationship(Relationship.fromValue(rs.getString("holderrelationship")))
                     .status(Status.fromValue(rs.getString("holderstatus")))
                     .tenantId(rs.getString("holdertenantid")).ownerType(rs.getString("connectionholdertype"))

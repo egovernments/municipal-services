@@ -1,16 +1,6 @@
 package org.egov.swservice.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.swservice.config.SWConfiguration;
@@ -25,7 +15,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -111,7 +104,7 @@ public class UserService {
 	 */
 	private Set<String> getMobileNumbers(SewerageConnectionRequest sewerageConnectionRequest) {
 		Set<String> listOfMobileNumbers = sewerageConnectionRequest.getSewerageConnection().getConnectionHolders()
-				.stream().map(ConnectionHolderInfo::getMobileNumber).collect(Collectors.toSet());
+				.stream().map(OwnerInfo::getMobileNumber).collect(Collectors.toSet());
 		StringBuilder uri = new StringBuilder(configuration.getUserHost())
 				.append(configuration.getUserSearchEndpoint());
 		UserSearchRequest userSearchRequest = UserSearchRequest.builder()
@@ -207,7 +200,7 @@ public class UserService {
 	 * @param role      The role of the user set in this case to CITIZEN
 	 * @param holderInfo The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, Role role, ConnectionHolderInfo holderInfo) {
+	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo holderInfo) {
 		holderInfo.setActive(true);
 		holderInfo.setStatus(Status.ACTIVE);
 		holderInfo.setTenantId(tenantId);
@@ -228,7 +221,7 @@ public class UserService {
 	 * @return UserDetailResponse containing the user if present and the
 	 *         responseInfo
 	 */
-	private UserDetailResponse userExists(ConnectionHolderInfo connectionHolderInfo, RequestInfo requestInfo) {
+	private UserDetailResponse userExists(OwnerInfo connectionHolderInfo, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = getBaseUserSearchRequest(connectionHolderInfo.getTenantId(), requestInfo);
 		userSearchRequest.setMobileNumber(connectionHolderInfo.getMobileNumber());
 		userSearchRequest.setUserType(connectionHolderInfo.getType());
@@ -262,7 +255,7 @@ public class UserService {
 	 * @param listOfMobileNumber list of unique mobileNumbers in the
 	 *                           sewerageconnection request
 	 */
-	private void setUserName(ConnectionHolderInfo holderInfo, Set<String> listOfMobileNumber) {
+	private void setUserName(OwnerInfo holderInfo, Set<String> listOfMobileNumber) {
 
 		if (listOfMobileNumber.contains(holderInfo.getMobileNumber())) {
 			holderInfo.setUserName(holderInfo.getMobileNumber());
@@ -279,7 +272,7 @@ public class UserService {
 	 * @param userDetailResponse
 	 * @param requestInfo
 	 */
-	private void setOwnerFields(ConnectionHolderInfo holderInfo, UserDetailResponse userDetailResponse,
+	private void setOwnerFields(OwnerInfo holderInfo, UserDetailResponse userDetailResponse,
 			RequestInfo requestInfo) {
 
 		holderInfo.setUuid(userDetailResponse.getUser().get(0).getUuid());
@@ -333,11 +326,11 @@ public class UserService {
 	}
 
 	public void updateUser(SewerageConnectionRequest request, SewerageConnection existingSewerageConnection) {
-		if(!CollectionUtils.isEmpty(existingSewerageConnection.getConnectionHolders())) {
+		if (!CollectionUtils.isEmpty(existingSewerageConnection.getConnectionHolders())) {
 			// We have connection holder in the existing application.
-			if(CollectionUtils.isEmpty(request.getSewerageConnection().getConnectionHolders())) {
+			if (CollectionUtils.isEmpty(request.getSewerageConnection().getConnectionHolders())) {
 				// New update request removed the connectionHolder - need to clear the records.
-				ConnectionHolderInfo conHolder = new ConnectionHolderInfo();
+				OwnerInfo conHolder = new OwnerInfo();
 				request.getSewerageConnection().addConnectionHolderInfo(conHolder);
 				return;
 			}

@@ -3,7 +3,6 @@ package org.egov.swservice.web.models.users;
 import java.util.List;
 
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.swservice.web.models.ConnectionHolderInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
