@@ -86,8 +86,10 @@ public class PaymentNotificationService {
 			HashMap<String, String> mappedRecord = mapRecords(context);
 			Map<String, Object> info = (Map<String, Object>) record.get("requestInfo");
 			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-			WaterConnection waterConnection = calculatorUtil.getWaterConnection(requestInfo,
+			List<WaterConnection> waterConnectionList = calculatorUtil.getWaterConnection(requestInfo,
 					mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+			int size = waterConnectionList.size();
+			WaterConnection waterConnection = waterConnectionList.get(size-1);
 			WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
 					.waterConnection(waterConnection).requestInfo(requestInfo).build();
 			Property property = wSCalculationUtil.getProperty(waterConnectionRequest);
