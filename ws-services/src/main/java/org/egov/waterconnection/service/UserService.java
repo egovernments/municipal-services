@@ -110,7 +110,7 @@ public class UserService {
 	 */
 	private Set<String> getMobileNumbers(WaterConnectionRequest waterConnectionRequest) {
 		Set<String> listOfMobileNumbers = waterConnectionRequest.getWaterConnection().getConnectionHolders().stream()
-				.map(ConnectionHolderInfo::getMobileNumber).collect(Collectors.toSet());
+				.map(OwnerInfo::getMobileNumber).collect(Collectors.toSet());
 		StringBuilder uri = new StringBuilder(configuration.getUserHost())
 				.append(configuration.getUserSearchEndpoint());
 		UserSearchRequest userSearchRequest = UserSearchRequest.builder()
@@ -205,7 +205,7 @@ public class UserService {
 	 * @param role      The role of the user set in this case to CITIZEN
 	 * @param holderInfo The user whose fields are to be set
 	 */
-	private void addUserDefaultFields(String tenantId, Role role, ConnectionHolderInfo holderInfo) {
+	private void addUserDefaultFields(String tenantId, Role role, OwnerInfo holderInfo) {
 		holderInfo.setActive(true);
 		holderInfo.setStatus(Status.ACTIVE);
 		holderInfo.setTenantId(tenantId);
@@ -226,7 +226,7 @@ public class UserService {
 	 * @return UserDetailResponse containing the user if present and the
 	 *         responseInfo
 	 */
-	private UserDetailResponse userExists(ConnectionHolderInfo connectionHolderInfo, RequestInfo requestInfo) {
+	private UserDetailResponse userExists(OwnerInfo connectionHolderInfo, RequestInfo requestInfo) {
 		UserSearchRequest userSearchRequest = getBaseUserSearchRequest(connectionHolderInfo.getTenantId(), requestInfo);
 		userSearchRequest.setMobileNumber(connectionHolderInfo.getMobileNumber());
 		userSearchRequest.setUserType(connectionHolderInfo.getType());
@@ -254,7 +254,7 @@ public class UserService {
 	 * @param listOfMobileNumber list of unique mobileNumbers in the waterconnection
 	 *                           request
 	 */
-	private void setUserName(ConnectionHolderInfo holderInfo, Set<String> listOfMobileNumber) {
+	private void setUserName(OwnerInfo holderInfo, Set<String> listOfMobileNumber) {
 
 		if (listOfMobileNumber.contains(holderInfo.getMobileNumber())) {
 			holderInfo.setUserName(holderInfo.getMobileNumber());
@@ -272,7 +272,7 @@ public class UserService {
 	 * @param userDetailResponse
 	 * @param requestInfo
 	 */
-	private void setOwnerFields(ConnectionHolderInfo holderInfo, UserDetailResponse userDetailResponse,
+	private void setOwnerFields(OwnerInfo holderInfo, UserDetailResponse userDetailResponse,
 			RequestInfo requestInfo) {
 
 		holderInfo.setUuid(userDetailResponse.getUser().get(0).getUuid());
@@ -308,7 +308,7 @@ public class UserService {
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
 		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
 			return Collections.emptySet();
-		return userDetailResponse.getUser().stream().map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		return userDetailResponse.getUser().stream().map(OwnerInfo::getUuid).collect(Collectors.toSet());
 	}
 
 	/**
@@ -332,7 +332,7 @@ public class UserService {
 			// We have connection holder in the existing application.
 			if(CollectionUtils.isEmpty(request.getWaterConnection().getConnectionHolders())) {
 				// New update request removed the connectionHolder - need to clear the records.
-				ConnectionHolderInfo conHolder = new ConnectionHolderInfo();
+				OwnerInfo conHolder = new OwnerInfo();
 				request.getWaterConnection().addConnectionHolderInfo(conHolder);
 				return;
 			}

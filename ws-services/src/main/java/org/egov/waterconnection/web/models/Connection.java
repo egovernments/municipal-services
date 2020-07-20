@@ -1,23 +1,20 @@
 
 package org.egov.waterconnection.web.models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.egov.waterconnection.web.models.workflow.ProcessInstance;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.egov.waterconnection.web.models.workflow.ProcessInstance;
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This is lightweight property object that can be used as reference by
@@ -124,7 +121,7 @@ public class Connection {
 	
 	@JsonProperty("connectionHolders")
 	@Valid
-	private List<ConnectionHolderInfo> connectionHolders;
+	private List<OwnerInfo> connectionHolders;
 
 	public Connection id(String id) {
 		this.id = id;
@@ -514,23 +511,23 @@ public class Connection {
 		this.processInstance = processInstance;
 	}
 	
-	public Connection addConnectionHolderInfo(ConnectionHolderInfo connectionHolderInfo) {
+	public Connection addConnectionHolderInfo(OwnerInfo ownerInfo) {
 		if (this.connectionHolders == null) {
-			this.connectionHolders = new ArrayList<ConnectionHolderInfo>();
+			this.connectionHolders = new ArrayList<OwnerInfo>();
 		}
-		if (!this.connectionHolders.contains(connectionHolderInfo))
-			this.connectionHolders.add(connectionHolderInfo);
+		if (!this.connectionHolders.contains(ownerInfo))
+			this.connectionHolders.add(ownerInfo);
 		return this;
 	}
 
 	@ApiModelProperty(value = "The connection holder info will enter by employee or citizen")
 	@Valid
-	public List<ConnectionHolderInfo> getConnectionHolders() {
+	public List<OwnerInfo> getConnectionHolders() {
 		return connectionHolders;
 	}
 
-	public void setConnectionHolders(List<ConnectionHolderInfo> connectionHolders) {
-		this.connectionHolders = connectionHolders;
+	public void setConnectionHolders(List<OwnerInfo> ownerInfo) {
+		this.connectionHolders = ownerInfo;
 	}
 	
 	public Connection dateEffectiveFrom(Long dateEffectiveFrom) {

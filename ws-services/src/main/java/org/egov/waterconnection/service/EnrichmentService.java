@@ -18,13 +18,8 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.IdGenRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
-import org.egov.waterconnection.web.models.AuditDetails;
+import org.egov.waterconnection.web.models.*;
 import org.egov.waterconnection.web.models.Connection.StatusEnum;
-import org.egov.waterconnection.web.models.ConnectionHolderInfo;
-import org.egov.waterconnection.web.models.SearchCriteria;
-import org.egov.waterconnection.web.models.Status;
-import org.egov.waterconnection.web.models.WaterConnection;
-import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.Idgen.IdResponse;
 import org.egov.waterconnection.web.models.users.UserDetailResponse;
 import org.egov.waterconnection.web.models.users.UserSearchRequest;
@@ -286,7 +281,7 @@ public class EnrichmentService {
 		for (WaterConnection waterConnection : waterConnectionList) {
 			if (!CollectionUtils.isEmpty(waterConnection.getConnectionHolders())) {
 				connectionHolderIds.addAll(waterConnection.getConnectionHolders().stream()
-						.map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet()));
+						.map(OwnerInfo::getUuid).collect(Collectors.toSet()));
 			}
 		}
 		if (CollectionUtils.isEmpty(connectionHolderIds))
@@ -303,8 +298,8 @@ public class EnrichmentService {
 	 * @param waterConnectionList List of water connection whose owner's are to be populated from userDetailsResponse
 	 */
 	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse, List<WaterConnection> waterConnectionList) {
-		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
-		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
+		List<OwnerInfo> connectionHolderInfos = userDetailResponse.getUser();
+		Map<String, OwnerInfo> userIdToConnectionHolderMap = new HashMap<>();
 		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
 		waterConnectionList.forEach(waterConnection -> {
 			if(!CollectionUtils.isEmpty(waterConnection.getConnectionHolders())){

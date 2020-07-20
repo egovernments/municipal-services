@@ -9,14 +9,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.web.models.AuditDetails;
+import org.egov.waterconnection.web.models.*;
 import org.egov.waterconnection.web.models.Connection.StatusEnum;
-import org.egov.waterconnection.web.models.ConnectionHolderInfo;
-import org.egov.waterconnection.web.models.Document;
-import org.egov.waterconnection.web.models.PlumberInfo;
-import org.egov.waterconnection.web.models.Relationship;
-import org.egov.waterconnection.web.models.Status;
-import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.workflow.ProcessInstance;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -127,9 +121,9 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
 
     private void addHoldersDeatilsToWaterConnection(ResultSet rs, WaterConnection waterConnection) throws SQLException {
         String uuid = rs.getString("userid");
-        List<ConnectionHolderInfo> connectionHolders = waterConnection.getConnectionHolders();
+        List<OwnerInfo> connectionHolders = waterConnection.getConnectionHolders();
         if (!CollectionUtils.isEmpty(connectionHolders)) {
-            for (ConnectionHolderInfo connectionHolderInfo : connectionHolders) {
+            for (OwnerInfo connectionHolderInfo : connectionHolders) {
                 if (!StringUtils.isEmpty(connectionHolderInfo.getUuid()) && !StringUtils.isEmpty(uuid) && connectionHolderInfo.getUuid().equals(uuid))
                     return;
             }
@@ -143,7 +137,7 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
             if (rs.wasNull()) {
                 isPrimaryOwner = null;
             }
-            ConnectionHolderInfo connectionHolderInfo = ConnectionHolderInfo.builder()
+            OwnerInfo connectionHolderInfo = OwnerInfo.builder()
                     .relationship(Relationship.fromValue(rs.getString("holderrelationship")))
                     .status(Status.fromValue(rs.getString("holderstatus")))
                     .tenantId(rs.getString("holdertenantid")).ownerType(rs.getString("connectionholdertype"))
