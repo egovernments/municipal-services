@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.egov.swservice.web.models.OwnerInfo;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,5 +19,5 @@ public class UserDetailResponse {
     ResponseInfo responseInfo;
 
     @JsonProperty("user")
-    List<ConnectionHolderInfo> user;
+    List<OwnerInfo> user;
 }
