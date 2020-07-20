@@ -3,6 +3,8 @@ package org.egov.pgr.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.egov.pgr.web.models.RequestInfoWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -11,11 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -30,29 +34,32 @@ import javax.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/v2")
+@Slf4j
 public class RequestsApiController{
 
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
 
-    @Value("classpath:mockData.json")
-    Resource resourceFile;
+    private ResourceLoader resourceLoader;
 
     @Autowired
-    public RequestsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public RequestsApiController(ObjectMapper objectMapper, HttpServletRequest request, ResourceLoader resourceLoader) {
         this.objectMapper = objectMapper;
         this.request = request;
+        this.resourceLoader = resourceLoader;
     }
+
+
 
 
 
     @RequestMapping(value="/requests/_create", method = RequestMethod.POST)
     public ResponseEntity<String> requestsCreatePost() throws IOException {
         try{
-            URI uri = resourceFile.getURI();
-            byte[] encoded = Files.readAllBytes(Paths.get(uri));
-            String res = new String(encoded,  StandardCharsets.US_ASCII);
+            Resource resource = resourceLoader.getResource("classpath:mockData.json");
+            File mockDataFile = resource.getFile();
+            String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
         catch (Exception e){
@@ -66,9 +73,10 @@ public class RequestsApiController{
     public ResponseEntity<String> requestsSearchPost(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                      @Valid @ModelAttribute RequestSearchCriteria criteria) {
      try{
-         URI uri = resourceFile.getURI();
-         byte[] encoded = Files.readAllBytes(Paths.get(uri));
-         String res = new String(encoded,  StandardCharsets.US_ASCII);
+         Resource resource = resourceLoader.getResource("classpath:mockData.json");
+         File mockDataFile = resource.getFile();
+         log.info("mock file: "+mockDataFile.toString());
+         String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
          return new ResponseEntity<>(res, HttpStatus.OK);
      }
      catch (Exception e){
@@ -81,9 +89,9 @@ public class RequestsApiController{
     @RequestMapping(value="/requests/_update", method = RequestMethod.POST)
     public ResponseEntity<String> requestsUpdatePost() throws IOException {
         try{
-            URI uri = resourceFile.getURI();
-            byte[] encoded = Files.readAllBytes(Paths.get(uri));
-            String res = new String(encoded,  StandardCharsets.US_ASCII);
+            Resource resource = resourceLoader.getResource("classpath:mockData.json");
+            File mockDataFile = resource.getFile();
+            String res  = FileUtils.readFileToString(mockDataFile, StandardCharsets.UTF_8);
             return new ResponseEntity<>(res, HttpStatus.OK);
         }
         catch (Exception e){
