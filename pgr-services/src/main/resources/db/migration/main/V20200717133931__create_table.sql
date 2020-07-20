@@ -14,7 +14,7 @@ createdtime         bigint                  NOT NULL,
 lastmodifiedby      character varying(256),
 lastmodifiedtime    bigint,
 CONSTRAINT uk_eg_pgr_service_v2 UNIQUE (id),
-CONSTRAINT pk_eg_pgr_serviceReq PRIMARY KEY (tenantId,serviceRequestId)
+CONSTRAINT pk_eg_pgr_serviceReq_v2 PRIMARY KEY (tenantId,serviceRequestId)
 );
 
 CREATE TABLE eg_pgr_address_v2 (
@@ -42,8 +42,8 @@ lastmodifiedby   	CHARACTER VARYING(128),
 lastmodifiedtime 	BIGINT,
 additionaldetails JSONB,
 
-CONSTRAINT pk_eg_pt_address PRIMARY KEY (id),
-CONSTRAINT fk_eg_pt_address FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
+CONSTRAINT pk_eg_pgr_address_v2 PRIMARY KEY (id),
+CONSTRAINT fk_eg_pgr_address_v2 FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
 );
 
 CREATE TABLE eg_pgr_document_v2(
@@ -60,8 +60,8 @@ lastModifiedBy   CHARACTER VARYING (128),
 createdTime      BIGINT NOT NULL,
 lastModifiedTime BIGINT,
 
-CONSTRAINT pk_eg_pgr_document_id PRIMARY KEY(id),
-CONSTRAINT fk_eg_pgr_document FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
+CONSTRAINT pk_eg_pgr_document_v2_id PRIMARY KEY(id),
+CONSTRAINT fk_eg_pgr_document_v2 FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
 
 );
 
