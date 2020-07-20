@@ -308,7 +308,7 @@ public class UserService {
 		UserDetailResponse userDetailResponse = userCall(userSearchRequest, uri);
 		if (CollectionUtils.isEmpty(userDetailResponse.getUser()))
 			return Collections.emptySet();
-		return userDetailResponse.getUser().stream().map(ConnectionHolderInfo::getUuid).collect(Collectors.toSet());
+		return userDetailResponse.getUser().stream().map(OwnerInfo::getUuid).collect(Collectors.toSet());
 	}
 
 	/**

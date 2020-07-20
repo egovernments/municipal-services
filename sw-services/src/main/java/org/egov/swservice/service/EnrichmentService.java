@@ -275,8 +275,8 @@ public class EnrichmentService {
 	 */
 	public void enrichConnectionHolderInfo(UserDetailResponse userDetailResponse,
 			List<SewerageConnection> sewerageConnectionList) {
-		List<ConnectionHolderInfo> connectionHolderInfos = userDetailResponse.getUser();
-		Map<String, ConnectionHolderInfo> userIdToConnectionHolderMap = new HashMap<>();
+		List<OwnerInfo> connectionHolderInfos = userDetailResponse.getUser();
+		Map<String, OwnerInfo> userIdToConnectionHolderMap = new HashMap<>();
 		connectionHolderInfos.forEach(user -> userIdToConnectionHolderMap.put(user.getUuid(), user));
 		sewerageConnectionList.forEach(sewerageConnection -> {
 			if (!CollectionUtils.isEmpty(sewerageConnection.getConnectionHolders())) {
