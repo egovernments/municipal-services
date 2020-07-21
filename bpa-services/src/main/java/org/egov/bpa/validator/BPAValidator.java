@@ -509,12 +509,13 @@ public class BPAValidator {
 	@SuppressWarnings("unchecked")
 	private void validateNocApprove(BPARequest bpaRequest, Object mdmsRes) {
 		BPA bpa = bpaRequest.getBPA();
+		log.info("===========> valdiateNocApprove method called");
 		if (config.getValidateRequiredNoc()) {
 			if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 					&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
 				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
 						bpaRequest.getBPA());
-
+				log.info("===========> valdiateNocApprove method called, application is in noc verification pending");
 				String riskType = "ALL";
 				if (StringUtils.isEmpty(bpa.getRiskType()) || bpa.getRiskType().equalsIgnoreCase("LOW")) {
 					riskType = bpa.getRiskType();
@@ -526,18 +527,9 @@ public class BPAValidator {
 						.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}", riskType);
 
 				List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsRes, nocPath);
-				List<String> nocTypes = new ArrayList<String>();
-				if (!CollectionUtils.isEmpty(nocMappingResponse)) {
-					List<Object> nocMappingArray = (List<Object>) nocMappingResponse.get(0);
-					if (!CollectionUtils.isEmpty(nocMappingArray)) {
-						for (int i = 0; i < nocMappingArray.size(); i++) {
-							if (((Map<String, Boolean>) nocMappingArray.get(i)).get("required")) {
-								nocTypes.add(((Map<String, String>) nocMappingArray.get(i)).get("type").toString());
-							}
-						}
-					}
-				}
+				List<String> nocTypes = JsonPath.read(nocMappingResponse, "$..type");
 
+				log.info("===========> valdiateNocApprove method called, noctypes====",nocTypes);
 				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
 				if (!CollectionUtils.isEmpty(nocs)) {
 					for (Noc noc : nocs) {
