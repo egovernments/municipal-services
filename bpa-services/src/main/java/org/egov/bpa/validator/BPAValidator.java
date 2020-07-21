@@ -543,17 +543,11 @@ public class BPAValidator {
 					for (Noc noc : nocs) {
 						if (!nocTypes.isEmpty() && nocTypes.contains(noc.getNocType())) {
 							List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
-							if (statuses.size() > 0) {
-								Boolean nocForwardCondn = false;
-								for (int i = 0; i < statuses.size(); i++) {
-									nocForwardCondn |= noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i));
-								}
-								if (!nocForwardCondn) {
-									log.error("Noc is not approved having applicationNo :" + noc.getApplicationNo());
-									throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
-											" Application can't be forwarded without NOC "
-													+ StringUtils.join(statuses, " or "));
-								}
+							if(!statuses.contains(noc.getApplicationStatus())) {
+								log.error("Noc is not approved having applicationNo :" + noc.getApplicationNo());
+								throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
+										" Application can't be forwarded without NOC "
+												+ StringUtils.join(statuses, " or "));
 							}
 						}
 					}

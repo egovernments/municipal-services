@@ -1,6 +1,5 @@
 package org.egov.bpa.service;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,13 +157,8 @@ public class NocService {
 			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
-					List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
-					if (statuses.size() > 0) {
-						Boolean nocForwardCondn = true;
-						for (int i = 0; i < statuses.size(); i++) {
-							nocForwardCondn &= !noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i));
-						}
-						if (offlneNocs.contains(noc.getNocType()) && nocForwardCondn) {
+					
+						if (offlneNocs.contains(noc.getNocType())) {
 							Workflow workflow = Workflow.builder().action(config.getNocAutoApproveAction()).build();
 							noc.setWorkflow(workflow);
 							NocRequest nocRequest = NocRequest.builder().noc(noc)
@@ -172,7 +166,7 @@ public class NocService {
 							updateNoc(nocRequest);
 							log.debug("Offline NOC is Auto-Approved " + noc.getApplicationNo());
 						}
-					}
+					
 				});
 			}
 		}
@@ -208,21 +202,13 @@ public class NocService {
 		BPA bpa = bpaRequest.getBPA();
 
 		nocs.forEach(noc -> {
-			List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
-			if (statuses.size() > 0) {
-				Boolean nocForwardCondn = true;
-				for (int i = 0; i < statuses.size(); i++) {
-					nocForwardCondn &= !noc.getApplicationStatus().equalsIgnoreCase(statuses.get(i));
-				}
-				if (nocForwardCondn) {
 					noc.setWorkflow(Workflow.builder().action(config.getNocVoidAction())
 							.comment(bpa.getWorkflow().getComments()).build());
 					NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 							.build();
 					updateNoc(nocRequest);
 					log.debug("Noc Voided having applicationNo : " + noc.getApplicationNo());
-				}
-			}
+			
 		});
 	}
 }
