@@ -158,7 +158,7 @@ public class NocService {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
 					
-						if (offlneNocs.contains(noc.getNocType())) {
+						if (offlneNocs.contains(noc.getNocType()) && !noc.getApplicationStatus().equalsIgnoreCase(config.getNocAutoApprovedState())) {
 							Workflow workflow = Workflow.builder().action(config.getNocAutoApproveAction()).build();
 							noc.setWorkflow(workflow);
 							NocRequest nocRequest = NocRequest.builder().noc(noc)
