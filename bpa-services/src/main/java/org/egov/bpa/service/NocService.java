@@ -1,5 +1,6 @@
 package org.egov.bpa.service;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,11 +155,12 @@ public class NocService {
 
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 				&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
+			List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
 			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
 					
-						if (offlneNocs.contains(noc.getNocType()) && !noc.getApplicationStatus().equalsIgnoreCase(config.getNocAutoApprovedState())) {
+						if (offlneNocs.contains(noc.getNocType()) && !statuses.contains(noc.getApplicationStatus())) {
 							Workflow workflow = Workflow.builder().action(config.getNocAutoApproveAction()).build();
 							noc.setWorkflow(workflow);
 							NocRequest nocRequest = NocRequest.builder().noc(noc)
