@@ -203,7 +203,7 @@ consumerGroup.on("message", function(message) {
   };
 
   const sendPaymentMessage=value=>{
-    console.log("value is"+ value);
+    console.log("value is"+ JSON.stringify(value));
     const { Payments, RequestInfo } = value;
     smsRequest["mobileNumber"] = get(
       Payments[0].paymentDetails[0],
