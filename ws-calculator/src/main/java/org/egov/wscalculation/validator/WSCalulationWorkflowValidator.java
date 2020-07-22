@@ -43,7 +43,7 @@ public class WSCalulationWorkflowValidator {
         int size = waterConnectionList.size();
         WaterConnection waterConnection = waterConnectionList.get(size-1);
         String waterApplicationNumber = waterConnection.getApplicationNo();
-        Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
+        //Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
         waterConnectionValidation(requestInfo,tenantId,waterApplicationNumber,errorMap);
 
         String propertyId = waterConnection.getPropertyId();

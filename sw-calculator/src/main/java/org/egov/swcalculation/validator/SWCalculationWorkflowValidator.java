@@ -50,7 +50,7 @@ public class SWCalculationWorkflowValidator {
         int size = sewerageConnectionList.size();
         SewerageConnection sewerageConnection = sewerageConnectionList.get(size-1);
         String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
-        Long dateEffectiveFrom = sewerageConnection.getDateEffectiveFrom();
+        //Long dateEffectiveFrom = sewerageConnection.getDateEffectiveFrom();
         sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
 
         String propertyId = sewerageConnection.getPropertyId();
@@ -58,8 +58,8 @@ public class SWCalculationWorkflowValidator {
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
 
-        if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
-            dateValidation(dateEffectiveFrom,connectionNo,errorMap);
+        /*if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
+            dateValidation(dateEffectiveFrom,connectionNo,errorMap);*/
 
         return  errorMap;
     }
