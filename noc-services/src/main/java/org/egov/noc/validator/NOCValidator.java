@@ -55,7 +55,7 @@ public class NOCValidator {
 		
 		if(!ObjectUtils.isEmpty(noc.getWorkflow()) && !StringUtils.isEmpty(noc.getWorkflow().getAction())) {
 		
-			if (noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_APPROVE) && (mode.equals(NOCConstants.ONLINE_MODE) 
+			if ( ( noc.getWorkflow().getAction().equalsIgnoreCase(NOCConstants.ACTION_APPROVE) && (mode.equals(NOCConstants.ONLINE_MODE) )
 					|| (mode.equals(NOCConstants.OFFLINE_MODE) && nocConfiguration.getNocOfflineDocRequired()))) {
 				validateRequiredDocuments(noc, mdmsData);
 			}
