@@ -25,18 +25,20 @@ public class WSCalculationWorkflowValidator {
 	private CalculatorUtil util;
 
 	 public Boolean applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Boolean genratedemand){
-	        Map<String,String> errorMap = new HashMap<>();
-	        WaterConnection waterConnection = util.getWaterConnection(requestInfo,connectionNo,tenantId);
+	    Map<String,String> errorMap = new HashMap<>();
+		 List<WaterConnection> waterConnectionList = util.getWaterConnection(requestInfo,connectionNo,tenantId);
+		 int size = waterConnectionList.size();
+		 WaterConnection waterConnection = waterConnectionList.get(size-1);
 		String waterApplicationNumber = waterConnection.getApplicationNo();
-		Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
+		//Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
 		waterConnectionValidation(requestInfo, tenantId, waterApplicationNumber, errorMap);
 		
 		String propertyId = waterConnection.getPropertyId();
         Property property = util.getProperty(requestInfo,tenantId,propertyId);
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
-		 if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
-			 dateValidation(dateEffectiveFrom,connectionNo,errorMap);
+        /*if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
+			 dateValidation(dateEffectiveFrom,connectionNo,errorMap);*/
         if(!CollectionUtils.isEmpty(errorMap)){
         	if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
                 throw new CustomException(errorMap);

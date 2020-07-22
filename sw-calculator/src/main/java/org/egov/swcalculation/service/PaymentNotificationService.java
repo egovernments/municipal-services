@@ -85,9 +85,11 @@ public class PaymentNotificationService {
 			HashMap<String, String> mappedRecord = mapRecords(context);
 			Map<String, Object> info = (Map<String, Object>) record.get("requestInfo");
 			RequestInfo requestInfo = mapper.convertValue(info, RequestInfo.class);
-			
-			SewerageConnection sewerageConnection = calculatorUtils.getSewerageConnection(requestInfo,
+   
+			List<SewerageConnection> sewerageConnectionList = calculatorUtils.getSewerageConnection(requestInfo,
 					mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
+			int size = sewerageConnectionList.size();
+			SewerageConnection sewerageConnection = sewerageConnectionList.get(size-1);
 			
 			SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
 					.sewerageConnection(sewerageConnection).requestInfo(requestInfo).build();

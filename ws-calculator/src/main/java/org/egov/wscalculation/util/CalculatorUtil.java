@@ -118,7 +118,7 @@ public class CalculatorUtil {
 	 *            Tenant Id
 	 * @return WaterConnection based on parameters
 	 */
-	public WaterConnection getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
+	public List<WaterConnection> getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
 		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(tenantId, connectionNo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -134,10 +134,25 @@ public class CalculatorUtil {
 			return null;
 
 		Collections.sort(response.getWaterConnection(), Comparator.comparing(wc -> wc.getAuditDetails().getLastModifiedTime()));
-		int size = response.getWaterConnection().size();
-		return response.getWaterConnection().get(size - 1);
+		
+		return response.getWaterConnection();
 	}
 
+	public  WaterConnection getWaterConnectionObject(List<WaterConnection> waterConnectionList){
+		int size = waterConnectionList.size();
+		if(size>1){
+			WaterConnection waterConnection = null;
+			if(waterConnectionList.get(size-1).getApplicationType().equalsIgnoreCase("MODIFY_WATER_CONNECTION") && waterConnectionList.get(size-1).getDateEffectiveFrom() > System.currentTimeMillis()){
+				waterConnection =  waterConnectionList.get(size-2);
+			}
+			else
+				waterConnection =  waterConnectionList.get(size-1);
+
+			return waterConnection;
+		}
+		else
+			return waterConnectionList.get(0);
+	}
 	/**
 	 * Creates waterConnection search url based on tenantId and connectionNumber
 	 * 
