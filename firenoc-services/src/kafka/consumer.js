@@ -203,25 +203,25 @@ consumerGroup.on("message", function(message) {
   };
 
   const sendPaymentMessage=value=>{
-    console.log("value is"+ JSON.stringify(value));
-    const { Payments, RequestInfo } = value;
+    
+    const { Payment, RequestInfo } = value;
     smsRequest["mobileNumber"] = get(
-      Payments[0].paymentDetails[0],
+      Payment.paymentDetails[0],
       "Bill[0].mobileNumber"
     );
 
-    let businessService=get(Payments[0].paymentDetails[0],"Bill[0].businessService")
+    let businessService=get(Payment.paymentDetails[0],"Bill[0].businessService")
     if (businessService === envVariables.BUSINESS_SERVICE) {
-    let paymentAmount=get(Payments[0].paymentDetails[0],"Bill[0].amountPaid");
+    let paymentAmount=get(Payment.paymentDetails[0],"Bill[0].amountPaid");
     console.log("paid amount is",paymentAmount);
 
-    let applicantName=get(Payments[0].paymentDetails[0],"Bill[0].payerName");
+    let applicantName=get(Payment.paymentDetails[0],"Bill[0].payerName");
     console.log("applicantName is",applicantName);
 
-    let receiptNumber=get(Payments[0].paymentDetails[0],"Bill[0].billDetails[0].receiptNumber");
+    let receiptNumber=get(Payment.paymentDetails[0],"Bill[0].billDetails[0].receiptNumber");
 
-    let applicationNumber=get(Payments[0].paymentDetails[0],"Bill[0].billDetails[0].consumerCode");
-    let tenant=get(Payments[0],"tenantId");
+    let applicationNumber=get(Payment.paymentDetails[0],"Bill[0].billDetails[0].consumerCode");
+    let tenant=get(Payment,"tenantId");
 
     let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenant}`;
 
