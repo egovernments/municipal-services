@@ -77,7 +77,7 @@ public class CalculatorUtils {
 	 *            The tenantId of the sewerage connection
 	 * @return The water connection fo the particular connection no
 	 */
-	public SewerageConnection getSewerageConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
+	public List<SewerageConnection> getSewerageConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
 		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getSewerageSearchURL(tenantId, connectionNo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -99,9 +99,23 @@ public class CalculatorUtils {
 			}
 		});
 
-		int size = response.getSewerageConnections().size();
+		return response.getSewerageConnections();
+	}
 
-		return response.getSewerageConnections().get(size-1);
+	public  SewerageConnection getSewerageConnectionObject(List<SewerageConnection> sewerageConnectionList){
+		int size = sewerageConnectionList.size();
+		if(size>1){
+			SewerageConnection sewerageConnection = null;
+			if(sewerageConnectionList.get(size-1).getApplicationType().equalsIgnoreCase("MODIFY_SEWERAGE_CONNECTION") && sewerageConnectionList.get(size-1).getDateEffectiveFrom() > System.currentTimeMillis()){
+				sewerageConnection =  sewerageConnectionList.get(size-2);
+			}
+			else
+				sewerageConnection =  sewerageConnectionList.get(size-1);
+
+			return sewerageConnection;
+		}
+		else
+			return sewerageConnectionList.get(0);
 	}
 
 	/**

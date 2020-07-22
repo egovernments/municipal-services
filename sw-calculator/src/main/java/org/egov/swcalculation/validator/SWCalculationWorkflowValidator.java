@@ -46,7 +46,9 @@ public class SWCalculationWorkflowValidator {
     }
 
     public Map<String,String> applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Map<String,String> errorMap){
-        SewerageConnection sewerageConnection = util.getSewerageConnection(requestInfo,connectionNo,tenantId);
+        List<SewerageConnection> sewerageConnectionList = util.getSewerageConnection(requestInfo,connectionNo,tenantId);
+        int size = sewerageConnectionList.size();
+        SewerageConnection sewerageConnection = sewerageConnectionList.get(size-1);
         String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
         Long dateEffectiveFrom = sewerageConnection.getDateEffectiveFrom();
         sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
