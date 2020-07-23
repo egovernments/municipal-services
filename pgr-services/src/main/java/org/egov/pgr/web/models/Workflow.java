@@ -37,9 +37,9 @@ public class Workflow   {
         @JsonProperty("comments")
         private String comments = null;
 
-        @JsonProperty("varificationDocuments")
+        @JsonProperty("verificationDocuments")
         @Valid
-        private List<Document> varificationDocuments = null;
+        private List<Document> verificationDocuments = null;
 
 
         public Workflow addAssignesItem(String assignesItem) {
@@ -50,11 +50,11 @@ public class Workflow   {
         return this;
         }
 
-        public Workflow addVarificationDocumentsItem(Document varificationDocumentsItem) {
-            if (this.varificationDocuments == null) {
-            this.varificationDocuments = new ArrayList<>();
+        public Workflow addVarificationDocumentsItem(Document verificationDocumentsItem) {
+            if (this.verificationDocuments == null) {
+            this.verificationDocuments = new ArrayList<>();
             }
-        this.varificationDocuments.add(varificationDocumentsItem);
+        this.verificationDocuments.add(verificationDocumentsItem);
         return this;
         }
 

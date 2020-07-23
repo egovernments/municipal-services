@@ -56,7 +56,7 @@ public class Address   {
         private String pincode = null;
 
         @JsonProperty("additionDetails")
-        private String additionDetails = null;
+        private Object additionDetails = null;
 
         @JsonProperty("buildingName")
         private String buildingName = null;
