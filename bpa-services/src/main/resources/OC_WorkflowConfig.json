@@ -182,6 +182,23 @@
             {
               "tenantId": "pb",
               "currentState": "PENDING_APPL_FEE_PAYMENT",
+              "action": "SKIP_PAYMENT",
+              "nextState": "DOC_VERIFICATION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
+                "SYSTEM_PAYMENT",
+                "CEMP"
+              ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "PENDING_APPL_FEE_PAYMENT",
               "action": "ADHOC",
               "nextState": "PENDING_APPL_FEE_PAYMENT",
               "roles": [
@@ -386,6 +403,24 @@
                 "BPA_TOWNPLANNER",
                 "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
+                "CEMP"
+              ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "PENDING_SANC_FEE_PAYMENT",
+              "action": "SKIP_PAYMENT",
+              "nextState": "APPROVED",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
+                "SYSTEM_PAYMENT",
+                "BPA_APPROVER",
                 "CEMP"
               ]
             }
