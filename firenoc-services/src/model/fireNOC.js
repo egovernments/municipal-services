@@ -632,6 +632,10 @@ const FireNOC = {
       // format: "int64",
       description: "Applied Date of the fire NOC as epoch"
     },
+    isLegacy: {
+      type: "boolean",
+      description: "Firenoc is created in system or not"
+    },
     fireNOCDetails: FireNOCDetails,
     auditDetails: AuditDetails
   },
