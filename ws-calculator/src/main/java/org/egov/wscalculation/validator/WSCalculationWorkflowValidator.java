@@ -30,15 +30,13 @@ public class WSCalculationWorkflowValidator {
 		 int size = waterConnectionList.size();
 		 WaterConnection waterConnection = waterConnectionList.get(size-1);
 		String waterApplicationNumber = waterConnection.getApplicationNo();
-		//Long dateEffectiveFrom = waterConnection.getDateEffectiveFrom();
 		waterConnectionValidation(requestInfo, tenantId, waterApplicationNumber, errorMap);
 		
 		String propertyId = waterConnection.getPropertyId();
         Property property = util.getProperty(requestInfo,tenantId,propertyId);
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
-        /*if(!StringUtils.isEmpty(dateEffectiveFrom) && dateEffectiveFrom != 0)
-			 dateValidation(dateEffectiveFrom,connectionNo,errorMap);*/
+
         if(!CollectionUtils.isEmpty(errorMap)){
         	if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
                 throw new CustomException(errorMap);
@@ -81,23 +79,4 @@ public class WSCalculationWorkflowValidator {
 
 		return isApplicationApproved;
 	}
-
-	public Map<String, String> dateValidation(Long dateEffectiveFrom, String connectionNo,
-											  Map<String, String> errormap) {
-		if ((System.currentTimeMillis() < dateEffectiveFrom)
-				&& (!getDate(System.currentTimeMillis()).equals(getDate(dateEffectiveFrom)))) {
-			String effectiveDate = getDate(dateEffectiveFrom);
-			errormap.put("DateEffectiveFromError", "Demand cannot be generated for the water connection " + connectionNo
-					+ " ,the modified connection will be in effect from " + effectiveDate.toString());
-		}
-		return errormap;
-	}
-
-	public String getDate(Long dateEffectiveFrom) {
-		Date date = new Date(dateEffectiveFrom);
-		DateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
-		dateformat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-		return dateformat.format(date);
-	}
-
 }

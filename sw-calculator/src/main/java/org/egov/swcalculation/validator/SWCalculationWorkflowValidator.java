@@ -43,22 +43,18 @@ public class SWCalculationWorkflowValidator {
         int size = sewerageConnectionList.size();
         SewerageConnection sewerageConnection = sewerageConnectionList.get(size-1);
         String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
-        //Long dateEffectiveFrom = sewerageConnection.getDateEffectiveFrom();
         sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
         String propertyId = sewerageConnection.getPropertyId();
         Property property = util.getProperty(requestInfo,tenantId,propertyId);
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
-        
-        /*if(!StringUtils.isEmpty(dateEffectiveFrom))
-            dateValidation(dateEffectiveFrom,connectionNo,errorMap);*/
         return  errorMap;
     }
 
     public void sewerageConnectionValidation(RequestInfo requestInfo,String tenantId, String sewerageApplicationNumber,Map<String,String> errorMap){
         Boolean isApplicationApproved = workflowValidation(requestInfo,tenantId,sewerageApplicationNumber);
         if(!isApplicationApproved)
-            errorMap.put("sewerageApplicationError","Demand cannot be generated as sewerage connection application with application number "+sewerageApplicationNumber+" is in workflow and not approved yet");
+            errorMap.put("SewerageApplicationError","Demand cannot be generated as sewerage connection application with application number "+sewerageApplicationNumber+" is in workflow and not approved yet");
     }
 
     public void propertyValidation(RequestInfo requestInfo,String tenantId, String propertyApplicationNumber,Map<String,String> errorMap){
@@ -79,24 +75,4 @@ public class SWCalculationWorkflowValidator {
 
         return isApplicationApproved;
     }
-
-    public Map<String, String> dateValidation(Long dateEffectiveFrom, String connectionNo,
-                                              Map<String, String> errormap) {
-        if ((System.currentTimeMillis() < dateEffectiveFrom
-                && (!getDate(System.currentTimeMillis()).equals(getDate(dateEffectiveFrom))))) {
-            String effectiveDate = getDate(dateEffectiveFrom);
-            errormap.put("DateEffectiveFromError", "Demand cannot be generated for the sewerage connection "
-                    + connectionNo + " ,the modified connection will be in effect from " + effectiveDate.toString());
-        }
-
-        return errormap;
-    }
-
-    public String getDate(Long dateEffectiveFrom){
-        Date date = new Date(dateEffectiveFrom);
-        DateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
-        dateformat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-        return dateformat.format(date);
-    }
-
 }
