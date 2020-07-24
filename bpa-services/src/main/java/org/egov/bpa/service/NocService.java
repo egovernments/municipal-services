@@ -189,11 +189,13 @@ public class NocService {
 				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
-					noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
-					NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
-							.build();
-					updateNoc(nocRequest);
-					log.debug("Noc Initiated with applicationNo : " + noc.getApplicationNo());
+					if(!noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.INPROGRESS_STATUS)){
+						noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
+						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
+								.build();
+						updateNoc(nocRequest);
+						log.debug("Noc Initiated with applicationNo : " + noc.getApplicationNo());
+					}
 				});
 			}
 		}
