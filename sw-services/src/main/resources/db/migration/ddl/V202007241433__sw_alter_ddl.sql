@@ -1,7 +1,6 @@
-DROP TABLE IF EXISTS eg_sw_connectionholder;
-CREATE TABLE eg_sw_connectionholder (
+CREATE TABLE IF NOT EXISTS eg_sw_connectionholder (
   tenantId            	CHARACTER VARYING (256),
-  connectionid      	CHARACTER VARYING (128) NOT NULL,
+  connectionid      	CHARACTER VARYING (128) NOT NULL UNIQUE,
   status             	CHARACTER VARYING (128),
   userid              	CHARACTER VARYING (128),
   isprimaryholder      	BOOLEAN,

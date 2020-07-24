@@ -32,7 +32,7 @@ public class SWCalculationWorkflowValidator {
         Boolean genratedemand = true;
         applicationValidation(requestInfo,tenantId,connectionNo,errorMap);
         if(!CollectionUtils.isEmpty(errorMap)){
-            log.error("DemandGeneartionError", "Demand cannot be generated as sewerage connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
+            log.error("DEMAND_GENERATION_ERROR", "Demand cannot be generated as sewerage connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
             genratedemand=false;
         }
         return genratedemand;
@@ -54,13 +54,13 @@ public class SWCalculationWorkflowValidator {
     public void sewerageConnectionValidation(RequestInfo requestInfo,String tenantId, String sewerageApplicationNumber,Map<String,String> errorMap){
         Boolean isApplicationApproved = workflowValidation(requestInfo,tenantId,sewerageApplicationNumber);
         if(!isApplicationApproved)
-            errorMap.put("SewerageApplicationError","Demand cannot be generated as sewerage connection application with application number "+sewerageApplicationNumber+" is in workflow and not approved yet");
+            errorMap.put("SEWERAGE_APPLICATION_ERROR","Demand cannot be generated as sewerage connection application with application number "+sewerageApplicationNumber+" is in workflow and not approved yet");
     }
 
     public void propertyValidation(RequestInfo requestInfo,String tenantId, String propertyApplicationNumber,Map<String,String> errorMap){
         Boolean isApplicationApproved = workflowValidation(requestInfo,tenantId,propertyApplicationNumber);
         if(!isApplicationApproved)
-            errorMap.put("PropertyApplicationError","Demand cannot be generated as property application with application number "+propertyApplicationNumber+" is in workflow and not approved yet");
+            errorMap.put("PROPERTY_APPLICATION_ERROR","Demand cannot be generated as property application with application number "+propertyApplicationNumber+" is in workflow and not approved yet");
     }
 
     public Boolean workflowValidation(RequestInfo requestInfo,String tenantId, String businessIds){

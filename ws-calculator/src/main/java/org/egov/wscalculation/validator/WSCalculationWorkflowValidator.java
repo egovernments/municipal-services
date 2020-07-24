@@ -41,7 +41,7 @@ public class WSCalculationWorkflowValidator {
         	if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
                 throw new CustomException(errorMap);
             else{
-                log.error("DemandGeneartionError", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
+                log.error("DEMAND_GENERATION_ERROR", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
                 genratedemand=false;
             }
 
@@ -53,7 +53,7 @@ public class WSCalculationWorkflowValidator {
 			Map<String, String> errorMap) {
 		Boolean isApplicationApproved = workflowValidation(requestInfo, tenantId, waterApplicationNumber);
 		if (!isApplicationApproved)
-			errorMap.put("WaterApplicationError",
+			errorMap.put("WATER_APPLICATION_ERROR",
 					"Demand cannot be generated as water connection application with application number "
 							+ waterApplicationNumber + " is in workflow and not approved yet");
 	}
@@ -62,7 +62,7 @@ public class WSCalculationWorkflowValidator {
 			Map<String, String> errorMap) {
 		Boolean isApplicationApproved = workflowValidation(requestInfo, tenantId, propertyApplicationNumber);
 		if (!isApplicationApproved)
-			errorMap.put("PropertyApplicationError",
+			errorMap.put("PROPERTY_APPLICATION_ERROR",
 					"Demand cannot be generated as property application with application number "
 							+ propertyApplicationNumber + " is in workflow and not approved yet");
 	}
