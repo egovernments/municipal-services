@@ -682,7 +682,7 @@ const BillingSlab = {
     fireNOCType: {
       type: "string",
       description: "FireNOCType, is unique enum value for a noc",
-      enum: ["NEW", "PROVISIONAL"]
+      enum: ["NEW", "PROVISIONAL","RENEWAL"]
     },
     buildingUsageType: {
       type: "string",
