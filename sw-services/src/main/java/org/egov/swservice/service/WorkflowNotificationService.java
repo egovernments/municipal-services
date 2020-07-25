@@ -91,6 +91,7 @@ public class WorkflowNotificationService {
 	String connectionNoReplacer = "$connectionNumber";
 	String mobileNoReplacer = "$mobileNo";
 	String applicationKey = "$applicationkey";
+	String propertyKey = "property";
 
 	/**
 	 * 
@@ -502,6 +503,7 @@ public class WorkflowNotificationService {
 			sewerageObject.put(applicationFee, calResponse.getCalculation().get(0).getFee());
 			sewerageObject.put(serviceFee, calResponse.getCalculation().get(0).getCharge());
 			sewerageObject.put(tax, calResponse.getCalculation().get(0).getTaxAmount());
+			sewerageObject.put(propertyKey, property);
 			String tenantId = property.getTenantId().split("\\.")[0];
 			String fileStoreId = getFielStoreIdFromPDFService(sewerageObject,
 					sewerageConnectionRequest.getRequestInfo(), tenantId);
