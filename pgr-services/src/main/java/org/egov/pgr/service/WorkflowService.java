@@ -68,7 +68,7 @@ public class WorkflowService {
         return state.getApplicationStatus();
     }
 
-    
+
     public void validateAssignee(ServiceRequest serviceRequest){
         /*
         * Call HRMS service and validate of the assignee belongs to same department
@@ -97,7 +97,21 @@ public class WorkflowService {
     }
 
 
-    /**
+    public void enrichmentForSendBackToCititzen(){
+        /*
+        * If send bac to citizen action is taken assignes should be set to accountId
+        *
+        * */
+    }
+
+
+    public void enrichWorkflow(ServiceRequest request){
+        /*
+        * Should enrich the workflow object in PGREntity Object
+        * */
+    }
+
+   /**
      * Enriches ProcessInstance Object for workflow
      * @param serviceRequest
      */
@@ -114,7 +128,7 @@ public class WorkflowService {
 
         return processInstance;
     }
-
+    
     /**
      * Method to integrate with workflow
      *

@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.UserInfo;
+import org.egov.common.contract.request.User;
 
 @AllArgsConstructor
 @Getter
@@ -16,7 +16,7 @@ public class CreateUserRequest {
     private RequestInfo requestInfo;
 
     @JsonProperty("user")
-    private UserInfo user;
+    private User user;
 
 }
 

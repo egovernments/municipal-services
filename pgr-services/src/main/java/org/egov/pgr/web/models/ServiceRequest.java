@@ -26,11 +26,8 @@ public class ServiceRequest   {
         @JsonProperty("RequestInfo")
         private RequestInfo requestInfo = null;
 
-        @JsonProperty("service")
-        private Service service = null;
-
-        @JsonProperty("workflow")
-        private Workflow workflow = null;
+        @JsonProperty("PGREntity")
+        private PGREntity pgrEntity = null;
 
 
 }
