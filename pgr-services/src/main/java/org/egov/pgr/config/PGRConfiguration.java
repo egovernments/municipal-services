@@ -14,6 +14,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.TimeZone;
 
 @Component
@@ -70,6 +71,25 @@ public class PGRConfiguration {
 
     @Value("${egov.idgen.pgr.serviceRequestId.format}")
     private String serviceRequestIdGenFormat;
+
+    //Workflow Config
+    @Value("${pgr.business.codes}")
+    private List<String> businessServiceList;
+
+    @Value("${workflow.host}")
+    private String wfHost;
+
+    @Value("${workflow.transition.path}")
+    private String wfTransitionPath;
+
+    @Value("${workflow.businessservice.search.path}")
+    private String wfBusinessServiceSearchPath;
+
+    @Value("${workflow.processinstance.search.path}")
+    private String wfProcessInstanceSearchPath;
+
+    @Value("${is.workflow.enabled}")
+    private Boolean isWorkflowEnabled;
 
 
 
