@@ -45,6 +45,9 @@ public class CalculatorUtil {
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
+	@Autowired
+	private ObjectMapper mapper;
+
 	/**
 	 * Methods provides all the usage category master for Water Service module
 	 */
@@ -119,7 +122,6 @@ public class CalculatorUtil {
 	 * @return WaterConnection based on parameters
 	 */
 	public List<WaterConnection> getWaterConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
-		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(tenantId, connectionNo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -182,7 +184,6 @@ public class CalculatorUtil {
 	 */
 	public WaterConnection getWaterConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
 			String tenantId) {
-		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getWaterSearchURL(searchCriteria),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -316,7 +317,6 @@ public class CalculatorUtil {
 	}
 
 	public Property getProperty(RequestInfo requestInfo, String tenantId, String propertyId) {
-		ObjectMapper mapper = new ObjectMapper();
 		String propertySearchURL = getPropertySearchURL(propertyId, tenantId);
 		Object propertyResult = serviceRequestRepository.fetchResult(new StringBuilder(propertySearchURL),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -345,7 +345,6 @@ public class CalculatorUtil {
 
 	public List<ProcessInstance> getWorkFlowProcessInstance(RequestInfo requestInfo, String tenantId,
 			String businessIds) {
-		ObjectMapper mapper = new ObjectMapper();
 		String workflowProcessInstanceSearchURL = getWorkflowProcessInstanceSearchURL(tenantId, businessIds);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(workflowProcessInstanceSearchURL),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());

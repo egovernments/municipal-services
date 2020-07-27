@@ -45,6 +45,9 @@ public class CalculatorUtils {
 	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
+	@Autowired
+	private ObjectMapper mapper;
+
 	/**
 	 * Prepares and returns MDMS search request with financial master criteria
 	 *
@@ -89,7 +92,6 @@ public class CalculatorUtils {
 	 * @return The water connection fo the particular connection no
 	 */
 	public List<SewerageConnection> getSewerageConnection(RequestInfo requestInfo, String connectionNo, String tenantId) {
-		ObjectMapper mapper = new ObjectMapper();
 		Object result = serviceRequestRepository.fetchResult(getSewerageSearchURL(tenantId, connectionNo),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 
@@ -215,7 +217,6 @@ public class CalculatorUtils {
 	 */
 	public SewerageConnection getSewerageConnectionOnApplicationNO(RequestInfo requestInfo, SearchCriteria searchCriteria,
 			String tenantId) {
-		ObjectMapper mapper = new ObjectMapper();
 		String url = getSewerageSearchURL(searchCriteria);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(url),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -313,7 +314,6 @@ public class CalculatorUtils {
 	}
 	
 	public Property getProperty(RequestInfo requestInfo, String tenantId, String propertyId){
-		ObjectMapper mapper = new ObjectMapper();
 		String propertySearchURL = getPropertySearchURL(propertyId,tenantId);
 		Object propertyResult = serviceRequestRepository.fetchResult(new StringBuilder(propertySearchURL),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
@@ -344,7 +344,6 @@ public class CalculatorUtils {
 
 
 	public List<ProcessInstance> getWorkFlowProcessInstance(RequestInfo requestInfo, String tenantId, String businessIds){
-		ObjectMapper mapper = new ObjectMapper();
 		String workflowProcessInstanceSearchURL = getWorkflowProcessInstanceSearchURL(tenantId,businessIds);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(workflowProcessInstanceSearchURL),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
