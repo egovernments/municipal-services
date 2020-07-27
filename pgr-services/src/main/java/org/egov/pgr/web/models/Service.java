@@ -2,7 +2,7 @@ package org.egov.pgr.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
-import org.egov.common.contract.request.UserInfo;
+import org.egov.common.contract.request.User;
 import org.springframework.validation.annotation.Validated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +24,7 @@ import lombok.Builder;
 @Builder
 public class Service   {
         @JsonProperty("citizen")
-        private UserInfo citizen = null;
+        private User citizen = null;
 
         @JsonProperty("id")
         private String id = null;

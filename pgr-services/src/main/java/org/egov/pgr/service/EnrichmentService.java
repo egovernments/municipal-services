@@ -13,7 +13,7 @@ public class EnrichmentService {
 
     public void enrichCreateRequest(ServiceRequest serviceRequest){
 
-        Service service = serviceRequest.getService();
+        Service service = serviceRequest.getPgrEntity().getService();
 
 
 

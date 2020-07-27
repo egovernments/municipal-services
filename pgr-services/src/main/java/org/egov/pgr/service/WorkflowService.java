@@ -30,7 +30,7 @@ public class WorkflowService {
         return null;
     }
 
-    
+
     public void validateAssignee(ServiceRequest serviceRequest){
         /*
         * Call HRMS service and validate of the assignee belongs to same department
@@ -38,6 +38,21 @@ public class WorkflowService {
         *
         * */
 
+    }
+
+
+    public void enrichmentForSendBackToCititzen(){
+        /*
+        * If send bac to citizen action is taken assignes should be set to accountId
+        *
+        * */
+    }
+
+
+    public void enrichWorkflow(ServiceRequest request){
+        /*
+        * Should enrich the workflow object in PGREntity Object
+        * */
     }
 
 

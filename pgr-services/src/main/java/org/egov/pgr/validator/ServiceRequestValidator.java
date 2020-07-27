@@ -1,7 +1,7 @@
 package org.egov.pgr.validator;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.UserInfo;
+import org.egov.common.contract.request.User;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
@@ -36,12 +36,12 @@ public class ServiceRequestValidator {
         RequestInfo requestInfo = request.getRequestInfo();
 
         if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)
-            && StringUtils.isEmpty(request.getService().getAccountId())){
+            && StringUtils.isEmpty(request.getPgrEntity().getService().getAccountId())){
             errorMap.put("INVALID_REQUEST","AccountId cannot be null");
         }
 
         if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_EMPLOYEE)){
-            UserInfo citizen = request.getService().getCitizen();
+            User citizen = request.getPgrEntity().getService().getCitizen();
             if(citizen == null)
                 errorMap.put("INVALID_REQUEST","Citizen object cannot be null");
             else if(citizen.getMobileNumber()==null || citizen.getName()==null)
