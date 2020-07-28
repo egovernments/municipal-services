@@ -309,9 +309,9 @@ public class EnrichmentService {
 								.convertValue(connectionHashMap.get(connection.getConnectionNo()).getAdditionalDetails(), HashMap.class);
 						additionalDetail2 = mapper
 								.convertValue(connection.getAdditionalDetails(), HashMap.class);
-						Long creationDate1 = (Long) additionalDetail1.get(SWConstants.APP_CREATED_DATE);
-						Long creationDate2 = (Long) additionalDetail2.get(SWConstants.APP_CREATED_DATE);
-						if (creationDate1 < creationDate2) {
+						BigDecimal creationDate1 = (BigDecimal) additionalDetail1.get(SWConstants.APP_CREATED_DATE);
+						BigDecimal creationDate2 = (BigDecimal) additionalDetail2.get(SWConstants.APP_CREATED_DATE);
+						if (creationDate1.compareTo(creationDate2) == -1) {
 							connectionHashMap.put(connection.getConnectionNo(), connection);
 						}
 					} else {
