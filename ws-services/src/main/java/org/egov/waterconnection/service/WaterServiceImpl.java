@@ -1,10 +1,5 @@
 package org.egov.waterconnection.service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
@@ -26,6 +21,12 @@ import org.egov.waterconnection.workflow.WorkflowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class WaterServiceImpl implements WaterService {
@@ -115,7 +116,8 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<WaterConnection> waterConnectionList;
 		waterConnectionList = getWaterConnectionsList(criteria, requestInfo);
-		if(criteria.getSearchType().equals(WCConstants.SEARCH_TYPE_CONNECTION)){
+		if (!StringUtils.isEmpty(criteria.getSearchType()) &&
+				criteria.getSearchType().equals(WCConstants.SEARCH_TYPE_CONNECTION)) {
 			waterConnectionList = enrichmentService.filterConnections(waterConnectionList);
 		}
 		waterConnectionValidator.validatePropertyForConnection(waterConnectionList);

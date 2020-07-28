@@ -209,4 +209,11 @@ public class SWConstants {
 	public static final String PAYMENT_NOTIFICATION_SMS = "SW_PAYMENT_NOTIFICATION_SMS";
 
 	public static final String NEW_SEWERAGE_APP_STATUS ="NEW_SEWERAGE_APPLICATION";
+
+	public static final String MODIFIED_FINAL_STATE = "APPROVED";
+
+	public static final List<String> FINAL_CONNECTION_STATES = Collections
+			.unmodifiableList(Arrays.asList(MODIFIED_FINAL_STATE, STATUS_APPROVED));
+
+	public static final String SEARCH_TYPE_CONNECTION = "CONNECTION";
 }

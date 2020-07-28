@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Component
 public class SewerageServiceImpl implements SewerageService {
@@ -115,6 +116,10 @@ public class SewerageServiceImpl implements SewerageService {
 	 */
 	public List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewerageConnectionList = getSewerageConnectionsList(criteria, requestInfo);
+		if(!StringUtils.isEmpty(criteria.getSearchType()) &&
+				criteria.getSearchType().equals(SWConstants.SEARCH_TYPE_CONNECTION)){
+			sewerageConnectionList = enrichmentService.filterConnections(sewerageConnectionList);
+		}
 		validateProperty.validatePropertyForConnection(sewerageConnectionList);
 		enrichmentService.enrichConnectionHolderDeatils(sewerageConnectionList, criteria, requestInfo);
 		return sewerageConnectionList;
