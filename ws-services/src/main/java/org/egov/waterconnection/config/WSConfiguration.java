@@ -145,9 +145,15 @@ public class WSConfiguration {
     
     @Value("${ws.application.pay.link}")
     private String applicationPayLink;
+	
+	@Value("${egov.msg.download.receipt.link}")
+	private String receiptDownloadLink;
     
     @Value("${egov.ws.estimate.endpoint}")
     private String estimationEndpoint;
+
+	@Value("${egov.collectiom.payment.search}")
+	private String paymentSearch;
     
     @Value("${ws.pdfservice.link}")
     private String pdfServiceLink;

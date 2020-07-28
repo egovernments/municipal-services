@@ -342,9 +342,9 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<payment link>",
 						waterServiceUtil.getShortnerURL(paymentLink));
 			}
-			if (messageToReplace.contains("<receipt download link>"))
+			/*if (messageToReplace.contains("<receipt download link>"))
 				messageToReplace = messageToReplace.replace("<receipt download link>",
-						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));
+						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));*/
 
 			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
