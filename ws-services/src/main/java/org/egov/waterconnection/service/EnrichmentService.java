@@ -306,9 +306,12 @@ public class EnrichmentService {
 		});
 	}
 
+
 	/**
 	 * Filter the connection from connection activated or modified state
+	 *
 	 * @param connectionList
+	 * @return
 	 */
 	public List<WaterConnection> filterConnections(List<WaterConnection> connectionList) {
 		HashMap<String, Connection> connectionHashMap = new HashMap<>();

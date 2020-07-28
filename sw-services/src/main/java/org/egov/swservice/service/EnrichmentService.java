@@ -1,13 +1,7 @@
 package org.egov.swservice.service;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -29,6 +23,7 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
@@ -289,5 +284,45 @@ public class EnrichmentService {
 				});
 			}
 		});
+	}
+
+	/**
+	 * Filter the connection from connection activated or modified state
+	 *
+	 * @param connectionList
+	 * @return
+	 */
+	public List<SewerageConnection> filterConnections(List<SewerageConnection> connectionList) {
+		HashMap<String, Connection> connectionHashMap = new HashMap<>();
+		connectionList.forEach(connection -> {
+			if (!StringUtils.isEmpty(connection.getConnectionNo())) {
+				if (connectionHashMap.get(connection.getConnectionNo()) == null &&
+						SWConstants.FINAL_CONNECTION_STATES.contains(connection.getApplicationStatus())) {
+					connectionHashMap.put(connection.getConnectionNo(), connection);
+				} else if (connectionHashMap.get(connection.getConnectionNo()) != null &&
+						SWConstants.FINAL_CONNECTION_STATES.contains(connection.getApplicationStatus())) {
+					if (connectionHashMap.get(connection.getConnectionNo()).getApplicationStatus().
+							equals(connection.getApplicationStatus())) {
+						HashMap additionalDetail1 = new HashMap<>();
+						HashMap additionalDetail2 = new HashMap<>();
+						additionalDetail1 = mapper
+								.convertValue(connectionHashMap.get(connection.getConnectionNo()).getAdditionalDetails(), HashMap.class);
+						additionalDetail2 = mapper
+								.convertValue(connection.getAdditionalDetails(), HashMap.class);
+						Long creationDate1 = (Long) additionalDetail1.get(SWConstants.APP_CREATED_DATE);
+						Long creationDate2 = (Long) additionalDetail2.get(SWConstants.APP_CREATED_DATE);
+						if (creationDate1 < creationDate2) {
+							connectionHashMap.put(connection.getConnectionNo(), connection);
+						}
+					} else {
+						if (connection.getApplicationStatus().equals(SWConstants
+								.MODIFIED_FINAL_STATE)) {
+							connectionHashMap.put(connection.getConnectionNo(), connection);
+						}
+					}
+				}
+			}
+		});
+		return  new ArrayList(connectionHashMap.values());
 	}
 }
