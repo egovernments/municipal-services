@@ -155,6 +155,8 @@ public class WSCalculatorQueryBuilder {
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.connectionno is not null");
 		return query.toString();
 		
 	}

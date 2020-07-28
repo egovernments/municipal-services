@@ -145,6 +145,13 @@
 						<class>org.egov.swservice.web.models.SearchCriteria</class>
 						<class>org.egov.swservice.web.models.SewerageConnectionResponse</class>
 					</classes>
+					<customTypeMappings>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.swservice.web.models.users.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
+						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
+					</customTypeMappings>
 					<namespace>Digit</namespace>
 					<debug>true</debug>
 					<outputKind>module</outputKind>

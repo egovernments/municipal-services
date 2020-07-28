@@ -160,4 +160,12 @@ public class SWConfiguration {
 	@Value("${workflow.process.search.path}")
 	private String wfProcessSearchPath;
 
+	@Value("${egov.user.create.path}")
+	private String userCreateEndPoint;
+
+	@Value("${egov.user.update.path}")
+	private String userUpdateEndPoint;
+	
+	@Value("${modify.sw.workflow.name}")
+	private String modifySWBusinessServiceName;
 }

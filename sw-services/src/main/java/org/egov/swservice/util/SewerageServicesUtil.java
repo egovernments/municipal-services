@@ -250,5 +250,14 @@ public class SewerageServicesUtil {
 		}
 		return url;
 	}
+	
+	/**
+	 *
+	 * @param sewerageConnectionRequest
+	 * @return
+	 */
+	public boolean isModifyConnectionRequest(SewerageConnectionRequest sewerageConnectionRequest) {
+		return !org.springframework.util.StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionNo());
+	}
 
 }
