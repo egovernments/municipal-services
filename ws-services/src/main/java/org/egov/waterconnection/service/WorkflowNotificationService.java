@@ -23,20 +23,7 @@ import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.util.NotificationUtil;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ValidateProperty;
-import org.egov.waterconnection.web.models.Action;
-import org.egov.waterconnection.web.models.ActionItem;
-import org.egov.waterconnection.web.models.CalculationCriteria;
-import org.egov.waterconnection.web.models.CalculationReq;
-import org.egov.waterconnection.web.models.CalculationRes;
-import org.egov.waterconnection.web.models.Category;
-import org.egov.waterconnection.web.models.Event;
-import org.egov.waterconnection.web.models.EventRequest;
-import org.egov.waterconnection.web.models.Property;
-import org.egov.waterconnection.web.models.Recepient;
-import org.egov.waterconnection.web.models.SMSRequest;
-import org.egov.waterconnection.web.models.Source;
-import org.egov.waterconnection.web.models.WaterConnection;
-import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.*;
 import org.egov.waterconnection.web.models.collection.PaymentRequest;
 import org.egov.waterconnection.web.models.collection.PaymentResponse;
 import org.egov.waterconnection.web.models.workflow.BusinessService;
@@ -565,21 +552,23 @@ public class WorkflowNotificationService {
                                                       WaterConnectionRequest waterConnectionRequest, String message, Property property) {
 
         Map<String, String> messageToReturn = new HashMap<>();
-        String receiptNumber = getReceiptNumber(waterConnectionRequest);
-        for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
-            String messageToReplace = message;
-            if (messageToReplace.contains("<receipt download link>")){
-                String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
-                link = link.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getApplicationNo());
-                link = link.replace("$tenantId", property.getTenantId());
-                link = link.replace("$businessService",businessService);
-                link = link.replace("$receiptNumber",receiptNumber);
-                link = link.replace("$mobile", mobileAndName.getKey());
-                link = waterServiceUtil.getShortnerURL(link);
-                messageToReplace = messageToReplace.replace("<receipt download link>",link);
-            }
-            messageToReturn.put(mobileAndName.getKey(), messageToReplace);
-        }
+		if (message.contains("<receipt download link>")) {
+			String receiptNumber = getReceiptNumber(waterConnectionRequest);
+			for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
+				String messageToReplace = message;
+
+				String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
+				link = link.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getApplicationNo());
+				link = link.replace("$tenantId", property.getTenantId());
+				link = link.replace("$businessService", businessService);
+				link = link.replace("$receiptNumber", receiptNumber);
+				link = link.replace("$mobile", mobileAndName.getKey());
+				link = waterServiceUtil.getShortnerURL(link);
+				messageToReplace = messageToReplace.replace("<receipt download link>", link);
+
+				messageToReturn.put(mobileAndName.getKey(), messageToReplace);
+			}
+		}
         return messageToReturn;
 
     }
@@ -588,7 +577,8 @@ public class WorkflowNotificationService {
 	    StringBuilder URL = waterServiceUtil.getcollectionURL();
 	    URL.append("?").append("consumerCodes=").append(waterConnectionRequest.getWaterConnection().getApplicationNo())
                 .append("&").append("tenantId=").append(waterConnectionRequest.getWaterConnection().getTenantId());
-        Object response = serviceRequestRepository.fetchResult(URL,waterConnectionRequest.getRequestInfo());
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build();
+        Object response = serviceRequestRepository.fetchResult(URL,requestInfoWrapper);
        PaymentResponse paymentResponse = mapper.convertValue(response, PaymentResponse.class);
        return paymentResponse.getPayments().get(0).getPaymentDetails().get(0).getReceiptNumber();
     }
