@@ -273,6 +273,6 @@ public class WaterServicesUtil {
 
 	public StringBuilder getcollectionURL() {
 		StringBuilder builder = new StringBuilder();
-		return builder.append(config.getCalculatorHost()).append(config.getPaymentSearch());
+		return builder.append(config.getCollectionHost()).append(config.getPaymentSearch());
 	}
 }
