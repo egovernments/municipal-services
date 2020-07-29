@@ -37,6 +37,8 @@ import org.egov.waterconnection.web.models.SMSRequest;
 import org.egov.waterconnection.web.models.Source;
 import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.waterconnection.web.models.collection.PaymentRequest;
+import org.egov.waterconnection.web.models.collection.PaymentResponse;
 import org.egov.waterconnection.web.models.workflow.BusinessService;
 import org.egov.waterconnection.web.models.workflow.State;
 import org.egov.waterconnection.workflow.WorkflowService;
@@ -92,6 +94,7 @@ public class WorkflowNotificationService {
 	String mobileNoReplacer = "$mobileNo";
 	String applicationKey = "$applicationkey";
 	String propertyKey = "property";
+	String businessService = "WS.ONE_TIME_FEE";
 	
 	
 	
@@ -164,6 +167,7 @@ public class WorkflowNotificationService {
 		}
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames, request,
 				message, property);
+        mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, request, message, property);
 		Set<String> mobileNumbers = mobileNumberAndMessage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), property.getTenantId());
 //		Map<String, String> mapOfPhnoAndUUIDs = waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
@@ -287,6 +291,7 @@ public class WorkflowNotificationService {
 		}
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				waterConnectionRequest, message, property);
+        mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
@@ -342,9 +347,6 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<payment link>",
 						waterServiceUtil.getShortnerURL(paymentLink));
 			}
-			/*if (messageToReplace.contains("<receipt download link>"))
-				messageToReplace = messageToReplace.replace("<receipt download link>",
-						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));*/
 
 			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
@@ -558,5 +560,37 @@ public class WorkflowNotificationService {
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
 	}
+
+    public Map<String, String> setRecepitDownloadLink(Map<String, String> mobileNumbersAndNames,
+                                                      WaterConnectionRequest waterConnectionRequest, String message, Property property) {
+
+        Map<String, String> messageToReturn = new HashMap<>();
+        String receiptNumber = getReceiptNumber(waterConnectionRequest);
+        for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
+            String messageToReplace = message;
+            if (messageToReplace.contains("<receipt download link>")){
+                String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
+                link = link.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getApplicationNo());
+                link = link.replace("$tenantId", property.getTenantId());
+                link = link.replace("$businessService",businessService);
+                link = link.replace("$receiptNumber",receiptNumber);
+                link = link.replace("$mobile", mobileAndName.getKey());
+                link = waterServiceUtil.getShortnerURL(link);
+                messageToReplace = messageToReplace.replace("<receipt download link>",link);
+            }
+            messageToReturn.put(mobileAndName.getKey(), messageToReplace);
+        }
+        return messageToReturn;
+
+    }
+
+    public String getReceiptNumber(WaterConnectionRequest waterConnectionRequest){
+	    StringBuilder URL = waterServiceUtil.getcollectionURL();
+	    URL.append("?").append("consumerCodes=").append(waterConnectionRequest.getWaterConnection().getApplicationNo())
+                .append("&").append("tenantId=").append(waterConnectionRequest.getWaterConnection().getTenantId());
+        Object response = serviceRequestRepository.fetchResult(URL,waterConnectionRequest.getRequestInfo());
+       PaymentResponse paymentResponse = mapper.convertValue(response, PaymentResponse.class);
+       return paymentResponse.getPayments().get(0).getPaymentDetails().get(0).getReceiptNumber();
+    }
 	
 }

@@ -236,6 +236,7 @@ public class PaymentNotificationService {
 						.replace("$consumerCode", waterConnectionRequest.getWaterConnection().getConnectionNo())
 						.replace("$tenantId", property.getTenantId());
 				actionLink = config.getNotificationUrl() + actionLink;
+				actionLink = notificationUtil.getShortnerURL(actionLink);
 				msg = msg.replace("<Link to Bill>", actionLink);
 			}
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
