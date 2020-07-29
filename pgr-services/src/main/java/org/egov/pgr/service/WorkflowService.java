@@ -38,7 +38,7 @@ public class WorkflowService {
      *
      * */
     public BusinessService getBusinessService(ServiceRequest serviceRequest){
-        String tenantId = serviceRequest.getService().getTenantId();
+        String tenantId = serviceRequest.getPgrEntity().getService().getTenantId();
         StringBuilder url = getSearchURLWithParams(tenantId, PGR_BUSINESSSERVICE);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(serviceRequest.getRequestInfo()).build();
         Object result = repository.fetchResult(url, requestInfoWrapper);
@@ -117,14 +117,14 @@ public class WorkflowService {
      */
     public ProcessInstance getProcessInstanceForPGR(ServiceRequest serviceRequest){
 
-        Service service = serviceRequest.getService();
+        Service service = serviceRequest.getPgrEntity().getService();
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setBusinessId(service.getServiceRequestId());
-        processInstance.setAction(serviceRequest.getWorkflow().getAction());
+        processInstance.setAction(serviceRequest.getPgrEntity().getWorkflow().getAction());
         processInstance.setModuleName(PGR_MODULENAME);
         processInstance.setTenantId(service.getTenantId());
-        processInstance.setBusinessService(PGR_WORKFLOW_CODE);
+        processInstance.setBusinessService(getBusinessService(serviceRequest).getBusinessService());
 
         return processInstance;
     }

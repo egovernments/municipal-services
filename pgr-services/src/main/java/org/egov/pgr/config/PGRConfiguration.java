@@ -92,6 +92,12 @@ public class PGRConfiguration {
     private Boolean isWorkflowEnabled;
 
 
+    // PGR Variables
+
+    @Value("${pgr.complain.idle.time}")
+    private Long complainMaxIdleTime;
+
+
 
 
 }

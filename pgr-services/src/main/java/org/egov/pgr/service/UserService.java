@@ -29,23 +29,55 @@ public class UserService {
 
 
 
-    public void upsertUser(ServiceRequest request){
+    public void callUserService(ServiceRequest request){
 
-        User userInfo = request.getPgrEntity().getService().getCitizen();
-        String tenantId = request.getPgrEntity().getService().getTenantId();
+        if(!StringUtils.isEmpty(request.getPgrEntity().getService().getAccountId()))
+            enrichUser(request);
+        else if(request.getPgrEntity().getService().getCitizen()!=null)
+            upsertUser(request);
 
-        // Search on mobile number as user name
-        UserDetailResponse userDetailResponse = searchUser(null, userInfo.getMobileNumber());
-        if (!userDetailResponse.getUser().isEmpty()) {
-            User user = userDetailResponse.getUser().get(0);
-        }
-        else {
-            createUser(request.getRequestInfo(),tenantId,userInfo);
-        }
     }
 
 
-    public void createUser(RequestInfo requestInfo,String tenantId, User userInfo) {
+    public void upsertUser(ServiceRequest request){
+
+        User user = request.getPgrEntity().getService().getCitizen();
+        String tenantId = request.getPgrEntity().getService().getTenantId();
+        User userServiceResponse = user;
+
+        // Search on mobile number as user name
+        UserDetailResponse userDetailResponse = searchUser(null, user.getMobileNumber());
+        if (!userDetailResponse.getUser().isEmpty()) {
+            User userFromSearch = userDetailResponse.getUser().get(0);
+            if(!user.getName().equalsIgnoreCase(userFromSearch.getName())){
+                userServiceResponse = updateUser(request.getRequestInfo(),user,userFromSearch);
+            }
+        }
+        else {
+            userServiceResponse = createUser(request.getRequestInfo(),tenantId,user);
+        }
+
+        // Enrich the accountId
+        request.getPgrEntity().getService().setAccountId(userServiceResponse.getUuid());
+    }
+
+
+    public void enrichUser(ServiceRequest request){
+
+        RequestInfo requestInfo = request.getRequestInfo();
+        String accountId = request.getPgrEntity().getService().getAccountId();
+
+        UserDetailResponse userDetailResponse = searchUser(accountId,null);
+
+        if(userDetailResponse.getUser().isEmpty())
+            throw new CustomException("INVALID_ACCOUNTID","No user exist for the given accountId");
+
+        else request.getPgrEntity().getService().setCitizen(userDetailResponse.getUser().get(0));
+
+    }
+
+
+    public User createUser(RequestInfo requestInfo,String tenantId, User userInfo) {
 
         userUtils.addUserDefaultFields(userInfo.getMobileNumber(),tenantId, userInfo);
         StringBuilder uri = new StringBuilder(config.getUserHost())
@@ -55,9 +87,27 @@ public class UserService {
 
         UserDetailResponse userDetailResponse = userUtils.userCall(new CreateUserRequest(requestInfo, userInfo), uri);
 
+        return userDetailResponse.getUser().get(0);
+
     }
 
-        private UserDetailResponse searchUser(String accountId, String userName){
+    public User updateUser(RequestInfo requestInfo,User user,User userFromSearch) {
+
+        userFromSearch.setName(user.getName());
+
+        StringBuilder uri = new StringBuilder(config.getUserHost())
+                .append(config.getUserContextPath())
+                .append(config.getUserUpdateEndpoint());
+
+
+        UserDetailResponse userDetailResponse = userUtils.userCall(new CreateUserRequest(requestInfo, userFromSearch), uri);
+
+        return userDetailResponse.getUser().get(0);
+
+    }
+
+    private UserDetailResponse searchUser(String accountId, String userName){
+
         UserSearchRequest userSearchRequest =new UserSearchRequest();
         userSearchRequest.setActive(true);
         userSearchRequest.setUserType(USERTYPE_CITIZEN);
@@ -73,6 +123,7 @@ public class UserService {
 
         StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
         return userUtils.userCall(userSearchRequest,uri);
+
     }
 
 
