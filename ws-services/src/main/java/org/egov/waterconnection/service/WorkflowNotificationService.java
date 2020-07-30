@@ -334,7 +334,10 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<payment link>",
 						waterServiceUtil.getShortnerURL(paymentLink));
 			}
-
+			/*if (messageToReplace.contains("<receipt download link>")){
+				messageToReplace = messageToReplace.replace("<receipt download link>",
+						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));
+			}*/
 			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
 				connectionDetaislLink = connectionDetaislLink.replace(connectionNoReplacer,
@@ -395,7 +398,12 @@ public class WorkflowNotificationService {
 								: waterConnection.getPlumberInfo().get(0).getMobileNumber());
 			}
 		  
-		}
+		}else{
+				String code = StringUtils.substringBetween(messageTemplate, "<Plumber Info>", "</Plumber Info>");
+				messageTemplate = messageTemplate.replace("<Plumber Info>", "");
+				messageTemplate = messageTemplate.replace("</Plumber Info>", "");
+				messageTemplate = messageTemplate.replace(code, "");
+			}
 		return messageTemplate;
 
 	}
