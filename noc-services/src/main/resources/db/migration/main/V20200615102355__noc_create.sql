@@ -56,3 +56,14 @@ CREATE TABLE public.eg_noc_document(
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
+
+CREATE INDEX noc_index  ON public.eg_noc 
+(
+    applicationno,
+    nocno,
+    tenantid,
+    id,
+    applicationstatus,
+    noctype
+);
+
