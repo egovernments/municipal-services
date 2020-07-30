@@ -296,4 +296,6 @@ components:
           $ref: >-
             https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ResponseInfo
         Noc:
-          $ref: '#/components/schemas/Noc'
+          type: array
+          items:
+            $ref: '#/components/schemas/Noc'
