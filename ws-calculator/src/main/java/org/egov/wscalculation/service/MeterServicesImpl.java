@@ -91,9 +91,6 @@ public class MeterServicesImpl implements MeterService {
 	 */
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
-		if(criteria.isEmpty()){
-			return Collections.emptyList();
-		}
 		return wSCalculationDao.searchMeterReadings(criteria);
 	}
 }
