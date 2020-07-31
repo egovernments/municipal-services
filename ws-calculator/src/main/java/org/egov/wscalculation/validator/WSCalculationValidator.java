@@ -144,39 +144,4 @@ public class WSCalculationValidator {
 			throw new CustomException("BILLING_PERIOD_PARSING_ISSUE", "Billing period can not parsed!!");
 		}
 	}
-
-	/**
-	 * validates for the required information needed to do the
-	 * calculation/estimation
-	 * 
-	 * @param waterConnection WaterConnection Object
-	 */
-	public void validateWaterConnectionForCalculation(WaterConnection waterConnection) {
-
-		Map<String, String> error = new HashMap<>();
-
-		// boolean isVacantLand =
-		// PT_TYPE_VACANT_LAND.equalsIgnoreCase(detail.getPropertyType());
-		//
-		// if(null == detail.getLandArea() && null == detail.getBuildUpArea())
-		// error.put(PT_ESTIMATE_AREA_NULL, PT_ESTIMATE_AREA_NULL_MSG);
-		//
-		// if (isVacantLand && null == detail.getLandArea())
-		// error.put(PT_ESTIMATE_VACANT_LAND_NULL,
-		// PT_ESTIMATE_VACANT_LAND_NULL_MSG);
-		//
-		// if (!isVacantLand && CollectionUtils.isEmpty(detail.getUnits()))
-		// error.put(PT_ESTIMATE_NON_VACANT_LAND_UNITS,
-		// PT_ESTIMATE_NON_VACANT_LAND_UNITS_MSG);
-
-		if (!CollectionUtils.isEmpty(error))
-			throw new CustomException(error);
-	}
-
-	public void validateMeterReadingSearchCriteria(MeterReadingSearchCriteria criteria) {
-		if (criteria.getConnectionNos() == null || criteria.getConnectionNos().isEmpty()) {
-			throw new CustomException("INVALID_SEARCH_CRITERIA", " Search can not be done without connection no");
-		}
-	}
-
 }

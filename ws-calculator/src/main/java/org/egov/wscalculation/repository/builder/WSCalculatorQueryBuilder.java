@@ -14,7 +14,7 @@ import org.springframework.util.StringUtils;
 public class WSCalculatorQueryBuilder {
 
 	@Autowired
-	WSCalculationConfiguration config;
+	private WSCalculationConfiguration config;
 
 	private static final String Offset_Limit_String = "OFFSET ? LIMIT ?";
 	private final static String Query = "SELECT mr.id, mr.connectionNo as connectionId, mr.billingPeriod, mr.meterStatus, mr.lastReading, mr.lastReadingDate, mr.currentReading,"
