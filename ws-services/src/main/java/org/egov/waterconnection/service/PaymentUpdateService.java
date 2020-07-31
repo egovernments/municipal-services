@@ -23,6 +23,7 @@ import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.repository.WaterDao;
 import org.egov.waterconnection.util.NotificationUtil;
+import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ValidateProperty;
 import org.egov.waterconnection.web.models.Action;
 import org.egov.waterconnection.web.models.Category;
@@ -84,6 +85,9 @@ public class PaymentUpdateService {
 	@Autowired
 	private WorkflowNotificationService workflowNotificationService;
 
+	@Autowired
+	private WaterServicesUtil waterServiceUtil;
+
 	/**
 	 * After payment change the application status
 	 *
@@ -95,7 +99,7 @@ public class PaymentUpdateService {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) || paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
 					isServiceMatched = true;
 				}
 			}
@@ -366,6 +370,18 @@ public class PaymentUpdateService {
 				String billingPeriod = builder.append(fromDate.format(formatter)).append(" - ").append(toDate.format(formatter)).toString();
 				message = message.replace("<Billing Period>", billingPeriod);
 			}
+
+			if (message.contains("<receipt download link>")){
+				String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
+				link = link.replace("$consumerCode", paymentDetail.getBill().getConsumerCode());
+				link = link.replace("$tenantId", paymentDetail.getTenantId());
+				link = link.replace("$businessService",paymentDetail.getBusinessService());
+				link = link.replace("$receiptNumber",paymentDetail.getReceiptNumber());
+				link = link.replace("$mobile", mobAndMesg.getKey());
+				link = waterServiceUtil.getShortnerURL(link);
+				message = message.replace("<receipt download link>",link);
+			}
+
 			messageToReturn.put(mobAndMesg.getKey(), message);
 		}
 		return messageToReturn;

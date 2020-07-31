@@ -182,6 +182,9 @@ public class WSCalculationConfiguration {
     
     @Value("${notification.url}")
     private String notificationUrl;
+
+	@Value("${ws.shortener.url}")
+	private String shortenerURL;
     
     @Value("${egov.property.service.host}")
 	private String propertyHost;
