@@ -13,6 +13,7 @@ import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.web.models.Property;
 import org.egov.swcalculation.web.models.SewerageConnection;
 import org.egov.swcalculation.web.models.workflow.ProcessInstance;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -27,14 +28,11 @@ public class SWCalculationWorkflowValidator {
     @Autowired
     private CalculatorUtils util;
 
-    public Boolean nonMeterconnectionValidation(RequestInfo requestInfo, String tenantId, String connectionNo){
+    public Boolean nonMeterconnectionValidation(RequestInfo requestInfo, String tenantId, String connectionNo,Boolean genratedemand){
         Map<String,String> errorMap = new HashMap<>();
-        Boolean genratedemand = true;
         applicationValidation(requestInfo,tenantId,connectionNo,errorMap);
-        if(!CollectionUtils.isEmpty(errorMap)){
-            log.error("DEMAND_GENERATION_ERROR", "Demand cannot be generated as sewerage connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
-            genratedemand=false;
-        }
+        if(!CollectionUtils.isEmpty(errorMap))
+            throw new CustomException(errorMap);
         return genratedemand;
     }
 

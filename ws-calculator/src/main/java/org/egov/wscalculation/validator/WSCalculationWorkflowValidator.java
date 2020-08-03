@@ -37,15 +37,9 @@ public class WSCalculationWorkflowValidator {
         String propertyApplicationNumber = property.getAcknowldgementNumber();
         propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
 
-        if(!CollectionUtils.isEmpty(errorMap)){
-        	if(WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(waterConnection.getConnectionType()))
-                throw new CustomException(errorMap);
-            else{
-                log.error("DEMAND_GENERATION_ERROR", "Demand cannot be generated as water connection with connection number "+connectionNo+" or property associated with it, is in workflow and not approved yet");
-                genratedemand=false;
-            }
+        if(!CollectionUtils.isEmpty(errorMap))
+			throw new CustomException(errorMap);
 
-        }
         return genratedemand;
 	}
 
