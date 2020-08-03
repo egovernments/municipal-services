@@ -414,6 +414,11 @@ public class WorkflowNotificationService {
 								: sewerageConnection.getPlumberInfo().get(0).getMobileNumber());
 			}
 
+		}else{
+			String code = StringUtils.substringBetween(messageTemplate, "<Plumber Info>", "</Plumber Info>");
+			messageTemplate = messageTemplate.replace("<Plumber Info>", "");
+			messageTemplate = messageTemplate.replace("</Plumber Info>", "");
+			messageTemplate = messageTemplate.replace(code, "");
 		}
 
 		return messageTemplate;

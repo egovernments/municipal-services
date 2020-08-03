@@ -22,6 +22,7 @@ import org.egov.swservice.repository.ServiceRequestRepository;
 import org.egov.swservice.repository.SewerageDao;
 import org.egov.swservice.util.NotificationUtil;
 import org.egov.swservice.util.SWConstants;
+import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
 import org.egov.swservice.web.models.Action;
 import org.egov.swservice.web.models.Event;
@@ -83,6 +84,8 @@ public class PaymentUpdateService {
 	@Autowired
 	private WorkflowNotificationService workflowNotificationService;
 
+	@Autowired
+	private SewerageServicesUtil sewerageServicesUtil;
 
 	/**
 	 * After payment change the application status
@@ -95,7 +98,8 @@ public class PaymentUpdateService {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice()) ||
+						SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService())) {
 					isServiceMatched = true;
 				}
 			}
@@ -360,6 +364,16 @@ public class PaymentUpdateService {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 				String billingPeriod = builder.append(fromDate.format(formatter)).append(" - ").append(toDate.format(formatter)).toString();
 				message = message.replace("<Billing Period>", billingPeriod);
+			}
+			if (message.contains("<receipt download link>")){
+				String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
+				link = link.replace("$consumerCode", paymentDetail.getBill().getConsumerCode());
+				link = link.replace("$tenantId", paymentDetail.getTenantId());
+				link = link.replace("$businessService",paymentDetail.getBusinessService());
+				link = link.replace("$receiptNumber",paymentDetail.getReceiptNumber());
+				link = link.replace("$mobile", mobAndMesg.getKey());
+				link = sewerageServicesUtil.getShortenedURL(link);
+				message = message.replace("<receipt download link>",link);
 			}
 			messageToReturn.put(mobAndMesg.getKey(), message);
 		}

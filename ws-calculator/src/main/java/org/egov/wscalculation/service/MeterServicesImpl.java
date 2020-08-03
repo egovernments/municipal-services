@@ -1,6 +1,7 @@
 package org.egov.wscalculation.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -90,7 +91,6 @@ public class MeterServicesImpl implements MeterService {
 	 */
 	@Override
 	public List<MeterReading> searchMeterReadings(MeterReadingSearchCriteria criteria, RequestInfo requestInfo) {
-		wsCalculationValidator.validateMeterReadingSearchCriteria(criteria);
 		return wSCalculationDao.searchMeterReadings(criteria);
 	}
 }

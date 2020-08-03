@@ -69,6 +69,10 @@ public class SearchCriteria {
 	@JsonProperty("applicationType")
 	private String applicationType;
 
+	@JsonProperty("searchType")
+	private String searchType = "APPLICATION";
+
+
 	@JsonIgnore
 	private List<String> ownerIds;
 
