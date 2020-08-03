@@ -632,9 +632,6 @@ public class DemandService {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (String connectionNo : connectionNos) {
-				Boolean genratedemand = swCalulationWorkflowValidator.nonMeterconnectionValidation(requestInfo,tenantId,connectionNo);
-				if(!genratedemand)
-					continue;
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
