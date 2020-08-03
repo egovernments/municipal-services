@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
+import org.egov.bpa.service.BPALandService;
 import org.egov.bpa.service.UserService;
 import org.egov.bpa.util.BPAConstants;
 import org.egov.bpa.util.NotificationUtil;
@@ -22,6 +23,8 @@ import org.egov.bpa.web.model.Event;
 import org.egov.bpa.web.model.EventRequest;
 import org.egov.bpa.web.model.Recepient;
 import org.egov.bpa.web.model.SMSRequest;
+import org.egov.bpa.web.model.landInfo.LandInfo;
+import org.egov.bpa.web.model.landInfo.LandSearchCriteria;
 import org.egov.bpa.web.model.landInfo.Source;
 import org.egov.bpa.web.model.user.UserDetailResponse;
 import org.egov.bpa.web.model.workflow.Action;
@@ -46,6 +49,9 @@ public class BPANotificationService {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private BPALandService bpalandService;
 
 	@Autowired
 	public BPANotificationService(BPAConfiguration config, ServiceRequestRepository serviceRequestRepository,
@@ -62,7 +68,6 @@ public class BPANotificationService {
 	 *            The bpaRequest listenend on the kafka topic
 	 */
 	public void process(BPARequest bpaRequest) {
-		log.info("PROCESS NOTIFICATION :");
 		List<SMSRequest> smsRequests = new LinkedList<>();
 		if (null != config.getIsSMSEnabled()) {
 			if (config.getIsSMSEnabled()) {
@@ -202,7 +207,6 @@ public class BPANotificationService {
 		String message = util.getCustomizedMsg(bpaRequest.getRequestInfo(), bpaRequest.getBPA(), localizationMessages);
 		Map<String, String> mobileNumberToOwner = getUserList(bpaRequest);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
-		log.info("enrichSMSRequest NOTIFICATION :");
 	}
 
 	/**
@@ -222,11 +226,25 @@ public class BPANotificationService {
 		bpaSearchCriteria.setOwnerIds(ownerId);
 		bpaSearchCriteria.setTenantId(tenantId);
 		UserDetailResponse userDetailResponse = userService.getUser(bpaSearchCriteria, bpaRequest.getRequestInfo());
-		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getMobileNumber(),
+		
+		LandSearchCriteria landcriteria = new LandSearchCriteria();
+		landcriteria.setTenantId(bpaSearchCriteria.getTenantId());
+		landcriteria.setIds(Arrays.asList(bpaRequest.getBPA().getLandId()));
+		List<LandInfo> landInfo = bpalandService.searchLandInfoToBPA(bpaRequest.getRequestInfo(), landcriteria);
+		
+		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getUserName(),
 				userDetailResponse.getUser().get(0).getName());
-		if (!bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
-				&& (!bpaRequest.getBPA().getStatus().equals(config.getStatusinprogress())
-						|| !bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove()))) {
+		
+
+		if (bpaRequest.getBPA().getLandInfo() == null) {
+			for (int j = 0; j < landInfo.size(); j++)
+				bpaRequest.getBPA().setLandInfo(landInfo.get(j));
+		}
+		
+		if (!(bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionsendtocitizen())
+				&& bpaRequest.getBPA().getStatus().equals("INITIATED"))
+				&& !(bpaRequest.getBPA().getWorkflow().getAction().equals(config.getActionapprove())
+						&& bpaRequest.getBPA().getStatus().equals("INPROGRESS"))) {
 			
 			bpaRequest.getBPA().getLandInfo().getOwners().forEach(owner -> {
 					if (owner.getMobileNumber() != null) {
@@ -235,7 +253,6 @@ public class BPANotificationService {
 			});
 			
 		}
-		log.info("User Received: " + mobileNumberToOwner );
 		return mobileNumberToOwner;
 	}
 }

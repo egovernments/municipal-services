@@ -241,4 +241,5 @@ public class WCConstants {
 			.unmodifiableList(Arrays.asList(MODIFIED_FINAL_STATE, STATUS_APPROVED));
 	
 	public static final String SEARCH_TYPE_CONNECTION = "CONNECTION";
+
 }

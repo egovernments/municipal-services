@@ -72,6 +72,7 @@ public class SearchCriteria {
 	@JsonProperty("searchType")
 	private String searchType = "APPLICATION";
 
+
 	@JsonIgnore
 	private List<String> ownerIds;
 
