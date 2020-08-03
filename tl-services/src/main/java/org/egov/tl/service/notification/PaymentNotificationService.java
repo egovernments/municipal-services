@@ -38,7 +38,7 @@ public class PaymentNotificationService {
     private TradeLicenseService tradeLicenseService;
 
     private NotificationUtil util;
-    
+
     private ObjectMapper mapper;
 
     private BPANotificationUtil bpaNotificationUtil;
@@ -158,14 +158,14 @@ public class PaymentNotificationService {
      * @return
      */
     private List<SMSRequest> getSMSRequests(TradeLicense license, Map<String,String> valMap,String localizationMessages){
-            List<SMSRequest> ownersSMSRequest = getOwnerSMSRequest(license,valMap,localizationMessages);
-            SMSRequest payerSMSRequest = getPayerSMSRequest(license,valMap,localizationMessages);
+        List<SMSRequest> ownersSMSRequest = getOwnerSMSRequest(license,valMap,localizationMessages);
+        SMSRequest payerSMSRequest = getPayerSMSRequest(license,valMap,localizationMessages);
 
-            List<SMSRequest> totalSMS = new LinkedList<>();
-            totalSMS.addAll(ownersSMSRequest);
-            totalSMS.add(payerSMSRequest);
+        List<SMSRequest> totalSMS = new LinkedList<>();
+        totalSMS.addAll(ownersSMSRequest);
+        totalSMS.add(payerSMSRequest);
 
-            return totalSMS;
+        return totalSMS;
     }
 
 
@@ -183,7 +183,7 @@ public class PaymentNotificationService {
             message = tlRenewalNotificationUtil.getOwnerPaymentMsg(license,valMap,localizationMessages);
         }
         else
-             message = util.getOwnerPaymentMsg(license,valMap,localizationMessages);
+            message = util.getOwnerPaymentMsg(license,valMap,localizationMessages);
 
         HashMap<String,String> mobileNumberToOwnerName = new HashMap<>();
         license.getTradeLicenseDetail().getOwners().forEach(owner -> {
