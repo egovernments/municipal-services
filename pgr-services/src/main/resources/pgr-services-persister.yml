@@ -119,7 +119,7 @@ serviceMaps:
       - jsonPath: $.PGREntity.service.id
 
 
-    - query: UPDATE eg_pgr_address_v2 SET doorno=?, plotno=?, buildingname=?, street=?, landmark=?, city=?, pincode=?, locality=?, district=?, region=?, state=?, country=?, latitude=?, longitude=?, lastmodifiedby=?, lastmodifiedtime=?, additionaldetails=? WHERE id=?;
+    - query: UPDATE eg_pgr_address_v2 SET doorno=?, plotno=?, buildingname=?, street=?, landmark=?, city=?, pincode=?, locality=?, district=?, region=?, state=?, country=?, latitude=?, longitude=?,additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
       basePath: PGREntity.service.address
       jsonMaps:
 
@@ -151,12 +151,12 @@ serviceMaps:
 
       - jsonPath: $.PGREntity.service.address.geoLocation.longitude
 
-      - jsonPath: $.PGREntity.service.address.auditDetails.additionDetails
+      - jsonPath: $.PGREntity.service.address.additionDetails
         type: JSON
         dbType: JSONB
 
-      - jsonPath: $.PGREntity.service.address.auditDetails.lastModifiedBy
+      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedBy
 
-      - jsonPath: $.PGREntity.service.address.auditDetails.lastModifiedTime
+      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedTime
 
       - jsonPath: $.PGREntity.service.address.id

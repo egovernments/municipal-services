@@ -76,20 +76,13 @@ public class RequestsApiController{
 
     }
 
-/*
+
     @RequestMapping(value="/requests/_update", method = RequestMethod.POST)
-    public ResponseEntity<String> requestsUpdatePost() throws IOException {
-        try{
-            Resource resource = resourceLoader.getResource("classpath:mockData.json");
-            InputStream mockDataFile = resource.getInputStream();
-            log.info("mock file: "+mockDataFile.toString());
-            String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
-            return new ResponseEntity<>(res, HttpStatus.OK);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new CustomException("FILEPATH_ERROR","Failed to read file for mock data");
-        }
-    }*/
+    public ResponseEntity<ServiceResponse> requestsUpdatePost(@RequestBody ServiceRequest request) throws IOException {
+        PGREntity pgrEntity = pgrService.update(request);
+        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
+        ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(Collections.singletonList(pgrEntity)).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

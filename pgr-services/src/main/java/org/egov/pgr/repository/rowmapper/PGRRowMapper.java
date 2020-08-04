@@ -61,6 +61,7 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
                         .accountId(accountId)
                         .applicationStatus(applicationStatus)
                         .source(source)
+                        .tenantId(tenantId)
                         .auditDetails(auditDetails)
                         .build();
 

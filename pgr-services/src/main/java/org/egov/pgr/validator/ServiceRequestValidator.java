@@ -3,15 +3,20 @@ package org.egov.pgr.validator;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
+import org.egov.pgr.repository.PGRRepository;
+import org.egov.pgr.web.models.PGREntity;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
@@ -23,10 +28,14 @@ public class ServiceRequestValidator {
 
     private PGRConfiguration config;
 
+    private PGRRepository repository;
+
     @Autowired
-    public ServiceRequestValidator(PGRConfiguration config) {
+    public ServiceRequestValidator(PGRConfiguration config, PGRRepository repository) {
         this.config = config;
+        this.repository = repository;
     }
+
 
     public void validateCreate(ServiceRequest request){
         Map<String,String> errorMap = new HashMap<>();
@@ -81,5 +90,18 @@ public class ServiceRequestValidator {
 
     }
 
+    public void validateUpdate(ServiceRequest request){
+
+        String id = request.getPgrEntity().getService().getId();
+
+        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
+        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
+
+        if(CollectionUtils.isEmpty(pgrEntities))
+            throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
+
+        // TO DO
+
+    }
 
 }

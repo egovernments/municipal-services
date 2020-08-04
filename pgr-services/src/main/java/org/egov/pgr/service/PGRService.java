@@ -70,6 +70,14 @@ public class PGRService {
     }
 
 
+    public PGREntity update(ServiceRequest request){
+        validator.validateUpdate(request);
+        userService.callUserService(request);
+        enrichmentService.enrichUpdateRequest(request);
+        producer.push(config.getUpdateTopic(),request);
+        return request.getPgrEntity();
+    }
+
 
 
 
