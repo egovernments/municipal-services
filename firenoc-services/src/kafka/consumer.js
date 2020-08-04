@@ -78,10 +78,9 @@ consumerGroup.on("message", function(message) {
         FireNOCs[i],
         "fireNOCDetails.applicantDetails.owners.0.mobileNumber"
       );
-      let firenocType =
-        get(FireNOCs[i], "fireNOCDetails.fireNOCType") === "NEW"
-          ? "new"
-          : "provisional";
+      let firenocType = get(FireNOCs[i], "fireNOCDetails.fireNOCType")
+	  
+	  firenocType=firenocType.toLowerCase();
 
       let ownerName = get(
         FireNOCs[i],
@@ -103,6 +102,15 @@ consumerGroup.on("message", function(message) {
       if(action==envVariables.SENDBACK){
         actionType="send back to";
       }
+	  
+	  let messageForcertificate;
+	    
+		if(firenocType=='renewal'){
+		messageForcertificate=	'your renewed Fire NOC Certificate has been generated.'
+		}else{
+			messageForcertificate=	'your Fire NOC Certificate has been generated.'
+		}
+	  
       let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
      
       let ownerInfo="";
@@ -162,7 +170,7 @@ consumerGroup.on("message", function(message) {
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and your Fire NOC Certificate has been generated.
+          Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and  ${messageForcertificate}
           Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.
           You can download your Fire NOC Certificate by clicking on the below link:
           ${downLoadLink}`;
