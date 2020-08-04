@@ -55,7 +55,12 @@ public class NOCUtil {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
 
-	
+	/**
+	 * prepares the MDMSCriteria to make MDMS Request
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return
+	 */
 	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getNOCModuleRequest();
 
@@ -68,7 +73,10 @@ public class NOCUtil {
 				.build();
 		return mdmsCriteriaReq;
 	}
-	
+	/**
+	 * fetches the noc documentTypes and nocTypes mdms data
+	 * @return
+	 */
 	public List<ModuleDetail> getNOCModuleRequest() {
 		List<MasterDetail> nocMasterDtls = new ArrayList<>();
 
@@ -89,7 +97,12 @@ public class NOCUtil {
 		return Arrays.asList(nocModuleDtls, commonMasterMDtl);
 	}	
 
-
+	/**
+	 * prepares MDMS call 
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return
+	 */
 	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
 		Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);

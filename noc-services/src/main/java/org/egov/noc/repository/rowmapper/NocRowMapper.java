@@ -21,7 +21,10 @@ import com.google.gson.Gson;
 
 @Component
 public class NocRowMapper implements ResultSetExtractor<List<Noc>> {
-	
+	/**
+	 * extracts the data from the resultSet and populate the NOC Objects
+	 * @see org.springframework.jdbc.core.ResultSetExtractor#extractData(java.sql.ResultSet)
+	 */
 	@Override
 	public List<Noc> extractData(ResultSet rs) throws SQLException, DataAccessException {
 		Map<String, Noc> nocListMap = new HashMap<>();
@@ -62,7 +65,12 @@ public class NocRowMapper implements ResultSetExtractor<List<Noc>> {
 		}
 		return new ArrayList<>(nocListMap.values());
 	}
-	
+	/**
+	 * add the child objects like document to the NOC object from the result set.
+	 * @param rs
+	 * @param noc
+	 * @throws SQLException
+	 */
 	@SuppressWarnings("unused")
 	private void addChildrenToProperty(ResultSet rs, Noc noc) throws SQLException {
 		String documentId = rs.getString("noc_doc_id");

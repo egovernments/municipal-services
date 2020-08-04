@@ -26,6 +26,12 @@ public class ServiceRequestRepository {
 		this.restTemplate = restTemplate;
 	}
 
+	/**
+	 * fetch the results using the request and uri appling restTempalte
+	 * @param uri
+	 * @param request
+	 * @return
+	 */
 	public Object fetchResult(StringBuilder uri, Object request) {
 		Object response = null;
 		log.info("URI: " + uri.toString());

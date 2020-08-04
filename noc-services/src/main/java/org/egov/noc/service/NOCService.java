@@ -44,7 +44,11 @@ public class NOCService {
 	@Autowired
 	private WorkflowService workflowService;
 
-	
+	/**
+	 * entry point from controller, takes care of next level logic from controller to create NOC application
+	 * @param nocRequest
+	 * @return
+	 */
 	public List<Noc> create(NocRequest nocRequest) {
 		String tenantId = nocRequest.getNoc().getTenantId().split("\\.")[0];
 		Object mdmsData = nocUtil.mDMSCall(nocRequest.getRequestInfo(), tenantId);
@@ -59,7 +63,11 @@ public class NOCService {
 		nocRepository.save(nocRequest);
 		return Arrays.asList(nocRequest.getNoc());
 	}
-	
+	/**
+	 * entry point from controller, takes care of next level logic from controller to update NOC application
+	 * @param nocRequest
+	 * @return
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public List<Noc> update(NocRequest nocRequest) {
 		String tenantId = nocRequest.getNoc().getTenantId().split("\\.")[0];
@@ -85,25 +93,39 @@ public class NOCService {
 		
 		return Arrays.asList(nocRequest.getNoc());
 	}
-	
+	/**
+	 * entry point from controller,applies the quired fileters and encrich search criteria and
+	 * return the noc application matching the search criteria
+	 * @param nocRequest
+	 * @return
+	 */
 	public List<Noc> search(NocSearchCriteria criteria, RequestInfo requestInfo) {
 		/*List<String> uuids = new ArrayList<String>();
 		uuids.add(requestInfo.getUserInfo().getUuid());
 		criteria.setAccountId(uuids);*/
-		List<Noc> noc = nocRepository.getNocData(criteria);
-		return noc.isEmpty() ? Collections.emptyList() : noc;
+		List<Noc> nocs = nocRepository.getNocData(criteria);
+		return nocs.isEmpty() ? Collections.emptyList() : nocs;
 	}	
 	
+	/**
+	 * Fetch the noc based on the id to update the NOC record
+	 * @param nocRequest
+	 * @return
+	 */
 	public Noc getNocForUpdate(NocRequest nocRequest) {		
 		List<String> ids = Arrays.asList(nocRequest.getNoc().getId());
 		NocSearchCriteria criteria = new NocSearchCriteria();
 		criteria.setIds(ids);
 		List<Noc> nocList = search(criteria, nocRequest.getRequestInfo());
-		if (CollectionUtils.isEmpty(nocList)) {
+		if (CollectionUtils.isEmpty(nocList) ) {
 			StringBuilder builder = new StringBuilder();
 			builder.append("Noc Application not found for: ").append(nocRequest.getNoc().getId()).append(" :ID");
 			throw new CustomException("INVALID_NOC_SEARCH", builder.toString());
-		}			
+		}else if( nocList.size() > 1) {
+			StringBuilder builder = new StringBuilder();
+			builder.append("Multiple Noc Application(s) not found for: ").append(nocRequest.getNoc().getId()).append(" :ID");
+			throw new CustomException("INVALID_NOC_SEARCH", builder.toString());
+		}
 		return nocList.get(0);
 	}
 	

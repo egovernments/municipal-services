@@ -32,10 +32,19 @@ public class NOCRepository {
 	@Autowired
 	private NocRowMapper rowMapper;
 	
+	/**
+	 * push the nocRequest object to the producer on the save topic
+	 * @param nocRequest
+	 */
 	public void save(NocRequest nocRequest) {
 		producer.push(config.getSaveTopic(), nocRequest);
 	}
 	
+	/**
+	 * pushes the nocRequest object to updateTopic if stateupdatable else to update workflow topic
+	 * @param nocRequest
+	 * @param isStateUpdatable
+	 */
 	public void update(NocRequest nocRequest, boolean isStateUpdatable) {		
 		if (isStateUpdatable) {
 			producer.push(config.getUpdateTopic(), nocRequest);
@@ -43,7 +52,12 @@ public class NOCRepository {
 		    producer.push(config.getUpdateWorkflowTopic(), nocRequest);
 		}
 	}
-	
+	/**
+	 * using the queryBulider query the data on applying the search criteria and return the data 
+	 * parsing throw row mapper
+	 * @param criteria
+	 * @return
+	 */
 	public List<Noc> getNocData(NocSearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getNocSearchQuery(criteria, preparedStmtList);

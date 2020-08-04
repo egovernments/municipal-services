@@ -43,7 +43,11 @@ public class EnrichmentService {
 	
 	@Autowired
 	private WorkflowService workflowService;
-	
+	/**
+	 * Enriches the nocReuqest object with puplating the id field with the uuids and the auditDetails
+	 * @param nocRequest
+	 * @param mdmsData
+	 */
 	public void enrichCreateRequest(NocRequest nocRequest, Object mdmsData) {
 		RequestInfo requestInfo = nocRequest.getRequestInfo();
 		AuditDetails auditDetails = nocUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -62,7 +66,10 @@ public class EnrichmentService {
 		
 		}
 	}
-	
+	/**
+	 * sets the ids for all the child objects of NOCRequest
+	 * @param request
+	 */
 	private void setIdgenIds(NocRequest request) {
 		RequestInfo requestInfo = request.getRequestInfo();
 		String tenantId = request.getNoc().getTenantId();
@@ -79,6 +86,14 @@ public class EnrichmentService {
 		noc.setApplicationNo(itr.next());
 	}
 	
+	/**
+	 * fetch the list of ids based on the params passed
+	 * @param requestInfo
+	 * @param tenantId
+	 * @param idKey
+	 * @param count
+	 * @return
+	 */
 	private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey, int count) {
 		List<IdResponse> idResponses = idGenRepository.getId(requestInfo, tenantId, idKey, count)
 				.getIdResponses();
@@ -88,7 +103,11 @@ public class EnrichmentService {
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}	
-	
+	/**
+	 * encriches the udpateRequest request Object populating the ids for documents, auditDetails 
+	 * @param nocRequest
+	 * @param searchResult
+	 */
 	public void enrichNocUpdateRequest(NocRequest nocRequest, Noc searchResult) {
 
 		RequestInfo requestInfo = nocRequest.getRequestInfo();
@@ -117,7 +136,12 @@ public class EnrichmentService {
 				.setCreatedTime(searchResult.getAuditDetails().getCreatedTime());
 
 	}
-	
+	/**
+	 * called on success of the workflow action.
+	 * setting the staus based on applicationStatus updated by workflow and generting the noc number
+	 * @param nocRequest
+	 * @param businessServiceValue
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void postStatusEnrichment(NocRequest nocRequest, String businessServiceValue) {
 		Noc noc = nocRequest.getNoc();

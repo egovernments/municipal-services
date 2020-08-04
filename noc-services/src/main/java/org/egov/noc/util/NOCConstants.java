@@ -27,6 +27,8 @@ public class NOCConstants {
 	
 	public static final String ACTION_APPROVE = "APPROVE";	
 	
+	public static final String ACTION_AUTO_APPROVE="AUTO_APPROVE";
+	
 	public static final String MODE = "mode";	
 	
 	public static final String ONLINE_MODE = "online";	
