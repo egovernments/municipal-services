@@ -72,7 +72,7 @@ public class UserService {
         User userServiceResponse = user;
 
         // Search on mobile number as user name
-        UserDetailResponse userDetailResponse = searchUser(null, user.getMobileNumber());
+        UserDetailResponse userDetailResponse = searchUser(userUtils.getStateLevelTenant(tenantId),null, user.getMobileNumber());
         if (!userDetailResponse.getUser().isEmpty()) {
             User userFromSearch = userDetailResponse.getUser().get(0);
             if(!user.getName().equalsIgnoreCase(userFromSearch.getName())){
@@ -92,8 +92,9 @@ public class UserService {
 
         RequestInfo requestInfo = request.getRequestInfo();
         String accountId = request.getPgrEntity().getService().getAccountId();
+        String tenantId = request.getPgrEntity().getService().getTenantId();
 
-        UserDetailResponse userDetailResponse = searchUser(accountId,null);
+        UserDetailResponse userDetailResponse = searchUser(userUtils.getStateLevelTenant(tenantId),accountId,null);
 
         if(userDetailResponse.getUser().isEmpty())
             throw new CustomException("INVALID_ACCOUNTID","No user exist for the given accountId");
@@ -132,11 +133,12 @@ public class UserService {
 
     }
 
-    private UserDetailResponse searchUser(String accountId, String userName){
+    private UserDetailResponse searchUser(String stateLevelTenant, String accountId, String userName){
 
         UserSearchRequest userSearchRequest =new UserSearchRequest();
         userSearchRequest.setActive(true);
         userSearchRequest.setUserType(USERTYPE_CITIZEN);
+        userSearchRequest.setTenantId(stateLevelTenant);
 
         if(StringUtils.isEmpty(accountId) && StringUtils.isEmpty(userName))
             return null;

@@ -16,3 +16,50 @@ You can view the api documentation in swagger-ui by pointing to
 http://localhost:8080/  
 
 Change default port value in application.properties
+
+## Postman Collection:
+https://www.getpostman.com/collections/09154f94d2c291a96777
+
+## Promotion:
+1. Add persister file path in evvironment yaml file (FileName: egov-pg-service-persister.yml)
+
+2.Add Role Action:
+Folowing Role Actions have to be mapped to both EMPLOYEE and CITIZEN role
+```json
+        {
+          "id": 2006,
+          "name": "Create PGR Request",
+          "url": "/pgr-services/v2/requests/_create",
+          "parentModule": "",
+          "displayName": "Create PGR Request",
+          "orderNumber": 0,
+          "enabled": false,
+          "serviceCode": "pgr-services",
+          "code": "null",
+          "path": ""
+        },
+        {
+          "id": 2007,
+          "name": "Update PGR Request",
+          "url": "/pgr-services/v2/requests/_update",
+          "parentModule": "",
+          "displayName": "Update PGR Request",
+          "orderNumber": 0,
+          "enabled": false,
+          "serviceCode": "pgr-services",
+          "code": "null",
+          "path": ""
+        },
+        {
+          "id": 2008,
+          "name": "Search PGR Request",
+          "url": "/pgr-services/v2/requests/_search",
+          "parentModule": "",
+          "displayName": "Search PGR Request",
+          "orderNumber": 0,
+          "enabled": false,
+          "serviceCode": "pgr-services",
+          "code": "null",
+          "path": ""
+        }
+
