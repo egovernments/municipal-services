@@ -6,8 +6,10 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.egov.pgr.web.models.RequestInfoWrapper;
-import org.egov.pgr.web.models.RequestSearchCriteria;
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pgr.service.PGRService;
+import org.egov.pgr.util.ResponseInfoFactory;
+import org.egov.pgr.web.models.*;
 import org.egov.tracer.model.CustomException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,54 +43,40 @@ public class RequestsApiController{
 
     private final ObjectMapper objectMapper;
 
-    private final HttpServletRequest request;
+    private PGRService pgrService;
 
-    private ResourceLoader resourceLoader;
+    private ResponseInfoFactory responseInfoFactory;
+
 
     @Autowired
-    public RequestsApiController(ObjectMapper objectMapper, HttpServletRequest request, ResourceLoader resourceLoader) {
+    public RequestsApiController(ObjectMapper objectMapper, PGRService pgrService, ResponseInfoFactory responseInfoFactory) {
         this.objectMapper = objectMapper;
-        this.request = request;
-        this.resourceLoader = resourceLoader;
+        this.pgrService = pgrService;
+        this.responseInfoFactory = responseInfoFactory;
     }
 
 
-
-
-
     @RequestMapping(value="/requests/_create", method = RequestMethod.POST)
-    public ResponseEntity<String> requestsCreatePost() throws IOException {
-        try{
-            Resource resource = resourceLoader.getResource("classpath:mockData.json");
-            InputStream mockDataFile = resource.getInputStream();
-            log.info("mock file: "+mockDataFile.toString());
-            String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
-            return new ResponseEntity<>(res, HttpStatus.OK);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw new CustomException("FILEPATH_ERROR","Failed to read file for mock data");
-        }
+    public ResponseEntity<ServiceResponse> requestsCreatePost(@RequestBody ServiceRequest request) throws IOException {
+
+        PGREntity pgrEntity = pgrService.create(request);
+        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
+        ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(Collections.singletonList(pgrEntity)).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
     @RequestMapping(value="/requests/_search", method = RequestMethod.POST)
-    public ResponseEntity<String> requestsSearchPost(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+    public ResponseEntity<ServiceResponse> requestsSearchPost(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                      @Valid @ModelAttribute RequestSearchCriteria criteria) {
-     try{
-         Resource resource = resourceLoader.getResource("classpath:mockData.json");
-         InputStream mockDataFile = resource.getInputStream();
-         log.info("mock file: "+mockDataFile.toString());
-         String res = IOUtils.toString(mockDataFile, StandardCharsets.UTF_8.name());
-         return new ResponseEntity<>(res, HttpStatus.OK);
-     }
-     catch (Exception e){
-         e.printStackTrace();
-         throw new CustomException("FILEPATH_ERROR","Failed to read file for mock data");
-     }
+        List<PGREntity> pgrEntities = pgrService.search(criteria);
+        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true);
+        ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(pgrEntities).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
+/*
     @RequestMapping(value="/requests/_update", method = RequestMethod.POST)
     public ResponseEntity<String> requestsUpdatePost() throws IOException {
         try{
@@ -102,6 +90,6 @@ public class RequestsApiController{
             e.printStackTrace();
             throw new CustomException("FILEPATH_ERROR","Failed to read file for mock data");
         }
-    }
+    }*/
 
 }

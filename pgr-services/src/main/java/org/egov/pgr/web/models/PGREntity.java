@@ -18,7 +18,6 @@ public class PGREntity {
     private Service service = null;
 
     @Valid
-    @NonNull
     @JsonProperty("workflow")
     private Workflow workflow = null;
 

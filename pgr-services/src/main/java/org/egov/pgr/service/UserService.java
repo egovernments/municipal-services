@@ -5,14 +5,20 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.util.UserUtils;
+import org.egov.pgr.web.models.PGREntity;
+import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.pgr.web.models.user.CreateUserRequest;
 import org.egov.pgr.web.models.user.UserDetailResponse;
 import org.egov.pgr.web.models.user.UserSearchRequest;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 
@@ -20,14 +26,15 @@ import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 public class UserService {
 
 
-
-
-
     private UserUtils userUtils;
 
     private PGRConfiguration config;
 
-
+    @Autowired
+    public UserService(UserUtils userUtils, PGRConfiguration config) {
+        this.userUtils = userUtils;
+        this.config = config;
+    }
 
     public void callUserService(ServiceRequest request){
 
@@ -38,8 +45,27 @@ public class UserService {
 
     }
 
+    public void enrichUsers(List<PGREntity> pgrEntities){
 
-    public void upsertUser(ServiceRequest request){
+        if(CollectionUtils.isEmpty(pgrEntities))
+            return;
+
+        Set<String> uuids = new HashSet<>();
+
+        pgrEntities.forEach(pgrEntity -> {
+            uuids.add(pgrEntity.getService().getAccountId());
+        });
+
+        Map<String,User> idToUserMap = searchBulkUser(new LinkedList<>(uuids));
+
+        pgrEntities.forEach(pgrEntity -> {
+            pgrEntity.getService().setCitizen(idToUserMap.get(pgrEntity.getService().getAccountId()));
+        });
+
+    }
+
+
+    private void upsertUser(ServiceRequest request){
 
         User user = request.getPgrEntity().getService().getCitizen();
         String tenantId = request.getPgrEntity().getService().getTenantId();
@@ -62,7 +88,7 @@ public class UserService {
     }
 
 
-    public void enrichUser(ServiceRequest request){
+    private void enrichUser(ServiceRequest request){
 
         RequestInfo requestInfo = request.getRequestInfo();
         String accountId = request.getPgrEntity().getService().getAccountId();
@@ -77,7 +103,7 @@ public class UserService {
     }
 
 
-    public User createUser(RequestInfo requestInfo,String tenantId, User userInfo) {
+    private User createUser(RequestInfo requestInfo,String tenantId, User userInfo) {
 
         userUtils.addUserDefaultFields(userInfo.getMobileNumber(),tenantId, userInfo);
         StringBuilder uri = new StringBuilder(config.getUserHost())
@@ -91,7 +117,7 @@ public class UserService {
 
     }
 
-    public User updateUser(RequestInfo requestInfo,User user,User userFromSearch) {
+    private User updateUser(RequestInfo requestInfo,User user,User userFromSearch) {
 
         userFromSearch.setName(user.getName());
 
@@ -124,6 +150,30 @@ public class UserService {
         StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
         return userUtils.userCall(userSearchRequest,uri);
 
+    }
+
+
+    private Map<String,User> searchBulkUser(List<String> uuids){
+
+        UserSearchRequest userSearchRequest =new UserSearchRequest();
+        userSearchRequest.setActive(true);
+        userSearchRequest.setUserType(USERTYPE_CITIZEN);
+
+
+        if(!CollectionUtils.isEmpty(uuids))
+            userSearchRequest.setUuid(uuids);
+
+
+        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+        UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest,uri);
+        List<User> users = userDetailResponse.getUser();
+
+        if(CollectionUtils.isEmpty(users))
+            throw new CustomException("USER_NOT_FOUND","No user found for the uuids");
+
+        Map<String,User> idToUserMap = users.stream().collect(Collectors.toMap(User::getUuid, Function.identity()));
+
+        return idToUserMap;
     }
 
 

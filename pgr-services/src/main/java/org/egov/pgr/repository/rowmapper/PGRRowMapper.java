@@ -54,7 +54,7 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
                 AuditDetails auditDetails = AuditDetails.builder().createdBy(createdby).createdTime(createdtime)
                                                 .lastModifiedBy(lastmodifiedby).lastModifiedTime(lastmodifiedtime).build();
 
-                Service service = Service.builder().id(id)
+                currentService = Service.builder().id(id)
                         .serviceCode(serviceCode)
                         .serviceRequestId(serviceRequestId)
                         .description(description)
@@ -67,9 +67,9 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
                 JsonNode additionalDetails = getAdditionalDetail("ser_additionaldetails",rs);
 
                 if(additionalDetails != null)
-                    service.setAdditionalDetail(additionalDetails);
+                    currentService.setAdditionalDetail(additionalDetails);
 
-                serviceMap.put(service.getId(),service);
+                serviceMap.put(currentService.getId(),currentService);
 
             }
             addChildrenToProperty(rs, currentService);
@@ -85,8 +85,8 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
 
         if(service.getAddress() == null){
 
-            Double latitude = (Double) rs.getObject("latitude");
-            Double longitude = (Double) rs.getObject("longitude");
+            Double latitude =  rs.getDouble("latitude");
+            Double longitude = rs.getDouble("longitude");
             Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
             GeoLocation geoLocation = GeoLocation.builder().latitude(latitude).longitude(longitude).build();

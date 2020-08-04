@@ -15,20 +15,18 @@ public class PGRQueryBuilder {
     private static final String INNER_JOIN_STRING = " INNER JOIN ";
     private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
 
-    private static final String QUERY_ALIAS =   "ser.id as ser_id,ads.id as ads_id,doc.id as doc_id," +
-                                                "ser.tenantId as ser_tenantId,ads.tenantId as ads_tenantId,doc.tenantId as doc_tenantId," +
+    private static final String QUERY_ALIAS =   "ser.id as ser_id,ads.id as ads_id," +
+                                                "ser.tenantId as ser_tenantId,ads.tenantId as ads_tenantId," +
                                                 "ser.additionaldetails as ser_additionaldetails,ads.additionaldetails as ads_additionaldetails," +
                                                 "ser.createdby as ser_createdby,ser.createdtime as ser_createdtime," +
                                                 "ser.lastmodifiedby as ser_lastmodifiedby,ser.lastmodifiedtime as ser_lastmodifiedtime," +
                                                 "ads.createdby as ads_createdby,ads.createdtime as ads_createdtime," +
-                                                "ads.lastmodifiedby as ads_lastmodifiedby,ads.lastmodifiedtime as ads_lastmodifiedtime," +
-                                                "doc.createdby as doc_createdby,doc.createdtime as doc_createdtime," +
-                                                "doc.lastmodifiedby as doc_lastmodifiedby,doc.lastmodifiedtime as doc_lastmodifiedtime";
+                                                "ads.lastmodifiedby as ads_lastmodifiedby,ads.lastmodifiedtime as ads_lastmodifiedtime " ;
 
-    private static final String QUERY = "select ser.*,ads.*,doc.*," + QUERY_ALIAS+
+
+    private static final String QUERY = "select ser.*,ads.*," + QUERY_ALIAS+
                                         " from eg_pgr_service_v2 ser INNER JOIN eg_pgr_address_v2 ads" +
-                                        " ON ads.parentId = ser.id LEFT OUTER JOIN " +
-                                        "eg_pgr_document_v2 doc ON doc.parentId = ser.id WEHRE";
+                                        " ON ads.parentId = ser.id ";
 
 
 

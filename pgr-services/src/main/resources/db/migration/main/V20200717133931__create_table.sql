@@ -46,22 +46,4 @@ CONSTRAINT pk_eg_pgr_address_v2 PRIMARY KEY (id),
 CONSTRAINT fk_eg_pgr_address_v2 FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
 );
 
-CREATE TABLE eg_pgr_document_v2(
-
-id               CHARACTER VARYING (128) NOT NULL,
-tenantId         CHARACTER VARYING (256) NOT NULL,
-parentid         CHARACTER VARYING (256) NOT NULL,
-documentType     CHARACTER VARYING (128) NOT NULL,
-fileStoreid      CHARACTER VARYING (128) NOT NULL,
-documentuid      CHARACTER VARYING (128),
-status           CHARACTER VARYING (128) NOT NULL,
-createdBy        CHARACTER VARYING (128) NOT NULL,
-lastModifiedBy   CHARACTER VARYING (128),
-createdTime      BIGINT NOT NULL,
-lastModifiedTime BIGINT,
-
-CONSTRAINT pk_eg_pgr_document_v2_id PRIMARY KEY(id),
-CONSTRAINT fk_eg_pgr_document_v2 FOREIGN KEY (parentid) REFERENCES eg_pgr_service_v2 (id)
-
-);
 

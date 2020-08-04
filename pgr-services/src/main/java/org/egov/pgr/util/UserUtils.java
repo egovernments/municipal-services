@@ -7,6 +7,7 @@ import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.ServiceRequestRepository;
 import org.egov.pgr.web.models.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -26,6 +27,12 @@ public class UserUtils {
 
     private PGRConfiguration config;
 
+    @Autowired
+    public UserUtils(ObjectMapper mapper, ServiceRequestRepository serviceRequestRepository, PGRConfiguration config) {
+        this.mapper = mapper;
+        this.serviceRequestRepository = serviceRequestRepository;
+        this.config = config;
+    }
 
     /**
      * Returns UserDetailResponse by calling user service with given uri and object

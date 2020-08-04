@@ -1,7 +1,9 @@
 package org.egov.pgr.util;
 
 import org.egov.pgr.web.models.AuditDetails;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PGRUtils {
 
 

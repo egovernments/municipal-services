@@ -3,9 +3,11 @@ package org.egov.pgr.validator;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
+import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -21,8 +23,10 @@ public class ServiceRequestValidator {
 
     private PGRConfiguration config;
 
-
-
+    @Autowired
+    public ServiceRequestValidator(PGRConfiguration config) {
+        this.config = config;
+    }
 
     public void validateCreate(ServiceRequest request){
         Map<String,String> errorMap = new HashMap<>();
@@ -68,5 +72,14 @@ public class ServiceRequestValidator {
             throw new CustomException("INVALID_ACTION","Complaint is closed");
 
     }
+
+
+
+    public void validateSearch(RequestSearchCriteria criteria){
+
+        // TO DO
+
+    }
+
 
 }

@@ -97,6 +97,11 @@ public class PGRConfiguration {
     @Value("${pgr.complain.idle.time}")
     private Long complainMaxIdleTime;
 
+    @Value("${pgr.kafka.create.topic}")
+    private String createTopic;
+
+    @Value("${pgr.kafka.update.topic}")
+    private String updateTopic;
 
 
 

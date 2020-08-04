@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
 
+import java.util.List;
+
 /**
  * Response to the service request
  */
@@ -26,11 +28,8 @@ public class ServiceResponse   {
         @JsonProperty("responseInfo")
         private ResponseInfo responseInfo = null;
 
-        @JsonProperty("services")
-        private Service services = null;
-
-        @JsonProperty("workflow")
-        private Workflow workflow = null;
+        @JsonProperty("PGREntities")
+        private List<PGREntity> pgrEntities = null;
 
 
 }
