@@ -6,6 +6,7 @@ import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.util.UserUtils;
 import org.egov.pgr.web.models.PGREntity;
+import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.pgr.web.models.user.CreateUserRequest;
@@ -179,6 +180,27 @@ public class UserService {
     }
 
 
+    public void enrichUserIds(RequestSearchCriteria criteria){
+
+        String tenantId = criteria.getTenantId();
+        String mobileNumber = criteria.getMobileNumber();
+
+        UserSearchRequest userSearchRequest =new UserSearchRequest();
+        userSearchRequest.setActive(true);
+        userSearchRequest.setUserType(USERTYPE_CITIZEN);
+        userSearchRequest.setTenantId(tenantId);
+        userSearchRequest.setMobileNumber(mobileNumber);
+
+        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+        UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest,uri);
+        List<User> users = userDetailResponse.getUser();
+
+        if(CollectionUtils.isEmpty(users))
+            throw new CustomException("USER_NOT_FOUND","No user found for the uuids");
+
+        Set<String> userIds = users.stream().map(User::getUuid).collect(Collectors.toSet());
+        criteria.setUserIds(userIds);
+    }
 
 
 

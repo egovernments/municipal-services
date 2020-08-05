@@ -86,6 +86,9 @@ public class ServiceRequestValidator {
 
     public void validateSearch(RequestSearchCriteria criteria){
 
+        if(criteria.getMobileNumber()!=null && criteria.getTenantId()==null)
+            throw new CustomException("INVALID_SEARCH","TenantId is mandatory to search on mobileNumber");
+
         // TO DO
 
     }

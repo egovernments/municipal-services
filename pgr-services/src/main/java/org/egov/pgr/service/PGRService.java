@@ -10,7 +10,9 @@ import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @org.springframework.stereotype.Service
@@ -64,6 +66,12 @@ public class PGRService {
 
     public List<PGREntity> search(RequestSearchCriteria criteria){
         validator.validateSearch(criteria);
+
+        if(criteria.getMobileNumber()!=null){
+            userService.enrichUserIds(criteria);
+            if(CollectionUtils.isEmpty(criteria.getUserIds()))
+                return new ArrayList<>();
+        }
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
         userService.enrichUsers(pgrEntities);
         return pgrEntities;
