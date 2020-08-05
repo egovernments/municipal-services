@@ -2,13 +2,9 @@ package org.egov.pgr.service;
 
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.util.UserUtils;
-import org.egov.pgr.web.models.PGREntity;
-import org.egov.pgr.web.models.RequestSearchCriteria;
-import org.egov.pgr.web.models.Service;
-import org.egov.pgr.web.models.ServiceRequest;
+import org.egov.pgr.web.models.*;
 import org.egov.pgr.web.models.user.CreateUserRequest;
 import org.egov.pgr.web.models.user.UserDetailResponse;
 import org.egov.pgr.web.models.user.UserSearchRequest;
@@ -48,16 +44,13 @@ public class UserService {
 
     public void enrichUsers(List<PGREntity> pgrEntities){
 
-        if(CollectionUtils.isEmpty(pgrEntities))
-            return;
-
         Set<String> uuids = new HashSet<>();
 
         pgrEntities.forEach(pgrEntity -> {
             uuids.add(pgrEntity.getService().getAccountId());
         });
 
-        Map<String,User> idToUserMap = searchBulkUser(new LinkedList<>(uuids));
+        Map<String, User> idToUserMap = searchBulkUser(new LinkedList<>(uuids));
 
         pgrEntities.forEach(pgrEntity -> {
             pgrEntity.getService().setCitizen(idToUserMap.get(pgrEntity.getService().getAccountId()));
@@ -70,7 +63,7 @@ public class UserService {
 
         User user = request.getPgrEntity().getService().getCitizen();
         String tenantId = request.getPgrEntity().getService().getTenantId();
-        User userServiceResponse = user;
+        User userServiceResponse = null;
 
         // Search on mobile number as user name
         UserDetailResponse userDetailResponse = searchUser(userUtils.getStateLevelTenant(tenantId),null, user.getMobileNumber());
@@ -79,6 +72,7 @@ public class UserService {
             if(!user.getName().equalsIgnoreCase(userFromSearch.getName())){
                 userServiceResponse = updateUser(request.getRequestInfo(),user,userFromSearch);
             }
+            else userServiceResponse = userDetailResponse.getUser().get(0);
         }
         else {
             userServiceResponse = createUser(request.getRequestInfo(),tenantId,user);
@@ -122,6 +116,7 @@ public class UserService {
     private User updateUser(RequestInfo requestInfo,User user,User userFromSearch) {
 
         userFromSearch.setName(user.getName());
+        userFromSearch.setActive(true);
 
         StringBuilder uri = new StringBuilder(config.getUserHost())
                 .append(config.getUserContextPath())

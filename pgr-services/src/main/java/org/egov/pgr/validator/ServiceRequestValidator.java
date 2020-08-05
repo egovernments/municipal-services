@@ -1,13 +1,9 @@
 package org.egov.pgr.validator;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.PGRRepository;
-import org.egov.pgr.web.models.PGREntity;
-import org.egov.pgr.web.models.RequestSearchCriteria;
-import org.egov.pgr.web.models.Service;
-import org.egov.pgr.web.models.ServiceRequest;
+import org.egov.pgr.web.models.*;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

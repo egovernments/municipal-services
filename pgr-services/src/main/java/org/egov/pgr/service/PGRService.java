@@ -75,6 +75,10 @@ public class PGRService {
                 return new ArrayList<>();
         }
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
+
+        if(CollectionUtils.isEmpty(pgrEntities))
+            return new ArrayList<>();;
+
         userService.enrichUsers(pgrEntities);
         workflowService.enrichWorkflow(requestInfo,pgrEntities);
         return pgrEntities;
