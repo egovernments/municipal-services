@@ -69,7 +69,7 @@ public class RequestsApiController{
     @RequestMapping(value="/requests/_search", method = RequestMethod.POST)
     public ResponseEntity<ServiceResponse> requestsSearchPost(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                      @Valid @ModelAttribute RequestSearchCriteria criteria) {
-        List<PGREntity> pgrEntities = pgrService.search(criteria);
+        List<PGREntity> pgrEntities = pgrService.search(requestInfoWrapper.getRequestInfo(), criteria);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true);
         ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(pgrEntities).build();
         return new ResponseEntity<>(response, HttpStatus.OK);

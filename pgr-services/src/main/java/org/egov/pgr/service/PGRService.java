@@ -1,6 +1,7 @@
 package org.egov.pgr.service;
 
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.PGRRepository;
@@ -59,12 +60,13 @@ public class PGRService {
         validator.validateCreate(request);
         userService.callUserService(request);
         enrichmentService.enrichCreateRequest(request);
+        workflowService.updateWorkflowStatus(request);
         producer.push(config.getCreateTopic(),request);
         return request.getPgrEntity();
     }
 
 
-    public List<PGREntity> search(RequestSearchCriteria criteria){
+    public List<PGREntity> search(RequestInfo requestInfo, RequestSearchCriteria criteria){
         validator.validateSearch(criteria);
 
         if(criteria.getMobileNumber()!=null){
@@ -74,6 +76,7 @@ public class PGRService {
         }
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
         userService.enrichUsers(pgrEntities);
+        workflowService.enrichWorkflow(requestInfo,pgrEntities);
         return pgrEntities;
     }
 
@@ -81,6 +84,7 @@ public class PGRService {
     public PGREntity update(ServiceRequest request){
         validator.validateUpdate(request);
         userService.callUserService(request);
+        workflowService.updateWorkflowStatus(request);
         enrichmentService.enrichUpdateRequest(request);
         producer.push(config.getUpdateTopic(),request);
         return request.getPgrEntity();

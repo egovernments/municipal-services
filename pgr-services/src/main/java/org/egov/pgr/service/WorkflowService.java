@@ -2,6 +2,7 @@ package org.egov.pgr.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.ServiceRequestRepository;
@@ -107,47 +108,62 @@ public class WorkflowService {
     }
 
 
-    public void enrichWorkflow(ServiceRequest request) {
+    public void enrichWorkflow(RequestInfo requestInfo, List<PGREntity> pgrEntities) {
 
-        String tenantId = request.getPgrEntity().getService().getTenantId();
-        String serviceRequestId = request.getPgrEntity().getService().getServiceRequestId();
-        RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(request.getRequestInfo()).build();
+        // FIX ME FOR BULK SEARCH
+        String tenantId = pgrEntities.get(0).getService().getTenantId();
+        String serviceRequestId = pgrEntities.get(0).getService().getServiceRequestId();
+        RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
         StringBuilder searchUrl = getprocessInstanceSearchURL(tenantId, serviceRequestId);
         Object result = repository.fetchResult(searchUrl, requestInfoWrapper);
 
 
-        List<ProcessInstance> processInstances = new ArrayList<>();
+        ProcessInstanceResponse processInstanceResponse = null;
         try {
-            processInstances = mapper.convertValue(result, new TypeReference<List<ProcessInstance>>(){});
+            processInstanceResponse = mapper.convertValue(result, ProcessInstanceResponse.class);
         } catch (IllegalArgumentException e) {
             throw new CustomException("PARSING ERROR", "Failed to parse response of workflow processInstance search");
         }
 
-        if (CollectionUtils.isEmpty(processInstances))
+        if (CollectionUtils.isEmpty(processInstanceResponse.getProcessInstances()))
             throw new CustomException("WORKFLOW_NOT_FOUND", "The workflow for serviceRequestId:  " + serviceRequestId + " is not found");
 
-        Workflow workflow = getWorkflow(processInstances.get(0));
-        request.getPgrEntity().setWorkflow(workflow);
+        Workflow workflow = getWorkflow(processInstanceResponse.getProcessInstances().get(0));
+        pgrEntities.get(0).setWorkflow(workflow);
 
     }
 
     /**
      * Enriches ProcessInstance Object for workflow
      *
-     * @param serviceRequest
+     * @param request
      */
-    public ProcessInstance getProcessInstanceForPGR(ServiceRequest serviceRequest) {
+    private ProcessInstance getProcessInstanceForPGR(ServiceRequest request) {
 
-        Service service = serviceRequest.getPgrEntity().getService();
+        Service service = request.getPgrEntity().getService();
+        Workflow workflow = request.getPgrEntity().getWorkflow();
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setBusinessId(service.getServiceRequestId());
-        processInstance.setAction(serviceRequest.getPgrEntity().getWorkflow().getAction());
+        processInstance.setAction(request.getPgrEntity().getWorkflow().getAction());
         processInstance.setModuleName(PGR_MODULENAME);
         processInstance.setTenantId(service.getTenantId());
-        processInstance.setBusinessService(getBusinessService(serviceRequest).getBusinessService());
-        processInstance.setDocuments(serviceRequest.getPgrEntity().getWorkflow().getVerificationDocuments());
+        processInstance.setBusinessService(getBusinessService(request).getBusinessService());
+        processInstance.setDocuments(request.getPgrEntity().getWorkflow().getVerificationDocuments());
+        processInstance.setComment(workflow.getComments());
+
+        if(!CollectionUtils.isEmpty(workflow.getAssignes())){
+            List<User> users = new ArrayList<>();
+
+            workflow.getAssignes().forEach(uuid -> {
+                User user = new User();
+                user.setUuid(uuid);
+                users.add(user);
+            });
+
+            processInstance.setAssignes(users);
+        }
 
         return processInstance;
     }
@@ -181,7 +197,7 @@ public class WorkflowService {
      * <p>
      * and return wf-response to sets the resultant status
      */
-    public State callWorkFlow(ProcessInstanceRequest workflowReq) {
+    private State callWorkFlow(ProcessInstanceRequest workflowReq) {
 
         ProcessInstanceResponse response = null;
         StringBuilder url = new StringBuilder(pgrConfiguration.getWfHost().concat(pgrConfiguration.getWfTransitionPath()));
