@@ -26,6 +26,9 @@ public class RequestSearchCriteria {
     @JsonProperty("mobileNumber")
     private String mobileNumber;
 
+    @JsonProperty("serviceRequestId")
+    private String serviceRequestId;
+
     @JsonProperty("ids")
     private Set<String> ids;
 

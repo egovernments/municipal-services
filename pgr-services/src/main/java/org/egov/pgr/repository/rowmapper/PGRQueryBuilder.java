@@ -46,6 +46,12 @@ public class PGRQueryBuilder {
             preparedStmtList.add(criteria.getServiceCode());
         }
 
+        if (criteria.getServiceRequestId() != null) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" ser.serviceRequestId=? ");
+            preparedStmtList.add(criteria.getServiceRequestId());
+        }
+
         Set<String> ids = criteria.getIds();
         if (!CollectionUtils.isEmpty(ids)) {
             addClauseIfRequired(preparedStmtList, builder);

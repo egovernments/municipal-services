@@ -195,9 +195,6 @@ public class UserService {
         UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest,uri);
         List<User> users = userDetailResponse.getUser();
 
-        if(CollectionUtils.isEmpty(users))
-            throw new CustomException("USER_NOT_FOUND","No user found for the uuids");
-
         Set<String> userIds = users.stream().map(User::getUuid).collect(Collectors.toSet());
         criteria.setUserIds(userIds);
     }
