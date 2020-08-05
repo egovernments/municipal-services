@@ -76,16 +76,16 @@ public class PGRConfiguration {
     @Value("${pgr.business.codes}")
     private List<String> businessServiceList;
 
-    @Value("${workflow.host}")
+    @Value("${egov.workflow.host}")
     private String wfHost;
 
-    @Value("${workflow.transition.path}")
+    @Value("${egov.workflow.transition.path}")
     private String wfTransitionPath;
 
-    @Value("${workflow.businessservice.search.path}")
+    @Value("${egov.workflow.businessservice.search.path}")
     private String wfBusinessServiceSearchPath;
 
-    @Value("${workflow.processinstance.search.path}")
+    @Value("${egov.workflow.processinstance.search.path}")
     private String wfProcessInstanceSearchPath;
 
     @Value("${is.workflow.enabled}")
