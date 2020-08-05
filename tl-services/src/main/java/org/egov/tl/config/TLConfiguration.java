@@ -282,6 +282,16 @@ public class TLConfiguration {
 
     @Value("${egov.tl.batch.expire.error.topic}")
     private String expiryErrorTopic;
+    
+    @Value("${egov.msg.pay.link}")
+    private String payLinkSMS;
+    
+    @Value("${egov.url.shortner.host}")
+    private String urlShortnerHost;
+
+    @Value("${egov.url.shortner.endpoint}")
+    private String urlShortnerEndpoint;
+
 
 
 

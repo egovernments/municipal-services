@@ -278,6 +278,8 @@ public class TLConstants {
     public static final String JOB_EXPIRY = "EXPIRY";
 
     public static final String DEFAULT_WORKFLOW = "NewTL";
+    
+    public static final String PAYMENT_LINK_PLACEHOLDER="{PAYMENT_LINK}";
 
     public TLConstants() {}
 
