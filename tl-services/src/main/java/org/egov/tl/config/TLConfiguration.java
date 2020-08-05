@@ -241,20 +241,23 @@ public class TLConfiguration {
     private Boolean isExternalWorkFlowEnabled;
 
     //USER EVENTS
-	@Value("${egov.ui.app.host}")
-	private String uiAppHost;
-    
-	@Value("${egov.usr.events.create.topic}")
-	private String saveUserEventsTopic;
-		
-	@Value("${egov.usr.events.pay.link}")
-	private String payLink;
-	
-	@Value("${egov.usr.events.pay.code}")
-	private String payCode;
-	
-	@Value("${egov.user.event.notification.enabledForTL}")
-	private Boolean isUserEventsNotificationEnabledForTL;
+    @Value("${egov.ui.app.host}")
+    private String uiAppHost;
+
+    @Value("${egov.usr.events.create.topic}")
+    private String saveUserEventsTopic;
+
+    @Value("${egov.usr.events.pay.link}")
+    private String payLink;
+
+    @Value("${egov.msg.pay.link}")
+    private String payLinkSMS;
+
+    @Value("${egov.usr.events.pay.code}")
+    private String payCode;
+
+    @Value("${egov.user.event.notification.enabledForTL}")
+    private Boolean isUserEventsNotificationEnabledForTL;
 
     @Value("${egov.user.event.notification.enabledForTLRenewal}")
     private Boolean isUserEventsNotificationEnabledForTLRenewal;
@@ -262,12 +265,12 @@ public class TLConfiguration {
     @Value("${egov.user.event.notification.enabledForBPA}")
     private Boolean isUserEventsNotificationEnabledForBPA;
 
-	@Value("${egov.usr.events.pay.triggers}")
-	private String payTriggers;
+    @Value("${egov.usr.events.pay.triggers}")
+    private String payTriggers;
 
 
 
-	//Reminder
+    //Reminder
     @Value("${egov.tl.reminder.period}")
     private Long reminderPeriod;
 
@@ -285,6 +288,13 @@ public class TLConfiguration {
 
 
 
+    // url shortner
+
+    @Value("${egov.url.shortner.host}")
+    private String urlShortnerHost;
+
+    @Value("${egov.url.shortner.endpoint}")
+    private String urlShortnerEndpoint;
 
 
 }
