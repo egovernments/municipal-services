@@ -2,9 +2,9 @@ package org.egov.pgr.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.Role;
-import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.ServiceRequestRepository;
+import org.egov.pgr.web.models.User;
 import org.egov.pgr.web.models.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +107,8 @@ public class UserUtils {
         userInfo.setRoles(Collections.singletonList(role));
         userInfo.setType("CITIZEN");
         userInfo.setUserName(mobileNumber);
+        userInfo.setTenantId(getStateLevelTenant(tenantId));
+        userInfo.setActive(true);
     }
 
     private Role getCitizenRole(String tenantId){

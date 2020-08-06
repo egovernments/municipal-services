@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
+import org.egov.pgr.web.models.User;
 
 @AllArgsConstructor
 @Getter
