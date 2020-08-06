@@ -240,12 +240,13 @@ public class NotificationUtil {
 		String UIHost = config.getUiAppHost();
 
 		String paymentPath = config.getPayLinkSMS();
+		log.info("payment path is "+paymentPath);
 		paymentPath = paymentPath.replace("$consumercode",license.getApplicationNumber());
 		paymentPath = paymentPath.replace("$tenantId",license.getTenantId());
 		paymentPath = paymentPath.replace("$businessservice",businessService_TL);
 
 		String finalPath = UIHost + paymentPath;
-
+		log.info("final payment path is "+paymentPath);
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(finalPath));
 		log.info("pay message is ",message);
 		return message;
