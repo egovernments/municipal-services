@@ -207,26 +207,8 @@ public class BPAUtil {
 		}
 	}
 
-	private StringBuilder getBillUri(BPA bpa) {
-		String status = bpa.getStatus().toString();
-		String code = null;
-
-		if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_MODULE)) {
-			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)) {
-				code = "BPA.NC_APP_FEE";
-			} else {
-				code = "BPA.NC_SAN_FEE";
-			}
-		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_LOW_MODULE_CODE)) {
-			if (status.equalsIgnoreCase(BPAConstants.BPA_LOW_APPL_FEE_STATE))
-				code = "BPA.LOW_RISK_PERMIT_FEE";
-		} else if (bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)) {
-			if (status.equalsIgnoreCase(BPAConstants.APPL_FEE_STATE)) {
-				code = "BPA.NC_OC_APP_FEE";
-			} else {
-				code = "BPA.NC_OC_SAN_FEE";
-			}
-		}
+	public StringBuilder getBillUri(BPA bpa) {
+		String code = getFeeBusinessSrvCode(bpa);
 
 		StringBuilder builder = new StringBuilder(config.getBillingHost());
 		builder.append(config.getDemandSearchEndpoint());
@@ -237,6 +219,24 @@ public class BPAUtil {
 		builder.append("&businessService=");
 		builder.append(code);
 		return builder;
+	}
+	
+	/**
+	 * return the FeeBusiness Service code based on the BPA workflowCode, BPA Status
+	 * @param bpa
+	 * @return
+	 */
+	public String getFeeBusinessSrvCode(BPA bpa) {
+		Map<String, Map<String, String>> wfStBSrvMap = config.getWorkflowStatusFeeBusinessSrvMap();
+		String businessSrvCode = null;
+		Map<String, String> statusBusSrvMap = wfStBSrvMap.get(bpa.getBusinessService());
+		if (!CollectionUtils.isEmpty(statusBusSrvMap)) {
+			if (bpa.getStatus() != null) {
+				businessSrvCode = statusBusSrvMap.get(bpa.getStatus());
+			} 
+		}
+		return businessSrvCode;
+		
 	}
 
 }

@@ -276,4 +276,7 @@ public class BPAConfiguration {
 	
 	@Value("${egov.inprogress.stsus}")
 	private String statusinprogress;
+	
+	@Value("#{${workflowStatusFeeBusinessSrvMap}}")
+	private Map<String,Map<String,String>> workflowStatusFeeBusinessSrvMap;
 }
