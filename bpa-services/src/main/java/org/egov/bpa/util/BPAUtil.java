@@ -126,6 +126,12 @@ public class BPAUtil {
 
 	}
 
+	/**
+	 * prepares the mdms request object
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return
+	 */
 	public MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo, String tenantId) {
 		List<ModuleDetail> moduleRequest = getBPAModuleRequest();
 
@@ -139,13 +145,21 @@ public class BPAUtil {
 		return mdmsCriteriaReq;
 	}
 
+	/**
+	 * makes mdms call with the given criteria and reutrn mdms data
+	 * @param requestInfo
+	 * @param tenantId
+	 * @return
+	 */
 	public Object mDMSCall(RequestInfo requestInfo, String tenantId) {
 		MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo, tenantId);
 		Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
 		return result;
 	}
 	
-	
+	/**
+	 * json path's defuault cofig to read/parse the json
+	 */
 	public void defaultJsonPathConfig() {
 		Configuration.setDefaults(new Configuration.Defaults() {
 
@@ -169,6 +183,12 @@ public class BPAUtil {
 		});
 	}
 
+	/**
+	 * fetch the busniess servce of the current record
+	 * @param applicationType
+	 * @param serviceType
+	 * @return
+	 */
 	public ArrayList<String> getBusinessService(String applicationType, String serviceType) {
 		Map<String, Map<String, String>> appSrvTypeBussSrvCode = config.getAppSrvTypeBussSrvCode();
 		String[] codes = null;
@@ -187,6 +207,11 @@ public class BPAUtil {
 		return  new ArrayList<String>(Arrays.asList(codes));
 	}
 
+	/**
+	 * Fetch the demand amount of the BPA
+	 * @param bpaRequest
+	 * @return
+	 */
 	public BigDecimal getDemandAmount(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -215,6 +240,11 @@ public class BPAUtil {
 		}
 	}
 
+	/**
+	 * gererate bill url with the query params
+	 * @param bpa
+	 * @return
+	 */
 	public StringBuilder getBillUri(BPA bpa) {
 		String code = getFeeBusinessSrvCode(bpa);
 

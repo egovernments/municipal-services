@@ -55,6 +55,12 @@ public class EnrichmentService {
 	@Autowired
 	private WorkflowIntegrator wfIntegrator;
 
+	/**
+	 * encrich create BPA Reqeust by adding audidetails and uuids
+	 * @param bpaRequest
+	 * @param mdmsData
+	 * @param values
+	 */
 	public void enrichBPACreateRequest(BPARequest bpaRequest, Object mdmsData, Map<String, String> values) {
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
 		AuditDetails auditDetails = bpaUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
@@ -135,6 +141,11 @@ public class EnrichmentService {
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
 
+	/**
+	 * enchrich the updateRequest 
+	 * @param bpaRequest
+	 * @param businessService
+	 */
 	public void enrichBPAUpdateRequest(BPARequest bpaRequest, BusinessService businessService) {
 
 		RequestInfo requestInfo = bpaRequest.getRequestInfo();
@@ -161,6 +172,11 @@ public class EnrichmentService {
 
 	}
 
+	/**
+	 * postStatus encrichment to update the status of the workflow to the application
+	 * and generating permit and oc number when applicable
+	 * @param bpaRequest
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void postStatusEnrichment(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
@@ -183,6 +199,16 @@ public class EnrichmentService {
 		}
 		
 		log.info("Application state is : " + state);
+		this.generateApprovalNo(bpaRequest, state);
+		
+	}
+	/**
+	 * generate the permit and oc number on approval status of the BPA and BPAOC respectively
+	 * @param bpaRequest
+	 * @param state
+	 */
+	private void generateApprovalNo(BPARequest bpaRequest,String state) {
+		BPA bpa= bpaRequest.getBPA();
 		if ((bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)
 				&& bpa.getStatus().equalsIgnoreCase(BPAConstants.APPROVED_STATE))
 				|| (!bpa.getBusinessService().equalsIgnoreCase(BPAConstants.BPA_OC_MODULE_CODE)
@@ -237,9 +263,12 @@ public class EnrichmentService {
 				}
 			}
 		}
-		
 	}
 
+	/**
+	 * handles the skippayment of the BPA when demand is zero
+	 * @param bpaRequest
+	 */
 	public void skipPayment(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
 		BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);

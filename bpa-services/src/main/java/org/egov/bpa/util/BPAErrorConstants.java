@@ -35,6 +35,8 @@ public class BPAErrorConstants {
 	public static final String UNABLE_TO_DOWNLOAD = "UNABLE TO DOWNLOAD";
 
 	public static final String INVALID_FILE = "INVALID FILE";
+	
+	public static final String INVALID_EDCR_REPORT = "INVALID EDCR REPORT URL";
 
 	public static final String INVALID_SEARCH = "INVALID SEARCH";
 

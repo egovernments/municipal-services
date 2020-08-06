@@ -96,7 +96,7 @@
               "tenantId": "pb",
               "currentState": "CITIZEN_APPROVAL_PENDING",
               "action": "APPROVE",
-              "nextState": "INITIATED",
+              "nextState": "INPROGRESS",
               "roles": [
                 "CITIZEN"
               ]
@@ -124,9 +124,9 @@
           "actions": [
             {
               "tenantId": "pb",
-              "currentState": "INITIATED",
+              "currentState": "INPROGRESS",
               "action": "INITIATE",
-              "nextState": "INITIATED",
+              "nextState": "INPROGRESS",
               "roles": [
                 "BPA_ARCHITECT",
                 "BPA_ENGINEER",
@@ -138,7 +138,7 @@
             },
             {
               "tenantId": "pb",
-              "currentState": "INITIATED",
+              "currentState": "INPROGRESS",
               "action": "APPLY",
               "nextState": "PENDING_APPL_FEE_PAYMENT",
               "roles": [
@@ -166,6 +166,23 @@
               "tenantId": "pb",
               "currentState": "PENDING_APPL_FEE_PAYMENT",
               "action": "PAY",
+              "nextState": "DOC_VERIFICATION_PENDING",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
+                "SYSTEM_PAYMENT",
+                "CEMP"
+              ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "PENDING_APPL_FEE_PAYMENT",
+              "action": "SKIP_PAYMENT",
               "nextState": "DOC_VERIFICATION_PENDING",
               "roles": [
                 "CITIZEN",
@@ -229,7 +246,7 @@
             {
               "tenantId": "pb",
               "currentState": "DOC_VERIFICATION_PENDING",
-              "action": "SENDBACKTOCITIZEN",
+              "action": "SEND_BACK_TO_CITIZEN",
               "nextState": "BACK_FROM_DOC_VERIFICATION",
               "roles": [
                 "BPA_VERIFIER"
@@ -268,7 +285,7 @@
             {
               "tenantId": "pb",
               "currentState": "FIELDINSPECTION_PENDING",
-              "action": "SENDBACKTOCITIZEN",
+              "action": "SEND_BACK_TO_CITIZEN",
               "nextState": "BACK_FROM_FI_VERIFICATION",
               "roles": [
                 "BPA_FIELD_INSPECTOR"
@@ -307,7 +324,7 @@
             {
               "tenantId": "pb",
               "currentState": "NOC_VERIFICATION_PENDING",
-              "action": "SENDBACKTOCITIZEN",
+              "action": "SEND_BACK_TO_CITIZEN",
               "nextState": "BACK_FROM_NOC_VERIFICATION",
               "roles": [
                 "BPA_NOC_VERIFIER"
@@ -386,6 +403,24 @@
                 "BPA_TOWNPLANNER",
                 "BPA_SUPERVISOR",
                 "SYSTEM_PAYMENT",
+                "CEMP"
+              ]
+            },
+            {
+              "tenantId": "pb",
+              "currentState": "PENDING_SANC_FEE_PAYMENT",
+              "action": "SKIP_PAYMENT",
+              "nextState": "APPROVED",
+              "roles": [
+                "CITIZEN",
+                "BPA_ARCHITECT",
+                "BPA_ENGINEER",
+                "BPA_BUILDER",
+                "BPA_STRUCTURALENGINEER",
+                "BPA_TOWNPLANNER",
+                "BPA_SUPERVISOR",
+                "SYSTEM_PAYMENT",
+                "BPA_APPROVER",
                 "CEMP"
               ]
             }

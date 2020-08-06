@@ -201,6 +201,10 @@ public class NocService {
 		}
 	}
 
+	/**
+	 * handles the BPA reject and revocate state by voiding the NOC applicable to BPA
+	 * @param bpaRequest
+	 */
 	public void handleBPARejectedStateForNoc(BPARequest bpaRequest) {
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
 		BPA bpa = bpaRequest.getBPA();

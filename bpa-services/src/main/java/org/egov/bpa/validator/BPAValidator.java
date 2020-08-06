@@ -59,6 +59,13 @@ public class BPAValidator {
 	}
 
 
+	/**
+	 * Validates the application documents of the BPA comparing the document types configured in the mdms
+	 * @param request
+	 * @param mdmsData
+	 * @param currentState
+	 * @param values
+	 */
 	private void validateApplicationDocuments(BPARequest request, Object mdmsData, String currentState, Map<String, String> values) {
 		Map<String, List<String>> masterData = mdmsValidator.getAttributeValues(mdmsData);
 		BPA bpa = request.getBPA();
@@ -140,6 +147,10 @@ public class BPAValidator {
 
 	}
 
+	/** 
+	 * validate duplicates documents in the bpa request
+	 * @param request
+	 */
 	private void validateDuplicateDocuments(BPARequest request) {
 		if (request.getBPA().getDocuments() != null) {
 			List<String> documentFileStoreIds = new LinkedList<String>();
@@ -233,6 +244,14 @@ public class BPAValidator {
 			throw new CustomException(BPAErrorConstants.INVALID_SEARCH, "To date cannot be prior to from date");
 	}
 
+	/**
+	 * valide the update BPARequest
+	 * @param bpaRequest
+	 * @param searchResult
+	 * @param mdmsData
+	 * @param currentState
+	 * @param edcrResponse
+	 */
 	public void validateUpdate(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {
 
 		BPA bpa = bpaRequest.getBPA();
@@ -244,6 +263,12 @@ public class BPAValidator {
 
 	}
 
+	/**
+	 * set the fields from search response to the bpaRequest for furhter processing
+	 * @param bpaRequest
+	 * @param searchResult
+	 * @param mdmsData
+	 */
 	private void setFieldsFromSearch(BPARequest bpaRequest, List<BPA> searchResult, Object mdmsData) {
 		Map<String, BPA> idToBPAFromSearch = new HashMap<>();
 
@@ -260,6 +285,11 @@ public class BPAValidator {
 
 
 
+	/**
+	 * Validate the ids of the search results
+	 * @param searchResult
+	 * @param bpa
+	 */
 	private void validateAllIds(List<BPA> searchResult, BPA bpa) {
 
 		Map<String, BPA> idToBPAFromSearch = new HashMap<>();
@@ -287,6 +317,12 @@ public class BPAValidator {
 
 
 
+	/**
+	 * validate the fields inspection checlist data populated by the user against the mdms
+	 * @param mdmsData
+	 * @param bpaRequest
+	 * @param wfState
+	 */
 	public void validateCheckList(Object mdmsData, BPARequest bpaRequest, String wfState) {
 		BPA bpa = bpaRequest.getBPA();
 		Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(), bpaRequest.getBPA());
@@ -294,9 +330,16 @@ public class BPAValidator {
         log.debug("serviceType is " + edcrResponse.get(BPAConstants.SERVICETYPE));
         
 		validateQuestions(mdmsData, bpa, wfState, edcrResponse);
-		validateDocTypes(mdmsData, bpa, wfState, edcrResponse);
+		validateFIDocTypes(mdmsData, bpa, wfState, edcrResponse);
 	}
 
+	/**
+	 * validate the fields insepction report questions agains the MDMS
+	 * @param mdmsData
+	 * @param bpa
+	 * @param wfState
+	 * @param edcrResponse
+	 */
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
 	private void validateQuestions(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsQns = null;
@@ -379,8 +422,15 @@ public class BPAValidator {
 		}
 	}
 
+	/**
+	 * Validate fieldinspection documents and their documentTypes
+	 * @param mdmsData
+	 * @param bpa
+	 * @param wfState
+	 * @param edcrResponse
+	 */
 	@SuppressWarnings(value = { "unchecked", "rawtypes" })
-	private void validateDocTypes(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
+	private void validateFIDocTypes(Object mdmsData, BPA bpa, String wfState, Map<String, String> edcrResponse) {
 		List<String> mdmsDocs = null;
 
 		log.debug("Fetching MDMS result for the state " + wfState);
@@ -465,6 +515,10 @@ public class BPAValidator {
 		}
 	}
 	
+	/**
+	 * Validate FieldINpsection report date and time
+	 * @param checkListFromRequest
+	 */
 	private void validateDateTime(@SuppressWarnings("rawtypes") Map checkListFromRequest) {
 
 		if (checkListFromRequest.get(BPAConstants.INSPECTION_DATE) == null
@@ -491,12 +545,20 @@ public class BPAValidator {
 		}
 	}
 
+	/**
+	 * validate the workflow and the nocapproval stages to move forward
+	 * @param bpaRequest
+	 * @param mdmsRes
+	 */
 	public void validatePreEnrichData(BPARequest bpaRequest, Object mdmsRes) {		
-		validateWorkflowActions(bpaRequest);
+		validateSkipPaymentAction(bpaRequest);
 		validateNocApprove(bpaRequest, mdmsRes);
 	}
-	
-	private void validateWorkflowActions(BPARequest bpaRequest) {
+	/**
+	 * Validate workflowActions against the skipPayment 
+	 * @param bpaRequest
+	 */
+	private void validateSkipPaymentAction(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
 		if (bpa.getWorkflow().getAction() != null && (bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_SKIP_PAY))) {
 			BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
@@ -506,6 +568,11 @@ public class BPAValidator {
 		}
 	}
 	
+	/**
+	 * Validates the NOC approval state to move forward the bpa applicaiton
+	 * @param bpaRequest
+	 * @param mdmsRes
+	 */
 	@SuppressWarnings("unchecked")
 	private void validateNocApprove(BPARequest bpaRequest, Object mdmsRes) {
 		BPA bpa = bpaRequest.getBPA();
