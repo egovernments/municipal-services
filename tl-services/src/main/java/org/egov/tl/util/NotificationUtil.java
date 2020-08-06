@@ -234,6 +234,9 @@ public class NotificationUtil {
 	 * @return customized message for approved
 	 */
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
+		
+		message = message.replace("<2>", license.getTradeName());
+		message = message.replace("<3>", amountToBePaid.toString());
 		String UIHost = config.getUiAppHost();
 
 		String paymentPath = config.getPayLinkSMS();
@@ -244,6 +247,7 @@ public class NotificationUtil {
 		String finalPath = UIHost + paymentPath;
 
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(finalPath));
+		log.info("pay message is ",message);
 		return message;
 	}
 
