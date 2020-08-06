@@ -22,20 +22,8 @@ import org.egov.swservice.util.NotificationUtil;
 import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.validator.ValidateProperty;
-import org.egov.swservice.web.models.Action;
-import org.egov.swservice.web.models.ActionItem;
-import org.egov.swservice.web.models.CalculationCriteria;
-import org.egov.swservice.web.models.CalculationReq;
-import org.egov.swservice.web.models.CalculationRes;
-import org.egov.swservice.web.models.Category;
-import org.egov.swservice.web.models.Event;
-import org.egov.swservice.web.models.EventRequest;
-import org.egov.swservice.web.models.Property;
-import org.egov.swservice.web.models.Recepient;
-import org.egov.swservice.web.models.SMSRequest;
-import org.egov.swservice.web.models.SewerageConnection;
-import org.egov.swservice.web.models.SewerageConnectionRequest;
-import org.egov.swservice.web.models.Source;
+import org.egov.swservice.web.models.*;
+import org.egov.swservice.web.models.collection.PaymentResponse;
 import org.egov.swservice.web.models.workflow.BusinessService;
 import org.egov.swservice.web.models.workflow.State;
 import org.egov.swservice.workflow.WorkflowService;
@@ -92,6 +80,7 @@ public class WorkflowNotificationService {
 	String mobileNoReplacer = "$mobileNo";
 	String applicationKey = "$applicationkey";
 	String propertyKey = "property";
+	String businessService = "SW.ONE_TIME_FEE";
 
 	/**
 	 * 
@@ -167,6 +156,8 @@ public class WorkflowNotificationService {
 		}
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
+		if (message.contains("<receipt download link>"))
+			mobileNumberAndMesssage = setRecepitDownloadLink(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
 		Set<String> mobileNumbers = new HashSet<>(mobileNumberAndMesssage.keySet());
 		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, sewerageConnectionRequest.getRequestInfo(),
 				property.getTenantId());
@@ -292,6 +283,8 @@ public class WorkflowNotificationService {
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
+		if (message.contains("<receipt download link>"))
+			mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
@@ -351,9 +344,9 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<payment link>",
 						sewerageServicesUtil.getShortenedURL(paymentLink));
 			}
-			if (messageToReplace.contains("<receipt download link>"))
+			/*if (messageToReplace.contains("<receipt download link>"))
 				messageToReplace = messageToReplace.replace("<receipt download link>",
-						sewerageServicesUtil.getShortenedURL(config.getNotificationUrl()));
+						sewerageServicesUtil.getShortenedURL(config.getNotificationUrl()));*/
 
 			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
@@ -577,6 +570,41 @@ public class WorkflowNotificationService {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("SEWERAGE_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
+	}
+
+	public Map<String, String> setRecepitDownloadLink(Map<String, String> mobileNumbersAndNames,
+													  SewerageConnectionRequest sewerageConnectionRequest, String message, Property property) {
+
+		Map<String, String> messageToReturn = new HashMap<>();
+		if (message.contains("<receipt download link>")) {
+			String receiptNumber = getReceiptNumber(sewerageConnectionRequest);
+			for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
+				String messageToReplace = message;
+
+				String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
+				link = link.replace("$consumerCode", sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+				link = link.replace("$tenantId", property.getTenantId());
+				link = link.replace("$businessService", businessService);
+				link = link.replace("$receiptNumber", receiptNumber);
+				link = link.replace("$mobile", mobileAndName.getKey());
+				link = sewerageServicesUtil.getShortenedURL(link);
+				messageToReplace = messageToReplace.replace("<receipt download link>", link);
+
+				messageToReturn.put(mobileAndName.getKey(), messageToReplace);
+			}
+		}
+		return messageToReturn;
+
+	}
+
+	public String getReceiptNumber(SewerageConnectionRequest sewerageConnectionRequest){
+		StringBuilder URL = sewerageServicesUtil.getcollectionURL();
+		URL.append("?").append("consumerCodes=").append(sewerageConnectionRequest.getSewerageConnection().getApplicationNo())
+				.append("&").append("tenantId=").append(sewerageConnectionRequest.getSewerageConnection().getTenantId());
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(sewerageConnectionRequest.getRequestInfo()).build();
+		Object response = serviceRequestRepository.fetchResult(URL,requestInfoWrapper);
+		PaymentResponse paymentResponse = mapper.convertValue(response, PaymentResponse.class);
+		return paymentResponse.getPayments().get(0).getPaymentDetails().get(0).getReceiptNumber();
 	}
 
 }
