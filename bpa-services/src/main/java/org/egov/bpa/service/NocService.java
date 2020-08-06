@@ -131,6 +131,11 @@ public class NocService {
 		}
 	}
 
+	/**
+	 * fetch the noc records with sourceRefId
+	 * @param bpaRequest
+	 * @return
+	 */
 	private StringBuilder getNOCWithSourceRef(BPARequest bpaRequest) {
 		StringBuilder uri = new StringBuilder(config.getNocServiceHost());
 		uri.append(config.getNocSearchEndpoint());
@@ -143,12 +148,23 @@ public class NocService {
 		return uri;
 	}
 
+	/**
+	 * Calls the iniate and approve offline workflow for the applicable noc records
+	 * @param bpaRequest
+	 * @param mdmsData
+	 */
 	public void manageNocWorkflowAction(BPARequest bpaRequest, Object mdmsData) {
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
 		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
 		approveOfflineNoc(bpaRequest, mdmsData, nocs);
 	}
 
+	/**
+	 * fetches the applicable offline noc's and mark them as approved
+	 * @param bpaRequest
+	 * @param mdmsData
+	 * @param nocs
+	 */
 	@SuppressWarnings("unchecked")
 	private void approveOfflineNoc(BPARequest bpaRequest, Object mdmsData, List<Noc> nocs) {
 		BPA bpa = bpaRequest.getBPA();
@@ -174,6 +190,13 @@ public class NocService {
 		}
 	}
 
+	/**
+	 *
+	 *initate the workflow of applicale NOc to the bpa
+	 * @param bpaRequest
+	 * @param mdmsData
+	 * @param nocs
+	 */
 	@SuppressWarnings("unchecked")
 	private void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData, List<Noc> nocs) {
 		BPA bpa = bpaRequest.getBPA();

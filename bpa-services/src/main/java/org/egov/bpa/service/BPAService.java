@@ -209,9 +209,9 @@ public class BPAService {
 				roles.add(role.getCode());
 			}
 			if ((criteria.tenantIdOnly() || criteria.isEmpty()) && roles.contains(BPAConstants.CITIZEN)) {
-				log.info("loading data of created and by me");
+				log.debug("loading data of created and by me");
 				bpas =  this.getBPACreatedForByMe(criteria, requestInfo, landcriteria, edcrNos);
-				log.info("no of bpas retuning by the search query" + bpas.size());
+				log.debug("no of bpas retuning by the search query" + bpas.size());
 			} else {
 				bpas = getBPAFromCriteria(criteria, requestInfo, edcrNos);
 				ArrayList<String> landIds = new ArrayList<String>();
@@ -250,12 +250,12 @@ public class BPAService {
 			criteria.setOwnerIds(uuids);
 			criteria.setCreatedBy(uuids);
 		}
-		log.info("loading data of created and by me"+ uuids.toString());
+		log.debug("loading data of created and by me"+ uuids.toString());
 		UserDetailResponse userInfo = userService.getUser(criteria, requestInfo);
 		if (userInfo != null) {
 			landcriteria.setMobileNumber(userInfo.getUser().get(0).getMobileNumber());
 		}
-		log.info("Call with multiple to Land::" + landcriteria.getTenantId() + landcriteria.getMobileNumber());
+		log.debug("Call with multiple to Land::" + landcriteria.getTenantId() + landcriteria.getMobileNumber());
 		ArrayList<LandInfo> landInfos = landService.searchLandInfoToBPA(requestInfo, landcriteria);
 		ArrayList<String> landIds = new ArrayList<String>();
 		if (landInfos.size() > 0) {
@@ -266,7 +266,7 @@ public class BPAService {
 		}
 		
 		bpas = getBPAFromCriteria(criteria, requestInfo, edcrNos);
-		log.info("no of bpas queried" + bpas.size());
+		log.debug("no of bpas queried" + bpas.size());
 		this.populateLandToBPA(bpas, landInfos, requestInfo);
 		return bpas;
 	}

@@ -576,13 +576,13 @@ public class BPAValidator {
 	@SuppressWarnings("unchecked")
 	private void validateNocApprove(BPARequest bpaRequest, Object mdmsRes) {
 		BPA bpa = bpaRequest.getBPA();
-		log.info("===========> valdiateNocApprove method called");
+		log.debug("===========> valdiateNocApprove method called");
 		if (config.getValidateRequiredNoc()) {
 			if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 					&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
 				Map<String, String> edcrResponse = edcrService.getEDCRDetails(bpaRequest.getRequestInfo(),
 						bpaRequest.getBPA());
-				log.info("===========> valdiateNocApprove method called, application is in noc verification pending");
+				log.debug("===========> valdiateNocApprove method called, application is in noc verification pending");
 				String riskType = "ALL";
 				if (StringUtils.isEmpty(bpa.getRiskType()) || bpa.getRiskType().equalsIgnoreCase("LOW")) {
 					riskType = bpa.getRiskType();
@@ -596,7 +596,7 @@ public class BPAValidator {
 				List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsRes, nocPath);
 				List<String> nocTypes = JsonPath.read(nocMappingResponse, "$..type");
 
-				log.info("===========> valdiateNocApprove method called, noctypes====",nocTypes);
+				log.debug("===========> valdiateNocApprove method called, noctypes====",nocTypes);
 				List<Noc> nocs = nocService.fetchNocRecords(bpaRequest);
 				if (!CollectionUtils.isEmpty(nocs)) {
 					for (Noc noc : nocs) {
