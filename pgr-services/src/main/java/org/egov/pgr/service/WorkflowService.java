@@ -2,6 +2,7 @@ package org.egov.pgr.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
@@ -112,10 +113,16 @@ public class WorkflowService {
 
         // FIX ME FOR BULK SEARCH
         String tenantId = pgrEntities.get(0).getService().getTenantId();
-        String serviceRequestId = pgrEntities.get(0).getService().getServiceRequestId();
+
+        List<String> serviceRequestIds = new ArrayList<>();
+
+        pgrEntities.forEach(pgrEntity -> {
+            serviceRequestIds.add(pgrEntity.getService().getServiceRequestId());
+        });
+
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-        StringBuilder searchUrl = getprocessInstanceSearchURL(tenantId, serviceRequestId);
+        StringBuilder searchUrl = getprocessInstanceSearchURL(tenantId, StringUtils.join(serviceRequestIds,','));
         Object result = repository.fetchResult(searchUrl, requestInfoWrapper);
 
 
@@ -126,11 +133,14 @@ public class WorkflowService {
             throw new CustomException("PARSING ERROR", "Failed to parse response of workflow processInstance search");
         }
 
-        if (CollectionUtils.isEmpty(processInstanceResponse.getProcessInstances()))
-            throw new CustomException("WORKFLOW_NOT_FOUND", "The workflow for serviceRequestId:  " + serviceRequestId + " is not found");
+        if (CollectionUtils.isEmpty(processInstanceResponse.getProcessInstances()) || processInstanceResponse.getProcessInstances().size()!=serviceRequestIds.size())
+            throw new CustomException("WORKFLOW_NOT_FOUND", "The workflow object is not found");
 
-        Workflow workflow = getWorkflow(processInstanceResponse.getProcessInstances().get(0));
-        pgrEntities.get(0).setWorkflow(workflow);
+        Map<String, Workflow> businessIdToWorkflow = getWorkflow(processInstanceResponse.getProcessInstances());
+
+        pgrEntities.forEach(pgrEntity -> {
+            pgrEntity.setWorkflow(businessIdToWorkflow.get(pgrEntity.getService().getServiceRequestId()));
+        });
 
     }
 
@@ -170,24 +180,30 @@ public class WorkflowService {
 
     /**
      *
-     * @param processInstance
+     * @param processInstances
      */
-    public Workflow getWorkflow(ProcessInstance processInstance) {
+    public Map<String, Workflow> getWorkflow(List<ProcessInstance> processInstances) {
 
-        List<String> userIds = null;
+        Map<String, Workflow> businessIdToWorkflow = new HashMap<>();
 
-        if(!CollectionUtils.isEmpty(processInstance.getAssignes())){
-            userIds = processInstance.getAssignes().stream().map(User::getUuid).collect(Collectors.toList());
-        }
+        processInstances.forEach(processInstance -> {
+            List<String> userIds = null;
 
-        Workflow workflow = Workflow.builder()
-                .action(processInstance.getAction())
-                .assignes(userIds)
-                .comments(processInstance.getComment())
-                .verificationDocuments(processInstance.getDocuments())
-                .build();
+            if(!CollectionUtils.isEmpty(processInstance.getAssignes())){
+                userIds = processInstance.getAssignes().stream().map(User::getUuid).collect(Collectors.toList());
+            }
 
-        return workflow;
+            Workflow workflow = Workflow.builder()
+                    .action(processInstance.getAction())
+                    .assignes(userIds)
+                    .comments(processInstance.getComment())
+                    .verificationDocuments(processInstance.getDocuments())
+                    .build();
+
+            businessIdToWorkflow.put(processInstance.getBusinessId(), workflow);
+        });
+
+        return businessIdToWorkflow;
     }
 
     /**
