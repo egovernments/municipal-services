@@ -185,6 +185,7 @@ components:
       required:
         - tenantId
         - accountId
+        - businessService
       
     Amount:
       type: object
