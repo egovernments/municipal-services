@@ -25,7 +25,12 @@ public class ServiceRequestRepository {
 		this.mapper = mapper;
 		this.restTemplate = restTemplate;
 	}
-
+	/**
+	 * fetchResult form the different services based on the url and request object
+	 * @param uri
+	 * @param request
+	 * @return
+	 */
 	public Object fetchResult(StringBuilder uri, Object request) {
 		Object response = null;
 		log.debug("URI: " + uri.toString());
