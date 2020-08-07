@@ -157,7 +157,7 @@ public class WorkflowNotificationService {
 		Map<String, String> mobileNumberAndMesssage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
 		if (message.contains("<receipt download link>"))
-			mobileNumberAndMesssage = setRecepitDownloadLink(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
+			mobileNumberAndMesssage = setRecepitDownloadLink(mobileNumberAndMesssage, sewerageConnectionRequest, message, property);
 		Set<String> mobileNumbers = new HashSet<>(mobileNumberAndMesssage.keySet());
 		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, sewerageConnectionRequest.getRequestInfo(),
 				property.getTenantId());
@@ -284,7 +284,7 @@ public class WorkflowNotificationService {
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				sewerageConnectionRequest, message, property);
 		if (message.contains("<receipt download link>"))
-			mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, sewerageConnectionRequest, message, property);
+			mobileNumberAndMessage = setRecepitDownloadLink(mobileNumberAndMessage, sewerageConnectionRequest, message, property);
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
 			smsRequest.add(req);
@@ -572,27 +572,25 @@ public class WorkflowNotificationService {
 		}
 	}
 
-	public Map<String, String> setRecepitDownloadLink(Map<String, String> mobileNumbersAndNames,
+	public Map<String, String> setRecepitDownloadLink(Map<String, String> mobileNumberAndMesssage,
 													  SewerageConnectionRequest sewerageConnectionRequest, String message, Property property) {
 
-		Map<String, String> messageToReturn = new HashMap<>();
-		if (message.contains("<receipt download link>")) {
+			Map<String, String> messageToReturn = new HashMap<>();
 			String receiptNumber = getReceiptNumber(sewerageConnectionRequest);
-			for (Entry<String, String> mobileAndName : mobileNumbersAndNames.entrySet()) {
-				String messageToReplace = message;
-
+			for (Entry<String, String> mobileAndMsg : mobileNumberAndMesssage.entrySet()) {
+				String messageToReplace = mobileAndMsg.getValue();
 				String link = config.getNotificationUrl() + config.getReceiptDownloadLink();
 				link = link.replace("$consumerCode", sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
 				link = link.replace("$tenantId", property.getTenantId());
 				link = link.replace("$businessService", businessService);
 				link = link.replace("$receiptNumber", receiptNumber);
-				link = link.replace("$mobile", mobileAndName.getKey());
+				link = link.replace("$mobile", mobileAndMsg.getKey());
 				link = sewerageServicesUtil.getShortenedURL(link);
 				messageToReplace = messageToReplace.replace("<receipt download link>", link);
 
-				messageToReturn.put(mobileAndName.getKey(), messageToReplace);
+				messageToReturn.put(mobileAndMsg.getKey(), messageToReplace);
 			}
-		}
+			
 		return messageToReturn;
 
 	}
