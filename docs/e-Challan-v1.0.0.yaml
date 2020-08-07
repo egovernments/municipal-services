@@ -13,9 +13,7 @@ info:
     email: contact@egovernments.org
 x-module: BPA
 x-common-path: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml'
-
 paths:
- 
   /eChallan/v1/_create:
     post:
       summary: Create new challan request
@@ -55,7 +53,6 @@ paths:
               $ref: '#/components/schemas/ChallanRequest'
         description: Request schema.
         required: true
-      
       responses:
         '202':
           description: Application submitted successfully
@@ -69,22 +66,18 @@ paths:
             '*/*':
               schema:
                 $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
-  
   /eChallan/v1/_search:
     post:
-      summary: Get the list of existing challan details 
+      summary: Get the list of existing challan details
       description: |
         Gets the list of service requests for a particular ULB based on search criteria.
       parameters:
         - $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/parameters/tenantId'
-        - name: serviceCode
+        - name: businessServiceCode
           in: query
-          description: Allows search for service type - comma separated list
+          description: Allows search for business service
           schema:
-            type: array
-            items:
-              type: string
-              maxItems: 5
+            type: string
         - name: ids
           in: query
           description: Search by list of UUID
@@ -113,8 +106,6 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
       tags:
         - eChallan APIs
-  
-      
 components:
   schemas:
     Challan:
@@ -138,6 +129,18 @@ components:
         businessService:
           type: string
           description: Business service code from "BusinessService" master(MDMS)
+          minLength: 2
+          maxLength: 128
+        fromDate:
+          type: integer
+          format: int64
+          description: Capture period for which challan needs to be generated 
+          minLength: 2
+          maxLength: 128
+        toDate:
+          type: integer
+          format: int64
+          description: Capture period for which challan needs to be generated 
           minLength: 2
           maxLength: 128
         challanNo:
@@ -164,7 +167,7 @@ components:
         additionalDetail:
           type: object
           description: This is the json object that will carry the actual input (whereever the metadata requries input). Structure should be same as the schema definition provided in the metadata of the service (schema compliance check to be performed at client/server)
-        applicationStatus:
+        status:
           type: string
           description: The current status of the service request.
           readOnly: true
@@ -184,9 +187,7 @@ components:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
       required:
         - tenantId
-        - accountId
         - businessService
-      
     Amount:
       type: object
       description: Capture the challan amount details
@@ -200,7 +201,6 @@ components:
           type: number
           format: double
           description: Capture the amount for a tax head
-    
     ChallanRequest:
       type: object
       description: Request object to fetch the report data
