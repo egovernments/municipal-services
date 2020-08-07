@@ -1035,6 +1035,7 @@ public class EstimationService {
 		Map<String, Object> penalty = getApplicableMaster(penaltyMasterList);
 
 		if (null == penalty) return penaltyAmt;
+		log.info("mutationPeriod in month  is"+ penalty.get(MUTATION_PAYMENT_PERIOD_IN_MONTH));
 		Integer mutationPaymentPeriodInMonth = Integer.parseInt(String.valueOf(penalty.get(MUTATION_PAYMENT_PERIOD_IN_MONTH)));
 		Long deadlineDate = getDeadlineDate(docDate,mutationPaymentPeriodInMonth);
 
