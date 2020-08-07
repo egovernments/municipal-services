@@ -154,7 +154,8 @@ public class WorkflowNotificationService {
 		}
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames, request,
 				message, property);
-        //mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, request, message, property);
+		if (message.contains("<receipt download link>"))
+        	mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, request, message, property);
 		Set<String> mobileNumbers = mobileNumberAndMessage.keySet().stream().collect(Collectors.toSet());
 		Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumbers, request.getRequestInfo(), property.getTenantId());
 //		Map<String, String> mapOfPhnoAndUUIDs = waterConnection.getProperty().getOwners().stream().collect(Collectors.toMap(OwnerInfo::getMobileNumber, OwnerInfo::getUuid));
@@ -278,7 +279,8 @@ public class WorkflowNotificationService {
 		}
 		Map<String, String> mobileNumberAndMessage = getMessageForMobileNumber(mobileNumbersAndNames,
 				waterConnectionRequest, message, property);
-        //mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, waterConnectionRequest, message, property);
+		if (message.contains("<receipt download link>"))
+        	mobileNumberAndMessage = setRecepitDownloadLink(mobileNumbersAndNames, waterConnectionRequest, message, property);
 		List<SMSRequest> smsRequest = new ArrayList<>();
 		mobileNumberAndMessage.forEach((mobileNumber, msg) -> {
 			SMSRequest req = SMSRequest.builder().mobileNumber(mobileNumber).message(msg).category(Category.TRANSACTION).build();
@@ -334,10 +336,10 @@ public class WorkflowNotificationService {
 				messageToReplace = messageToReplace.replace("<payment link>",
 						waterServiceUtil.getShortnerURL(paymentLink));
 			}
-			if (messageToReplace.contains("<receipt download link>")){
+			/*if (messageToReplace.contains("<receipt download link>")){
 				messageToReplace = messageToReplace.replace("<receipt download link>",
 						waterServiceUtil.getShortnerURL(config.getNotificationUrl()));
-			}
+			}*/
 			if (messageToReplace.contains("<connection details page>")) {
 				String connectionDetaislLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
 				connectionDetaislLink = connectionDetaislLink.replace(connectionNoReplacer,

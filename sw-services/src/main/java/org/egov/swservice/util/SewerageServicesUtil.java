@@ -260,4 +260,9 @@ public class SewerageServicesUtil {
 		return !org.springframework.util.StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionNo());
 	}
 
+	public StringBuilder getcollectionURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCollectionHost()).append(config.getPaymentSearch());
+	}
+
 }

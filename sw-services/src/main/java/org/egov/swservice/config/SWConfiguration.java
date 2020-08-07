@@ -171,4 +171,10 @@ public class SWConfiguration {
 
 	@Value("${egov.msg.download.receipt.link}")
 	private String receiptDownloadLink;
+
+	@Value("${egov.collection.host}")
+	private String collectionHost;
+
+	@Value("${egov.collectiom.payment.search}")
+	private String paymentSearch;
 }
