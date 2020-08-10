@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,6 +26,8 @@ import lombok.Builder;
 @NoArgsConstructor
 @Builder
 public class Boundary   {
+
+        @NotNull
         @JsonProperty("code")
         private String code = null;
 

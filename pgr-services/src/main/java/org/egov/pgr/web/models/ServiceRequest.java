@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 /**
  * Request object to fetch the report data
  */
@@ -23,9 +26,13 @@ import lombok.Builder;
 @NoArgsConstructor
 @Builder
 public class ServiceRequest   {
+
+        @NotNull
         @JsonProperty("RequestInfo")
         private RequestInfo requestInfo = null;
 
+        @Valid
+        @NotNull
         @JsonProperty("PGREntity")
         private PGREntity pgrEntity = null;
 

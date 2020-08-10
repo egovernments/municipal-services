@@ -182,7 +182,7 @@
             },
             {
               "action": "RATE",
-              "nextState": "CLOSEDAFTERREJECTION",
+              "nextState": "CLOSEDAFTERRESOLUTION",
               "roles": [
                 "CFC",
                 "CITIZEN"

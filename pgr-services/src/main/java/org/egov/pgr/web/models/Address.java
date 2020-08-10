@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
 
+import javax.validation.Valid;
+
 /**
  * Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. 
  */
@@ -64,6 +66,7 @@ public class Address   {
         @JsonProperty("street")
         private String street = null;
 
+        @Valid
         @JsonProperty("locality")
         private Boundary locality = null;
 

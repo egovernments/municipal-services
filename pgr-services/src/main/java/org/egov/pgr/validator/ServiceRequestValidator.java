@@ -1,5 +1,6 @@
 package org.egov.pgr.validator;
 
+import com.jayway.jsonpath.JsonPath;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.PGRRepository;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.egov.pgr.util.PGRConstants.MDMS_SERVICEDEF_SEARCH;
 import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 import static org.egov.pgr.util.PGRConstants.USERTYPE_EMPLOYEE;
 
@@ -33,9 +35,10 @@ public class ServiceRequestValidator {
     }
 
 
-    public void validateCreate(ServiceRequest request){
+    public void validateCreate(ServiceRequest request, Object mdmsData){
         Map<String,String> errorMap = new HashMap<>();
         validateUserData(request,errorMap);
+        validateMDMS(request, mdmsData);
 
         if(!errorMap.isEmpty())
             throw new CustomException(errorMap);
@@ -69,6 +72,28 @@ public class ServiceRequestValidator {
     }
 
 
+    private void validateMDMS(ServiceRequest request, Object mdmsData){
+
+        String serviceCode = request.getPgrEntity().getService().getServiceCode();
+        String jsonPath = MDMS_SERVICEDEF_SEARCH.replace("{SERVICEDEF}",serviceCode);
+
+        List<Object> res = null;
+
+        try{
+            res = JsonPath.read(mdmsData,jsonPath);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response");
+        }
+
+        if(CollectionUtils.isEmpty(res))
+            throw new CustomException("INVALID_SERVICECODE","The service code: "+serviceCode+" is not present in MDMS");
+
+
+    }
+
+
     private void validateIdleTime(ServiceRequest request){
         Service service = request.getPgrEntity().getService();
         Long lastModifiedTime = service.getAuditDetails().getLastModifiedTime();
@@ -89,10 +114,10 @@ public class ServiceRequestValidator {
 
     }
 
-    public void validateUpdate(ServiceRequest request){
+    public void validateUpdate(ServiceRequest request, Object mdmsData){
 
         String id = request.getPgrEntity().getService().getId();
-
+        validateMDMS(request, mdmsData);
         RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
 

@@ -57,7 +57,7 @@ public class RequestsApiController{
 
 
     @RequestMapping(value="/requests/_create", method = RequestMethod.POST)
-    public ResponseEntity<ServiceResponse> requestsCreatePost(@RequestBody ServiceRequest request) throws IOException {
+    public ResponseEntity<ServiceResponse> requestsCreatePost(@Valid @RequestBody ServiceRequest request) throws IOException {
 
         PGREntity pgrEntity = pgrService.create(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
@@ -78,7 +78,7 @@ public class RequestsApiController{
 
 
     @RequestMapping(value="/requests/_update", method = RequestMethod.POST)
-    public ResponseEntity<ServiceResponse> requestsUpdatePost(@RequestBody ServiceRequest request) throws IOException {
+    public ResponseEntity<ServiceResponse> requestsUpdatePost(@Valid @RequestBody ServiceRequest request) throws IOException {
         PGREntity pgrEntity = pgrService.update(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(Collections.singletonList(pgrEntity)).build();

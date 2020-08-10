@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 /**
  * Instance of Service request raised for a particular service. As per extension propsed in the Service definition \&quot;attributes\&quot; carry the input values requried by metadata definition in the structure as described by the corresponding schema.  * Any one of &#39;address&#39; or &#39;(lat and lang)&#39; or &#39;addressid&#39; is mandatory 
  */
@@ -28,9 +33,11 @@ public class Service   {
         @JsonProperty("id")
         private String id = null;
 
+        @NotNull
         @JsonProperty("tenantId")
         private String tenantId = null;
 
+        @NotNull
         @JsonProperty("serviceCode")
         private String serviceCode = null;
 
@@ -43,15 +50,23 @@ public class Service   {
         @JsonProperty("accountId")
         private String accountId = null;
 
+        @Max(5)
+        @Min(1)
+        @JsonProperty("rating")
+        private Integer rating ;
+
         @JsonProperty("additionalDetail")
         private Object additionalDetail = null;
 
         @JsonProperty("applicationStatus")
         private String applicationStatus = null;
 
+        @NotNull
         @JsonProperty("source")
         private String source = null;
 
+        @Valid
+        @NotNull
         @JsonProperty("address")
         private Address address = null;
 

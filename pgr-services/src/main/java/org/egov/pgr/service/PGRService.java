@@ -5,6 +5,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.PGRRepository;
+import org.egov.pgr.util.MDMSUtils;
 import org.egov.pgr.validator.ServiceRequestValidator;
 import org.egov.pgr.web.models.PGREntity;
 import org.egov.pgr.web.models.RequestSearchCriteria;
@@ -37,11 +38,13 @@ public class PGRService {
 
     private PGRRepository repository;
 
+    private MDMSUtils mdmsUtils;
+
 
     @Autowired
     public PGRService(EnrichmentService enrichmentService, UserService userService, WorkflowService workflowService,
                       ServiceRequestValidator serviceRequestValidator, ServiceRequestValidator validator, Producer producer,
-                      PGRConfiguration config, PGRRepository repository) {
+                      PGRConfiguration config, PGRRepository repository, MDMSUtils mdmsUtils) {
         this.enrichmentService = enrichmentService;
         this.userService = userService;
         this.workflowService = workflowService;
@@ -50,6 +53,7 @@ public class PGRService {
         this.producer = producer;
         this.config = config;
         this.repository = repository;
+        this.mdmsUtils = mdmsUtils;
     }
 
 
@@ -57,7 +61,8 @@ public class PGRService {
 
 
     public PGREntity create(ServiceRequest request){
-        validator.validateCreate(request);
+        Object mdmsData = mdmsUtils.mDMSCall(request);
+        validator.validateCreate(request, mdmsData);
         userService.callUserService(request);
         enrichmentService.enrichCreateRequest(request);
         workflowService.updateWorkflowStatus(request);
@@ -86,7 +91,8 @@ public class PGRService {
 
 
     public PGREntity update(ServiceRequest request){
-        validator.validateUpdate(request);
+        Object mdmsData = mdmsUtils.mDMSCall(request);
+        validator.validateUpdate(request, mdmsData);
         userService.callUserService(request);
         workflowService.updateWorkflowStatus(request);
         enrichmentService.enrichUpdateRequest(request);

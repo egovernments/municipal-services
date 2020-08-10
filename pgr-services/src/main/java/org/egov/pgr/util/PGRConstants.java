@@ -20,6 +20,11 @@ public class PGRConstants {
 
     public static final String PGR_MODULENAME = "PGR";
 
+    public static final String MDMS_SERVICEDEF = "ServiceDefs";
+
+    public static final String MDMS_MODULE_NAME = "RAINMAKER-PGR";
+
+    public static final String MDMS_SERVICEDEF_SEARCH = "$.MdmsRes.RAINMAKER-PGR.ServiceDefs[?(@.serviceCode=='{SERVICEDEF}')]";
 
 
 
