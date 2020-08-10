@@ -266,4 +266,14 @@ public class WaterServicesUtil {
 		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
 		return response.toString();
 	}
+	
+	public boolean isModifyConnectionRequest(WaterConnectionRequest waterConnectionRequest) {
+		return !StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionNo());
+	}
+
+	public StringBuilder getcollectionURL() {
+		StringBuilder builder = new StringBuilder();
+		return builder.append(config.getCollectionHost()).append(config.getPaymentSearch());
+	}
+
 }
