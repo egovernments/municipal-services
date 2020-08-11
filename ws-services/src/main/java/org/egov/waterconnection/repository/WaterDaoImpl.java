@@ -59,6 +59,7 @@ public class WaterDaoImpl implements WaterDao {
 			return Collections.emptyList();
 
 		System.out.println("\n\nQuery---> "+query+"\n\n");
+		System.out.println("\n\npreparedStatement---> "+preparedStatement+"\n\n");
 		List<WaterConnection> waterConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
 				waterRowMapper);
 		if (waterConnectionList == null)
