@@ -105,8 +105,10 @@ public class PaymentUpdateService {
 			}
 			if (!isServiceMatched)
 				return;
-			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
-					paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
+			if(!paymentRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("SYSTEM"))
+				paymentRequest.getRequestInfo().setUserInfo(fetchUser(
+						paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
+
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
 				log.info("Consuming Business Service : {}" , paymentDetail.getBusinessService());
 				if (paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
