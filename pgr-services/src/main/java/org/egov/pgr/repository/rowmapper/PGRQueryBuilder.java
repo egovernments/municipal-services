@@ -28,9 +28,10 @@ public class PGRQueryBuilder {
                                         " from eg_pgr_service_v2 ser INNER JOIN eg_pgr_address_v2 ads" +
                                         " ON ads.parentId = ser.id ";
 
+    private static final String COUNT_WRAPPER = "select count(*) from ({INTERNAL_QUERY}) as count";
 
 
-    public String getTLSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList) {
+    public String getPGRSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList) {
 
         StringBuilder builder = new StringBuilder(QUERY);
 
@@ -69,6 +70,12 @@ public class PGRQueryBuilder {
         return builder.toString();
     }
 
+
+    public String getCountQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList){
+        String query = getPGRSearchQuery(criteria, preparedStmtList);
+        String countQuery = COUNT_WRAPPER.replace("{INTERNAL_QUERY}", query);
+        return countQuery;
+    }
 
     private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
         if (values.isEmpty())
