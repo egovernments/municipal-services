@@ -154,7 +154,9 @@ public class NocService {
 	 * @param mdmsData
 	 */
 	public void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData) {
+		System.out.println("====> initiateNocWorkflow");
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
+		System.out.println("====> initiateNocWorkflow = no of noc "+ nocs.size());
 		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
 	}
 	
@@ -217,10 +219,12 @@ public class NocService {
 				.replace("{3}", (StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
 						? "ALL" : bpa.getRiskType().toString());
 		List<Object> triggerActionStates = (List<Object>) JsonPath.read(mdmsData, nocPath);
+		System.out.println("====> initiateNocWorkflow = triggerStates" + triggerActionStates.toString());
 		if (!CollectionUtils.isEmpty(triggerActionStates)
 				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
+					System.out.println("====> noc application status " + noc.getApplicationStatus()  +" for noc appno "+ noc.getApplicationNo());
 					if(!noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.INPROGRESS_STATUS)){
 						noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())

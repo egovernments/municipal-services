@@ -408,7 +408,7 @@ public class BPAService {
 
 		nocService.manageOfflineNocs(bpaRequest, mdmsData);
 		wfIntegrator.callWorkFlow(bpaRequest);
-
+		System.out.println("===> workflow done =>" +bpaRequest.getBPA().getStatus()  );
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		
 		log.debug("Bpa status is : " + bpa.getStatus());
