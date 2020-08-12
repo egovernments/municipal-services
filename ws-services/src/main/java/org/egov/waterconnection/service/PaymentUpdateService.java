@@ -105,8 +105,8 @@ public class PaymentUpdateService {
 			}
 			if (!isServiceMatched)
 				return;
-			if(!paymentRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("SYSTEM"))
-				paymentRequest.getRequestInfo().setUserInfo(fetchUser(
+
+			paymentRequest.getRequestInfo().setUserInfo(fetchUser(
 						paymentRequest.getRequestInfo().getUserInfo().getUuid(), paymentRequest.getRequestInfo()));
 
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
