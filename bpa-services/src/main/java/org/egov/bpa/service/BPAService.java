@@ -408,7 +408,6 @@ public class BPAService {
 
 		nocService.manageOfflineNocs(bpaRequest, mdmsData);
 		wfIntegrator.callWorkFlow(bpaRequest);
-		nocService.initiateNocWorkflow(bpaRequest, mdmsData);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		
