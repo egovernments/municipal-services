@@ -401,14 +401,15 @@ public class BPAService {
 
 		bpaRequest.getBPA().setAuditDetails(searchResult.get(0).getAuditDetails());
 		
+		nocService.manageOfflineNocs(bpaRequest, mdmsData);
 		bpaValidator.validatePreEnrichData(bpaRequest, mdmsData);
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		
 		this.handleRejectSendBackActions(applicationType, bpaRequest, businessService, searchResult, mdmsData, edcrResponse);
 
-		nocService.manageOfflineNocs(bpaRequest, mdmsData);
+		
 		wfIntegrator.callWorkFlow(bpaRequest);
-		System.out.println("===> workflow done =>" +bpaRequest.getBPA().getStatus()  );
+		log.debug("===> workflow done =>" +bpaRequest.getBPA().getStatus()  );
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		
 		log.debug("Bpa status is : " + bpa.getStatus());
