@@ -26,7 +26,7 @@ public class NOCConsumer {
 		ObjectMapper mapper = new ObjectMapper();
 		NocRequest nocRequest = new NocRequest();
 		try {
-			log.debug("Consuming record: " + record);
+			log.info("Consuming record: " + record);
 			nocRequest = mapper.convertValue(record, NocRequest.class);
 		} catch (final Exception e) {
 			log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
