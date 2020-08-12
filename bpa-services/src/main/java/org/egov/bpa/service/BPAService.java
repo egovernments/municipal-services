@@ -405,8 +405,10 @@ public class BPAService {
 		enrichmentService.enrichBPAUpdateRequest(bpaRequest, businessService);
 		
 		this.handleRejectSendBackActions(applicationType, bpaRequest, businessService, searchResult, mdmsData, edcrResponse);
-		nocService.manageNocWorkflowAction(bpaRequest, mdmsData);
+
+		nocService.manageOfflineNocs(bpaRequest, mdmsData);
 		wfIntegrator.callWorkFlow(bpaRequest);
+		nocService.initiateNocWorkflow(bpaRequest, mdmsData);
 
 		enrichmentService.postStatusEnrichment(bpaRequest);
 		

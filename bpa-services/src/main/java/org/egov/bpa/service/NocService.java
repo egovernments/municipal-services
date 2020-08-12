@@ -149,13 +149,22 @@ public class NocService {
 	}
 
 	/**
-	 * Calls the iniate and approve offline workflow for the applicable noc records
+	 * Calls the iniate  workflow for the applicable noc records
 	 * @param bpaRequest
 	 * @param mdmsData
 	 */
-	public void manageNocWorkflowAction(BPARequest bpaRequest, Object mdmsData) {
+	public void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData) {
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
 		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
+	}
+	
+	/**
+	 * Calls the  approve offline workflow for the applicable noc records
+	 * @param bpaRequest
+	 * @param mdmsData
+	 */
+	public void manageOfflineNocs(BPARequest bpaRequest, Object mdmsData) {
+		List<Noc> nocs = fetchNocRecords(bpaRequest);
 		approveOfflineNoc(bpaRequest, mdmsData, nocs);
 	}
 
