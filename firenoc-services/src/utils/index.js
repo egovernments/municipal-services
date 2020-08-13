@@ -77,7 +77,7 @@ export const createWorkFlow = async body => {
       businessId: fireNOC.fireNOCDetails.applicationNumber,
       action: fireNOC.fireNOCDetails.action,
       comment: get(fireNOC.fireNOCDetails, "comment", null),
-      assignee: fireNOC.fireNOCDetails.assignee
+      assignes: fireNOC.fireNOCDetails.assignee
         ? { uuid: fireNOC.fireNOCDetails.assignee }
         : fireNOC.fireNOCDetails.assignee,
       documents: get(fireNOC.fireNOCDetails, "wfDocuments", null),
@@ -86,7 +86,9 @@ export const createWorkFlow = async body => {
       moduleName: envVariables.BUSINESS_SERVICE
     };
   });
-  
+  console.log("\n\nProcessInstances");
+  console.log(ProcessInstances);
+  console.log("\n\n");
   let requestBody = {
     RequestInfo: body.RequestInfo,
     ProcessInstances: processInstances
