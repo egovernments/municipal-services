@@ -221,8 +221,9 @@ public class NocService {
 						? "ALL" : bpa.getRiskType().toString());
 		List<Object> triggerActionStates = (List<Object>) JsonPath.read(mdmsData, nocPath);
 		log.debug("====> initiateNocWorkflow = triggerStates" + triggerActionStates.toString());
+		
 		if (!CollectionUtils.isEmpty(triggerActionStates)
-				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
+				&& "DOC_VERIFICATION_INPROGRESS".equalsIgnoreCase(bpa.getStatus())) {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
 					log.debug("====> noc application status " + noc.getApplicationStatus()  +" for noc appno "+ noc.getApplicationNo());
@@ -230,11 +231,14 @@ public class NocService {
 						noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 								.build();
+						System.out.println(nocRequest);
 						updateNoc(nocRequest);
+						
 						log.debug("Noc Initiated with applicationNo : " + noc.getApplicationNo());
 					}
 				});
 			}
+			
 		}
 	}
 

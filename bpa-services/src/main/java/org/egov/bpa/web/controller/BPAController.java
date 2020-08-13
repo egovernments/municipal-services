@@ -45,7 +45,6 @@ public class BPAController {
 
 	@PostMapping(value = "/_create")
 	public ResponseEntity<BPAResponse> create(@Valid @RequestBody BPARequest bpaRequest) {
-		bpaUtil.defaultJsonPathConfig();
 		BPA bpa = bpaService.create(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
 		bpas.add(bpa);
