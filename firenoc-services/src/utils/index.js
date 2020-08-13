@@ -78,8 +78,8 @@ export const createWorkFlow = async body => {
       action: fireNOC.fireNOCDetails.action,
       comment: get(fireNOC.fireNOCDetails.additionalDetail, "comment", null),
       assignes: fireNOC.fireNOCDetails.additionalDetail.assignee
-        ? { uuid: fireNOC.fireNOCDetails.additionalDetail.assignee }
-        : fireNOC.fireNOCDetails.additionalDetail.assignee,
+        ? { uuid: fireNOC.fireNOCDetails.additionalDetail.assignee[0] }
+        : null,
       documents: get(fireNOC.fireNOCDetails.additionalDetail, "wfDocuments", null),
       sla: 0,
       previousStatus: null,
