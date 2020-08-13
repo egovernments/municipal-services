@@ -87,7 +87,7 @@ export const createWorkFlow = async body => {
     };
   });
   console.log("\n\nProcessInstances");
-  console.log(ProcessInstances);
+  console.log(processInstances);
   console.log("\n\n");
   let requestBody = {
     RequestInfo: body.RequestInfo,
