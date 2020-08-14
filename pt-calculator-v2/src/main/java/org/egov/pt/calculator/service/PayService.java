@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static org.egov.pt.calculator.util.CalculatorConstants.*;
+
+import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.collections.Payment;
@@ -114,7 +116,7 @@ public class PayService {
 				Map<String, Object> rebateMap = (Map<String, Object>) rebate;
 				if ( (long)rebateMap.get("startingDay") < currentTime
 						&& currentTime < (long)rebateMap.get("endingDay")) {
-					rebateAmt = taxAmt.multiply(BigDecimal.valueOf((double) rebateMap.get("rate"))).divide(HUNDRED);
+					rebateAmt = taxAmt.multiply(BigDecimal.valueOf(((Number) rebateMap.get(CalculatorConstants.RATE_FIELD_NAME)).doubleValue())).divide(HUNDRED);
 				}
 			}
 		}
