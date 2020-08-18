@@ -1,9 +1,6 @@
 package org.egov.waterconnection.util;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -66,7 +63,10 @@ public class WaterServicesUtil {
 	private String mobileNumber = "mobileNumber=";
 	private String propertyIds = "propertyIds=";
 	private String uuids = "uuids=";
+	private String locality = "locality=";
 	private String URL = "url";
+	private String code = "code";
+
 	
 
 	/**
@@ -98,6 +98,14 @@ public class WaterServicesUtil {
 		if (waterConnectionRequest.getRequestInfo().getUserInfo() != null
 				&& "EMPLOYEE".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
 			propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
+		}
+		if (waterConnectionRequest.getRequestInfo().getUserInfo() != null
+				&& "SYSTEM".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
+			HashMap<String, Object> addDetail = objectMapper
+					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
+			HashMap<String, Object> locality = objectMapper.convertValue(addDetail, HashMap.class);
+			propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
+			propertyCriteria.setLocality(locality.get(code).toString());
 		}
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),
@@ -210,6 +218,11 @@ public class WaterServicesUtil {
 			if (isanyparametermatch)url.append("&");
 			isanyparametermatch = true;
 			url.append(mobileNumber).append(criteria.getMobileNumber());
+		}
+		if (!StringUtils.isEmpty(criteria.getLocality())) {
+			if (isanyparametermatch)url.append("&");
+			isanyparametermatch = true;
+			url.append(locality).append(criteria.getLocality());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getUuids())) {
 			if (isanyparametermatch)url.append("&");
