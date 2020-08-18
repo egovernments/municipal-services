@@ -65,7 +65,7 @@ public class WaterServicesUtil {
 	private String uuids = "uuids=";
 	private String locality = "locality=";
 	private String URL = "url";
-	private String code = "code";
+	private String localityCode = "locality";
 
 	
 
@@ -103,9 +103,8 @@ public class WaterServicesUtil {
 				&& "SYSTEM".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
 			HashMap<String, Object> addDetail = objectMapper
 					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
-			HashMap<String, Object> locality = objectMapper.convertValue(addDetail, HashMap.class);
 			propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
-			propertyCriteria.setLocality(locality.get(code).toString());
+			propertyCriteria.setLocality(addDetail.get(localityCode).toString());
 		}
 		Object result = serviceRequestRepository.fetchResult(
 				getPropertyURL(propertyCriteria),
