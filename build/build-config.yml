@@ -147,3 +147,17 @@ config:
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "noc-services/src/main/resources/db"
         image-name: "noc-services-db"
+        
+  - name: "builds/municipal-services/echallan-services"
+    build:
+      - work-dir: "echallan-services"
+        image-name: "echallan-services"
+        dockerfile: "build/maven/Dockerfile"
+      - work-dir: "echallan-services/src/main/resources/db"
+        image-name: "echallan-services-db"         
+
+  - name: "builds/municipal-services/echallan-calculator"
+    build:
+      - work-dir: "echallan-calculator"
+        image-name: "echallan-calculator"
+        dockerfile: "build/maven/Dockerfile"         
