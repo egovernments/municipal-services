@@ -50,9 +50,16 @@ public class PGRRepository {
 
     public List<Service> getServices(RequestSearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getTLSearchQuery(criteria, preparedStmtList);
+        String query = queryBuilder.getPGRSearchQuery(criteria, preparedStmtList);
         List<Service> services =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
         return services;
+    }
+
+    public Integer getCount(RequestSearchCriteria criteria) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = queryBuilder.getCountQuery(criteria, preparedStmtList);
+        Integer count =  jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
+        return count;
     }
 
 
