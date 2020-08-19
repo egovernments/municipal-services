@@ -150,7 +150,10 @@ public class PropertyConfiguration {
 	
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
-	
+    
+    @Value("${egov.usr.events.receipt.link}")
+    private String receiptLink;
+    
 	@Value("${egov.user.event.notification.enabled}")
 	private Boolean isUserEventsNotificationEnabled;
 

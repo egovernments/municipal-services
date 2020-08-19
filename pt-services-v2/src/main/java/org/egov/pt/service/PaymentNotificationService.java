@@ -485,6 +485,7 @@ public class PaymentNotificationService {
 		message = message.replace("<tenantId>", valMap.get("tenantId"));
 		message = message.replace("<pt due>.", valMap.get("amountDue"));
 		message = message.replace("<pay_link>", "$paylink");
+		message = message.replace("<receipt_link>", "$receiptlink");
 		// message = message.replace("<FY>",valMap.get("financialYear"));
 		return message;
 	}
@@ -503,6 +504,7 @@ public class PaymentNotificationService {
 		message = message.replace("<tenantId>", valMap.get("tenantId"));
 		message = message.replace("<Enter pending amount>", valMap.get("amountDue"));
 		message = message.replace("<pay_link>", "$paylink");
+		message = message.replace("<receipt_link>", "$receiptlink");
 		// message = message.replace("<Insert FY>",valMap.get("financialYear"));
 		return message;
 	}
@@ -562,6 +564,14 @@ public class PaymentNotificationService {
 						message = message.replace("$paylink", "");
 					}
 				}
+
+				String receiptlink = propertyConfiguration.getReceiptLink()
+						.replace("$consumerCode", valMap.get("propertyId"))
+						.replace("$tenantId", valMap.get("tenantId"));
+				receiptlink = propertyConfiguration.getUiAppHost() + receiptlink;
+				receiptlink = getShortenedURL(receiptlink);
+				message = message.replace("$receiptlink", receiptlink);
+
 				SMSRequest smsRequest = new SMSRequest(mobileNumber, message);
 				log.info("smsRequests: " + smsRequests);
 
