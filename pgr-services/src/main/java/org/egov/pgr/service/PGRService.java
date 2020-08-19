@@ -100,6 +100,10 @@ public class PGRService {
         return request.getPgrEntity();
     }
 
+    public Integer count(RequestInfo requestInfo, RequestSearchCriteria criteria){
+        Integer count = repository.getCount(criteria);
+        return count;
+    }
 
 
 

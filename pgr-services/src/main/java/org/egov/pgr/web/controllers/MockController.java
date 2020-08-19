@@ -6,6 +6,7 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.egov.pgr.util.HRMSUtil;
 import org.egov.pgr.web.models.RequestInfoWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -46,12 +47,17 @@ public class MockController {
 
     private ResourceLoader resourceLoader;
 
+    private HRMSUtil hrmsUtil;
+
     @Autowired
-    public MockController(ObjectMapper objectMapper, HttpServletRequest request, ResourceLoader resourceLoader) {
+    public MockController(ObjectMapper objectMapper, HttpServletRequest request, ResourceLoader resourceLoader, HRMSUtil hrmsUtil) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.resourceLoader = resourceLoader;
+        this.hrmsUtil = hrmsUtil;
     }
+
+
 
 
     @RequestMapping(value = "/requests/_create", method = RequestMethod.POST)
@@ -99,4 +105,13 @@ public class MockController {
         }
     }
 
+
+    @RequestMapping(value = "/requests/_test", method = RequestMethod.POST)
+    public ResponseEntity<List<String>> requestsTest(@RequestBody RequestInfoWrapper requestInfoWrapper,
+                                               @RequestParam String tenantId, @RequestParam List<String> uuids) {
+
+        List<String> department = hrmsUtil.getDepartment(tenantId, uuids, requestInfoWrapper.getRequestInfo());
+
+        return  new ResponseEntity<>(department, HttpStatus.OK);
+    }
 }

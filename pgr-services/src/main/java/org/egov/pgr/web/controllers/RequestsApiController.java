@@ -76,13 +76,22 @@ public class RequestsApiController{
 
     }
 
-
     @RequestMapping(value="/requests/_update", method = RequestMethod.POST)
     public ResponseEntity<ServiceResponse> requestsUpdatePost(@Valid @RequestBody ServiceRequest request) throws IOException {
         PGREntity pgrEntity = pgrService.update(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         ServiceResponse response = ServiceResponse.builder().responseInfo(responseInfo).pgrEntities(Collections.singletonList(pgrEntity)).build();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/requests/_count", method = RequestMethod.POST)
+    public ResponseEntity<CountResponse> requestsCountPost(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+                                                              @Valid @ModelAttribute RequestSearchCriteria criteria) {
+        Integer count = pgrService.count(requestInfoWrapper.getRequestInfo(), criteria);
+        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true);
+        CountResponse response = CountResponse.builder().responseInfo(responseInfo).count(count).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
 }
