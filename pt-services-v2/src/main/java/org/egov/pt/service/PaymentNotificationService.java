@@ -316,8 +316,9 @@ public class PaymentNotificationService {
 					Map<String, String> payerMap = new HashMap<>();
 					payerMap.putAll(listOfValMap.get(0));
 					payerMap.put("mobileNumber", payment.getMobileNumber());
+					listOfValMap.add(payerMap);
 		}
-
+		log.info("Messages to send: "+listOfValMap);
 		return listOfValMap;
 	}
 
