@@ -48,6 +48,22 @@ public class ServiceRequestValidator {
 
 
 
+    public void validateUpdate(ServiceRequest request, Object mdmsData){
+
+        String id = request.getPgrEntity().getService().getId();
+        validateMDMS(request, mdmsData);
+        validateDepartment(request, mdmsData);
+        validateIdleTime(request);
+        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
+        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
+
+        if(CollectionUtils.isEmpty(pgrEntities))
+            throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
+
+        // TO DO
+
+    }
+
     private void validateUserData(ServiceRequest request,Map<String, String> errorMap){
 
         RequestInfo requestInfo = request.getRequestInfo();
@@ -140,7 +156,10 @@ public class ServiceRequestValidator {
         Service service = request.getPgrEntity().getService();
         Long lastModifiedTime = service.getAuditDetails().getLastModifiedTime();
 
-        if(System.currentTimeMillis()-lastModifiedTime > config.getComplainMaxIdleTime())
+        if(!request.getPgrEntity().getWorkflow().getAction().equalsIgnoreCase(PGR_WF_REOPEN))
+            return;
+
+        else if(System.currentTimeMillis()-lastModifiedTime > config.getComplainMaxIdleTime())
             throw new CustomException("INVALID_ACTION","Complaint is closed");
 
     }
@@ -156,19 +175,6 @@ public class ServiceRequestValidator {
 
     }
 
-    public void validateUpdate(ServiceRequest request, Object mdmsData){
 
-        String id = request.getPgrEntity().getService().getId();
-        validateMDMS(request, mdmsData);
-        validateDepartment(request, mdmsData);
-        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
-        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
-
-        if(CollectionUtils.isEmpty(pgrEntities))
-            throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
-
-        // TO DO
-
-    }
 
 }
