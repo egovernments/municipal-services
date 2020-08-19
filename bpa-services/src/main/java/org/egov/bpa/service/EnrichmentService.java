@@ -53,7 +53,13 @@ public class EnrichmentService {
 	private EDCRService edcrService;
 	
 	@Autowired
-	private WorkflowIntegrator wfIntegrator;
+	private WorkflowIntegrator wfIntegrator;	
+	
+	@Autowired
+	private NocService nocService;
+
+	@Autowired
+	private BPAUtil util;
 
 	/**
 	 * encrich create BPA Reqeust by adding audidetails and uuids
@@ -180,7 +186,9 @@ public class EnrichmentService {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void postStatusEnrichment(BPARequest bpaRequest) {
 		BPA bpa = bpaRequest.getBPA();
-
+		String tenantId = bpaRequest.getBPA().getTenantId().split("\\.")[0];
+		Object mdmsData = util.mDMSCall(bpaRequest.getRequestInfo(), tenantId);
+		
 		BusinessService businessService = workflowService.getBusinessService(bpa, bpaRequest.getRequestInfo(),
 				bpa.getApplicationNo());
 		log.info("Application status is : " + bpa.getStatus());
@@ -200,6 +208,7 @@ public class EnrichmentService {
 		
 		log.info("Application state is : " + state);
 		this.generateApprovalNo(bpaRequest, state);
+		nocService.initiateNocWorkflow(bpaRequest,mdmsData);
 		
 	}
 	/**

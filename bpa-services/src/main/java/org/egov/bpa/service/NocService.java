@@ -149,13 +149,24 @@ public class NocService {
 	}
 
 	/**
-	 * Calls the iniate and approve offline workflow for the applicable noc records
+	 * Calls the iniate  workflow for the applicable noc records
 	 * @param bpaRequest
 	 * @param mdmsData
 	 */
-	public void manageNocWorkflowAction(BPARequest bpaRequest, Object mdmsData) {
+	public void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData) {
+		log.debug("====> initiateNocWorkflow");
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
+		log.debug("====> initiateNocWorkflow = no of noc "+ nocs.size());
 		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
+	}
+	
+	/**
+	 * Calls the  approve offline workflow for the applicable noc records
+	 * @param bpaRequest
+	 * @param mdmsData
+	 */
+	public void manageOfflineNocs(BPARequest bpaRequest, Object mdmsData) {
+		List<Noc> nocs = fetchNocRecords(bpaRequest);
 		approveOfflineNoc(bpaRequest, mdmsData, nocs);
 	}
 
@@ -168,14 +179,15 @@ public class NocService {
 	@SuppressWarnings("unchecked")
 	private void approveOfflineNoc(BPARequest bpaRequest, Object mdmsData, List<Noc> nocs) {
 		BPA bpa = bpaRequest.getBPA();
-
+		log.debug(" auto approval of offline noc with bpa status "+ bpa.getStatus() +" and "+bpa.getWorkflow().getAction());
 		if (bpa.getStatus().equalsIgnoreCase(BPAConstants.NOCVERIFICATION_STATUS)
 				&& bpa.getWorkflow().getAction().equalsIgnoreCase(BPAConstants.ACTION_FORWORD)) {
 			List<String> statuses = Arrays.asList(config.getNocValidationCheckStatuses().split(","));
 			List<String> offlneNocs = (List<String>) JsonPath.read(mdmsData, BPAConstants.NOCTYPE_OFFLINE_MAP);
+			log.debug(" auto approval of offline noc with bpa status and no of nocs "+offlneNocs.size()+" noc statuses"+ statuses.toString());
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
-					
+					log.debug(" auto approval of offline noc "+ noc.getApplicationNo() +" _"+noc.getApplicationStatus());
 						if (offlneNocs.contains(noc.getNocType()) && !statuses.contains(noc.getApplicationStatus())) {
 							Workflow workflow = Workflow.builder().action(config.getNocAutoApproveAction()).build();
 							noc.setWorkflow(workflow);
@@ -208,10 +220,12 @@ public class NocService {
 				.replace("{3}", (StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
 						? "ALL" : bpa.getRiskType().toString());
 		List<Object> triggerActionStates = (List<Object>) JsonPath.read(mdmsData, nocPath);
+		log.debug("====> initiateNocWorkflow = triggerStates" + triggerActionStates.toString());
 		if (!CollectionUtils.isEmpty(triggerActionStates)
 				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
+					log.debug("====> noc application status " + noc.getApplicationStatus()  +" for noc appno "+ noc.getApplicationNo());
 					if(!noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.INPROGRESS_STATUS)){
 						noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
