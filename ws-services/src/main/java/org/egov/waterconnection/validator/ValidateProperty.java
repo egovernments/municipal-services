@@ -41,7 +41,7 @@ public class ValidateProperty {
 					"Water connection cannot be enriched without PropertyId");
 		}
 		Property property = propertyList.get();
-		if (StringUtils.isEmpty(property.getUsageCategory())) {
+		if (StringUtils.isEmpty(property.getUsageCategory()) && !(waterConnectionRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("SYSTEM"))) {
 			throw new CustomException("INVALID_PROPERTY_USAGE_TYPE",
 					"Water connection cannot be enriched without property usage type");
 		}
