@@ -571,9 +571,9 @@ public class PropertyValidator {
 		
 		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
 
-			Boolean isBillUnpaid = propertyUtil.isBillUnpaid(propertyFromSearch.getPropertyId(), propertyFromSearch.getTenantId(), request.getRequestInfo());
-			if (isBillUnpaid)
-				throw new CustomException("EG_PT_MUTATION_UNPAID_ERROR", "Property has to be completely paid for before initiating the mutation process");
+//			Boolean isBillUnpaid = propertyUtil.isBillUnpaid(propertyFromSearch.getPropertyId(), propertyFromSearch.getTenantId(), request.getRequestInfo());
+//			if (isBillUnpaid)
+//				throw new CustomException("EG_PT_MUTATION_UNPAID_ERROR", "Property has to be completely paid for before initiating the mutation process");
 		}
 		
 		if (configs.getIsMutationWorkflowEnabled() && request.getProperty().getWorkflow() == null)

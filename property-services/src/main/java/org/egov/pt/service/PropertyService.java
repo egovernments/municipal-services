@@ -175,7 +175,7 @@ public class PropertyService {
 		propertyValidator.validateMutation(request, propertyFromSearch);
 		userService.createUser(request);
 		enrichmentService.enrichMutationRequest(request, propertyFromSearch);
-		calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
+		//calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
 		
 		// TODO FIX ME block property changes FIXME
 		util.setdataForNotification(request, MUTATION_PROCESS_CONSTANT);
