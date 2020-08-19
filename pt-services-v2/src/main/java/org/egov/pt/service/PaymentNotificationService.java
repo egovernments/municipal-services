@@ -29,7 +29,6 @@ import org.egov.pt.web.models.collection.PaymentRequest;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -265,6 +264,7 @@ public class PaymentNotificationService {
 
 	/**
 	 * Returns the map of the values required from the record
+	 * It also adds the payer mobile num if it is diffrent from owner
 	 * 
 	 * @return The required values as key,value pair
 	 */
@@ -309,6 +309,13 @@ public class PaymentNotificationService {
 
 				listOfValMap.add(valMap);
 			}
+		}
+
+		if (listOfValMap.size()>0 && (!listOfValMap.stream().filter(val -> val.get("mobileNumber").equalsIgnoreCase(payment.getMobileNumber()))
+				.findFirst().isPresent())) {
+					Map<String, String> payerMap = new HashMap<>();
+					payerMap.putAll(listOfValMap.get(0));
+					payerMap.put("mobileNumber", payment.getMobileNumber());
 		}
 
 		return listOfValMap;
