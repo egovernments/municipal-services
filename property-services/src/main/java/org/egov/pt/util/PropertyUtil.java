@@ -90,7 +90,7 @@ public class PropertyUtil extends CommonUtils {
 	 */
 	private org.egov.pt.models.user.User getMaskedOwnerInfo(OwnerInfo info) {
 
-		//info.setMobileNumber(null);
+		info.setMobileNumber(null);
 		info.setUuid(null);
 		info.setUserName(null);
 		info.setGender(null);
