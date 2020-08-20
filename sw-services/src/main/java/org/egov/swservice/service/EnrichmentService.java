@@ -100,6 +100,7 @@ public class EnrichmentService {
 					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)) {
 				additionalDetail.put(SWConstants.ESTIMATION_DATE_CONST, System.currentTimeMillis());
 			}
+			additionalDetail.put(SWConstants.LOCALITY,addDetail.get(SWConstants.LOCALITY).toString());
 		}
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 	}

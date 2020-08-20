@@ -57,6 +57,7 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
                 addtionalDetails.put(SWConstants.ESTIMATION_FILESTORE_ID, rs.getString("estimationfileStoreId"));
                 addtionalDetails.put(SWConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
                 addtionalDetails.put(SWConstants.ESTIMATION_DATE_CONST, rs.getBigDecimal("estimationLetterDate"));
+                addtionalDetails.put(SWConstants.LOCALITY, rs.getString("locality"));
                 sewarageConnection.setAdditionalDetails(addtionalDetails);
                 sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
                 sewarageConnection.setApplicationType(rs.getString("applicationType"));

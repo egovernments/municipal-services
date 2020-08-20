@@ -183,6 +183,8 @@ public class WCConstants {
 
 	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
 
+	public static final String LOCALITY = "locality";
+
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections
 			.unmodifiableList(Arrays.asList(ADHOC_PENALTY, ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT,
 					ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST, DETAILS_PROVIDED_BY,
