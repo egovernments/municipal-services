@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -101,6 +102,14 @@ public class WaterServicesUtil {
 		}
 		if (waterConnectionRequest.getRequestInfo().getUserInfo() != null
 				&& "SYSTEM".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
+			waterConnectionRequest.getRequestInfo().getUserInfo().setType("EMPLOYEE");
+			List<Role> oldRoles = waterConnectionRequest.getRequestInfo().getUserInfo().getRoles();
+			List<Role>  newRoles = new ArrayList<>();
+			for(Role role:oldRoles){
+				if(!role.getCode().equalsIgnoreCase("ANONYMOUS"))
+					newRoles.add(role);
+			}
+			waterConnectionRequest.getRequestInfo().getUserInfo().setRoles(newRoles);
 			HashMap<String, Object> addDetail = objectMapper
 					.convertValue(waterConnectionRequest.getWaterConnection().getAdditionalDetails(), HashMap.class);
 			propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
