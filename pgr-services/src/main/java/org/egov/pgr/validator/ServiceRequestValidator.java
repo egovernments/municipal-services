@@ -53,7 +53,7 @@ public class ServiceRequestValidator {
         String id = request.getPgrEntity().getService().getId();
         validateMDMS(request, mdmsData);
         validateDepartment(request, mdmsData);
-        validateIdleTime(request);
+        validateReOpen(request);
         RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
 
@@ -152,14 +152,22 @@ public class ServiceRequestValidator {
     }
 
 
-    private void validateIdleTime(ServiceRequest request){
-        Service service = request.getPgrEntity().getService();
-        Long lastModifiedTime = service.getAuditDetails().getLastModifiedTime();
+    private void validateReOpen(ServiceRequest request){
 
         if(!request.getPgrEntity().getWorkflow().getAction().equalsIgnoreCase(PGR_WF_REOPEN))
             return;
 
-        else if(System.currentTimeMillis()-lastModifiedTime > config.getComplainMaxIdleTime())
+
+        Service service = request.getPgrEntity().getService();
+        RequestInfo requestInfo = request.getRequestInfo();
+        Long lastModifiedTime = service.getAuditDetails().getLastModifiedTime();
+
+        if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)){
+            if(!requestInfo.getUserInfo().getUuid().equalsIgnoreCase(service.getAccountId()))
+                throw new CustomException("INVALID_ACTION","Not authorized to re-open the complain");
+        }
+
+        if(System.currentTimeMillis()-lastModifiedTime > config.getComplainMaxIdleTime())
             throw new CustomException("INVALID_ACTION","Complaint is closed");
 
     }
