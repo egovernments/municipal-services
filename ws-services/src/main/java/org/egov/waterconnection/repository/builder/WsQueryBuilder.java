@@ -79,7 +79,7 @@ public class WsQueryBuilder {
 				return null;
 		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
 		boolean propertyIdsPresent = false;
-		if (!StringUtils.isEmpty(criteria.getMobileNumber())) {
+		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
@@ -110,11 +110,10 @@ public class WsQueryBuilder {
 			query.append(" conn.tenantid = ? ");
 			preparedStatement.add(criteria.getTenantId());
 		}
-//		if (!StringUtils.isEmpty(criteria.getPropertyId())) {
-//			addClauseIfRequired(preparedStatement, query);
-//			query.append(" conn.property_id = ? ");
-//			preparedStatement.add(criteria.getPropertyId());
-//		}
+		if (!StringUtils.isEmpty(criteria.getPropertyId()) && StringUtils.isEmpty(criteria.getMobileNumber())) {
+			if(propertyIdsPresent)
+				query.append(")");
+		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.id in (").append(createQuery(criteria.getIds())).append(" )");
