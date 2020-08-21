@@ -131,7 +131,8 @@ public class SewerageServicesUtil {
 
 	public List<Property> propertySearchOnCriteria(SearchCriteria sewerageConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())) {
+		if (StringUtils.isEmpty(sewerageConnectionSearchCriteria.getMobileNumber())
+				&& StringUtils.isEmpty(sewerageConnectionSearchCriteria.getPropertyId())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();

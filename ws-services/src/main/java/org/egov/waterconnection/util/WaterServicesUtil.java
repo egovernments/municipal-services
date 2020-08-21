@@ -135,7 +135,8 @@ public class WaterServicesUtil {
 	 */
 	public List<Property> propertySearchOnCriteria(SearchCriteria waterConnectionSearchCriteria,
 			RequestInfo requestInfo) {
-		if (StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())) {
+		if (StringUtils.isEmpty(waterConnectionSearchCriteria.getMobileNumber())
+				&& StringUtils.isEmpty(waterConnectionSearchCriteria.getPropertyId())) {
 			return Collections.emptyList();
 		}
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
