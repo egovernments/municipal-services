@@ -199,9 +199,10 @@ public class EstimationService {
 			int groundUnitsCount = 0;
 			Double groundUnitsArea = 0.0;
 			int i = 0;
-
-			for (Unit unit : detail.getUnits()) {
-
+            List<Unit> activeUnits=detail.getUnits().stream().filter(unit->unit.getActive()==true)
+            		.collect(Collectors.toList());
+            
+			for (Unit unit : activeUnits) {
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
 				billingSlabIds.add(slab.getId()+"|"+i);

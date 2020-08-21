@@ -128,6 +128,7 @@ public class TranslationService {
                 unitMap.put("unitArea", unit.getConstructionDetail().getBuiltUpArea());
                 unitMap.put("arv", unit.getArv());
                 unitMap.put("occupancyType", unit.getOccupancyType());
+                unitMap.put("active", unit.getActive());
 
                 String[] masterData = unit.getUsageCategory().split("\\.");
 
