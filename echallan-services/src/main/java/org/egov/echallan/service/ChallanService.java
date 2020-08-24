@@ -1,8 +1,15 @@
 package org.egov.echallan.service;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.repository.ChallanRepository;
+import org.egov.echallan.web.models.user.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,5 +60,47 @@ public class ChallanService {
 		return request.getChallan();
 	}
 	
+	
+	 public List<Challan> search(SearchCriteria criteria, RequestInfo requestInfo){
+	        List<Challan> challans;
+	       // challanValidator.validateSearch(requestInfo,criteria,serviceFromPath);
+	       // criteria.setBusinessService(serviceFromPath);
+	        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
+	         if(criteria.getMobileNumber()!=null){
+	        	 challans = getChallansFromMobileNumber(criteria,requestInfo);
+	         }
+	         else {
+	        	 challans = getChallansWithOwnerInfo(criteria,requestInfo);
+	         }
+	       return challans;
+	    }
+	 
+	 public List<Challan> getChallansFromMobileNumber(SearchCriteria criteria, RequestInfo requestInfo){
+		 List<Challan> challans = new LinkedList<>();
+	        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
+	        // If user not found with given user fields return empty list
+	        if(userDetailResponse.getUser().size()==0){
+	            return Collections.emptyList();
+	        }
+	        enrichmentService.enrichSearchCriteriaWithOwnerids(criteria,userDetailResponse);
+	        challans = repository.getChallans(criteria);
+
+	        if(challans.size()==0){
+	            return Collections.emptyList();
+	        }
+
+	        criteria=enrichmentService.getChallanCriteriaFromIds(challans);
+	        challans = getChallansWithOwnerInfo(criteria,requestInfo);
+	        return challans;
+	    }
+	 
+	 public List<Challan> getChallansWithOwnerInfo(SearchCriteria criteria,RequestInfo requestInfo){
+	        List<Challan> challans = repository.getChallans(criteria);
+	        if(challans.isEmpty())
+	            return Collections.emptyList();
+	        challans = enrichmentService.enrichChallanSearch(challans,criteria,requestInfo);
+	        return challans;
+	    }
+
 	
 }

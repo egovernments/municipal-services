@@ -12,19 +12,15 @@
 
 package org.egov.echallan.model;
 
-import java.util.Objects;
 
 import org.egov.echallan.web.models.user.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,31 +37,31 @@ public class UserInfo extends User {
 
   @JsonProperty("tenantId")
 
-  private String tenantId = null;
+  private String tenantId;
 
   @JsonProperty("uuid")
 
-  private String uuid = null;
+  private String uuid;
 
   @JsonProperty("userName")
 
-  private String userName = null;
+  private String userName;
 
   @JsonProperty("password")
 
-  private String password = null;
+  private String password;
 
   @JsonProperty("idToken")
 
-  private String idToken = null;
+  private String idToken;
 
   @JsonProperty("mobileNumber")
 
-  private String mobileNumber = null;
+  private String mobileNumber;
 
   @JsonProperty("email")
 
-  private String email = null;
+  private String email;
 
   @JsonProperty("primaryrole")
 
@@ -73,7 +69,7 @@ public class UserInfo extends User {
 
   @JsonProperty("additionalroles")
 
-  private List<TenantRole> additionalroles = null;
+  private List<TenantRole> additionalroles;
   public UserInfo tenantId(String tenantId) {
     this.tenantId = tenantId;
     return this;

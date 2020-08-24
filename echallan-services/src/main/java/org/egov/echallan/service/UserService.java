@@ -1,16 +1,20 @@
 package org.egov.echallan.service;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.model.UserInfo;
 import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.web.models.user.CreateUserRequest;
@@ -62,45 +66,67 @@ public class UserService {
 				.code("CITIZEN")
 				.name("Citizen")
 				.build();
-		System.out.println("userInfo:::"+userInfo.getMobileNumber());
-		addUserDefaultFields(challan.getTenantId(), role, userInfo);
-		UserDetailResponse userDetailResponse = searchByUserName(userInfo.getMobileNumber(), challan.getTenantId());
-		if (CollectionUtils.isEmpty(userDetailResponse.getUser())) {
-			System.out.println("new user :::");
-		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
-		userInfo.setUserName(userInfo.getMobileNumber());
-		CreateUserRequest userRequest = CreateUserRequest.builder()
-				.requestInfo(requestInfo)
-				.user(userInfo)
-				.build();
+		
+		
+		if(challan.getAccountId()==null) {
+			addUserDefaultFields(challan.getTenantId(), role, userInfo);
+            //  UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
+            StringBuilder uri = new StringBuilder(userHost)
+                    .append(userContextPath)
+                    .append(userCreateEndpoint);
+            String userName = UUID.randomUUID().toString();
+            userInfo.setUserName(userName);
 
-		userDetailResponse = userCall(userRequest, uri);
+            UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, userInfo), uri);
+            if (userDetailResponse.getUser().get(0).getUuid() == null) {
+                throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
+            }
+            setOwnerFields(userInfo, userDetailResponse, requestInfo);
 		}
 		else {
-			//Update existing user with the input values
-			System.out.println("already exists::"+userDetailResponse.getUser().get(0).getFatherOrHusbandName());
-		}
-		setOwnerFields(userInfo, userDetailResponse, requestInfo);
-		
+            UserDetailResponse userDetailResponse = userExists(userInfo,challan,requestInfo);
+            if(userDetailResponse.getUser().isEmpty())
+                throw new CustomException("INVALID USER","The uuid "+challan.getAccountId()+" does not exists");
+           //update needs to be added
+            setOwnerFields(userInfo,userDetailResponse,requestInfo);
+        }
 
 	}
 	
 	
+	private UserDetailResponse userExists(UserInfo owner,Challan challan,RequestInfo requestInfo){
+        UserSearchRequest userSearchRequest =new UserSearchRequest();
+        userSearchRequest.setTenantId(challan.getTenantId().split("\\.")[0]);
+     //   userSearchRequest.setMobileNumber(owner.getMobileNumber());
+     //   userSearchRequest.setName(owner.getName());
+        userSearchRequest.setRequestInfo(requestInfo);
+        userSearchRequest.setActive(true);
+        userSearchRequest.setUserType("CITIZEN");
+     //   if(owner.getUuid()!=null)
+            userSearchRequest.setUuid(Arrays.asList(challan.getAccountId()));
+        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+        return userCall(userSearchRequest,uri);
+    }
+	
+	 private void setOwnerFields(UserInfo owner, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
+	        owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
+	        owner.setId(userDetailResponse.getUser().get(0).getId());
+	        owner.setUserName((userDetailResponse.getUser().get(0).getUserName()));
+	        owner.setCreatedBy(requestInfo.getUserInfo().getUuid());
+	        owner.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+	        owner.setCreatedDate(System.currentTimeMillis());
+	        owner.setLastModifiedDate(System.currentTimeMillis());
+	        owner.setActive(userDetailResponse.getUser().get(0).getActive());
+	    } 
+	 
 	 private void addUserDefaultFields(String tenantId,Role role, UserInfo userInfo){
-		 userInfo.setMobileNumber(userInfo.getMobileNumber());
-		 userInfo.setUserName(userInfo.getMobileNumber());
 		 userInfo.setActive(true);
-		 userInfo.setTenantId(tenantId);
+		 userInfo.setTenantId(tenantId.split("\\.")[0]);
 		 userInfo.setRoles(Collections.singletonList(role));
 		 userInfo.setType("CITIZEN");
-		 userInfo.setCreatedDate(null);
-		 userInfo.setCreatedBy(null );
-		 userInfo.setLastModifiedDate(null);
-		 userInfo.setLastModifiedBy(null );
-		 userInfo.setName(userInfo.getName());
 	    }
 	
-	 private UserDetailResponse searchByUserName(String userName,String tenantId){
+	 public  UserDetailResponse searchByUserName(String userName,String tenantId){
 	        UserSearchRequest userSearchRequest = new UserSearchRequest();
 	        userSearchRequest.setUserType("CITIZEN");
 	        userSearchRequest.setUserName(userName);
@@ -109,6 +135,26 @@ public class UserService {
 	        return userCall(userSearchRequest,uri);
 
 	    }
+	 
+	 public UserDetailResponse getUser(SearchCriteria criteria,RequestInfo requestInfo){
+	        UserSearchRequest userSearchRequest = getUserSearchRequest(criteria,requestInfo);
+	        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+	        UserDetailResponse userDetailResponse = userCall(userSearchRequest,uri);
+	        return userDetailResponse;
+	    }
+
+	    private UserSearchRequest getUserSearchRequest(SearchCriteria criteria, RequestInfo requestInfo){
+	        UserSearchRequest userSearchRequest = new UserSearchRequest();
+	        userSearchRequest.setRequestInfo(requestInfo);
+	        userSearchRequest.setTenantId(criteria.getTenantId());
+	        userSearchRequest.setMobileNumber(criteria.getMobileNumber());
+	        userSearchRequest.setActive(true);
+	        userSearchRequest.setUserType("CITIZEN");
+	        if(!CollectionUtils.isEmpty(criteria.getUserIds()))
+	            userSearchRequest.setUuid(criteria.getUserIds());
+	        return userSearchRequest;
+	    }
+	 
 	 
 	 @SuppressWarnings("unchecked")
 		private UserDetailResponse userCall(Object userRequest, StringBuilder url) {
@@ -119,7 +165,6 @@ public class UserService {
 			else if (url.indexOf(userCreateEndpoint) != -1)
 				dobFormat = "dd/MM/yyyy";
 			try{
-	        	System.out.println(userRequest);
 	            LinkedHashMap responseMap = (LinkedHashMap)serviceRequestRepository.fetchResult(url, userRequest);
 	            parseResponse(responseMap,dobFormat);
 	            UserDetailResponse userDetailResponse = mapper.convertValue(responseMap,UserDetailResponse.class);
@@ -133,7 +178,6 @@ public class UserService {
 	 
 	 @SuppressWarnings("unchecked")
 		private void parseResponse(LinkedHashMap<String, Object> responeMap,String dobFormat) {
-	    	
 	        List<LinkedHashMap<String, Object>> users = (List<LinkedHashMap<String, Object>>)responeMap.get("user");
 	        String format1 = "dd-MM-yyyy HH:mm:ss";
 	        
@@ -171,15 +215,5 @@ public class UserService {
 	        return  d.getTime();
 	    }
 	 
-	    private void setOwnerFields(UserInfo userInfo, UserDetailResponse userDetailResponse,RequestInfo requestInfo){
-	    	
-	    	userInfo.setUuid(userDetailResponse.getUser().get(0).getUuid());
-	    	userInfo.setId(userDetailResponse.getUser().get(0).getId());
-	    	userInfo.setUserName((userDetailResponse.getUser().get(0).getUserName()));
-	    	userInfo.setCreatedBy(requestInfo.getUserInfo().getUuid());
-	    	userInfo.setCreatedDate(System.currentTimeMillis());
-	    	userInfo.setLastModifiedBy(requestInfo.getUserInfo().getUuid());
-	    	userInfo.setLastModifiedDate(System.currentTimeMillis());
-	    	userInfo.setActive(userDetailResponse.getUser().get(0).getActive());
-	    }
+	   
 }

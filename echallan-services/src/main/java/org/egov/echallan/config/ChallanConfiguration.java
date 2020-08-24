@@ -167,5 +167,12 @@ public class ChallanConfiguration {
     @Value("${egov.url.shortner.endpoint}")
     private String urlShortnerEndpoint;
 
+    @Value("${egov.challan.default.limit}")
+    private Integer defaultLimit;
 
+    @Value("${egov.challan.default.offset}")
+    private Integer defaultOffset;
+
+    @Value("${egov.challan.max.limit}")
+    private Integer maxSearchLimit;
 }
