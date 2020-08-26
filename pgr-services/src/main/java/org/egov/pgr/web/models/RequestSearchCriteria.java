@@ -23,7 +23,7 @@ public class RequestSearchCriteria {
     private String serviceCode;
 
     @JsonProperty("applicationStatus")
-    private String applicationStatus;
+    private Set<String> applicationStatus;
 
     @JsonProperty("mobileNumber")
     private String mobileNumber;

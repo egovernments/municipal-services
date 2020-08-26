@@ -1,5 +1,6 @@
 package org.egov.pgr.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.pgr.repository.rowmapper.PGRQueryBuilder;
 import org.egov.pgr.repository.rowmapper.PGRRowMapper;
 import org.egov.pgr.web.models.PGREntity;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
+@Slf4j
 public class PGRRepository {
 
 

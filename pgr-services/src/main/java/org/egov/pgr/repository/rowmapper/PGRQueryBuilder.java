@@ -44,10 +44,11 @@ public class PGRQueryBuilder {
             preparedStmtList.add(criteria.getServiceCode());
         }
 
-        if (criteria.getApplicationStatus() != null) {
+        Set<String> applicationStatuses = criteria.getApplicationStatus();
+        if (!CollectionUtils.isEmpty(applicationStatuses)) {
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.applicationStatus=? ");
-            preparedStmtList.add(criteria.getApplicationStatus());
+            builder.append(" ser.applicationStatus IN (").append(createQuery(applicationStatuses)).append(")");
+            addToPreparedStatement(preparedStmtList, applicationStatuses);
         }
 
         if (criteria.getServiceRequestId() != null) {
@@ -89,11 +90,13 @@ public class PGRQueryBuilder {
     }
 
     private void addLimitAndOffset(StringBuilder builder, RequestSearchCriteria criteria, List<Object> preparedStmtList){
-        builder.append(" LIMIT ? ");
-        preparedStmtList.add(criteria.getLimit());
 
         builder.append(" OFFSET ? ");
         preparedStmtList.add(criteria.getOffset());
+
+        builder.append(" LIMIT ? ");
+        preparedStmtList.add(criteria.getLimit());
+
     }
 
     private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
@@ -108,7 +111,7 @@ public class PGRQueryBuilder {
         StringBuilder builder = new StringBuilder();
         int length = ids.size();
         for( int i = 0; i< length; i++){
-            builder.append(" LOWER(?)");
+            builder.append(" ? ");
             if(i != length -1) builder.append(",");
         }
         return builder.toString();
