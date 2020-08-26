@@ -176,7 +176,7 @@ public class ServiceRequestValidator {
 
     public void validateSearch(RequestSearchCriteria criteria){
 
-        if( (criteria.getMobileNumber()!=null || criteria.getApplicationStatus()!=null
+        if( (criteria.getMobileNumber()!=null 
                 || criteria.getServiceRequestId()!=null || criteria.getIds()!=null
                 || criteria.getServiceCode()!=null )
                 && criteria.getTenantId()==null)
