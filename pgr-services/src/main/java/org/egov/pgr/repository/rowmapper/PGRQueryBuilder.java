@@ -12,9 +12,6 @@ import java.util.Set;
 public class PGRQueryBuilder {
 
 
-    private static final String INNER_JOIN_STRING = " INNER JOIN ";
-    private static final String LEFT_OUTER_JOIN_STRING = " LEFT OUTER JOIN ";
-
     private static final String QUERY_ALIAS =   "ser.id as ser_id,ads.id as ads_id," +
                                                 "ser.tenantId as ser_tenantId,ads.tenantId as ads_tenantId," +
                                                 "ser.additionaldetails as ser_additionaldetails,ads.additionaldetails as ads_additionaldetails," +
@@ -47,6 +44,12 @@ public class PGRQueryBuilder {
             preparedStmtList.add(criteria.getServiceCode());
         }
 
+        if (criteria.getApplicationStatus() != null) {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" ser.applicationStatus=? ");
+            preparedStmtList.add(criteria.getApplicationStatus());
+        }
+
         if (criteria.getServiceRequestId() != null) {
             addClauseIfRequired(preparedStmtList, builder);
             builder.append(" ser.serviceRequestId=? ");
@@ -67,6 +70,10 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
+        addOrderByClause(builder);
+
+        addLimitAndOffset(builder, criteria, preparedStmtList);
+
         return builder.toString();
     }
 
@@ -75,6 +82,18 @@ public class PGRQueryBuilder {
         String query = getPGRSearchQuery(criteria, preparedStmtList);
         String countQuery = COUNT_WRAPPER.replace("{INTERNAL_QUERY}", query);
         return countQuery;
+    }
+
+    private void addOrderByClause(StringBuilder builder){
+        builder.append( " ORDER BY ser_createdtime DESC ");
+    }
+
+    private void addLimitAndOffset(StringBuilder builder, RequestSearchCriteria criteria, List<Object> preparedStmtList){
+        builder.append(" LIMIT ? ");
+        preparedStmtList.add(criteria.getLimit());
+
+        builder.append(" OFFSET ? ");
+        preparedStmtList.add(criteria.getOffset());
     }
 
     private static void addClauseIfRequired(List<Object> values, StringBuilder queryString) {

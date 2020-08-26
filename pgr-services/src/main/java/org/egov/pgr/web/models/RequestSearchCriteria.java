@@ -16,12 +16,14 @@ import java.util.Set;
 @Builder
 public class RequestSearchCriteria {
 
-    @NotNull
     @JsonProperty("tenantId")
     private String tenantId;
 
     @JsonProperty("serviceCode")
     private String serviceCode;
+
+    @JsonProperty("applicationStatus")
+    private String applicationStatus;
 
     @JsonProperty("mobileNumber")
     private String mobileNumber;
@@ -32,7 +34,20 @@ public class RequestSearchCriteria {
     @JsonProperty("ids")
     private Set<String> ids;
 
+    @JsonProperty("limit")
+    private Integer limit;
+
+    @JsonProperty("offset")
+    private Integer offset;
+
     @JsonIgnore
     private Set<String> userIds;
+
+
+
+    public boolean isEmpty(){
+        return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null
+        && this.applicationStatus==null && this.ids==null && this.userIds==null);
+    }
 
 }
