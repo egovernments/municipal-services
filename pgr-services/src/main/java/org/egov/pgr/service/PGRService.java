@@ -74,11 +74,11 @@ public class PGRService {
     public List<PGREntity> search(RequestInfo requestInfo, RequestSearchCriteria criteria){
         validator.validateSearch(criteria);
 
-        if(criteria.getMobileNumber()!=null){
-            userService.enrichUserIds(criteria);
-            if(CollectionUtils.isEmpty(criteria.getUserIds()))
-                return new ArrayList<>();
-        }
+        enrichmentService.enrichSearchRequest(requestInfo, criteria);
+
+        if(criteria.isEmpty())
+            return new ArrayList<>();
+
         List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
 
         if(CollectionUtils.isEmpty(pgrEntities))
