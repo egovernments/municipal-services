@@ -128,7 +128,9 @@ public class PropertyService {
 	private void processPropertyUpdate(PropertyRequest request, Property propertyFromSearch) {
 		
 		propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
+		userService.createUser(request);
 		request.getProperty().setOwners(propertyFromSearch.getOwners());
+		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		
 		PropertyRequest OldPropertyRequest = PropertyRequest.builder()
