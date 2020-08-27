@@ -48,6 +48,22 @@ public class ServiceRequestValidator {
 
 
 
+    public void validateUpdate(ServiceRequest request, Object mdmsData){
+
+        String id = request.getPgrEntity().getService().getId();
+        validateMDMS(request, mdmsData);
+        validateDepartment(request, mdmsData);
+        validateReOpen(request);
+        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
+        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
+
+        if(CollectionUtils.isEmpty(pgrEntities))
+            throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
+
+        // TO DO
+
+    }
+
     private void validateUserData(ServiceRequest request,Map<String, String> errorMap){
 
         RequestInfo requestInfo = request.getRequestInfo();
@@ -136,9 +152,20 @@ public class ServiceRequestValidator {
     }
 
 
-    private void validateIdleTime(ServiceRequest request){
+    private void validateReOpen(ServiceRequest request){
+
+        if(!request.getPgrEntity().getWorkflow().getAction().equalsIgnoreCase(PGR_WF_REOPEN))
+            return;
+
+
         Service service = request.getPgrEntity().getService();
+        RequestInfo requestInfo = request.getRequestInfo();
         Long lastModifiedTime = service.getAuditDetails().getLastModifiedTime();
+
+        if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)){
+            if(!requestInfo.getUserInfo().getUuid().equalsIgnoreCase(service.getAccountId()))
+                throw new CustomException("INVALID_ACTION","Not authorized to re-open the complain");
+        }
 
         if(System.currentTimeMillis()-lastModifiedTime > config.getComplainMaxIdleTime())
             throw new CustomException("INVALID_ACTION","Complaint is closed");
@@ -149,26 +176,15 @@ public class ServiceRequestValidator {
 
     public void validateSearch(RequestSearchCriteria criteria){
 
-        if(criteria.getMobileNumber()!=null && criteria.getTenantId()==null)
-            throw new CustomException("INVALID_SEARCH","TenantId is mandatory to search on mobileNumber");
+        if( (criteria.getMobileNumber()!=null || criteria.getServiceRequestId()!=null || criteria.getIds()!=null
+                || criteria.getServiceCode()!=null )
+                && criteria.getTenantId()==null)
+            throw new CustomException("INVALID_SEARCH","TenantId is mandatory search param");
 
         // TO DO
 
     }
 
-    public void validateUpdate(ServiceRequest request, Object mdmsData){
 
-        String id = request.getPgrEntity().getService().getId();
-        validateMDMS(request, mdmsData);
-        validateDepartment(request, mdmsData);
-        RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
-        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
-
-        if(CollectionUtils.isEmpty(pgrEntities))
-            throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
-
-        // TO DO
-
-    }
 
 }

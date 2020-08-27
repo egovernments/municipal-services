@@ -103,6 +103,15 @@ public class PGRConfiguration {
     @Value("${pgr.kafka.update.topic}")
     private String updateTopic;
 
+    @Value("${pgr.default.offset}")
+    private Integer defaultOffset;
+
+    @Value("${pgr.default.limit}")
+    private Integer defaultLimit;
+
+    @Value("${pgr.search.max.limit}")
+    private Integer maxLimit;
+
 
     //MDMS
     @Value("${egov.mdms.host}")

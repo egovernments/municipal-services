@@ -175,9 +175,8 @@ public class UserService {
     }
 
 
-    public void enrichUserIds(RequestSearchCriteria criteria){
+    public void enrichUserIds(String tenantId, RequestSearchCriteria criteria){
 
-        String tenantId = criteria.getTenantId();
         String mobileNumber = criteria.getMobileNumber();
 
         UserSearchRequest userSearchRequest =new UserSearchRequest();

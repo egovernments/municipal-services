@@ -4,19 +4,19 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.IdGenRepository;
 import org.egov.pgr.util.PGRUtils;
-import org.egov.pgr.web.models.AuditDetails;
+import org.egov.pgr.web.models.*;
 import org.egov.pgr.web.models.Idgen.IdResponse;
-import org.egov.pgr.web.models.Service;
-import org.egov.pgr.web.models.ServiceRequest;
-import org.egov.pgr.web.models.Workflow;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 
 @org.springframework.stereotype.Service
 public class EnrichmentService {
@@ -27,12 +27,17 @@ public class EnrichmentService {
 
     private PGRConfiguration config;
 
+    private UserService userService;
+
     @Autowired
-    public EnrichmentService(PGRUtils utils, IdGenRepository idGenRepository, PGRConfiguration config) {
+    public EnrichmentService(PGRUtils utils, IdGenRepository idGenRepository, PGRConfiguration config, UserService userService) {
         this.utils = utils;
         this.idGenRepository = idGenRepository;
         this.config = config;
+        this.userService = userService;
     }
+
+
 
 
 
@@ -77,6 +82,31 @@ public class EnrichmentService {
         AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(),false);
 
         service.setAuditDetails(auditDetails);
+
+    }
+
+
+    public void enrichSearchRequest(RequestInfo requestInfo, RequestSearchCriteria criteria){
+
+        if(criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)){
+            String citizenMobileNumber = requestInfo.getUserInfo().getUserName();
+            criteria.setMobileNumber(citizenMobileNumber);
+        }
+
+        String tenantId = (criteria.getTenantId()!=null) ? criteria.getTenantId() : requestInfo.getUserInfo().getTenantId();
+
+        if(criteria.getMobileNumber()!=null){
+            userService.enrichUserIds(tenantId, criteria);
+        }
+
+        if(criteria.getLimit()==null)
+            criteria.setLimit(config.getDefaultLimit());
+
+        if(criteria.getOffset()==null)
+            criteria.setOffset(config.getDefaultOffset());
+
+        if(criteria.getLimit()!=null && criteria.getLimit() > config.getMaxLimit())
+            criteria.setLimit(config.getMaxLimit());
 
     }
 
