@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.22.RELEASE</version>
+    <version>2.2.6.RELEASE</version>
   </parent>
   <groupId>org.egov</groupId>
   <artifactId>echallan-calculator</artifactId>
@@ -29,6 +29,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
+      <version>6.4.3</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -52,7 +53,7 @@
    <dependency>
       <groupId>org.egov.services</groupId>
       <artifactId>tracer</artifactId>
-      <version>1.1.5-SNAPSHOT</version>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.egov.services</groupId>
@@ -120,6 +121,49 @@
               <artifactId>spring-boot-devtools</artifactId>
             </exclude>
           </excludes>
+        </configuration>
+      </plugin>
+       <plugin>
+        <groupId>cz.habarta.typescript-generator</groupId>
+        <artifactId>typescript-generator-maven-plugin</artifactId>
+        <version>2.22.595</version>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>process-classes</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <jsonLibrary>jackson2</jsonLibrary>
+          <classes>
+
+            <class>org.egov.echallancalculation.model.RequestInfoWrapper</class>
+            <class>org.egov.echallancalculation.web.models.calculation.CalculationReq</class>
+            <class>org.egov.echallancalculation.web.models.calculation.CalculationRes</class>
+            <class>org.egov.echallancalculation.web.models.calculation.CalulationCriteria</class>
+            <class>org.egov.echallancalculation.web.models.calculation.FeeAndBillingSlabIds</class>
+            <class>org.egov.echallancalculation.web.models.calculation.TaxHeadEstimate</class>
+            <class>org.egov.echallancalculation.model.Challan</class>
+            <class>org.egov.echallancalculation.model.ChallanRequest</class>
+            <class>org.egov.echallancalculation.model.ChallanResponse</class>
+            <class>org.egov.echallancalculation.web.models.demand.TaxHeadEstimate</class>
+            <class>org.egov.echallancalculation.web.models.demand.TaxAndPayment</class>
+            <class>org.egov.echallancalculation.web.models.demand.BillDetail</class>
+            <class>org.egov.echallancalculation.web.models.demand.BillAccountDetail</class>
+            <class>org.egov.echallancalculation.web.models.demand.BillRequest</class>
+            <class>org.egov.echallancalculation.web.models.demand.BillResponse</class>
+            <class>org.egov.echallancalculation.web.models.demand.GenerateBillCriteria</class>
+            <class>org.egov.echallancalculation.web.models.demand.DemandDetail</class>
+            <class>org.egov.echallancalculation.web.models.demand.DemandRequest</class>
+            <class>org.egov.echallancalculation.web.models.demand.DemandResponse</class>
+            <class>org.egov.echallancalculation.web.models.demand.CollectionType</class>
+          </classes>
+          <namespace>Digit</namespace>
+          <debug>true</debug>
+          <outputKind>module</outputKind>
         </configuration>
       </plugin>
     </plugins>
