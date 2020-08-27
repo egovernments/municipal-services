@@ -23,7 +23,6 @@ public class ChallanService {
 //    @Autowired
 //    private ChallanValidator challanValidator;
 
-    @Autowired
     private UserService userService;
     
     private ChallanRepository repository;

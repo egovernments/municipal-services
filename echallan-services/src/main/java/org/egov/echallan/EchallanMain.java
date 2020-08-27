@@ -11,11 +11,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
+import org.springframework.stereotype.Component;
 
 import java.util.TimeZone;
 
 @SpringBootApplication
-@ComponentScan(basePackages = { "org.egov.echallan", "org.egov.echallan.web.controllers" , "org.egov.echallan.config"})
+@Component
 @Import({ TracerConfiguration.class })
 public class EchallanMain {
 

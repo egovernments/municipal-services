@@ -175,4 +175,11 @@ public class ChallanConfiguration {
 
     @Value("${egov.challan.max.limit}")
     private Integer maxSearchLimit;
+    
+    @Value("${kafka.topics.notification.sms}")
+    private String smsNotifTopic;
+
+    @Value("${notification.sms.enabled}")
+    private Boolean isSMSEnabled;
+    
 }

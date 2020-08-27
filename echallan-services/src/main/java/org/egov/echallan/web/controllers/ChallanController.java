@@ -34,6 +34,12 @@ public class ChallanController {
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
+//	@Autowired
+//	private MigrationService migrationService;
+//	
+//	@Autowired
+//    private PropertyValidator propertyValidator;
+
 	@PostMapping("/_create")
 	public ResponseEntity<ChallanResponse> create(@Valid @RequestBody ChallanRequest challanRequest) {
 
