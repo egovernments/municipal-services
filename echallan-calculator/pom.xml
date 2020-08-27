@@ -161,6 +161,13 @@
             <class>org.egov.echallancalculation.web.models.demand.DemandResponse</class>
             <class>org.egov.echallancalculation.web.models.demand.CollectionType</class>
           </classes>
+          <customTypeNaming>
+          	<typeNaming>org.egov.echallancalculation.web.models.demand.Demand$StatusEnum:DemandStatus</typeNaming>
+            <typeNaming>org.egov.echallancalculation.web.models.demand.Bill$StatusEnum:BillStatus</typeNaming>
+          </customTypeNaming>
+          <customTypeMappings>
+            <customTypeMapping>org.egov.echallancalculation.web.models.user.User:User</customTypeMapping>
+          </customTypeMappings>
           <namespace>Digit</namespace>
           <debug>true</debug>
           <outputKind>module</outputKind>
