@@ -152,6 +152,7 @@
           </classes>
           <customTypeMappings>
             <customTypeMapping>org.egov.echallan.model.AuditDetails:AuditDetails</customTypeMapping>
+            <customTypeMapping>org.egov.echallan.web.models.user.User:User</customTypeMapping>
           </customTypeMappings>
           <namespace>Digit</namespace>
           <debug>true</debug>

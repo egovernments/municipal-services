@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.AuditDetails;
 import org.egov.mdms.model.MasterDetail;
