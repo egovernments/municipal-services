@@ -131,7 +131,7 @@ const fireNocBuildingsRowMapper = (row, mapper = []) => {
     applicationDocuments: fireNocApplicationDocumentsRowMapper(row),
     landArea: intConversion(row.landarea),
     totalCoveredArea:intConversion(row.totalcoveredarea),
-    parkingArea:row.parkingarea,
+    parkingArea:intConversion(row.parkingarea),
     leftSurrounding:row.leftsurrounding,
     rightSurrounding:row.rightsurrounding,
     frontSurrounding:row.frontsurrounding,
