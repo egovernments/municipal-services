@@ -50,8 +50,8 @@ public class MeterServicesImpl implements MeterService {
 	@Override
 	public List<MeterReading> createMeterReading(MeterConnectionRequest meterConnectionRequest) {
 		Boolean genratedemand = true;
-		wsCalulationWorkflowValidator.applicationValidation(meterConnectionRequest.getRequestInfo(),meterConnectionRequest.getMeterReading().getTenantId(),meterConnectionRequest.getMeterReading().getConnectionNo(),genratedemand);
-		
+		if(meterConnectionRequest.getMeterReading().getGenerateDemand())
+			wsCalulationWorkflowValidator.applicationValidation(meterConnectionRequest.getRequestInfo(),meterConnectionRequest.getMeterReading().getTenantId(),meterConnectionRequest.getMeterReading().getConnectionNo(),genratedemand);
 		List<MeterReading> meterReadingsList = new ArrayList<MeterReading>();
 		wsCalculationValidator.validateMeterReading(meterConnectionRequest, true);
 		enrichmentService.enrichMeterReadingRequest(meterConnectionRequest);
