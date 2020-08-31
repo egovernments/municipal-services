@@ -134,7 +134,7 @@ public class TLRenewalCalculation {
 
         MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
                 getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
-        Map<String, JSONArray> res = response.getMdmsRes().get("PropertyTax");
+        Map<String, JSONArray> res = response.getMdmsRes().get("TradeLicense");
         System.out.println("MDMS--->"+res.toString());
         for (Map.Entry<String, JSONArray> entry : res.entrySet())
             timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
@@ -150,7 +150,7 @@ public class TLRenewalCalculation {
         details.add(MasterDetail.builder().name(TLCalculatorConstants.PENANLTY_MASTER).build());
 
         ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
-                .moduleName("PropertyTax").build();
+                .moduleName("TradeLicense").build();
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
                 .build();
         return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
