@@ -82,6 +82,9 @@ public class ProcessInstance {
     @JsonProperty("assignes")
     private List<User> assignes;
 
+    @JsonProperty("assigner")
+    private User assigner = null;
+
     public ProcessInstance addDocumentsItem(Document documentsItem) {
         if (this.documents == null) {
             this.documents = new ArrayList<>();

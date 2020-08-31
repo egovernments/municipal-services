@@ -21,7 +21,7 @@ Change default port value in application.properties
 https://www.getpostman.com/collections/09154f94d2c291a96777
 
 ## Promotion:
-1. Add persister file path in evvironment yaml file (FileName: egov-pgr-service-persister.yml)
+1. Add persister file path in environment yaml file (FileName: egov-pgr-service-persister.yml)
 
 2.Add Role Action:
 Folowing Role Actions have to be mapped to both EMPLOYEE and CITIZEN role

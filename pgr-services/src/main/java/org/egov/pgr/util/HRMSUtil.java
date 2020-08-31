@@ -58,7 +58,7 @@ public class HRMSUtil {
 
 
 
-    private StringBuilder getHRMSURI(String tenantId, List<String> uuids){
+    public StringBuilder getHRMSURI(String tenantId, List<String> uuids){
 
         StringBuilder builder = new StringBuilder(config.getHrmsHost());
         builder.append(config.getHrmsEndPoint());

@@ -127,4 +127,28 @@ public class PGRConfiguration {
     @Value("${egov.hrms.search.endpoint}")
     private String hrmsEndPoint;
 
+    //Notification
+    @Value("${egov.user.event.notification.enabled}")
+    private Boolean isUserEventsNotificationEnabled;
+
+    @Value("${notification.sms.enabled}")
+    private Boolean isSMSEnabled;
+
+    @Value("${egov.localization.statelevel}")
+    private Boolean isLocalizationStateLevel;
+
+    @Value("${egov.localization.host}")
+    private String localizationHost;
+
+    @Value("${egov.localization.context.path}")
+    private String localizationContextPath;
+
+    @Value("${egov.localization.search.endpoint}")
+    private String localizationSearchEndpoint;
+
+    @Value("${kafka.topics.notification.sms}")
+    private String smsNotifTopic;
+
+    @Value("${egov.usr.events.create.topic}")
+    private String saveUserEventsTopic;
 }

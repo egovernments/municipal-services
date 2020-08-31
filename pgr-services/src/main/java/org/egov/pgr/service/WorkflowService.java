@@ -223,7 +223,7 @@ public class WorkflowService {
     }
 
 
-    private StringBuilder getprocessInstanceSearchURL(String tenantId, String serviceRequestId) {
+    public StringBuilder getprocessInstanceSearchURL(String tenantId, String serviceRequestId) {
 
         StringBuilder url = new StringBuilder(pgrConfiguration.getWfHost());
         url.append(pgrConfiguration.getWfProcessInstanceSearchPath());
