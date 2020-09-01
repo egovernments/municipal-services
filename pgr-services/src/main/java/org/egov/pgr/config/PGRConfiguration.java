@@ -151,4 +151,13 @@ public class PGRConfiguration {
 
     @Value("${egov.usr.events.create.topic}")
     private String saveUserEventsTopic;
+
+    @Value("${mseva.mobile.app.download.link}")
+    private String mobileDownloadLink;
+
+    @Value("${egov.url.shortner.host}")
+    private String urlShortnerHost;
+
+    @Value("${egov.url.shortner.endpoint}")
+    private String urlShortnerEndpoint;
 }

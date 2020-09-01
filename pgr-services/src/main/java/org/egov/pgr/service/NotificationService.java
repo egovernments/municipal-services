@@ -134,8 +134,10 @@ public class NotificationService {
             messageToReplace = messageToReplace.replace("<date>", date.format(formatter));
         }
 
-        /*if (messageToReplace.contains("<download link>"))
-            messageToReplace = messageToReplace.replace("<download link>", pgrEntity.getService().getServiceRequestId());*/
+        if (messageToReplace.contains("<download link>")){
+            String appLink = notificationUtil.getShortnerURL(config.getMobileDownloadLink());
+            messageToReplace = messageToReplace.replace("<download link>", appLink);
+        }
 
         if (messageToReplace.contains("<emp_name>")){
             ProcessInstance processInstance = getEmployeeName(pgrEntity.getService().getTenantId(),pgrEntity.getService().getServiceRequestId(),request.getRequestInfo(),PGR_WF_RESOLVE);

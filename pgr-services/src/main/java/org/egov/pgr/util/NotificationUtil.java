@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import static org.egov.pgr.util.PGRConstants.*;
@@ -30,6 +31,8 @@ public class NotificationUtil {
     @Autowired
     private Producer producer;
 
+    @Autowired
+    private RestTemplate restTemplate;
 
     public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
         @SuppressWarnings("rawtypes")
@@ -97,5 +100,18 @@ public class NotificationUtil {
         producer.push(config.getSaveUserEventsTopic(), request);
     }
 
+    public String getShortnerURL(String actualURL) {
+        HashMap<String,String> body = new HashMap<>();
+        body.put("url",actualURL);
+        StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
+        builder.append(config.getUrlShortnerEndpoint());
+        String res = restTemplate.postForObject(builder.toString(), body, String.class);
+
+        if(StringUtils.isEmpty(res)){
+            log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+actualURL); ;
+            return actualURL;
+        }
+        else return res;
+    }
 
 }
