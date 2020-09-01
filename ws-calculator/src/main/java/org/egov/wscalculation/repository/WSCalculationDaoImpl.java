@@ -43,7 +43,6 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	@Autowired
 	private DemandSchedulerRowMapper demandSchedulerRowMapper;
 	
-
 	@Value("${egov.meterservice.createmeterconnection}")
 	private String createMeterConnection;
 

@@ -145,9 +145,15 @@ public class WSConfiguration {
     
     @Value("${ws.application.pay.link}")
     private String applicationPayLink;
+	
+	@Value("${egov.msg.download.receipt.link}")
+	private String receiptDownloadLink;
     
     @Value("${egov.ws.estimate.endpoint}")
     private String estimationEndpoint;
+
+	@Value("${egov.collectiom.payment.search}")
+	private String paymentSearch;
     
     @Value("${ws.pdfservice.link}")
     private String pdfServiceLink;
@@ -172,5 +178,16 @@ public class WSConfiguration {
 
 	@Value("${egov.waterservice.savefilestoreIds.topic}")
 	private String saveFileStoreIdsTopic;
-   
+ 
+	@Value("${egov.user.create.path}")
+	private String userCreateEndPoint;
+
+	@Value("${egov.user.update.path}")
+	private String userUpdateEndPoint;
+	
+	@Value("${modify.ws.workflow.name}")
+	private String modifyWSBusinessServiceName;
+
+	@Value("${egov.collection.host}")
+	private String collectionHost;
 }
