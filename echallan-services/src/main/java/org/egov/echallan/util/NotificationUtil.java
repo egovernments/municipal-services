@@ -73,11 +73,11 @@ public class NotificationUtil {
 		tocal.setTimeInMillis((long) challan.getTaxPeriodTo());
         message = message.replace("<citizen>",challan.getCitizen().getName());
         message = message.replace("<service>", service);
-        message = message.replace("<fromdate>", " "+ fromcal.get(Calendar.DATE) + "/" + fromcal.get(Calendar.MONTH) + "/" + fromcal.get(Calendar.YEAR)+ " ".toUpperCase());
-        message = message.replace("<todate>", " "+ tocal.get(Calendar.DATE) + "/" + tocal.get(Calendar.MONTH) + "/" + tocal.get(Calendar.YEAR)+ " ".toUpperCase());
+        message = message.replace("<fromdate>", " "+ fromcal.get(Calendar.DATE) + "/" + (fromcal.get(Calendar.MONTH)+1) + "/" + fromcal.get(Calendar.YEAR)+ " ".toUpperCase());
+        message = message.replace("<todate>", " "+ tocal.get(Calendar.DATE) + "/" + (tocal.get(Calendar.MONTH)+1) + "/" + tocal.get(Calendar.YEAR)+ " ".toUpperCase());
 
         
-        message = message.replace("<duedate>", " "+ cal.get(Calendar.DATE) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.YEAR)+ " ".toUpperCase());
+        message = message.replace("<duedate>", " "+ cal.get(Calendar.DATE) + "/" + (cal.get(Calendar.MONTH)+1) + "/" + cal.get(Calendar.YEAR)+ " ".toUpperCase());
         message = message.replace("<amount>", amountToBePaid.toString());
         String UIHost = config.getUiAppHost();
 		String paymentPath = config.getPayLinkSMS();
