@@ -38,14 +38,23 @@ public class SWCalculationWorkflowValidator {
 
     public Map<String,String> applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Map<String,String> errorMap){
         List<SewerageConnection> sewerageConnectionList = util.getSewerageConnection(requestInfo,connectionNo,tenantId);
-        int size = sewerageConnectionList.size();
-        SewerageConnection sewerageConnection = sewerageConnectionList.get(size-1);
-        String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
-        sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
-        String propertyId = sewerageConnection.getPropertyId();
-        Property property = util.getProperty(requestInfo,tenantId,propertyId);
-        String propertyApplicationNumber = property.getAcknowldgementNumber();
-        propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+        SewerageConnection sewerageConnection = null;
+        if(sewerageConnectionList != null){
+            int size = sewerageConnectionList.size();
+            sewerageConnection = sewerageConnectionList.get(size-1);
+            String sewerageApplicationNumber = sewerageConnection.getApplicationNo();
+            sewerageConnectionValidation(requestInfo,tenantId,sewerageApplicationNumber,errorMap);
+            String propertyId = sewerageConnection.getPropertyId();
+            Property property = util.getProperty(requestInfo,tenantId,propertyId);
+            String propertyApplicationNumber = property.getAcknowldgementNumber();
+            propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+        }
+        else{
+            errorMap.put("SEWERAGE_CONNECTION_ERROR",
+                    "Sewerage connection object is null");
+        }
+
+
         return  errorMap;
     }
 
