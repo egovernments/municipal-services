@@ -218,7 +218,9 @@ public class NotificationService {
         Map<String, String> reassigneeDetails = new HashMap<>();
         List<String> mdmsDepartmentList = null;
         List<String> hrmsDepartmentList = null;
-        String departmentFromMDMS,designamtion,employeeName;
+        List<String> designamtion = null;
+        List<String> employeeName = null;
+        String departmentFromMDMS;
 
         //HRSMS CALL
         StringBuilder url = hrmsUtils.getHRMSURI(request.getPgrEntity().getService().getTenantId(), request.getPgrEntity().getWorkflow().getAssignes());
@@ -256,8 +258,8 @@ public class NotificationService {
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response for department");
         }
 
-        reassigneeDetails.put("designamtion",designamtion);
-        reassigneeDetails.put("employeeName",employeeName);
+        reassigneeDetails.put("designamtion",designamtion.get(0));
+        reassigneeDetails.put("employeeName",employeeName.get(0));
 
         return reassigneeDetails;
     }
