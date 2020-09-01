@@ -50,7 +50,7 @@ public class EnrichmentService {
         Workflow workflow = serviceRequest.getPgrEntity().getWorkflow();
         String tenantId = service.getTenantId();
 
-        AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(),true);
+        AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,true);
 
         service.setAuditDetails(auditDetails);
         service.setId(UUID.randomUUID().toString());
@@ -79,7 +79,7 @@ public class EnrichmentService {
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
         Service service = serviceRequest.getPgrEntity().getService();
-        AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(),false);
+        AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,false);
 
         service.setAuditDetails(auditDetails);
 

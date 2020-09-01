@@ -67,7 +67,8 @@ public class NotificationService {
             String mobileNumber = request.getPgrEntity().getService().getCitizen().getMobileNumber();
 
             if(!StringUtils.isEmpty(finalMessage)){
-
+                log.info(finalMessage);
+                log.info(mobileNumber);
                 if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
                     EventRequest eventRequest = enrichEventRequest(request,finalMessage);
                     if (eventRequest != null) {
@@ -77,7 +78,7 @@ public class NotificationService {
 
                 if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
                     List<SMSRequest> smsRequests = new ArrayList<>();
-                    enrichSmsRequest(mobileNumber,finalMessage);
+                    smsRequests = enrichSmsRequest(mobileNumber,finalMessage);
                     if (!CollectionUtils.isEmpty(smsRequests)) {
                         notificationUtil.sendSMS(smsRequests);
                     }
