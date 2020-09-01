@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
-import org.egov.echallancalculation.config.ChallanConfiguration;
 import org.egov.echallancalculation.model.Challan;
 import org.egov.echallancalculation.model.RequestInfoWrapper;
 import org.egov.echallancalculation.repository.DemandRepository;
 import org.egov.echallancalculation.repository.ServiceRequestRepository;
 import org.egov.echallancalculation.util.CalculationUtils;
-import org.egov.echallancalculation.util.CalculatorConstants;
 import org.egov.echallancalculation.web.models.calculation.Calculation;
 import org.egov.echallancalculation.web.models.demand.*;
 import org.egov.tracer.model.CustomException;
@@ -21,7 +19,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 
@@ -40,7 +37,7 @@ public class DemandService {
     @Autowired
     private DemandRepository demandRepository;
 
-
+    public static final String MDMS_ROUNDOFF_TAXHEAD= "TL_ROUNDOFF";
     /**
      * Creates or updates Demand
      * @param requestInfo The RequestInfo of the calculation request
@@ -48,15 +45,12 @@ public class DemandService {
      */
     public void generateDemand(RequestInfo requestInfo,List<Calculation> calculations,String businessService){
 
-        //List that will contain Calculation for new demands
         List<Calculation> createCalculations = new LinkedList<>();
 
-        //List that will contain Calculation for old demands
         List<Calculation> updateCalculations = new LinkedList<>();
 
         if(!CollectionUtils.isEmpty(calculations)){
 
-            //Collect required parameters for demand search
             String tenantId = calculations.get(0).getTenantId();
             Set<String> applicationNumbers = calculations.stream().map(calculation -> calculation.getChallan().getChallanNo()).collect(Collectors.toSet());
             List<Demand> demands = searchDemand(tenantId,applicationNumbers,requestInfo,businessService);
@@ -64,7 +58,6 @@ public class DemandService {
             if(!CollectionUtils.isEmpty(demands))
                 applicationNumbersFromDemands = demands.stream().map(Demand::getConsumerCode).collect(Collectors.toSet());
 
-            //If demand already exists add it updateCalculations else createCalculations
             for(Calculation calculation : calculations)
             {      if(!applicationNumbersFromDemands.contains(calculation.getChallan().getChallanNo()))
                         createCalculations.add(calculation);
@@ -306,7 +299,7 @@ public class DemandService {
         * Sum all taxHeads except RoundOff as new roundOff will be calculated
         * */
         for (DemandDetail demandDetail : demandDetails){
-            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.MDMS_ROUNDOFF_TAXHEAD))
+            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(MDMS_ROUNDOFF_TAXHEAD))
                 totalTax = totalTax.add(demandDetail.getTaxAmount());
             else prevRoundOffDemandDetail = demandDetail;
         }
@@ -345,7 +338,7 @@ public class DemandService {
         if(roundOff.compareTo(BigDecimal.ZERO)!=0){
                  DemandDetail roundOffDemandDetail = DemandDetail.builder()
                     .taxAmount(roundOff)
-                    .taxHeadMasterCode(CalculatorConstants.MDMS_ROUNDOFF_TAXHEAD)
+                    .taxHeadMasterCode(MDMS_ROUNDOFF_TAXHEAD)
                     .tenantId(tenantId)
                     .collectionAmount(BigDecimal.ZERO)
                     .build();

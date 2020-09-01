@@ -95,10 +95,6 @@ public class ChallanConfiguration {
     private String hierarchyTypeCode;
 
 
-
-    @Value("${egov.tl.calculator.getBill.endpoint}")
-    private String getBillEndpoint;
-
     @Value("${egov.billingservice.host}")
     private String billingHost;
 
@@ -114,22 +110,10 @@ public class ChallanConfiguration {
     @Value("${egov.demand.search.endpoint}")
     private String demandSearchEndpoint;
     
-    
-    @Value("${egov.receipt.businessserviceTL}")
-    private String businessServiceTL;
-
-
-    @Value("${egov.receipt.businessserviceBPA}")
-    private String businessServiceBPA;
-
 
     //SMS
     @Value("${kafka.topics.notification.sms}")
     private String smsNotifTopic;
-
-    @Value("${notification.sms.enabled.forTL}")
-    private Boolean isTLSMSEnabled;
-
 
     //Localization
     @Value("${egov.localization.host}")
@@ -176,15 +160,6 @@ public class ChallanConfiguration {
 	
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
-	
-	@Value("${egov.user.event.notification.enabledForTL}")
-	private Boolean isUserEventsNotificationEnabledForTL;
-
-    @Value("${egov.user.event.notification.enabledForTLRenewal}")
-    private Boolean isUserEventsNotificationEnabledForTLRenewal;
-
-    @Value("${egov.user.event.notification.enabledForBPA}")
-    private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;

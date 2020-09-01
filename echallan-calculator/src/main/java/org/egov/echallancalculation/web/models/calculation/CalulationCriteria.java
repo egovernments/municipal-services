@@ -1,7 +1,6 @@
 package org.egov.echallancalculation.web.models.calculation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.ApiModel;
 import lombok.*;
 
 import org.egov.echallancalculation.model.Challan;
@@ -10,11 +9,6 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-/**
- * Either challan object or the challan number is mandatory apart from tenantid.
- */
-@ApiModel(description = "Either tradelicense object or the application number is mandatory apart from tenantid.")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-27T14:56:03.454+05:30")
 

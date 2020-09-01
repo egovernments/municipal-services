@@ -93,14 +93,6 @@ public class CalculationUtils {
             return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
     }
 
-
-    /**
-     * Call tl-services to get tradeLicense for the given applicationNumber and tenantID
-     * @param requestInfo The RequestInfo of the incoming request
-     * @param applicationNumber The applicationNumber whose tradeLicense has to be fetched
-     * @param tenantId The tenantId of the tradeLicense
-     * @return The tradeLicense fo the particular applicationNumber
-     */
     public Challan getChallan(RequestInfo requestInfo, String challanNo, String tenantId){
         String url = getChallanSearchURL();
         url = url.replace("{1}",tenantId).replace("{2}",challanNo);
