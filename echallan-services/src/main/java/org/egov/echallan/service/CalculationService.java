@@ -44,9 +44,7 @@ public class CalculationService {
             throw new CustomException("INVALID REQUEST","The request for calculation cannot be empty or null");
 
         CalculationRes response = getCalculation(requestInfo,challan);
-        System.out.println("response---"+response.toString());
         List<Calculation> calculations = response.getCalculations();
-        System.out.println("calculations---"+calculations);
         Map<String,Calculation> applicationNumberToCalculation = new HashMap<>();
         calculations.forEach(calculation -> {
             applicationNumberToCalculation.put(calculation.getChallan().getChallanNo(),calculation);
@@ -72,16 +70,13 @@ public class CalculationService {
                 .build();
 
         Object result = serviceRequestRepository.fetchResult(uri,request);
-        System.out.println("result---"+result.toString());
         CalculationRes response = null;
         try{
             response = mapper.convertValue(result,CalculationRes.class);
-            System.out.println("responsesfsdf---"+response.getCalculations());
         }
         catch (IllegalArgumentException e){
             throw new CustomException("PARSING ERROR","Failed to parse response of calculate");
         } 
-        System.out.println("response---"+response);
         return response;
     }
 

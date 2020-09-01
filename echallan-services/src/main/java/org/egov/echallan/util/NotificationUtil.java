@@ -49,7 +49,6 @@ public class NotificationUtil {
 		
 		
 		messageTemplate = getMessageTemplate("echallan.create.sms", localizationMessage);
-		System.out.println("message template==="+messageTemplate);
 		message = getCreateMsg(requestInfo,challan, messageTemplate);
 		
 
@@ -69,7 +68,6 @@ public class NotificationUtil {
 		fromcal.setTimeInMillis((long) challan.getTaxPeriodFrom());
 		
 		String service = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
-		//String service = getMessageTemplate(formatCodes(challan.getBusinessService()),localizationMessage);
 		
 		Calendar tocal = Calendar.getInstance();
 		tocal.setTimeInMillis((long) challan.getTaxPeriodTo());
@@ -87,7 +85,6 @@ public class NotificationUtil {
 		paymentPath = paymentPath.replace("$tenantId",challan.getTenantId());
 		paymentPath = paymentPath.replace("$businessservice",challan.getBusinessService());
 		String finalPath = UIHost + paymentPath;
-		System.out.println("final path---->"+finalPath);
 		message = message.replace("<Link>",getShortenedUrl(finalPath));
 
         return message;
@@ -143,11 +140,9 @@ public class NotificationUtil {
 	public String getShortenedUrl(String url){
 		HashMap<String,String> body = new HashMap<>();
 		body.put("url",url);
-		System.out.println("input url :::"+url);
 		StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
 		builder.append(config.getUrlShortnerEndpoint());
 		String res = restTemplate.postForObject(builder.toString(), body, String.class);
-		System.out.println("response from shortneer:::"+res);
 		if(StringUtils.isEmpty(res)){
 			log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
 			return url;

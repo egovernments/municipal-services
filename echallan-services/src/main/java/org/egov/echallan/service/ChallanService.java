@@ -20,20 +20,12 @@ public class ChallanService {
     @Autowired
     private EnrichmentService enrichmentService;
 
-//    @Autowired
-//    private ChallanValidator challanValidator;
-
     private UserService userService;
     
     private ChallanRepository repository;
     
     private CalculationService calculationService;
     
-
-//    @Autowired
-//	private WorkflowService wfService;
-
-
     @Autowired
     public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService ) {
         this.enrichmentService = enrichmentService;
@@ -50,8 +42,6 @@ public class ChallanService {
 	 * @return Challan successfully created
 	 */
 	public Challan create(ChallanRequest request) {
-
-		//challanValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		calculationService.addCalculation(request);
@@ -62,8 +52,6 @@ public class ChallanService {
 	
 	 public List<Challan> search(SearchCriteria criteria, RequestInfo requestInfo){
 	        List<Challan> challans;
-	       // challanValidator.validateSearch(requestInfo,criteria,serviceFromPath);
-	       // criteria.setBusinessService(serviceFromPath);
 	        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
 	         if(criteria.getMobileNumber()!=null){
 	        	 challans = getChallansFromMobileNumber(criteria,requestInfo);
@@ -77,7 +65,6 @@ public class ChallanService {
 	 public List<Challan> getChallansFromMobileNumber(SearchCriteria criteria, RequestInfo requestInfo){
 		 List<Challan> challans = new LinkedList<>();
 	        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
-	        // If user not found with given user fields return empty list
 	        if(userDetailResponse.getUser().size()==0){
 	            return Collections.emptyList();
 	        }

@@ -61,7 +61,6 @@ public class ChallanRepository {
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getChallanSearchQuery(criteria, preparedStmtList);
         List<Challan> challans =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
-        //sortChildObjectsById(challans);
         return challans;
     }
     

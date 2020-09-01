@@ -146,15 +146,6 @@ public class ChallanConfiguration {
 	
 	@Value("${egov.usr.events.pay.code}")
 	private String payCode;
-	
-	@Value("${egov.user.event.notification.enabledForTL}")
-	private Boolean isUserEventsNotificationEnabledForTL;
-
-    @Value("${egov.user.event.notification.enabledForTLRenewal}")
-    private Boolean isUserEventsNotificationEnabledForTLRenewal;
-
-    @Value("${egov.user.event.notification.enabledForBPA}")
-    private Boolean isUserEventsNotificationEnabledForBPA;
 
 	@Value("${egov.usr.events.pay.triggers}")
 	private String payTriggers;

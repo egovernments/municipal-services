@@ -1,21 +1,15 @@
 package org.egov.echallan.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
-import org.egov.echallan.model.SMSRequest;
 import org.egov.echallan.producer.Producer;
 import org.egov.echallan.util.NotificationUtil;
 import org.egov.mdms.model.MasterDetail;
@@ -69,10 +63,8 @@ public class NotificationService {
 				String message = null;
 				String tenantId = challanRequest.getChallan().getTenantId();
 				List<String> businessServiceAllowed = fetchBusinessServiceFromMDMS(challanRequest.getRequestInfo(), tenantId);
-				System.out.println("businessServiceAllowed=="+businessServiceAllowed);
 				if(!CollectionUtils.isEmpty(businessServiceAllowed)) {
 					Challan challan = challanRequest.getChallan();
-					System.out.println("challan.getBusinessService()==="+challan.getBusinessService());
 						if (businessServiceAllowed.contains(challan.getBusinessService())) {
 							String mobilenumber = challan.getCitizen().getMobileNumber();
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
@@ -81,7 +73,6 @@ public class NotificationService {
 								Map<String, Object> request = new HashMap<>();
 								request.put("mobileNumber", mobilenumber);
 								request.put("message", message);
-								System.out.println("Final message=="+message);
 								producer.push(config.getSmsNotifTopic(), request);
 							} else {
 								log.error("No message configured! Notification will not be sent.");

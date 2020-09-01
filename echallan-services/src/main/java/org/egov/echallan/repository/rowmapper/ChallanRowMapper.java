@@ -1,12 +1,10 @@
 package org.egov.echallan.repository.rowmapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.egov.echallan.model.Address;
 import org.egov.echallan.model.AuditDetails;
 import org.egov.echallan.model.Boundary;
 import org.egov.echallan.model.Challan;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -20,19 +18,12 @@ import java.util.*;
 @Component
 public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
 
-
-    @Autowired
-    private ObjectMapper mapper;
-
-
-
     public List<Challan> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<String, Challan> challanMap = new LinkedHashMap<>();
 
         while (rs.next()) {
             String id = rs.getString("challan_id");
             Challan currentChallan = challanMap.get(id);
-            String tenantId = rs.getString("challan_tenantId");
 
             if(currentChallan == null){
                 Long lastModifiedTime = rs.getLong("challan_lastModifiedTime");
@@ -48,7 +39,7 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
                         .lastModifiedTime(lastModifiedTime)
                         .build();
 
-                currentChallan = currentChallan.builder().auditDetails(auditdetails)
+                currentChallan = Challan.builder().auditDetails(auditdetails)
                 		.accountId(rs.getString("uuid"))
                 		.challanNo(rs.getString("challanno"))
                 		.businessService(rs.getString("businessservice"))

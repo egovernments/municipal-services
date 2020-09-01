@@ -8,13 +8,6 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
 
 import java.util.List;
-
-/**
- * <h1>IdGenerationRequest</h1>
- * 
- * @author VISHAL_GENIUS
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

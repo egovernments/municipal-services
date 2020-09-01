@@ -112,10 +112,6 @@ public class Address {
   @JsonProperty("detail")
   private String detail = null;
 
-  /**
-  * Unique Identifier of the tenant to which user primarily belongs
-  * @return tenantId
-  **/
   public String getTenantId() {
     return tenantId;
   }
@@ -128,11 +124,6 @@ public class Address {
   }
 
   
-
-  /**
-  * House number or door number.
-  * @return doorNo
-  **/
   public String getDoorNo() {
     return doorNo;
   }
@@ -145,21 +136,13 @@ public class Address {
   }
 
   
-
-  /**
-  * Plot number of the house.
-  * @return plotNo
-  **/
   public String getPlotNo() {
     return plotNo;
   }
   public void setPlotNo(String plotNo) {
     this.plotNo = plotNo;
   }
-  /**
-  * System generated id for the address
-  * @return id
-  **/
+
   public String getId() {
     return id;
   }
@@ -168,12 +151,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * additional landmark to help locate the address
-  * @return landmark
-  **/
   public String getLandmark() {
     return landmark;
   }
@@ -185,12 +162,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * City of the address. Can be represented by the tenantid itself
-  * @return city
-  **/
   public String getCity() {
     return city;
   }
@@ -202,12 +173,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * The district in which the property is located
-  * @return district
-  **/
   public String getDistrict() {
     return district;
   }
@@ -219,12 +184,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * The Region in which the property is located
-  * @return region
-  **/
   public String getRegion() {
     return region;
   }
@@ -236,12 +195,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * The State in which the property is located
-  * @return state
-  **/
   public String getState() {
     return state;
   }
@@ -253,12 +206,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * The country in which the property is located
-  * @return country
-  **/
   public String getCountry() {
     return country;
   }
@@ -270,12 +217,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * PIN code of the address. Indian pincodes will usually be all numbers.
-  * @return pincode
-  **/
   public String getPincode() {
     return pincode;
   }
@@ -287,12 +228,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * more address detail as may be needed
-  * @return additionDetails
-  **/
   public String getAdditionDetails() {
     return additionDetails;
   }
@@ -305,11 +240,6 @@ public class Address {
   }
 
   
-
-  /**
-  * Name of the building
-  * @return buildingName
-  **/
   public String getBuildingName() {
     return buildingName;
   }
@@ -321,12 +251,6 @@ public class Address {
     return this;
   }
 
-  
-
-  /**
-  * Street Name
-  * @return street
-  **/
   public String getStreet() {
     return street;
   }

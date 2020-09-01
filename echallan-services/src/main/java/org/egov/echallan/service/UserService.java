@@ -52,11 +52,6 @@ public class UserService {
 	@Value("${egov.user.update.path}")
 	private String userUpdateEndpoint;
 
-	/**
-	 * Creates user of the owners of property if it is not created already
-	 * 
-	 * @param request PropertyRequest received for creating properties
-	 */
 	public void createUser(ChallanRequest request) {
 
 		Challan challan = request.getChallan();
@@ -70,7 +65,6 @@ public class UserService {
 		
 		if(challan.getAccountId()==null) {
 			addUserDefaultFields(challan.getTenantId(), role, userInfo);
-            //  UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
             StringBuilder uri = new StringBuilder(userHost)
                     .append(userContextPath)
                     .append(userCreateEndpoint);
@@ -97,13 +91,10 @@ public class UserService {
 	private UserDetailResponse userExists(UserInfo owner,Challan challan,RequestInfo requestInfo){
         UserSearchRequest userSearchRequest =new UserSearchRequest();
         userSearchRequest.setTenantId(challan.getTenantId().split("\\.")[0]);
-     //   userSearchRequest.setMobileNumber(owner.getMobileNumber());
-     //   userSearchRequest.setName(owner.getName());
         userSearchRequest.setRequestInfo(requestInfo);
         userSearchRequest.setActive(true);
         userSearchRequest.setUserType("CITIZEN");
-     //   if(owner.getUuid()!=null)
-            userSearchRequest.setUuid(Arrays.asList(challan.getAccountId()));
+        userSearchRequest.setUuid(Arrays.asList(challan.getAccountId()));
         StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
         return userCall(userSearchRequest,uri);
     }

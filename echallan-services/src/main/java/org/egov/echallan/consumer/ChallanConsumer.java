@@ -31,12 +31,10 @@ public class ChallanConsumer {
         ObjectMapper mapper = new ObjectMapper();
         ChallanRequest challanRequest = new ChallanRequest();
         try {
-            log.info("Consuming record: " + record);
             challanRequest = mapper.convertValue(record, ChallanRequest.class);
         } catch (final Exception e) {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }
-       System.out.println("received msg===");
         notificationService.sendChallanNotification(challanRequest);
     }
 }

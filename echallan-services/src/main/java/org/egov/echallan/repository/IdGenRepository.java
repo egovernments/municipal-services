@@ -39,7 +39,6 @@ public class IdGenRepository {
             reqList.add(IdRequest.builder().idName(name).format(format).tenantId(tenantId).build());
         }
         IdGenerationRequest req = IdGenerationRequest.builder().idRequests(reqList).requestInfo(requestInfo).build();
-        System.out.println(req);
         IdGenerationResponse response = null;
         try {
             response = restTemplate.postForObject( config.getIdGenHost()+ config.getIdGenPath(), req, IdGenerationResponse.class);

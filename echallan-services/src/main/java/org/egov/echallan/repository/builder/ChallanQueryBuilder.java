@@ -91,8 +91,6 @@ public class ChallanQueryBuilder {
 
         }
 
-       // enrichCriteriaForUpdateSearch(builder,preparedStmtList,criteria);
-
         return addPaginationWrapper(builder.toString(),preparedStmtList,criteria);
     }
 

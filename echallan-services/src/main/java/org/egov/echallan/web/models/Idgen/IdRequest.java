@@ -8,12 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * <h1>IdRequest</h1>
- * 
- * @author Narendra
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -2,13 +2,10 @@ package org.egov.echallan.producer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.kafka.CustomKafkaTemplate;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class Producer {
 
 	@Autowired

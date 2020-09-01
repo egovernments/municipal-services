@@ -8,12 +8,6 @@ import org.egov.common.contract.response.ResponseInfo;
 
 import java.util.List;
 
-/**
- * <h1>IdGenerationResponse</h1>
- *
- * @author VISHAL_GENIUS
- *
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
