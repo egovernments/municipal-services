@@ -27,15 +27,23 @@ public class WSCalculationWorkflowValidator {
 	 public Boolean applicationValidation(RequestInfo requestInfo,String tenantId,String connectionNo, Boolean genratedemand){
 	    Map<String,String> errorMap = new HashMap<>();
 		 List<WaterConnection> waterConnectionList = util.getWaterConnection(requestInfo,connectionNo,tenantId);
-		 int size = waterConnectionList.size();
-		 WaterConnection waterConnection = waterConnectionList.get(size-1);
-		String waterApplicationNumber = waterConnection.getApplicationNo();
-		waterConnectionValidation(requestInfo, tenantId, waterApplicationNumber, errorMap);
-		
-		String propertyId = waterConnection.getPropertyId();
-        Property property = util.getProperty(requestInfo,tenantId,propertyId);
-        String propertyApplicationNumber = property.getAcknowldgementNumber();
-        propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+		 WaterConnection waterConnection = null;
+		 if(waterConnectionList != null){
+			 int size = waterConnectionList.size();
+			 waterConnection = waterConnectionList.get(size-1);
+
+			 String waterApplicationNumber = waterConnection.getApplicationNo();
+			 waterConnectionValidation(requestInfo, tenantId, waterApplicationNumber, errorMap);
+
+			 String propertyId = waterConnection.getPropertyId();
+			 Property property = util.getProperty(requestInfo,tenantId,propertyId);
+			 String propertyApplicationNumber = property.getAcknowldgementNumber();
+			 propertyValidation(requestInfo,tenantId,propertyApplicationNumber,errorMap);
+		 }
+		 else{
+			 errorMap.put("WATER_CONNECTION_ERROR",
+					 "Water connection object is null");
+		 }
 
         if(!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
