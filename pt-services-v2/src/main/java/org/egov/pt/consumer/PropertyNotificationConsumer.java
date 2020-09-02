@@ -2,11 +2,8 @@ package org.egov.pt.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.service.NotificationService;
 import org.egov.pt.service.PaymentNotificationService;
-import org.egov.pt.web.models.Property;
-import org.egov.pt.web.models.PropertyDetail;
 import org.egov.pt.web.models.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +13,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -27,10 +21,11 @@ public class PropertyNotificationConsumer {
     @Autowired
     private NotificationService notificationService;
 
-
     @Autowired
     private PaymentNotificationService paymentNotificationService;
 
+    @Value("${update.notification.sms.enabled}")
+    private boolean isUpdateSmsEnabled;
 
     @KafkaListener(topics = {"${persister.update.property.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
@@ -43,8 +38,9 @@ public class PropertyNotificationConsumer {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }
         log.info("property Received: "+propertyRequest.getProperties().get(0).getPropertyId());
-
-        notificationService.process(propertyRequest,topic);
+        if(isUpdateSmsEnabled) {
+            notificationService.process(propertyRequest,topic);
+        }
     }
 
 
