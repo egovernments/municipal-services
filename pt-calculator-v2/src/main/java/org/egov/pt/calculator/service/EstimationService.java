@@ -111,7 +111,6 @@ public class EstimationService {
 	 */
 	public Map<String, Calculation> calculateAndCreateDemand(CalculationReq calculationReq){
 	//	assessmentService.enrichAssessment(calculationReq);
-		log.info("request is" ,new Gson().toJson(calculationReq));
 		Map<String,Calculation> res = demandService.generateDemands(calculationReq);
 		return res;
 	}
