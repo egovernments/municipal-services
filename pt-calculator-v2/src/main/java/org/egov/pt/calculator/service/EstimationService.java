@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
@@ -109,6 +111,7 @@ public class EstimationService {
 	 */
 	public Map<String, Calculation> calculateAndCreateDemand(CalculationReq calculationReq){
 	//	assessmentService.enrichAssessment(calculationReq);
+		log.info("request is" ,new Gson().toJson(calculationReq));
 		Map<String,Calculation> res = demandService.generateDemands(calculationReq);
 		return res;
 	}
