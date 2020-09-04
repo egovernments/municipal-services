@@ -28,6 +28,7 @@ import static org.egov.tl.util.TLConstants.*;
 import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -338,7 +339,12 @@ public class TradeLicenseService {
 
         criteria.setIds(ids);
         licenses = repository.getPlainLicenseSearch(criteria);
-        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
+
+        if(!CollectionUtils.isEmpty(licenses))
+            licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
+
+        log.info("Total Records Returned: "+licenses.size());
+
         return licenses;
     }
 
