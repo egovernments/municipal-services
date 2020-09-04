@@ -258,7 +258,7 @@ public class TLQueryBuilder {
         List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
 
-			builder.append(" tl.licensenumber IN (").append(createQuery(ids)).append(")");
+			builder.append(" WHERE tl.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 		

@@ -91,7 +91,7 @@ import javax.servlet.http.HttpServletRequest;
 
 
 
-        @RequestMapping(value="/_plainsearch", method = RequestMethod.POST)
+            @RequestMapping(value="/_plainsearch", method = RequestMethod.POST)
         public ResponseEntity<TradeLicenseResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                             @Valid @ModelAttribute TradeLicenseSearchCriteria criteria){
 
