@@ -9,6 +9,7 @@ import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.repository.ChallanRepository;
+import org.egov.echallan.validator.ChallanValidator;
 import org.egov.echallan.web.models.user.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,16 @@ public class ChallanService {
     
     private CalculationService calculationService;
     
+    private ChallanValidator validator;
+    
     @Autowired
-    public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService ) {
+    public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService,
+    		ChallanValidator validator) {
         this.enrichmentService = enrichmentService;
         this.userService = userService;
         this.repository = repository;
         this.calculationService = calculationService;
+        this.validator = validator;
     }
     
     
@@ -42,6 +47,7 @@ public class ChallanService {
 	 * @return Challan successfully created
 	 */
 	public Challan create(ChallanRequest request) {
+		validator.validateFields(request);
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
 		calculationService.addCalculation(request);
