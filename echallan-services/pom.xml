@@ -149,7 +149,15 @@
             <class>org.egov.echallan.web.models.calculation.CalulationCriteria</class>
             <class>org.egov.echallan.web.models.calculation.FeeAndBillingSlabIds</class>
             <class>org.egov.echallan.web.models.calculation.TaxHeadEstimate</class>
+            <class>org.egov.echallan.web.models.collection.PaymentRequest</class>
+            <class>org.egov.echallan.web.models.collection.PaymentDetail</class>
+            <class>org.egov.echallan.web.models.collection.BillDetail</class>
+            <class>org.egov.echallan.web.models.collection.BillAccountDetail</class>
           </classes>
+          <customTypeNaming>
+            <typeNaming>org.egov.echallan.web.models.collection.Bill$StatusEnum:BillStatus</typeNaming>
+            <typeNaming>org.egov.echallan.web.models.collection.Bill$PurposeEnum:BillPurpose</typeNaming>
+          </customTypeNaming>
           <customTypeMappings>
             <customTypeMapping>org.egov.echallan.model.AuditDetails:AuditDetails</customTypeMapping>
             <customTypeMapping>org.egov.echallan.web.models.user.User:User</customTypeMapping>
