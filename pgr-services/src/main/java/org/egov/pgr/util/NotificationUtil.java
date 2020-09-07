@@ -34,14 +34,14 @@ public class NotificationUtil {
     @Autowired
     private RestTemplate restTemplate;
 
-    public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
+    public String getLocalizationMessages(String tenantId, RequestInfo requestInfo,String module) {
         @SuppressWarnings("rawtypes")
-        LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
+        LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo, module),
                 requestInfo);
         return new JSONObject(responseMap).toString();
     }
 
-    public StringBuilder getUri(String tenantId, RequestInfo requestInfo) {
+    public StringBuilder getUri(String tenantId, RequestInfo requestInfo, String module) {
 
         if (config.getIsLocalizationStateLevel())
             tenantId = tenantId.split("\\.")[0];
@@ -52,7 +52,7 @@ public class NotificationUtil {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
                 .append(config.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
-                .append("&tenantId=").append(tenantId).append("&module=").append(MODULE);
+                .append("&tenantId=").append(tenantId).append("&module=").append(module);
 
         return uri;
     }
@@ -112,6 +112,21 @@ public class NotificationUtil {
             return actualURL;
         }
         else return res;
+    }
+
+    public String getCustomizedMsgForPlaceholder(String localizationMessage,String notificationCode) {
+        String path = "$..messages[?(@.code==\"{}\")].message";
+        path = path.replace("{}", notificationCode);
+        String message = null;
+        try {
+            ArrayList<String> messageObj = (ArrayList<String>) JsonPath.parse(localizationMessage).read(path);
+            if(messageObj != null && messageObj.size() > 0) {
+                message = messageObj.get(0);
+            }
+        } catch (Exception e) {
+            log.warn("Fetching from localization for placeholder failed", e);
+        }
+        return message;
     }
 
 }

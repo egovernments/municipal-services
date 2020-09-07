@@ -104,12 +104,17 @@ public class NotificationService {
     private String getFinalMessage(ServiceRequest request, String topic, String applicationStatus) {
         String tenantId = request.getPgrEntity().getService().getTenantId();
         String action = request.getPgrEntity().getWorkflow().getAction();
-        String localizationMessage = notificationUtil.getLocalizationMessages(tenantId, request.getRequestInfo());
+        String localizationMessage = notificationUtil.getLocalizationMessages(tenantId, request.getRequestInfo(),PGR_MODULE);
 
         String message = notificationUtil.getCustomizedMsg(action, applicationStatus, localizationMessage);
         if (message == null) {
             log.info("No message Found For Topic : " + topic);
             return message;
+        }
+
+        if (message.contains("<complaint_type>")){
+            String localisedComplaint = notificationUtil.getCustomizedMsgForPlaceholder(localizationMessage,"pgr.complaint.category."+request.getPgrEntity().getService().getServiceCode());
+            message = message.replace("<complaint_type>", localisedComplaint);
         }
 
         String finalMessage = getMessageForMobileNumber(message,request);
@@ -120,8 +125,8 @@ public class NotificationService {
         String messageToReplace = message;
         PGREntity pgrEntity = request.getPgrEntity();
 
-        if (messageToReplace.contains("<complaint_type>"))
-            messageToReplace = messageToReplace.replace("<complaint_type>", pgrEntity.getService().getServiceCode());
+        /*if (messageToReplace.contains("<complaint_type>"))
+            messageToReplace = messageToReplace.replace("<complaint_type>", pgrEntity.getService().getServiceCode());*/
 
         if (messageToReplace.contains("<id>"))
             messageToReplace = messageToReplace.replace("<id>", pgrEntity.getService().getServiceRequestId());
@@ -149,9 +154,6 @@ public class NotificationService {
 
        /* if (messageToReplace.contains("<reason>"))
             messageToReplace = messageToReplace.replace("<reason>", pgrEntity.getWorkflow().getComments());*/
-
-        if (messageToReplace.contains("<additional_comments>"))
-            messageToReplace = messageToReplace.replace("<additional_comments>", pgrEntity.getWorkflow().getComments());
 
         if(pgrEntity.getService().getApplicationStatus().equalsIgnoreCase(PENDINGATLME) && pgrEntity.getWorkflow().getAction().equalsIgnoreCase(REASSIGN)){
 
@@ -225,6 +227,7 @@ public class NotificationService {
         List<String> employeeName = null;
         String departmentFromMDMS;
 
+        String localisationMessageForPlaceholder =  notificationUtil.getLocalizationMessages(request.getPgrEntity().getService().getTenantId(), request.getRequestInfo(),COMMON_MODULE);
         //HRSMS CALL
         StringBuilder url = hrmsUtils.getHRMSURI(request.getPgrEntity().getService().getTenantId(), request.getPgrEntity().getWorkflow().getAssignes());
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(request.getRequestInfo()).build();
@@ -247,8 +250,10 @@ public class NotificationService {
             throw new CustomException("PARSING_ERROR","Failed to fetch department from mdms data for serviceCode: "+request.getPgrEntity().getService().getServiceCode());
         else departmentFromMDMS = mdmsDepartmentList.get(0);
 
-        if(hrmsDepartmentList.contains(departmentFromMDMS))
-            reassigneeDetails.put("department",departmentFromMDMS);
+        if(hrmsDepartmentList.contains(departmentFromMDMS)){
+            String localisedDept = notificationUtil.getCustomizedMsgForPlaceholder(localisationMessageForPlaceholder,"COMMON_MASTERS_DEPARTMENT_"+departmentFromMDMS);
+            reassigneeDetails.put("department",localisedDept);
+        }
 
         String designationJsonPath = HRMS_DESIGNATION_JSONPATH.replace("{department}",departmentFromMDMS);
 
@@ -261,7 +266,9 @@ public class NotificationService {
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response for department");
         }
 
-        reassigneeDetails.put("designamtion",designamtion.get(0));
+        String localisedDesignation = notificationUtil.getCustomizedMsgForPlaceholder(localisationMessageForPlaceholder,"COMMON_MASTERS_DESIGNATION_"+designamtion.get(0));
+
+        reassigneeDetails.put("designamtion",localisedDesignation);
         reassigneeDetails.put("employeeName",employeeName.get(0));
 
         return reassigneeDetails;
