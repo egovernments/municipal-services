@@ -38,11 +38,10 @@ public class EnrichmentService {
     }
 
 
-
-
-
-
-
+    /**
+     * Enriches the create request with auditDetails. uuids and custom ids from idGen service
+     * @param serviceRequest The create request
+     */
     public void enrichCreateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
@@ -74,7 +73,10 @@ public class EnrichmentService {
     }
 
 
-
+    /**
+     * Enriches the update request (updates the lastModifiedTime in auditDetails0
+     * @param serviceRequest The update request
+     */
     public void enrichUpdateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
@@ -85,7 +87,12 @@ public class EnrichmentService {
 
     }
 
-
+    /**
+     * Enriches the search criteria in case of default search and enriches the userIds from mobileNumber in case of seach based on mobileNumber.
+     * Also sets the default limit and offset if none is provided
+     * @param requestInfo
+     * @param criteria
+     */
     public void enrichSearchRequest(RequestInfo requestInfo, RequestSearchCriteria criteria){
 
         if(criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)){

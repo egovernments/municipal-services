@@ -36,6 +36,11 @@ public class PGRRepository {
     }
 
 
+    /**
+     * searches services based on search criteria and then wraps it into pgrEntities
+     * @param criteria
+     * @return
+     */
     public List<PGREntity> getPGREntities(RequestSearchCriteria criteria){
         List<Service> services = getServices(criteria);
         List<String> serviceRequestids = services.stream().map(Service::getServiceRequestId).collect(Collectors.toList());
@@ -49,7 +54,11 @@ public class PGRRepository {
         return pgrEntities;
     }
 
-
+    /**
+     * searches services based on search criteria
+     * @param criteria
+     * @return
+     */
     public List<Service> getServices(RequestSearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getPGRSearchQuery(criteria, preparedStmtList);
@@ -57,6 +66,11 @@ public class PGRRepository {
         return services;
     }
 
+    /**
+     * Returns the count based on the search criteria
+     * @param criteria
+     * @return
+     */
     public Integer getCount(RequestSearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getCountQuery(criteria, preparedStmtList);

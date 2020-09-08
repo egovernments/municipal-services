@@ -31,6 +31,11 @@ public class MDMSUtils {
         this.serviceRequestRepository = serviceRequestRepository;
     }
 
+    /**
+     * Calls MDMS service to fetch pgr master data
+     * @param request
+     * @return
+     */
     public Object mDMSCall(ServiceRequest request){
         RequestInfo requestInfo = request.getRequestInfo();
         String tenantId = request.getPgrEntity().getService().getTenantId();
@@ -40,6 +45,12 @@ public class MDMSUtils {
     }
 
 
+    /**
+     * Returns mdms search criteria based on the tenantId
+     * @param requestInfo
+     * @param tenantId
+     * @return
+     */
     private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,String tenantId){
         List<ModuleDetail> pgrModuleRequest = getPGRModuleRequest();
 

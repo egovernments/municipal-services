@@ -33,6 +33,10 @@ public class UserService {
         this.config = config;
     }
 
+    /**
+     * Calls user service to enrich user from search or upsert user
+     * @param request
+     */
     public void callUserService(ServiceRequest request){
 
         if(!StringUtils.isEmpty(request.getPgrEntity().getService().getAccountId()))
@@ -42,6 +46,10 @@ public class UserService {
 
     }
 
+    /**
+     * Calls user search to fetch the list of user and enriches it in pgrEntities
+     * @param pgrEntities
+     */
     public void enrichUsers(List<PGREntity> pgrEntities){
 
         Set<String> uuids = new HashSet<>();
@@ -59,6 +67,11 @@ public class UserService {
     }
 
 
+    /**
+     * Creates or updates the user based on if the user exists. The user existance is searched based on userName = mobileNumber
+     * If the there is already a user with that mobileNumber, the existing user is updated
+     * @param request
+     */
     private void upsertUser(ServiceRequest request){
 
         User user = request.getPgrEntity().getService().getCitizen();
@@ -83,6 +96,10 @@ public class UserService {
     }
 
 
+    /**
+     * Calls user search to fetch a user and enriches it in request
+     * @param request
+     */
     private void enrichUser(ServiceRequest request){
 
         RequestInfo requestInfo = request.getRequestInfo();
@@ -98,7 +115,13 @@ public class UserService {
 
     }
 
-
+    /**
+     * Creates the user from the given userInfo by calling user service
+     * @param requestInfo
+     * @param tenantId
+     * @param userInfo
+     * @return
+     */
     private User createUser(RequestInfo requestInfo,String tenantId, User userInfo) {
 
         userUtils.addUserDefaultFields(userInfo.getMobileNumber(),tenantId, userInfo);
@@ -113,6 +136,13 @@ public class UserService {
 
     }
 
+    /**
+     * Updates the given user by calling user service
+     * @param requestInfo
+     * @param user
+     * @param userFromSearch
+     * @return
+     */
     private User updateUser(RequestInfo requestInfo,User user,User userFromSearch) {
 
         userFromSearch.setName(user.getName());
@@ -129,6 +159,13 @@ public class UserService {
 
     }
 
+    /**
+     * calls the user search API based on the given accountId and userName
+     * @param stateLevelTenant
+     * @param accountId
+     * @param userName
+     * @return
+     */
     private UserDetailResponse searchUser(String stateLevelTenant, String accountId, String userName){
 
         UserSearchRequest userSearchRequest =new UserSearchRequest();
@@ -150,7 +187,11 @@ public class UserService {
 
     }
 
-
+    /**
+     * calls the user search API based on the given list of user uuids
+     * @param uuids
+     * @return
+     */
     private Map<String,User> searchBulkUser(List<String> uuids){
 
         UserSearchRequest userSearchRequest =new UserSearchRequest();
@@ -174,7 +215,11 @@ public class UserService {
         return idToUserMap;
     }
 
-
+    /**
+     * Enriches the list of userUuids associated with the mobileNumber in the search criteria
+     * @param tenantId
+     * @param criteria
+     */
     public void enrichUserIds(String tenantId, RequestSearchCriteria criteria){
 
         String mobileNumber = criteria.getMobileNumber();

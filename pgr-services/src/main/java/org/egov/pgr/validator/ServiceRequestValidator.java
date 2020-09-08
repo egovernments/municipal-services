@@ -37,6 +37,11 @@ public class ServiceRequestValidator {
     }
 
 
+    /**
+     * Validates the create request
+     * @param request Request for creating the complaint
+     * @param mdmsData The master data for pgr
+     */
     public void validateCreate(ServiceRequest request, Object mdmsData){
         Map<String,String> errorMap = new HashMap<>();
         validateUserData(request,errorMap);
@@ -47,7 +52,11 @@ public class ServiceRequestValidator {
     }
 
 
-
+    /**
+     * Validates if the update request is valid
+     * @param request The request to update complaint
+     * @param mdmsData The master data for pgr
+     */
     public void validateUpdate(ServiceRequest request, Object mdmsData){
 
         String id = request.getPgrEntity().getService().getId();
@@ -64,6 +73,11 @@ public class ServiceRequestValidator {
 
     }
 
+    /**
+     * Validates the user related data in the complaint
+     * @param request The request of creating/updating complaint
+     * @param errorMap HashMap to capture any errors
+     */
     private void validateUserData(ServiceRequest request,Map<String, String> errorMap){
 
         RequestInfo requestInfo = request.getRequestInfo();
@@ -90,6 +104,11 @@ public class ServiceRequestValidator {
     }
 
 
+    /**
+     * Validated the master data sent in the request
+     * @param request The request of creating/updating complaint
+     * @param mdmsData The master data for pgr
+     */
     private void validateMDMS(ServiceRequest request, Object mdmsData){
 
         String serviceCode = request.getPgrEntity().getService().getServiceCode();
@@ -112,6 +131,11 @@ public class ServiceRequestValidator {
     }
 
 
+    /**
+     *
+     * @param request
+     * @param mdmsData
+     */
     private void validateDepartment(ServiceRequest request, Object mdmsData){
 
         String tenantId = request.getPgrEntity().getService().getTenantId();
@@ -152,6 +176,10 @@ public class ServiceRequestValidator {
     }
 
 
+    /**
+     *
+     * @param request
+     */
     private void validateReOpen(ServiceRequest request){
 
         if(!request.getPgrEntity().getWorkflow().getAction().equalsIgnoreCase(PGR_WF_REOPEN))
@@ -173,7 +201,10 @@ public class ServiceRequestValidator {
     }
 
 
-
+    /**
+     *
+     * @param criteria
+     */
     public void validateSearch(RequestSearchCriteria criteria){
 
         if( (criteria.getMobileNumber()!=null 

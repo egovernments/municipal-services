@@ -57,9 +57,11 @@ public class PGRService {
     }
 
 
-
-
-
+    /**
+     * Creates a complaint in the system
+     * @param request The service request containg the complaint information
+     * @return
+     */
     public PGREntity create(ServiceRequest request){
         Object mdmsData = mdmsUtils.mDMSCall(request);
         validator.validateCreate(request, mdmsData);
@@ -71,6 +73,12 @@ public class PGRService {
     }
 
 
+    /**
+     * Searches the complaints in the system based on the given criteria
+     * @param requestInfo The requestInfo of the search call
+     * @param criteria The search criteria containg the params on which to search
+     * @return
+     */
     public List<PGREntity> search(RequestInfo requestInfo, RequestSearchCriteria criteria){
         validator.validateSearch(criteria);
 
@@ -90,6 +98,11 @@ public class PGRService {
     }
 
 
+    /**
+     * Updates the complaint (used to forward the complaint from one application status to another)
+     * @param request The request containing the complaint to be updated
+     * @return
+     */
     public PGREntity update(ServiceRequest request){
         Object mdmsData = mdmsUtils.mDMSCall(request);
         validator.validateUpdate(request, mdmsData);
@@ -100,6 +113,12 @@ public class PGRService {
         return request.getPgrEntity();
     }
 
+    /**
+     * Returns the total number of comaplaints matching the given criteria
+     * @param requestInfo The requestInfo of the search call
+     * @param criteria The search criteria containg the params for which count is required
+     * @return
+     */
     public Integer count(RequestInfo requestInfo, RequestSearchCriteria criteria){
         Integer count = repository.getCount(criteria);
         return count;
