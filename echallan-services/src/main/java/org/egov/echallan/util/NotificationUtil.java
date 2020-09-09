@@ -29,6 +29,9 @@ public class NotificationUtil {
 	public static final String BUSINESSSERVICELOCALIZATION_CODE_PREFIX = "BILLINGSERVICE_BUSINESSSERVICE_";
 	public static final String LOCALIZATION_CODES_JSONPATH = "$.messages[0].code";
 	public static final String LOCALIZATION_MSGS_JSONPATH = "$.messages[0].message";
+	private static final String CREATE_CODE = "echallan.create.sms";
+	private static final String UPDATE_CODE = "echallan.update.sms";
+
 	private ChallanConfiguration config;
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -47,11 +50,18 @@ public class NotificationUtil {
 	public String getCustomizedMsg(RequestInfo requestInfo, Challan challan, String localizationMessage) {
 		String message = null, messageTemplate;
 		
-		
-		messageTemplate = getMessageTemplate("echallan.create.sms", localizationMessage);
+		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CREATE_CODE);
 		message = getCreateMsg(requestInfo,challan, messageTemplate);
 		
 
+		return message;
+	}
+	
+	
+	public String getCustomizedMsgForUpdate(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+		String message = null, messageTemplate;
+		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,UPDATE_CODE);
+		message = getCreateMsg(requestInfo,challan, messageTemplate);
 		return message;
 	}
 

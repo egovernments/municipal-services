@@ -93,6 +93,15 @@ public class ChallanService {
 	        challans = enrichmentService.enrichChallanSearch(challans,criteria,requestInfo);
 	        return challans;
 	    }
+	 
+	 public Challan update(ChallanRequest request) {
+		 	validator.validateFields(request);
+			//enrichmentService.enrichCreateRequest(request);
+			userService.createUser(request);
+			calculationService.addCalculation(request);
+			repository.update(request);
+			return request.getChallan();
+		}
 
 	
 }

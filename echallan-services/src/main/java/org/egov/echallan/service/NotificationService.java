@@ -57,7 +57,7 @@ public class NotificationService {
 		this.producer = producer;
 	}
 	
-	public void sendChallanNotification(ChallanRequest challanRequest) {
+	public void sendChallanNotification(ChallanRequest challanRequest,boolean isSave) {
 		if(null != config.getIsSMSEnabled()) {
 			if(config.getIsSMSEnabled()) {
 				String message = null;
@@ -68,7 +68,10 @@ public class NotificationService {
 						if (businessServiceAllowed.contains(challan.getBusinessService())) {
 							String mobilenumber = challan.getCitizen().getMobileNumber();
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
-							message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
+							if(isSave)
+								message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
+							else
+								message = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
 							if (!StringUtils.isEmpty(message)) {
 								Map<String, Object> request = new HashMap<>();
 								request.put("mobileNumber", mobilenumber);

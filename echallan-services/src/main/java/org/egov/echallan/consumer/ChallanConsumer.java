@@ -3,6 +3,7 @@ package org.egov.echallan.consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
+import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,15 @@ public class ChallanConsumer {
 
     private NotificationService notificationService;
 
-
+    private ChallanConfiguration config;
+    
     @Autowired
-    public ChallanConsumer(NotificationService notificationService) {
+    public ChallanConsumer(NotificationService notificationService,ChallanConfiguration config) {
         this.notificationService = notificationService;
+        this.config = config;
     }
 
-    @KafkaListener(topics = {"${persister.save.challan.topic}"})
+    @KafkaListener(topics = {"${persister.save.challan.topic}","${persister.update.challan.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         ObjectMapper mapper = new ObjectMapper();
         ChallanRequest challanRequest = new ChallanRequest();
@@ -35,6 +38,10 @@ public class ChallanConsumer {
         } catch (final Exception e) {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }
-        notificationService.sendChallanNotification(challanRequest);
+        if(topic.equalsIgnoreCase(config.getSaveChallanTopic()))
+        	notificationService.sendChallanNotification(challanRequest,true);
+        else if(topic.equalsIgnoreCase(config.getUpdateChallanTopic()))
+            notificationService.sendChallanNotification(challanRequest,false);
+
     }
 }

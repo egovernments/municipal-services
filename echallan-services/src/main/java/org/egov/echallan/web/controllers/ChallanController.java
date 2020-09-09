@@ -56,6 +56,15 @@ public class ChallanController {
 	     return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	 @PostMapping("/_update")
+	 public ResponseEntity<ChallanResponse> update(@Valid @RequestBody ChallanRequest challanRequest) {
+		Challan challan = challanService.update(challanRequest);
+		ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(challanRequest.getRequestInfo(), true);
+		ChallanResponse response = ChallanResponse.builder().challans(Arrays.asList(challan))
+				.responseInfo(resInfo)
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 	
 
 }

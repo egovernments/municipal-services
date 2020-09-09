@@ -56,6 +56,16 @@ public class ChallanRepository {
         producer.push(config.getSaveChallanTopic(), challanRequest);
     }
     
+    /**
+     * Pushes the request on update topic
+     *
+     * @param ChallanRequest The challan create request
+     */
+    public void update(ChallanRequest challanRequest) {
+    	
+        producer.push(config.getUpdateChallanTopic(), challanRequest);
+    }
+    
     
     public List<Challan> getChallans(SearchCriteria criteria) {
         List<Object> preparedStmtList = new ArrayList<>();
