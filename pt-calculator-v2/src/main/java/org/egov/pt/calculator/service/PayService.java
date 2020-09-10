@@ -59,7 +59,7 @@ public class PayService {
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;
 
-		if (rebate.equals(BigDecimal.ZERO)) {
+		if (rebate.compareTo(BigDecimal.ZERO)==0) {
 			penalty = getPenalty(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER));
 			interest = getInterest(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER),
 					payments,taxPeriod);
