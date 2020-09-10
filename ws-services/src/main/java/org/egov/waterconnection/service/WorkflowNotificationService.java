@@ -220,7 +220,7 @@ public class WorkflowNotificationService {
 			}
 			if (code.equalsIgnoreCase("DOWNLOAD RECEIPT")) {
 				String receiptNumber = getReceiptNumber(connectionRequest);
-				actionLink = config.getNotificationUrl() + config.getReceiptDownloadLink();
+				actionLink = config.getNotificationUrl() + config.getCitizenReceiptDownloadLink();
 				actionLink = actionLink.replace("$consumerCode", connectionRequest.getWaterConnection().getApplicationNo());
 				actionLink = actionLink.replace("$tenantId", property.getTenantId());
 				actionLink = actionLink.replace("$businessService", businessService);
@@ -230,11 +230,8 @@ public class WorkflowNotificationService {
 			if (code.equalsIgnoreCase("View History Link")) {
 				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
 				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
-				actionLink = actionLink.replace(applicationNumberReplacer,
-						connectionRequest.getWaterConnection().getApplicationNo());
+				actionLink = actionLink.replace(applicationNumberReplacer, connectionRequest.getWaterConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
-				actionLink = actionLink.replace("<View History Link>",
-						waterServiceUtil.getShortnerURL(actionLink));
 			}
 			if (code.equalsIgnoreCase("Connection Detail Page")) {
 				actionLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
