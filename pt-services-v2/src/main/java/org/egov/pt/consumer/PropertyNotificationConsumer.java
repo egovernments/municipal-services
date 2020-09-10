@@ -6,7 +6,6 @@ import org.egov.pt.service.NotificationService;
 import org.egov.pt.service.PaymentNotificationService;
 import org.egov.pt.web.models.PropertyRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -24,9 +23,6 @@ public class PropertyNotificationConsumer {
     @Autowired
     private PaymentNotificationService paymentNotificationService;
 
-    @Value("${update.notification.sms.enabled}")
-    private boolean isUpdateSmsEnabled;
-
     @KafkaListener(topics = {"${persister.update.property.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         ObjectMapper mapper = new ObjectMapper();
@@ -38,9 +34,7 @@ public class PropertyNotificationConsumer {
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
         }
         log.info("property Received: "+propertyRequest.getProperties().get(0).getPropertyId());
-        if(isUpdateSmsEnabled) {
-            notificationService.process(propertyRequest,topic);
-        }
+        notificationService.process(propertyRequest,topic);
     }
 
 
@@ -48,9 +42,5 @@ public class PropertyNotificationConsumer {
     public void listenPayments(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         paymentNotificationService.process(record,topic);
     }
-
-
-
-
 
 }

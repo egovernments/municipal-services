@@ -4,9 +4,14 @@ import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.ServiceRequestRepository;
+import org.egov.pt.util.ErrorConstants;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.web.models.*;
@@ -38,6 +43,15 @@ public class NotificationService {
     @Autowired
     private URLShorterService urlShorterService;
 
+    @Value("${update.notification.sms.enabled}")
+    private boolean isUpdateSmsEnabled;
+
+    @Value("${egov.mdms.host}")
+    private String mdmsHost;
+
+    @Value("${egov.mdms.search.endpoint}")
+    private String mdmsEndpoint;
+
     @Value("${notification.url}")
     private String notificationURL;
     
@@ -51,59 +65,70 @@ public class NotificationService {
      * Processes the json and send the SMSRequest
      * @param request The propertyRequest for which notification has to be send
      */
-    public void process(PropertyRequest request,String topic){
-        String tenantId = request.getProperties().get(0).getTenantId();
-        StringBuilder uri = util.getUri(tenantId,request.getRequestInfo()); 
-        StringBuilder tenantUri = util.getTenantUri(tenantId,request.getRequestInfo());
-        String tenantPath = "$..messages[?(@.code==\"{}\")].message";
+    public void process(PropertyRequest request, String topic) {
 
-        try{
-            String citizenMobileNumber = request.getRequestInfo().getUserInfo().getMobileNumber();
-            String path = getJsonPath(topic, request.getRequestInfo().getUserInfo().getType());
-            Object messageObj = null;
-            Object tenantObj = null;
-            try {
-                LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
-                String jsonString = new JSONObject(responseMap).toString();
-                messageObj = JsonPath.parse(jsonString).read(path);
-            }catch(Exception e) {
-            	throw new CustomException("LOCALIZATION ERROR","Unable to get message from localization");
-            }
-            try {
-                LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(tenantUri, request.getRequestInfo());
-                String jsonString = new JSONObject(responseMap).toString();
-                tenantObj = JsonPath.parse(jsonString).read(tenantPath.replace("{}", "TENANT_TENANTS_"+tenantId.replace(".", "_").toUpperCase()));
-            }catch(Exception e) {
-            	throw new CustomException("LOCALIZATION ERROR","Unable to get message from localization");
-            }
-            String tenantMessage = ((ArrayList<String>)tenantObj).get(0);
-            String message = ((ArrayList<String>)messageObj).get(0).replace("<ulbname>", tenantMessage);           
-            List<Event> events = new ArrayList<>();
-            request.getProperties().forEach(property -> {
-                String customMessage = getCustomizedMessage(property,message,path);
-                Set<String> listOfMobileNumber = getMobileNumbers(property);
-                if(request.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-                    listOfMobileNumber.add(citizenMobileNumber);
-                List<SMSRequest> smsRequests = getSMSRequests(listOfMobileNumber,customMessage);
-                if(null == propertyConfiguration.getIsUserEventsNotificationEnabled())
-                	propertyConfiguration.setIsUserEventsNotificationEnabled(true);
-                if(propertyConfiguration.getIsUserEventsNotificationEnabled()) {
-                	List<Event> eventsForAProperty = getEvents(listOfMobileNumber, customMessage, request, false);
-                	if(!CollectionUtils.isEmpty(eventsForAProperty)) {
-                        events.addAll(eventsForAProperty);
-                	}
+
+        try {
+            if (isUpdateSmsEnabled) {
+                List<List<String>> tenants = getUpdateSmsEnabledCities();
+                if (tenants.get(0).contains(request.getProperties().get(0).getTenantId())) {
+
+                    String tenantId = request.getProperties().get(0).getTenantId();
+                    StringBuilder uri = util.getUri(tenantId, request.getRequestInfo());
+                    StringBuilder tenantUri = util.getTenantUri(tenantId, request.getRequestInfo());
+                    String tenantPath = "$..messages[?(@.code==\"{}\")].message";            
+
+                    String citizenMobileNumber = request.getRequestInfo().getUserInfo().getMobileNumber();
+                    String path = getJsonPath(topic, request.getRequestInfo().getUserInfo().getType());
+                    Object messageObj = null;
+                    Object tenantObj = null;
+                    try {
+                        LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+                                request.getRequestInfo());
+                        String jsonString = new JSONObject(responseMap).toString();
+                        messageObj = JsonPath.parse(jsonString).read(path);
+                    } catch (Exception e) {
+                        throw new CustomException("LOCALIZATION ERROR", "Unable to get message from localization");
+                    }
+                    try {
+                        LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(tenantUri,
+                                request.getRequestInfo());
+                        String jsonString = new JSONObject(responseMap).toString();
+                        tenantObj = JsonPath.parse(jsonString).read(
+                                tenantPath.replace("{}", "TENANT_TENANTS_" + tenantId.replace(".", "_").toUpperCase()));
+                    } catch (Exception e) {
+                        throw new CustomException("LOCALIZATION ERROR", "Unable to get message from localization");
+                    }
+                    String tenantMessage = ((ArrayList<String>) tenantObj).get(0);
+                    String message = ((ArrayList<String>) messageObj).get(0).replace("<ulbname>", tenantMessage);
+                    List<Event> events = new ArrayList<>();
+                    request.getProperties().forEach(property -> {
+                        String customMessage = getCustomizedMessage(property, message, path);
+                        Set<String> listOfMobileNumber = getMobileNumbers(property);
+                        if (request.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
+                            listOfMobileNumber.add(citizenMobileNumber);
+                        List<SMSRequest> smsRequests = getSMSRequests(listOfMobileNumber, customMessage);
+                        if (null == propertyConfiguration.getIsUserEventsNotificationEnabled())
+                            propertyConfiguration.setIsUserEventsNotificationEnabled(true);
+                        if (propertyConfiguration.getIsUserEventsNotificationEnabled()) {
+                            List<Event> eventsForAProperty = getEvents(listOfMobileNumber, customMessage, request,
+                                    false);
+                            if (!CollectionUtils.isEmpty(eventsForAProperty)) {
+                                events.addAll(eventsForAProperty);
+                            }
+                        }
+                        sendSMS(smsRequests);
+                    });
+                    if (!CollectionUtils.isEmpty(events)) {
+                        EventRequest eventReq = EventRequest.builder().requestInfo(request.getRequestInfo())
+                                .events(events).build();
+                        sendEventNotification(eventReq);
+                    }
                 }
-                sendSMS(smsRequests);
-             });
-            if(!CollectionUtils.isEmpty(events)) {
-                EventRequest eventReq = EventRequest.builder().requestInfo(request.getRequestInfo()).events(events).build();
-                sendEventNotification(eventReq);
             }
-
-        }
-        catch(Exception e){
-        	log.error("There was an error while processing notifications: ",e);
-        	throw new CustomException("ERROR_PROCESSING_NOTIFS","There was an error while processing notifications.");
+        } catch (Exception e) {
+            log.error("There was an error while processing notifications: ", e);
+            throw new CustomException("ERROR_PROCESSING_NOTIFS", "There was an error while processing notifications.");
         }
     }
 
@@ -376,7 +401,23 @@ public class NotificationService {
         }
     }
 
+    private List<List<String>> getUpdateSmsEnabledCities() {
+        StringBuilder uri = new StringBuilder(mdmsHost).append(mdmsEndpoint);
+        List<MasterDetail> masterDetails = new ArrayList<>();
+        masterDetails.add(MasterDetail.builder().name("citywiseconfig").build());
+        List<ModuleDetail> moduleDetails = new ArrayList<>();
+        moduleDetails.add(ModuleDetail.builder().moduleName("tenant").masterDetails(masterDetails).build());
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().tenantId("uk").moduleDetails(moduleDetails).build();
+        MdmsCriteriaReq req = MdmsCriteriaReq.builder().requestInfo(new RequestInfo()).mdmsCriteria(mdmsCriteria).build();
 
-
+        try {
+            Object result = serviceRequestRepository.fetchResult(uri, req);
+            return JsonPath.read(result,"$.MdmsRes.tenant.citywiseconfig[?(@.config=='ptSendUpdateSMS')].enabledCities");
+        } catch (Exception e) {
+            log.error("Error while fetvhing MDMS data",e);
+            throw new CustomException(ErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
+                    ErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
+        }
+    }
 
 }
