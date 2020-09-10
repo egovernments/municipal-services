@@ -57,7 +57,7 @@ public class OwnerInfo extends User {
 	private Status status;
 
 	@JsonProperty("documents")
-	@Valid
+//	@Valid
 	private List<Document> documents;
 
 	@JsonProperty("relationship")
