@@ -177,4 +177,10 @@ public class SWConfiguration {
 
 	@Value("${egov.collectiom.payment.search}")
 	private String paymentSearch;
+
+	@Value("${egov.usr.events.download.receipt.link}")
+	private String userEventReceiptDownloadLink;
+
+	@Value("${egov.usr.events.pay.link}")
+	private String userEventApplicationPayLink;
 }
