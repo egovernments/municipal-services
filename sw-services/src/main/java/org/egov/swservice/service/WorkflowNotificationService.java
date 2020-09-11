@@ -216,16 +216,19 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
 			if (code.equalsIgnoreCase("PAY NOW")) {
-				actionLink = config.getNotificationUrl() + config.getApplicationPayLink();
+				actionLink = config.getNotificationUrl() + config.getUserEventApplicationPayLink();
 				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
 				actionLink = actionLink.replace(consumerCodeReplacer, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
 			if (code.equalsIgnoreCase("DOWNLOAD RECEIPT")) {
-				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
-				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
-				actionLink = actionLink.replace(applicationNumberReplacer, sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
-				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
+				String receiptNumber = getReceiptNumber(sewerageConnectionRequest);
+				actionLink = config.getNotificationUrl() + config.getUserEventReceiptDownloadLink();
+				actionLink = actionLink.replace("$consumerCode", sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
+				actionLink = actionLink.replace("$tenantId", property.getTenantId());
+				actionLink = actionLink.replace("$businessService", businessService);
+				actionLink = actionLink.replace("$receiptNumber", receiptNumber);
+				actionLink = actionLink.replace("$mobile", mobileNumber);
 			}
 			if (code.equalsIgnoreCase("View History Link")) {
 				actionLink = config.getNotificationUrl() + config.getViewHistoryLink();
@@ -233,8 +236,12 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(applicationNumberReplacer,
 						sewerageConnectionRequest.getSewerageConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
-				actionLink = actionLink.replace("<View History Link>",
-						sewerageServicesUtil.getShortenedURL(actionLink));
+			}
+			if (code.equalsIgnoreCase("Connection Detail Page")) {
+				actionLink = config.getNotificationUrl() + config.getConnectionDetailsLink();
+				actionLink = actionLink.replace(connectionNoReplacer, sewerageConnectionRequest.getSewerageConnection().getConnectionNo());
+				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
+				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
 			}
 			ActionItem item = ActionItem.builder().actionUrl(actionLink).code(code).build();
 			items.add(item);

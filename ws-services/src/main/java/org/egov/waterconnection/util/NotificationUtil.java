@@ -164,6 +164,7 @@ public class NotificationUtil {
 	 * @param request EventRequest Object
 	 */
 	public void sendEventNotification(EventRequest request) {
+		log.info("Event: " + request.toString());
 		producer.push(config.getSaveUserEventsTopic(), request);
 	}
 	
