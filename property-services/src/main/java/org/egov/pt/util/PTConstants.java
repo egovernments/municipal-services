@@ -302,5 +302,10 @@ public class PTConstants {
 
     public static final String KEY_PDF_DOCUMENTTYPE = "documentType";
 
+    public static final String PT_CORRECTION_PENDING = "CORRECTIONPENDING";
+
+    public static final String ASMT_USER_EVENT_PAY = "pay";
+
+    public static final String VIEW_APPLICATION_CODE = "View Application";
 }
 

@@ -1,13 +1,6 @@
 package org.egov.pt.util;
 
 
-import static org.egov.pt.util.PTConstants.NOTIFICATION_LOCALE;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_MODULENAME;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_OWNERNAME;
-import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_NAME;
-import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_POSTEDBY;
-import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_TYPE;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,10 +13,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.models.event.Event;
-import org.egov.pt.models.event.EventRequest;
-import org.egov.pt.models.event.Recepient;
-import org.egov.pt.models.event.Source;
+import org.egov.pt.models.Property;
+import org.egov.pt.models.event.*;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.SMSRequest;
@@ -37,6 +28,8 @@ import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+
+import static org.egov.pt.util.PTConstants.*;
 
 @Slf4j
 @Component
@@ -256,7 +249,7 @@ public class NotificationUtil {
     * @param smsRequests
     * @param events
     */
-   public List<Event> enrichEvent(List<SMSRequest> smsRequests, RequestInfo requestInfo, String tenantId){
+   public List<Event> enrichEvent(List<SMSRequest> smsRequests, RequestInfo requestInfo, String tenantId, Property property, Boolean isActionReq){
 
 		List<Event> events = new ArrayList<>();
        Set<String> mobileNumbers = smsRequests.stream().map(SMSRequest :: getMobileNumber).collect(Collectors.toSet());
@@ -271,10 +264,43 @@ public class NotificationUtil {
            List<String> toUsers = new ArrayList<>();
            toUsers.add(mapOfPhnoAndUUIDs.get(mobileNumber));
            Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
+
+           Action action = null;
+           if(isActionReq){
+               List<ActionItem> items = new ArrayList<>();
+               String msg = smsRequests.get(0).getMessage();
+               String actionLink = "";
+               if(msg.contains(PT_CORRECTION_PENDING)){
+                   actionLink = config.getUserEventViewPropertyLink().replace("$mobileNo", mobileNumber)
+                           .replace("$tenantId", tenantId)
+                           .replace("$propertyId" , property.getPropertyId())
+                           .replace("$applicationNumber" , property.getAcknowldgementNumber());
+
+                   actionLink = config.getUiAppHost() + actionLink;
+                   ActionItem item = ActionItem.builder().actionUrl(actionLink).code(VIEW_APPLICATION_CODE).build();
+                   items.add(item);
+               }
+
+               if(msg.contains(ASMT_USER_EVENT_PAY)){
+                   actionLink = config.getPayLink().replace("$mobile", mobileNumber)
+                           .replace("$consumerCode", property.getPropertyId())
+                           .replace("$tenantId", property.getTenantId())
+                           .replace("$businessService" , PT_BUSINESSSERVICE);
+
+                   actionLink = config.getUiAppHost() + actionLink;
+                   ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
+                   items.add(item);
+               }
+
+
+               action = Action.builder().actionUrls(items).build();
+
+           }
            events.add(Event.builder().tenantId(tenantId).description(mobileNumberToMsg.get(mobileNumber))
                    .eventType(USREVENTS_EVENT_TYPE).name(USREVENTS_EVENT_NAME)
                    .postedBy(USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
-                   .eventDetails(null).build());
+                   .eventDetails(null).actions(action).build());
+
 		});
 		return events;
 	}
