@@ -213,14 +213,14 @@ public class WorkflowNotificationService {
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
 			if (code.equalsIgnoreCase("PAY NOW")) {
-				actionLink = config.getNotificationUrl() + config.getApplicationPayLink();
+				actionLink = config.getNotificationUrl() + config.getUserEventApplicationPayLink();
 				actionLink = actionLink.replace(mobileNoReplacer, mobileNumber);
 				actionLink = actionLink.replace(consumerCodeReplacer, connectionRequest.getWaterConnection().getApplicationNo());
 				actionLink = actionLink.replace(tenantIdReplacer, property.getTenantId());
 			}
 			if (code.equalsIgnoreCase("DOWNLOAD RECEIPT")) {
 				String receiptNumber = getReceiptNumber(connectionRequest);
-				actionLink = config.getNotificationUrl() + config.getCitizenReceiptDownloadLink();
+				actionLink = config.getNotificationUrl() + config.getUserEventReceiptDownloadLink();
 				actionLink = actionLink.replace("$consumerCode", connectionRequest.getWaterConnection().getApplicationNo());
 				actionLink = actionLink.replace("$tenantId", property.getTenantId());
 				actionLink = actionLink.replace("$businessService", businessService);

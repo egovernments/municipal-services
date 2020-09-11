@@ -149,8 +149,11 @@ public class WSConfiguration {
 	@Value("${egov.msg.download.receipt.link}")
 	private String receiptDownloadLink;
 
-	@Value("${egov.otp.msg.download.receipt.link}")
-	private String citizenReceiptDownloadLink;
+	@Value("${egov.usr.events.download.receipt.link}")
+	private String userEventReceiptDownloadLink;
+
+	@Value("${egov.usr.events.pay.link}")
+	private String userEventApplicationPayLink;
     
     @Value("${egov.ws.estimate.endpoint}")
     private String estimationEndpoint;
