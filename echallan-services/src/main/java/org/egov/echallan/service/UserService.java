@@ -108,6 +108,7 @@ public class UserService {
 	        owner.setCreatedDate(System.currentTimeMillis());
 	        owner.setLastModifiedDate(System.currentTimeMillis());
 	        owner.setActive(userDetailResponse.getUser().get(0).getActive());
+	        owner.setName(userDetailResponse.getUser().get(0).getName());
 	    } 
 	 
 	 private void addUserDefaultFields(String tenantId,Role role, UserInfo userInfo){
