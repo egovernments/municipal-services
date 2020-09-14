@@ -124,6 +124,9 @@ public class PropertyConfiguration {
     
     @Value("${egov.notif.view.property}")
     private String viewPropertyLink;
+
+    @Value("${egov.usr.events.view.history.link}")
+    private String userEventViewPropertyLink;
     
     @Value("${egov.notif.view.mutation}")
     private String viewMutationLink;
