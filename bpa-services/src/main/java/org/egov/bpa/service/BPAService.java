@@ -384,7 +384,7 @@ public class BPAService {
 
 		List<BPA> searchResult = getBPAWithBPAId(bpaRequest);
 		if (CollectionUtils.isEmpty(searchResult) || searchResult.size() > 1) {
-			throw new CustomException(BPAErrorConstants.UPDATE_ERROR, "Failed to Update the Application, Found None or multiple applications!");
+			throw new CustomException(BPAErrorConstants.UPDATE_ERROR, "Failed to Update the Application");
 		}
 		
 		
@@ -548,7 +548,7 @@ public class BPAService {
 					document.close();
 				}
 			} catch (Exception ex) {
-				throw new CustomException(BPAErrorConstants.INVALID_FILE, "unable to close this file");
+				throw new CustomException(BPAErrorConstants.INVALID_FILE, "UNABLE CLOSE THE FILE");
 			}
 		}
 	}

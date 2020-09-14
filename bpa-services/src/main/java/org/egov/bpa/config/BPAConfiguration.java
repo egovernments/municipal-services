@@ -309,8 +309,8 @@ public class BPAConfiguration {
 	private String statusinprogress;
 	
 
-	@Value("#{${nocSourceConfig}}")
-	private Map<String,String> nocSourceConfig;
+	@Value("#{${nocSourceCnofig}}")
+	private Map<String,String> nocSourceCnofig;
 
 	@Value("#{${workflowStatusFeeBusinessSrvMap}}")
 	private Map<String,Map<String,String>> workflowStatusFeeBusinessSrvMap;

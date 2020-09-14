@@ -61,7 +61,7 @@ public class NocService {
 				.replace("{1}", edcrResponse.get(BPAConstants.APPLICATIONTYPE))
 				.replace("{2}", edcrResponse.get(BPAConstants.SERVICETYPE)).replace("{3}", riskType);
 		
-		Map<String,String> nocSourceCnofig = config.getNocSourceConfig();
+		Map<String,String> nocSourceCnofig = config.getNocSourceCnofig();
 
 		List<Object> nocMappingResponse = (List<Object>) JsonPath.read(mdmsData, nocPath);
 		List<String> nocTypes = JsonPath.read(nocMappingResponse, "$..type");

@@ -96,6 +96,7 @@ public class OCService {
 			String tenantId = criteria.getTenantId();
 			MdmsCriteriaReq mdmsCriteriaReq = util.getMDMSRequest(requestInfo, tenantId);
 			Object result = serviceRequestRepository.fetchResult(util.getMdmsSearchUrl(), mdmsCriteriaReq);
+			System.out.println(result);
 
 			ArrayList OcData = new ArrayList();
 			OcData.add(JsonPath.read(result, "$.MdmsRes.BPA.RiskTypeComputation"));
