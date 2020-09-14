@@ -392,6 +392,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			throw new CustomException("PARSING ERROR", "The propertyAdditionalDetail json cannot be parsed");
 		}
 
+		if(propertyAdditionalDetails.isEmpty())
+			propertyAdditionalDetails = null;
+		
 		return propertyAdditionalDetails;
 
 	}

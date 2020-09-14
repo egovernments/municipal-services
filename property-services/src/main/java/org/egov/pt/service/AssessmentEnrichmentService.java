@@ -132,6 +132,8 @@ public class AssessmentEnrichmentService {
      */
     public void enrichAssessmentProcessInstance(AssessmentRequest request, Property property){
 
+    	Assessment assessment = request.getAssessment();
+    	
         if(request.getAssessment().getWorkflow().getAction().equalsIgnoreCase(WORKFLOW_SENDBACK_CITIZEN)){
 
            List<User> owners = assessmentUtils.getUserForWorkflow(property);
@@ -139,7 +141,7 @@ public class AssessmentEnrichmentService {
            request.getAssessment().getWorkflow().setAssignes(owners);
         }
 
-        State state = workflowService.getCurrentState(request.getRequestInfo(), request.getAssessment());
+        State state = workflowService.getCurrentState(request.getRequestInfo(), assessment.getTenantId(), assessment.getAssessmentNumber());
 
         ProcessInstance processInstance = request.getAssessment().getWorkflow();
         processInstance.setBusinessId(request.getAssessment().getAssessmentNumber());
