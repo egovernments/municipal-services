@@ -58,7 +58,9 @@ public class PGRConstants {
 
     public static final String NOTIFICATION_LOCALE = "en_IN";
 
-    public static final String MODULE = "rainmaker-pgr";
+    public static final String PGR_MODULE = "rainmaker-pgr";
+
+    public static final String COMMON_MODULE = "rainmaker-common";
 
     public static final String DATE_PATTERN = "dd/MM/yyyy";
 
