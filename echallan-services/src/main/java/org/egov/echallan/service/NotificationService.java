@@ -88,7 +88,7 @@ public class NotificationService {
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
 							if(isSave)
 								message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
-							else
+							else if(challan.getApplicationStatus().equalsIgnoreCase("ACTIVE"))
 								message = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
 							if (!StringUtils.isEmpty(message)) {
 								Map<String, Object> request = new HashMap<>();
@@ -129,9 +129,10 @@ public class NotificationService {
 		String message="";
 		if(isSave)
 			message = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
-		else
+		else if(challan.getApplicationStatus().equalsIgnoreCase("ACTIVE"))
 			message = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
-			
+		else
+			return null;
         Map<String,String > mobileNumberToOwner = new HashMap<>();
         String mobile = challan.getCitizen().getMobileNumber();
         if(mobile!=null)
