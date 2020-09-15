@@ -18,18 +18,11 @@ To setup the rainmaker-pgr in your local system, clone the [Muncipal Service rep
 To run the rainmaker-pgr locally, you need to port forward below services locally
 
 ```bash
-
-Clone the Repo https://github.com/egovernments/core-services/tree/master/egov-mdms-service
-`kubectl -n egov port-forward <egov-mdms-service pod id> 8094:8080`
-
-
-Clone the Repo https://github.com/egovernments/core-services/tree/master/egov-localization
-`kubectl -n egov port-forward <egov-localisation pod id> 8087:8080` 
-
-
-Clone the Repo https://github.com/egovernments/core-services/tree/master/egov-persister
-`kubectl -n egov port-forward <egov-persister pod id> 8082:8080` 
-
+function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
+kubectl port-forward -n egov $(kgpt egov-mdms-service) 8081:8080
+kubectl port-forward -n egov $(kgpt egov-localization) 8082:8080
+kubectl port-forward -n egov $(kgpt egov-persister) 8083:8080
+```
 
 To run the th-services locally, update below listed properties in `application.properties` prior to running the project:
 
@@ -45,6 +38,4 @@ reassign.complaint.enabled : Key to nable notifications on re-assign.
 reopen.complaint.enabled : Key to enable notifications on re-open.
 comment.by.employee.notif.enabled : Key to enable notifications on comment.
 notification.allowed.on.status : Fallback locale incase the client doesn’t send the locale.
-
 ```
-
