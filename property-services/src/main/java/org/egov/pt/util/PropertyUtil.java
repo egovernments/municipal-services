@@ -136,6 +136,14 @@ public class PropertyUtil extends CommonUtils {
 			wf.setModuleName(configs.getPropertyModuleName());
 			wf.setAction("OPEN");
 			break;
+			
+		case LEGACY_ENTRY :
+			
+			wf.setBusinessService(configs.getLegacyPTWfName());
+			wf.setModuleName(configs.getPropertyModuleName());
+			wf.setAction("OPEN");
+			break;
+			
 
 		case UPDATE :
 			break;

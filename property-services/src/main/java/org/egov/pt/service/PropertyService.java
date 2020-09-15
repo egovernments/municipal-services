@@ -78,8 +78,15 @@ public class PropertyService {
 		propertyValidator.validateCreateRequest(request);
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);
-		if (config.getIsWorkflowEnabled())
-			wfService.updateWorkflow(request, CreationReason.CREATE);
+		if (config.getIsWorkflowEnabled()
+				&& !request.getProperty().getCreationReason().equals(CreationReason.DATA_UPLOAD)) {
+			wfService.updateWorkflow(request, request.getProperty().getCreationReason());
+
+		} else {
+
+			request.getProperty().setStatus(Status.ACTIVE);
+		}
+
 		producer.push(config.getSavePropertyTopic(), request);
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
@@ -121,7 +128,9 @@ public class PropertyService {
 	private void processPropertyUpdate(PropertyRequest request, Property propertyFromSearch) {
 		
 		propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
+		userService.createUser(request);
 		request.getProperty().setOwners(propertyFromSearch.getOwners());
+		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		
 		PropertyRequest OldPropertyRequest = PropertyRequest.builder()

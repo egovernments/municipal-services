@@ -116,6 +116,8 @@ public class PTConstants {
 
     public static final List<String> FIELDS_FOR_PROPERTY_MUTATION = Collections.unmodifiableList(Arrays.asList("propertyType","usageCategory","ownershipCategory","noOfFloors","landArea"));
 
+    public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";
+    
     public static final String WORKFLOW_START_ACTION = "INITIATE";
 
     public static final String ASMT_WORKFLOW_CODE = "ASMT";
