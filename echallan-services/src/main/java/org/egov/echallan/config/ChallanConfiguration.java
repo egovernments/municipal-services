@@ -173,4 +173,7 @@ public class ChallanConfiguration {
     @Value("${notification.sms.enabled}")
     private Boolean isSMSEnabled;
     
+    @Value("${egov.user.event.notification.enabled}")
+    private Boolean isUserEventEnabled;
+    
 }

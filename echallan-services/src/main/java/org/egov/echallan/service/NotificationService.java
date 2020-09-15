@@ -1,9 +1,13 @@
 package org.egov.echallan.service;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -11,7 +15,15 @@ import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.producer.Producer;
+import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.util.NotificationUtil;
+import org.egov.echallan.web.models.user.User;
+import org.egov.echallan.web.models.uservevents.Action;
+import org.egov.echallan.web.models.uservevents.ActionItem;
+import org.egov.echallan.web.models.uservevents.Event;
+import org.egov.echallan.web.models.uservevents.EventRequest;
+import org.egov.echallan.web.models.uservevents.Recepient;
+import org.egov.echallan.web.models.uservevents.Source;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -44,17 +56,23 @@ public class NotificationService {
 	
 	private Producer producer;
 	
+	 private ServiceRequestRepository serviceRequestRepository;
+	
 	private static final String BUSINESSSERVICE_MDMS_MODULE = "BillingService";
 	public static final String BUSINESSSERVICE_MDMS_MASTER = "BusinessService";
 	public static final String BUSINESSSERVICE_CODES_FILTER = "$.[?(@.type=='Adhoc')].code";
 	public static final String BUSINESSSERVICE_CODES_JSONPATH = "$.MdmsRes.BillingService.BusinessService";
+	public static final String  USREVENTS_EVENT_TYPE = "SYSTEMGENERATED";
+	public static final String  USREVENTS_EVENT_NAME = "Challan";
+	public static final String  USREVENTS_EVENT_POSTEDBY = "SYSTEM-CHALLAN";
 	
 	@Autowired
-	public NotificationService(ChallanConfiguration config,RestTemplate restTemplate,NotificationUtil util,Producer producer) {
+	public NotificationService(ChallanConfiguration config,RestTemplate restTemplate,NotificationUtil util,Producer producer,ServiceRequestRepository serviceRequestRepository) {
 		this.config = config;
 		this.restTemplate = restTemplate;
 		this.util = util;
 		this.producer = producer;
+		this.serviceRequestRepository = serviceRequestRepository;
 	}
 	
 	public void sendChallanNotification(ChallanRequest challanRequest,boolean isSave) {
@@ -88,8 +106,71 @@ public class NotificationService {
 					log.info("Business services to which notifs are to be sent, couldn't be retrieved! Notification will not be sent.");
 				}
 			}
+			
+			if(null != config.getIsUserEventEnabled()) {
+				if(config.getIsUserEventEnabled()) {
+					EventRequest eventRequest = getEventsForChallan(challanRequest,isSave);
+					System.out.println("eventRequest=="+eventRequest.getEvents().toString());
+					if(null != eventRequest)
+						sendEventNotification(eventRequest);
+				}
+			}
+			
 		}
 	}
+	
+	
+	
+	private EventRequest getEventsForChallan(ChallanRequest request,boolean isSave) {
+    	List<Event> events = new ArrayList<>();
+        String tenantId = request.getChallan().getTenantId();
+		String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
+		Challan challan = request.getChallan();
+		String message="";
+		if(isSave)
+			message = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
+		else
+			message = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
+			
+        Map<String,String > mobileNumberToOwner = new HashMap<>();
+        String mobile = challan.getCitizen().getMobileNumber();
+        if(mobile!=null)
+             mobileNumberToOwner.put(mobile,challan.getCitizen().getName());
+        
+        Map<String, String> mapOfPhnoAndUUIDs = fetchUserUUIDs(mobile, request.getRequestInfo(), request.getChallan().getTenantId());
+        if (CollectionUtils.isEmpty(mapOfPhnoAndUUIDs.keySet()))
+            return null;
+    		
+    	List<String> toUsers = new ArrayList<>();
+    	toUsers.add(mapOfPhnoAndUUIDs.get(mobile));
+    	Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
+    	List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
+    	Action action = null;
+    	if(payTriggerList.contains(challan.getApplicationStatus())) {
+           List<ActionItem> items = new ArrayList<>();
+           String actionLink = config.getPayLink().replace("$mobile", mobile)
+        						.replace("$applicationNo", challan.getChallanNo())
+        						.replace("$tenantId", challan.getTenantId())
+        						.replace("$businessService", challan.getBusinessService());
+           actionLink = config.getUiAppHost() + actionLink;
+           ActionItem item = ActionItem.builder().actionUrl(actionLink).code(config.getPayCode()).build();
+           items.add(item);
+           action = Action.builder().actionUrls(items).build();
+    	}
+    	events.add(Event.builder().tenantId(challan.getTenantId()).description(message)
+						.eventType(USREVENTS_EVENT_TYPE).name(USREVENTS_EVENT_NAME)
+						.postedBy(USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
+    					.eventDetails(null).actions(action).build());
+        if(!CollectionUtils.isEmpty(events)) {
+    		return EventRequest.builder().requestInfo(request.getRequestInfo()).events(events).build();
+        }else {
+        	return null;
+        }
+    	
+		
+    }
+	
+	
 	
 	private List<String> fetchBusinessServiceFromMDMS(RequestInfo requestInfo, String tenantId){
 		List<String> masterData = new ArrayList<>();
@@ -121,6 +202,37 @@ public class NotificationService {
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
 	
-
+	private Map<String, String> fetchUserUUIDs(String mobileNumber, RequestInfo requestInfo, String tenantId) {
+    	Map<String, String> mapOfPhnoAndUUIDs = new HashMap<>();
+    	StringBuilder uri = new StringBuilder();
+    	uri.append(config.getUserHost()).append(config.getUserSearchEndpoint());
+    	Map<String, Object> userSearchRequest = new HashMap<>();
+    	userSearchRequest.put("RequestInfo", requestInfo);
+		userSearchRequest.put("tenantId", tenantId);
+		userSearchRequest.put("userType", "CITIZEN");
+    	userSearchRequest.put("userName", mobileNumber);
+    	try {
+    		Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+    		if(null != user) {
+    			List<User> users = JsonPath.read(user, "$.user");
+    			if(users.size()!=0) {
+    			String uuid = JsonPath.read(user, "$.user[0].uuid");
+    			mapOfPhnoAndUUIDs.put(mobileNumber, uuid);
+    			}
+    		}else {
+        		log.error("Service returned null while fetching user for username - "+mobileNumber);
+    		}
+    	}catch(Exception e) {
+    		log.error("Exception while fetching user for username - "+mobileNumber);
+    		log.error("Exception trace: ",e);
+    	}
+    	return mapOfPhnoAndUUIDs;
+    }
 	
+	
+
+	public void sendEventNotification(EventRequest request) {
+		producer.push(config.getSaveUserEventsTopic(), request);
+	}
+
 }
