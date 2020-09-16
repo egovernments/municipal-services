@@ -22,6 +22,7 @@ import org.egov.pt.models.Unit;
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.workflow.ProcessInstance;
+import org.egov.pt.models.workflow.State;
 import org.egov.pt.service.DiffService;
 import org.egov.pt.service.PropertyService;
 import org.egov.pt.service.WorkflowService;
@@ -129,22 +130,31 @@ public class PropertyValidator {
 
 		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
 		
+		
+		Boolean isstateUpdatable =  false;
 		/*
 		 *  update and mutation open state are same currently
 		 *  
 		 *  creation reason will change for begining of a workflow 
 		 */
 		if (property.getWorkflow().getAction().equalsIgnoreCase(configs.getMutationOpenState())
-				&& propertyFromSearch.getStatus().equals(Status.ACTIVE))
+				&& propertyFromSearch.getStatus().equals(Status.ACTIVE)) {
 			fieldsUpdated.remove("creationReason");
+			isstateUpdatable = true;
+
+		} else {
+
+			State currentState = workflowService.getCurrentState(request.getRequestInfo(), property.getTenantId(),
+					property.getAcknowldgementNumber());
+			if (null == currentState)
+				throw new CustomException("EG_PT_WF_ERROR", "No entity found in workflow for the Application number : "
+						+ property.getAcknowldgementNumber());
+			isstateUpdatable = currentState.getIsStateUpdatable() ? currentState.getIsStateUpdatable() != null : false;
+		}
 
 		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch);
 		objectsAdded.removeAll(Arrays.asList("TextNode","Role", "LongNode", "JsonNodeFactory", "IntNode"));
-
-		Boolean isstateUpdatable = workflowService
-				.getCurrentState(request.getRequestInfo(), property.getTenantId(), property.getAcknowldgementNumber())
-				.getIsStateUpdatable();
-
+		
 		if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
 			throw new CustomException("EG_PT_WF_UPDATE_ERROR",
 					"The current state of workflow does not allow chnages to property");
