@@ -82,6 +82,7 @@ public class NotificationUtil {
 		Calendar tocal = Calendar.getInstance();
 		tocal.setTimeInMillis((long) challan.getTaxPeriodTo());
         message = message.replace("<citizen>",challan.getCitizen().getName());
+        message = message.replace("<challanno>", challan.getChallanNo());
         message = message.replace("<service>", service);
         message = message.replace("<fromdate>", " "+ fromcal.get(Calendar.DATE) + "/" + (fromcal.get(Calendar.MONTH)+1) + "/" + fromcal.get(Calendar.YEAR)+ " ".toUpperCase());
         message = message.replace("<todate>", " "+ tocal.get(Calendar.DATE) + "/" + (tocal.get(Calendar.MONTH)+1) + "/" + tocal.get(Calendar.YEAR)+ " ".toUpperCase());
