@@ -98,8 +98,7 @@ public class PaymentUpdateService {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) || 
-            paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService())) {
 					isServiceMatched = true;
 				}
 			}
@@ -186,8 +185,7 @@ public class PaymentUpdateService {
 			log.info("Payment Notification consumer :");
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
-						paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+				if (WCConstants.WATER_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService())) {
 					isServiceMatched = true;
 				}
 			}
