@@ -39,29 +39,29 @@ public class UserService {
      */
     public void callUserService(ServiceRequest request){
 
-        if(!StringUtils.isEmpty(request.getPgrEntity().getService().getAccountId()))
+        if(!StringUtils.isEmpty(request.getService().getAccountId()))
             enrichUser(request);
-        else if(request.getPgrEntity().getService().getCitizen()!=null)
+        else if(request.getService().getCitizen()!=null)
             upsertUser(request);
 
     }
 
     /**
-     * Calls user search to fetch the list of user and enriches it in pgrEntities
-     * @param pgrEntities
+     * Calls user search to fetch the list of user and enriches it in serviceWrappers
+     * @param serviceWrappers
      */
-    public void enrichUsers(List<PGREntity> pgrEntities){
+    public void enrichUsers(List<ServiceWrapper> serviceWrappers){
 
         Set<String> uuids = new HashSet<>();
 
-        pgrEntities.forEach(pgrEntity -> {
-            uuids.add(pgrEntity.getService().getAccountId());
+        serviceWrappers.forEach(serviceWrapper -> {
+            uuids.add(serviceWrapper.getService().getAccountId());
         });
 
         Map<String, User> idToUserMap = searchBulkUser(new LinkedList<>(uuids));
 
-        pgrEntities.forEach(pgrEntity -> {
-            pgrEntity.getService().setCitizen(idToUserMap.get(pgrEntity.getService().getAccountId()));
+        serviceWrappers.forEach(serviceWrapper -> {
+            serviceWrapper.getService().setCitizen(idToUserMap.get(serviceWrapper.getService().getAccountId()));
         });
 
     }
@@ -74,8 +74,8 @@ public class UserService {
      */
     private void upsertUser(ServiceRequest request){
 
-        User user = request.getPgrEntity().getService().getCitizen();
-        String tenantId = request.getPgrEntity().getService().getTenantId();
+        User user = request.getService().getCitizen();
+        String tenantId = request.getService().getTenantId();
         User userServiceResponse = null;
 
         // Search on mobile number as user name
@@ -92,7 +92,7 @@ public class UserService {
         }
 
         // Enrich the accountId
-        request.getPgrEntity().getService().setAccountId(userServiceResponse.getUuid());
+        request.getService().setAccountId(userServiceResponse.getUuid());
     }
 
 
@@ -103,15 +103,15 @@ public class UserService {
     private void enrichUser(ServiceRequest request){
 
         RequestInfo requestInfo = request.getRequestInfo();
-        String accountId = request.getPgrEntity().getService().getAccountId();
-        String tenantId = request.getPgrEntity().getService().getTenantId();
+        String accountId = request.getService().getAccountId();
+        String tenantId = request.getService().getTenantId();
 
         UserDetailResponse userDetailResponse = searchUser(userUtils.getStateLevelTenant(tenantId),accountId,null);
 
         if(userDetailResponse.getUser().isEmpty())
             throw new CustomException("INVALID_ACCOUNTID","No user exist for the given accountId");
 
-        else request.getPgrEntity().getService().setCitizen(userDetailResponse.getUser().get(0));
+        else request.getService().setCitizen(userDetailResponse.getUser().get(0));
 
     }
 

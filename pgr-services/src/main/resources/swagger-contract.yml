@@ -268,7 +268,7 @@ components:
         requestInfo:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
         pgrEntity:
-          $ref: '#/components/schemas/PGREntity'
+          $ref: '#/components/schemas/ServiceWrapper'
       required:
       - RequestInfo
       - pgrEntity
@@ -281,7 +281,7 @@ components:
         PGREntities:
           type: array
           items:
-            $ref: '#/components/schemas/PGREntity'
+            $ref: '#/components/schemas/ServiceWrapper'
       required:
       - ResponseInfo
       - pgrEntity

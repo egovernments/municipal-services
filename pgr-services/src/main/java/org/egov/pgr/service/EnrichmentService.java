@@ -45,9 +45,16 @@ public class EnrichmentService {
     public void enrichCreateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
-        Service service = serviceRequest.getPgrEntity().getService();
-        Workflow workflow = serviceRequest.getPgrEntity().getWorkflow();
+        Service service = serviceRequest.getService();
+        Workflow workflow = serviceRequest.getWorkflow();
         String tenantId = service.getTenantId();
+
+        // Enrich accountId of the logged in citizen
+        if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN))
+            serviceRequest.getService().setAccountId(requestInfo.getUserInfo().getUuid());
+
+        userService.callUserService(serviceRequest);
+
 
         AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,true);
 
@@ -80,11 +87,12 @@ public class EnrichmentService {
     public void enrichUpdateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
-        Service service = serviceRequest.getPgrEntity().getService();
+        Service service = serviceRequest.getService();
         AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,false);
 
         service.setAuditDetails(auditDetails);
 
+        userService.callUserService(serviceRequest);
     }
 
     /**

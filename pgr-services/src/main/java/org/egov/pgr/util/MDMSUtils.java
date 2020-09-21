@@ -38,7 +38,7 @@ public class MDMSUtils {
      */
     public Object mDMSCall(ServiceRequest request){
         RequestInfo requestInfo = request.getRequestInfo();
-        String tenantId = request.getPgrEntity().getService().getTenantId();
+        String tenantId = request.getService().getTenantId();
         MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo,tenantId);
         Object result = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
         return result;
