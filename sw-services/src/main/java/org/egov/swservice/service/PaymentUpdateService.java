@@ -179,8 +179,7 @@ public class PaymentUpdateService {
 			log.info("Payment Notification consumer :");
 			boolean isServiceMatched = false;
 			for (PaymentDetail paymentDetail : paymentRequest.getPayment().getPaymentDetails()) {
-				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService()) ||
-						paymentDetail.getBusinessService().equalsIgnoreCase(config.getReceiptBusinessservice())) {
+				if (SWConstants.SEWERAGE_SERVICE_BUSINESS_ID.equals(paymentDetail.getBusinessService())) {
 					isServiceMatched = true;
 				}
 			}
