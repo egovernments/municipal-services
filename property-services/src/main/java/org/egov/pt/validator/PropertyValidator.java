@@ -149,7 +149,7 @@ public class PropertyValidator {
 			if (null == currentState)
 				throw new CustomException("EG_PT_WF_ERROR", "No entity found in workflow for the Application number : "
 						+ property.getAcknowldgementNumber());
-			isstateUpdatable = currentState.getIsStateUpdatable() ? currentState.getIsStateUpdatable() != null : false;
+			isstateUpdatable = currentState.getIsStateUpdatable() != null ? currentState.getIsStateUpdatable() : false;
 		}
 
 		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch);
