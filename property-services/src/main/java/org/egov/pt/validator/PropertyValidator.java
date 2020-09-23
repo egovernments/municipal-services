@@ -153,8 +153,9 @@ public class PropertyValidator {
 		}
 
 		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch);
-		objectsAdded.removeAll(Arrays.asList("TextNode","Role", "LongNode", "JsonNodeFactory", "IntNode"));
-		
+		objectsAdded.removeAll(Arrays.asList("TextNode", "Role", "NullNode", "LongNode", "JsonNodeFactory", "IntNode",
+				"ProcessInstance"));
+
 		if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
 			throw new CustomException("EG_PT_WF_UPDATE_ERROR",
 					"The current state of workflow does not allow chnages to property");
