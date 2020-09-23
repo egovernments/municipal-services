@@ -202,7 +202,7 @@ public class PropertyValidator {
                         }
 
                         if("RENTED".equalsIgnoreCase(unit.getOccupancyType())){
-                            if(unit.getArv()==null || unit.getArv().compareTo(new BigDecimal(0))!=1)
+                            if(unit.getArv()==null || unit.getArv().compareTo(new BigDecimal(0))!=-1)
                                 errorMap.put("INVALID ARV","Total Annual Rent should be greater than zero ");
                         }
                     });
