@@ -19,8 +19,8 @@ To run the egov-user-event locally, you need to port forward below services loca
 
 ```bash
 function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
-kubectl port-forward -n egov $(kgpt egov-persister) 8082:8080
-kubectl port-forward -n egov $(kgpt egov-localisation) 8087:8080
+kubectl port-forward -n egov $(kgpt egov-persister) 8082:8080 &
+kubectl port-forward -n egov $(kgpt egov-localisation) 8087:8080 &
 kubectl port-forward -n egov $(kgpt egov-mdms-service) 8094:8080
 ```
 
