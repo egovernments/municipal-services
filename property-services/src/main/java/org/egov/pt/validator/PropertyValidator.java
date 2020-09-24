@@ -149,7 +149,7 @@ public class PropertyValidator {
 			State currentState = workflowService.getCurrentState(request.getRequestInfo(), property.getTenantId(),
 					property.getAcknowldgementNumber());
 			BusinessService businessService = workflowService.getBusinessService(property.getTenantId(),
-					currentState.getBusinessServiceId(), request.getRequestInfo());
+					property.getWorkflow().getBusinessService(), request.getRequestInfo());
 			isstateUpdatable = workflowService.isStateUpdatable(currentState.getState(), businessService);
 		}
 
