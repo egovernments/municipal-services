@@ -4,6 +4,7 @@ import static org.egov.pt.util.PTConstants.FIELDS_TO_IGNORE;
 import static org.egov.pt.util.PTConstants.VARIABLE_ACTIVE;
 import static org.egov.pt.util.PTConstants.VARIABLE_USERACTIVE;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,11 +15,14 @@ import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
+import org.javers.core.diff.custom.BigDecimalComparatorWithFixedEquals;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 @Service
 public class DiffService {
+	
+	private Javers javers;
 
     /**
      * Gives the field names whose values are different in the two classes
@@ -29,7 +33,7 @@ public class DiffService {
      */
     public List<String> getUpdatedFields(Object propertyFromUpdate, Object propertyFromSearch) {
 
-        Javers javers = JaversBuilder.javers().build();
+        Javers javers = getJavers();
 
         Diff diff = javers.compare(propertyFromUpdate, propertyFromSearch);
         List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
@@ -57,11 +61,11 @@ public class DiffService {
      */
     public List<String> getObjectsAdded(Object propertyFromUpdate, Object propertyFromSearch) {
 
-        Javers javers = JaversBuilder.javers().build();
-        Diff diff = javers.compare(propertyFromSearch, propertyFromUpdate);
-        List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
+		Javers javers = getJavers();
+		Diff diff = javers.compare(propertyFromSearch, propertyFromUpdate);
+		List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
 
-        List<String> classModified = new LinkedList<>();
+		List<String> classModified = new LinkedList<>();
 
         if (CollectionUtils.isEmpty(objectsAdded))
             return classModified;
@@ -84,7 +88,8 @@ public class DiffService {
      */
     private List<String> getObjectsRemoved(Property propertyFromUpdate, Property propertyFromSearch) {
 
-        Javers javers = JaversBuilder.javers().build();
+        Javers javers = JaversBuilder.javers()
+				.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals()).build();
         Diff diff = javers.compare(propertyFromUpdate, propertyFromSearch);
         List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
 
@@ -119,5 +124,13 @@ public class DiffService {
         return className;
     }
 
+	private Javers getJavers() {
+
+		if (javers == null)
+			javers = JaversBuilder.javers().registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
+					.build();
+
+		return javers;
+	}
 
 }
