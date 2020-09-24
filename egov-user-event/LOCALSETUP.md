@@ -19,18 +19,14 @@ To run the egov-user-event locally, you need to port forward below services loca
 
 ```bash
 function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
-kubectl port-forward -n egov $(kgpt egov-persister) 8082:8080 &
-kubectl port-forward -n egov $(kgpt egov-localisation) 8087:8080 &
-kubectl port-forward -n egov $(kgpt egov-mdms-service) 8094:8080
+kubectl port-forward -n egov $(kgpt egov-localisation) 8084:8080 &
+kubectl port-forward -n egov $(kgpt egov-mdms-service) 8085:8080
 ```
 
 To run the th-services locally, update below listed properties in `application.properties` prior to running the project:
 
 ```ini
-# Default pagination offset
-mseva.notif.search.offset=
-
-# Default pagination limit
-mseva.notif.search.limit=
+egov.mdms.host = http://localhost:8084
+egov.localisation.host = http://localhost:8085
 ```
 

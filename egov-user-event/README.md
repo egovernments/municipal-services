@@ -23,7 +23,16 @@ http://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/mun
 ## Service Details
 
 This service manages user events on the egov-platform, which means all the events about which the user (essentially citizen) has to be notified are stored and retrieved through this service. 
-Events can be created either by an API call or through pushing records to the Kafka Queue. 
+Events can be created either by an API call or through pushing records to the Kafka Queue.
+
+**Configurable Properties:**
+
+Following are the properties in application.properties file in egov-user-events service which are configurable.
+
+| Property                     | Value    | Remarks                    | 
+| -----------------------------| ---------| ---------------------------|
+| `mseva.notif.search.offset`  | 0        | Default pagination offset. |
+| `mseva.notif.search.limit`   | 200      | Default pagination limit.  |
 
 
 ### API Details
