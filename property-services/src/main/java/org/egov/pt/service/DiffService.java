@@ -66,6 +66,7 @@ public class DiffService {
     public List<String> getObjectsAdded(Object propertyFromUpdate, Object propertyFromSearch, String flowType) {
 
 		Javers javers = getJavers(flowType);
+
 		Diff diff = javers.compare(propertyFromSearch, propertyFromUpdate);
 		List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
 
