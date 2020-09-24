@@ -21,6 +21,7 @@ import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.Unit;
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
+import org.egov.pt.models.workflow.BusinessService;
 import org.egov.pt.models.workflow.ProcessInstance;
 import org.egov.pt.models.workflow.State;
 import org.egov.pt.service.DiffService;
@@ -128,7 +129,8 @@ public class PropertyValidator {
 		if (configs.getIsWorkflowEnabled() && request.getProperty().getWorkflow() == null)
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for update process");
 
-		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
+		// third variable is needed only for mutation
+		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch, "");
 		
 		
 		Boolean isstateUpdatable =  false;
@@ -146,13 +148,13 @@ public class PropertyValidator {
 
 			State currentState = workflowService.getCurrentState(request.getRequestInfo(), property.getTenantId(),
 					property.getAcknowldgementNumber());
-			if (null == currentState)
-				throw new CustomException("EG_PT_WF_ERROR", "No entity found in workflow for the Application number : "
-						+ property.getAcknowldgementNumber());
-			isstateUpdatable = currentState.getIsStateUpdatable() != null ? currentState.getIsStateUpdatable() : false;
+			BusinessService businessService = workflowService.getBusinessService(property.getTenantId(),
+					currentState.getBusinessServiceId(), request.getRequestInfo());
+			isstateUpdatable = workflowService.isStateUpdatable(currentState.getState(), businessService);
 		}
 
-		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch);
+		// third variable is needed only for mutation
+		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch, "");
 		objectsAdded.removeAll(Arrays.asList("TextNode", "Role", "NullNode", "LongNode", "JsonNodeFactory", "IntNode",
 				"ProcessInstance"));
 
@@ -629,7 +631,7 @@ public class PropertyValidator {
 		if (configs.getIsMutationWorkflowEnabled() && request.getProperty().getWorkflow() == null)
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for mutation process");
 		
-		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
+		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch, PTConstants.MUTATION_PROCESS_CONSTANT);
 		// only editable field in mutation other than owners, additinal details.
 		fieldsUpdated.remove("ownershipCategory");
 		

@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
+import org.egov.pt.util.PTConstants;
 import org.egov.tracer.model.CustomException;
 import org.javers.core.Javers;
 import org.javers.core.JaversBuilder;
@@ -23,6 +25,8 @@ import org.springframework.util.CollectionUtils;
 public class DiffService {
 	
 	private Javers javers;
+	
+	private Javers javersForMutation;
 
     /**
      * Gives the field names whose values are different in the two classes
@@ -31,9 +35,9 @@ public class DiffService {
      * @param propertyFromSearch License from db on which update is called
      * @return List of variable names which are changed
      */
-    public List<String> getUpdatedFields(Object propertyFromUpdate, Object propertyFromSearch) {
+    public List<String> getUpdatedFields(Object propertyFromUpdate, Object propertyFromSearch, String flowType) {
 
-        Javers javers = getJavers();
+        Javers javers = getJavers(flowType);
 
         Diff diff = javers.compare(propertyFromUpdate, propertyFromSearch);
         List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
@@ -59,9 +63,9 @@ public class DiffService {
      * @param propertyFromSearch Property from db on which update is called
      * @return Names of Classes added or removed during update
      */
-    public List<String> getObjectsAdded(Object propertyFromUpdate, Object propertyFromSearch) {
+    public List<String> getObjectsAdded(Object propertyFromUpdate, Object propertyFromSearch, String flowType) {
 
-		Javers javers = getJavers();
+		Javers javers = getJavers(flowType);
 		Diff diff = javers.compare(propertyFromSearch, propertyFromUpdate);
 		List objectsAdded = diff.getObjectsByChangeType(NewObject.class);
 
@@ -86,10 +90,9 @@ public class DiffService {
      * @param propertyFromSearch License from db on which update is called
      * @return Names of Classes added or removed during update
      */
-    private List<String> getObjectsRemoved(Property propertyFromUpdate, Property propertyFromSearch) {
+    private List<String> getObjectsRemoved(Property propertyFromUpdate, Property propertyFromSearch, String flowType) {
 
-        Javers javers = JaversBuilder.javers()
-				.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals()).build();
+        Javers javers = getJavers(flowType);
         Diff diff = javers.compare(propertyFromUpdate, propertyFromSearch);
         List<ValueChange> changes = diff.getChangesByType(ValueChange.class);
 
@@ -123,14 +126,36 @@ public class DiffService {
         }
         return className;
     }
+    
+    
+    /**
+	 * 
+	 * @param flowType
+	 * @return
+	 */
+	private Javers getJavers(String flowType) {
 
-	private Javers getJavers() {
+		Javers javersLocal = null;
 
-		if (javers == null)
-			javers = JaversBuilder.javers().registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
-					.build();
+		switch (flowType) {
 
-		return javers;
+		case PTConstants.MUTATION_PROCESS_CONSTANT:
+
+			if (javersForMutation == null)
+				javersForMutation = JaversBuilder.javers()
+						.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
+						.registerIgnoredClass(OwnerInfo.class).build();
+			javersLocal = javersForMutation;
+			break;
+
+		default:
+			if (javers == null)
+				javers = JaversBuilder.javers()
+						.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals()).build();
+			javersLocal = javers;
+		}
+
+		return javersLocal;
 	}
 
 }
