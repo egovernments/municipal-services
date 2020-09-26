@@ -199,13 +199,12 @@ public class AssessmentService {
 	private Boolean isWorkflowTriggered(Assessment assessment, Assessment assessmentFromSearch){
 
 		Boolean isWorkflowTriggeredByFieldChange = false;
-		List<String> fieldsUpdated = diffService.getUpdatedFields(assessment, assessmentFromSearch, "");
+		List<String> fieldsUpdated = diffService.getUpdatedFields(assessment, assessmentFromSearch);
 
 		if(!CollectionUtils.isEmpty(fieldsUpdated))
 			isWorkflowTriggeredByFieldChange = intersection(new LinkedList<>(Arrays.asList(config.getAssessmentWorkflowTriggerParams().split(","))), fieldsUpdated);
 
-		// third variable is needed only for mutation
-		List<String> objectsAdded = diffService.getObjectsAdded(assessment, assessmentFromSearch, "");
+		List<String> objectsAdded = diffService.getObjectsAdded(assessment, assessmentFromSearch);
 
 		Boolean isWorkflowTriggeredByObjectAddition = false;
 		if(!CollectionUtils.isEmpty(objectsAdded))
