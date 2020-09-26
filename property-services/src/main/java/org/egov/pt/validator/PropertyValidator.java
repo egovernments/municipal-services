@@ -129,7 +129,8 @@ public class PropertyValidator {
 		if (configs.getIsWorkflowEnabled() && request.getProperty().getWorkflow() == null)
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for update process");
 
-		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
+		// third variable is needed only for mutation
+		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch, "");
 		
 		
 		Boolean isstateUpdatable =  false;
@@ -152,8 +153,8 @@ public class PropertyValidator {
 			isstateUpdatable = workflowService.isStateUpdatable(currentState.getState(), businessService);
 		}
 
-		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch);
-		// unwanted lsit objects appearing from diff, workflow - process instance should never be comoared
+		// third variable is needed only for mutation
+		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch, "");
 		objectsAdded.removeAll(Arrays.asList("TextNode", "Role", "NullNode", "LongNode", "JsonNodeFactory", "IntNode",
 				"ProcessInstance"));
 
@@ -630,20 +631,9 @@ public class PropertyValidator {
 		if (configs.getIsMutationWorkflowEnabled() && request.getProperty().getWorkflow() == null)
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for mutation process");
 		
-		/*
-		 *  resetting owner info to avoid detection in javers
-		 *  not able to bypass using javers methods
-		 */
-		List<OwnerInfo> ownersfromsearch = propertyFromSearch.getOwners();
-		propertyFromSearch.setOwners(property.getOwners());
-		
-		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
+		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch, PTConstants.MUTATION_PROCESS_CONSTANT);
 		// only editable field in mutation other than owners, additinal details.
 		fieldsUpdated.remove("ownershipCategory");
-		/*
-		 *  resetting owner info back to search information
-		 */
-		propertyFromSearch.setOwners(ownersfromsearch);
 		
 		if (property.getWorkflow().getAction().equalsIgnoreCase(configs.getMutationOpenState())
 				&& propertyFromSearch.getStatus().equals(Status.ACTIVE)) {
