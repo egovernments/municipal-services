@@ -18,7 +18,6 @@ import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
 import org.javers.core.diff.changetype.ValueChange;
 import org.javers.core.diff.custom.BigDecimalComparatorWithFixedEquals;
-import org.javers.core.metamodel.clazz.EntityDefinitionBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -145,13 +144,8 @@ public class DiffService {
 
 			if (javersForMutation == null)
 				javersForMutation = JaversBuilder.javers()
-					.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
-					.registerEntity(EntityDefinitionBuilder.entityDefinition(Property.class)
-							.withIdPropertyName("propertyId")
-							.withTypeName("Property")
-							.withIgnoredProperties("owners")
-							.build()).build();
-			
+						.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
+						.registerIgnoredClass(OwnerInfo.class).build();
 			javersLocal = javersForMutation;
 			break;
 
