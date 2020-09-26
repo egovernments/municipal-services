@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.egov.pt.models.Document;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.util.PTConstants;
@@ -145,7 +146,9 @@ public class DiffService {
 			if (javersForMutation == null)
 				javersForMutation = JaversBuilder.javers()
 						.registerValue(BigDecimal.class, new BigDecimalComparatorWithFixedEquals())
-						.registerIgnoredClass(OwnerInfo.class).build();
+						.registerIgnoredClass(OwnerInfo.class)
+						.registerIgnoredClass(Document.class).build();
+			
 			javersLocal = javersForMutation;
 			break;
 
