@@ -634,8 +634,10 @@ public class PropertyValidator {
 		 *  resetting owner info to avoid detection in javers
 		 *  not able to bypass using javers methods
 		 */
-		List<OwnerInfo> ownersfromsearch = propertyFromSearch.getOwners();
-		propertyFromSearch.setOwners(property.getOwners());
+		List<OwnerInfo> ownersFromsearch = propertyFromSearch.getOwners();
+		List<OwnerInfo> ownersFromRequest = property.getOwners();
+		property.setOwners(null);
+		propertyFromSearch.setOwners(null);
 		
 		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch);
 		// only editable field in mutation other than owners, additinal details.
@@ -643,7 +645,8 @@ public class PropertyValidator {
 		/*
 		 *  resetting owner info back to search information
 		 */
-		propertyFromSearch.setOwners(ownersfromsearch);
+		property.setOwners(ownersFromRequest);
+		propertyFromSearch.setOwners(ownersFromsearch);
 		
 		if (property.getWorkflow().getAction().equalsIgnoreCase(configs.getMutationOpenState())
 				&& propertyFromSearch.getStatus().equals(Status.ACTIVE)) {
