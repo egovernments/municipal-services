@@ -12,6 +12,8 @@ NA
 - ID-GEN
 - pt-calculator
 - MDMS
+- Location
+- localisation
 
 ### Swagger API Contract
 
