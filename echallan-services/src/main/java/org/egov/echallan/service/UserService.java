@@ -63,27 +63,26 @@ public class UserService {
 				.build();
 		
 		
-		if(challan.getAccountId()==null) {
+		//if(challan.getAccountId()==null) {
 			addUserDefaultFields(challan.getTenantId(), role, userInfo);
             StringBuilder uri = new StringBuilder(userHost)
                     .append(userContextPath)
                     .append(userCreateEndpoint);
             String userName = UUID.randomUUID().toString();
             userInfo.setUserName(userName);
-
             UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, userInfo), uri);
             if (userDetailResponse.getUser().get(0).getUuid() == null) {
                 throw new CustomException("INVALID USER RESPONSE", "The user created has uuid as null");
             }
             setOwnerFields(userInfo, userDetailResponse, requestInfo);
-		}
+		/*}
 		else {
             UserDetailResponse userDetailResponse = userExists(userInfo,challan,requestInfo);
             if(userDetailResponse.getUser().isEmpty())
                 throw new CustomException("INVALID USER","The uuid "+challan.getAccountId()+" does not exists");
            //update needs to be added
             setOwnerFields(userInfo,userDetailResponse,requestInfo);
-        }
+        }*/
 
 	}
 	

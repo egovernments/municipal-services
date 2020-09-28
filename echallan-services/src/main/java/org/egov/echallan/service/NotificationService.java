@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -38,6 +36,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.egov.echallan.util.ChallanConstants.*;
 
 @Service
 @Slf4j
@@ -88,8 +87,10 @@ public class NotificationService {
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
 							if(isSave)
 								message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
-							else if(challan.getApplicationStatus().equalsIgnoreCase("ACTIVE"))
+							else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_ACTIVE))
 								message = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
+							else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_CANCELLED))
+								message = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
 							if (!StringUtils.isEmpty(message)) {
 								Map<String, Object> request = new HashMap<>();
 								request.put("mobileNumber", mobilenumber);
@@ -129,7 +130,7 @@ public class NotificationService {
 		String message="";
 		if(isSave)
 			message = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
-		else if(challan.getApplicationStatus().equalsIgnoreCase("ACTIVE"))
+		else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_ACTIVE))
 			message = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
 		else
 			return null;

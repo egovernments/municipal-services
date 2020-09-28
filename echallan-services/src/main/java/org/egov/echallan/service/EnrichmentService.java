@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.egov.echallan.util.ChallanConstants.*;
 
 @Service
 public class EnrichmentService {
@@ -45,7 +46,7 @@ public class EnrichmentService {
         Challan challan = challanRequest.getChallan();
         challan.setAuditDetails(auditDetails);
         challan.setId(UUID.randomUUID().toString());
-        challan.setApplicationStatus("ACTIVE");
+        challan.setApplicationStatus(STATUS_ACTIVE);
         if(challan.getAddress()!=null) {
         	challan.getAddress().setId(UUID.randomUUID().toString());
         	challan.getAddress().setTenantId(challan.getTenantId());
@@ -155,4 +156,12 @@ public class EnrichmentService {
         searchCriteria.setUserIds(new ArrayList<>(ownerids));
         return searchCriteria;
     }
+
+	public void enrichUpdateRequest(ChallanRequest request) {
+		 RequestInfo requestInfo = request.getRequestInfo();
+	     String uuid = requestInfo.getUserInfo().getUuid();
+	     AuditDetails auditDetails = commUtils.getAuditDetails(uuid, false);
+	     Challan challan = request.getChallan();
+	     challan.setAuditDetails(auditDetails);
+	}
 }

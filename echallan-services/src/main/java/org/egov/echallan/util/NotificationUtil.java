@@ -31,7 +31,7 @@ public class NotificationUtil {
 	public static final String LOCALIZATION_MSGS_JSONPATH = "$.messages[0].message";
 	private static final String CREATE_CODE = "echallan.create.sms";
 	private static final String UPDATE_CODE = "echallan.update.sms";
-
+	private static final String CANCEL_CODE = "echallan.cancel.sms";
 	private ChallanConfiguration config;
 
 	private ServiceRequestRepository serviceRequestRepository;
@@ -64,7 +64,22 @@ public class NotificationUtil {
 		message = getCreateMsg(requestInfo,challan, messageTemplate);
 		return message;
 	}
+	
+	public String getCustomizedMsgForCancel(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+		String message = null, messageTemplate;
+		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CANCEL_CODE);
+		message = getCancelMsg(requestInfo,challan, messageTemplate);
+		return message;
+	}
 
+	private String getCancelMsg(RequestInfo requestInfo,Challan challan, String message) {
+		String service = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
+		 message = message.replace("<citizen>",challan.getCitizen().getName());
+	     message = message.replace("<challanno>", challan.getChallanNo());
+	     message = message.replace("<service>", service);
+	     return message;
+	}
+	
 	private String getCreateMsg(RequestInfo requestInfo,Challan challan, String message) {
 		String billDetails = getBillDetails(requestInfo,challan);
 		

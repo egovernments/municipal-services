@@ -94,13 +94,32 @@ public class ChallanService {
 	        return challans;
 	    }
 	 
+	 public List<Challan> searchChallans(ChallanRequest request){
+	        SearchCriteria criteria = new SearchCriteria();
+	        List<String> ids = new LinkedList<>();
+	        ids.add(request.getChallan().getId());
+
+	        criteria.setTenantId(request.getChallan().getTenantId());
+	        criteria.setIds(ids);
+	        criteria.setBusinessService(request.getChallan().getBusinessService());
+
+	        List<Challan> challans = repository.getChallans(criteria);
+
+	        if(challans.isEmpty())
+	            return Collections.emptyList();
+	        challans = enrichmentService.enrichChallanSearch(challans,criteria,request.getRequestInfo());
+	        return challans;
+	    }
+	 
 	 public Challan update(ChallanRequest request) {
-		 	validator.validateFields(request);
-			//enrichmentService.enrichCreateRequest(request);
-			userService.createUser(request);
-			calculationService.addCalculation(request);
-			repository.update(request);
-			return request.getChallan();
+		 validator.validateFields(request);
+		 
+		 List<Challan> searchResult = searchChallans(request);
+		 validator.validateUpdateRequest(request,searchResult);
+		 enrichmentService.enrichUpdateRequest(request);
+		 calculationService.addCalculation(request);
+		 repository.update(request);
+		 return request.getChallan();
 		}
 
 	

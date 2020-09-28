@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.egov.echallan.util.ChallanConstants.*;
+
 @Service
 public class PaymentUpdateService {
 	
@@ -37,7 +39,6 @@ public class PaymentUpdateService {
 	@Autowired
 	 private CommonUtils commUtils;
 	
-	public static final String STATUS_PAID  = "PAID";
 	
 	
 	public void process(HashMap<String, Object> record) {
