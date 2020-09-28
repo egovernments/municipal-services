@@ -11,6 +11,7 @@ import org.egov.echallancalculation.repository.ServiceRequestRepository;
 import org.egov.echallancalculation.util.CalculationUtils;
 import org.egov.echallancalculation.web.models.calculation.Calculation;
 import org.egov.echallancalculation.web.models.demand.*;
+import org.egov.echallancalculation.web.models.demand.Demand.StatusEnum;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -148,8 +149,10 @@ public class DemandService {
 
             if(CollectionUtils.isEmpty(searchResult))
                 throw new CustomException("INVALID UPDATE","No demand exists for applicationNumber: "+calculation.getChallan().getChallanNo());
-
+            
             Demand demand = searchResult.get(0);
+            if(calculation.getChallan().getApplicationStatus()!=null && calculation.getChallan().getApplicationStatus().equals(StatusEnum.CANCELLED.toString()))
+            	demand.setStatus(StatusEnum.CANCELLED);
             List<DemandDetail> demandDetails = demand.getDemandDetails();
             List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation,demandDetails);
             demand.setDemandDetails(updatedDemandDetails);
