@@ -183,6 +183,7 @@ public class PropertyService {
 		
 		propertyValidator.validateMutation(request, propertyFromSearch);
 		userService.createUser(request);
+		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichMutationRequest(request, propertyFromSearch);
 		calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
 		
