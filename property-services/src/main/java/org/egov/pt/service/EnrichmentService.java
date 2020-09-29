@@ -128,6 +128,14 @@ public class EnrichmentService {
 				}
 			});
 				
+			property.getUnits().forEach(unit -> {
+
+				if (unit.getId() == null) {
+					unit.setId(UUID.randomUUID().toString());
+					unit.setActive(true);
+				}
+			});
+				
 		Institution institute = property.getInstitution();
 		if (!ObjectUtils.isEmpty(institute) && null == institute.getId())
 			property.getInstitution().setId(UUID.randomUUID().toString());
