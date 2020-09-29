@@ -77,7 +77,9 @@ public class PaymentNotificationService {
 
     final String receiptNumberKey = "receiptNumber";
 
+    final String payerNameKey = "payerName";
 
+    final String commonOwner = "COMMON_OWNER";
     /**
      * Generates sms from the input record and Sends smsRequest to SMSService
      * @param record The kafka message from receipt create topic
@@ -159,12 +161,13 @@ public class PaymentNotificationService {
      */
     private List<SMSRequest> getSMSRequests(TradeLicense license, Map<String,String> valMap,String localizationMessages){
             List<SMSRequest> ownersSMSRequest = getOwnerSMSRequest(license,valMap,localizationMessages);
-            SMSRequest payerSMSRequest = getPayerSMSRequest(license,valMap,localizationMessages);
-
             List<SMSRequest> totalSMS = new LinkedList<>();
             totalSMS.addAll(ownersSMSRequest);
-            totalSMS.add(payerSMSRequest);
 
+            if(!valMap.get(paidByKey).equalsIgnoreCase(commonOwner)){
+                SMSRequest payerSMSRequest = getPayerSMSRequest(license,valMap,localizationMessages);
+                totalSMS.add(payerSMSRequest);
+            }
             return totalSMS;
     }
 
@@ -216,7 +219,7 @@ public class PaymentNotificationService {
         else
             message = util.getPayerPaymentMsg(license,valMap,localizationMessages);
 
-        String customizedMsg = message.replace("<1>",valMap.get(paidByKey));
+        String customizedMsg = message.replace("<1>",valMap.get(payerNameKey));
         SMSRequest smsRequest = new SMSRequest(valMap.get(payerMobileNumberKey),customizedMsg);
         return smsRequest;
     }
@@ -239,10 +242,11 @@ public class PaymentNotificationService {
             valMap.put(businessServiceKey,businessServiceList.isEmpty()?null:businessServiceList.get(0));
             valMap.put(consumerCodeKey,consumerCodeList.isEmpty()?null:consumerCodeList.get(0));
             valMap.put(tenantIdKey,context.read("$.Payment.tenantId"));
-            valMap.put(payerMobileNumberKey,mobileNumberList.isEmpty()?null:mobileNumberList.get(0));
+            valMap.put(payerMobileNumberKey,context.read("$.Payment.mobileNumber"));
             valMap.put(paidByKey,context.read("$.Payment.paidBy"));
             valMap.put(amountPaidKey,amountPaidList.isEmpty()?null:String.valueOf(amountPaidList.get(0)));
             valMap.put(receiptNumberKey,receiptNumberList.isEmpty()?null:receiptNumberList.get(0));
+            valMap.put(payerNameKey,context.read("$.Payment.payerName"));
         }
         catch (Exception e){
             e.printStackTrace();
