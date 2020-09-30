@@ -258,7 +258,7 @@ public class TLRenewalNotificationUtil {
 
         String finalPath = UIHost + paymentPath;
 
-        message = message.replace(PAYMENT_LINK_PLACEHOLDER,notificationUtil.getShortenedUrl(finalPath));
+        message = message.replace(PAYMENT_LINK_PLACEHOLDER,notificationUtil.getShortnerURL(finalPath));
 
         return message;
     }

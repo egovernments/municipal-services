@@ -1,5 +1,7 @@
 package org.egov.tl.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,10 +12,12 @@ import org.egov.tl.producer.Producer;
 import org.egov.tl.repository.ServiceRequestRepository;
 import org.egov.tl.web.models.*;
 import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -34,12 +38,15 @@ public class NotificationUtil {
 
 	private RestTemplate restTemplate;
 
+	private ObjectMapper mapper;
+
 	@Autowired
-	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, Producer producer, RestTemplate restTemplate) {
+	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, Producer producer, RestTemplate restTemplate, ObjectMapper mapper) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.producer = producer;
 		this.restTemplate = restTemplate;
+		this.mapper = mapper;
 	}
 
 
@@ -251,7 +258,7 @@ public class NotificationUtil {
 
 		String finalPath = UIHost + paymentPath;
 		System.out.println("\nfinalPath--->"+finalPath+"\n");
-		String paymetLink = getShortenedUrl(finalPath);
+		String paymetLink = getShortnerURL(finalPath);
 		System.out.println("\npaymetLink--->"+paymetLink+"\n");
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER, paymetLink);
 		System.out.println("\nmessage--->"+message+"\n");
@@ -547,21 +554,17 @@ public class NotificationUtil {
 	/**
 	 * Method to shortent the url
 	 * returns the same url if shortening fails
-	 * @param url
+	 * @param actualURL
 	 */
-	public String getShortenedUrl(String url){
+	public String getShortnerURL(String actualURL) {
+		net.minidev.json.JSONObject obj = new net.minidev.json.JSONObject();
+		obj.put("url", actualURL);
+		String url = config.getUrlShortnerHost() + config.getUrlShortnerEndpoint();
 
-		HashMap<String,String> body = new HashMap<>();
-		body.put("url",url);
-		StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
-		builder.append(config.getUrlShortnerEndpoint());
-		String res = restTemplate.postForObject(builder.toString(), body, String.class);
-
-		if(StringUtils.isEmpty(res)){
-			log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
-			return url;
-		}
-		else return res;
+		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
+		return response.toString();
 	}
+
+
 
 }
