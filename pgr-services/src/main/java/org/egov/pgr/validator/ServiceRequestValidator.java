@@ -265,7 +265,7 @@ public class ServiceRequestValidator {
      */
     private void validateSource(String source){
 
-        String allowedSourceStr = null;
+        List<String> allowedSourceStr = Arrays.asList(config.getAllowedSource().split(","));
 
         if(!allowedSourceStr.contains(source))
             throw new CustomException("INVALID_SOURCE","The source: "+source+" is not valid");
