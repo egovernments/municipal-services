@@ -196,7 +196,7 @@ public class TLNotificationService {
     			}
     			if(viewTriggerList.contains(license.getStatus())){
 					List<ActionItem> items = new ArrayList<>();
-					String actionLink = config.getViewApplicationLink()
+					String actionLink = config.getViewApplicationLink().replace("$mobile", mobile)
 							.replace("$applicationNo", license.getApplicationNumber())
 							.replace("$tenantId", license.getTenantId());
 					actionLink = config.getUiAppHost() + actionLink;
