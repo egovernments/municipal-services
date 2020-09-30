@@ -252,6 +252,7 @@ public class NotificationUtil {
 		String finalPath = UIHost + paymentPath;
 		System.out.println("\nfinalPath--->"+finalPath+"\n");
 		String paymetLink = getShortenedUrl(finalPath);
+		System.out.println("\npaymetLink--->"+paymetLink+"\n");
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER, paymetLink);
 		System.out.println("\nmessage--->"+message+"\n");
 		return message;
