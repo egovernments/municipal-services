@@ -559,8 +559,11 @@ public class NotificationUtil {
 	public String getShortnerURL(String actualURL) {
 		net.minidev.json.JSONObject obj = new net.minidev.json.JSONObject();
 		obj.put("url", actualURL);
-		String url = config.getUrlShortnerHost()+config.getUrlShortnerEndpoint();
-
+		String URLHost = config.getUrlShortnerHost();
+		String URLShortEndPoint = config.getUrlShortnerEndpoint();
+		String url = URLHost + URLShortEndPoint;
+		//String url = config.getUrlShortnerHost()+config.getUrlShortnerEndpoint();
+		System.out.println("\nurl--->"+url+"\n");
 		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
 		return response.toString();
 	}
