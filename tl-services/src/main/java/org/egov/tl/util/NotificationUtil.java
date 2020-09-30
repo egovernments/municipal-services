@@ -250,8 +250,9 @@ public class NotificationUtil {
 		paymentPath = paymentPath.replace("$businessservice",businessService_TL);
 
 		String finalPath = UIHost + paymentPath;
-
+		System.out.println("\nmessage--->"+message+"\n");
 		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(finalPath));
+		System.out.println("\nmessage--->"+message+"\n");
 		return message;
 	}
 
