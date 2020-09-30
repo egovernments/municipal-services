@@ -79,8 +79,11 @@ public class NotificationUtil {
 
 		case ACTION_STATUS_APPROVED:
 			BigDecimal amountToBePaid = getAmountToBePaid(requestInfo, license);
+			System.out.println("\namountToBePaid--->"+amountToBePaid+"\n");
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_APPROVED, localizationMessage);
+			System.out.println("\nmessageTemplate--->"+messageTemplate+"\n");
 			message = getApprovedMsg(license, amountToBePaid, messageTemplate);
+			System.out.println("\nmessage--->"+message+"\n");
 			break;
 
 		case ACTION_STATUS_REJECTED:
