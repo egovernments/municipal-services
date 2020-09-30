@@ -296,5 +296,14 @@ public class TLConfiguration {
     @Value("${tl.url.shortner.endpoint}")
     private String urlShortnerEndpoint;
 
+    @Value("${egov.usr.events.view.application.triggers}")
+    private String viewApplicationTriggers;
+
+    @Value("${egov.usr.events.view.application.link}")
+    private String viewApplicationLink;
+
+    @Value("${egov.usr.events.view.application.code}")
+    private String viewApplicationCode;
+
 
 }
