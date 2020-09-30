@@ -124,12 +124,16 @@ public class PropertyConfiguration {
     
     @Value("${egov.notif.view.property}")
     private String viewPropertyLink;
+    
+    @Value("${egov.notif.view.mutation}")
+    private String viewMutationLink;
+    
 
     @Value("${egov.usr.events.view.history.link}")
     private String userEventViewPropertyLink;
     
-    @Value("${egov.notif.view.mutation}")
-    private String viewMutationLink;
+    @Value("${egov.usr.events.view.mutation.history.link}")
+    private String userEventViewMutationLink;    
     
     //Property Search Params
     @Value("${citizen.allowed.search.params}")
