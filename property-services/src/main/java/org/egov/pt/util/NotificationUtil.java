@@ -1,6 +1,17 @@
 package org.egov.pt.util;
 
 
+import static org.egov.pt.util.PTConstants.ASMT_USER_EVENT_PAY;
+import static org.egov.pt.util.PTConstants.NOTIFICATION_LOCALE;
+import static org.egov.pt.util.PTConstants.NOTIFICATION_MODULENAME;
+import static org.egov.pt.util.PTConstants.NOTIFICATION_OWNERNAME;
+import static org.egov.pt.util.PTConstants.PT_BUSINESSSERVICE;
+import static org.egov.pt.util.PTConstants.PT_CORRECTION_PENDING;
+import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_NAME;
+import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_POSTEDBY;
+import static org.egov.pt.util.PTConstants.USREVENTS_EVENT_TYPE;
+import static org.egov.pt.util.PTConstants.VIEW_APPLICATION_CODE;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,7 +25,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Property;
-import org.egov.pt.models.event.*;
+import org.egov.pt.models.enums.CreationReason;
+import org.egov.pt.models.event.Action;
+import org.egov.pt.models.event.ActionItem;
+import org.egov.pt.models.event.Event;
+import org.egov.pt.models.event.EventRequest;
+import org.egov.pt.models.event.Recepient;
+import org.egov.pt.models.event.Source;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.SMSRequest;
@@ -28,8 +45,6 @@ import org.springframework.web.client.RestTemplate;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static org.egov.pt.util.PTConstants.*;
 
 @Slf4j
 @Component
@@ -271,7 +286,13 @@ public class NotificationUtil {
                String msg = smsRequests.get(0).getMessage();
                String actionLink = "";
                if(msg.contains(PT_CORRECTION_PENDING)){
-                   actionLink = config.getUserEventViewPropertyLink().replace("$mobileNo", mobileNumber)
+            	   
+					String url = config.getUserEventViewPropertyLink();
+					if (property.getCreationReason().equals(CreationReason.MUTATION)) {
+						url = config.getUserEventViewMutationLink();
+					}
+					
+                   actionLink = url.replace("$mobileNo", mobileNumber)
                            .replace("$tenantId", tenantId)
                            .replace("$propertyId" , property.getPropertyId())
                            .replace("$applicationNumber" , property.getAcknowldgementNumber());
