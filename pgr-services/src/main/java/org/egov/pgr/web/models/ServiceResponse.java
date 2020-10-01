@@ -28,8 +28,8 @@ public class ServiceResponse   {
         @JsonProperty("responseInfo")
         private ResponseInfo responseInfo = null;
 
-        @JsonProperty("PGREntities")
-        private List<PGREntity> pgrEntities = null;
+        @JsonProperty("ServiceWrappers")
+        private List<ServiceWrapper> serviceWrappers = null;
 
 
 }

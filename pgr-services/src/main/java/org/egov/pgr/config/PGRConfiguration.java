@@ -160,4 +160,18 @@ public class PGRConfiguration {
 
     @Value("${egov.url.shortner.endpoint}")
     private String urlShortnerEndpoint;
+
+
+
+    //Allowed Search Parameters
+    @Value("${citizen.allowed.search.params}")
+    private String allowedCitizenSearchParameters;
+
+    @Value("${employee.allowed.search.params}")
+    private String allowedEmployeeSearchParameters;
+
+    //Sources
+    @Value("${allowed.source}")
+    private String allowedSource;
+
 }

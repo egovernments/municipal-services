@@ -7,9 +7,8 @@ import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.PGRRepository;
 import org.egov.pgr.util.MDMSUtils;
 import org.egov.pgr.validator.ServiceRequestValidator;
-import org.egov.pgr.web.models.PGREntity;
+import org.egov.pgr.web.models.ServiceWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
-import org.egov.pgr.web.models.Service;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -57,49 +56,66 @@ public class PGRService {
     }
 
 
-
-
-
-    public PGREntity create(ServiceRequest request){
+    /**
+     * Creates a complaint in the system
+     * @param request The service request containg the complaint information
+     * @return
+     */
+    public ServiceRequest create(ServiceRequest request){
         Object mdmsData = mdmsUtils.mDMSCall(request);
         validator.validateCreate(request, mdmsData);
-        userService.callUserService(request);
         enrichmentService.enrichCreateRequest(request);
         workflowService.updateWorkflowStatus(request);
         producer.push(config.getCreateTopic(),request);
-        return request.getPgrEntity();
+        return request;
     }
 
 
-    public List<PGREntity> search(RequestInfo requestInfo, RequestSearchCriteria criteria){
-        validator.validateSearch(criteria);
+    /**
+     * Searches the complaints in the system based on the given criteria
+     * @param requestInfo The requestInfo of the search call
+     * @param criteria The search criteria containg the params on which to search
+     * @return
+     */
+    public List<ServiceWrapper> search(RequestInfo requestInfo, RequestSearchCriteria criteria){
+        validator.validateSearch(requestInfo, criteria);
 
         enrichmentService.enrichSearchRequest(requestInfo, criteria);
 
         if(criteria.isEmpty())
             return new ArrayList<>();
 
-        List<PGREntity> pgrEntities = repository.getPGREntities(criteria);
+        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
 
-        if(CollectionUtils.isEmpty(pgrEntities))
+        if(CollectionUtils.isEmpty(serviceWrappers))
             return new ArrayList<>();;
 
-        userService.enrichUsers(pgrEntities);
-        workflowService.enrichWorkflow(requestInfo,pgrEntities);
-        return pgrEntities;
+        userService.enrichUsers(serviceWrappers);
+        workflowService.enrichWorkflow(requestInfo,serviceWrappers);
+        return serviceWrappers;
     }
 
 
-    public PGREntity update(ServiceRequest request){
+    /**
+     * Updates the complaint (used to forward the complaint from one application status to another)
+     * @param request The request containing the complaint to be updated
+     * @return
+     */
+    public ServiceRequest update(ServiceRequest request){
         Object mdmsData = mdmsUtils.mDMSCall(request);
         validator.validateUpdate(request, mdmsData);
-        userService.callUserService(request);
-        workflowService.updateWorkflowStatus(request);
         enrichmentService.enrichUpdateRequest(request);
+        workflowService.updateWorkflowStatus(request);
         producer.push(config.getUpdateTopic(),request);
-        return request.getPgrEntity();
+        return request;
     }
 
+    /**
+     * Returns the total number of comaplaints matching the given criteria
+     * @param requestInfo The requestInfo of the search call
+     * @param criteria The search criteria containg the params for which count is required
+     * @return
+     */
     public Integer count(RequestInfo requestInfo, RequestSearchCriteria criteria){
         Integer count = repository.getCount(criteria);
         return count;

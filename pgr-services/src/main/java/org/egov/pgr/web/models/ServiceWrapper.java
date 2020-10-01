@@ -9,7 +9,7 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PGREntity {
+public class ServiceWrapper {
 
 
     @Valid

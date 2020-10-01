@@ -10,7 +10,7 @@ import org.egov.pgr.util.HRMSUtil;
 import org.egov.pgr.util.MDMSUtils;
 import org.egov.pgr.util.NotificationUtil;
 import org.egov.pgr.web.models.Notification.*;
-import org.egov.pgr.web.models.PGREntity;
+import org.egov.pgr.web.models.ServiceWrapper;
 import org.egov.pgr.web.models.RequestInfoWrapper;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.egov.pgr.web.models.workflow.ProcessInstance;
@@ -56,15 +56,15 @@ public class NotificationService {
 
     public void process(ServiceRequest request, String topic) {
         try {
-            String applicationStatus = request.getPgrEntity().getService().getApplicationStatus();
+            String applicationStatus = request.getService().getApplicationStatus();
 
-            if (!(NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getPgrEntity().getWorkflow().getAction()+"_"+applicationStatus))) {
+            if (!(NOTIFICATION_ENABLE_FOR_STATUS.contains(request.getWorkflow().getAction()+"_"+applicationStatus))) {
                 log.info("Notification Disabled For State :" + applicationStatus);
                 return;
             }
 
             String finalMessage = getFinalMessage(request, topic, applicationStatus);
-            String mobileNumber = request.getPgrEntity().getService().getCitizen().getMobileNumber();
+            String mobileNumber = request.getService().getCitizen().getMobileNumber();
 
             if(!StringUtils.isEmpty(finalMessage)){
                 log.info(finalMessage);
@@ -102,8 +102,8 @@ public class NotificationService {
      * @return Returns list of SMSRequest
      */
     private String getFinalMessage(ServiceRequest request, String topic, String applicationStatus) {
-        String tenantId = request.getPgrEntity().getService().getTenantId();
-        String action = request.getPgrEntity().getWorkflow().getAction();
+        String tenantId = request.getService().getTenantId();
+        String action = request.getWorkflow().getAction();
         String localizationMessage = notificationUtil.getLocalizationMessages(tenantId, request.getRequestInfo(),PGR_MODULE);
 
         String message = notificationUtil.getCustomizedMsg(action, applicationStatus, localizationMessage);
@@ -113,7 +113,7 @@ public class NotificationService {
         }
 
         if (message.contains("<complaint_type>")){
-            String localisedComplaint = notificationUtil.getCustomizedMsgForPlaceholder(localizationMessage,"pgr.complaint.category."+request.getPgrEntity().getService().getServiceCode());
+            String localisedComplaint = notificationUtil.getCustomizedMsgForPlaceholder(localizationMessage,"pgr.complaint.category."+request.getService().getServiceCode());
             message = message.replace("<complaint_type>", localisedComplaint);
         }
 
@@ -123,16 +123,16 @@ public class NotificationService {
 
     public String getMessageForMobileNumber(String message, ServiceRequest request){
         String messageToReplace = message;
-        PGREntity pgrEntity = request.getPgrEntity();
+        ServiceWrapper serviceWrapper = ServiceWrapper.builder().service(request.getService()).workflow(request.getWorkflow()).build();
 
         /*if (messageToReplace.contains("<complaint_type>"))
             messageToReplace = messageToReplace.replace("<complaint_type>", pgrEntity.getService().getServiceCode());*/
 
         if (messageToReplace.contains("<id>"))
-            messageToReplace = messageToReplace.replace("<id>", pgrEntity.getService().getServiceRequestId());
+            messageToReplace = messageToReplace.replace("<id>", serviceWrapper.getService().getServiceRequestId());
 
         if (messageToReplace.contains("<date>")){
-            Long createdTime = pgrEntity.getService().getAuditDetails().getCreatedTime();
+            Long createdTime = serviceWrapper.getService().getAuditDetails().getCreatedTime();
             LocalDate date = Instant.ofEpochMilli(createdTime > 10 ? createdTime : createdTime * 1000)
                     .atZone(ZoneId.systemDefault()).toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN);
@@ -145,17 +145,17 @@ public class NotificationService {
         }
 
         if (messageToReplace.contains("<emp_name>")){
-            ProcessInstance processInstance = getEmployeeName(pgrEntity.getService().getTenantId(),pgrEntity.getService().getServiceRequestId(),request.getRequestInfo(),PGR_WF_RESOLVE);
+            ProcessInstance processInstance = getEmployeeName(serviceWrapper.getService().getTenantId(),serviceWrapper.getService().getServiceRequestId(),request.getRequestInfo(),PGR_WF_RESOLVE);
             messageToReplace = messageToReplace.replace("<emp_name>", processInstance.getAssigner().getName());
         }
 
         if (messageToReplace.contains("<additional_comments>"))
-            messageToReplace = messageToReplace.replace("<additional_comments>", pgrEntity.getWorkflow().getComments());
+            messageToReplace = messageToReplace.replace("<additional_comments>", serviceWrapper.getWorkflow().getComments());
 
        /* if (messageToReplace.contains("<reason>"))
             messageToReplace = messageToReplace.replace("<reason>", pgrEntity.getWorkflow().getComments());*/
 
-        if(pgrEntity.getService().getApplicationStatus().equalsIgnoreCase(PENDINGATLME) && pgrEntity.getWorkflow().getAction().equalsIgnoreCase(REASSIGN)){
+        if(serviceWrapper.getService().getApplicationStatus().equalsIgnoreCase(PENDINGATLME) && serviceWrapper.getWorkflow().getAction().equalsIgnoreCase(REASSIGN)){
 
             Map<String, String> reassigneeDetails  = getHRMSEmployee(request);
 
@@ -199,7 +199,7 @@ public class NotificationService {
 
     public String getDepartment(ServiceRequest request){
         Object mdmsData = mdmsUtils.mDMSCall(request);
-        String serviceCode = request.getPgrEntity().getService().getServiceCode();
+        String serviceCode = request.getService().getServiceCode();
         String jsonPath = MDMS_SERVICEDEF_SEARCH.replace("{SERVICEDEF}",serviceCode);
 
         List<Object> res = null;
@@ -227,15 +227,15 @@ public class NotificationService {
         List<String> employeeName = null;
         String departmentFromMDMS;
 
-        String localisationMessageForPlaceholder =  notificationUtil.getLocalizationMessages(request.getPgrEntity().getService().getTenantId(), request.getRequestInfo(),COMMON_MODULE);
+        String localisationMessageForPlaceholder =  notificationUtil.getLocalizationMessages(request.getService().getTenantId(), request.getRequestInfo(),COMMON_MODULE);
         //HRSMS CALL
-        StringBuilder url = hrmsUtils.getHRMSURI(request.getPgrEntity().getService().getTenantId(), request.getPgrEntity().getWorkflow().getAssignes());
+        StringBuilder url = hrmsUtils.getHRMSURI(request.getService().getTenantId(), request.getWorkflow().getAssignes());
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(request.getRequestInfo()).build();
         Object response = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 
         //MDMS CALL
         Object mdmsData = mdmsUtils.mDMSCall(request);
-        String jsonPath = MDMS_DEPARTMENT_SEARCH.replace("{SERVICEDEF}",request.getPgrEntity().getService().getServiceCode());
+        String jsonPath = MDMS_DEPARTMENT_SEARCH.replace("{SERVICEDEF}",request.getService().getServiceCode());
 
         try{
             mdmsDepartmentList = JsonPath.read(mdmsData,jsonPath);
@@ -247,7 +247,7 @@ public class NotificationService {
         }
 
         if(CollectionUtils.isEmpty(mdmsDepartmentList))
-            throw new CustomException("PARSING_ERROR","Failed to fetch department from mdms data for serviceCode: "+request.getPgrEntity().getService().getServiceCode());
+            throw new CustomException("PARSING_ERROR","Failed to fetch department from mdms data for serviceCode: "+request.getService().getServiceCode());
         else departmentFromMDMS = mdmsDepartmentList.get(0);
 
         if(hrmsDepartmentList.contains(departmentFromMDMS)){
@@ -282,8 +282,8 @@ public class NotificationService {
     }
 
     private EventRequest enrichEventRequest(ServiceRequest request, String finalMessage) {
-        String tenantId = request.getPgrEntity().getService().getTenantId();
-        String mobileNumber = request.getPgrEntity().getService().getCitizen().getMobileNumber();
+        String tenantId = request.getService().getTenantId();
+        String mobileNumber = request.getService().getCitizen().getMobileNumber();
 
         Map<String, String> mapOfPhoneNoAndUUIDs = fetchUserUUIDs(mobileNumber, request.getRequestInfo(),tenantId);
 
@@ -296,8 +296,8 @@ public class NotificationService {
         toUsers.add(mapOfPhoneNoAndUUIDs.get(mobileNumber));
         Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
         events.add(Event.builder().tenantId(tenantId).description(finalMessage).eventType(USREVENTS_EVENT_TYPE)
-                    .name(USREVENTS_EVENT_NAME).postedBy(USREVENTS_EVENT_POSTEDBY)
-                    .source(Source.WEBAPP).recepient(recepient).eventDetails(null).build());
+                .name(USREVENTS_EVENT_NAME).postedBy(USREVENTS_EVENT_POSTEDBY)
+                .source(Source.WEBAPP).recepient(recepient).eventDetails(null).build());
 
         if (!CollectionUtils.isEmpty(events)) {
             return EventRequest.builder().requestInfo(request.getRequestInfo()).events(events).build();
@@ -323,22 +323,22 @@ public class NotificationService {
         userSearchRequest.put("tenantId", tenantId);
         userSearchRequest.put("userType", "CITIZEN");
         userSearchRequest.put("userName", mobileNumber);
-            try {
-                Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
-                if(null != user) {
-                    String uuid = JsonPath.read(user, "$.user[0].uuid");
-                    mapOfPhoneNoAndUUIDs.put(mobileNumber, uuid);
-                }else {
-                    log.error("Service returned null while fetching user for username - "+mobileNumber);
-                }
-            }catch(Exception e) {
-                log.error("Exception while fetching user for username - "+mobileNumber);
-                log.error("Exception trace: ",e);
+        try {
+            Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+            if(null != user) {
+                String uuid = JsonPath.read(user, "$.user[0].uuid");
+                mapOfPhoneNoAndUUIDs.put(mobileNumber, uuid);
+            }else {
+                log.error("Service returned null while fetching user for username - "+mobileNumber);
             }
+        }catch(Exception e) {
+            log.error("Exception while fetching user for username - "+mobileNumber);
+            log.error("Exception trace: ",e);
+        }
 
         return mapOfPhoneNoAndUUIDs;
     }
 
 
 
-    }
+}
