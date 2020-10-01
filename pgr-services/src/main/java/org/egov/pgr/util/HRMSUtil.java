@@ -31,6 +31,13 @@ public class HRMSUtil {
         this.config = config;
     }
 
+    /**
+     * Gets the list of department for the given list of uuids of employees
+     * @param tenantId
+     * @param uuids
+     * @param requestInfo
+     * @return
+     */
     public List<String> getDepartment(String tenantId, List<String> uuids, RequestInfo requestInfo){
 
         StringBuilder url = getHRMSURI(tenantId, uuids);
@@ -56,7 +63,12 @@ public class HRMSUtil {
 
     }
 
-
+    /**
+     * Builds HRMS search URL
+     * @param tenantId
+     * @param uuids
+     * @return
+     */
 
     public StringBuilder getHRMSURI(String tenantId, List<String> uuids){
 

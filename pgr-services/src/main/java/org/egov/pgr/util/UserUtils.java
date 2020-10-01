@@ -82,13 +82,12 @@ public class UserUtils {
         }
     }
 
-/**
- * Converts date to long
- * @param date date to be parsed
- * @param format Format of the date
- * @return Long value of date
- */
-
+    /**
+     * Converts date to long
+     * @param date date to be parsed
+     * @param format Format of the date
+     * @return Long value of date
+     */
     private Long dateTolong(String date,String format){
         SimpleDateFormat f = new SimpleDateFormat(format);
         Date d = null;
@@ -101,7 +100,12 @@ public class UserUtils {
         return  d.getTime();
     }
 
-
+    /**
+     * enriches the userInfo with statelevel tenantId and other fields
+     * @param mobileNumber
+     * @param tenantId
+     * @param userInfo
+     */
     public void addUserDefaultFields(String mobileNumber,String tenantId, User userInfo){
         Role role = getCitizenRole(tenantId);
         userInfo.setRoles(Collections.singletonList(role));
@@ -111,6 +115,11 @@ public class UserUtils {
         userInfo.setActive(true);
     }
 
+    /**
+     * Returns role object for citizen
+     * @param tenantId
+     * @return
+     */
     private Role getCitizenRole(String tenantId){
         Role role = new Role();
         role.setCode("CITIZEN");

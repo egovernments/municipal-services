@@ -38,17 +38,23 @@ public class EnrichmentService {
     }
 
 
-
-
-
-
-
+    /**
+     * Enriches the create request with auditDetails. uuids and custom ids from idGen service
+     * @param serviceRequest The create request
+     */
     public void enrichCreateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
-        Service service = serviceRequest.getPgrEntity().getService();
-        Workflow workflow = serviceRequest.getPgrEntity().getWorkflow();
+        Service service = serviceRequest.getService();
+        Workflow workflow = serviceRequest.getWorkflow();
         String tenantId = service.getTenantId();
+
+        // Enrich accountId of the logged in citizen
+        if(requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN))
+            serviceRequest.getService().setAccountId(requestInfo.getUserInfo().getUuid());
+
+        userService.callUserService(serviceRequest);
+
 
         AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,true);
 
@@ -74,18 +80,27 @@ public class EnrichmentService {
     }
 
 
-
+    /**
+     * Enriches the update request (updates the lastModifiedTime in auditDetails0
+     * @param serviceRequest The update request
+     */
     public void enrichUpdateRequest(ServiceRequest serviceRequest){
 
         RequestInfo requestInfo = serviceRequest.getRequestInfo();
-        Service service = serviceRequest.getPgrEntity().getService();
+        Service service = serviceRequest.getService();
         AuditDetails auditDetails = utils.getAuditDetails(requestInfo.getUserInfo().getUuid(), service,false);
 
         service.setAuditDetails(auditDetails);
 
+        userService.callUserService(serviceRequest);
     }
 
-
+    /**
+     * Enriches the search criteria in case of default search and enriches the userIds from mobileNumber in case of seach based on mobileNumber.
+     * Also sets the default limit and offset if none is provided
+     * @param requestInfo
+     * @param criteria
+     */
     public void enrichSearchRequest(RequestInfo requestInfo, RequestSearchCriteria criteria){
 
         if(criteria.isEmpty() && requestInfo.getUserInfo().getType().equalsIgnoreCase(USERTYPE_CITIZEN)){

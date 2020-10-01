@@ -1,3 +1,4 @@
+
 package org.egov.pgr.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,12 +24,14 @@ public class NotificationConsumer {
     @Autowired
     private ObjectMapper mapper;
 
-    /**
+
+/**
      * Consumes the water connection record and send notification
      *
      * @param record
      * @param topic
      */
+
     @KafkaListener(topics = { "${pgr.kafka.create.topic}" ,"${pgr.kafka.update.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
@@ -42,3 +45,4 @@ public class NotificationConsumer {
         }
     }
 }
+

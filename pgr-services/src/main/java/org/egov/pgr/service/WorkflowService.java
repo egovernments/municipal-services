@@ -1,6 +1,5 @@
 package org.egov.pgr.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -41,7 +40,7 @@ public class WorkflowService {
      *
      * */
     public BusinessService getBusinessService(ServiceRequest serviceRequest) {
-        String tenantId = serviceRequest.getPgrEntity().getService().getTenantId();
+        String tenantId = serviceRequest.getService().getTenantId();
         StringBuilder url = getSearchURLWithParams(tenantId, PGR_BUSINESSSERVICE);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(serviceRequest.getRequestInfo()).build();
         Object result = repository.fetchResult(url, requestInfoWrapper);
@@ -68,7 +67,7 @@ public class WorkflowService {
         ProcessInstance processInstance = getProcessInstanceForPGR(serviceRequest);
         ProcessInstanceRequest workflowRequest = new ProcessInstanceRequest(serviceRequest.getRequestInfo(), Collections.singletonList(processInstance));
         State state = callWorkFlow(workflowRequest);
-        serviceRequest.getPgrEntity().getService().setApplicationStatus(state.getApplicationStatus());
+        serviceRequest.getService().setApplicationStatus(state.getApplicationStatus());
         return state.getApplicationStatus();
     }
 
@@ -109,14 +108,14 @@ public class WorkflowService {
     }
 
 
-    public void enrichWorkflow(RequestInfo requestInfo, List<PGREntity> pgrEntities) {
+    public void enrichWorkflow(RequestInfo requestInfo, List<ServiceWrapper> serviceWrappers) {
 
         // FIX ME FOR BULK SEARCH
-        String tenantId = pgrEntities.get(0).getService().getTenantId();
+        String tenantId = serviceWrappers.get(0).getService().getTenantId();
 
         List<String> serviceRequestIds = new ArrayList<>();
 
-        pgrEntities.forEach(pgrEntity -> {
+        serviceWrappers.forEach(pgrEntity -> {
             serviceRequestIds.add(pgrEntity.getService().getServiceRequestId());
         });
 
@@ -138,7 +137,7 @@ public class WorkflowService {
 
         Map<String, Workflow> businessIdToWorkflow = getWorkflow(processInstanceResponse.getProcessInstances());
 
-        pgrEntities.forEach(pgrEntity -> {
+        serviceWrappers.forEach(pgrEntity -> {
             pgrEntity.setWorkflow(businessIdToWorkflow.get(pgrEntity.getService().getServiceRequestId()));
         });
 
@@ -151,16 +150,16 @@ public class WorkflowService {
      */
     private ProcessInstance getProcessInstanceForPGR(ServiceRequest request) {
 
-        Service service = request.getPgrEntity().getService();
-        Workflow workflow = request.getPgrEntity().getWorkflow();
+        Service service = request.getService();
+        Workflow workflow = request.getWorkflow();
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setBusinessId(service.getServiceRequestId());
-        processInstance.setAction(request.getPgrEntity().getWorkflow().getAction());
+        processInstance.setAction(request.getWorkflow().getAction());
         processInstance.setModuleName(PGR_MODULENAME);
         processInstance.setTenantId(service.getTenantId());
         processInstance.setBusinessService(getBusinessService(request).getBusinessService());
-        processInstance.setDocuments(request.getPgrEntity().getWorkflow().getVerificationDocuments());
+        processInstance.setDocuments(request.getWorkflow().getVerificationDocuments());
         processInstance.setComment(workflow.getComments());
 
         if(!CollectionUtils.isEmpty(workflow.getAssignes())){

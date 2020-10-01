@@ -8,84 +8,84 @@ serviceMaps:
     queryMaps:
 
     - query: INSERT INTO eg_pgr_service_v2(id, tenantid, servicecode, servicerequestid, description, accountid, additionaldetails, applicationstatus, source, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: PGREntity.service
+      basePath: service
       jsonMaps:
-      - jsonPath: $.PGREntity.service.id
+      - jsonPath: $.service.id
 
-      - jsonPath: $.PGREntity.service.tenantId
+      - jsonPath: $.service.tenantId
 
-      - jsonPath: $.PGREntity.service.serviceCode
+      - jsonPath: $.service.serviceCode
 
-      - jsonPath: $.PGREntity.service.serviceRequestId
+      - jsonPath: $.service.serviceRequestId
 
-      - jsonPath: $.PGREntity.service.description
+      - jsonPath: $.service.description
 
-      - jsonPath: $.PGREntity.service.accountId
+      - jsonPath: $.service.accountId
 
-      - jsonPath: $.PGREntity.service.additionalDetail
+      - jsonPath: $.service.additionalDetail
         type: JSON
         dbType: JSONB
 
-      - jsonPath: $.PGREntity.service.applicationStatus
+      - jsonPath: $.service.applicationStatus
 
-      - jsonPath: $.PGREntity.service.source
+      - jsonPath: $.service.source
 
-      - jsonPath: $.PGREntity.service.auditDetails.createdBy
+      - jsonPath: $.service.auditDetails.createdBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.createdTime
+      - jsonPath: $.service.auditDetails.createdTime
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedBy
+      - jsonPath: $.service.auditDetails.lastModifiedBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedTime
+      - jsonPath: $.service.auditDetails.lastModifiedTime
 
     - query: INSERT INTO eg_pgr_address_v2(id, tenantid, parentid, doorno, plotno, buildingname, street, landmark, city, pincode, locality, district, region, state, country, latitude, longitude, additionaldetails, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: PGREntity.service.address
+      basePath: service.address
       jsonMaps:
-      - jsonPath: $.PGREntity.service.address.id
+      - jsonPath: $.service.address.id
 
-      - jsonPath: $.PGREntity.service.address.tenantId
+      - jsonPath: $.service.address.tenantId
 
-      - jsonPath: $.PGREntity.service.id
+      - jsonPath: $.service.id
 
-      - jsonPath: $.PGREntity.service.address.doorNo
+      - jsonPath: $.service.address.doorNo
 
-      - jsonPath: $.PGREntity.service.address.plotNo
+      - jsonPath: $.service.address.plotNo
 
-      - jsonPath: $.PGREntity.service.address.buildingName
+      - jsonPath: $.service.address.buildingName
 
-      - jsonPath: $.PGREntity.service.address.street
+      - jsonPath: $.service.address.street
 
-      - jsonPath: $.PGREntity.service.address.landmark
+      - jsonPath: $.service.address.landmark
 
-      - jsonPath: $.PGREntity.service.address.city
+      - jsonPath: $.service.address.city
 
-      - jsonPath: $.PGREntity.service.address.pincode
+      - jsonPath: $.service.address.pincode
 
-      - jsonPath: $.PGREntity.service.address.locality.code
+      - jsonPath: $.service.address.locality.code
 
-      - jsonPath: $.PGREntity.service.address.district
+      - jsonPath: $.service.address.district
 
-      - jsonPath: $.PGREntity.service.address.region
+      - jsonPath: $.service.address.region
 
-      - jsonPath: $.PGREntity.service.address.state
+      - jsonPath: $.service.address.state
 
-      - jsonPath: $.PGREntity.service.address.country
+      - jsonPath: $.service.address.country
 
-      - jsonPath: $.PGREntity.service.address.geoLocation.latitude
+      - jsonPath: $.service.address.geoLocation.latitude
 
-      - jsonPath: $.PGREntity.service.address.geoLocation.longitude
+      - jsonPath: $.service.address.geoLocation.longitude
 
-      - jsonPath: $.PGREntity.service.address.additionDetails
+      - jsonPath: $.service.address.additionDetails
         type: JSON
         dbType: JSONB
 
-      - jsonPath: $.PGREntity.service.auditDetails.createdBy
+      - jsonPath: $.service.auditDetails.createdBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.createdTime
+      - jsonPath: $.service.auditDetails.createdTime
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedBy
+      - jsonPath: $.service.auditDetails.lastModifiedBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedTime
+      - jsonPath: $.service.auditDetails.lastModifiedTime
 
 
 
@@ -96,69 +96,69 @@ serviceMaps:
     queryMaps:
 
     - query: UPDATE eg_pgr_service_v2 SET servicecode=?, rating = ?,servicerequestid=?, description=?, accountid=?, additionaldetails=?, applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
-      basePath: PGREntity.service
+      basePath: service
       jsonMaps:
-      - jsonPath: $.PGREntity.service.serviceCode
+      - jsonPath: $.service.serviceCode
 
-      - jsonPath: $.PGREntity.service.rating
+      - jsonPath: $.service.rating
 
-      - jsonPath: $.PGREntity.service.serviceRequestId
+      - jsonPath: $.service.serviceRequestId
 
-      - jsonPath: $.PGREntity.service.description
+      - jsonPath: $.service.description
 
-      - jsonPath: $.PGREntity.service.accountId
+      - jsonPath: $.service.accountId
 
-      - jsonPath: $.PGREntity.service.additionalDetail
+      - jsonPath: $.service.additionalDetail
         type: JSON
         dbType: JSONB
 
-      - jsonPath: $.PGREntity.service.applicationStatus
+      - jsonPath: $.service.applicationStatus
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedBy
+      - jsonPath: $.service.auditDetails.lastModifiedBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedTime
+      - jsonPath: $.service.auditDetails.lastModifiedTime
 
-      - jsonPath: $.PGREntity.service.id
+      - jsonPath: $.service.id
 
 
     - query: UPDATE eg_pgr_address_v2 SET doorno=?, plotno=?, buildingname=?, street=?, landmark=?, city=?, pincode=?, locality=?, district=?, region=?, state=?, country=?, latitude=?, longitude=?,additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
-      basePath: PGREntity.service.address
+      basePath: service.address
       jsonMaps:
 
-      - jsonPath: $.PGREntity.service.address.doorNo
+      - jsonPath: $.service.address.doorNo
 
-      - jsonPath: $.PGREntity.service.address.plotNo
+      - jsonPath: $.service.address.plotNo
 
-      - jsonPath: $.PGREntity.service.address.buildingName
+      - jsonPath: $.service.address.buildingName
 
-      - jsonPath: $.PGREntity.service.address.street
+      - jsonPath: $.service.address.street
 
-      - jsonPath: $.PGREntity.service.address.landmark
+      - jsonPath: $.service.address.landmark
 
-      - jsonPath: $.PGREntity.service.address.city
+      - jsonPath: $.service.address.city
 
-      - jsonPath: $.PGREntity.service.address.pincode
+      - jsonPath: $.service.address.pincode
 
-      - jsonPath: $.PGREntity.service.address.locality.code
+      - jsonPath: $.service.address.locality.code
 
-      - jsonPath: $.PGREntity.service.address.district
+      - jsonPath: $.service.address.district
 
-      - jsonPath: $.PGREntity.service.address.region
+      - jsonPath: $.service.address.region
 
-      - jsonPath: $.PGREntity.service.address.state
+      - jsonPath: $.service.address.state
 
-      - jsonPath: $.PGREntity.service.address.country
+      - jsonPath: $.service.address.country
 
-      - jsonPath: $.PGREntity.service.address.geoLocation.latitude
+      - jsonPath: $.service.address.geoLocation.latitude
 
-      - jsonPath: $.PGREntity.service.address.geoLocation.longitude
+      - jsonPath: $.service.address.geoLocation.longitude
 
-      - jsonPath: $.PGREntity.service.address.additionDetails
+      - jsonPath: $.service.address.additionDetails
         type: JSON
         dbType: JSONB
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedBy
+      - jsonPath: $.service.auditDetails.lastModifiedBy
 
-      - jsonPath: $.PGREntity.service.auditDetails.lastModifiedTime
+      - jsonPath: $.service.auditDetails.lastModifiedTime
 
-      - jsonPath: $.PGREntity.service.address.id
+      - jsonPath: $.service.address.id
