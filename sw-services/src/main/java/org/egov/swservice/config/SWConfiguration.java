@@ -160,4 +160,27 @@ public class SWConfiguration {
 	@Value("${workflow.process.search.path}")
 	private String wfProcessSearchPath;
 
+	@Value("${egov.user.create.path}")
+	private String userCreateEndPoint;
+
+	@Value("${egov.user.update.path}")
+	private String userUpdateEndPoint;
+	
+	@Value("${modify.sw.workflow.name}")
+	private String modifySWBusinessServiceName;
+
+	@Value("${egov.msg.download.receipt.link}")
+	private String receiptDownloadLink;
+
+	@Value("${egov.collection.host}")
+	private String collectionHost;
+
+	@Value("${egov.collectiom.payment.search}")
+	private String paymentSearch;
+
+	@Value("${egov.usr.events.download.receipt.link}")
+	private String userEventReceiptDownloadLink;
+
+	@Value("${egov.usr.events.pay.link}")
+	private String userEventApplicationPayLink;
 }
