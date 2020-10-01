@@ -2,15 +2,12 @@
 All notable changes to this module will be documented in this file.
 
 ## 1.1.0 - 2020-10-01
-
-	- SendBack to CITIZEN added in the workflow.
-## 1.1.0
+- SendBack to CITIZEN added in the workflow.
 
 ## 1.0.1 - 2020-10-01
 
-	- Legacy entry separate workflow configured
-	- Upload workflow disabled by default
-## 1.0.1
+- Legacy entry separate workflow configured
+- Upload workflow disabled by default
 
 ## 1.0.0 - 2020-06-25
 
@@ -18,6 +15,4 @@ All notable changes to this module will be documented in this file.
 - Upgraded to `tracer:2.0.0-SNAPSHOT`
 - Upgraded to spring boot `2.2.6-RELEASE`
 - Removed `start.sh` and `Dockerfile`
-
-
 - Base version
