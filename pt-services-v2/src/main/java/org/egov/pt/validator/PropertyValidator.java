@@ -484,13 +484,14 @@ public class PropertyValidator {
      * Validates if property is created by employee the citizenInfo cannot be null
      * @param request PropertyRequest received for create or update
      */
-    private void validateCitizenInfo(PropertyRequest request){
+    public void validateCitizenInfo(PropertyRequest request){
         Map<String,String> errorMap = new HashMap<>();
         RequestInfo requestInfo = request.getRequestInfo();
         if(!requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN")){
             request.getProperties().forEach(property -> {
                 property.getPropertyDetails().forEach(propertyDetail -> {
                  // Checks for mandatory fields in citizenInfo if the assessment is done by employee
+                	log.info("################ citizen name"+propertyDetail.getCitizenInfo().getName());
                     if(propertyDetail.getCitizenInfo()==null){
                         errorMap.put("INVALID CITIZENINFO","CitizenInfo Object cannot be null");
                     }
