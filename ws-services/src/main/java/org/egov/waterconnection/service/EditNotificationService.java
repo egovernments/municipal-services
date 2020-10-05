@@ -30,6 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.egov.waterconnection.constants.WCConstants.*;
+
 @Service
 @Slf4j
 public class EditNotificationService {
@@ -86,9 +88,9 @@ public class EditNotificationService {
 		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = WCConstants.DEFAULT_OBJECT_EDIT_APP_MSG;
+			message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_EDIT_APP_MSG, localizationMessage);
 			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_IN_APP))
-				message = WCConstants.DEFAULT_OBJECT_MODIFY_APP_MSG;
+				message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_MODIFY_APP_MSG, localizationMessage);
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
@@ -146,9 +148,9 @@ public class EditNotificationService {
 		String message = notificationUtil.getCustomizedMsg(code, localizationMessage);
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
-			message = WCConstants.DEFAULT_OBJECT_EDIT_SMS_MSG;
+			message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_EDIT_SMS_MSG, localizationMessage);
 			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_SMS))
-				message = WCConstants.DEFAULT_OBJECT_MODIFY_SMS_MSG;
+				message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_MODIFY_SMS_MSG, localizationMessage);
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {

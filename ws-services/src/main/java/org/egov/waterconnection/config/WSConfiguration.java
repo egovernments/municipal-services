@@ -167,7 +167,7 @@ public class WSConfiguration {
     @Value("${ws.fileStore.link}")
     private String fileStoreLink;
     
-    @Value("${ws.shortener.url}")
+    @Value("${egov.shortener.url}")
     private String shortenerURL;
     
     @Value("${egov.pdfservice.host}")

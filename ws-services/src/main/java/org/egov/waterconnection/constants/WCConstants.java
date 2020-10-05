@@ -143,13 +143,13 @@ public class WCConstants {
 
 	public static final String WS_EDIT_IN_APP = "WS_EDIT_IN_APP_MESSAGE";
 
-	public static final String DEFAULT_OBJECT_EDIT_SMS_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>.";
+	public static final String DEFAULT_OBJECT_EDIT_SMS_MSG = "WS_DEFAULT_EDIT_NEW_CONNECTION_SMS_MESSAGE";
 
-	public static final String DEFAULT_OBJECT_EDIT_APP_MSG = "Dear <Owner Name>, Your Application <Application number>  for a New <Service> Connection has been edited. Click here for more details <View History Link>.";
+	public static final String DEFAULT_OBJECT_EDIT_APP_MSG = "WS_DEFAULT_EDIT_NEW_CONNECTION_APP_MESSAGE";
 
-	public static final String DEFAULT_OBJECT_MODIFY_SMS_MSG = "Dear <Owner Name>, Your Application <Application number> for Modification of the Connection has been edited. For more details, please log in to <mseva URL> or download <mseva app link>";
+	public static final String DEFAULT_OBJECT_MODIFY_SMS_MSG = "WS_DEFAULT_EDIT_MODIFY_CONNECTION_SMS_MESSAGE";
 
-	public static final String DEFAULT_OBJECT_MODIFY_APP_MSG = "Dear Consumer, Your Application <Application number>  for Modification of the Connection has been edited. Click here for more details <View History Link>";
+	public static final String DEFAULT_OBJECT_MODIFY_APP_MSG = "WS_DEFAULT_EDIT_MODIFY_CONNECTION_APP_MESSAGE";
 
 	public static final String WS_MODIFY_SMS = "WS_MODIFY_SMS_MESSAGE";
 	
