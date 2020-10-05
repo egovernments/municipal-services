@@ -20,7 +20,7 @@ import lombok.Setter;
 @Component
 public class WSCalculationConfiguration {
 
-	@Value("${egov.ws_calculation.meterReading.default.limit}")
+	@Value("${egov.ws.search.meterReading.pagination.default.limit}")
 	private Integer meterReadingDefaultLimit;
 
 	@Value("${egov.ws_calculation.meterReading.default.offset}")
@@ -183,7 +183,7 @@ public class WSCalculationConfiguration {
     @Value("${notification.url}")
     private String notificationUrl;
 
-	@Value("${ws.shortener.url}")
+    @Value("${egov.shortener.url}")
 	private String shortenerURL;
     
     @Value("${egov.property.service.host}")
