@@ -47,6 +47,7 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
                 		.referenceId(rs.getString("referenceid"))
                 		.taxPeriodFrom(taxPeriodFrom)
                 		.taxPeriodTo(taxPeriodto)
+                		.description(rs.getString("description"))
                 		.applicationStatus(rs.getString("applicationstatus"))
                         .id(id)
                         .build();
