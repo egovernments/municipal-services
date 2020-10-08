@@ -1,7 +1,7 @@
 
 # bpa-calculator
 
-bpa-calculator service present in municipal services provides multiple functionalities like calculating Application Fee, Sanction Fee, Low Permit Fee, OC Deviation Charges, generating demands for a particular BPA, BPA OC applications , updating demands
+bpa-calculator service used to generate Application Fee, Sanction Fee, Low Application Permit Fee, Deviation Charges for  building permit and Occupancy Certificate Application.Based on the Application Type, RiskType and ServiceType Fee to be calculated and generates a demand for the calculated amount for Payment. 
 
 ### DB UML Diagram
 
@@ -9,13 +9,13 @@ bpa-calculator service present in municipal services provides multiple functiona
 
 ### Service Dependencies
 
-- dcr-services ( get  Edcr data )
+- dcr-services (Use Edcr data )
 
-- mdms  ( to refer the calculation configuraton )
+- egov-mdms ( Configurations/master by MDMS )
 
-- billing ( generate and update demands )
+- billing-service ( Generate and update demands )
 
-- bpa-services (get the bpa application data for fee calculation )
+- bpa-services (Get the bpa application data for fee calculation )
 
 ### Swagger API Contract
 
@@ -23,7 +23,7 @@ NA
 
 ## Service Details
 
-bpa-calculator service present in municipal services provides multiple functionalities like calculating Application Fee, Sanction Fee, Low Permit Fee, OC Deviation Charges, generating demands for a particular BPA, BPA OC applications , updating demands
+bpa-calculator service present in municipal services provides multiple functionalities like calculating Application Fee, Sanction Fee, Low Permit Fee, OC Deviation Charges, generating demands for a particular BPA, BPA occupancy certificate applications and demand updation.
 
 ### API Details
 - Calculate : bpa-calculator/v1/_calculate end point used to calculate the Fee and create Demand with the applicable businessService and TaxHeads
