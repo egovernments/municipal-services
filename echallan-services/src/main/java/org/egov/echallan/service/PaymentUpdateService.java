@@ -8,6 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.AuditDetails;
 import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.producer.Producer;
@@ -59,7 +60,7 @@ public class PaymentUpdateService {
 				List<Challan> challans = challanService.search(criteria, requestInfo);
 				String uuid = requestInfo.getUserInfo().getUuid();
 			    AuditDetails auditDetails = commUtils.getAuditDetails(uuid, true);
-				challans.forEach(challan -> challan.setApplicationStatus(STATUS_PAID));
+				challans.forEach(challan -> challan.setApplicationStatus(StatusEnum.PAID));
 				challans.get(0).setAuditDetails(auditDetails);
 				ChallanRequest request = ChallanRequest.builder().requestInfo(requestInfo).challan(challans.get(0)).build();
 				producer.push(config.getUpdateChallanTopic(), request);

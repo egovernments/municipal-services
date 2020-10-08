@@ -51,6 +51,9 @@ public class SearchCriteria {
 	@JsonProperty("limit")
 	private Integer limit;
 	
+	@JsonProperty("status")
+    private String status;
+	
 	public boolean isEmpty() {
         return (this.tenantId == null && this.ids == null  && this.mobileNumber == null 
         );

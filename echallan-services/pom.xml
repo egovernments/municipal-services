@@ -160,6 +160,7 @@
           <customTypeNaming>
             <typeNaming>org.egov.echallan.web.models.collection.Bill$StatusEnum:BillStatus</typeNaming>
             <typeNaming>org.egov.echallan.web.models.collection.Bill$PurposeEnum:BillPurpose</typeNaming>
+            <typeNaming>org.egov.echallan.model.Challan$StatusEnum:ApplicationStatus</typeNaming>
           </customTypeNaming>
           <customTypeMappings>
             <customTypeMapping>org.egov.echallan.model.AuditDetails:AuditDetails</customTypeMapping>

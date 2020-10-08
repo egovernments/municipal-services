@@ -5,6 +5,7 @@ import org.egov.echallan.model.Address;
 import org.egov.echallan.model.AuditDetails;
 import org.egov.echallan.model.Boundary;
 import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.Challan.StatusEnum;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,8 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
                 		.taxPeriodFrom(taxPeriodFrom)
                 		.taxPeriodTo(taxPeriodto)
                 		.description(rs.getString("description"))
-                		.applicationStatus(rs.getString("applicationstatus"))
+                		.applicationStatus(StatusEnum.valueOf(rs.getString("applicationstatus")))
+                		.filestoreid(rs.getString("filestoreid"))
                         .id(id)
                         .build();
 

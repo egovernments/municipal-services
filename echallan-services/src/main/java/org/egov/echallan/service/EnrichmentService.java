@@ -4,9 +4,11 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.AuditDetails;
 import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.model.UserInfo;
+import org.egov.echallan.repository.ChallanRepository;
 import org.egov.echallan.repository.IdGenRepository;
 import org.egov.echallan.util.CommonUtils;
 import org.egov.echallan.web.models.Idgen.IdResponse;
@@ -30,13 +32,14 @@ public class EnrichmentService {
     private ChallanConfiguration config;
     private CommonUtils commUtils;
     private UserService userService;
-
+    private ChallanRepository challanRepository;
     @Autowired
-    public EnrichmentService(IdGenRepository idGenRepository, ChallanConfiguration config, CommonUtils commonUtils, UserService userService) {
+    public EnrichmentService(IdGenRepository idGenRepository, ChallanConfiguration config, CommonUtils commonUtils, UserService userService, ChallanRepository challanRepository) {
         this.idGenRepository = idGenRepository;
         this.config = config;
         this.commUtils = commonUtils;
         this.userService = userService;
+        this.challanRepository = challanRepository;
     }
 
     public void enrichCreateRequest(ChallanRequest challanRequest) {
@@ -46,11 +49,12 @@ public class EnrichmentService {
         Challan challan = challanRequest.getChallan();
         challan.setAuditDetails(auditDetails);
         challan.setId(UUID.randomUUID().toString());
-        challan.setApplicationStatus(STATUS_ACTIVE);
+        challan.setApplicationStatus(StatusEnum.ACTIVE);
         if(challan.getAddress()!=null) {
         	challan.getAddress().setId(UUID.randomUUID().toString());
         	challan.getAddress().setTenantId(challan.getTenantId());
         }
+        challan.setFilestoreid(null);
         if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
         challan.setAccountId(requestInfo.getUserInfo().getUuid());
         setIdgenIds(challanRequest);
@@ -163,5 +167,11 @@ public class EnrichmentService {
 	     AuditDetails auditDetails = commUtils.getAuditDetails(uuid, false);
 	     Challan challan = request.getChallan();
 	     challan.setAuditDetails(auditDetails);
+	     String fileStoreId = challan.getFilestoreid();
+	     if(fileStoreId!=null) {
+	    	 //Need to uncomment on adding filestore inactive service
+	    	 //challanRepository.setInactiveFileStoreId(challan.getTenantId(), Collections.singletonList(fileStoreId));
+	     }
+	     challan.setFilestoreid(null);
 	}
 }

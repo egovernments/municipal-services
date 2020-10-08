@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.producer.Producer;
 import org.egov.echallan.repository.ServiceRequestRepository;
@@ -36,7 +37,6 @@ import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static org.egov.echallan.util.ChallanConstants.*;
 
 @Service
 @Slf4j
@@ -87,9 +87,9 @@ public class NotificationService {
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
 							if(isSave)
 								message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
-							else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_ACTIVE))
+							else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
 								message = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
-							else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_CANCELLED))
+							else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
 								message = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
 							if (!StringUtils.isEmpty(message)) {
 								Map<String, Object> request = new HashMap<>();
@@ -130,7 +130,7 @@ public class NotificationService {
 		String message="";
 		if(isSave)
 			message = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
-		else if(challan.getApplicationStatus().equalsIgnoreCase(STATUS_ACTIVE))
+		else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
 			message = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
 		else
 			return null;
@@ -148,7 +148,7 @@ public class NotificationService {
     	Recepient recepient = Recepient.builder().toUsers(toUsers).toRoles(null).build();
     	List<String> payTriggerList = Arrays.asList(config.getPayTriggers().split("[,]"));
     	Action action = null;
-    	if(payTriggerList.contains(challan.getApplicationStatus())) {
+    	if(payTriggerList.contains(challan.getApplicationStatus().toString())) {
            List<ActionItem> items = new ArrayList<>();
            String actionLink = config.getPayLink().replace("$mobile", mobile)
         						.replace("$applicationNo", challan.getChallanNo())

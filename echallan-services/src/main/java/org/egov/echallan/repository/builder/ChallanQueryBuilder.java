@@ -37,7 +37,7 @@ public class ChallanQueryBuilder {
               " result) result_offset " +
               "WHERE offset_ > ? AND offset_ <= ?";
 
-
+      public static final String FILESTOREID_UPDATE_SQL = "UPDATE eg_echallan SET filestoreid=? WHERE id=?";
 
 
 
@@ -86,6 +86,11 @@ public class ChallanQueryBuilder {
                 addClauseIfRequired(preparedStmtList, builder);
                 builder.append("  challan.challanno = ? ");
                 preparedStmtList.add(criteria.getChallanNo());
+            }
+            if (criteria.getStatus() != null) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append("  challan.applicationstatus = ? ");
+                preparedStmtList.add(criteria.getStatus());
             }
 
 

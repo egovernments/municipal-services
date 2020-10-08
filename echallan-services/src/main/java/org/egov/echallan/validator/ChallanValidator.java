@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.egov.echallan.model.Amount;
 import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Component;
@@ -63,7 +64,7 @@ public class ChallanValidator {
 			errorMap.put("INVALID UPDATE", "User Details not matching with the Search result");
 		if(!challan.getCitizen().getMobileNumber().equalsIgnoreCase(searchchallan.getCitizen().getMobileNumber()))
 			errorMap.put("INVALID UPDATE", "User Details not matching with the Search result");
-		if(!searchchallan.getApplicationStatus().equalsIgnoreCase(STATUS_ACTIVE))
+		if(searchchallan.getApplicationStatus()!=StatusEnum.ACTIVE)
 			errorMap.put("INVALID UPDATE", "Challan cannot be updated/cancelled");
 		if(!challan.getTenantId().equalsIgnoreCase(request.getRequestInfo().getUserInfo().getTenantId()))
        	 	errorMap.put("Invalid Tenant", "Invalid tenant id");
