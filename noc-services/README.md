@@ -28,11 +28,12 @@ Module is used to apply NOC application for approval of respective noc users.
 
 ### Swagger API Contract
 
-NA
+ - [Swagger API](https://github.com/egovernments/municipal-services/blob/Noc-Contract/docs/noc/noc-v-1.0.0.yaml)
+
 
 ## Service Details
 
-For every service applied there is a need to get the No objection certificate from concerned departments. Based on the  configuration we have for the NOCs , for every application there will be a set of NOCs required. There should be a provision to allow the NOC department user to login to our system and upload the required NOC. We are providing a user to one NOC department. Based on the workflow mode(online/offline) of each noc type, the NOC department user can perform action. 
+For every building plan service applied there is a need to get the No objection certificate from concerned departments. Based on the  configuration we have for the NOCs , for every application there will be a set of NOCs required. There should be a provision to allow the NOC department user to login to our system and upload the required NOC. We are providing a user to one NOC department. Based on the workflow mode(online/offline) of each noc type, the NOC department user can perform action. 
 
 Online mode – NOC department user can login to system and approve/reject the application.
 
