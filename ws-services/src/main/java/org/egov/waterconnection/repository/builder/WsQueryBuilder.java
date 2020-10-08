@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import static org.egov.waterconnection.constants.WCConstants.SEARCH_TYPE_CONNECTION;
 
 @Component
 public class WsQueryBuilder {
@@ -37,7 +38,7 @@ public class WsQueryBuilder {
     
 	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.connectionType, wc.waterSource,"
 			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading, wc.appCreatedDate,"
-			+ " wc.detailsprovidedby, wc.estimationfileStoreId , wc.sanctionfileStoreId , wc.estimationLetterDate, "
+			+ " wc.detailsprovidedby, wc.estimationfileStoreId , wc.sanctionfileStoreId , wc.estimationLetterDate, wc.propertyid, "
 			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea,"
 			+ " conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.applicationType, conn.dateEffectiveFrom,"
 			+ " conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment, conn.createdBy as ws_createdBy, conn.lastModifiedBy as ws_lastModifiedBy,"
@@ -79,13 +80,18 @@ public class WsQueryBuilder {
 				return null;
 		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
 		boolean propertyIdsPresent = false;
+		
+		String PROPERTYID_QUERY = " (conn.property_id in (";
+		if(criteria.getSearchType().equalsIgnoreCase(SEARCH_TYPE_CONNECTION))
+			PROPERTYID_QUERY = " (wc.propertyid in (";
+
 		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
-				query.append(" (conn.property_id in (").append(createQuery(propertyIds)).append(" )");
+				query.append(PROPERTYID_QUERY).append(createQuery(propertyIds)).append(" )");
 				addToPreparedStatement(preparedStatement, propertyIds);
 				propertyIdsPresent = true;
 			}
