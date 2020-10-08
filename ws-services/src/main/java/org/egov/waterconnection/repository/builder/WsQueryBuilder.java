@@ -81,9 +81,9 @@ public class WsQueryBuilder {
 		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
 		boolean propertyIdsPresent = false;
 		
-		String PROPERTYID_QUERY = " (conn.property_id in (";
-		if(criteria.getSearchType().equalsIgnoreCase(SEARCH_TYPE_CONNECTION))
-			PROPERTYID_QUERY = " (wc.propertyid in (";
+		String propertyIdQuery = " (conn.property_id in (";
+		if(!StringUtils.isEmpty(criteria.getSearchType()) && criteria.getSearchType().equalsIgnoreCase(SEARCH_TYPE_CONNECTION))
+			propertyIdQuery = " (wc.propertyid in (";
 
 		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
 			Set<String> propertyIds = new HashSet<>();
@@ -91,7 +91,7 @@ public class WsQueryBuilder {
 			propertyList.forEach(property -> propertyIds.add(property.getId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
-				query.append(PROPERTYID_QUERY).append(createQuery(propertyIds)).append(" )");
+				query.append(propertyIdQuery).append(createQuery(propertyIds)).append(" )");
 				addToPreparedStatement(preparedStatement, propertyIds);
 				propertyIdsPresent = true;
 			}
