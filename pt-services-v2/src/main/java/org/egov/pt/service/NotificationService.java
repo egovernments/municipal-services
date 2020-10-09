@@ -71,7 +71,7 @@ public class NotificationService {
         try {
             if (isUpdateSmsEnabled) {
                 List<List<String>> tenants = getUpdateSmsEnabledCities();
-                if (tenants.get(0).contains(request.getProperties().get(0).getTenantId())) {
+                if (!tenants.get(0).contains(request.getProperties().get(0).getTenantId())) {
 
                     String tenantId = request.getProperties().get(0).getTenantId();
                     StringBuilder uri = util.getUri(tenantId, request.getRequestInfo());
