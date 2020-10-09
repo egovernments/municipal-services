@@ -77,7 +77,7 @@ public class WaterServiceImpl implements WaterService {
 	/**
 	 * 
 	 * @param waterConnectionRequest
-	 *            WaterConnectionRequest contains water connection to be created
+	 *            WaterConnectionRequest contaiupdateWaterConnectionns water connection to be created
 	 * @return List of WaterConnection after create
 	 */
 	@Override
@@ -90,6 +90,7 @@ public class WaterServiceImpl implements WaterService {
 			if (!CollectionUtils.isEmpty(previousConnectionsList)) {
 				workflowService.validateInProgressWF(previousConnectionsList, waterConnectionRequest.getRequestInfo(),
 						waterConnectionRequest.getWaterConnection().getTenantId());
+				markOldApplication(previousConnectionsList,waterConnectionRequest.getRequestInfo());
 			}
 			reqType = WCConstants.MODIFY_CONNECTION;
 		}
@@ -232,5 +233,15 @@ public class WaterServiceImpl implements WaterService {
 		waterDaoImpl.pushForEditNotification(waterConnectionRequest);
 		enrichmentService.postForMeterReading(waterConnectionRequest, WCConstants.MODIFY_CONNECTION);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
+	}
+
+	public void markOldApplication(List<WaterConnection> previousConnectionsList,RequestInfo requestInfo) {
+		for(WaterConnection waterConnection:previousConnectionsList){
+			if(!waterConnection.getOldApplication()){
+				waterConnection.setOldApplication(Boolean.TRUE);
+				WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder().requestInfo(requestInfo).waterConnection(waterConnection).build();
+				waterDao.updateWaterConnection(waterConnectionRequest,Boolean.TRUE);
+			}
+		}
 	}
 }
