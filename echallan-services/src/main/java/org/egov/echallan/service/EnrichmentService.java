@@ -169,8 +169,7 @@ public class EnrichmentService {
 	     challan.setAuditDetails(auditDetails);
 	     String fileStoreId = challan.getFilestoreid();
 	     if(fileStoreId!=null) {
-	    	 //Need to uncomment on adding filestore inactive service
-	    	 //challanRepository.setInactiveFileStoreId(challan.getTenantId(), Collections.singletonList(fileStoreId));
+	    	 challanRepository.setInactiveFileStoreId(challan.getTenantId(), Collections.singletonList(fileStoreId));
 	     }
 	     challan.setFilestoreid(null);
 	}
