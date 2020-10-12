@@ -31,17 +31,18 @@ public class ChallanConsumer {
 
     @KafkaListener(topics = {"${persister.save.challan.topic}","${persister.update.challan.topic}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+        try {
         ObjectMapper mapper = new ObjectMapper();
         ChallanRequest challanRequest = new ChallanRequest();
-        try {
+  
             challanRequest = mapper.convertValue(record, ChallanRequest.class);
-        } catch (final Exception e) {
-            log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
-        }
+
         if(topic.equalsIgnoreCase(config.getSaveChallanTopic()))
         	notificationService.sendChallanNotification(challanRequest,true);
         else if(topic.equalsIgnoreCase(config.getUpdateChallanTopic()))
             notificationService.sendChallanNotification(challanRequest,false);
-
+        } catch (final Exception e) {
+            log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);
+        }
     }
 }
