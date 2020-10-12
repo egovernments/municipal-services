@@ -111,7 +111,6 @@ public class NotificationService {
 			if(null != config.getIsUserEventEnabled()) {
 				if(config.getIsUserEventEnabled()) {
 					EventRequest eventRequest = getEventsForChallan(challanRequest,isSave);
-					System.out.println("eventRequest=="+eventRequest.getEvents().toString());
 					if(null != eventRequest)
 						sendEventNotification(eventRequest);
 				}
