@@ -351,7 +351,7 @@ public class EstimationService {
 
 
 		PropertyDetail detail = property.getPropertyDetails().get(0);
-		BigDecimal payableTax = taxAmt;
+		BigDecimal payableTax = taxAmt.setScale(2, 2);
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 
 		//PropertyDetail detail = property.getPropertyDetails().get(0);
