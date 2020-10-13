@@ -112,9 +112,9 @@ public class UserService {
 			setOwnerFields(owner, userDetailResponse, requestInfo);
 		});
 		
-		if (owners.size() != owners.stream().map(OwnerInfo::getUuid).collect(Collectors.toSet()).size())
-			throw new CustomException("EG_PT_DUPLICATE_OWNER",
-					"Duplicate owner found in request, please make sure owner information is not duplicate");
+//		if (owners.size() != owners.stream().map(OwnerInfo::getUuid).collect(Collectors.toSet()).size())
+//			throw new CustomException("EG_PT_DUPLICATE_OWNER",
+//					"Duplicate owner found in request, please make sure owner information is not duplicate");
 	}
 
 
