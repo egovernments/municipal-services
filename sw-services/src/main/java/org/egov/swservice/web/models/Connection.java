@@ -125,6 +125,9 @@ public class Connection {
 	@JsonProperty("dateEffectiveFrom")
 	private Long dateEffectiveFrom = null;
 
+	@JsonProperty("oldApplication")
+	private Boolean oldApplication = false;
+
 	public Connection id(String id) {
 		this.id = id;
 		return this;
@@ -171,6 +174,14 @@ public class Connection {
 	public Connection applicationNo(String applicationNo) {
 		this.applicationNo = applicationNo;
 		return this;
+	}
+
+	@ApiModelProperty(value = " ")
+
+	public Boolean getOldApplication() {return oldApplication;}
+
+	public void setOldApplication(Boolean oldApplication) {
+		this.oldApplication = oldApplication;
 	}
 
 	/**
@@ -579,10 +590,10 @@ public class Connection {
 				&& Objects.equals(this.connectionCategory, connection.connectionCategory)
 				&& Objects.equals(this.connectionType, connection.connectionType)
 				&& Objects.equals(this.additionalDetails, connection.additionalDetails)
-				&& Objects.equals(this.auditDetails, connection.auditDetails)
 				&& Objects.equals(this.connectionHolders, connection.connectionHolders)
 				&& Objects.equals(this.applicationType, connection.applicationType)
-				&& Objects.equals(this.dateEffectiveFrom, connection.dateEffectiveFrom);
+				&& Objects.equals(this.dateEffectiveFrom, connection.dateEffectiveFrom)
+				&& Objects.equals(this.oldApplication, connection.oldApplication);
 	}
 
 	@Override
@@ -590,7 +601,7 @@ public class Connection {
 		return Objects.hash(id, tenantId, propertyId, applicationNo, applicationStatus, status, connectionNo,
 				oldConnectionNo, documents, plumberInfo, roadType, roadCuttingArea, connectionExecutionDate,
 				connectionCategory, connectionType, additionalDetails, auditDetails, connectionHolders,
-				applicationType, dateEffectiveFrom);
+				applicationType, dateEffectiveFrom, oldApplication);
 	}
 
 	@Override
@@ -618,6 +629,7 @@ public class Connection {
 		sb.append("    connectionHolders: ").append(toIndentedString(connectionHolders)).append("\n");
 		sb.append("    applicationType: ").append(toIndentedString(applicationType)).append("\n");
 		sb.append("	   dateEffectiveFrom: ").append(toIndentedString(dateEffectiveFrom)).append("\n");
+		sb.append("	   oldApplication: ").append(toIndentedString(oldApplication)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
