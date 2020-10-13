@@ -77,7 +77,7 @@ public class UserService {
 							.append(configuration.getUserContextPath()).append(configuration.getUserUpdateEndPoint());
 					userDetailResponse = userCall(new ConnectionUserRequest(request.getRequestInfo(), holderInfo), uri);
 					if (userDetailResponse.getUser().get(0).getUuid() == null) {
-						throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
+						throw new CustomException("INVALID_USER_RESPONSE", "The user updated has uuid as null");
 					}
 				}
 				// Assigns value of fields from user got from userDetailResponse to owner object
