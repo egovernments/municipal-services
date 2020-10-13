@@ -607,7 +607,7 @@ public class PropertyValidator {
 		
 		for (OwnerInfo owner : property.getOwners()) {
 
-			mobileNumberPlusNameSet.add(owner.getMobileNumber()+owner.getName());
+			mobileNumberPlusNameSet.add(owner.getMobileNumber()+owner.getName()+owner.getOwnerType());
 			if (StringUtils.isEmpty(owner.getStatus())) {
 				isNullStatusFound = true;
 			}
