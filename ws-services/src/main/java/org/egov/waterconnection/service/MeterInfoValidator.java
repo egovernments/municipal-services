@@ -82,8 +82,8 @@ public class MeterInfoValidator implements WaterActionValidator {
 			BigDecimal initialMeterReading = BigDecimal.ZERO;
 			initialMeterReading = new BigDecimal(
 					String.valueOf(addDetail.get(WCConstants.INITIAL_METER_READING_CONST)));
-			if (initialMeterReading.compareTo(BigDecimal.ZERO) == 0) {
-				errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero");
+			if (initialMeterReading.compareTo(BigDecimal.ZERO) == 0 || initialMeterReading.compareTo(BigDecimal.ZERO) == -1 ) {
+				errorMap.put("INVALID_INITIAL_METER_READING", "Initial meter reading can not be zero or negative");
 			}
 		}
 	}
