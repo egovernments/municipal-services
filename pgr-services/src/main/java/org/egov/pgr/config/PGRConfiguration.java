@@ -174,4 +174,9 @@ public class PGRConfiguration {
     @Value("${allowed.source}")
     private String allowedSource;
 
+
+    // Migration
+    @Value("${persister.save.transition.wf.topic}")
+    private String workflowSaveTopic;
+
 }

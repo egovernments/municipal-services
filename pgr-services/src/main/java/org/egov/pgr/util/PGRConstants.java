@@ -72,6 +72,7 @@ public class PGRConstants {
 
     public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-PGR";
 
+    public static final String IMAGE_DOCUMENT_TYPE = "PHOTO";
 
 
   
