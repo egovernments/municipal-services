@@ -339,9 +339,7 @@ public class EnrichmentService {
 							connectionHashMap.put(connection.getConnectionNo(), connection);
 						}
 					} else {
-						if (connection.getApplicationStatus().equals(WCConstants.MODIFIED_FINAL_STATE)
-								&& connection.getDateEffectiveFrom() < System.currentTimeMillis()
-								&& !connection.getOldApplication()) {
+						if (connection.getApplicationStatus().equals(WCConstants.MODIFIED_FINAL_STATE) && connection.getDateEffectiveFrom() < System.currentTimeMillis() && !connection.getOldApplication()) {
 							connectionHashMap.put(connection.getConnectionNo(), connection);
 						}
 					}
