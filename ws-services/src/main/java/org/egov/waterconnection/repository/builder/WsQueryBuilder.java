@@ -164,12 +164,12 @@ public class WsQueryBuilder {
 			query.append(" conn.applicationType = ? ");
 			preparedStatement.add(criteria.getApplicationType());
 		}
-		if(!StringUtils.isEmpty(criteria.getSearchType())
+		/*if(!StringUtils.isEmpty(criteria.getSearchType())
 				&& criteria.getSearchType().equalsIgnoreCase(SEARCH_TYPE_CONNECTION)){
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.isoldapplication = ? ");
 			preparedStatement.add(Boolean.FALSE);
-		}
+		}*/
 		query.append(ORDER_BY_CLAUSE);
 		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 	}
