@@ -327,7 +327,9 @@ public class DemandService {
 		DemandResponse res = mapper.convertValue(
 				repository.fetchResult(utils.getDemandSearchUrl(latestAssessment), new RequestInfoWrapper(requestInfo)),
 				DemandResponse.class);
-		BigDecimal totalCollectedAmount = res.getDemands().get(0)
+		if(res.getDemands()!=null && res.getDemands().size()>0){
+		
+			BigDecimal totalCollectedAmount = res.getDemands().get(0)
 				.getDemandDetails().stream()
 				.map(d -> d.getCollectionAmount())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -339,6 +341,11 @@ public class DemandService {
 		}
 
 		return res.getDemands().get(0);
+		}else{
+			
+			return null;
+		}
+		
 	}
 
 	/**
