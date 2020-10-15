@@ -446,6 +446,21 @@ public class DemandService {
 				oldRebate = oldRebate.add(demandDetail.getTaxAmount());
 			}
 		}
+		if(rebate==null){
+			rebate=BigDecimal.ZERO;
+					
+		}
+		
+		if(penalty==null){
+			penalty=BigDecimal.ZERO;
+		}
+		
+		if(interest==null){
+			
+			interest=BigDecimal.ZERO;
+			
+		}
+		
 		if(rebate.compareTo(oldRebate)!=0){
 				details.add(DemandDetail.builder().taxAmount(rebate.subtract(oldRebate))
 						.taxHeadMasterCode(PT_TIME_REBATE).demandId(demandId).tenantId(tenantId)
