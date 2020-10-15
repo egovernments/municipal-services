@@ -60,8 +60,8 @@ public class PayService {
 	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedPtTax,
 			 String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap,List<Receipt> receipts,Demand demand) {
        
-            BigDecimal taxAmount= demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-		BigDecimal collectionAmount= demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+       
+       
 		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
 			return null;
 
@@ -78,7 +78,9 @@ public class PayService {
 			interest = getInterest(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER),
 					receipts);
 		}
-		
+		if(demand!=null){
+			BigDecimal taxAmount= demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			BigDecimal collectionAmount= demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		if(taxAmount.compareTo(collectionAmount)==0){
 		List<DemandDetail> demanddetailList=	demand.getDemandDetails().stream().filter(demanddetail->demanddetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_TIME_REBATE)).collect(Collectors.toList());
 		BigDecimal rebateamount= demanddetailList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -86,7 +88,7 @@ public class PayService {
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, BigDecimal.ZERO);
 		estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
 		}
-
+		}
 		else{
 		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
