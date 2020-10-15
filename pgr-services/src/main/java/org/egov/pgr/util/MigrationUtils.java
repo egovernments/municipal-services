@@ -31,7 +31,7 @@ public class MigrationUtils {
         this.config = config;
     }
 
-    public Map<Long,String> getIdtoUUIDMap(List<String> ids){
+    public Map<Long, String> getIdtoUUIDMap(List<String> ids) {
 
         /**
          * calls the user search API based on the given list of user uuids
@@ -39,28 +39,25 @@ public class MigrationUtils {
          * @return
          */
 
-            UserSearchRequest userSearchRequest =new UserSearchRequest();
-            userSearchRequest.setActive(true);
-            userSearchRequest.setUserType(USERTYPE_CITIZEN);
+        UserSearchRequest userSearchRequest = new UserSearchRequest();
+
+        if (!CollectionUtils.isEmpty(ids))
+            userSearchRequest.setId(ids);
 
 
-            if(!CollectionUtils.isEmpty(ids))
-                userSearchRequest.setId(ids);
+        StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+        UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest, uri);
+        List<User> users = userDetailResponse.getUser();
 
+        if (CollectionUtils.isEmpty(users))
+            throw new CustomException("USER_NOT_FOUND", "No user found for the uuids");
 
-            StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
-            UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest,uri);
-            List<User> users = userDetailResponse.getUser();
+        Map<Long, String> idToUuidMap = users.stream().collect(Collectors.toMap(User::getId, User::getUuid));
 
-            if(CollectionUtils.isEmpty(users))
-                throw new CustomException("USER_NOT_FOUND","No user found for the uuids");
+        if (idToUuidMap.keySet().size() != ids.size())
+            throw new CustomException("UUID_NOT_FOUND", "Number of ids searched: " + ids.size() + " uuids returned: " + idToUuidMap.keySet());
 
-            Map<Long,String> idToUuidMap = users.stream().collect(Collectors.toMap(User::getId, User::getUuid));
-
-            if(idToUuidMap.keySet().size()!=ids.size())
-                throw new CustomException("UUID_NOT_FOUND","Number of ids searched: "+ids.size()+" uuids returned: "+idToUuidMap.keySet());
-
-            return idToUuidMap;
+        return idToUuidMap;
 
     }
 
