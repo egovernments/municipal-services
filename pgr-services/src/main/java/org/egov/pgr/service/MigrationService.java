@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
+import org.egov.pgr.util.MigrationUtils;
 import org.egov.pgr.web.models.*;
 import org.egov.pgr.web.models.pgrV1.*;
 import org.egov.pgr.web.models.pgrV1.Address;
@@ -27,6 +28,8 @@ import static org.egov.pgr.util.PGRConstants.IMAGE_DOCUMENT_TYPE;
 public class MigrationService {
 
 
+    @Autowired
+    private MigrationUtils migrationUtils;
 
     @Autowired
     private Producer producer;
@@ -48,18 +51,11 @@ public class MigrationService {
 
 
 
-    public void migrate(ServiceResponse serviceResponse){
-
-
-        List<Service> servicesV1 = serviceResponse.getServices();
-        List<ActionHistory> actions = serviceResponse.getActionHistory();
-
-    }
-
     /**
      * Data Assumptions:
      * All records have actionHistory
      * Is AuditDetails of old address different from service auditDetails
+     * Every citizen and employee has uuid
      */
 
     /*
@@ -67,9 +63,41 @@ public class MigrationService {
     * Skipping records with empty actionHistory as no linking with service is possible in that case
     * Images are added in workflow doument with documentType as PHOTO which is defined in constants file
     * Citizen object is not migrated as it is stored in user service only it's reference i.e accountId is migrated
+    * Splitting Role in 'by' in actionInfo and storing only uuid not role in workflow (Why was it stored in that way?)
+    *
     *
     *
     * */
+
+
+    public void migrate(ServiceResponse serviceResponse){
+
+
+        List<Service> servicesV1 = serviceResponse.getServices();
+        List<ActionHistory> actions = serviceResponse.getActionHistory();
+
+        Set<String> ids = new HashSet<>();
+
+        servicesV1.forEach(service -> {
+            ids.add(service.getAuditDetails().getCreatedBy());
+            ids.add(service.getAuditDetails().getLastModifiedBy());
+            ids.add(service.getAccountId());
+        });
+
+        actions.forEach(actionHistory -> {
+            actionHistory.getActions().forEach(actionInfo -> {
+                ids.add(actionInfo.getAssignee());
+                ids.add(actionInfo.getBy().split(":")[0]);
+            });
+        });
+
+        Map<Long,String> idToUuidMap = migrationUtils.getIdtoUUIDMap(new LinkedList<>(ids));
+
+
+
+    }
+
+
 
     /**
      *
@@ -77,7 +105,7 @@ public class MigrationService {
      * @param actionHistories
      * @return
      */
-    private void transform(List<Service> servicesV1, List<ActionHistory> actionHistories){
+    private void transform(List<Service> servicesV1, List<ActionHistory> actionHistories, Map<Long,String> idToUuidMap){
 
 
         Map<String,List<ActionInfo>> idToActionMap = new HashMap<>();
@@ -97,10 +125,10 @@ public class MigrationService {
             List<ActionInfo> actionInfos = idToActionMap.get(serviceV1.getServiceRequestId());
             List<ProcessInstance> workflows = new LinkedList<>();
 
-            org.egov.pgr.web.models.Service service = transformService(serviceV1);
+            org.egov.pgr.web.models.Service service = transformService(serviceV1, idToUuidMap);
 
             actionInfos.forEach(actionInfo -> {
-                ProcessInstance workflow = transformAction(actionInfo);
+                ProcessInstance workflow = transformAction(actionInfo, idToUuidMap);
                 workflows.add(workflow);
             });
 
@@ -115,7 +143,7 @@ public class MigrationService {
     }
 
 
-    private org.egov.pgr.web.models.Service transformService(Service serviceV1){
+    private org.egov.pgr.web.models.Service transformService(Service serviceV1, Map<Long,String> idToUuidMap){
 
         String tenantId = serviceV1.getTenantId();
         String serviceCode = serviceV1.getServiceCode();
@@ -126,13 +154,17 @@ public class MigrationService {
 
 
         /**
-         * AccountId is id not uuid in old pgr mapping has to fetched
+         * AccountId is id not uuid in old pgr, mapping has to fetched
          * of id to uuid
          */
-        String accountId = serviceV1.getAccountId();
+        String accountId = idToUuidMap.get(Long.parseLong(serviceV1.getAccountId()));
 
 
         AuditDetails auditDetails = serviceV1.getAuditDetails();
+
+        // Setting uuid in place of id in auditDetails
+        auditDetails.setCreatedBy(idToUuidMap.get(Long.parseLong(auditDetails.getCreatedBy())));
+        auditDetails.setLastModifiedBy(idToUuidMap.get(Long.parseLong(auditDetails.getLastModifiedBy())));
 
         Object attributes = serviceV1.getAttributes();
 
@@ -216,10 +248,13 @@ public class MigrationService {
 
 
 
-    private ProcessInstance transformAction(ActionInfo actionInfo){
+    private ProcessInstance transformAction(ActionInfo actionInfo, Map<Long,String> idToUuidMap){
 
         String uuid = actionInfo.getUuid();
-        String createdBy = actionInfo.getBy();
+
+        // FIXME Should the role be stored
+        String createdBy = actionInfo.getBy().split(":")[0];
+
         Long createdTime = actionInfo.getWhen();
         String businessId = actionInfo.getBusinessKey();
         String action = actionInfo.getAction();
@@ -232,8 +267,12 @@ public class MigrationService {
         State state = State.builder().state(oldToNewStatus.get(status)).build();
 
         // LastmodifiedTime and by is same as that for created as every time new entry is created whenever any action is taken
-        org.egov.pgr.web.models.AuditDetails auditDetails = org.egov.pgr.web.models.AuditDetails.builder().createdBy(createdBy)
+        AuditDetails auditDetails = AuditDetails.builder().createdBy(createdBy)
                 .createdTime(createdTime).lastModifiedBy(createdBy).lastModifiedTime(createdTime).build();
+
+        // Setting uuid in place of id in auditDetails
+        auditDetails.setCreatedBy(idToUuidMap.get(Long.parseLong(auditDetails.getCreatedBy())));
+        auditDetails.setLastModifiedBy(idToUuidMap.get(Long.parseLong(auditDetails.getLastModifiedBy())));
 
         ProcessInstance workflow = ProcessInstance.builder()
                                     .id(uuid)
@@ -248,7 +287,7 @@ public class MigrationService {
         // Wrapping assignee uuid in User object to add it in workflow
         if(!StringUtils.isEmpty(assignee)){
             User user = new User();
-            user.setUuid(assignee);
+            user.setUuid(idToUuidMap.get(Long.parseLong(assignee)));
             workflow.setAssignes(Collections.singletonList(user));
         }
 
