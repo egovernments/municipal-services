@@ -3,7 +3,9 @@ package org.egov.pt.calculator.service;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
@@ -13,6 +15,9 @@ import org.egov.pt.calculator.web.models.demand.BillAccountDetail;
 import org.egov.pt.calculator.web.models.demand.BillDetail;
 import org.egov.pt.calculator.web.models.demand.BillRequest;
 import org.egov.pt.calculator.web.models.demand.BillResponse;
+import org.egov.pt.calculator.web.models.demand.Demand;
+import org.egov.pt.calculator.web.models.demand.DemandDetail;
+import org.egov.pt.calculator.web.models.property.Property;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +46,9 @@ public class PayService {
 	@Autowired
 	private MasterDataService mDService;
 	
+	@Autowired
+	private DemandService demandService;
+	
 	/**
 	 * Updates the incoming demand with latest rebate, penalty and interest values if applicable
 	 * 
@@ -50,8 +58,10 @@ public class PayService {
 	 * @return
 	 */
 	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt, BigDecimal collectedPtTax,
-			 String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap,List<Receipt> receipts) {
-
+			 String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap,List<Receipt> receipts,Demand demand) {
+       
+            BigDecimal taxAmount= demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal collectionAmount= demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
 			return null;
 
@@ -68,10 +78,20 @@ public class PayService {
 			interest = getInterest(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER),
 					receipts);
 		}
+		
+		if(taxAmount.compareTo(collectionAmount)==0){
+		List<DemandDetail> demanddetailList=	demand.getDemandDetails().stream().filter(demanddetail->demanddetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_TIME_REBATE)).collect(Collectors.toList());
+		BigDecimal rebateamount= demanddetailList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
+		estimates.put(CalculatorConstants.PT_TIME_PENALTY, BigDecimal.ZERO);
+		estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
+		}
 
+		else{
 		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
+		}
 		return estimates;
 	}
 
@@ -84,6 +104,7 @@ public class PayService {
 	 * @return
 	 */
 	public BigDecimal getRebate(BigDecimal taxAmt, String assessmentYear, JSONArray rebateMasterList) {
+	//	Demand demand = demandService.getLatestDemandForCurrentFinancialYear(requestInfo,property);
 
 		BigDecimal rebateAmt = BigDecimal.ZERO;
 		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
@@ -405,6 +426,14 @@ public class PayService {
 	private Integer getCurrentYear(){
 		Integer year = Calendar.getInstance().get(Calendar.YEAR);
 		return year;
+	}
+
+	public Demand checkRebateForAssessment(RequestInfo requestInfo, Property property) {
+		// TODO Auto-generated method stub
+		Demand demand=demandService.getLatestDemandForCurrentFinancialYear(requestInfo, property);
+		
+		return demand;
+		
 	}
 
 }

@@ -103,9 +103,10 @@ public class DemandService {
 			if(advanceCarryforwardEstimate.isPresent())
 				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
 
+		Demand olddemand=	getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),criteria.getProperty());
 			// true represents that the demand should be updated from this call
 			BigDecimal carryForwardCollectedAmount = getCarryForwardAndCancelOldDemand(newTax, criteria,
-					request.getRequestInfo(), true);
+					request.getRequestInfo(), true,olddemand);
 
 			if (carryForwardCollectedAmount.doubleValue() >= 0.0) {
 				Property property = criteria.getProperty();
@@ -230,7 +231,7 @@ public class DemandService {
 				throw new CustomException(CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR,
 						CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR_MSG);
 
-			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
+			applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods,null,null);
 
 			roundOffDecimalForDemand(demand, requestInfoWrapper);
 
@@ -261,7 +262,7 @@ public class DemandService {
 	 * @return
 	 */
 	protected BigDecimal getCarryForwardAndCancelOldDemand(BigDecimal newTax, CalculationCriteria criteria, RequestInfo requestInfo
-			, boolean cancelDemand) {
+			, boolean cancelDemand, Demand demand) {
 
 		Property property = criteria.getProperty();
 
@@ -270,7 +271,7 @@ public class DemandService {
 
 		if(null == property.getPropertyId()) return carryForward;
 
-		Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
+		//Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
 		
 		if(null == demand) return carryForward;
 
@@ -381,7 +382,7 @@ public class DemandService {
 	 * @return
 	 */
 	private boolean applytimeBasedApplicables(Demand demand,RequestInfoWrapper requestInfoWrapper,
-			Map<String, JSONArray> timeBasedExmeptionMasterMap,List<TaxPeriod> taxPeriods) {
+			Map<String, JSONArray> timeBasedExmeptionMasterMap,List<TaxPeriod> taxPeriods, RequestInfo requestInfo,Property property) {
 
 		boolean isCurrentDemand = false;
 		String tenantId = demand.getTenantId();
@@ -421,7 +422,7 @@ public class DemandService {
 		List<DemandDetail> details = demand.getDemandDetails();
 		
 		Map<String, BigDecimal> rebatePenaltyEstimates = payService.applyPenaltyRebateAndInterest(taxAmtForApplicableGeneration,
-				collectedApplicableAmount, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap,receipts);
+				collectedApplicableAmount, taxPeriod.getFinancialYear(), timeBasedExmeptionMasterMap,receipts,demand);
 		
 		if(null == rebatePenaltyEstimates) return isCurrentDemand;
 		

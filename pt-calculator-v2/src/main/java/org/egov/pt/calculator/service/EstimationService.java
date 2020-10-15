@@ -19,6 +19,7 @@ import org.egov.pt.calculator.web.models.CalculationRes;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.demand.Bill;
 import org.egov.pt.calculator.web.models.demand.Category;
+import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
 import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.Property;
@@ -85,7 +86,8 @@ public class EstimationService {
 			PropertyDetail detail = property.getPropertyDetails().get(0);
 			calcValidator.validatePropertyForCalculation(detail);
 			String assessmentNumber = detail.getAssessmentNumber();
-			Calculation calculation = getCalculation(requestInfo, criteria, getEstimationMap(criteria, requestInfo),masterMap);
+		    Demand demand=demandService.getLatestDemandForCurrentFinancialYear(requestInfo,property);
+			Calculation calculation = getCalculation(requestInfo, criteria,demand, getEstimationMap(criteria, requestInfo,demand),masterMap);
 			calculation.setServiceNumber(assessmentNumber);
 			calculationPropertyMap.put(assessmentNumber, calculation);
 		}
@@ -106,8 +108,9 @@ public class EstimationService {
         PropertyDetail detail = property.getPropertyDetails().get(0);
         calcValidator.validatePropertyForCalculation(detail);
         Map<String,Object> masterMap = mDataService.getMasterMap(request);
-        return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(), criteria,
-                getEstimationMap(criteria, request.getRequestInfo()),masterMap)));
+    	Demand demand=demandService.getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),property);
+        return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(), criteria,demand,
+                getEstimationMap(criteria, request.getRequestInfo(),demand),masterMap)));
     }
 
 	/**
@@ -118,7 +121,7 @@ public class EstimationService {
      * @param requestInfo request info from incoming request.
 	 * @return Map<String, Double>
 	 */
-	private Map<String,List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo) {
+	private Map<String,List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo,Demand demand) {
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal usageExemption = BigDecimal.ZERO;
@@ -199,7 +202,7 @@ public class EstimationService {
 
 		}
 		List<TaxHeadEstimate> taxHeadEstimates =  getEstimatesForTax(assessmentYear, taxAmt, usageExemption, detail, propertyBasedExemptionMasterMap,
-				timeBasedExemptionMasterMap);
+				timeBasedExemptionMasterMap,demand);
 
 		Map<String,List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates",taxHeadEstimates);
@@ -321,7 +324,7 @@ public class EstimationService {
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(String assessmentYear, BigDecimal taxAmt, BigDecimal usageExemption, PropertyDetail detail,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
-			Map<String, JSONArray> timeBasedExemeptionMasterMap) {
+			Map<String, JSONArray> timeBasedExemeptionMasterMap,Demand demand) {
 
 		BigDecimal payableTax = taxAmt;
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
@@ -361,10 +364,9 @@ public class EstimationService {
 		BigDecimal cancerCess = mDataService.getCess(payableTax, assessmentYear, cancerCessMasterList);
 		estimates.add(
 				TaxHeadEstimate.builder().taxHeadCode(PT_CANCER_CESS).estimateAmount(cancerCess.setScale(2, 2)).build());
-
 		// get applicable rebate and penalty
 		Map<String, BigDecimal> rebatePenaltyMap = payService.applyPenaltyRebateAndInterest(payableTax, BigDecimal.ZERO,
-				 assessmentYear, timeBasedExemeptionMasterMap,null);
+				 assessmentYear, timeBasedExemeptionMasterMap,null,demand);
 
 		if (null != rebatePenaltyMap) {
 
@@ -401,7 +403,7 @@ public class EstimationService {
 	 * @param requestInfo request info from incoming request.
 	 * @return Calculation object constructed based on the resulting tax amount and other applicables(rebate/penalty)
 	 */
-    private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,
+    private Calculation getCalculation(RequestInfo requestInfo, CalculationCriteria criteria,Demand demand,
 									   Map<String,List> estimatesAndBillingSlabs,Map<String,Object> masterMap) {
 
 		List<TaxHeadEstimate> estimates = estimatesAndBillingSlabs.get("estimates");
@@ -429,28 +431,39 @@ public class EstimationService {
 
 		for (TaxHeadEstimate estimate : estimates) {
 
-			Category category = taxHeadCategoryMap.get(estimate.getTaxHeadCode());
-			estimate.setCategory(category);
+			
+			estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
 
-			switch (category) {
+			switch (estimate.getTaxHeadCode().toString()) {
 
-			case TAX:
+			case PT_TAX:
 				taxAmt = taxAmt.add(estimate.getEstimateAmount());
 				if(estimate.getTaxHeadCode().equalsIgnoreCase(PT_TAX))
 					ptTax = ptTax.add(estimate.getEstimateAmount());
+				estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
+				//payService.checkRebateForAssessment(requestInfo,property);
 				break;
 
-			case PENALTY:
+			case PT_TIME_PENALTY:
 				penalty = penalty.add(estimate.getEstimateAmount());
+				estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
 				break;
 
-			case REBATE:
+			case PT_TIME_REBATE:
 				rebate = rebate.add(estimate.getEstimateAmount());
+				estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
 				break;
 
-			case EXEMPTION:
+			case PT_UNIT_USAGE_EXEMPTION:
 				exemption = exemption.add(estimate.getEstimateAmount());
+				estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
 				break;
+				
+			case PT_OWNER_EXEMPTION:
+				exemption = exemption.add(estimate.getEstimateAmount());
+				estimate.setCategory(taxHeadCategoryMap.get(estimate.getTaxHeadCode()));
+				break;
+				
 
 			default:
 				taxAmt = taxAmt.add(estimate.getEstimateAmount());
@@ -469,7 +482,7 @@ public class EstimationService {
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption);
 		// false in the argument represents that the demand shouldn't be updated from this call
-		BigDecimal collectedAmtForOldDemand = demandService.getCarryForwardAndCancelOldDemand(ptTax, criteria, requestInfo, false);
+		BigDecimal collectedAmtForOldDemand = demandService.getCarryForwardAndCancelOldDemand(ptTax, criteria, requestInfo, false,demand);
 
 		if(collectedAmtForOldDemand.compareTo(BigDecimal.ZERO) > 0)
 			estimates.add(TaxHeadEstimate.builder()
@@ -699,5 +712,13 @@ public class EstimationService {
 
 		return !(null != applicableUsageMasterExemption
 				&& null != applicableUsageMasterExemption.get(EXEMPTION_FIELD_NAME));
+	}
+	
+	public Demand checkRebateForAssessment(RequestInfo requestInfo, Property property) {
+		// TODO Auto-generated method stub
+		Demand demand=demandService.getLatestDemandForCurrentFinancialYear(requestInfo, property);
+		
+		return demand;
+		
 	}
 }
