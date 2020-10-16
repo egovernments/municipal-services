@@ -382,7 +382,7 @@ public class EstimationService {
 			}
 			
 			if(penalty==null){
-				rebate=BigDecimal.ZERO;
+				penalty=BigDecimal.ZERO;
 			}
 			
 			if(interest==null){
