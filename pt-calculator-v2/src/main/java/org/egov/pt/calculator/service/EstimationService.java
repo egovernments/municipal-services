@@ -376,6 +376,19 @@ public class EstimationService {
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_REBATE).estimateAmount(rebate).build());
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_PENALTY).estimateAmount(penalty).build());
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TIME_INTEREST).estimateAmount(interest).build());
+			
+			if(rebate==null){
+				rebate=BigDecimal.ZERO;
+			}
+			
+			if(penalty==null){
+				rebate=BigDecimal.ZERO;
+			}
+			
+			if(interest==null){
+				interest=BigDecimal.ZERO;
+			}
+			
 			payableTax = payableTax.add(rebate).add(penalty).add(interest);
 		}
 
