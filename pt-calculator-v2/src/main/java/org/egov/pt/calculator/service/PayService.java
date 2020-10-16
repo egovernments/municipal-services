@@ -87,6 +87,10 @@ public class PayService {
 		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, BigDecimal.ZERO);
 		estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
+		}else{
+			estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
+			estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
+			estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
 		}
 		}
 		else{

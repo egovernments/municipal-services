@@ -581,19 +581,11 @@ public class DemandService {
 			if(!CollectionUtils.isEmpty(detailList)){
 				details.addAll(detailList);
 				BigDecimal amount= detailList.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                 
-				if(estimate.getTaxHeadCode()==PT_TIME_REBATE && estimate.getEstimateAmount().compareTo(BigDecimal.ZERO)==0 && amount.compareTo(BigDecimal.ZERO)<0){
-					details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
-							.taxAmount(amount)
-							.collectionAmount(BigDecimal.ZERO)
-							.tenantId(tenantId).build());
-				}else{
-					details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
-							.taxAmount(estimate.getEstimateAmount().subtract(amount))
-							.collectionAmount(BigDecimal.ZERO)
-							.tenantId(tenantId).build());
-				}
-				
+
+				details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
+						.taxAmount(estimate.getEstimateAmount().subtract(amount))
+						.collectionAmount(BigDecimal.ZERO)
+						.tenantId(tenantId).build());
 			}
 			else{
 				details.add(DemandDetail.builder().taxHeadMasterCode(estimate.getTaxHeadCode())
