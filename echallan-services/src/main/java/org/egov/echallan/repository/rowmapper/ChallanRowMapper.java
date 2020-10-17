@@ -6,10 +6,17 @@ import org.egov.echallan.model.AuditDetails;
 import org.egov.echallan.model.Boundary;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.Challan.StatusEnum;
+import org.egov.tracer.model.CustomException;
+import org.postgresql.util.PGobject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -18,10 +25,12 @@ import java.util.*;
 
 @Component
 public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
+	@Autowired
+    private ObjectMapper mapper;
 
     public List<Challan> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<String, Challan> challanMap = new LinkedHashMap<>();
-
+       
         while (rs.next()) {
             String id = rs.getString("challan_id");
             Challan currentChallan = challanMap.get(id);
@@ -32,14 +41,14 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
 
                 Long taxPeriodFrom = (Long) rs.getObject("taxperiodfrom");
                 Long taxPeriodto = (Long) rs.getObject("taxperiodto");
-
+                PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
                 AuditDetails auditdetails = AuditDetails.builder()
                         .createdBy(rs.getString("challan_createdBy"))
                         .createdTime(rs.getLong("challan_createdTime"))
                         .lastModifiedBy(rs.getString("challan_lastModifiedBy"))
                         .lastModifiedTime(lastModifiedTime)
                         .build();
-
+                try {
                 currentChallan = Challan.builder().auditDetails(auditdetails)
                 		.accountId(rs.getString("uuid"))
                 		.challanNo(rs.getString("challanno"))
@@ -53,13 +62,20 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
                 		.filestoreid(rs.getString("filestoreid"))
                         .id(id)
                         .build();
-
+                if(pgObj!=null){
+                    JsonNode additionalDetail = mapper.readTree(pgObj.getValue());
+                    currentChallan.setAdditionalDetail(additionalDetail);
+                }
+                }
+                catch (IOException e){
+                    throw new CustomException("PARSING ERROR","Error while parsing additionalDetail json");
+                }
                 challanMap.put(id,currentChallan);
             }
             addChildrenToProperty(rs, currentChallan);
 
         }
-
+       
         return new ArrayList<>(challanMap.values());
 
     }
