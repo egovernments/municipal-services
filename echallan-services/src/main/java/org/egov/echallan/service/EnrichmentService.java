@@ -169,7 +169,7 @@ public class EnrichmentService {
 	     challan.setAuditDetails(auditDetails);
 	     String fileStoreId = challan.getFilestoreid();
 	     if(fileStoreId!=null) {
-	    	 challanRepository.setInactiveFileStoreId(challan.getTenantId(), Collections.singletonList(fileStoreId));
+	    	 challanRepository.setInactiveFileStoreId(challan.getTenantId().split("\\.")[0], Collections.singletonList(fileStoreId));
 	     }
 	     challan.setFilestoreid(null);
 	}
