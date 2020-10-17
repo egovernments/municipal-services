@@ -23,6 +23,14 @@ public class ChallanConstants {
     public static final String KEY_PDF_FILESTOREID = "filestoreids";
     
     public static final String KEY_NAME = "key";
+    
+	public static final String GL_CODE_JSONPATH_CODE = "$.MdmsRes.BillingService.GLCode[?(@.code==\"{}\")]";
+
+	public static final String GL_CODE = "glcode";
+	
+	public static final String GL_CODE_MASTER = "GLCode";
+
+	public static final String BILLING_SERVICE = "BillingService";
 
     public ChallanConstants() {}
 

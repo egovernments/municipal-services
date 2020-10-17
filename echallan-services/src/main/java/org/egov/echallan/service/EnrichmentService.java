@@ -10,15 +10,21 @@ import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.model.UserInfo;
 import org.egov.echallan.repository.ChallanRepository;
 import org.egov.echallan.repository.IdGenRepository;
+import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.util.CommonUtils;
 import org.egov.echallan.web.models.Idgen.IdResponse;
 import org.egov.echallan.web.models.user.User;
 import org.egov.echallan.web.models.user.UserDetailResponse;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.jayway.jsonpath.JsonPath;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,13 +39,17 @@ public class EnrichmentService {
     private CommonUtils commUtils;
     private UserService userService;
     private ChallanRepository challanRepository;
+    private ServiceRequestRepository serviceRequestRepository;
+    
     @Autowired
-    public EnrichmentService(IdGenRepository idGenRepository, ChallanConfiguration config, CommonUtils commonUtils, UserService userService, ChallanRepository challanRepository) {
+    public EnrichmentService(IdGenRepository idGenRepository, ChallanConfiguration config, CommonUtils commonUtils, UserService userService, 
+    		ChallanRepository challanRepository,ServiceRequestRepository serviceRequestRepository) {
         this.idGenRepository = idGenRepository;
         this.config = config;
         this.commUtils = commonUtils;
         this.userService = userService;
         this.challanRepository = challanRepository;
+        this.serviceRequestRepository = serviceRequestRepository;
     }
 
     public void enrichCreateRequest(ChallanRequest challanRequest) {
@@ -58,6 +68,7 @@ public class EnrichmentService {
         if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
         challan.setAccountId(requestInfo.getUserInfo().getUuid());
         setIdgenIds(challanRequest);
+        setGLCode(challanRequest);
     }
 
     private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey,
@@ -173,4 +184,36 @@ public class EnrichmentService {
 	     }
 	     challan.setFilestoreid(null);
 	}
+	
+	private void setGLCode(ChallanRequest request) {
+		RequestInfo requestInfo = request.getRequestInfo();
+		Challan challan = request.getChallan();
+		String tenantId = challan.getTenantId();
+		ModuleDetail glCodeRequest = getGLCodeRequest(); 
+		List<ModuleDetail> moduleDetails = new LinkedList<>();
+		moduleDetails.add(glCodeRequest);
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
+				.build();
+		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria)
+				.requestInfo(requestInfo).build();
+
+		StringBuilder url = new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
+
+		Object result = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
+		String jsonPath = GL_CODE_JSONPATH_CODE.replace("{}",challan.getBusinessService());
+		List<Map<String,Object>> jsonOutput =  JsonPath.read(result, jsonPath);
+		if(jsonOutput.size()!=0) {
+			Map<String,Object> glCodeObj = jsonOutput.get(0);
+			challan.setAdditionalDetail(glCodeObj);
+		}
+	}
+
+	private ModuleDetail getGLCodeRequest() {
+		List<MasterDetail> masterDetails = new ArrayList<>();
+		masterDetails.add(MasterDetail.builder().name(GL_CODE_MASTER).build());
+		ModuleDetail moduleDtls = ModuleDetail.builder().masterDetails(masterDetails)
+				.moduleName(BILLING_SERVICE).build();
+		return moduleDtls;
+	}
+
 }
