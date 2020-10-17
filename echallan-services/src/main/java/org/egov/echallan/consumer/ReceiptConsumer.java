@@ -25,7 +25,10 @@ public class ReceiptConsumer {
 
     @KafkaListener(topics = {"${kafka.topics.receipt.create}"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-        
+        try {
         paymentUpdateService.process(record);
+        } catch (final Exception e) {
+            log.error("Error while listening to value: " + record + " on topic: " + topic + ": ", e.getMessage());
+        }
     }
 }

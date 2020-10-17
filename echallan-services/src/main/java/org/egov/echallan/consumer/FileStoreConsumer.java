@@ -30,7 +30,7 @@ public class FileStoreConsumer {
 
     @KafkaListener(topics = { "${kafka.topics.filestore}" })
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
-
+    	try {
         List<Map<String,Object>> jobMaps = (List<Map<String,Object>>)record.get(KEY_PDF_JOBS);
 
         List<Challan> challans = new ArrayList<>();
@@ -46,7 +46,9 @@ public class FileStoreConsumer {
 
 
         challanRepository.updateFileStoreId(challans);
-
+    	 } catch (final Exception e) {
+             log.error("Error while listening to value: " + record + " on topic: " + topic + ": ", e.getMessage());
+         }
 
     }
 

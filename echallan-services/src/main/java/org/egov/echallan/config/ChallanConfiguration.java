@@ -176,4 +176,7 @@ public class ChallanConfiguration {
     @Value("${egov.user.event.notification.enabled}")
     private Boolean isUserEventEnabled;
     
+    
+    @Value("${kafka.topics.receipt.cancel.name}")
+    private String receiptCancelTopic;
 }

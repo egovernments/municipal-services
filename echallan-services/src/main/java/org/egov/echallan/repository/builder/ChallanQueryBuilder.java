@@ -38,6 +38,8 @@ public class ChallanQueryBuilder {
               "WHERE offset_ > ? AND offset_ <= ?";
 
       public static final String FILESTOREID_UPDATE_SQL = "UPDATE eg_echallan SET filestoreid=? WHERE id=?";
+      
+      public static final String CANCEL_RECEIPT_UPDATE_SQL = "UPDATE eg_echallan SET applicationStatus='ACTIVE' WHERE challanNo=? and businessService=?";
 
 
 
