@@ -503,7 +503,7 @@ public class PaymentNotificationService {
 	private SMSRequest getSMSRequestsWithoutReceipt(String mobileNumber, String customizedMessage) {
 
 		String finalMessage = customizedMessage.replace("$mobile", mobileNumber);
-		if (customizedMessage.contains("<payLink>")) {
+		if (customizedMessage.contains("<receipt download link>")) {
 			finalMessage = finalMessage.replace("Click on the link to download payment receipt <receipt download link>", "");
 		}
 		return new SMSRequest(mobileNumber, finalMessage);
