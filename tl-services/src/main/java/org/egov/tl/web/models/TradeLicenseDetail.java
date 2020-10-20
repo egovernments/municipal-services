@@ -129,7 +129,7 @@ public class TradeLicenseDetail   {
 
         @JsonProperty("accessories")
         @Valid
-        private List<Accessory> accessories = null;
+        private List<Accessory> accessories = new ArrayList<>();
 
         @JsonProperty("applicationDocuments")
         @Valid
