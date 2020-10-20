@@ -136,7 +136,7 @@ public class PaymentNotificationService {
 			List<SMSRequest> smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
 			String payerMobileNo = transaction.getUser().getMobileNumber();
 			if (!mobileNumbers.contains(payerMobileNo)) {
-				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage));
+				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage, valMap));
 			}
             
 
@@ -230,7 +230,7 @@ public class PaymentNotificationService {
             smsRequests.addAll(getSMSRequests(mobileNumbers,customMessage, valMap));
 			String payerMobileNo = paymentRequest.getPayment().getMobileNumber();
 			if (!mobileNumbers.contains(payerMobileNo)) {
-				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage));
+				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage, valMap));
 			}
 
             if(null == propertyConfiguration.getIsUserEventsNotificationEnabled() || propertyConfiguration.getIsUserEventsNotificationEnabled()) {
@@ -500,11 +500,14 @@ public class PaymentNotificationService {
      * @param customizedMessage The message to sent
      * @return SMSRequest
      */
-	private SMSRequest getSMSRequestsWithoutReceipt(String mobileNumber, String customizedMessage) {
+	private SMSRequest getSMSRequestsWithoutReceipt(String mobileNumber, String customizedMessage, Map<String, String> valMap) {
 
 		String finalMessage = customizedMessage.replace("$mobile", mobileNumber);
 		if (customizedMessage.contains("<receipt download link>")) {
 			finalMessage = finalMessage.replace("Click on the link to download payment receipt <receipt download link>", "");
+		}
+		if (customizedMessage.contains("<payLink>")) {
+			finalMessage = finalMessage.replace("<payLink>", getPaymentLink(valMap));
 		}
 		return new SMSRequest(mobileNumber, finalMessage);
 	}
