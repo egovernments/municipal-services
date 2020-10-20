@@ -56,6 +56,9 @@ public class MigrationService {
      * All records have actionHistory
      * Is AuditDetails of old address different from service auditDetails
      * Every citizen and employee has uuid
+     *
+     *
+     *
      */
 
     /*
@@ -65,6 +68,8 @@ public class MigrationService {
      * Citizen object is not migrated as it is stored in user service only it's reference i.e accountId is migrated
      * Splitting Role in 'by' in actionInfo and storing only uuid not role in workflow (Why was it stored in that way?)
      * Removed @Pattern in citizen from name, mobileNumber, address from SearchReponse in old pgr so that batch don't fail for any data
+     * id field set by generating new uuid as old one didn't have this field
+     * Assumed ActionHistory comes in descending order from old pgr search API
      *
      *
      * */
@@ -137,6 +142,8 @@ public class MigrationService {
                 workflows.add(workflow);
             });
 
+
+            service.setApplicationStatus(oldToNewStatus.get(actionInfos.get(0).getStatus()));
             ProcessInstanceRequest processInstanceRequest = ProcessInstanceRequest.builder().processInstances(workflows).build();
             ServiceRequest serviceRequest = ServiceRequest.builder().service(service).build();
 
@@ -202,6 +209,7 @@ public class MigrationService {
         Boolean active = serviceV1.getActive();
 
         org.egov.pgr.web.models.Service service = org.egov.pgr.web.models.Service.builder()
+                .id(UUID.randomUUID().toString())
                 .tenantId(tenantId)
                 .accountId(accountId)
                 .additionalDetail(attributes)
