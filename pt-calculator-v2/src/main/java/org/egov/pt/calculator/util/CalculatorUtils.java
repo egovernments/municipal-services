@@ -627,11 +627,24 @@ public class CalculatorUtils {
         DemandResponse res = mapper.convertValue(
                 repository.fetchResult(getDemandSearchUrl(criteria), new RequestInfoWrapper(requestInfo)),
                 DemandResponse.class);
+        if(res.getDemands()!=null && res.getDemands().size()>0){
+    		
+			BigDecimal totalCollectedAmount = res.getDemands().get(0)
+				.getDemandDetails().stream()
+				.map(d -> d.getCollectionAmount())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (CollectionUtils.isEmpty(res.getDemands()))
-            return null;
+		if (totalCollectedAmount.remainder(BigDecimal.ONE ).compareTo(BigDecimal.ZERO) != 0 ){
+			// The total collected amount is fractional most probably because of previous
+			// round off dropping prior to BS/CS 1.1 release
+			throw new CustomException("INVALID_COLLECT_AMOUNT", "The collected amount is fractional, please contact support for data correction");
+		}
 
-        return res.getDemands().get(0);
+		return res.getDemands().get(0);
+		}else{
+			
+			return null;
+		}
     }
 
 

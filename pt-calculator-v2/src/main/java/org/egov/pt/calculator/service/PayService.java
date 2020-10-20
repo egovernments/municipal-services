@@ -3,6 +3,7 @@ package org.egov.pt.calculator.service;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
@@ -46,8 +47,8 @@ public class PayService {
 	 * @return
 	 */
 	public Map<String, BigDecimal> applyPenaltyRebateAndInterest(BigDecimal taxAmt,BigDecimal collectedPtTax,
-			 String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap,List<Payment> payments,TaxPeriod taxPeriod) {
-
+			 String assessmentYear, Map<String, JSONArray> timeBasedExmeptionMasterMap,List<Payment> payments,TaxPeriod taxPeriod, Demand demand) {
+	
 		if (BigDecimal.ZERO.compareTo(taxAmt) >= 0)
 			return null;
 
@@ -59,15 +60,32 @@ public class PayService {
 		BigDecimal penalty = BigDecimal.ZERO;
 		BigDecimal interest = BigDecimal.ZERO;
 
-		if (rebate.compareTo(BigDecimal.ZERO)==0) {
+        if (rebate.compareTo(BigDecimal.ZERO)==0) {
 			penalty = getPenalty(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER));
 			interest = getInterest(taxAmt, assessmentYear, timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER),
 					payments,taxPeriod);
 		}
 
+        if(demand!=null){
+			BigDecimal taxAmount= demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			BigDecimal collectionAmount= demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		if(taxAmount.compareTo(collectionAmount)==0){
+		List<DemandDetail> demanddetailList=	demand.getDemandDetails().stream().filter(demanddetail->demanddetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_TIME_REBATE)).collect(Collectors.toList());
+		BigDecimal rebateamount= demanddetailList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
+		estimates.put(CalculatorConstants.PT_TIME_PENALTY, BigDecimal.ZERO);
+		estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
+		}else{
+			estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
+			estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
+			estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
+		}
+		}
+		else{
 		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
 		estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
+		}
 		return estimates;
 	}
 
