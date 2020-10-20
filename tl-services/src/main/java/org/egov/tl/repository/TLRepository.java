@@ -119,8 +119,11 @@ public class TLRepository {
         tradeLicenses.forEach(license -> {
             license.getTradeLicenseDetail().getOwners().sort(Comparator.comparing(User::getUuid));
             license.getTradeLicenseDetail().getTradeUnits().sort(Comparator.comparing(TradeUnit::getId));
-            if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories()))
+            if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories())) {
                 license.getTradeLicenseDetail().getAccessories().sort(Comparator.comparing(Accessory::getId));
+            }else {
+            	license.getTradeLicenseDetail().setAccessories(new ArrayList<>());
+            }
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getApplicationDocuments()))
                 license.getTradeLicenseDetail().getApplicationDocuments().sort(Comparator.comparing(Document::getId));
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getVerificationDocuments()))
