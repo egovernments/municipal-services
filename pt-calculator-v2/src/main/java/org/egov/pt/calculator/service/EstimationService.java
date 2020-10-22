@@ -31,6 +31,7 @@ import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.demand.Category;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
 import org.egov.pt.calculator.web.models.property.*;
+import org.egov.pt.calculator.web.models.propertyV2.AssessmentRequestV2;
 import org.egov.pt.calculator.web.models.propertyV2.AssessmentResponseV2;
 import org.egov.pt.calculator.web.models.propertyV2.PropertyV2;
 import org.egov.tracer.model.CustomException;
@@ -150,13 +151,22 @@ public class EstimationService {
 	 * @param request incoming calculation request containing the criteria.
 	 * @return CalculationRes calculation object containing all the tax for the given criteria.
 	 */
-    public CalculationRes getTaxCalculation(CalculationReq request) {
+    @SuppressWarnings("unchecked")
+	public CalculationRes getTaxCalculation(CalculationReq request,AssessmentRequestV2 assessmentRequestV2) {
 
         CalculationCriteria criteria = request.getCalculationCriteria().get(0);
         Property property = criteria.getProperty();
         PropertyDetail detail = property.getPropertyDetails().get(0);
         calcValidator.validatePropertyForCalculation(detail);
         Map<String,Object> masterMap = mDataService.getMasterMap(request);
+        if(assessmentRequestV2!=null){
+        Map<String,Map<String, Object>>finicialYears=(Map<String, Map<String, Object>>) masterMap.get(FINANCIALYEAR_MASTER_KEY);
+        Long startingDateForFinicialYear=  Long.valueOf(finicialYears.get(assessmentRequestV2.getAssessment().getFinancialYear()).get("startingDate").toString());
+        log.info("starting date is" +startingDateForFinicialYear);
+        criteria.setFromDate(startingDateForFinicialYear); 
+        Long endingDateForFinicialYear=  Long.valueOf(finicialYears.get(assessmentRequestV2.getAssessment().getFinancialYear()).get("endingDate").toString());
+        criteria.setToDate(endingDateForFinicialYear);
+        }
         Demand demand=utils.getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),request.getCalculationCriteria().get(0));
         return new CalculationRes(new ResponseInfo(), Collections.singletonList(getCalculation(request.getRequestInfo(), criteria,demand, masterMap)));
     }

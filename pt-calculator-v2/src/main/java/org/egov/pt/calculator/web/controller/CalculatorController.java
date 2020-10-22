@@ -40,7 +40,7 @@ public class CalculatorController {
 
 	@PostMapping("/_estimate")
 	public ResponseEntity<CalculationRes> getTaxEstimation(@RequestBody @Valid CalculationReq calculationReq) {
-		return new ResponseEntity<>(calculatorService.getTaxCalculation(calculationReq), HttpStatus.OK);
+		return new ResponseEntity<>(calculatorService.getTaxCalculation(calculationReq,null), HttpStatus.OK);
 	}
 
 	@PostMapping("/_calculate")

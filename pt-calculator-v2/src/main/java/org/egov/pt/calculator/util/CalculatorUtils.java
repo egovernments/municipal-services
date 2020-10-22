@@ -617,7 +617,7 @@ public class CalculatorUtils {
      * @return
      */
     public Demand getLatestDemandForCurrentFinancialYear(RequestInfo requestInfo, CalculationCriteria calculationCriteria) {
-
+       
         DemandSearchCriteria criteria = new DemandSearchCriteria();
         criteria.setFromDate(calculationCriteria.getFromDate());
         criteria.setToDate(calculationCriteria.getToDate());
