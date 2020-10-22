@@ -83,6 +83,7 @@ public class DemandService {
 	 * @param request
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<String, Calculation> generateDemands(CalculationReq request) {
 
 		List<CalculationCriteria> criterias = request.getCalculationCriteria();
@@ -112,7 +113,7 @@ public class DemandService {
 			if(advanceCarryforwardEstimate.isPresent())
 				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
 			
-			if(criteria.getFromDate()==null && criteria.getToDate()==null){
+			if((!(criteria.getFromDate() instanceof Long))  && (!(criteria.getToDate() instanceof Long))){
 		        Map<String,Map<String, Object>>finicialYears=(Map<String, Map<String, Object>>) masterMap.get(FINANCIALYEAR_MASTER_KEY);
 		        Long startingDateForFinicialYear=  Long.valueOf(finicialYears.get(detail.getFinancialYear()).get("startingDate").toString());
 		        log.info("starting date is" +startingDateForFinicialYear);
