@@ -68,10 +68,5 @@ public class PGRConstants {
     public static final String USREVENTS_EVENT_NAME = "PGR";
 
     public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-PGR";
-
-
-
-
-
 }
 

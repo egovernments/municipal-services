@@ -1,19 +1,13 @@
 package org.egov.notificationconsumer.web.models.workflow;
-
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.egov.pgr.web.models.Document;
+import org.egov.notificationconsumer.web.models.Document;
 import org.egov.common.contract.request.User;
 import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
