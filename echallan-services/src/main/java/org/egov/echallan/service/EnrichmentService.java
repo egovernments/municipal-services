@@ -65,8 +65,6 @@ public class EnrichmentService {
         	challan.getAddress().setTenantId(challan.getTenantId());
         }
         challan.setFilestoreid(null);
-        if (requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-        challan.setAccountId(requestInfo.getUserInfo().getUuid());
         setIdgenIds(challanRequest);
         setGLCode(challanRequest);
     }
