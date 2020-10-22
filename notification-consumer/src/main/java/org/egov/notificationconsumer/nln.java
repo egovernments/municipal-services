@@ -1,2 +1,4 @@
-package org.egov.notificationconsumer;public class nln {
+package org.egov.notificationconsumer;
+
+public class nln {
 }

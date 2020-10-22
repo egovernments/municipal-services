@@ -1,2 +1,4 @@
-package org.egov.notificationconsumer.web;public class vfs {
+package org.egov.notificationconsumer.web;
+
+public class vfs {
 }

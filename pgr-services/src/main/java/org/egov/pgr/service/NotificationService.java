@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
+import static org.apache.kafka.common.requests.FetchMetadata.log;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
