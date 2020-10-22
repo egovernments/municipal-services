@@ -90,7 +90,8 @@ public class DemandService {
 		List<String> lesserAssessments = new ArrayList<>();
 		Map<String, String> consumerCodeFinYearMap = new HashMap<>();
 		Map<String,Object> masterMap = mDataService.getMasterMap(request);
-
+        
+	
 
 		Map<String, Calculation> propertyCalculationMap = estimationService.getEstimationPropertyMap(request,masterMap);
 		for (CalculationCriteria criteria : criterias) {
@@ -110,6 +111,15 @@ public class DemandService {
 				.findAny();
 			if(advanceCarryforwardEstimate.isPresent())
 				newTax = advanceCarryforwardEstimate.get().getEstimateAmount();
+			
+			if(criteria.getFromDate()==null && criteria.getToDate()==null){
+		        Map<String,Map<String, Object>>finicialYears=(Map<String, Map<String, Object>>) masterMap.get(FINANCIALYEAR_MASTER_KEY);
+		        Long startingDateForFinicialYear=  Long.valueOf(finicialYears.get(detail.getFinancialYear()).get("startingDate").toString());
+		        log.info("starting date is" +startingDateForFinicialYear);
+		        criteria.setFromDate(startingDateForFinicialYear); 
+		        Long endingDateForFinicialYear=  Long.valueOf(finicialYears.get(detail.getFinancialYear()).get("endingDate").toString());
+		        criteria.setToDate(endingDateForFinicialYear);
+		        }
 
 			Demand oldDemand = utils.getLatestDemandForCurrentFinancialYear(request.getRequestInfo(),criteria);
 
