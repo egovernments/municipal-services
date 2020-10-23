@@ -2,6 +2,7 @@ package org.egov.notificationconsumer.consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.notificationconsumer.service.NotificationService;
+import org.egov.notificationconsumer.web.models.ServiceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;

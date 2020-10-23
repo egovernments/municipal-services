@@ -35,7 +35,5 @@ public class ServiceRequest {
     @Valid
     @JsonProperty("workflow")
     private Workflow workflow = null;
-
-
 }
 

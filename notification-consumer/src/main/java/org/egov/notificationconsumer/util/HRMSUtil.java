@@ -1,6 +1,4 @@
 package org.egov.notificationconsumer.util;
-
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.commons.lang3.StringUtils;
