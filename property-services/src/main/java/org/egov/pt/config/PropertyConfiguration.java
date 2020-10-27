@@ -44,6 +44,9 @@ public class PropertyConfiguration {
     //PERSISTER
     @Value("${persister.save.property.topic}")
     private String savePropertyTopic;
+    
+    @Value("${persister.migration.property.topic}")
+    private String migratePropertyTopic;
 
     @Value("${persister.update.property.topic}")
     private String updatePropertyTopic;

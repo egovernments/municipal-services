@@ -622,9 +622,8 @@ public class MigrationService {
                    throw new CustomException(errorMap);*/
                 }
 
-                kafkaTemplate.send(config.getSavePropertyTopic(), "propertyMigration", request);
+                kafkaTemplate.send(config.getMigratePropertyTopic(), kafkaKeyValue, request);
                 properties.add(property);
-                
 
                 if(oldProperty.getPropertyDetails().get(i)!=null)
                     migrateAssesment(oldProperty.getPropertyDetails().get(i),property,requestInfo,errorMap,masters,units);
