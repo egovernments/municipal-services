@@ -622,7 +622,7 @@ public class MigrationService {
                    throw new CustomException(errorMap);*/
                 }
 
-                kafkaTemplate.send(config.getSavePropertyTopic(), kafkaKeyValue, request);
+                kafkaTemplate.send(config.getSavePropertyTopic(), "propertyMigration", request);
                 properties.add(property);
                 
 
