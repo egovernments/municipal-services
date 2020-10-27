@@ -194,11 +194,17 @@ public class MigrationService {
         return migrationCount;
     }
 
-    public Map<String, String> initiateProcess(RequestInfoWrapper requestInfoWrapper,OldPropertyCriteria propertyCriteria,Map<String, String> errorMap){
+    public Map<String, String> initiateProcess(RequestInfoWrapper requestInfoWrapper,OldPropertyCriteria propertyCriteria,Map<String, String> errorMap, String SingleTenantId){
 
         Map<String, String> resultMap = null;
         Map<String, List<String>> masters = getMDMSData(requestInfoWrapper.getRequestInfo(),config.getStateLevelTenantId());
-        List<String> tenantList = getTenantList();
+        
+		List<String> tenantList;
+
+		if (StringUtils.isEmpty(SingleTenantId)) {
+			tenantList = getTenantList();
+		} else
+			tenantList = Arrays.asList(SingleTenantId);
 
         if(StringUtils.isEmpty(propertyCriteria.getLimit()))
             propertyCriteria.setLimit(Long.valueOf(batchSize));
