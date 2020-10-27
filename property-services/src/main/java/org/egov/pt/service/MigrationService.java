@@ -1,61 +1,99 @@
 package org.egov.pt.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.jayway.jsonpath.JsonPath;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
+import static org.egov.pt.util.PTConstants.LIMIT_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.util.PTConstants.OFFSET_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.util.PTConstants.SEPARATER;
+import static org.egov.pt.util.PTConstants.TENANT_ID_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.util.PTConstants.URL_PARAMS_SEPARATER;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.models.*;
 import org.egov.pt.models.Address;
+import org.egov.pt.models.Assessment;
+import org.egov.pt.models.AuditDetails;
+import org.egov.pt.models.ConstructionDetail;
+import org.egov.pt.models.Document;
+import org.egov.pt.models.GeoLocation;
+import org.egov.pt.models.Institution;
+import org.egov.pt.models.Locality;
+import org.egov.pt.models.OwnerInfo;
+import org.egov.pt.models.Property;
+import org.egov.pt.models.Unit;
 import org.egov.pt.models.UnitUsage;
-import org.egov.pt.models.enums.*;
-import org.egov.pt.models.oldProperty.*;
-//import org.egov.pt.models.oldProperty.PropertyCriteria;
-import org.egov.pt.models.user.UserDetailResponse;
+import org.egov.pt.models.enums.Channel;
+import org.egov.pt.models.enums.CreationReason;
+import org.egov.pt.models.enums.Relationship;
+import org.egov.pt.models.enums.Source;
+import org.egov.pt.models.enums.Status;
+import org.egov.pt.models.oldProperty.Boundary;
+import org.egov.pt.models.oldProperty.MigrationCount;
+import org.egov.pt.models.oldProperty.OldAuditDetails;
+import org.egov.pt.models.oldProperty.OldDocument;
+import org.egov.pt.models.oldProperty.OldInstitution;
+import org.egov.pt.models.oldProperty.OldOwnerInfo;
+import org.egov.pt.models.oldProperty.OldProperty;
+import org.egov.pt.models.oldProperty.OldPropertyCriteria;
+import org.egov.pt.models.oldProperty.OldPropertyResponse;
+import org.egov.pt.models.oldProperty.OldUnit;
+import org.egov.pt.models.oldProperty.OldUserDetailResponse;
+import org.egov.pt.models.oldProperty.PropertyDetail;
 import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.AssessmentRepository;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.repository.builder.OldPropertyQueryBuilder;
-import org.egov.pt.repository.builder.PropertyQueryBuilder;
 import org.egov.pt.repository.rowmapper.MigrationCountRowMapper;
 import org.egov.pt.repository.rowmapper.OldPropertyRowMapper;
-import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.util.AssessmentUtils;
 import org.egov.pt.util.ErrorConstants;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.validator.AssessmentValidator;
 import org.egov.pt.validator.PropertyMigrationValidator;
-import org.egov.pt.validator.PropertyValidator;
-import org.egov.pt.web.contracts.*;
+import org.egov.pt.web.contracts.AssessmentRequest;
+import org.egov.pt.web.contracts.PropertyMigrationCountRequest;
+import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
+import org.egov.tracer.kafka.CustomKafkaTemplate;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.jayway.jsonpath.JsonPath;
 
-import static org.egov.pt.util.PTConstants.*;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
@@ -64,6 +102,9 @@ public class MigrationService {
 
     @Autowired
     private Producer producer;
+    
+    @Autowired
+    private CustomKafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
     private AssessmentValidator validator;
@@ -163,7 +204,7 @@ public class MigrationService {
             propertyCriteria.setLimit(Long.valueOf(batchSize));
 
         if(StringUtils.isEmpty(propertyCriteria.getOffset()))
-            propertyCriteria.setLimit(Long.valueOf(batchOffset));
+            propertyCriteria.setOffset(Long.valueOf(batchOffset));
 
         for(int i= 0;i<tenantList.size();i++){
             MigrationCount migrationCount = getMigrationCountForTenant(tenantList.get(i));
@@ -464,8 +505,14 @@ public class MigrationService {
             Collections.sort(oldProperty.getPropertyDetails(), new Comparator<PropertyDetail>() {
                 @Override
                 public int compare(PropertyDetail pd1, PropertyDetail pd2) {
-                    return pd1.getAuditDetails().getCreatedTime().compareTo(pd2.getAuditDetails().getCreatedTime());
-                }
+
+					int financialYeardiff = pd1.getFinancialYear().compareTo(pd2.getFinancialYear());
+
+					if (financialYeardiff == 0)
+						return pd1.getAuditDetails().getCreatedTime().compareTo(pd2.getAuditDetails().getCreatedTime());
+					else
+						return financialYeardiff;
+				}
             });
 
             for(int i=0;i< oldProperty.getPropertyDetails().size();i++){
@@ -566,7 +613,7 @@ public class MigrationService {
                    throw new CustomException(errorMap);*/
                 }
 
-                producer.push(config.getSavePropertyTopic(), request);
+                kafkaTemplate.send(config.getSavePropertyTopic(), "propertyMigration", request);
                 properties.add(property);
                 
 
