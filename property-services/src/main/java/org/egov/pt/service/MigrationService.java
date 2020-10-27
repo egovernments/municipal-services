@@ -515,6 +515,9 @@ public class MigrationService {
 				}
             });
 
+            // to map key for partition
+            String kafkaKeyValue = String.valueOf(getKafkaKeyValue(propertyId));
+            
             for(int i=0;i< oldProperty.getPropertyDetails().size();i++){
                 Property property = new Property();
                 property.setId(Id);
@@ -613,7 +616,7 @@ public class MigrationService {
                    throw new CustomException(errorMap);*/
                 }
 
-                kafkaTemplate.send(config.getSavePropertyTopic(), "propertyMigration", request);
+                kafkaTemplate.send(config.getSavePropertyTopic(), kafkaKeyValue, request);
                 properties.add(property);
                 
 
@@ -627,7 +630,19 @@ public class MigrationService {
         return properties;
     }
 
-    public Address migrateAddress(org.egov.pt.models.oldProperty.Address oldAddress){
+    /**
+     * modulo value of property-id based on number of partiiton
+     * 
+     * @param propertyId
+     * @return
+     */
+	private int getKafkaKeyValue(String propertyId) {
+
+		return Integer.valueOf(propertyId.substring(propertyId.length() - 3, propertyId.length() - 1))
+				% config.getPartitionCount();
+	}
+
+	public Address migrateAddress(org.egov.pt.models.oldProperty.Address oldAddress){
         Address address = new Address();
         address.setTenantId(oldAddress.getTenantId());
         address.setDoorNo(oldAddress.getDoorNo());

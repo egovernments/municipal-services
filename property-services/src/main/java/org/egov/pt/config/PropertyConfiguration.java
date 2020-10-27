@@ -59,6 +59,9 @@ public class PropertyConfiguration {
 
     @Value("${persister.migration.batch.count.topic}")
     private String migartionBatchCountTopic;
+    
+    @Value("${kafka.partition.count}")
+	private Integer partitionCount;
 
 
     //USER
@@ -298,4 +301,5 @@ public class PropertyConfiguration {
 
     @Value("${state.level.tenant.id}")
     private String stateLevelTenantId;
+
 }
