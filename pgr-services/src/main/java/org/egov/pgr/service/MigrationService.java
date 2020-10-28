@@ -11,17 +11,19 @@ import org.egov.pgr.web.models.pgrV1.*;
 import org.egov.pgr.web.models.pgrV1.Address;
 import org.egov.pgr.web.models.pgrV1.Service;
 import org.egov.pgr.web.models.pgrV1.ServiceResponse;
-import org.egov.pgr.web.models.workflow.ProcessInstance;
-import org.egov.pgr.web.models.workflow.ProcessInstanceRequest;
-import org.egov.pgr.web.models.workflow.State;
+import org.egov.pgr.web.models.workflow.*;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 import static org.egov.pgr.util.PGRConstants.IMAGE_DOCUMENT_TYPE;
+import static org.egov.pgr.util.PGRConstants.PGR_BUSINESSSERVICE;
+import static org.egov.pgr.util.PGRConstants.PGR_MODULENAME;
 
 @Component
 @Slf4j
@@ -37,11 +39,13 @@ public class MigrationService {
     @Autowired
     private PGRConfiguration config;
 
+    private Map<String,String> statusToUUIDMap;
+
     private final Map<String, String> oldToNewStatus = new HashMap<String, String>() {
         {
 
             put("open", "OPEN");
-            put("assigned", "ASSIGNED");
+            put("assigned", "PENDINGATLME");
             put("closed", "CLOSED");
             put("rejected", "REJECTED");
             put("resolved", "RESOLVED");
@@ -50,8 +54,21 @@ public class MigrationService {
         }
     };
 
+    @PostConstruct
+    private void setStatusToUUIDMap(){
+        this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
+    }
+
+
+
 
     /**
+     *
+     * Comment actions has to be added in workflow
+     * Active field has to be added
+     * Media contains the complete url path instead of fileStoreId
+     *
+     *
      * Data Assumptions:
      * All records have actionHistory
      * Is AuditDetails of old address different from service auditDetails
@@ -201,6 +218,7 @@ public class MigrationService {
         GeoLocation geoLocation = GeoLocation.builder().longitude(longitutude).latitude(latitude).build();
         org.egov.pgr.web.models.Address address = transformAddress(serviceV1.getAddressDetail());
         address.setGeoLocation(geoLocation);
+        address.setTenantId(tenantId);
 
         /**
          * FIXME
@@ -277,6 +295,7 @@ public class MigrationService {
         // FIXME Should the role be stored
         String createdBy = actionInfo.getBy().split(":")[0];
 
+        String tenantId = actionInfo.getTenantId();
         Long createdTime = actionInfo.getWhen();
         String businessId = actionInfo.getBusinessKey();
         String action = actionInfo.getAction();
@@ -284,9 +303,10 @@ public class MigrationService {
         String assignee = actionInfo.getAssignee();
         String comments = actionInfo.getComment();
         List<String> fileStoreIds = actionInfo.getMedia();
+        String stateUUID = statusToUUIDMap.get(oldToNewStatus.get(status));
 
 
-        State state = State.builder().state(oldToNewStatus.get(status)).build();
+        State state = State.builder().uuid(stateUUID).state(oldToNewStatus.get(status)).build();
 
         // LastmodifiedTime and by is same as that for created as every time new entry is created whenever any action is taken
         AuditDetails auditDetails = AuditDetails.builder().createdBy(createdBy)
@@ -298,10 +318,13 @@ public class MigrationService {
 
         ProcessInstance workflow = ProcessInstance.builder()
                 .id(uuid)
+                .tenantId(tenantId)
                 .action(action)
                 .comment(comments)
                 .businessId(businessId)
+                .moduleName(PGR_MODULENAME)
                 .state(state)
+                .businessService(PGR_BUSINESSSERVICE)
                 .auditDetails(auditDetails)
                 .build();
 
@@ -312,6 +335,11 @@ public class MigrationService {
             user.setUuid(idToUuidMap.get(Long.parseLong(assignee)));
             workflow.setAssignes(Collections.singletonList(user));
         }
+
+        User assigner = new User();
+        assigner.setUuid(idToUuidMap.get(Long.parseLong(createdBy)));
+        workflow.setAssigner(assigner);
+
 
         // Setting the images uploaded in workflow document
         if (!CollectionUtils.isEmpty(fileStoreIds)) {

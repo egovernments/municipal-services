@@ -179,4 +179,8 @@ public class PGRConfiguration {
     @Value("${persister.save.transition.wf.topic}")
     private String workflowSaveTopic;
 
+    @Value("${pgr.statelevel.tenantid}")
+    private String tenantId;
+
+
 }
