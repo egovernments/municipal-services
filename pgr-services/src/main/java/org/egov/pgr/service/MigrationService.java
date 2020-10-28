@@ -319,7 +319,7 @@ public class MigrationService {
             for (String fileStoreId : fileStoreIds) {
                 Document document = Document.builder()
                         .documentType(IMAGE_DOCUMENT_TYPE)
-                        .fileStore(fileStoreId)
+                        .fileStoreId(fileStoreId)
                         .id(UUID.randomUUID().toString())
                         .build();
                 documents.add(document);

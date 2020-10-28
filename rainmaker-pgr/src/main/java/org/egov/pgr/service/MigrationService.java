@@ -2,6 +2,7 @@ package org.egov.pgr.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pgr.contract.MigrationCriteria;
 import org.egov.pgr.contract.ServiceReqSearchCriteria;
 import org.egov.pgr.contract.ServiceResponse;
 import org.egov.pgr.producer.PGRProducer;
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -36,9 +39,11 @@ public class MigrationService {
         this.grievanceService = grievanceService;
     }
 
-    public void migrateData(RequestInfo requestInfo){
+    public void migrateData(RequestInfo requestInfo, MigrationCriteria migrationCriteria){
 
-        List<String> tenantIds = getListOfTenantId();
+
+
+        Set<String> tenantIds = (!CollectionUtils.isEmpty(migrationCriteria.getTenantIds()))?migrationCriteria.getTenantIds():getListOfTenantId();
 
         for(String tenantId : tenantIds){
 
@@ -70,8 +75,8 @@ public class MigrationService {
 
 
 
-    private List<String> getListOfTenantId(){
-        List<String> tenantIds = new LinkedList<>();
+    private Set<String> getListOfTenantId(){
+        Set<String> tenantIds = new HashSet<>();
 
         // TO DO
 
