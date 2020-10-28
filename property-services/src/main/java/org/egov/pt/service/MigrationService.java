@@ -642,9 +642,8 @@ public class MigrationService {
      * @return
      */
 	private int getKafkaKeyValue(String propertyId) {
-
-		return Integer.valueOf(propertyId.substring(propertyId.length() - 3, propertyId.length() - 1))
-				% config.getPartitionCount();
+		
+		return propertyId.hashCode()% config.getPartitionCount();
 	}
 
 	public Address migrateAddress(org.egov.pt.models.oldProperty.Address oldAddress){
