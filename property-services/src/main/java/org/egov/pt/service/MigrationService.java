@@ -80,7 +80,6 @@ import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -194,17 +193,17 @@ public class MigrationService {
         return migrationCount;
     }
 
-    public Map<String, String> initiateProcess(RequestInfoWrapper requestInfoWrapper,OldPropertyCriteria propertyCriteria,Map<String, String> errorMap, String SingleTenantId){
+    public Map<String, String> initiateProcess(RequestInfoWrapper requestInfoWrapper,OldPropertyCriteria propertyCriteria,Map<String, String> errorMap, List<String> tenantIdList){
 
         Map<String, String> resultMap = null;
         Map<String, List<String>> masters = getMDMSData(requestInfoWrapper.getRequestInfo(),config.getStateLevelTenantId());
         
 		List<String> tenantList;
 
-		if (StringUtils.isEmpty(SingleTenantId)) {
+		if (!CollectionUtils.isEmpty(tenantIdList)) {
 			tenantList = getTenantList();
 		} else
-			tenantList = Arrays.asList(SingleTenantId);
+			tenantList = tenantIdList;
 
         if(StringUtils.isEmpty(propertyCriteria.getLimit()))
             propertyCriteria.setLimit(Long.valueOf(batchSize));
