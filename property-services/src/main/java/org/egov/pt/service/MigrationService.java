@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -81,6 +82,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -251,12 +253,13 @@ public class MigrationService {
         long count = getTenantCount(propertyCriteria.getTenantId());
         log.info("Count: "+count);
         log.info("startbatch: "+startBatch);
+        List<CompletableFuture<List<Property>>> futures = new ArrayList<>();
 
             while(startBatch<count) {
                 long startTime = System.nanoTime();
                 List<OldProperty> oldProperties = searchOldPropertyFromURL(requestInfoWrapper,propertyCriteria) ;
                 try {
-                    properties= migrateProperty(requestInfo,oldProperties,masters,errorMap);
+                    futures.add(migrateProperty(requestInfo,oldProperties,masters,errorMap));
                 } catch (Exception e) {
 
                     log.error("Migration failed at batch count of : " + startBatch);
@@ -275,7 +278,7 @@ public class MigrationService {
                 migrationCount.setLimit(Long.valueOf(batchSizeInput));
                 migrationCount.setCreatedTime(System.currentTimeMillis());
                 migrationCount.setTenantid(propertyCriteria.getTenantId());
-                migrationCount.setRecordCount(Long.valueOf(startBatch+batchSizeInput));
+                migrationCount.setRecordCount((long) (startBatch + batchSizeInput));
                 PropertyMigrationCountRequest request = PropertyMigrationCountRequest.builder().requestInfo(requestInfo).migrationCount(migrationCount).build();
                 producer.push(config.getMigartionBatchCountTopic(), request);
 
@@ -283,7 +286,9 @@ public class MigrationService {
                 propertyCriteria.setOffset(Long.valueOf(startBatch));
                 System.out.println("Property Count which pushed into kafka topic:"+count2);
             }
+
         propertyCriteria.setOffset(Long.valueOf(batchOffset));
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         return responseMap;
 
     }
@@ -497,7 +502,8 @@ public class MigrationService {
         return  d.getTime();
     }
 
-    public  List<Property> migrateProperty(RequestInfo requestInfo, List<OldProperty> oldProperties,Map<String, List<String>> masters,Map<String, String> errorMap) {
+    @Async
+    public CompletableFuture<List<Property>> migrateProperty(RequestInfo requestInfo, List<OldProperty> oldProperties, Map<String, List<String>> masters, Map<String, String> errorMap) {
         List<Property> properties = new ArrayList<>();
         for(OldProperty oldProperty : oldProperties){
 
@@ -632,7 +638,7 @@ public class MigrationService {
             count2++;
         }
 
-        return properties;
+        return CompletableFuture.completedFuture(properties);
     }
 
     /**
