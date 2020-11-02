@@ -88,7 +88,8 @@ public class PropertyService {
         } else {
             properties = getPropertiesWithOwnerInfo(criteria, requestInfo);
         }
-        enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
+        //removed for migration
+       // enrichmentService.enrichBoundary(new PropertyRequest(requestInfo, properties));
         return properties;
     }
 
@@ -110,8 +111,10 @@ public class PropertyService {
         if (CollectionUtils.isEmpty(properties))
             return Collections.emptyList();
         enrichmentService.enrichPropertyCriteriaWithOwnerids(criteria, properties);
-        UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
-        enrichmentService.enrichOwner(userDetailResponse, properties);
+        
+        // removed for migration
+        //UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
+        //enrichmentService.enrichOwner(userDetailResponse, properties);
         return properties;
     }
 
