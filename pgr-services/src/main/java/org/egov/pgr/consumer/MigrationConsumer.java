@@ -2,6 +2,7 @@ package org.egov.pgr.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.pgr.service.MigrationService;
+import org.egov.pgr.web.models.pgrV1.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -25,10 +26,11 @@ public class MigrationConsumer {
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
-
+            ServiceResponse serviceResponse = mapper.convertValue(record,ServiceResponse.class);
+            migrationService.migrate(serviceResponse);
         }
         catch (Exception e){
-
+            e.printStackTrace();
         }
 
     }
