@@ -201,9 +201,9 @@ public class MigrationService {
 		List<String> tenantList;
 
 		if (!CollectionUtils.isEmpty(tenantIdList)) {
-			tenantList = getTenantList();
-		} else
 			tenantList = tenantIdList;
+		} else
+			tenantList = getTenantList();
 
         if(StringUtils.isEmpty(propertyCriteria.getLimit()))
             propertyCriteria.setLimit(Long.valueOf(batchSize));
