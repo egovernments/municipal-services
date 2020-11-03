@@ -119,7 +119,7 @@ public class PropertyQueryBuilder {
 			" WHERE pt.tenantid = ? and " +
 			" pt.propertyid in (select propertyid from eg_pt_property_v2 where tenantid= ? order by propertyid offset ? limit ?) " +
 			" ORDER BY pt.propertyid DESC)" +
-			" select *, insti.*, insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId from property_temp_table" +
+			" select *, insti.*,insti.id as instiid, insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId from property_temp_table" +
 			" left outer join eg_pt_institution_v2 as insti on insti.propertydetail = property_temp_table.propertydetailid;";
 
 
