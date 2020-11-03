@@ -13,12 +13,15 @@ import lombok.NoArgsConstructor;
 import org.egov.pt.web.models.PropertyDetail.StatusEnum;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class PropertyCriteria {
 
+	@NotNull
 	private String tenantId;
 
 	@JsonProperty("ids")
@@ -51,11 +54,13 @@ public class PropertyCriteria {
 	private String accountId;
 
 	private List<PropertyInfo.StatusEnum> statuses;
-	
+
+	@NotNull
     @JsonProperty("offset")
     private Long offset;
 
-    @JsonProperty("limit")
+	@NotNull
+	@JsonProperty("limit")
     private Long limit;
 
 	@JsonProperty("asOnDate")

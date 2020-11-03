@@ -105,29 +105,41 @@ public class PropertyQueryBuilder {
 			"    eg_pt_institution_v2 insti ON asmt.assessmentnumber=insti.propertydetail WHERE_CLAUSE_PLACHOLDER ";
 	
 
+
+	private static final String OPTIMIZED_QUERY = "with property_temp_table as " +
+			"( SELECT pt.*,ptdl.*" +
+			" ,address.*,owner.*,doc.*,unit.*, pt.propertyid as ptid, ptdl.assessmentnumber as propertydetailid,doc.id as documentid,unit.id as unitid,address.id as addresskeyid,pt.additionalDetails as pt_additionalDetails,ownerdoc.id as ownerdocid,ownerdoc.documenttype as ownerdocType,ownerdoc.filestore as ownerfileStore,ownerdoc.documentuid as ownerdocuid, ptdl.additionalDetails as ptdl_additionalDetails,ptdl.createdby as assesscreatedby,ptdl.lastModifiedBy as assesslastModifiedBy,ptdl.createdTime as assesscreatedTime,ptdl.lastModifiedTime as assesslastModifiedTime,ptdl.status as propertydetailstatus, unit.occupancyDate as unitoccupancyDate, ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor,pt.lastModifiedTime as propertylastModifiedTime,pt.createdby as propertyCreatedby,pt.lastModifiedBy as propertyModifiedBy,pt.createdTime as propertyCreatedTime" +
+			"FROM eg_pt_property_v2 pt " +
+			"INNER JOIN eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " +
+			"INNER JOIN eg_pt_owner_v2 owner ON ptdl.assessmentnumber=owner.propertydetail " +
+			"INNER JOIN eg_pt_address_v2 address on address.property=pt.propertyid " +
+			"LEFT OUTER JOIN eg_pt_unit_v2 unit ON ptdl.assessmentnumber=unit.propertydetail " +
+			"LEFT OUTER JOIN eg_pt_document_propertydetail_v2 doc ON ptdl.assessmentnumber=doc.propertydetail " +
+			"LEFT OUTER JOIN eg_pt_document_owner_v2 ownerdoc ON ownerdoc.userid=owner.userid " +
+			"WHERE pt.tenantid = ? and " +
+			"pt.propertyid in (select propertyid from eg_pt_property_v2 where tenantid= ? order by propertyid offset ? limit ?) " +
+			"--and exists (select id from eg_pt_institution_v2 as insti where insti.propertydetail = ptdl.assessmentnumber)" +
+			"ORDER BY pt.propertyid DESC)" +
+			"select *, insti.*, insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId from property_temp_table" +
+			"left outer join eg_pt_institution_v2 as insti on insti.propertydetail = property_temp_table.propertydetailid;";
+
+
 	public String getPropertyLikeQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
-		StringBuilder builder = new StringBuilder(LIKE_QUERY);	
-		
-		if(!StringUtils.isEmpty(criteria.getTenantId())) {
-			if(criteria.getTenantId().equals("pb")) {
-				builder.append("pt.tenantid LIKE ? ");
-				preparedStmtList.add("pb%");
-			}else {
-				builder.append("pt.tenantid = ? ");
-				preparedStmtList.add(criteria.getTenantId());
-			}
-		}else {
-			builder.append("pt.tenantid LIKE ? ");
-			preparedStmtList.add("pb%");
-		}
+		StringBuilder builder = new StringBuilder(OPTIMIZED_QUERY);
+
+
+		preparedStmtList.add(criteria.getTenantId());
+		preparedStmtList.add(criteria.getTenantId());
+		preparedStmtList.add(criteria.getOffset());
+		preparedStmtList.add(criteria.getLimit());
 
 
 		/*builder.append("AND pt.propertyid LIKE ?");
-		System.out.println("\n\ncriteria.getPropertyId()-->"+criteria.getPropertyId()+"\n\n");
+		System.out.println("\ncriteria.getPropertyId()-->"+criteria.getPropertyId()+"\n\n");
 		preparedStmtList.add(criteria.getPropertyId());*/
 
 		//return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
-		return addPaginationClause(builder, preparedStmtList, criteria);
+		return builder.toString();
 
 	}
 
