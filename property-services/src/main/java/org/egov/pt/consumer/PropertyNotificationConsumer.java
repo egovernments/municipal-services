@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
+//@Service
 @Slf4j
 public class PropertyNotificationConsumer {
 

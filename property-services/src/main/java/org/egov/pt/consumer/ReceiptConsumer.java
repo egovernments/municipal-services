@@ -11,7 +11,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class ReceiptConsumer {
 
 	@Autowired

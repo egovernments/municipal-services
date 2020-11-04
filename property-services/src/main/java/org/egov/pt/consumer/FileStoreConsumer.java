@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import static org.egov.pt.util.PTConstants.*;
 
-@Component
+//@Component
 @Slf4j
 public class FileStoreConsumer {
 
