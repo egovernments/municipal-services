@@ -174,7 +174,11 @@ public class SWCalculationConfiguration {
 
 	@Value("${egov.property.searchendpoint}")
 	private String searchPropertyEndPoint;
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 	@Value("${workflow.workDir.path}")
 	private String workflowHost;
 

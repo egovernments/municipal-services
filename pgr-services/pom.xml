@@ -97,6 +97,25 @@
             <version>0.0.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+<<<<<<< HEAD
+=======
+        <dependency>
+            <groupId>org.egov</groupId>
+            <artifactId>ws-services</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.egov</groupId>
+            <artifactId>rainmaker-pgr</artifactId>
+            <version>1.1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.egov</groupId>
+            <artifactId>pgr-services</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
     </dependencies>
     <repositories>
         <repository>

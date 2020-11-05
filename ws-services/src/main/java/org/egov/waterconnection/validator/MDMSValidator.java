@@ -41,7 +41,7 @@ public class MDMSValidator {
 
 	@Value("${egov.mdms.search.endpoint}")
 	private String mdmsEndpoint;
-    
+
 	/**
 	 * Validate Master data for given request
 	 * 
@@ -99,8 +99,11 @@ public class MDMSValidator {
 			throw new CustomException(WCConstants.INVALID_CONNECTION_TYPE, WCConstants.INVALID_CONNECTION_TYPE);
 		}
 	}
+<<<<<<< HEAD
  
 
+=======
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 
 	private void validateMDMSData(String[] masterNames, Map<String, List<String>> codes) {
 		Map<String, String> errorMap = new HashMap<>();

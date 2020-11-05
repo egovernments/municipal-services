@@ -594,6 +594,10 @@ public class Connection {
 				&& Objects.equals(this.connectionCategory, connection.connectionCategory)
 				&& Objects.equals(this.connectionType, connection.connectionType)
 				&& Objects.equals(this.additionalDetails, connection.additionalDetails)
+<<<<<<< HEAD
+=======
+				&& Objects.equals(this.auditDetails, connection.auditDetails)
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 				&& Objects.equals(this.connectionHolders, connection.connectionHolders)
 				&& Objects.equals(this.applicationType, connection.applicationType)
 				&& Objects.equals(this.dateEffectiveFrom, connection.dateEffectiveFrom);

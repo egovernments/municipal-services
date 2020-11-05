@@ -5,7 +5,11 @@
 	<artifactId>noc-services</artifactId>
 	<packaging>jar</packaging>
 	<name>noc-services</name>
+<<<<<<< HEAD
 	<version>1.0.0-SNAPSHOT</version>
+=======
+	<version>0.0.1-SNAPSHOT</version>
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 	<properties>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>

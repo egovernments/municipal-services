@@ -96,7 +96,11 @@ public class DemandService {
 
     @Autowired
 	private WSCalculationWorkflowValidator wsCalulationWorkflowValidator;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 	/**
 	 * Creates or updates Demand
 	 * 

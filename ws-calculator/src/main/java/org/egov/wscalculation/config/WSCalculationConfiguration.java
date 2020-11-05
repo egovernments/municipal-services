@@ -180,6 +180,7 @@ public class WSCalculationConfiguration {
     	private String deadLetterTopicSingle;
     
     
+<<<<<<< HEAD
     	@Value("${notification.url}")
     	private String notificationUrl;
 
@@ -187,6 +188,15 @@ public class WSCalculationConfiguration {
 	private String shortenerURL;
     
     	@Value("${egov.property.service.host}")
+=======
+    @Value("${notification.url}")
+    private String notificationUrl;
+
+	@Value("${ws.shortener.url}")
+	private String shortenerURL;
+    
+    @Value("${egov.property.service.host}")
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 	private String propertyHost;
 
 	@Value("${egov.property.searchendpoint}")

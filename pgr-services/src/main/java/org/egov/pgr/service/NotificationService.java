@@ -20,7 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+<<<<<<< HEAD
 
+=======
+import static org.apache.kafka.common.requests.FetchMetadata.log;
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;

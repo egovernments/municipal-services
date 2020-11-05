@@ -384,7 +384,11 @@ public class BPAService {
 
 		List<BPA> searchResult = getBPAWithBPAId(bpaRequest);
 		if (CollectionUtils.isEmpty(searchResult) || searchResult.size() > 1) {
+<<<<<<< HEAD
 			throw new CustomException(BPAErrorConstants.UPDATE_ERROR, "Failed to Update the Application, Found None or multiple applications!");
+=======
+			throw new CustomException(BPAErrorConstants.UPDATE_ERROR, "Failed to Update the Application");
+>>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
 		}
 		
 		
