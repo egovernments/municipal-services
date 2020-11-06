@@ -846,6 +846,8 @@ public class MigrationService {
         StringBuilder usageCategory = new StringBuilder();
         if(StringUtils.isEmpty(oldUnit.getUsageCategoryMajor()))
             return null;
+        else if(!StringUtils.isEmpty(oldUnit.getUsageCategoryMajor()) && StringUtils.isEmpty(oldUnit.getUsageCategoryMinor()))
+        	return oldUnit.getUsageCategoryMajor();
         else
             usageCategory.append(oldUnit.getUsageCategoryMajor());
         if(!StringUtils.isEmpty(oldUnit.getUsageCategoryMinor()))
