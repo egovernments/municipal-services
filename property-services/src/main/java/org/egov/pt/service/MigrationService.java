@@ -60,15 +60,12 @@ import org.egov.pt.models.oldProperty.OldUserDetailResponse;
 import org.egov.pt.models.oldProperty.PropertyDetail;
 import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.producer.Producer;
-import org.egov.pt.repository.AssessmentRepository;
 import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.repository.builder.OldPropertyQueryBuilder;
 import org.egov.pt.repository.rowmapper.MigrationCountRowMapper;
 import org.egov.pt.repository.rowmapper.OldPropertyRowMapper;
-import org.egov.pt.util.AssessmentUtils;
 import org.egov.pt.util.ErrorConstants;
 import org.egov.pt.util.PTConstants;
-import org.egov.pt.validator.AssessmentValidator;
 import org.egov.pt.validator.PropertyMigrationValidator;
 import org.egov.pt.web.contracts.AssessmentRequest;
 import org.egov.pt.web.contracts.PropertyMigrationCountRequest;
@@ -106,9 +103,6 @@ public class MigrationService {
     private CustomKafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
-    private AssessmentValidator validator;
-
-    @Autowired
     private PropertyConfiguration config;
 
     @Autowired
@@ -116,12 +110,6 @@ public class MigrationService {
 
     @Autowired
     private ObjectMapper mapper;
-
-    @Autowired
-    private AssessmentUtils AssmtUtils;
-
-    @Autowired
-    private AssessmentRepository assessmentRepository;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -523,7 +511,13 @@ public class MigrationService {
             // to map key for partition
             String kafkaKeyValue = String.valueOf(getKafkaKeyValue(propertyId));
             
+            int detailCount = oldProperty.getPropertyDetails().size();
+            boolean isDetailActive = false;
+            
             for(int i=0;i< oldProperty.getPropertyDetails().size();i++){
+            	
+				if (detailCount == i+1)
+					isDetailActive = true;
                 Property property = new Property();
                 property.setId(Id);
                 property.setPropertyId(propertyId);
@@ -586,7 +580,7 @@ public class MigrationService {
                 if(oldProperty.getPropertyDetails().get(i).getUnits() == null)
                     property.setUnits(null);
                 else{
-                    units=migrateUnit(oldProperty.getPropertyDetails().get(i).getUnits());
+                    units=migrateUnit(oldProperty.getPropertyDetails().get(i).getUnits(), isDetailActive);
                     property.setUnits(units);
 
                 }
@@ -607,7 +601,7 @@ public class MigrationService {
 
 
                 if(oldProperty.getPropertyDetails().get(i).getOwners()!=null){
-                    List<OwnerInfo> ownerInfos = migrateOwnerInfo(oldProperty.getPropertyDetails().get(i).getOwners());
+                    List<OwnerInfo> ownerInfos = migrateOwnerInfo(oldProperty.getPropertyDetails().get(i).getOwners(), isDetailActive);
                     property.setOwners(ownerInfos);
                 }
                 else
@@ -706,7 +700,7 @@ public class MigrationService {
         return  geoLocation;
     }
 
-    public List<OwnerInfo> migrateOwnerInfo(Set<OldOwnerInfo> oldOwnerInfosSet){
+    public List<OwnerInfo> migrateOwnerInfo(Set<OldOwnerInfo> oldOwnerInfosSet, Boolean isOwnerActive){
         List<OwnerInfo> ownerInfolist = new ArrayList<>();
         for(OldOwnerInfo oldOwnerInfo : oldOwnerInfosSet){
             OwnerInfo ownerInfo = new OwnerInfo();
@@ -752,7 +746,12 @@ public class MigrationService {
             ownerInfo.setOwnerShipPercentage(oldOwnerInfo.getOwnerShipPercentage());
             ownerInfo.setOwnerType(oldOwnerInfo.getOwnerType());
             ownerInfo.setInstitutionId(oldOwnerInfo.getInstitutionId());
-            ownerInfo.setStatus(Status.ACTIVE);
+            
+			if (isOwnerActive)
+				ownerInfo.setStatus(Status.ACTIVE);
+			else
+				ownerInfo.setStatus(Status.INACTIVE);
+
             if(oldOwnerInfo.getOldDocuments() == null)
                 ownerInfo.setDocuments(null);
             else
@@ -821,7 +820,7 @@ public class MigrationService {
     }
 
 
-    public List<Unit> migrateUnit(List<OldUnit> oldUnits){
+    public List<Unit> migrateUnit(List<OldUnit> oldUnits,Boolean isUnitActive ){
         List<Unit> units = new ArrayList<>();
         for(OldUnit oldUnit : oldUnits){
             Unit unit = new Unit();
@@ -832,10 +831,7 @@ public class MigrationService {
             unit.setUsageCategory(migrateUnitUsageCategory(oldUnit));
             unit.setOccupancyType(oldUnit.getOccupancyType());
             unit.setOccupancyDate(oldUnit.getOccupancyDate());
-            if(oldUnit.getActive() == null)
-                unit.setActive(Boolean.TRUE);
-            else
-                unit.setActive(oldUnit.getActive());
+            unit.setActive(isUnitActive);
             unit.setConstructionDetail(migrateConstructionDetail(oldUnit));
             //unit.setAdditionalDetails(oldUnit.getAdditionalDetails());
             //unit.setAuditDetails();
