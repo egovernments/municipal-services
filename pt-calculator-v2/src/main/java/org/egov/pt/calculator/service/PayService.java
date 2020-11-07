@@ -86,7 +86,8 @@ public class PayService {
 		BigDecimal rebateamount= demanddetailList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		List<DemandDetail> penalityList=	demand.getDemandDetails().stream().filter(demanddetail->demanddetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_TIME_PENALTY)).collect(Collectors.toList());
 		BigDecimal penaltyAmount= penalityList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-		
+		List<DemandDetail> interestList=	demand.getDemandDetails().stream().filter(demanddetail->demanddetail.getTaxHeadMasterCode().equalsIgnoreCase(CalculatorConstants.PT_TIME_INTEREST)).collect(Collectors.toList());
+		BigDecimal intersetAmount= interestList.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
 		if(penaltyAmount.compareTo(BigDecimal.ZERO)==0){
 		estimates.put(CalculatorConstants.PT_TIME_PENALTY, BigDecimal.ZERO);
@@ -94,7 +95,11 @@ public class PayService {
 		else{
 			estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
 		}
-		estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
+		if(intersetAmount.compareTo(BigDecimal.ZERO)==0) {
+			estimates.put(CalculatorConstants.PT_TIME_INTEREST, BigDecimal.ZERO);
+			}else {
+				estimates.put(CalculatorConstants.PT_TIME_INTEREST, interest.setScale(2, 2));
+			}
 		}else{
 			estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate.setScale(2, 2).negate());
 			estimates.put(CalculatorConstants.PT_TIME_PENALTY, penalty.setScale(2, 2));
