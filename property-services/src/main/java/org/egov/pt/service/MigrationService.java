@@ -744,7 +744,10 @@ public class MigrationService {
             ownerInfo.setCorrespondenceAddress(oldOwnerInfo.getCorrespondenceAddress());
             ownerInfo.setIsPrimaryOwner(oldOwnerInfo.getIsPrimaryOwner());
             ownerInfo.setOwnerShipPercentage(oldOwnerInfo.getOwnerShipPercentage());
-            ownerInfo.setOwnerType(oldOwnerInfo.getOwnerType());
+			if (null == oldOwnerInfo.getOwnerType())
+				ownerInfo.setOwnerType("NONE");
+			else
+				ownerInfo.setOwnerType(oldOwnerInfo.getOwnerType());
             ownerInfo.setInstitutionId(oldOwnerInfo.getInstitutionId());
             
 			if (isOwnerActive)
