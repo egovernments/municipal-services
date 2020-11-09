@@ -551,6 +551,8 @@ public class MigrationService {
 
                 if(!StringUtils.isEmpty(oldProperty.getCreationReason()))
                     property.setCreationReason(CreationReason.fromValue(String.valueOf(oldProperty.getCreationReason())));
+                else 
+                	property.setCreationReason(CreationReason.CREATE);
 
 
                 property.setNoOfFloors(oldProperty.getPropertyDetails().get(i).getNoOfFloors());
