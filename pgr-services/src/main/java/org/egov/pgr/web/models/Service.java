@@ -56,7 +56,7 @@ public class Service   {
         @JsonProperty("rating")
         private Integer rating ;
 
-        @CharacterConstraint(size = 1000)
+        @CharacterConstraint(size = 150)
         @JsonProperty("additionalDetail")
         private Object additionalDetail = null;
 
