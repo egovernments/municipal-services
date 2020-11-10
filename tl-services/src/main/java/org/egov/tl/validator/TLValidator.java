@@ -255,6 +255,7 @@ public class TLValidator {
                     Long currentToDate = license.getValidTo();
                     Long existingFromDate = searchObj.getValidFrom();
                     Long existingToDate = searchObj.getValidTo();
+                    if( license.getAction().equals(TLConstants.ACTION_CANCEL)) {
                     if(currentFromDate < existingToDate){
                         throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the previous applications ValidTo Date");
                     }
@@ -266,7 +267,9 @@ public class TLValidator {
                     }
                     if(currentFromDate > currentToDate){
                         throw new CustomException("INVALID FROM DATE","ValidFrom cannot be greater than ValidTo Date");
-                    }          
+                    }  
+                    
+                    }
                    
                 }else{
                     throw new CustomException("RENEWAL ERROR","The license applied for renewal is not present in the repository");
