@@ -255,7 +255,7 @@ public class TLValidator {
                     Long currentToDate = license.getValidTo();
                     Long existingFromDate = searchObj.getValidFrom();
                     Long existingToDate = searchObj.getValidTo();
-                    if( license.getAction().equals(TLConstants.ACTION_CANCEL)) {
+                    if(!license.getAction().equals(TLConstants.ACTION_CANCEL)) {
                     if(currentFromDate < existingToDate){
                         throw new CustomException("INVALID FROM DATE","ValidFrom should be greater than the previous applications ValidTo Date");
                     }
