@@ -3,9 +3,6 @@ package org.egov.pt.util;
 import static org.egov.pt.util.PTConstants.ASMT_MODULENAME;
 import static org.egov.pt.util.PTConstants.BILL_AMOUNT_PATH;
 import static org.egov.pt.util.PTConstants.BILL_NODEMAND_ERROR_CODE;
-import static org.egov.pt.util.PTConstants.CREATE_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.MUTATION_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.UPDATE_PROCESS_CONSTANT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +47,7 @@ public class PropertyUtil extends CommonUtils {
 	@Autowired
 	private ObjectMapper mapper;
 	
-	/**
+    /**
 	 * Populates the owner fields inside of property objects from the response by user api
 	 * 
 	 * Ignoring if now user is not found in user response, no error will be thrown
@@ -87,7 +84,6 @@ public class PropertyUtil extends CommonUtils {
 		});
 	}
 	
-	
 	/**
 	 * nullifying the PII's for open search
 	 * @param info
@@ -104,6 +100,7 @@ public class PropertyUtil extends CommonUtils {
 		
 		return info;
 	}
+
 
 	public ProcessInstanceRequest getProcessInstanceForMutationPayment(PropertyRequest propertyRequest) {
 
@@ -124,7 +121,7 @@ public class PropertyUtil extends CommonUtils {
 					.build();
 	}
 	
-public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, CreationReason creationReasonForWorkflow) {
+	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, CreationReason creationReasonForWorkflow) {
 		
 		Property property = request.getProperty();
 		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
@@ -237,31 +234,17 @@ public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, 
 	}
 
 
-public void setdataForNotification(PropertyRequest request, String notificationAction) {
+	/**
+	 * Public method to infer whether the search is for open or authenticated user
+	 * 
+	 * @param userInfo
+	 * @return
+	 */
+	public Boolean isPropertySearchOpen(User userInfo) {
 
-		ProcessInstance workflow = request.getProperty().getWorkflow();
-
-		if (workflow != null) {
-
-			workflow.setNotificationAction(notificationAction);
-		} else {
-			workflow = ProcessInstance.builder().notificationAction(notificationAction).build();
-		}
-		request.getProperty().setWorkflow(workflow);
+		return userInfo.getType().equalsIgnoreCase("SYSTEM")
+				&& userInfo.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()).contains("ANONYMOUS");
 	}
-
-/**
- * Public method to infer whether the search is for open or authenticated user
- * 
- * @param userInfo
- * @return
- */
-public Boolean isPropertySearchOpen(User userInfo) {
-
-	return userInfo.getType().equalsIgnoreCase("SYSTEM")
-			&& userInfo.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()).contains("ANONYMOUS");
-}
-
 
 	public List<OwnerInfo> getCopyOfOwners(List<OwnerInfo> owners) {
 
@@ -272,6 +255,4 @@ public Boolean isPropertySearchOpen(User userInfo) {
 		});
 		return copyOwners;
 	}
-	
-	
 }

@@ -585,7 +585,6 @@ public class PropertyValidator {
         if(!CollectionUtils.isEmpty(criteria.getOwnerIds()) && !allowedParams.contains("ownerids"))
             throw new CustomException("EG_PT_INVALID_SEARCH","Search based on ownerId is not available for : " + userType);
     }
-
 	/**
 	 * Validates if the mobileNumber is 10 digit and starts with 5 or greater
 	 * 
