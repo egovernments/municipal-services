@@ -662,7 +662,7 @@ public class PropertyValidator {
 			throw new CustomException("EG_PT_MUTATION_FIELDS_ERROR", "Mandatory fields Missing for mutation, please provide the following information in additionalDetails : "
 							+ "reasonForTransfer, documentNumber, documentDate, documentValue and marketValue");
 		} catch (Exception e) {
-			throw new CustomException("EG_PT_ADDITIONALDETAILS_PARSING_ERROR", e.getMessage());
+			throw new CustomException("EG_PT_ADDITIONALDETAILS_PARSING_ERROR", e.toString());
 		}
 
 		Boolean isNullStatusFound = false;
