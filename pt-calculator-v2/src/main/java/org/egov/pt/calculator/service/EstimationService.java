@@ -100,6 +100,8 @@ public class EstimationService {
 	private ObjectMapper mapper;
 	
 
+	@Value("${customization.unbuiltarea.prorated:true}")
+	Boolean unBuiltAreaProrated;
 
 
 	@Value("${customization.pbfirecesslogic:false}")
@@ -199,6 +201,8 @@ public class EstimationService {
 				timeBasedExemptionMasterMap);
 
 		List<String> billingSlabIds = new LinkedList<>();
+		HashMap<Unit, BillingSlab> unitSlabMapping = new HashMap<>();
+		List<Unit> groundFloorUnits = new LinkedList<>();
 
 		/*
 		 * by default land should get only one slab from database per tenantId
@@ -222,6 +226,7 @@ public class EstimationService {
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
 				billingSlabIds.add(slab.getId()+"|"+i);
+				unitSlabMapping.put(unit, slab);
 
 				/*
 				 * counting the number of units & total area in ground floor for unbuilt area
@@ -230,6 +235,7 @@ public class EstimationService {
 				if (unit.getFloorNo().equalsIgnoreCase("0")) {
 					groundUnitsCount += 1;
 					groundUnitsArea += unit.getUnitArea();
+					groundFloorUnits.add(unit);
 					if (null != slab.getUnBuiltUnitRate())
 						unBuiltRate += slab.getUnBuiltUnitRate();
 				}
@@ -241,14 +247,25 @@ public class EstimationService {
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
-			taxAmt = taxAmt.add(getUnBuiltRate(detail, unBuiltRate, groundUnitsCount, groundUnitsArea));
+			//taxAmt = taxAmt.add(getUnBuiltRate(detail, unBuiltRate, groundUnitsCount, groundUnitsArea));
+			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
+
+			/*
+			 * making call to get unbuilt area tax estimate
+			 */
+			taxAmt = taxAmt.add(unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
 
 			/*
 			 * special case to handle property with one unit
 			 */
-			if (detail.getUnits().size() == 1)
-				usageExemption = getExemption(detail.getUnits().get(0), taxAmt, assessmentYear,
-						propertyBasedExemptionMasterMap);
+//			if (detail.getUnits().size() == 1)
+//				usageExemption = getExemption(detail.getUnits().get(0), taxAmt, assessmentYear,
+//						propertyBasedExemptionMasterMap);
+			
+			for (Map.Entry<Unit,BigDecimal> e: unBuiltRateCalc.entrySet()) {
+				BigDecimal ue = getExemption(e.getKey(), e.getValue(), assessmentYear, propertyBasedExemptionMasterMap);
+				usageExemption = usageExemption.add(ue);
+			}
 		}
 
 		List<TaxHeadEstimate> taxHeadEstimates =  getEstimatesForTax(requestInfo,taxAmt, usageExemption, property, propertyBasedExemptionMasterMap,
@@ -1228,6 +1245,56 @@ public class EstimationService {
 		}
 		return ownerInfo;
 	}
+	
+	/**
+	 * Private method to calculate the un-built area tax estimate
+	 *
+	 * gives the subtraction of landArea and buildUpArea if both are present.
+	 *
+	 * on absence of landArea Zero will be given.
+	 *
+	 * on absence of buildUpArea sum of all unit areas of ground floor
+	 *
+	 * will be subtracted from the landArea.
+	 *
+	 * the un-Built UnitRate is the average of unBuilt rates from ground units.
+	 *
+	 * @param detail The property detail
+	 * @param unitSlabMapping The slabs applicable for every unit
+	 * @param groundUnits The units on the ground floor
+	 * @param groundUnitsArea Sum of ground floor units area
+	 * @return calculated tax for un-built area in the property detail.
+	 */
+	private HashMap<Unit, BigDecimal> getUnBuiltRate(PropertyDetail detail, HashMap<Unit, BillingSlab> unitSlabMapping, List<Unit> groundUnits, Double groundUnitsArea) {
+
+        BigDecimal unBuiltAmt = BigDecimal.ZERO;
+		HashMap<Unit, BigDecimal>  unBuiltRateCalc = new HashMap<>();
+
+        if (null != detail.getLandArea() && groundUnits.size() > 0) {
+
+			double diffArea = null != detail.getBuildUpArea() ? detail.getLandArea() - detail.getBuildUpArea()
+					: detail.getLandArea() - groundUnitsArea;
+			// ignoring if land Area is lesser than buildUpArea/groundUnitsAreaSum in estimate instead of throwing error
+			// since property service validates the same for calculation
+			diffArea = diffArea < 0.0 ? 0.0 : diffArea;
+
+			for (Unit unit : groundUnits) {
+
+				BillingSlab slab = unitSlabMapping.get(unit);
+				if (slab.getUnBuiltUnitRate() == null) {
+					unBuiltRateCalc.put(unit, BigDecimal.ZERO);
+				} else {
+					if (unBuiltAreaProrated) {
+						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)));
+					} else {
+						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)));
+					}
+				}
+			}
+
+		}
+        return unBuiltRateCalc;
+    }
 
 
 }
