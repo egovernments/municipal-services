@@ -637,7 +637,7 @@ public class GrievanceService {
 				services.add(obj.getServices());
 			}
 		});
-		replaceIdsWithUrls(actionHistory);
+		//replaceIdsWithUrls(actionHistory);
 
 		return ServiceResponse.builder().responseInfo(factory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.services(services).actionHistory(actionHistory).build();
