@@ -671,11 +671,11 @@ public class PropertyValidator {
 		Set<Status> statusSet = new HashSet<>();
 		Set<String> searchOwnerUuids = propertyFromSearch.getOwners().stream().map(OwnerInfo::getUuid).collect(Collectors.toSet());
 		List<String> uuidsNotFound = new ArrayList<String>();
-		Set<String> mobileNumberPlusNamePlusStatusSet = new HashSet<>();
+		Set<String> mobileNumberPlusNameSet = new HashSet<>();
 		
 		for (OwnerInfo owner : property.getOwners()) {
 
-			mobileNumberPlusNamePlusStatusSet.add(owner.getMobileNumber()+owner.getName()+owner.getStatus());
+			mobileNumberPlusNameSet.add(owner.getMobileNumber()+owner.getName());
 			if (StringUtils.isEmpty(owner.getStatus())) {
 				isNullStatusFound = true;
 			}
@@ -690,7 +690,7 @@ public class PropertyValidator {
 				uuidsNotFound.add(owner.getUuid());
 		}
 		
-		if(property.getOwners().size() != mobileNumberPlusNamePlusStatusSet.size())
+		if(property.getOwners().size() != mobileNumberPlusNameSet.size())
 			errorMap.put("EG_PT_MUTATION_DUPLICATE_OWNER_ERROR", "Same Owner object is repated in the update Request");
 
 		if (isNullStatusFound)
