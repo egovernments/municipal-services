@@ -704,8 +704,9 @@ public class EstimationService {
 
 		Map<String, List<Object>> ownerTypeMap = propertyMasterMap.get(OWNER_TYPE_MASTER);
 		BigDecimal userExemption = BigDecimal.ZERO;
-		final int userCount = owners.size();
-		BigDecimal share = taxAmt.divide(BigDecimal.valueOf(userCount),2, 2);
+		final long userCount = owners.stream()
+				.filter(owner -> OWNER_STATUS_ACTIVE.equalsIgnoreCase(owner.getStatus().toString())).count();
+		BigDecimal share = taxAmt.divide(BigDecimal.valueOf(userCount), 2, 2);
 
 		for (OwnerInfo owner : owners) {
 
