@@ -712,15 +712,17 @@ public class EstimationService {
 			if (null == ownerTypeMap.get(owner.getOwnerType()))
 				continue;
 
-			Map<String, Object> applicableOwnerType = mDataService.getApplicableMaster(financialYear,
-					ownerTypeMap.get(owner.getOwnerType()));
+			if (OWNER_STATUS_ACTIVE.equalsIgnoreCase(owner.getStatus().toString())) {
+				Map<String, Object> applicableOwnerType = mDataService.getApplicableMaster(financialYear,
+						ownerTypeMap.get(owner.getOwnerType()));
 
 			if (null != applicableOwnerType) {
 
 				BigDecimal currentExemption = mDataService.calculateApplicables(share,
 						applicableOwnerType.get(EXEMPTION_FIELD_NAME));
 
-				userExemption = userExemption.add(currentExemption);
+					userExemption = userExemption.add(currentExemption);
+				}
 			}
 		}
 		return userExemption;
