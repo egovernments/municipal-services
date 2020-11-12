@@ -130,8 +130,9 @@ public class PropertyService {
 		propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
 		if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {
 			userService.createUser(request);
-		} else
+		} else {
 			request.getProperty().setOwners(util.getCopyOfOwners(propertyFromSearch.getOwners()));
+		}
 		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
 		

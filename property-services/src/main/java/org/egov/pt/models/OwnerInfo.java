@@ -166,8 +166,17 @@ public class OwnerInfo extends User {
 		this.ownerType = ownerInfo.getOwnerType();
 		this.institutionId = ownerInfo.getInstitutionId();
 		this.status = ownerInfo.getStatus();
-		this.documents = ownerInfo.getDocuments();
+		this.documents = copyDocuments(ownerInfo.getDocuments());
 		this.relationship = ownerInfo.getRelationship();
+	}
+
+	private @Valid List<Document> copyDocuments(List<Document> documents) {
+		
+		List<Document> newDocs = new ArrayList<>();
+		documents.forEach(doc -> {
+			newDocs.add(doc.toBuilder().build());
+		});
+		return newDocs;
 	}
 
 }
