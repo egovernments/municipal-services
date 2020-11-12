@@ -28,6 +28,7 @@ import lombok.ToString;
 
 public class OwnerInfo extends User {
 
+	
 	@JsonProperty("ownerInfoUuid")
 	private String ownerInfoUuid;
 	
@@ -174,5 +175,71 @@ public class OwnerInfo extends User {
 		});
 		return newDocs;
 	}
+	
+	public boolean mutationequals(OwnerInfo otherOwner) {
+		
+		
+		if (this == otherOwner)
+			return true;
+
+		if (fatherOrHusbandName == null) {
+			if (otherOwner.fatherOrHusbandName != null)
+				return false;
+		} else if (!fatherOrHusbandName.equals(otherOwner.fatherOrHusbandName))
+			return false;
+
+		if (gender == null) {
+			if (otherOwner.gender != null)
+				return false;
+		} else if (!gender.equals(otherOwner.gender))
+			return false;
+
+		if (institutionId == null) {
+			if (otherOwner.institutionId != null)
+				return false;
+		} else if (!institutionId.equals(otherOwner.institutionId))
+			return false;
+
+		if (isPrimaryOwner == null) {
+			if (otherOwner.isPrimaryOwner != null)
+				return false;
+		} else if (!isPrimaryOwner.equals(otherOwner.isPrimaryOwner))
+			return false;
+
+		if (ownerShipPercentage == null) {
+			if (otherOwner.ownerShipPercentage != null)
+				return false;
+		} else if (!ownerShipPercentage.equals(otherOwner.ownerShipPercentage))
+			return false;
+		
+		if (ownerType == null) {
+			if (otherOwner.ownerType != null)
+				return false;
+		} else if (!ownerType.equals(otherOwner.ownerType))
+			return false;
+		
+		if (relationship != otherOwner.relationship)
+			return false;
+		
+		if (status != otherOwner.status)
+			return false;
+		
+		
+		if (this.getName() == null) {
+			if (otherOwner.getName() != null)
+				return false;
+		} else if (!this.getName().equals(otherOwner.getName()))
+			return false;
+		
+		if (this.getMobileNumber() == null) {
+			if (otherOwner.getMobileNumber() != null)
+				return false;
+		} else if (!this.getMobileNumber().equals(otherOwner.getMobileNumber()))
+			return false;
+		
+		
+		return true;
+	}
+
 
 }

@@ -701,11 +701,17 @@ public class PropertyValidator {
 
 		if (!CollectionUtils.isEmpty(uuidsNotFound))
 			errorMap.put("EG_PT_UPDATE_OWNER_ERROR", "Invalid owners found in request : " + uuidsNotFound);
-		
+
 		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
 
-			if (!isNewOWnerAdded && !isOwnerCancelled)
-				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or make an existing object INACTIVE in the request");
+			if (property.getOwners().size() > 1 && (!isNewOWnerAdded && !isOwnerCancelled)) {
+				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
+						"Mutation request should either add a new owner object or make an existing object INACTIVE in the request");
+			} else if (propertyFromSearch.getOwners().get(0).mutationequals(property.getOwners().get(0))) {
+
+				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
+						"Mutation request should either add a new owner object or update an existing object in the request");
+			}
 
 			if (isOwnerCancelled && property.getOwners().size() == 1)
 				errorMap.put("EG_PT_MUTATION_OWNER_REMOVAL_ERROR", "Single owner of a property cannot be deactivated or removed in a mutation request");
