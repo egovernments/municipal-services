@@ -176,7 +176,7 @@ public class OwnerInfo extends User {
 		return newDocs;
 	}
 	
-	public boolean mutationequals(OwnerInfo otherOwner) {
+	public boolean mutationEquals(OwnerInfo otherOwner) {
 		
 		
 		if (this == otherOwner)
