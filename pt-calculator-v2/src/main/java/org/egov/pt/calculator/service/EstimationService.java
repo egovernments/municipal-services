@@ -1273,7 +1273,7 @@ public class EstimationService {
 
         if (null != detail.getLandArea() && groundUnits.size() > 0) {
 
-			double diffArea = null != detail.getBuildUpArea() ? detail.getLandArea() - detail.getBuildUpArea()
+			double diffArea = detail.getBuildUpArea() >0  ? detail.getLandArea() - detail.getBuildUpArea()
 					: detail.getLandArea() - groundUnitsArea;
 			// ignoring if land Area is lesser than buildUpArea/groundUnitsAreaSum in estimate instead of throwing error
 			// since property service validates the same for calculation
