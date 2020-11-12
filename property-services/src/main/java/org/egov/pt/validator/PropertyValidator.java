@@ -707,7 +707,7 @@ public class PropertyValidator {
 			if (property.getOwners().size() > 1 && (!isNewOWnerAdded && !isOwnerCancelled)) {
 				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
 						"Mutation request should either add a new owner object or make an existing object INACTIVE in the request");
-			} else if (propertyFromSearch.getOwners().get(0).mutationequals(property.getOwners().get(0))) {
+			} else if (propertyFromSearch.getOwners().get(0).mutationEquals(property.getOwners().get(0))) {
 
 				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
 						"Mutation request should either add a new owner object or update an existing object in the request");
