@@ -1272,8 +1272,11 @@ public class EstimationService {
 		HashMap<Unit, BigDecimal>  unBuiltRateCalc = new HashMap<>();
 
         if (null != detail.getLandArea() && groundUnits.size() > 0) {
-
-			double diffArea = detail.getBuildUpArea() >0  ? detail.getLandArea() - detail.getBuildUpArea()
+           
+        	if(detail.getBuildUpArea()==null)
+        		detail.setBuildUpArea(0.0);
+        	
+			double diffArea = detail.getBuildUpArea() >0   ? detail.getLandArea() - detail.getBuildUpArea()
 					: detail.getLandArea() - groundUnitsArea;
 			// ignoring if land Area is lesser than buildUpArea/groundUnitsAreaSum in estimate instead of throwing error
 			// since property service validates the same for calculation
