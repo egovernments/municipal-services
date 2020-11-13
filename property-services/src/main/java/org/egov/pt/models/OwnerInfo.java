@@ -167,7 +167,10 @@ public class OwnerInfo extends User {
 		this.relationship = ownerInfo.getRelationship();
 	}
 
-	private @Valid List<Document> copyDocuments(List<Document> documents) {
+	private List<Document> copyDocuments(List<Document> documents) {
+		
+		if(CollectionUtils.isEmpty(documents))
+			return null;
 		
 		List<Document> newDocs = new ArrayList<>();
 		documents.forEach(doc -> {
