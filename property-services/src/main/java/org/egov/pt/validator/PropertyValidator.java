@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -662,7 +663,7 @@ public class PropertyValidator {
 			throw new CustomException("EG_PT_MUTATION_FIELDS_ERROR", "Mandatory fields Missing for mutation, please provide the following information in additionalDetails : "
 							+ "reasonForTransfer, documentNumber, documentDate, documentValue and marketValue");
 		} catch (Exception e) {
-			throw new CustomException("EG_PT_ADDITIONALDETAILS_PARSING_ERROR", e.getMessage());
+			throw new CustomException("EG_PT_ADDITIONALDETAILS_PARSING_ERROR", e.toString());
 		}
 
 		Boolean isNullStatusFound = false;
@@ -701,11 +702,15 @@ public class PropertyValidator {
 
 		if (!CollectionUtils.isEmpty(uuidsNotFound))
 			errorMap.put("EG_PT_UPDATE_OWNER_ERROR", "Invalid owners found in request : " + uuidsNotFound);
-		
-		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
 
-			if (!isNewOWnerAdded && !isOwnerCancelled)
-				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or make an existing object INACTIVE in the request");
+		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
+			
+
+			if (!isNewOWnerAdded && !isOwnerCancelled) {
+
+				if (!isAtleastOneOwnerModified(propertyFromSearch, errorMap, property))
+					errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or update an existing object in the request");
+			}
 
 			if (isOwnerCancelled && property.getOwners().size() == 1)
 				errorMap.put("EG_PT_MUTATION_OWNER_REMOVAL_ERROR", "Single owner of a property cannot be deactivated or removed in a mutation request");
@@ -756,6 +761,33 @@ public class PropertyValidator {
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
+	}
+
+	/**
+	 * Verfies if atleast one owner in mutation request is modified
+	 * 
+	 * @param propertyFromSearch
+	 * @param errorMap
+	 * @param property
+	 * @return
+	 */
+	private Boolean isAtleastOneOwnerModified(Property propertyFromSearch, Map<String, String> errorMap, Property property) {
+		
+		Map<String, OwnerInfo> ownerIdMapFromSearch = propertyFromSearch.getOwners().stream().collect(Collectors.toMap(OwnerInfo::getOwnerInfoUuid, Function.identity()));
+
+		for (OwnerInfo ownerFromRequest : property.getOwners()) {
+
+			OwnerInfo OwnerFromSearch = ownerIdMapFromSearch.get(ownerFromRequest.getOwnerInfoUuid());
+
+			if (OwnerFromSearch == null) {
+
+				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Owner with invalid id found in the property request object : " + ownerFromRequest.getOwnerInfoUuid());
+			}
+			if (!ownerFromRequest.mutationEquals(ownerFromRequest))
+				return true;
+		}
+
+		return false;
 	}
 
 }
