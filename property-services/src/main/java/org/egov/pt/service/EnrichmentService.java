@@ -100,12 +100,12 @@ public class EnrichmentService {
      * @param request  PropertyRequest received for property update
      * @param propertiesFromResponse Properties returned by calling search based on id in PropertyRequest
      */
-    public void enrichUpdateRequest(PropertyRequest request,Property propertyFromDb) {
-    	
-    	Property property = request.getProperty();
-        RequestInfo requestInfo = request.getRequestInfo();
-        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
-        
+	public void enrichUpdateRequest(PropertyRequest request,Property propertyFromDb) {
+
+		Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+		AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
+
 		Boolean isWfEnabled = config.getIsWorkflowEnabled();
 		Boolean iswfStarting = propertyFromDb.getStatus().equals(Status.ACTIVE);
 
@@ -118,7 +118,7 @@ public class EnrichmentService {
 
 			enrichPropertyForNewWf(requestInfo, property, false);
 		}
-		
+
 		if (!CollectionUtils.isEmpty(property.getDocuments()))
 			property.getDocuments().forEach(doc -> {
 
@@ -127,11 +127,8 @@ public class EnrichmentService {
 					doc.setStatus(Status.ACTIVE);
 				}
 			});
-				
-<<<<<<< HEAD
-	    	if (!CollectionUtils.isEmpty(property.getUnits()))
-=======
->>>>>>> c1f03e96a4231f45783bae8d0a18f04d93b69c2b
+
+		if (!CollectionUtils.isEmpty(property.getUnits()))
 			property.getUnits().forEach(unit -> {
 
 				if (unit.getId() == null) {
@@ -139,17 +136,17 @@ public class EnrichmentService {
 					unit.setActive(true);
 				}
 			});
-				
+
 		Institution institute = property.getInstitution();
 		if (!ObjectUtils.isEmpty(institute) && null == institute.getId())
 			property.getInstitution().setId(UUID.randomUUID().toString());
 
-            property.setAuditDetails(auditDetails);
-            property.setAccountId(propertyFromDb.getAccountId());
-       
+		property.setAuditDetails(auditDetails);
+		property.setAccountId(propertyFromDb.getAccountId());
+
 		property.setAdditionalDetails(
 				propertyutil.jsonMerge(propertyFromDb.getAdditionalDetails(), property.getAdditionalDetails()));
-    }
+	}
 
 
 

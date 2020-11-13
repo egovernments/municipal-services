@@ -84,10 +84,21 @@ public class PropertyRepository {
 			builder.append(" where tenantid=?");
 			preparedStmtList.add(criteria.getTenantId());
 		}
-		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
+		if (!ObjectUtils.isEmpty(criteria.getFromDate())) {
+			builder.append(" where fromdate=?");
+			preparedStmtList.add(criteria.getFromDate());
+		}
+		if (!ObjectUtils.isEmpty(criteria.getToDate())) {
+			builder.append(" where todate=?");
+			preparedStmtList.add(criteria.getToDate());
+		}
+		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ? tenantId ? fromDate ? toDate ?";
 		builder.append(orderbyClause);
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
+		preparedStmtList.add(criteria.getTenantId());
+		preparedStmtList.add(criteria.getFromDate());
+		preparedStmtList.add(criteria.getToDate());
 		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
 	}
 	/**
