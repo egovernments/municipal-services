@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -703,14 +704,12 @@ public class PropertyValidator {
 			errorMap.put("EG_PT_UPDATE_OWNER_ERROR", "Invalid owners found in request : " + uuidsNotFound);
 
 		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
+			
 
-			if (property.getOwners().size() > 1 && (!isNewOWnerAdded && !isOwnerCancelled)) {
-				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
-						"Mutation request should either add a new owner object or make an existing object INACTIVE in the request");
-			} else if (propertyFromSearch.getOwners().get(0).mutationEquals(property.getOwners().get(0))) {
+			if (!isNewOWnerAdded && !isOwnerCancelled) {
 
-				errorMap.put("EG_PT_MUTATION_OWNER_ERROR",
-						"Mutation request should either add a new owner object or update an existing object in the request");
+				if (!isAtleastOneOwnerModified(propertyFromSearch, errorMap, property))
+					errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or update an existing object in the request");
 			}
 
 			if (isOwnerCancelled && property.getOwners().size() == 1)
@@ -762,6 +761,33 @@ public class PropertyValidator {
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
+	}
+
+	/**
+	 * Verfies if atleast one owner in mutation request is modified
+	 * 
+	 * @param propertyFromSearch
+	 * @param errorMap
+	 * @param property
+	 * @return
+	 */
+	private Boolean isAtleastOneOwnerModified(Property propertyFromSearch, Map<String, String> errorMap, Property property) {
+		
+		Map<String, OwnerInfo> ownerIdMapFromSearch = propertyFromSearch.getOwners().stream().collect(Collectors.toMap(OwnerInfo::getOwnerInfoUuid, Function.identity()));
+
+		for (OwnerInfo ownerFromRequest : property.getOwners()) {
+
+			OwnerInfo OwnerFromSearch = ownerIdMapFromSearch.get(ownerFromRequest.getOwnerInfoUuid());
+
+			if (OwnerFromSearch == null) {
+
+				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Owner with invalid id found in the property request object : " + ownerFromRequest.getOwnerInfoUuid());
+			}
+			if (!ownerFromRequest.mutationEquals(ownerFromRequest))
+				return true;
+		}
+
+		return false;
 	}
 
 }
