@@ -782,7 +782,7 @@ public class PropertyValidator {
 
 				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Owner with invalid id found in the property request object : " + ownerFromRequest.getOwnerInfoUuid());
 			}
-			if (!ownerFromRequest.mutationEquals(ownerFromRequest))
+			if (!ownerFromRequest.mutationEquals(OwnerFromSearch))
 				return true;
 		}
 
