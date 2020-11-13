@@ -106,7 +106,9 @@ public class EnrichmentService {
     	
     	Property property = request.getProperty();
         RequestInfo requestInfo = request.getRequestInfo();
-        AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
+        AuditDetails auditDetailsForUpdate = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
+        propertyFromDb.setAuditDetails(auditDetailsForUpdate);
+        
         
 		Boolean isWfEnabled = config.getIsWorkflowEnabled();
 		Boolean iswfStarting = propertyFromDb.getStatus().equals(Status.ACTIVE);
@@ -134,8 +136,9 @@ public class EnrichmentService {
 		if (!ObjectUtils.isEmpty(institute) && null == institute.getId())
 			property.getInstitution().setId(UUID.randomUUID().toString());
 
-            property.setAuditDetails(auditDetails);
-            property.setAccountId(propertyFromDb.getAccountId());
+		AuditDetails auditDetails = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), true);
+		property.setAuditDetails(auditDetails);
+		property.setAccountId(propertyFromDb.getAccountId());
        
 		property.setAdditionalDetails(
 				propertyutil.jsonMerge(propertyFromDb.getAdditionalDetails(), property.getAdditionalDetails()));
@@ -202,6 +205,8 @@ public class EnrichmentService {
 		Property property = request.getProperty();
 		Boolean isWfEnabled = config.getIsMutationWorkflowEnabled();
 		Boolean iswfStarting = propertyFromSearch.getStatus().equals(Status.ACTIVE);
+		AuditDetails auditDetailsForUpdate = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
+		propertyFromSearch.setAuditDetails(auditDetailsForUpdate);
 
 		if (!isWfEnabled) {
 
