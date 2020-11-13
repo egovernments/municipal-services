@@ -48,11 +48,11 @@ public class PaymentUpdateService {
 	public void process(HashMap<String, Object> record) {
 
 		try {
-			log.info("Process for object", record);
+			log.info("Process for object"+ record);
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			//Update the challan only when the payment is fully done.
-			if(!paymentRequest.getPayment().getTotalAmountPaid().equals(paymentRequest.getPayment().getTotalDue())) 
+			if( paymentRequest.getPayment().getTotalAmountPaid().compareTo(paymentRequest.getPayment().getTotalDue())!=0) 
 				return;
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
 			for (PaymentDetail paymentDetail : paymentDetails) {
