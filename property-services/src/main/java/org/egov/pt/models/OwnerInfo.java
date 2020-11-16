@@ -10,6 +10,7 @@ import org.egov.common.contract.request.Role;
 import org.egov.pt.models.enums.Relationship;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.User;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
