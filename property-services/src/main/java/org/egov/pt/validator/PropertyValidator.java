@@ -671,12 +671,21 @@ public class PropertyValidator {
 		Set<Status> statusSet = new HashSet<>();
 		Set<String> searchOwnerUuids = propertyFromSearch.getOwners().stream().map(OwnerInfo::getUuid).collect(Collectors.toSet());
 		List<String> uuidsNotFound = new ArrayList<String>();
-		Set<String> activeMobileNumberPlusNameOwnerSet = new HashSet<>();
+		Map<String, Integer> activeMobileNumberPlusNameOwnerMap = new HashMap<>();
 		
 		for (OwnerInfo owner : property.getOwners()) {
 
-			if (owner.getStatus() == Status.ACTIVE)
-				activeMobileNumberPlusNameOwnerSet.add(owner.getMobileNumber() + owner.getName() + owner.getStatus());
+			if (owner.getStatus() == Status.ACTIVE) {
+
+				String key = owner.getMobileNumber() + owner.getName();
+				if (activeMobileNumberPlusNameOwnerMap.get(key) == null) {
+					activeMobileNumberPlusNameOwnerMap.put(key, 1);
+				} else {
+					Integer val = activeMobileNumberPlusNameOwnerMap.get(key);
+					activeMobileNumberPlusNameOwnerMap.put(key, val++);
+				}
+			}
+			
 			if (StringUtils.isEmpty(owner.getStatus())) {
 				isNullStatusFound = true;
 			}
@@ -691,8 +700,8 @@ public class PropertyValidator {
 				uuidsNotFound.add(owner.getUuid());
 		}
 		
-		if(property.getOwners().size() != activeMobileNumberPlusNameOwnerSet.size())
-			errorMap.put("EG_PT_MUTATION_DUPLICATE_OWNER_ERROR", "Same Owner object is repated in the update Request with active status");
+		if(activeMobileNumberPlusNameOwnerMap.values().stream().anyMatch(valueCount -> valueCount > 1))
+			errorMap.put("EG_PT_MUTATION_DUPLICATE_OWNER_ERROR", "Active Owner object with combination of name and mobilenumber is repated in the update Request");
 
 		if (isNullStatusFound)
 			errorMap.put("EG_PT_MUTATION_ALL_OWNER_STATUS_NULL_ERROR", "Status of the owner objects cannot be null, please make the status either ACTIVE or INACTIVE");
