@@ -16,6 +16,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.CreateUserRequest;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
@@ -95,22 +96,93 @@ public class UserService {
 					throw new CustomException("INVALID USER RESPONSE",
 							"The user create has failed for the mobileNumber : " + owner.getUserName());
 				}
-				
+
 			} else {
 
-				owner.setId(userDetailResponse.getUser().get(0).getId());
-				owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-				addUserDefaultFields(property.getTenantId(), role, owner);
-
-				StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
-				userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-				if (userDetailResponse.getUser().get(0).getUuid() == null) {
-					throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
-				}
+				userDetailResponse = updateExistingUser(property, requestInfo, role, owner, userDetailResponse.getUser().get(0));
 			}
 			// Assigns value of fields from user got from userDetailResponse to owner object
 			setOwnerFields(owner, userDetailResponse, requestInfo);
 		});
+	}
+
+
+    /**
+     * update existing user
+     * 
+     */
+	private UserDetailResponse updateExistingUser(Property property, RequestInfo requestInfo, Role role,
+			OwnerInfo ownerFromRequest, OwnerInfo ownerInfoFromSearch) {
+		
+		UserDetailResponse userDetailResponse;
+		
+		ownerFromRequest.setId(ownerInfoFromSearch.getId());
+		ownerFromRequest.setUuid(ownerInfoFromSearch.getUuid());
+		addUserDefaultFields(property.getTenantId(), role, ownerFromRequest);
+
+		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
+		userDetailResponse = userCall(new CreateUserRequest(requestInfo, ownerFromRequest), uri);
+		if (userDetailResponse.getUser().get(0).getUuid() == null) {
+			throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
+		}
+		return userDetailResponse;
+	}
+    
+
+    /**
+     * creating multiple usersfor mutation request 
+     * 
+     * @param PropertyRequest
+     */
+    public void createUserForMutation (PropertyRequest request, Boolean isWorkflowStarting){
+    	
+        Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+		Role role = getCitizenRole();
+		List<OwnerInfo> owners = property.getOwners();
+
+		for (OwnerInfo ownerFromRequest : owners) {
+
+			if (ownerFromRequest.getUuid() != null && ownerFromRequest.getStatus().equals(Status.ACTIVE) && isWorkflowStarting)
+				continue;
+
+			addUserDefaultFields(property.getTenantId(), role, ownerFromRequest);
+			UserDetailResponse userDetailResponse = userExists(ownerFromRequest, requestInfo);
+			List<OwnerInfo> existingUsersFromService = userDetailResponse.getUser();
+
+			if (CollectionUtils.isEmpty(existingUsersFromService)) {
+
+				ownerFromRequest.setUserName(ownerFromRequest.getMobileNumber());
+				userDetailResponse = createUser(requestInfo, ownerFromRequest);
+				
+			} else {
+
+				ownerFromRequest.setUserName(UUID.randomUUID().toString());
+				userDetailResponse = createUser(requestInfo, ownerFromRequest);
+			}
+			// Assigns value of fields from user got from userDetailResponse to owner object
+			setOwnerFields(ownerFromRequest, userDetailResponse, requestInfo);
+		}
+	}
+
+    	private UserDetailResponse createUser(RequestInfo requestInfo, OwnerInfo owner) {
+		UserDetailResponse userDetailResponse;
+		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
+
+		CreateUserRequest userRequest = CreateUserRequest.builder()
+				.requestInfo(requestInfo)
+				.user(owner)
+				.build();
+
+		userDetailResponse = userCall(userRequest, uri);
+		
+		if (ObjectUtils.isEmpty(userDetailResponse)) {
+
+			throw new CustomException("INVALID USER RESPONSE",
+					"The user create has failed for the mobileNumber : " + owner.getUserName());
+
+		}
+		return userDetailResponse;
 	}
 
 
