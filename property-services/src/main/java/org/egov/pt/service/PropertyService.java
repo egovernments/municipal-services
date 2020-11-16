@@ -185,7 +185,7 @@ public class PropertyService {
 	private void processOwnerMutation(PropertyRequest request, Property propertyFromSearch) {
 		
 		propertyValidator.validateMutation(request, propertyFromSearch);
-		userService.createUser(request);
+		userService.createUserForMutation(request, !propertyFromSearch.getStatus().equals(Status.INWORKFLOW));
 		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichMutationRequest(request, propertyFromSearch);
 		//calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
