@@ -95,6 +95,15 @@ public class PropertyValidator {
 		validateFields(request, errorMap);
 		if (!CollectionUtils.isEmpty(units))
 			validateUnits(request, errorMap);
+		
+		
+		Set<String> uniqueOwnerSet = owners.stream()
+				.map(owner -> owner.getName() + owner.getMobileNumber()).collect(Collectors.toSet());
+		
+		if (uniqueOwnerSet.size() != owners.size())
+			throw new CustomException("EG_PT_OWNER INFO ERROR", "Duplicate Owners in the request");
+			
+		
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -716,9 +725,7 @@ public class PropertyValidator {
 			
 
 			if (!isNewOWnerAdded && !isOwnerCancelled) {
-
-				if (!isAtleastOneOwnerModified(propertyFromSearch, errorMap, property))
-					errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or update an existing object in the request");
+					errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Mutation request should either add a new owner object or update an existing object to INACTIVE");
 			}
 
 			if (isOwnerCancelled && property.getOwners().size() == 1)

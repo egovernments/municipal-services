@@ -23,7 +23,6 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -249,5 +248,29 @@ public class OwnerInfo extends User {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "OwnerInfo [ownerInfoUuid=" + ownerInfoUuid + ", gender=" + gender + ", fatherOrHusbandName="
+				+ fatherOrHusbandName + ", correspondenceAddress=" + correspondenceAddress + ", isPrimaryOwner="
+				+ isPrimaryOwner + ", ownerShipPercentage=" + ownerShipPercentage + ", ownerType=" + ownerType
+				+ ", institutionId=" + institutionId + ", status=" + status + ", documents=" + documents
+				+ ", relationship=" + relationship + ", hashCode=" + hashCode() + ", Id=" + getId()
+				+ ", Uuid=" + getUuid() + ", UserName=" + getUserName() + ", Password=" + getPassword()
+				+ ", Salutation=" + getSalutation() + ", Name=" + getName() + ", MobileNumber="
+				+ getMobileNumber() + ", EmailId=" + getEmailId() + ", AltContactNumber="
+				+ getAltContactNumber() + ", Pan=" + getPan() + ", AadhaarNumber=" + getAadhaarNumber()
+				+ ", PermanentAddress=" + getPermanentAddress() + ", PermanentCity=" + getPermanentCity()
+				+ ", PermanentPincode=" + getPermanentPincode() + ", CorrespondenceCity="
+				+ getCorrespondenceCity() + ", CorrespondencePincode=" + getCorrespondencePincode()
+				+ ", Active=" + getActive() + ", Dob=" + getDob() + ", PwdExpiryDate="
+				+ getPwdExpiryDate() + ", Locale=" + getLocale() + ", Type=" + getType() + ", Signature="
+				+ getSignature() + ", AccountLocked=" + getAccountLocked() + ", Roles=" + getRoles()
+				+ ", BloodGroup=" + getBloodGroup() + ", IdentificationMark=" + getIdentificationMark()
+				+ ", Photo=" + getPhoto() + ", CreatedBy=" + getCreatedBy() + ", CreatedDate="
+				+ getCreatedDate() + ", LastModifiedBy=" + getLastModifiedBy() + ", LastModifiedDate="
+				+ getLastModifiedDate() + ", TenantId=" + getTenantId() + "]";
+	}
 
+
+	
 }
