@@ -7,9 +7,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -149,16 +151,23 @@ public class UserService {
 			addUserDefaultFields(property.getTenantId(), role, ownerFromRequest);
 			UserDetailResponse userDetailResponse = userExists(ownerFromRequest, requestInfo);
 			List<OwnerInfo> existingUsersFromService = userDetailResponse.getUser();
+			Map<String, OwnerInfo> ownerMapFromSearch = existingUsersFromService.stream().collect(Collectors.toMap(OwnerInfo::getUuid, Function.identity()));
 
 			if (CollectionUtils.isEmpty(existingUsersFromService)) {
 
-				ownerFromRequest.setUserName(ownerFromRequest.getMobileNumber());
+				ownerFromRequest.setUserName(UUID.randomUUID().toString());
 				userDetailResponse = createUser(requestInfo, ownerFromRequest);
 				
 			} else {
 
-				ownerFromRequest.setUserName(UUID.randomUUID().toString());
-				userDetailResponse = createUser(requestInfo, ownerFromRequest);
+				String uuid = ownerFromRequest.getUuid();
+				if (uuid != null && ownerMapFromSearch.containsKey(uuid)) {
+					updateExistingUser(property, requestInfo, role, ownerFromRequest, ownerMapFromSearch.get(uuid));
+				} else {
+
+					ownerFromRequest.setUserName(UUID.randomUUID().toString());
+					userDetailResponse = createUser(requestInfo, ownerFromRequest);
+				}
 			}
 			// Assigns value of fields from user got from userDetailResponse to owner object
 			setOwnerFields(ownerFromRequest, userDetailResponse, requestInfo);
