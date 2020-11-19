@@ -384,9 +384,10 @@ public class DemandService {
 		OwnerInfo owner = null;
 
 		for(OwnerInfo ownerInfo : detail.getOwners()){
-			if(ownerInfo.getStatus().toString().equalsIgnoreCase(OwnerInfo.OwnerStatus.ACTIVE.toString()))
+			if(ownerInfo.getStatus().toString().equalsIgnoreCase(OwnerInfo.OwnerStatus.ACTIVE.toString())){
 				owner = ownerInfo;
-			break;
+				break;
+			}
 		}	
 
 		/*if (null != detail.getCitizenInfo())
