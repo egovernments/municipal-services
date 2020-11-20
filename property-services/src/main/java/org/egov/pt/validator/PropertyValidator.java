@@ -680,6 +680,7 @@ public class PropertyValidator {
 		Boolean isOwnerCancelled = false;
 		Set<Status> statusSet = new HashSet<>();
 		Set<String> searchOwnerUuids = propertyFromSearch.getOwners().stream().map(OwnerInfo::getUuid).collect(Collectors.toSet());
+		Map<String, Long> requestOwnerUuuidsCount = property.getOwners().stream().map(owner -> owner.getUuid()).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 		List<String> uuidsNotFound = new ArrayList<String>();
 		Map<String, Integer> activeMobileNumberPlusNameOwnerMap = new HashMap<>();
 		
@@ -710,6 +711,9 @@ public class PropertyValidator {
 				uuidsNotFound.add(owner.getUuid());
 		}
 		
+		if(requestOwnerUuuidsCount.values().stream().anyMatch(valueCount -> valueCount > 1))
+			errorMap.put("EG_PT_MUTATION_DUPLICATE_OWNER_UUID_ERROR", "Multiple Owner object with same uuid Found. Please send new Owner objects without uuid");
+
 		if(activeMobileNumberPlusNameOwnerMap.values().stream().anyMatch(valueCount -> valueCount > 1))
 			errorMap.put("EG_PT_MUTATION_DUPLICATE_OWNER_ERROR", "Active Owner object with combination of name and mobilenumber is repated in the update Request");
 
