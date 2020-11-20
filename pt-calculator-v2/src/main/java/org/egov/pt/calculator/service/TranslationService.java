@@ -107,6 +107,9 @@ public class TranslationService {
         propertyDetail.put("usageCategoryMinor", usageCategoryMinor);
         propertyDetail.put("ownershipCategory", ownershipCategory);
         propertyDetail.put("subOwnershipCategory", subOwnershipCategory);
+        if(property.getAdditionalDetails()!=null) {
+        	propertyDetail.put("additionalDetails", property.getAdditionalDetails());
+        }
 
         // propertyDetail.put("adhocExemption", );
         // propertyDetail.put("adhocPenalty",);

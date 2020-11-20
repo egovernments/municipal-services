@@ -38,15 +38,15 @@ public class PBFirecessUtils {
         }
 
         if (propertyAttributes!=null &&
-                propertyAttributes.get("heightAbove36Feet")!=null &&
-                (Boolean) propertyAttributes.get("heightAbove36Feet")) {
+                propertyAttributes.get("heightOfProperty")!=null &&
+                (Boolean) propertyAttributes.get("heightOfProperty")) {
             // height is above 36 feet
             firecess_building_height = new BigDecimal ((Integer) ((HashMap)applicableMaster.get("dynamicRates")).get("firecess_building_height"));
         }
 
         if (propertyAttributes!=null &&
-                propertyAttributes.get("inflammable")!=null &&
-                (Boolean)propertyAttributes.get("inflammable")) {
+                propertyAttributes.get("inflammableMaterial")!=null &&
+                (Boolean)propertyAttributes.get("inflammableMaterial")) {
             // height is above 36 feet
             firecess_inflammable = new BigDecimal ((Integer) ((HashMap)applicableMaster.get("dynamicRates")).get("firecess_inflammable"));
         }
