@@ -162,7 +162,7 @@ public class UserService {
 
 				String uuid = ownerFromRequest.getUuid();
 				if (uuid != null && ownerMapFromSearch.containsKey(uuid)) {
-					updateExistingUser(property, requestInfo, role, ownerFromRequest, ownerMapFromSearch.get(uuid));
+					userDetailResponse = updateExistingUser(property, requestInfo, role, ownerFromRequest, ownerMapFromSearch.get(uuid));
 				} else {
 
 					ownerFromRequest.setUserName(UUID.randomUUID().toString());
