@@ -1,5 +1,6 @@
 package org.egov.pt.repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -84,21 +85,16 @@ public class PropertyRepository {
 			builder.append(" where tenantid=?");
 			preparedStmtList.add(criteria.getTenantId());
 		}
-		if (!ObjectUtils.isEmpty(criteria.getFromDate())) {
-			builder.append(" where fromdate=?");
+		if(!ObjectUtils.isEmpty(criteria.getFromDate()) && !ObjectUtils.isEmpty(criteria.getToDate()))
+		{
+			builder.append(" createdTime BETWEEN (:fromDate=?) AND (:toDate=?)");
 			preparedStmtList.add(criteria.getFromDate());
-		}
-		if (!ObjectUtils.isEmpty(criteria.getToDate())) {
-			builder.append(" where todate=?");
 			preparedStmtList.add(criteria.getToDate());
 		}
-		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ? tenantId ? fromDate ? toDate ?";
+		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ? ";
 		builder.append(orderbyClause);
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
-		preparedStmtList.add(criteria.getTenantId());
-		preparedStmtList.add(criteria.getFromDate());
-		preparedStmtList.add(criteria.getToDate());
 		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
 	}
 	/**
