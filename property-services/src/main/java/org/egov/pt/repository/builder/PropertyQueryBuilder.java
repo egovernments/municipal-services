@@ -1,8 +1,10 @@
 package org.egov.pt.repository.builder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import java.time.Instant;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.PropertyCriteria;
 import org.egov.tracer.model.CustomException;
@@ -117,17 +119,16 @@ public class PropertyQueryBuilder {
 	 * @return
 	 */
 	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
-
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
-					&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
-					&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
-					&& CollectionUtils.isEmpty(criteria.getUuids())
-					&& null == criteria.getMobileNumber()
-					&& null == criteria.getName();
-		
+				&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
+				&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
+				&& CollectionUtils.isEmpty(criteria.getUuids())
+				&& null == criteria.getMobileNumber()
+				&& null == criteria.getName();
+
 		if(isEmpty)
 			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
-		
+
 		StringBuilder builder = new StringBuilder(QUERY);
 		Boolean appendAndQuery = false;
 
@@ -135,6 +136,19 @@ public class PropertyQueryBuilder {
 			builder.append(" property.tenantid=?");
 			preparedStmtList.add(criteria.getTenantId());
 			appendAndQuery = true;
+		}
+
+		if(criteria.getFromDate() != null){
+			addClauseIfRequired(builder,preparedStmtList);
+
+			// If user does NOT specify toDate, take today's date as the toDate by default
+			if(criteria.getToDate() == null){
+				criteria.setToDate(Instant.now().toEpochMilli());
+			}
+
+			builder.append(" property.createdTime BETWEEN (:fromDate=?) AND (:toDate=?) ");
+			preparedStmtList.add(criteria.getFromDate());
+			preparedStmtList.add(criteria.getToDate());
 		}
 
 		if (null != criteria.getStatus()) {
@@ -145,7 +159,7 @@ public class PropertyQueryBuilder {
 			preparedStmtList.add(criteria.getStatus());
 			appendAndQuery= true;
 		}
-		
+
 		if (null != criteria.getLocality()) {
 
 			if(appendAndQuery)
@@ -164,7 +178,7 @@ public class PropertyQueryBuilder {
 			addToPreparedStatementWithUpperCase(preparedStmtList, propertyIds);
 			appendAndQuery= true;
 		}
-		
+
 		Set<String> acknowledgementIds = criteria.getAcknowledgementIds();
 		if (!CollectionUtils.isEmpty(acknowledgementIds)) {
 
@@ -174,7 +188,7 @@ public class PropertyQueryBuilder {
 			addToPreparedStatementWithUpperCase(preparedStmtList, acknowledgementIds);
 			appendAndQuery= true;
 		}
-		
+
 		Set<String> uuids = criteria.getUuids();
 		if (!CollectionUtils.isEmpty(uuids)) {
 
@@ -215,6 +229,19 @@ public class PropertyQueryBuilder {
 			builder.append(" property.tenantid=?");
 			preparedStmtList.add(criteria.getTenantId());
 			appendAndQuery = true;
+		}
+
+		if(criteria.getFromDate() != null){
+			addClauseIfRequired(builder,preparedStmtList);
+
+			// If user does NOT specify toDate, take today's date as the toDate by default
+			if(criteria.getToDate() == null){
+				criteria.setToDate(Instant.now().toEpochMilli());
+			}
+
+			builder.append(" property.createdTime BETWEEN (:fromDate=?) AND (:toDate=?) ");
+			preparedStmtList.add(criteria.getFromDate());
+			preparedStmtList.add(criteria.getToDate());
 		}
 
 		Set<String> propertyIds = criteria.getPropertyIds();
@@ -269,6 +296,14 @@ public class PropertyQueryBuilder {
 		ids.forEach(id -> {
 			preparedStmtList.add(id.toUpperCase());
 		});
+	}
+
+	private static void addClauseIfRequired(StringBuilder queryString,List<Object> values) {
+		if (values.isEmpty())
+			queryString.append(" WHERE ");
+		else {
+			queryString.append(" AND");
+		}
 	}
 
 	public String getpropertyAuditQuery() {
