@@ -132,21 +132,19 @@ public class PropertyQueryBuilder {
 		StringBuilder builder = new StringBuilder(QUERY);
 		Boolean appendAndQuery = false;
 
-		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
-			builder.append(" property.tenantid=?");
-			preparedStmtList.add(criteria.getTenantId());
+		if (!ObjectUtils.isEmpty(criteria.getTenantIds())) {
+			builder.append(" property.tenantid IN (:tenantIds) ");
+			preparedStmtList.add(criteria.getTenantIds());
 			appendAndQuery = true;
 		}
 
-		if(criteria.getFromDate() != null){
-			addClauseIfRequired(builder,preparedStmtList);
-
+		if (criteria.getFromDate() != null) {
+			addClauseIfRequired(builder, preparedStmtList);
 			// If user does NOT specify toDate, take today's date as the toDate by default
-			if(criteria.getToDate() == null){
+			if (criteria.getToDate() == null) {
 				criteria.setToDate(Instant.now().toEpochMilli());
-			}
-
-			builder.append(" property.createdTime BETWEEN (:fromDate=?) AND (:toDate=?) ");
+			};
+			builder.append("property.createdTime BETWEEN (:fromDate) AND (:toDate)");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
 		}
@@ -226,20 +224,18 @@ public class PropertyQueryBuilder {
 		Boolean appendAndQuery = false;
 
 		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
-			builder.append(" property.tenantid=?");
+			builder.append(" property.tenantid IN (:tenantIds) ");
 			preparedStmtList.add(criteria.getTenantId());
 			appendAndQuery = true;
 		}
 
-		if(criteria.getFromDate() != null){
-			addClauseIfRequired(builder,preparedStmtList);
-
+		if (criteria.getFromDate() != null) {
+			addClauseIfRequired(builder, preparedStmtList);
 			// If user does NOT specify toDate, take today's date as the toDate by default
-			if(criteria.getToDate() == null){
+			if (criteria.getToDate() == null) {
 				criteria.setToDate(Instant.now().toEpochMilli());
-			}
-
-			builder.append(" property.createdTime BETWEEN (:fromDate=?) AND (:toDate=?) ");
+			};
+			builder.append(" property.createdTime BETWEEN (:fromDate) AND (:toDate)");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
 		}

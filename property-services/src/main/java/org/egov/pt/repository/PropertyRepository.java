@@ -81,14 +81,9 @@ public class PropertyRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
-		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
-			builder.append(" where tenantid=?");
-			preparedStmtList.add(criteria.getTenantId());
-		}
-
-		if(!ObjectUtils.isEmpty(criteria.getFromDate()) && !ObjectUtils.isEmpty(criteria.getToDate()))
-		{
-			builder.append(" createdTime BETWEEN (:fromDate=?) AND (:toDate=?)");
+		if (!ObjectUtils.isEmpty(criteria.getTenantIds()) && !ObjectUtils.isEmpty(criteria.getFromDate()) && !ObjectUtils.isEmpty(criteria.getToDate())) {
+			builder.append(" where tenantid IN (:tenantIds) BETWEEN fromDate=? AND toDate=? ");
+			preparedStmtList.add(criteria.getTenantIds());
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
 		}
