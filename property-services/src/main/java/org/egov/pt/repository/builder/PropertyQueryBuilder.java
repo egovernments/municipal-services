@@ -210,7 +210,7 @@ public class PropertyQueryBuilder {
 		String withClauseQuery = WITH_CLAUSE_QUERY.replace(REPLACE_STRING, builder);
 		return addPaginationWrapper(withClauseQuery, preparedStmtList, criteria);
 	}
-	
+
 	public String getPropertyQueryForBulkSearch(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
