@@ -143,7 +143,7 @@ public class PropertyQueryBuilder {
 			// If user does NOT specify toDate, take today's date as the toDate by default
 			if (criteria.getToDate() == null) {
 				criteria.setToDate(Instant.now().toEpochMilli());
-			};
+			}
 			builder.append("property.createdTime BETWEEN (:fromDate) AND (:toDate)");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
@@ -210,8 +210,7 @@ public class PropertyQueryBuilder {
 		String withClauseQuery = WITH_CLAUSE_QUERY.replace(REPLACE_STRING, builder);
 		return addPaginationWrapper(withClauseQuery, preparedStmtList, criteria);
 	}
-
-
+	
 	public String getPropertyQueryForBulkSearch(PropertyCriteria criteria, List<Object> preparedStmtList) {
 
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
@@ -234,7 +233,7 @@ public class PropertyQueryBuilder {
 			// If user does NOT specify toDate, take today's date as the toDate by default
 			if (criteria.getToDate() == null) {
 				criteria.setToDate(Instant.now().toEpochMilli());
-			};
+			}
 			builder.append(" property.createdTime BETWEEN (:fromDate) AND (:toDate)");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
