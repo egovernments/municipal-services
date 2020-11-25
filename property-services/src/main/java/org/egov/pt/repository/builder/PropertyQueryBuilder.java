@@ -118,7 +118,7 @@ public class PropertyQueryBuilder {
 	 * @param preparedStmtList
 	 * @return
 	 */
-	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
+	public String getPropertySearchQuery(PropertyCriteria criteria, List<Object> preparedStmtList, Boolean isPlainSearch) {
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
 				&& CollectionUtils.isEmpty(criteria.getAcknowledgementIds())
 				&& CollectionUtils.isEmpty(criteria.getOldpropertyids())
@@ -131,19 +131,48 @@ public class PropertyQueryBuilder {
 
 		StringBuilder builder = new StringBuilder(QUERY);
 		Boolean appendAndQuery = false;
-
-		if (!ObjectUtils.isEmpty(criteria.getTenantIds())) {
-			builder.append(" property.tenantid IN (:tenantIds) ");
-			preparedStmtList.add(criteria.getTenantIds());
-			appendAndQuery = true;
+		if(isPlainSearch)
+		{
+			if (!CollectionUtils.isEmpty(criteria.getTenantIds()))
+				{
+					addClauseIfRequired(builder,preparedStmtList);
+					builder.append(" property.tenantId IN (:tenantIds)  ");
+					preparedStmtList.add(criteria.getTenantIds());
+				}
+			else
+				{
+					throw new CustomException("TENANT_ID_LIST_NULL", "Tenant ids are not provided for searching.");
+				}
 		}
-
-		if (criteria.getFromDate() != null) {
+		else
+			{
+			if (StringUtils.isNotBlank(criteria.getTenantId()))
+			{
+					addClauseIfRequired(builder,preparedStmtList);
+					if (criteria.getTenantId().split("\\.").length > 1)
+					{
+						builder.append(" property.tenantId =:tenantId");
+						preparedStmtList.add(criteria.getTenantId());
+					}
+					else
+					{
+						builder.append(" property.tenantId LIKE :tenantId");
+						preparedStmtList.add(criteria.getTenantId() + "%");
+					}
+			}
+			else
+				{
+					throw new CustomException("TENANT_ID_NULL", "Tenant id is not provided for searching.");
+				}
+		}
+		if (criteria.getFromDate() != null)
+		{
 			addClauseIfRequired(builder, preparedStmtList);
 			// If user does NOT specify toDate, take today's date as the toDate by default
-			if (criteria.getToDate() == null) {
+			if (criteria.getToDate() == null)
+			{
 				criteria.setToDate(Instant.now().toEpochMilli());
-			};
+			}
 			builder.append("property.createdTime BETWEEN (:fromDate) AND (:toDate)");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
@@ -212,7 +241,7 @@ public class PropertyQueryBuilder {
 	}
 
 
-	public String getPropertyQueryForBulkSearch(PropertyCriteria criteria, List<Object> preparedStmtList) {
+	public String getPropertyQueryForBulkSearch(PropertyCriteria criteria, List<Object> preparedStmtList, Boolean isPlainSearch) {
 
 		Boolean isEmpty = CollectionUtils.isEmpty(criteria.getPropertyIds())
 				&& CollectionUtils.isEmpty(criteria.getUuids());
@@ -223,10 +252,39 @@ public class PropertyQueryBuilder {
 		StringBuilder builder = new StringBuilder(QUERY);
 		Boolean appendAndQuery = false;
 
-		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
-			builder.append(" property.tenantid IN (:tenantIds) ");
-			preparedStmtList.add(criteria.getTenantId());
-			appendAndQuery = true;
+		if(isPlainSearch)
+		{
+			if (!CollectionUtils.isEmpty(criteria.getTenantIds()))
+			{
+				addClauseIfRequired(builder,preparedStmtList);
+				builder.append(" property.tenantId IN (:tenantIds)  ");
+				preparedStmtList.add(criteria.getTenantIds());
+			}
+			else
+			{
+				throw new CustomException("TENANT_ID_LIST_NULL", "Tenant ids are not provided for searching.");
+			}
+		}
+		else
+		{
+			if (StringUtils.isNotBlank(criteria.getTenantId()))
+			{
+				addClauseIfRequired(builder,preparedStmtList);
+				if (criteria.getTenantId().split("\\.").length > 1)
+				{
+					builder.append(" property.tenantId =:tenantId");
+					preparedStmtList.add(criteria.getTenantId());
+				}
+				else
+				{
+					builder.append(" property.tenantId LIKE :tenantId");
+					preparedStmtList.add(criteria.getTenantId() + "%");
+				}
+			}
+			else
+			{
+				throw new CustomException("TENANT_ID_NULL", "Tenant id is not provided for searching.");
+			}
 		}
 
 		if (criteria.getFromDate() != null) {

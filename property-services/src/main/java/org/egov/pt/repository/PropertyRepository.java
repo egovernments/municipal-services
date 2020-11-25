@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-
+import static org.apache.kafka.common.requests.FetchMetadata.log;
 import com.google.common.collect.Sets;
 import org.springframework.util.ObjectUtils;
 
@@ -64,16 +64,19 @@ public class PropertyRepository {
 	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		Boolean isPlainSearch = true;
+		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch);
 		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
 		else
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
+
 	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList);
+		Boolean isPlainSearch = true;
+		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList, isPlainSearch);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
