@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
-
+import static org.apache.kafka.common.requests.FetchMetadata.log;
 import com.google.common.collect.Sets;
 import org.springframework.util.ObjectUtils;
 
@@ -63,16 +63,19 @@ public class PropertyRepository {
 	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		Boolean isPlainSearch = true;
+		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch);
 		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
 		else
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
+
 	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList);
+		Boolean isPlainSearch = true;
+		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList, isPlainSearch);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
@@ -80,9 +83,11 @@ public class PropertyRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
-		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
-			builder.append(" where tenantid=?");
-			preparedStmtList.add(criteria.getTenantId());
+		if (!ObjectUtils.isEmpty(criteria.getTenantIds()) && !ObjectUtils.isEmpty(criteria.getFromDate()) && !ObjectUtils.isEmpty(criteria.getToDate())) {
+			builder.append(" where tenantid IN (:tenantIds) BETWEEN fromDate=? AND toDate=? ");
+			preparedStmtList.add(criteria.getTenantIds());
+			preparedStmtList.add(criteria.getFromDate());
+			preparedStmtList.add(criteria.getToDate());
 		}
 		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
 		builder.append(orderbyClause);
