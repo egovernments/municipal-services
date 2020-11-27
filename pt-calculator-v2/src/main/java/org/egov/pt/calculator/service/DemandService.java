@@ -649,13 +649,19 @@ public class DemandService {
 
 		for(Map.Entry<String, List<DemandDetail>> entry : taxHeadCodeDetailMap.entrySet()){
 			List<DemandDetail> demandDetails = entry.getValue();
-			if(demandDetails!=null && demandDetails.size()>0 && !demandDetails.get(0).getTaxHeadMasterCode().equalsIgnoreCase(PT_ROUNDOFF)) {
+			
 			BigDecimal taxAmount= demandDetails.stream().map(DemandDetail::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			BigDecimal collectionAmount= demandDetails.stream().map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			BigDecimal netAmount = collectionAmount.subtract(taxAmount);
+			if(demandDetails!=null && demandDetails.size()>0 && !demandDetails.get(0).getTaxHeadMasterCode().equalsIgnoreCase(PT_ROUNDOFF)) {
 			details.add(DemandDetail.builder().taxHeadMasterCode(entry.getKey())
 					.taxAmount(netAmount)
 					.collectionAmount(BigDecimal.ZERO)
+					.tenantId(tenantId).build());
+		}else {
+			details.add(DemandDetail.builder().taxHeadMasterCode(entry.getKey())
+					.taxAmount(taxAmount)
+					.collectionAmount(collectionAmount)
 					.tenantId(tenantId).build());
 		}
 		}
