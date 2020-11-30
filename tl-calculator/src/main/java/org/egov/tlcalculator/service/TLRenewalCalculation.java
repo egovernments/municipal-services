@@ -14,6 +14,7 @@ import org.egov.tlcalculator.web.models.demand.Category;
 import org.egov.tlcalculator.web.models.demand.TaxHeadEstimate;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -132,12 +133,17 @@ public class TLRenewalCalculation {
      */
     public void setPropertyMasterValues(RequestInfo requestInfo, String tenantId, Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
-        MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-                getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+        MdmsResponse response = mapper.convertValue(fetchMdmsData(requestInfo, tenantId), MdmsResponse.class);
         Map<String, JSONArray> res = response.getMdmsRes().get("TradeLicense");
         System.out.println("MDMS--->"+res.toString());
         for (Map.Entry<String, JSONArray> entry : res.entrySet())
             timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
+    }
+
+    @Cacheable(value = "mdmsData", sync = true, key = "tenantId")
+    private Object fetchMdmsData(RequestInfo requestInfo, String tenantId) {
+        return repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+                getPropertyModuleRequest(requestInfo, tenantId));
     }
 
     /**
