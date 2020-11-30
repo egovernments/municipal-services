@@ -80,7 +80,10 @@ public class AssessmentRowMapper implements ResultSetExtractor<List<Assessment>>
 				assessmentMap.put(assessment.getId(), assessment);
 			}else {
 				assessment.getUnitUsageList().add(getUnitUsage(rs));
-				assessment.getDocuments().add(getDocument(rs));
+				Document document = getDocument(rs);
+				if(document != null) {
+					assessment.getDocuments().add(document);
+				}				
 			}
 		}
 
