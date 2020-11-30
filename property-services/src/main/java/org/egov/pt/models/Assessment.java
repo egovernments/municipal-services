@@ -62,7 +62,7 @@ public class Assessment {
 
 	@JsonProperty("documents")
 	@Valid
-	private Set<Document> documents ;
+	private Set<Document> documents = new HashSet<>();
 
 	@JsonProperty("additionalDetails")
 	private JsonNode additionalDetails ;
