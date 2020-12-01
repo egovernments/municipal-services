@@ -63,7 +63,8 @@ public class ServiceRequestValidator {
         validateDepartment(request, mdmsData);
         validateReOpen(request);
         RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
-        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
+        Boolean isPlainSearch = false;
+        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria, isPlainSearch);
 
         if(CollectionUtils.isEmpty(serviceWrappers))
             throw new CustomException("INVALID_UPDATE","The record that you are trying to update does not exists");
@@ -217,6 +218,12 @@ public class ServiceRequestValidator {
 
         validateSearchParam(requestInfo, criteria);
 
+    }
+
+    public void validatePlainSearch(RequestSearchCriteria criteria){
+        if(CollectionUtils.isEmpty(criteria.getTenantIds())){
+           throw new CustomException("TENANT_ID_LIST_EMPTY", "Tenant ids not provided for searching.");
+        }
     }
 
 

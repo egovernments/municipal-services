@@ -85,7 +85,9 @@ public class PGRService {
         if(criteria.isEmpty())
             return new ArrayList<>();
 
-        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
+        Boolean isPlainSearch = false;
+
+        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria, isPlainSearch);
 
         if(CollectionUtils.isEmpty(serviceWrappers))
             return new ArrayList<>();;
@@ -95,6 +97,30 @@ public class PGRService {
         return serviceWrappers;
     }
 
+    public List<ServiceWrapper> plainSearch(RequestInfo requestInfo, RequestSearchCriteria criteria){
+        validator.validatePlainSearch(criteria);
+
+        if(criteria.getLimit()==null)
+            criteria.setLimit(config.getDefaultLimit());
+
+        if(criteria.getOffset()==null)
+            criteria.setOffset(config.getDefaultOffset());
+
+        if(criteria.getLimit()!=null && criteria.getLimit() > config.getMaxLimit())
+            criteria.setLimit(config.getMaxLimit());
+
+        Boolean isPlainSearch = true;
+
+        List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria, isPlainSearch);
+
+        if(CollectionUtils.isEmpty(serviceWrappers)){
+            return new ArrayList<>();
+        }
+
+        userService.enrichUsers(serviceWrappers);
+        List<ServiceWrapper> enrichedWrappers = workflowService.enrichWorkflowForBulkSearch(requestInfo, serviceWrappers);
+        return enrichedWrappers;
+    }
 
     /**
      * Updates the complaint (used to forward the complaint from one application status to another)

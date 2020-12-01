@@ -1,9 +1,11 @@
 package org.egov.pgr.repository.rowmapper;
 
 import org.egov.pgr.web.models.RequestSearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -28,14 +30,24 @@ public class PGRQueryBuilder {
     private static final String COUNT_WRAPPER = "select count(*) from ({INTERNAL_QUERY}) as count";
 
 
-    public String getPGRSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList) {
+    public String getPGRSearchQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList, Boolean isPlainSearch) {
 
         StringBuilder builder = new StringBuilder(QUERY);
 
-        if (criteria.getTenantId() != null) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.tenantid=? ");
-            preparedStmtList.add(criteria.getTenantId());
+        if(isPlainSearch){
+            Set<String> tenantIds = criteria.getTenantIds();
+            if(!CollectionUtils.isEmpty(tenantIds)){
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantId IN (").append(createQuery(tenantIds)).append(")");
+                addToPreparedStatement(preparedStmtList, tenantIds);
+            }
+        }
+        else {
+            if (criteria.getTenantId() != null) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantId=? ");
+                preparedStmtList.add(criteria.getTenantId());
+            }
         }
 
         if (criteria.getServiceCode() != null) {
@@ -71,6 +83,25 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
+        if (criteria.getFromDate() != null) {
+            addClauseIfRequired(preparedStmtList, builder);
+
+            //If user does not specify toDate, take today's date as toDate by default.
+            if (criteria.getToDate() == null) {
+                criteria.setToDate(Instant.now().toEpochMilli());
+            }
+
+            builder.append(" ser.createdtime BETWEEN ? AND ?");
+            preparedStmtList.add(criteria.getFromDate());
+            preparedStmtList.add(criteria.getToDate());
+
+        } else {
+            //if only toDate is provided as parameter without fromDate parameter, throw an exception.
+            if (criteria.getToDate() != null) {
+                throw new CustomException("INVALID_SEARCH", "Cannot specify toDate without a fromDate");
+            }
+        }
+
         addOrderByClause(builder);
 
         addLimitAndOffset(builder, criteria, preparedStmtList);
@@ -80,7 +111,8 @@ public class PGRQueryBuilder {
 
 
     public String getCountQuery(RequestSearchCriteria criteria, List<Object> preparedStmtList){
-        String query = getPGRSearchQuery(criteria, preparedStmtList);
+        Boolean isPlainSearch = false;
+        String query = getPGRSearchQuery(criteria, preparedStmtList, isPlainSearch);
         String countQuery = COUNT_WRAPPER.replace("{INTERNAL_QUERY}", query);
         return countQuery;
     }

@@ -19,6 +19,9 @@ public class RequestSearchCriteria {
     @JsonProperty("tenantId")
     private String tenantId;
 
+    @JsonProperty("tenantIds")
+    private Set<String> tenantIds;
+
     @JsonProperty("serviceCode")
     private String serviceCode;
 
@@ -33,6 +36,12 @@ public class RequestSearchCriteria {
 
     @JsonProperty("ids")
     private Set<String> ids;
+
+    @JsonProperty("fromDate")
+    private Long fromDate;
+
+    @JsonProperty("toDate")
+    private Long toDate;
 
     @JsonProperty("limit")
     private Integer limit;

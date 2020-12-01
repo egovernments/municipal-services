@@ -143,6 +143,67 @@ public class WorkflowService {
 
     }
 
+    public List<ServiceWrapper> enrichWorkflowForBulkSearch(RequestInfo requestInfo, List<ServiceWrapper> serviceWrappers) {
+
+        Map<String, List<ServiceWrapper> > tenantToServiceWrapperMap = prepareMapForBulkSearch(serviceWrappers);
+
+        List<List<ServiceWrapper> > enrichmentResult = new ArrayList<>();
+
+        List<ServiceWrapper> enrichedWrappers = new ArrayList<>();
+
+        for(String tenantId : tenantToServiceWrapperMap.keySet()) {
+            List<String> serviceRequestIds = new ArrayList<>();
+
+            tenantToServiceWrapperMap.get(tenantId).forEach(pgrEntity -> {
+                serviceRequestIds.add(pgrEntity.getService().getServiceRequestId());
+            });
+
+            RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+            StringBuilder searchUrl = getprocessInstanceSearchURL(tenantId, StringUtils.join(serviceRequestIds, ','));
+            Object result = repository.fetchResult(searchUrl, requestInfoWrapper);
+
+
+            ProcessInstanceResponse processInstanceResponse = null;
+            try {
+                processInstanceResponse = mapper.convertValue(result, ProcessInstanceResponse.class);
+            } catch (IllegalArgumentException e) {
+                throw new CustomException("PARSING ERROR", "Failed to parse response of workflow processInstance search");
+            }
+
+            if (CollectionUtils.isEmpty(processInstanceResponse.getProcessInstances()))
+                throw new CustomException("WORKFLOW_NOT_FOUND", "The workflow object is not found");
+
+            Map<String, Workflow> businessIdToWorkflow = getWorkflow(processInstanceResponse.getProcessInstances());
+
+            tenantToServiceWrapperMap.get(tenantId).forEach(pgrEntity -> {
+                pgrEntity.setWorkflow(businessIdToWorkflow.get(pgrEntity.getService().getServiceRequestId()));
+            });
+            enrichmentResult.add(tenantToServiceWrapperMap.get(tenantId));
+        }
+
+        for(List<ServiceWrapper> l : enrichmentResult){
+            enrichedWrappers.addAll(l);
+        }
+
+        return enrichedWrappers;
+
+    }
+
+    public Map<String, List<ServiceWrapper> > prepareMapForBulkSearch(List<ServiceWrapper> serviceWrappers){
+        Map<String, List<ServiceWrapper> > tenantToServiceWrapperMap = new HashMap<>();
+
+        for(ServiceWrapper svc : serviceWrappers){
+            String tenantId = svc.getService().getTenantId();
+            if(!tenantToServiceWrapperMap.containsKey(tenantId)){
+                tenantToServiceWrapperMap.put(tenantId, new ArrayList<>());
+            }
+            tenantToServiceWrapperMap.get(tenantId).add(svc);
+        }
+
+        return tenantToServiceWrapperMap;
+    }
+
     /**
      * Enriches ProcessInstance Object for workflow
      *

@@ -41,8 +41,8 @@ public class PGRRepository {
      * @param criteria
      * @return
      */
-    public List<ServiceWrapper> getServiceWrappers(RequestSearchCriteria criteria){
-        List<Service> services = getServices(criteria);
+    public List<ServiceWrapper> getServiceWrappers(RequestSearchCriteria criteria, Boolean isPlainSearch){
+        List<Service> services = getServices(criteria, isPlainSearch);
         List<String> serviceRequestids = services.stream().map(Service::getServiceRequestId).collect(Collectors.toList());
         Map<String, Workflow> idToWorkflowMap = new HashMap<>();
         List<ServiceWrapper> serviceWrappers = new ArrayList<>();
@@ -59,9 +59,11 @@ public class PGRRepository {
      * @param criteria
      * @return
      */
-    public List<Service> getServices(RequestSearchCriteria criteria) {
+    public List<Service> getServices(RequestSearchCriteria criteria, Boolean isPlainSearch) {
         List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getPGRSearchQuery(criteria, preparedStmtList);
+        String query = queryBuilder.getPGRSearchQuery(criteria, preparedStmtList, isPlainSearch);
+        log.info("Query:" + query);
+        log.info("PreparedStmtValues" + preparedStmtList);
         List<Service> services =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
         return services;
     }
