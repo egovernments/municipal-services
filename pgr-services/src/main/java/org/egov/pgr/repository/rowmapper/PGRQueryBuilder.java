@@ -71,6 +71,13 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
+        if(criteria.getLocality()!=null)
+        {
+            addClauseIfRequired(preparedStmtList, builder);
+            builder.append(" ads.locality=? ");
+            preparedStmtList.add(criteria.getLocality());
+        }
+
         addOrderByClause(builder);
 
         addLimitAndOffset(builder, criteria, preparedStmtList);

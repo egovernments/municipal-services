@@ -43,11 +43,13 @@ public class RequestSearchCriteria {
     @JsonIgnore
     private Set<String> userIds;
 
+    @JsonProperty("locality")
+    private String locality;
 
 
     public boolean isEmpty(){
         return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null
-        && this.applicationStatus==null && this.ids==null && this.userIds==null);
+        && this.applicationStatus==null && this.ids==null && this.userIds==null && this.locality==null);
     }
 
 }
