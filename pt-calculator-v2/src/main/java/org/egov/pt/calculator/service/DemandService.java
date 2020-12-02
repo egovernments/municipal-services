@@ -339,13 +339,32 @@ public class DemandService {
 
 		if (BigDecimal.ZERO.compareTo(carryForward) > 0 || !cancelDemand) return carryForward;
 		
-		demand.setStatus(Demand.StatusEnum.CANCELLED);
-		DemandRequest request = DemandRequest.builder().demands(Arrays.asList(demand)).requestInfo(requestInfo).build();
+		//demand.setStatus(Demand.StatusEnum.CANCELLED);
+
+		List<Demand> demands = utils.getDemandForCurrentFinancialYear(requestInfo,criteria);
+		List<Demand> demandsToBeCancelled = demandsToBeCancelled(demands);
+
+		DemandRequest request = DemandRequest.builder().demands(demandsToBeCancelled).requestInfo(requestInfo).build();
 		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
 		repository.fetchResult(updateDemandUrl, request);
 
 		return carryForward;
 	}
+
+
+	private List<Demand> demandsToBeCancelled(List<Demand> demands){
+
+		List<Demand> demandsToBeCancelled = new LinkedList<>();
+
+		demands.forEach(demand -> {
+			if(demand.getStatus().equals(Demand.StatusEnum.ACTIVE)){
+				demand.setStatus(Demand.StatusEnum.CANCELLED);
+				demandsToBeCancelled.add(demand);
+			}
+		});
+		return demandsToBeCancelled;
+	}
+
 
 /*	*//**
 	 * @param requestInfo

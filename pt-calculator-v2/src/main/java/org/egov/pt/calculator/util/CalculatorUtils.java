@@ -647,6 +647,41 @@ public class CalculatorUtils {
 		}
     }
 
+    /**
+     * @param requestInfo
+     * @param calculationCriteria
+     * @return
+     */
+    public List<Demand> getDemandForCurrentFinancialYear(RequestInfo requestInfo, CalculationCriteria calculationCriteria) {
+
+        DemandSearchCriteria criteria = new DemandSearchCriteria();
+        criteria.setFromDate(calculationCriteria.getFromDate());
+        criteria.setToDate(calculationCriteria.getToDate());
+        criteria.setTenantId(calculationCriteria.getTenantId());
+        criteria.setPropertyId(calculationCriteria.getProperty().getPropertyId());
+
+        DemandResponse res = mapper.convertValue(
+                repository.fetchResult(getDemandSearchUrl(criteria), new RequestInfoWrapper(requestInfo)),
+                DemandResponse.class);
+        if(res.getDemands()!=null && res.getDemands().size()>0){
+
+            BigDecimal totalCollectedAmount = res.getDemands().get(0)
+                    .getDemandDetails().stream()
+                    .map(d -> d.getCollectionAmount())
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            if (totalCollectedAmount.remainder(BigDecimal.ONE ).compareTo(BigDecimal.ZERO) != 0 ){
+                // The total collected amount is fractional most probably because of previous
+                // round off dropping prior to BS/CS 1.1 release
+                throw new CustomException("INVALID_COLLECT_AMOUNT", "The collected amount is fractional, please contact support for data correction");
+            }
+
+            return res.getDemands();
+        }else{
+
+            return null;
+        }
+    }
 
     /**
      * Creates search query for PT based on tenantId and list of assessment numbers
