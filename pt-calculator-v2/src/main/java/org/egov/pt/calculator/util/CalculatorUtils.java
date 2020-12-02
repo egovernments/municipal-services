@@ -627,9 +627,17 @@ public class CalculatorUtils {
         DemandResponse res = mapper.convertValue(
                 repository.fetchResult(getDemandSearchUrl(criteria), new RequestInfoWrapper(requestInfo)),
                 DemandResponse.class);
-        if(res.getDemands()!=null && res.getDemands().size()>0){
+
+        List<Demand> demands = res.getDemands();
+
+
+
+        if(demands!=null && demands.size()>0){
+
+            Comparator<Demand> comparator = Comparator.comparing(h -> h.getAuditDetails().getCreatedTime());
+            demands.sort(comparator.reversed());
     		
-			BigDecimal totalCollectedAmount = res.getDemands().get(0)
+			BigDecimal totalCollectedAmount = demands.get(0)
 				.getDemandDetails().stream()
 				.map(d -> d.getCollectionAmount())
 				.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -639,8 +647,8 @@ public class CalculatorUtils {
 			// round off dropping prior to BS/CS 1.1 release
 			throw new CustomException("INVALID_COLLECT_AMOUNT", "The collected amount is fractional, please contact support for data correction");
 		}
+		return demands.get(0);
 
-		return res.getDemands().get(0);
 		}else{
 			
 			return null;
