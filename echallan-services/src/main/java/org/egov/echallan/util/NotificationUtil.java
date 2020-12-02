@@ -73,14 +73,10 @@ public class NotificationUtil {
 	}
 
 	private String getCancelMsg(RequestInfo requestInfo,Challan challan, String message) {
-		String billDetails = getBillDetails(requestInfo,challan);
-		Object obj = JsonPath.parse(billDetails).read(BILL_AMOUNT_JSONPATH);
-		BigDecimal amountToBePaid = new BigDecimal(obj.toString());
 		String service = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
 		 message = message.replace("<citizen>",challan.getCitizen().getName());
 	     message = message.replace("<challanno>", challan.getChallanNo());
 	     message = message.replace("<service>", service);
-	     message = message.replace("<amount>", amountToBePaid.toString());
 	     return message;
 	}
 	
