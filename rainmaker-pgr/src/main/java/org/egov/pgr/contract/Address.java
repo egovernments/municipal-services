@@ -29,12 +29,12 @@ public class Address {
 
 	@NotNull
 	@JsonProperty("mohalla")
-	@Pattern(regexp="^[a-zA-Z0-9 ._-]*$")
+	@Pattern(regexp="^[a-zA-Z0-9 .+_-]*$")
 	@Size(max=30)
 	public String mohalla;
 	
 	@JsonProperty("locality")
-	@Pattern(regexp = "^[a-zA-Z0-9!@#._,/: ()&'-]*$")
+	@Pattern(regexp = "^[a-zA-Z0-9!@+#._,/: ()&'-]*$")
 	@Size(max=100)
 	public String locality;
 
