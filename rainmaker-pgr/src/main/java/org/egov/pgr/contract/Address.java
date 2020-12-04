@@ -34,7 +34,6 @@ public class Address {
 	public String mohalla;
 	
 	@JsonProperty("locality")
-	@Pattern(regexp = "^[a-zA-Z0-9!@+#._,/: ()&'-]*$")
 	@Size(max=100)
 	public String locality;
 
