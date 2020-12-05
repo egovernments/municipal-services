@@ -112,6 +112,8 @@ consumerGroup.on("message", function(message) {
 		}
 	  
       let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
+	    
+     console.log("download link "+ downLoadLink);	    
      
       let ownerInfo="";
       ownerInfo= get(RequestInfo,"userInfo.roles");
@@ -120,6 +122,7 @@ consumerGroup.on("message", function(message) {
        ownerInfo=ownerInfo[0].name;
       }
      console.log("ownerInfo is",ownerInfo);
+     console.log("firenoc status is",FireNOCs[i].fireNOCDetails.status);
       switch (FireNOCs[i].fireNOCDetails.status) {
 /*case "INITIATED":
           smsRequest[
@@ -190,7 +193,7 @@ consumerGroup.on("message", function(message) {
         topic,
         messages: JSON.stringify(smsRequest)
       });
-      // console.log("smsRequest",smsRequest);
+       console.log("smsRequest is",smsRequest);
       if (smsRequest.message) {
         events.push({
           tenantId: tenantId,
