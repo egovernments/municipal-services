@@ -334,11 +334,13 @@ consumerGroup.on("message", function(message) {
       break;
   }
 
+	console.log("payloads is",payloads);
   producer.send(payloads, function(err, data) {
+	 
     if (!err) {
-      console.log(data);
+      console.log("sucessfully pushed" + data);
     } else {
-      console.log(err);
+      console.log("failed to push " + err);
     }
   });
 });
