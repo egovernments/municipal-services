@@ -40,6 +40,9 @@ public class RequestSearchCriteria {
     @JsonProperty("ids")
     private Set<String> ids;
 
+    @JsonProperty("locality")
+    private String locality;
+
     @JsonProperty("limit")
     private Integer limit;
 
@@ -63,7 +66,7 @@ public class RequestSearchCriteria {
 
     public boolean isEmpty(){
         return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null
-        && this.applicationStatus==null && this.ids==null && this.userIds==null);
+        && this.applicationStatus==null && this.ids==null && this.userIds==null && this.locality==null);
     }
 
 }
