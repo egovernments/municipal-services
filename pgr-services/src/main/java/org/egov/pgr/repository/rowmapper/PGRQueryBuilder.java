@@ -96,7 +96,7 @@ public class PGRQueryBuilder {
     private void addOrderByClause(StringBuilder builder, RequestSearchCriteria criteria){
 
         if(StringUtils.isEmpty(criteria.getSortBy()))
-            builder.append( " ORDER BY ser_createdtime DESC ");
+            builder.append( " ORDER BY ser_createdtime ");
 
         else if(criteria.getSortBy()== RequestSearchCriteria.SortBy.locality)
             builder.append(" ORDER BY ads.locality ");
