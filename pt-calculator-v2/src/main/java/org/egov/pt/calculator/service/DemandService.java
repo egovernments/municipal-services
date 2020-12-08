@@ -342,10 +342,7 @@ public class DemandService {
 		//demand.setStatus(Demand.StatusEnum.CANCELLED);
 
 		List<Demand> demands = utils.getDemandForCurrentFinancialYear(requestInfo,criteria);
-		log.info("demands searched for id: "+demands.toString());
 		List<Demand> demandsToBeCancelled = demandsToBeCancelled(demands);
-
-		log.info("demands for cancellation: "+demandsToBeCancelled.toString());
 
 		DemandRequest request = DemandRequest.builder().demands(demandsToBeCancelled).requestInfo(requestInfo).build();
 		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
