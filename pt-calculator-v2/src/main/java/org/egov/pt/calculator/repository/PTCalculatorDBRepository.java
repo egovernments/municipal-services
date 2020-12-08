@@ -37,7 +37,7 @@ public class PTCalculatorDBRepository {
 	@Autowired
 	private MutationBillingSlabRowMapper mutationBillingSlabRowMapper;
 	
-	@Cacheable("billingSlabs")
+	@Cacheable(value = "billingSlabs", sync = true)
 	public List<BillingSlab> searchBillingSlab(BillingSlabSearchCriteria billingSlabSearcCriteria) {
 		
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -46,7 +46,7 @@ public class PTCalculatorDBRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), billingSlabRowMapper);
 	}
 
-	@Cacheable("mutationBillingSlabs")
+	@Cacheable(value = "mutationBillingSlabs", sync = true)
 	public List<MutationBillingSlab> searchMutationBillingSlab(MutationBillingSlabSearchCriteria billingSlabSearchCriteria){
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = mutationBillingSlabQueryBuilder.getBillingSlabSearchQuery(billingSlabSearchCriteria, preparedStmtList);

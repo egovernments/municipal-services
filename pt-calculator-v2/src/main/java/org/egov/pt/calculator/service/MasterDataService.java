@@ -24,6 +24,7 @@ import org.egov.pt.calculator.web.models.demand.TaxPeriodResponse;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +56,8 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
-	@SuppressWarnings("unchecked") 
+	@SuppressWarnings("unchecked")
+	@Cacheable(value = "financialYear", key = "{#assessmentYear, #tenantId}", sync = true)
 	public Map<String, Object> getFinancialYear(RequestInfo requestInfo, String assessmentYear, String tenantId) {
 
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getFinancialYearRequest(requestInfo, assessmentYear, tenantId);
@@ -76,6 +78,7 @@ public class MasterDataService {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
+	@Cacheable(value = "financialYears", key = "{#assessmentYears, #tenantId}", sync = true)
 	public Map<String,Map<String, Object>> getFinancialYear(String tenantId,RequestInfo requestInfo,Set<String> assessmentYears) {
 		MdmsCriteriaReq mdmsCriteriaReq = calculatorUtils.getFinancialYearRequest(requestInfo, assessmentYears, tenantId);
 		StringBuilder url = calculatorUtils.getMdmsSearchUrl();
@@ -101,6 +104,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
+	@Cacheable(value = "taxHeadMaster", key = "tenantId", sync = true)
 	public List<TaxHeadMaster> getTaxHeadMasterMap(RequestInfo requestInfo, String tenantId) {
 
 		StringBuilder uri = calculatorUtils.getTaxHeadSearchUrl(tenantId);
@@ -116,6 +120,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
+	@Cacheable(value = "taxPeriod", key = "tenantId", sync = true)
 	public List<TaxPeriod> getTaxPeriodList(RequestInfo requestInfo, String tenantId) {
 
 		StringBuilder uri = calculatorUtils.getTaxPeriodSearchUrl(tenantId);
@@ -134,8 +139,7 @@ public class MasterDataService {
 	public void setPropertyMasterValues(RequestInfo requestInfo, String tenantId,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap, Map<String, JSONArray> timeBasedExemptionMasterMap) {
 
-		MdmsResponse response = mapper.convertValue(repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
-				calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId)), MdmsResponse.class);
+		MdmsResponse response = getMDMSResponse(calculatorUtils.getMdmsSearchUrl(), calculatorUtils.getPropertyModuleRequest(requestInfo, tenantId));
 		Map<String, JSONArray> res = response.getMdmsRes().get(CalculatorConstants.PROPERTY_TAX_MODULE);
 		for (Entry<String, JSONArray> entry : res.entrySet()) {
 
@@ -149,7 +153,13 @@ public class MasterDataService {
 			timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
 		}
 	}
-	
+
+	@Cacheable(value = "mdmsCache", sync = true)
+	private MdmsResponse getMDMSResponse(StringBuilder mdmsSearchUrl, MdmsCriteriaReq propertyModuleRequest) {
+		return mapper.convertValue(repository.fetchResult(mdmsSearchUrl,
+				propertyModuleRequest), MdmsResponse.class);
+	}
+
 	/**
 	 * Parses the master which has an exemption in them
 	 * @param entry
