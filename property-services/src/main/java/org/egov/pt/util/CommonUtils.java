@@ -26,6 +26,7 @@ import org.egov.pt.web.contracts.IdRequest;
 import org.egov.pt.web.contracts.IdResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -125,13 +126,12 @@ public class CommonUtils {
      * @return Map of MasterData name to the list of code in the MasterData
      *
      */
+    @Cacheable(value = "cMDMSAttributeValues", sync = true, key = "{#moduleName, #names.toString(), #filter, #jsonpath}")
     public Map<String,List<String>> getAttributeValues(String tenantId, String moduleName, List<String> names, String filter,String jsonpath, RequestInfo requestInfo){
 
-    	StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
-        MdmsCriteriaReq criteriaReq = prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
-        Optional<Object> response = restRepo.fetchResult(uri, criteriaReq);
-        
-        try {
+		Optional<Object> response = getMDMSResponse(tenantId, moduleName, names, filter, requestInfo);
+
+		try {
         	if(response.isPresent()) {
                 return JsonPath.read(response.get(),jsonpath);
         	}
@@ -142,8 +142,16 @@ public class CommonUtils {
         
         return null;
     }
-	
-    public MdmsCriteriaReq prepareMdMsRequest(String tenantId,String moduleName, List<String> names, String filter, RequestInfo requestInfo) {
+
+    @Cacheable(value = "mdmsMaster", sync = true, key = "{#tenantId, #moduleName, #names.toString(), #filter}")
+	private Optional<Object> getMDMSResponse(String tenantId, String moduleName, List<String> names, String filter, RequestInfo requestInfo) {
+		StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
+		MdmsCriteriaReq criteriaReq = prepareMdMsRequest(tenantId, moduleName, names, filter, requestInfo);
+		Optional<Object> response = restRepo.fetchResult(uri, criteriaReq);
+		return response;
+	}
+
+	public MdmsCriteriaReq prepareMdMsRequest(String tenantId,String moduleName, List<String> names, String filter, RequestInfo requestInfo) {
 
         List<MasterDetail> masterDetails = new ArrayList<>();
 
