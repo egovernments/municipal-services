@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
@@ -77,8 +78,10 @@ public class PayService {
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			if (oldTaxAmount.compareTo(collectionAmount) == 0) {
 				BigDecimal oldCollectedTaxAmount = demand.getDemandDetails().stream()
-						.filter(demanddetail -> demanddetail.getTaxHeadMasterCode()
-								.equalsIgnoreCase(CalculatorConstants.PT_TAX))
+						.filter(demanddetail -> Stream
+								.of(CalculatorConstants.PT_TAX, CalculatorConstants.PT_OWNER_EXEMPTION,
+										CalculatorConstants.PT_UNIT_USAGE_EXEMPTION)
+								.anyMatch(demanddetail.getTaxHeadMasterCode()::equalsIgnoreCase))
 						.map(DemandDetail::getCollectionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 				List<DemandDetail> demanddetailList = demand.getDemandDetails().stream()
 						.filter(demanddetail -> demanddetail.getTaxHeadMasterCode()
