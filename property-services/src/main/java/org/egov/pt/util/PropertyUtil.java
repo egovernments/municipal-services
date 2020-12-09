@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.JsonPath;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
@@ -18,6 +19,7 @@ import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.enums.CreationReason;
+import org.egov.pt.models.enums.Source;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.workflow.ProcessInstance;
 import org.egov.pt.models.workflow.ProcessInstanceRequest;
@@ -25,6 +27,8 @@ import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.ServiceCallException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -132,10 +136,17 @@ public class PropertyUtil extends CommonUtils {
 		switch (creationReasonForWorkflow) {
 		
 		case CREATE :
-
-			wf.setBusinessService(configs.getCreatePTWfName());
-			wf.setModuleName(configs.getPropertyModuleName());
-			wf.setAction("OPEN");
+			if(property.getSource().equals(Source.WATER_CHARGES)){
+				JSONObject response=getWnsPTworkflowConfig(request);
+				wf.setBusinessService(response.get("businessService").toString());
+				wf.setModuleName(configs.getPropertyModuleName());
+				wf.setAction(response.get("initialAction").toString());
+			}
+			else{
+				wf.setBusinessService(configs.getCreatePTWfName());
+				wf.setModuleName(configs.getPropertyModuleName());
+				wf.setAction("OPEN");
+			}
 			break;
 			
 		case LEGACY_ENTRY :
@@ -254,5 +265,18 @@ public class PropertyUtil extends CommonUtils {
 			copyOwners.add(new OwnerInfo(owner));
 		});
 		return copyOwners;
+	}
+
+	public JSONObject getWnsPTworkflowConfig(PropertyRequest request){
+		List<String> masterName = Arrays.asList( "PTWorkflow");
+		Map<String, List<String>> codes = getAttributeValues(configs.getStateLevelTenantId(), PTConstants.MDMS_PT_MOD_NAME,masterName , "$.*",PTConstants.JSONPATH_CODES, request.getRequestInfo());
+		JSONObject obj = new JSONObject(codes);
+		JSONArray configArray = obj.getJSONArray("PTWorkflow");
+		JSONObject response = new JSONObject();
+		for(int i=0;i<configArray.length();i++){
+			if(!configArray.getJSONObject(i).getBoolean("enable"))
+				response=configArray.getJSONObject(i);
+		}
+		return response;
 	}
 }
