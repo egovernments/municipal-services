@@ -13,6 +13,7 @@ import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.SMSRequest;
 import org.egov.echallan.producer.Producer;
 import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.util.NotificationUtil;
@@ -77,25 +78,28 @@ public class NotificationService {
 	public void sendChallanNotification(ChallanRequest challanRequest,boolean isSave) {
 		if(null != config.getIsSMSEnabled()) {
 			if(config.getIsSMSEnabled()) {
-				String message = null;
+				HashMap<String, String> msgDetail = null;
 				String tenantId = challanRequest.getChallan().getTenantId();
 				List<String> businessServiceAllowed = fetchBusinessServiceFromMDMS(challanRequest.getRequestInfo(), tenantId);
 				if(!CollectionUtils.isEmpty(businessServiceAllowed)) {
 					Challan challan = challanRequest.getChallan();
 						if (businessServiceAllowed.contains(challan.getBusinessService())) {
 							String mobilenumber = challan.getCitizen().getMobileNumber();
+							String[] users = new String[] {challan.getCitizen().getUuid()};
 							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
 							if(isSave)
-								message = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
+								msgDetail = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
 							else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
-								message = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
+								msgDetail = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
 							else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
-								message = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
-							if (!StringUtils.isEmpty(message)) {
-								Map<String, Object> request = new HashMap<>();
-								request.put("mobileNumber", mobilenumber);
-								request.put("message", message);
-								producer.push(config.getSmsNotifTopic(), request);
+								msgDetail = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
+							if (!StringUtils.isEmpty(msgDetail.get(NotificationUtil.MSG_KEY))) {
+								SMSRequest smsRequest = SMSRequest.builder().
+										mobileNumber(mobilenumber).
+										message(msgDetail.get(NotificationUtil.MSG_KEY)).
+										templateId(msgDetail.get(NotificationUtil.TEMPLATE_KEY)).
+										users(users).build();
+								producer.push(config.getSmsNotifTopic(), smsRequest);
 							} else {
 								log.error("No message configured! Notification will not be sent.");
 							}
@@ -126,11 +130,11 @@ public class NotificationService {
         String tenantId = request.getChallan().getTenantId();
 		String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
 		Challan challan = request.getChallan();
-		String message="";
+		HashMap<String, String> msgDetail =null; 
 		if(isSave)
-			message = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
+			msgDetail = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
 		else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
-			message = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
+			msgDetail = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
 		else
 			return null;
         Map<String,String > mobileNumberToOwner = new HashMap<>();
@@ -158,7 +162,7 @@ public class NotificationService {
            items.add(item);
            action = Action.builder().actionUrls(items).build();
     	}
-    	events.add(Event.builder().tenantId(challan.getTenantId()).description(message)
+    	events.add(Event.builder().tenantId(challan.getTenantId()).description(msgDetail.get(NotificationUtil.MSG_KEY))
 						.eventType(USREVENTS_EVENT_TYPE).name(USREVENTS_EVENT_NAME)
 						.postedBy(USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
     					.eventDetails(null).actions(action).build());

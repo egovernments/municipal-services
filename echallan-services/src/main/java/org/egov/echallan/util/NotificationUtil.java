@@ -1,6 +1,10 @@
 package org.egov.echallan.util;
 
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.ReadContext;
+
 import org.springframework.web.client.RestTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +33,9 @@ public class NotificationUtil {
 	public static final String BUSINESSSERVICELOCALIZATION_CODE_PREFIX = "BILLINGSERVICE_BUSINESSSERVICE_";
 	public static final String LOCALIZATION_CODES_JSONPATH = "$.messages[0].code";
 	public static final String LOCALIZATION_MSGS_JSONPATH = "$.messages[0].message";
+	public static final String LOCALIZATION_TEMPLATEID_JSONPATH = "$.messages[0].templateId";
+	public static final String MSG_KEY="message";
+	public static final String TEMPLATE_KEY="templateId";
 	private static final String CREATE_CODE = "echallan.create.sms";
 	private static final String UPDATE_CODE = "echallan.update.sms";
 	private static final String CANCEL_CODE = "echallan.cancel.sms";
@@ -47,36 +54,30 @@ public class NotificationUtil {
 	}
 
 
-	public String getCustomizedMsg(RequestInfo requestInfo, Challan challan, String localizationMessage) {
-		String message = null, messageTemplate;
-		
-		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CREATE_CODE);
-		message = getCreateMsg(requestInfo,challan, messageTemplate);
-		
-
-		return message;
+	public HashMap<String, String> getCustomizedMsg(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+		HashMap<String, String> msgDetail  = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CREATE_CODE);
+		msgDetail.put(MSG_KEY, getCreateMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
+		return msgDetail;
 	}
 	
 	
-	public String getCustomizedMsgForUpdate(RequestInfo requestInfo, Challan challan, String localizationMessage) {
-		String message = null, messageTemplate;
-		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,UPDATE_CODE);
-		message = getCreateMsg(requestInfo,challan, messageTemplate);
-		return message;
+	public HashMap<String, String> getCustomizedMsgForUpdate(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+		HashMap<String, String> msgDetail  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,UPDATE_CODE);
+		msgDetail.put(MSG_KEY, getCreateMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
+		return msgDetail;
 	}
 	
-	public String getCustomizedMsgForCancel(RequestInfo requestInfo, Challan challan, String localizationMessage) {
-		String message = null, messageTemplate;
-		messageTemplate = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CANCEL_CODE);
-		message = getCancelMsg(requestInfo,challan, messageTemplate);
-		return message;
+	public HashMap<String, String> getCustomizedMsgForCancel(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+		HashMap<String, String> msgDetail  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CANCEL_CODE);
+		msgDetail.put(MSG_KEY, getCancelMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
+		return msgDetail;
 	}
 
 	private String getCancelMsg(RequestInfo requestInfo,Challan challan, String message) {
-		String service = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
+		 HashMap<String, String> businessMsg  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
 		 message = message.replace("<citizen>",challan.getCitizen().getName());
 	     message = message.replace("<challanno>", challan.getChallanNo());
-	     message = message.replace("<service>", service);
+	     message = message.replace("<service>", businessMsg.get(MSG_KEY));
 	     return message;
 	}
 	
@@ -92,13 +93,13 @@ public class NotificationUtil {
 		Calendar fromcal = Calendar.getInstance();
 		fromcal.setTimeInMillis((long) challan.getTaxPeriodFrom());
 		
-		String service = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
+		HashMap<String, String> businessMsg  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,formatCodes(challan.getBusinessService()));
 		
 		Calendar tocal = Calendar.getInstance();
 		tocal.setTimeInMillis((long) challan.getTaxPeriodTo());
         message = message.replace("<citizen>",challan.getCitizen().getName());
         message = message.replace("<challanno>", challan.getChallanNo());
-        message = message.replace("<service>", service);
+        message = message.replace("<service>", businessMsg.get(MSG_KEY));
         message = message.replace("<fromdate>", " "+ fromcal.get(Calendar.DATE) + "/" + (fromcal.get(Calendar.MONTH)+1) + "/" + fromcal.get(Calendar.YEAR)+ " ".toUpperCase());
         message = message.replace("<todate>", " "+ tocal.get(Calendar.DATE) + "/" + (tocal.get(Calendar.MONTH)+1) + "/" + tocal.get(Calendar.YEAR)+ " ".toUpperCase());
 
@@ -116,11 +117,12 @@ public class NotificationUtil {
         return message;
     }
 	
-	private String fetchContentFromLocalization(RequestInfo requestInfo, String tenantId, String module, String code) {
+	private HashMap<String, String> fetchContentFromLocalization(RequestInfo requestInfo, String tenantId, String module, String code) {
 		if (config.getIsLocalizationStateLevel())
 			tenantId = tenantId.split("\\.")[0];
 		String message = null;
-		String code1 = null;
+		String templateId = null;
+		HashMap<String, String> msgDetail = new HashMap<String, String>();
 		Object result = null;
 		String locale = requestInfo.getMsgId().split("[|]")[1]; // Conventionally locale is sent in the first index of msgid split by |
 		if(StringUtils.isEmpty(locale))
@@ -136,12 +138,19 @@ public class NotificationUtil {
 		try {
 			result = restTemplate.postForObject(uri.toString(), request, Map.class);
 			System.out.println("result=="+result);
-			code1 = JsonPath.read(result, LOCALIZATION_CODES_JSONPATH);
-			message = JsonPath.read(result, LOCALIZATION_MSGS_JSONPATH);
+			Configuration suppressExceptionConfiguration = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
+		    ReadContext jsonData = JsonPath.using(suppressExceptionConfiguration).parse(result);
+
+			
+			templateId = jsonData.read( LOCALIZATION_TEMPLATEID_JSONPATH);
+			message = jsonData.read( LOCALIZATION_MSGS_JSONPATH);
+		 
+			msgDetail.put(MSG_KEY,message);
+			msgDetail.put(TEMPLATE_KEY,templateId);
 		} catch (Exception e) {
 			log.error("Exception while fetching from localization: " + e);
 		}
-		return message;
+		return msgDetail;
 		
 	}
 	
