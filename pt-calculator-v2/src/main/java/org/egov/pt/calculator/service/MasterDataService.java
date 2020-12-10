@@ -104,7 +104,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
-	@Cacheable(value = "taxHeadMaster", key = "tenantId", sync = true)
+	@Cacheable(value = "taxHeadMaster", key = "{#tenantId}", sync = true)
 	public List<TaxHeadMaster> getTaxHeadMasterMap(RequestInfo requestInfo, String tenantId) {
 
 		StringBuilder uri = calculatorUtils.getTaxHeadSearchUrl(tenantId);
@@ -120,7 +120,7 @@ public class MasterDataService {
 	 * @param tenantId
 	 * @return
 	 */
-	@Cacheable(value = "taxPeriod", key = "tenantId", sync = true)
+	@Cacheable(value = "taxPeriod", key = "{#tenantId}", sync = true)
 	public List<TaxPeriod> getTaxPeriodList(RequestInfo requestInfo, String tenantId) {
 
 		StringBuilder uri = calculatorUtils.getTaxPeriodSearchUrl(tenantId);
