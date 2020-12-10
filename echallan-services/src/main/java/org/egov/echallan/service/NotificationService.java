@@ -93,7 +93,7 @@ public class NotificationService {
 								msgDetail = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
 							else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
 								msgDetail = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
-							if (!StringUtils.isEmpty(msgDetail.get(NotificationUtil.MSG_KEY))) {
+							if (msgDetail!=null && !StringUtils.isEmpty(msgDetail.get(NotificationUtil.MSG_KEY))) {
 								SMSRequest smsRequest = SMSRequest.builder().
 										mobileNumber(mobilenumber).
 										message(msgDetail.get(NotificationUtil.MSG_KEY)).
