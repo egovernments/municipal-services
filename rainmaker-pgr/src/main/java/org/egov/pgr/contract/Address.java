@@ -34,7 +34,7 @@ public class Address {
 	public String mohalla;
 	
 	@JsonProperty("locality")
-	@Size(max=100)
+	@Size(max=300)
 	public String locality;
 
 	@NotNull
