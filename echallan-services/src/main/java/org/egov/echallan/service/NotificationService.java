@@ -135,6 +135,8 @@ public class NotificationService {
 			msgDetail = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
 		else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
 			msgDetail = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
+		else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
+			msgDetail = util.getCustomizedMsgForCancel(request.getRequestInfo(), challan, localizationMessages);
 		else
 			return null;
         Map<String,String > mobileNumberToOwner = new HashMap<>();
