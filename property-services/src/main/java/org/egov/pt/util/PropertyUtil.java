@@ -274,7 +274,7 @@ public class PropertyUtil extends CommonUtils {
 		JSONArray configArray = obj.getJSONArray("PTWorkflow");
 		JSONObject response = new JSONObject();
 		for(int i=0;i<configArray.length();i++){
-			if(!configArray.getJSONObject(i).getBoolean("enable"))
+			if(configArray.getJSONObject(i).getBoolean("enable"))
 				response=configArray.getJSONObject(i);
 		}
 		return response;
