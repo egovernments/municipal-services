@@ -3,6 +3,7 @@ package org.egov.pt.calculator.service;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -197,8 +198,6 @@ public class PayService {
 		if (null == interestMap)
 			return interestAmt;
 
-		
-		
 		String[] time = getStartTime(assessmentYear, interestMap);
 
 		Calendar cal = Calendar.getInstance();
@@ -206,6 +205,12 @@ public class PayService {
 		long currentUTC = System.currentTimeMillis();
 		long currentIST = System.currentTimeMillis() + TIMEZONE_OFFSET;
 		long interestStart = cal.getTimeInMillis();
+		List<Payment> filteredPaymentsAfterIntersetDate = null;
+		if (!CollectionUtils.isEmpty(payments)) {
+			filteredPaymentsAfterIntersetDate = payments.stream()
+					.filter(payment -> payment.getTransactionDate() >= interestStart).collect(Collectors.toList());
+
+		}
 
 		if (interestStart < currentIST) {
 
@@ -215,23 +220,48 @@ public class PayService {
 				return calculateInterest(numberOfDaysInMillies, taxAmt, interestMap);
 			} else {
 
+				Integer indexOfLastPaymentBeforeIntersetStart = null;
+				Payment lastPaymentBeforeIntersetStart = null;
+
+				for (int i = 0; i < payments.size(); i++) {
+
+					if (payments.get(i).getTransactionDate() >= interestStart) {
+
+						indexOfLastPaymentBeforeIntersetStart = i - 1;
+						break;
+					}
+
+				}
+
+				if (indexOfLastPaymentBeforeIntersetStart != null && indexOfLastPaymentBeforeIntersetStart >= 0) {
+					lastPaymentBeforeIntersetStart = payments.get(indexOfLastPaymentBeforeIntersetStart);
+				}
+
+				Boolean isTaxPeriodPresent = utils.isTaxPeriodAvaialble(lastPaymentBeforeIntersetStart, taxPeriod);
+
+				BigDecimal firstApplicableAmount = taxAmt;
+
+				if (lastPaymentBeforeIntersetStart != null && isTaxPeriodPresent) {
+					firstApplicableAmount = utils
+							.getTaxAmtFromPaymentForApplicablesGeneration(lastPaymentBeforeIntersetStart, taxPeriod);
+				}
 				BigDecimal applicableAmount;
 				BigDecimal interestCalculated;
-				int numberOfPeriods = payments.size() + 1;
+				int numberOfPeriods = filteredPaymentsAfterIntersetDate.size() + 1;
 				long numberOfDaysInMillies;
 				Payment payment;
 
 				for (int i = 0; i < numberOfPeriods; i++) {
 
 					if (i != numberOfPeriods - 1)
-						payment = payments.get(i);
+						payment = filteredPaymentsAfterIntersetDate.get(i);
 					else
-						payment = payments.get(i - 1);
+						payment = filteredPaymentsAfterIntersetDate.get(i - 1);
 
 					if (i == 0) {
 
-						applicableAmount = taxAmt;
-						
+						applicableAmount = firstApplicableAmount;
+
 						numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
 						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					} else if (i == numberOfPeriods - 1) {
@@ -241,7 +271,7 @@ public class PayService {
 						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					} else {
 
-						Payment paymentPrev = payments.get(i - 1);
+						Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
 						applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(paymentPrev, taxPeriod);
 						numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
 								- getEODEpoch(paymentPrev.getTransactionDate());
@@ -445,9 +475,6 @@ public class PayService {
 	 */
 	private BigDecimal calculateInterest(long numberOfDaysInMillies, BigDecimal applicableAmount,
 			Map<String, Object> interestMap) {
-		if(numberOfDaysInMillies<0) {
-			return new BigDecimal(0);
-		}
 		BigDecimal interestAmt;
 		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
 		if (BigDecimal.ONE.compareTo(noOfDays) <= 0)
