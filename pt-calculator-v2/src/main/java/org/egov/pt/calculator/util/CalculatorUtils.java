@@ -528,8 +528,8 @@ public class CalculatorUtils {
 		payment.getPaymentDetails().forEach(paymentDetail -> {
 			if (paymentDetail.getBusinessService().equalsIgnoreCase(SERVICE_FIELD_VALUE_PT)) {
 				paymentDetail.getBill().getBillDetails().forEach(billDetail -> {
-					if (billDetail.getFromPeriod() == taxPeriod.getFromDate()
-							&& billDetail.getToPeriod() == taxPeriod.getToDate()) {
+					if (billDetail.getFromPeriod().equals(taxPeriod.getFromDate())
+							&& billDetail.getToPeriod().equals(taxPeriod.getToDate())) {
 						billAccountDetails.addAll(billDetail.getBillAccountDetails());
 					}
 				});
@@ -780,8 +780,8 @@ public class CalculatorUtils {
 		for (PaymentDetail paymentDetail : payment.getPaymentDetails()) {
 			if (paymentDetail.getBusinessService().equalsIgnoreCase(SERVICE_FIELD_VALUE_PT)) {
 				for (BillDetail billDetail : paymentDetail.getBill().getBillDetails()) {
-					if (billDetail.getFromPeriod() == taxPeriod.getFromDate()
-							&& billDetail.getToPeriod() == taxPeriod.getToDate()) {
+					if (billDetail.getFromPeriod().equals(taxPeriod.getFromDate())
+							&& billDetail.getToPeriod().equals(taxPeriod.getToDate())) {
 						isTaxPeriodPresent = true;
 					}
 				}

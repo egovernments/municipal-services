@@ -254,33 +254,45 @@ public class PayService {
 				long numberOfDaysInMillies;
 				Payment payment;
 
-				for (int i = 0; i < numberOfPeriods; i++) {
-
-					if (i != numberOfPeriods - 1)
-						payment = filteredPaymentsAfterIntersetDate.get(i);
-					else
-						payment = filteredPaymentsAfterIntersetDate.get(i - 1);
-
-					if (i == 0) {
-
-						applicableAmount = firstApplicableAmount;
-
-						numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
-						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
-					} else if (i == numberOfPeriods - 1) {
-
-						applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(payment, taxPeriod);
-						numberOfDaysInMillies = getEODEpoch(currentUTC) - getEODEpoch(payment.getTransactionDate());
-						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
-					} else {
-
-						Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
-						applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(paymentPrev, taxPeriod);
-						numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
-								- getEODEpoch(paymentPrev.getTransactionDate());
-						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
-					}
+				if (CollectionUtils.isEmpty(filteredPaymentsAfterIntersetDate)) {
+					applicableAmount = firstApplicableAmount;
+					numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
+					interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					interestAmt = interestAmt.add(interestCalculated);
+				} else {
+
+					for (int i = 0; i < numberOfPeriods; i++) {
+
+						if (i != numberOfPeriods - 1)
+							payment = filteredPaymentsAfterIntersetDate.get(i);
+						else
+							payment = filteredPaymentsAfterIntersetDate.get(i - 1);
+
+						if (i == 0) {
+
+							applicableAmount = firstApplicableAmount;
+
+							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
+							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
+									interestMap);
+						} else if (i == numberOfPeriods - 1) {
+
+							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(payment, taxPeriod);
+							numberOfDaysInMillies = getEODEpoch(currentUTC) - getEODEpoch(payment.getTransactionDate());
+							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
+									interestMap);
+						} else {
+
+							Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
+							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(paymentPrev,
+									taxPeriod);
+							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
+									- getEODEpoch(paymentPrev.getTransactionDate());
+							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
+									interestMap);
+						}
+						interestAmt = interestAmt.add(interestCalculated);
+					}
 				}
 			}
 		}
