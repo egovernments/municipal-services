@@ -197,6 +197,8 @@ public class PayService {
 		if (null == interestMap)
 			return interestAmt;
 
+		
+		
 		String[] time = getStartTime(assessmentYear, interestMap);
 
 		Calendar cal = Calendar.getInstance();
@@ -229,6 +231,7 @@ public class PayService {
 					if (i == 0) {
 
 						applicableAmount = taxAmt;
+						
 						numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
 						interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					} else if (i == numberOfPeriods - 1) {
@@ -442,6 +445,9 @@ public class PayService {
 	 */
 	private BigDecimal calculateInterest(long numberOfDaysInMillies, BigDecimal applicableAmount,
 			Map<String, Object> interestMap) {
+		if(numberOfDaysInMillies<0) {
+			return new BigDecimal(0);
+		}
 		BigDecimal interestAmt;
 		BigDecimal noOfDays = BigDecimal.valueOf((TimeUnit.MILLISECONDS.toDays(Math.abs(numberOfDaysInMillies))));
 		if (BigDecimal.ONE.compareTo(noOfDays) <= 0)
