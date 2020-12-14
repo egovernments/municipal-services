@@ -134,49 +134,42 @@ public class PropertyQueryBuilder {
 		Boolean appendAndQuery = false;
 		if(isPlainSearch)
 		{
-			if (!CollectionUtils.isEmpty(criteria.getTenantIds()))
-				{
-					addClauseIfRequired(builder,preparedStmtList);
-					builder.append(" property.tenantId IN (:tenantIds)  ");
-					preparedStmtList.add(criteria.getTenantIds());
-				}
-			else
-				{
-					throw new CustomException("TENANT_ID_LIST_NULL", "Tenant ids are not provided for searching.");
-				}
+			Set<String> tenantIds = criteria.getTenantIds();
+			if(!CollectionUtils.isEmpty(tenantIds))
+			{
+				addClauseIfRequired(preparedStmtList,builder);
+				builder.append("property.tenantid IN (").append(createQuery(tenantIds)).append(")");
+				addToPreparedStatement(preparedStmtList,tenantIds);
+			}
 		}
 		else
+		{
+			if(criteria.getTenantId()!=null)
 			{
-			if (StringUtils.isNotBlank(criteria.getTenantId()))
-			{
-					addClauseIfRequired(builder,preparedStmtList);
-					if (criteria.getTenantId().split("\\.").length > 1)
-					{
-						builder.append(" property.tenantId =:tenantId");
-						preparedStmtList.add(criteria.getTenantId());
-					}
-					else
-					{
-						builder.append(" property.tenantId LIKE :tenantId");
-						preparedStmtList.add(criteria.getTenantId() + "%");
-					}
+				addClauseIfRequired(preparedStmtList,builder);
+				builder.append("property.tenantid=?");
+				preparedStmtList.add(criteria.getTenantId());
 			}
-			else
-				{
-					throw new CustomException("TENANT_ID_NULL", "Tenant id is not provided for searching.");
-				}
 		}
+
 		if (criteria.getFromDate() != null)
 		{
-			addClauseIfRequired(builder, preparedStmtList);
+			addClauseIfRequired(preparedStmtList,builder);
 			// If user does NOT specify toDate, take today's date as the toDate by default
 			if (criteria.getToDate() == null)
 			{
 				criteria.setToDate(Instant.now().toEpochMilli());
 			}
-			builder.append("property.createdTime BETWEEN (:fromDate) AND (:toDate)");
+			builder.append("property.createdTime BETWEEN ? AND ?");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
+		}
+		else
+		{
+			if(criteria.getToDate()!=null)
+			{
+				throw new CustomException("INVALID SEARCH", "From Date should be mentioned first");
+			}
 		}
 
 		if (null != criteria.getStatus()) {
@@ -253,39 +246,43 @@ public class PropertyQueryBuilder {
 		StringBuilder builder = new StringBuilder(QUERY);
 		Boolean appendAndQuery = false;
 
-
 		if(isPlainSearch)
 		{
-			if (!CollectionUtils.isEmpty(criteria.getTenantIds()))
+			Set<String> tenantIds = criteria.getTenantIds();
+			if(!CollectionUtils.isEmpty(tenantIds))
 			{
-				addClauseIfRequired(builder,preparedStmtList);
-				builder.append(" property.tenantId IN (:tenantIds)  ");
-				preparedStmtList.add(criteria.getTenantIds());
-			}
-			else
-			{
-				throw new CustomException("TENANT_ID_LIST_NULL", "Tenant ids are not provided for searching.");
+				addClauseIfRequired(preparedStmtList,builder);
+				builder.append("property.tenantid IN (").append(createQuery(tenantIds)).append(")");
+				addToPreparedStatement(preparedStmtList,tenantIds);
 			}
 		}
 		else
 		{
-			if (StringUtils.isNotBlank(criteria.getTenantId()))
+			if(criteria.getTenantId()!=null)
 			{
-				addClauseIfRequired(builder,preparedStmtList);
-				if (criteria.getTenantId().split("\\.").length > 1)
-				{
-					builder.append(" property.tenantId =:tenantId");
-					preparedStmtList.add(criteria.getTenantId());
-				}
-				else
-				{
-					builder.append(" property.tenantId LIKE :tenantId");
-					preparedStmtList.add(criteria.getTenantId() + "%");
-				}
+				addClauseIfRequired(preparedStmtList,builder);
+				builder.append("property.tenantid=?");
+				preparedStmtList.add(criteria.getTenantId());
 			}
-			else
+		}
+
+		if (criteria.getFromDate() != null)
+		{
+			addClauseIfRequired(preparedStmtList,builder);
+			// If user does NOT specify toDate, take today's date as the toDate by default
+			if (criteria.getToDate() == null)
 			{
-				throw new CustomException("TENANT_ID_NULL", "Tenant id is not provided for searching.");
+				criteria.setToDate(Instant.now().toEpochMilli());
+			}
+			builder.append("property.createdTime BETWEEN ? AND ?");
+			preparedStmtList.add(criteria.getFromDate());
+			preparedStmtList.add(criteria.getToDate());
+		}
+		else
+		{
+			if(criteria.getToDate()!=null)
+			{
+				throw new CustomException("INVALID SEARCH", "From Date should be mentioned first");
 			}
 		}
 
@@ -343,7 +340,7 @@ public class PropertyQueryBuilder {
 		});
 	}
 
-	private static void addClauseIfRequired(StringBuilder queryString,List<Object> values) {
+	private static void addClauseIfRequired(List<Object> values,StringBuilder queryString) {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {

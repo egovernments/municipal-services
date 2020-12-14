@@ -1,12 +1,13 @@
 package org.egov.pt.repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import java.util.Iterator;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
@@ -20,6 +21,7 @@ import org.egov.pt.repository.rowmapper.PropertyAuditRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.service.UserService;
 import org.egov.pt.util.PropertyUtil;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
@@ -52,7 +54,14 @@ public class PropertyRepository {
 	
     @Autowired
     private UserService userService;
-    
+
+	@Autowired
+	public PropertyRepository(PropertyQueryBuilder queryBuilder, PropertyRowMapper rowMapper, JdbcTemplate jdbcTemplate) {
+		this.queryBuilder = queryBuilder;
+		this.rowMapper = rowMapper;
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
 	public List<String> getPropertyIds(Set<String> ownerIds) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
@@ -79,16 +88,40 @@ public class PropertyRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
+	private String createQuery(Set<String> ids) {
+		StringBuilder builder = new StringBuilder();
+		int length = ids.size();
+		for (int i = 0; i < length; i++) {
+			builder.append(" ?");
+			if (i != length - 1)
+				builder.append(",");
+		}
+		return builder.toString();
+	}
+
 	public List<String> fetchIds(PropertyCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
+		Boolean isPlainSearch = false;
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
-		if (!ObjectUtils.isEmpty(criteria.getTenantIds()) && !ObjectUtils.isEmpty(criteria.getFromDate()) && !ObjectUtils.isEmpty(criteria.getToDate())) {
-			builder.append(" where tenantid IN (:tenantIds) BETWEEN fromDate=? AND toDate=? ");
-			preparedStmtList.add(criteria.getTenantIds());
-			preparedStmtList.add(criteria.getFromDate());
-			preparedStmtList.add(criteria.getToDate());
+		if(isPlainSearch)
+		{
+			Set<String> tenantIds = criteria.getTenantIds();
+			if(!ObjectUtils.isEmpty(tenantIds))
+			{
+				builder.append(" where tenantid IN (").append(createQuery(tenantIds)).append(")");
+				preparedStmtList.add(tenantIds);
+			}
 		}
+		else
+		{
+			if(!ObjectUtils.isEmpty(criteria.getTenantId()))
+			{
+				builder.append(" where tenantid=?");
+				preparedStmtList.add(criteria.getTenantId());
+			}
+		}
+
 		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
 		builder.append(orderbyClause);
 		preparedStmtList.add(criteria.getOffset());
