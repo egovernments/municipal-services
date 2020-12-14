@@ -229,6 +229,9 @@ public class PayService {
 
 						indexOfLastPaymentBeforeIntersetStart = i - 1;
 						break;
+					} else {
+
+						indexOfLastPaymentBeforeIntersetStart = i;
 					}
 
 				}
