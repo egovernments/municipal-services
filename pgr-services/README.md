@@ -12,7 +12,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - egov-mdms
 - egov-persister
 - egov-notification-sms
-- egov-notification-mail
+- email-notification
 - egov-hrms
 - egov-workflow-v2
 - egov-url-shortening
