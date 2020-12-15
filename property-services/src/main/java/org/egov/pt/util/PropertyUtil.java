@@ -2,7 +2,8 @@ package org.egov.pt.util;
 
 import static org.egov.pt.util.PTConstants.ASMT_MODULENAME;
 import static org.egov.pt.util.PTConstants.BILL_AMOUNT_PATH;
-import static org.egov.pt.util.PTConstants.BILL_NODEMAND_ERROR_CODE;
+import static org.egov.pt.util.PTConstants.BILL_NO_DEMAND_ERROR_CODE;
+import static org.egov.pt.util.PTConstants.BILL_NO_PAYABLE_DEMAND_ERROR_CODE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.jayway.jsonpath.JsonPath;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
@@ -232,7 +232,7 @@ public class PropertyUtil extends CommonUtils {
 			res = restRepo.fetchResult(uri, new RequestInfoWrapper(request)).get();
 		} catch (ServiceCallException e) {
 			
-			if(!e.getError().contains(BILL_NODEMAND_ERROR_CODE))
+			if(!(e.getError().contains(BILL_NO_DEMAND_ERROR_CODE) || e.getError().contains(BILL_NO_PAYABLE_DEMAND_ERROR_CODE)))
 				throw e;
 		}
 		
