@@ -232,7 +232,7 @@ public class PropertyUtil extends CommonUtils {
 			res = restRepo.fetchResult(uri, new RequestInfoWrapper(request)).get();
 		} catch (ServiceCallException e) {
 			
-			if(!e.getError().contains(BILL_NO_DEMAND_ERROR_CODE) || !e.getError().contains(BILL_NO_PAYABLE_DEMAND_ERROR_CODE))
+			if(!(e.getError().contains(BILL_NO_DEMAND_ERROR_CODE) || e.getError().contains(BILL_NO_PAYABLE_DEMAND_ERROR_CODE)))
 				throw e;
 		}
 		
