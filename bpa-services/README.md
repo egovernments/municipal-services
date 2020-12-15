@@ -16,7 +16,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - egov-user-event ( What’s New and Events )
 
-- egov-filestore ( To store the documents uploaded by the user )
+- filestore ( To store the documents uploaded by the user )
 
 - egov-idgen ( To generate the application No, Permit No )
 

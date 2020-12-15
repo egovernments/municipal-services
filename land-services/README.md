@@ -11,7 +11,7 @@ This service is the major service supporting bpa-services which handles the data
 
 - egov-user  ( Manage user )
 
-- egov-filestore ( To store the documents uploaded by the user )
+- filestore ( To store the documents uploaded by the user )
 
 - egov-idgen ( To generate the application No, Permit No )
 

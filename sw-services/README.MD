@@ -10,7 +10,7 @@ This module created to manage Sewerage Service connections against a Property in
 - egov-idgen
 - egov-persister
 - sw-calculator
-- egov-filestore
+- filestore
 - pdf-service
 
 ### Swagger API Contract
