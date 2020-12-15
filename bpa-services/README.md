@@ -32,7 +32,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - egov-persister ( Helps to persist the data  )
 
-- egov-searcher ( Search query used to simply the search )
+- searcher ( Search query used to simply the search )
 
 - egov-workflow-v2 ( Workflow configuration for different BPA application is configured )
 

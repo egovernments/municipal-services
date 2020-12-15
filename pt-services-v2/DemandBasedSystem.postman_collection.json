@@ -36,7 +36,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8080/egov-searcher/rainmaker-pt-demandbased/searchAssessmentsToUpdate/_get",
+			"name": "http://localhost:8080/searcher/rainmaker-pt-demandbased/searchAssessmentsToUpdate/_get",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -50,14 +50,14 @@
 					"raw": "{\n  \"RequestInfo\": {\n    \"apiId\": \"Rainmaker\",\n    \"ver\": \".01\",\n    \"ts\": 0,\n    \"action\": \"_create\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"authToken\": \"d617f4ee-a4be-4087-ba7d-bab207ec056e\",\n    \"correlationId\": \"a2e4642e-8cb5-483b-8ea2-827cbe822c5f\"\n  },\n  \"searchCriteria\": {\n    \"locality\": \"SUN13\",\n    \"tenantId\": \"pb.amritsar\"\n  }\n}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/egov-searcher/rainmaker-pt-demandbased/searchAssessmentsToUpdate/_get",
+					"raw": "http://localhost:8080/searcher/rainmaker-pt-demandbased/searchAssessmentsToUpdate/_get",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"egov-searcher",
+						"searcher",
 						"rainmaker-pt-demandbased",
 						"searchAssessmentsToUpdate",
 						"_get"
