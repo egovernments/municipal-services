@@ -124,7 +124,7 @@ The system has a citizen interface and an employee interface.
 - egov-mdms-service
 - egov-localization
 - egov-idgen
-- egov-searcher
+- searcher
 - filestore
 - egov-hrms
 - egov-user
