@@ -15,14 +15,17 @@ import org.egov.pt.models.user.User;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.repository.builder.PropertyQueryBuilder;
+import org.egov.pt.repository.rowmapper.OpenPropertyRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyAuditRowMapper;
 import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.service.UserService;
 import org.egov.pt.util.PropertyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import com.google.common.collect.Sets;
 
@@ -37,6 +40,9 @@ public class PropertyRepository {
 
 	@Autowired
 	private PropertyRowMapper rowMapper;
+	
+	@Autowired
+	private OpenPropertyRowMapper openRowMapper;
 	
 	@Autowired
 	private PropertyAuditRowMapper auditRowMapper;
@@ -54,11 +60,35 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria) {
+	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
+		if (isApiOpen)
+			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
+		else
+			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+	}
+	
+	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+	}
+	
+	public List<String> fetchIds(PropertyCriteria criteria) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String basequery = "select id from eg_pt_property";
+		StringBuilder builder = new StringBuilder(basequery);
+		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
+			builder.append(" where tenantid=?");
+			preparedStmtList.add(criteria.getTenantId());
+		}
+		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
+		builder.append(orderbyClause);
+		preparedStmtList.add(criteria.getOffset());
+		preparedStmtList.add(criteria.getLimit());
+		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
 	}
 
 	/**
@@ -69,15 +99,17 @@ public class PropertyRepository {
 	 * @param requestInfo RequestInfo object of the request
 	 * @return properties with owner information added from user service
 	 */
-	public List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo) {
+	public List<Property> getPropertiesWithOwnerInfo(PropertyCriteria criteria, RequestInfo requestInfo, Boolean isInternal) {
 
 		List<Property> properties;
+		
+		Boolean isOpenSearch = isInternal ? false : util.isPropertySearchOpen(requestInfo.getUserInfo());
 
-		if (criteria.isAudit()) {
+		if (criteria.isAudit() && !isOpenSearch) {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria);
+			properties = getProperties(criteria, isOpenSearch);
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
@@ -89,9 +121,11 @@ public class PropertyRepository {
 		userSearchRequest.setUuid(ownerIds);
 
 		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
-		util.enrichOwner(userDetailResponse, properties);
+		util.enrichOwner(userDetailResponse, properties, isOpenSearch);
 		return properties;
 	}
+	
+	
 	
 	private List<Property> getPropertyAudit(PropertyCriteria criteria) {
 

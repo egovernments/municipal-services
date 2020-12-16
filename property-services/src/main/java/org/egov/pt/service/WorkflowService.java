@@ -6,6 +6,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
+import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.workflow.BusinessService;
 import org.egov.pt.models.workflow.BusinessServiceResponse;
@@ -101,17 +102,17 @@ public class WorkflowService {
         return url;
     }
     
-	/**
+    /**
 	 * method to prepare process instance request 
 	 * and assign status back to property
 	 * 
 	 * @param request
 	 */
-	public State updateWorkflow(PropertyRequest request, String process) {
+	public State updateWorkflow(PropertyRequest request, CreationReason creationReasonForWorkflow) {
 
 		Property property = request.getProperty();
 		
-		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, process);
+		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, creationReasonForWorkflow);
 		State state = callWorkFlow(workflowReq);
 		
 		if (state.getApplicationStatus().equalsIgnoreCase(configs.getWfStatusActive()) && property.getPropertyId() == null) {

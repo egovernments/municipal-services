@@ -202,6 +202,9 @@ public class PropertyConfiguration {
     @Value("${property.workflow.name}")
     private String createPTWfName;
     
+    @Value("${property.legacy.entry.workflow.name}")
+    private String LegacyPTWfName;
+    
     @Value("${property.update.workflow.name}")
     private String updatePTWfName;
     
