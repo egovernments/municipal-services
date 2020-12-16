@@ -14,7 +14,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 - egov-idgen ( To generate the application No)
 
-- egov-localization ( To use the localized messages )
+- localization ( To use the localized messages )
 
 - egov-location ( To store the address locality )
 
