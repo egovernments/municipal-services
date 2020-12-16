@@ -82,7 +82,7 @@ public class Address   {
         @JsonProperty("detail")
         private String detail = null;
 
-        @Size(max=64)
+        @Size(max=255)
         @JsonProperty("buildingName")
         private String buildingName = null;
 
