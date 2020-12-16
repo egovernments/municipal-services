@@ -10,7 +10,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 ### Service Dependencies
 
-- egov-user  ( Manage user )
+- user  ( Manage user )
 
 - tl-services [Stakeholder Registration ( Registration process of Stakeholder is handled by this service)]
 

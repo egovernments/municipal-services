@@ -10,7 +10,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 ### Service Dependencies
 
-- egov-user  ( Manage user )
+- user  ( Manage user )
 
 - egov-idgen ( To generate the application No)
 
