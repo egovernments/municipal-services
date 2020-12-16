@@ -17,7 +17,7 @@ This service is the major service supporting bpa-services which handles the data
 
 - indexer ( To index the bpa data )
 
-- egov-localization ( To use the localized messages )
+- localization ( To use the localized messages )
 
 - egov-location ( To store the address locality )
 

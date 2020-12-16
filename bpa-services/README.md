@@ -22,7 +22,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - indexer ( To index the bpa data )
 
-- egov-localization ( To use the localized messages )
+- localization ( To use the localized messages )
 
 - egov-location ( To store the address locality )
 
