@@ -11,7 +11,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - egov-idgen
 - egov-mdms
 - persister
-- egov-notification-sms
+- sms-notification
 - email-notification
 - egov-hrms
 - egov-workflow-v2

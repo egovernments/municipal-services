@@ -28,7 +28,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - egov-mdms ( Configurations/master data used in the application is served by MDMS )
 
-- egov-notification-sms ( Service to send SMS to the users involved in the application )
+- sms-notification ( Service to send SMS to the users involved in the application )
 
 - persister ( Helps to persist the data  )
 
