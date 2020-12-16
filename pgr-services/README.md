@@ -6,7 +6,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - NA
 
 ### Service Dependencies
-- egov-user
+- user
 - egov-localization
 - egov-idgen
 - egov-mdms

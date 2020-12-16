@@ -9,7 +9,7 @@ This service is the major service supporting bpa-services which handles the data
 
 ### Service Dependencies
 
-- egov-user  ( Manage user )
+- user  ( Manage user )
 
 - filestore ( To store the documents uploaded by the user )
 

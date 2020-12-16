@@ -15,7 +15,7 @@ the steps for approval of the application.
 - egov-mdms-service
 - egov-localization
 - egov-idgen
-- egov-user
+- user
 
 ### Swagger API Contract
 

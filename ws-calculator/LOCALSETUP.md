@@ -22,7 +22,7 @@ To run the ws-calculator in local system, you need to port forward below service
  kubectl port-forward -n egov $(kgpt property-service) 8084:8080 &
  kubectl port-forward -n egov $(kgpt egov-mdms-service) 8085:8080 &
  kubectl port-forward -n egov $(kgpt ws-servics) 8086:8080 &
- kubectl port-forward -n egov $(kgpt egov-user) 8087:8080
+ kubectl port-forward -n egov $(kgpt user) 8087:8080
  kubectl port-forward -n egov $(kgpt billing-service) 8088:8080
  kubectl port-forward -n egov $(kgpt egov-workflow-v2) 8089:8080
 ``` 
