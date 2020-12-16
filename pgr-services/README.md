@@ -10,7 +10,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - egov-localization
 - egov-idgen
 - egov-mdms
-- egov-persister
+- persister
 - egov-notification-sms
 - email-notification
 - egov-hrms

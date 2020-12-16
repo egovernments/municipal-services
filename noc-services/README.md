@@ -22,7 +22,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 - egov-notification-sms ( Service to send SMS to the users involved in the application )
 
-- egov-persister ( Helps to persist the data  )
+- persister ( Helps to persist the data  )
 
 - egov-workflow-v2 ( Workflow configuration for different BPA application is configured )
 

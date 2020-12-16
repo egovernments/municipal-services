@@ -8,7 +8,7 @@ This module created to manage WaterService connections against a Property in the
 - egov-mdms service
 - property-service
 - egov-idgen
-- egov-persister
+- persister
 - ws-calculator
 - filestore
 - pdf-service

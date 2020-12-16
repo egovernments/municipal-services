@@ -23,7 +23,7 @@ This service is the major service supporting bpa-services which handles the data
 
 - egov-mdms ( Configurations/master data used in the application is served by MDMS )
 
-- egov-persister ( Helps to persist the data )
+- persister ( Helps to persist the data )
 
 ### Swagger API Contract
 
