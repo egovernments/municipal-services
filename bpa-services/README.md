@@ -22,15 +22,15 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - egov-indexer ( To index the bpa data )
 
-- egov-localization ( To use the localized messages )
+- localization ( To use the localized messages )
 
 - egov-location ( To store the address locality )
 
 - egov-mdms ( Configurations/master data used in the application is served by MDMS )
 
-- egov-notification-sms ( Service to send SMS to the users involved in the application )
+- sms-notification ( Service to send SMS to the users involved in the application )
 
-- egov-persister ( Helps to persist the data  )
+- persister ( Helps to persist the data  )
 
 - searcher ( Search query used to simply the search )
 

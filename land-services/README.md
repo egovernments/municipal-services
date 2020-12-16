@@ -17,13 +17,13 @@ This service is the major service supporting bpa-services which handles the data
 
 - egov-indexer ( To index the bpa data )
 
-- egov-localization ( To use the localized messages )
+- localization ( To use the localized messages )
 
 - egov-location ( To store the address locality )
 
 - egov-mdms ( Configurations/master data used in the application is served by MDMS )
 
-- egov-persister ( Helps to persist the data )
+- persister ( Helps to persist the data )
 
 ### Swagger API Contract
 

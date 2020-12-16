@@ -7,7 +7,7 @@ This module created to manage the Bill calculation for the registered water serv
 ### Service Dependencies
 - egov-mdms service
 - property-service
-- egov-persister
+- persister
 - ws-service
 - egov-user
 - egov-workflow-v2

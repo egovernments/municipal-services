@@ -78,7 +78,7 @@ public class DemandNotificationService {
 	
 	@SuppressWarnings("unused")
 	private void enrichEmailRequest(DemandNotificationObj notificationObj, List<EmailRequest> emailRequest, String topic) {
-		// Commenting out this method - As of now, egov-notification-mail service also reads from SMS Kafka Topic to
+		// Commenting out this method - As of now, email-notification service also reads from SMS Kafka Topic to
 		// send out the email notification - Will remove the implementation if this change is permanent.
 
 //		String tenantId = notificationObj.getTenantId();

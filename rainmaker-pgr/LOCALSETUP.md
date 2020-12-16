@@ -21,7 +21,7 @@ To run the rainmaker-pgr locally, you need to port forward below services locall
 function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
 kubectl port-forward -n egov $(kgpt egov-mdms-service) 8081:8080
 kubectl port-forward -n egov $(kgpt egov-localization) 8082:8080
-kubectl port-forward -n egov $(kgpt egov-persister) 8083:8080
+kubectl port-forward -n egov $(kgpt persister) 8083:8080
 ```
 
 To run the th-services locally, update below listed properties in `application.properties` prior to running the project:
