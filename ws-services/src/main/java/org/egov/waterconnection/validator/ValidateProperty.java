@@ -64,7 +64,7 @@ public class ValidateProperty {
 	public JSONObject getWnsPTworkflowConfig(RequestInfo requestInfo,String tenantId){
 		tenantId = tenantId.split("\\.")[0];
 		List<String> propertyModuleMasters = new ArrayList<>(Arrays.asList("PTWorkflow"));
-		Map<String, List<String>> codes = mdmsValidator.getAttributeValues(tenantId,WCConstants.PROPERTY_MASTER_MODULE, propertyModuleMasters, "$.*.code",
+		Map<String, List<String>> codes = mdmsValidator.getAttributeValues(tenantId,WCConstants.PROPERTY_MASTER_MODULE, propertyModuleMasters, "$.*",
 				WCConstants.PROPERTY_JSONPATH_ROOT,requestInfo);
 		JSONObject obj = new JSONObject(codes);
 		JSONArray configArray = obj.getJSONArray("PTWorkflow");
