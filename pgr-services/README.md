@@ -15,7 +15,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - email-notification
 - egov-hrms
 - egov-workflow-v2
-- egov-url-shortening
+- url-shortening
 
 
 ### Swagger API Contract
