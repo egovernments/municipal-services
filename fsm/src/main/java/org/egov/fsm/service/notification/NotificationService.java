@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
+import org.egov.fsm.service.UserService;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.NotificationUtil;
 import org.egov.fsm.web.model.ActionItem;
@@ -41,8 +42,8 @@ public class NotificationService {
 
 	private NotificationUtil util;
 
-//	@Autowired
-//	private UserService userService;
+	@Autowired
+	private UserService userService;
 
 
 	@Autowired
