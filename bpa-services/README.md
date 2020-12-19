@@ -20,7 +20,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - egov-idgen ( To generate the application No, Permit No )
 
-- egov-indexer ( To index the bpa data )
+- indexer ( To index the bpa data )
 
 - egov-localization ( To use the localized messages )
 
