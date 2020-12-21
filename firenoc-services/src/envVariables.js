@@ -70,7 +70,7 @@ const envVariables = {
 
   //idgen service configurations
   EGOV_IDGEN_HOST: process.env.EGOV_IDGEN_HOST || "http://localhost:8087",
-  EGOV_IDGEN_CONTEXT_PATH: process.env.EGOV_IDGEN_CONTEXT_PATH || "/egov-idgen",
+  EGOV_IDGEN_CONTEXT_PATH: process.env.EGOV_IDGEN_CONTEXT_PATH || "/idgen",
   EGOV_IDGEN_GENERATE_ENPOINT:
     process.env.EGOV_IDGEN_GENERATE_ENPOINT || "/id/_generate",
   EGOV_IDGEN_FN_APPLICATION_NO_NAME:

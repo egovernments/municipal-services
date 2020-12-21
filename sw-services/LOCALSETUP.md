@@ -21,7 +21,7 @@ To run the sw-services in local system, you need to port forward below services.
  function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
  kubectl port-forward -n egov $(kgpt property-service) 8084:8080 &
  kubectl port-forward -n egov $(kgpt egov-mdms-service) 8085:8080 &
- kubectl port-forward -n egov $(kgpt egov-idgen) 8086:8080 &
+ kubectl port-forward -n egov $(kgpt idgen) 8086:8080 &
  kubectl port-forward -n egov $(kgpt sw-calculator) 8087:8080 &
  kubectl port-forward -n egov $(kgpt billing-service) 8088:8080 &
  kubectl port-forward -n egov $(kgpt filestore) 8089:8080 &

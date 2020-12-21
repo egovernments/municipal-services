@@ -7,7 +7,7 @@ The main objective of the Fire-NOC module is to provide **No Objection Certifica
 ### Service Dependencies
 - egov-mdms
 - user
-- egov-idgen
+- idgen
 - egov-workflow
 - egov-location
 - firenoc-calculator
