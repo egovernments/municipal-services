@@ -18,7 +18,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - filestore ( To store the documents uploaded by the user )
 
-- egov-idgen ( To generate the application No, Permit No )
+- idgen ( To generate the application No, Permit No )
 
 - indexer ( To index the bpa data )
 

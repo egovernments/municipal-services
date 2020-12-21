@@ -21,7 +21,7 @@ To run the th-services locally, you need to port forward below services locally
 function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
 kubectl port-forward -n egov $(kgpt tl-calculator) 8087:8080 & 
 kubectl port-forward -n egov $(kgpt billing-service) 8088:8080 &
-kubectl port-forward -n egov $(kgpt egov-idgen) 8089:8080 &
+kubectl port-forward -n egov $(kgpt idgen) 8089:8080 &
 kubectl port-forward -n egov $(kgpt user) 8090:8080 &
 kubectl port-forward -n egov $(kgpt egov-location) 8091:8080 &  
 kubectl port-forward -n egov $(kgpt workflow) 8092:8080 &  

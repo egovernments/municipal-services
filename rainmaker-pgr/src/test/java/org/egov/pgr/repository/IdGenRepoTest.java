@@ -31,7 +31,7 @@ public class IdGenRepoTest {
 
 	private String idGenHost = "http://localhost:8088/";
 
-	private String idGenPath = "egov-idgen/id/_generate";
+	private String idGenPath = "idgen/id/_generate";
 
 	@Mock
 	private RestTemplate restTemplate;
@@ -44,7 +44,7 @@ public class IdGenRepoTest {
 		/*static void	setField(java.lang.Class<?> targetClass, java.lang.String name, java.lang.Object value)
 		Set the static field with the given name on the provided targetClass to the supplied value.*/
 		
-		ReflectionTestUtils.setField(idGenRepo, "idGenPath", "egov-idgen/id/_generate");
+		ReflectionTestUtils.setField(idGenRepo, "idGenPath", "idgen/id/_generate");
 		ReflectionTestUtils.setField(idGenRepo, "idGenHost", "http://localhost:8088/");
 	}
 	

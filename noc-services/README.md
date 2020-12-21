@@ -12,7 +12,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 - user  ( Manage user )
 
-- egov-idgen ( To generate the application No)
+- idgen ( To generate the application No)
 
 - localization ( To use the localized messages )
 

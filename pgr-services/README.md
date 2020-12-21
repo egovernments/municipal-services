@@ -8,7 +8,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 ### Service Dependencies
 - user
 - egov-localization
-- egov-idgen
+- idgen
 - egov-mdms
 - persister
 - sms-notification

@@ -123,7 +123,7 @@ The system has a citizen interface and an employee interface.
 
 - egov-mdms-service
 - egov-localization
-- egov-idgen
+- idgen
 - searcher
 - filestore
 - egov-hrms
