@@ -88,11 +88,13 @@ public class PropertyQueryBuilder {
 			"    pt.lastModifiedTime as propertylastModifiedTime,pt.createdby as propertyCreatedby,"+
 			"    ptdl.status as propertydetailstatus "+
 			"    FROM eg_pt_property_v2 pt INNER JOIN eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " +
-			"    INNER JOIN (Select max(createdTime) as maxcreatedtime,property from eg_pt_propertydetail_v2 ptd " +
-			"	 WHERE_CLAUSE_PLACHOLDER_ASSESSMENT " +
-			"	 GROUP BY property,financialyear) as maxasses " +
-			"    ON maxasses.property = ptdl.property and maxasses.maxcreatedtime = ptdl.createdtime" +
-		"		 WHERE_CLAUSE_PLACHOLDER_PROPERTY) as asmt "+
+			/*
+			 * "    INNER JOIN (Select max(createdTime) as maxcreatedtime,property from eg_pt_propertydetail_v2 ptd "
+			 * + "	 WHERE_CLAUSE_PLACHOLDER_ASSESSMENT " +
+			 * "	 GROUP BY property,financialyear) as maxasses " +
+			 * "    ON maxasses.property = ptdl.property and maxasses.maxcreatedtime = ptdl.createdtime"
+			 +*/ 
+		    "    WHERE_CLAUSE_PLACHOLDER_PROPERTY) as asmt "+
 				 INNER_JOIN_STRING+
 			"    eg_pt_owner_v2 owner ON asmt.assessmentnumber=owner.propertydetail     " +
 				 INNER_JOIN_STRING+
