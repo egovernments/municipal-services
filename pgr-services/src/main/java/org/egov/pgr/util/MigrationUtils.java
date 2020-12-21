@@ -2,6 +2,7 @@ package org.egov.pgr.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.ServiceRequestRepository;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 import static org.egov.pgr.util.PGRConstants.PGR_BUSINESSSERVICE;
 import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 
+@Slf4j
 @Component
 public class MigrationUtils {
 
@@ -54,11 +57,12 @@ public class MigrationUtils {
          * @return
          */
 
+        ids.removeAll(Collections.singleton(null));
+
         UserSearchRequest userSearchRequest = new UserSearchRequest();
 
         if (!CollectionUtils.isEmpty(ids))
             userSearchRequest.setId(ids);
-
 
         StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
         UserDetailResponse userDetailResponse = userUtils.userCall(userSearchRequest, uri);
@@ -70,7 +74,7 @@ public class MigrationUtils {
         Map<Long, String> idToUuidMap = users.stream().collect(Collectors.toMap(User::getId, User::getUuid));
 
         if (idToUuidMap.keySet().size() != ids.size())
-            throw new CustomException("UUID_NOT_FOUND", "Number of ids searched: " + ids.size() + " uuids returned: " + idToUuidMap.keySet());
+            throw new CustomException("UUID_NOT_FOUND", "Number of ids searched: " + ids.size() + " uuids returned: " + idToUuidMap.keySet().size());
 
         return idToUuidMap;
 

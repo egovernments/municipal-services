@@ -1,6 +1,7 @@
 package org.egov.pgr.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.pgr.service.MigrationService;
 import org.egov.pgr.web.models.pgrV1.ServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 
+@Slf4j
 @Component
 public class MigrationConsumer {
 
@@ -26,6 +28,7 @@ public class MigrationConsumer {
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
+            log.info("Received migration request " + record);
             ServiceResponse serviceResponse = mapper.convertValue(record,ServiceResponse.class);
             migrationService.migrate(serviceResponse);
         }

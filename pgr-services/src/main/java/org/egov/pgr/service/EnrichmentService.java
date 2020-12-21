@@ -62,6 +62,7 @@ public class EnrichmentService {
         service.setId(UUID.randomUUID().toString());
         service.getAddress().setId(UUID.randomUUID().toString());
         service.getAddress().setTenantId(tenantId);
+        service.setActive(true);
 
         if(workflow.getVerificationDocuments()!=null){
             workflow.getVerificationDocuments().forEach(document -> {

@@ -70,8 +70,8 @@ public class ServiceReqSearchCriteria {
 	@JsonProperty("createdBy")
 	private String createdBy;
 	
-	@JsonProperty("noOfRecords")
-	private Long noOfRecords;
+	@JsonProperty("limit")
+	private Long limit;
 	
 	@JsonProperty("offset")
 	private Long offset;

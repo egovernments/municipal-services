@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping(value = "/v2")
+@RequestMapping(value = "v2/")
 public class MigrationController {
 
 
