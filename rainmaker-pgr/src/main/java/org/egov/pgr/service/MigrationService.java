@@ -92,7 +92,10 @@ public class MigrationService {
                 addToPreparedStatement(preparedStmtList, migrationCriteria.getServiceRequestIds());
 
                 String finalQuery = addPagination(addServiceRequestIdSearchClause);
-                preparedStmtList.add(offset);
+                if(CollectionUtils.isEmpty(migrationCriteria.getServiceRequestIds()))
+                    preparedStmtList.add(offset);
+                else
+                    preparedStmtList.add(0l);
                 preparedStmtList.add(batchSize);
 
                 log.info("Final Search Query: " + finalQuery);
