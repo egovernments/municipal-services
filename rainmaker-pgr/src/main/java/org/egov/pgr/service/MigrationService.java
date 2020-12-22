@@ -74,7 +74,7 @@ public class MigrationService {
 
             Long count = jdbcTemplate.queryForObject(sqlCount, new Object[] { tenantId }, Long.class);
 
-            Long offset = count;
+            Long offset = CollectionUtils.isEmpty(migrationCriteria.getServiceRequestIds()) ? count : 0l;
 
             while (true){
 
@@ -92,10 +92,7 @@ public class MigrationService {
                 addToPreparedStatement(preparedStmtList, migrationCriteria.getServiceRequestIds());
 
                 String finalQuery = addPagination(addServiceRequestIdSearchClause);
-                if(CollectionUtils.isEmpty(migrationCriteria.getServiceRequestIds()))
-                    preparedStmtList.add(offset);
-                else
-                    preparedStmtList.add(0l);
+                preparedStmtList.add(offset);
                 preparedStmtList.add(batchSize);
 
                 log.info("Final Search Query: " + finalQuery);
