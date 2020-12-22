@@ -270,6 +270,7 @@ public class MigrationService {
                 .description(description)
                 .source(source)
                 .address(address)
+                .active(active)
                 .auditDetails(auditDetails)
                 .build();
 
