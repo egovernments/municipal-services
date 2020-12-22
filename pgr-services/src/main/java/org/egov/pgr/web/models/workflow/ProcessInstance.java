@@ -89,6 +89,9 @@ public class ProcessInstance {
     @JsonProperty("auditDetails")
     private AuditDetails auditDetails = null;
 
+    @JsonProperty("businesssServiceSla")
+    private Long businesssServiceSla = null;
+
     public ProcessInstance addDocumentsItem(Document documentsItem) {
         if (this.documents == null) {
             this.documents = new ArrayList<>();

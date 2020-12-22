@@ -70,6 +70,8 @@ public class MigrationService {
         }
     };
 
+    private final Long businessLevelSla = 432000000l;
+
     @PostConstruct
     private void setStatusToUUIDMap(){
         this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
@@ -181,12 +183,15 @@ public class MigrationService {
         for (Service serviceV1 : servicesV1) {
 
             List<ActionInfo> actionInfos = idToActionMap.get(serviceV1.getServiceRequestId());
+
+            Map<String, Long> actionUuidToSlaMap = getActionUUidToSLAMap(actionInfos);
+
             List<ProcessInstance> workflows = new LinkedList<>();
 
             org.egov.pgr.web.models.Service service = transformService(serviceV1, idToUuidMap);
 
             actionInfos.forEach(actionInfo -> {
-                ProcessInstance workflow = transformAction(actionInfo, idToUuidMap);
+                ProcessInstance workflow = transformAction(actionInfo, idToUuidMap, actionUuidToSlaMap);
                 workflows.add(workflow);
             });
 
@@ -317,7 +322,7 @@ public class MigrationService {
     }
 
 
-    private ProcessInstance transformAction(ActionInfo actionInfo, Map<Long, String> idToUuidMap) {
+    private ProcessInstance transformAction(ActionInfo actionInfo, Map<Long, String> idToUuidMap, Map<String, Long> actionUuidToSlaMap) {
 
         String uuid = actionInfo.getUuid();
 
@@ -354,6 +359,7 @@ public class MigrationService {
                 .moduleName(PGR_MODULENAME)
                 .state(state)
                 .businessService(PGR_BUSINESSSERVICE)
+                .businesssServiceSla(actionUuidToSlaMap.get(actionInfo.getUuid()))
                 .auditDetails(auditDetails)
                 .build();
 
@@ -387,5 +393,21 @@ public class MigrationService {
         return workflow;
     }
 
+    private Map<String, Long> getActionUUidToSLAMap(List<ActionInfo> actionInfos){
+        Map<String, Long> uuidTOSLAMap = new HashMap<>();
+        actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
+        int totalCount = actionInfos.size();
+        if(!CollectionUtils.isEmpty(actionInfos))
+            uuidTOSLAMap.put(actionInfos.get(0).getUuid(), businessLevelSla);
+        for(int i = 1; i < totalCount; i++){
+
+            ActionInfo actionInfo = actionInfos.get(i);
+            ActionInfo previousActionInfo = actionInfos.get(i-1);
+            Long timeSpent = actionInfo.getWhen() - previousActionInfo.getWhen();
+            Long slaLeft = uuidTOSLAMap.get(previousActionInfo.getUuid()) - timeSpent;
+            uuidTOSLAMap.put(actionInfo.getUuid(), slaLeft);
+        }
+        return uuidTOSLAMap;
+    }
 
 }
