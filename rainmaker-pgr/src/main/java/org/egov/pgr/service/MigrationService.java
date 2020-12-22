@@ -90,7 +90,8 @@ public class MigrationService {
                 preparedStmtList.add(tenantId);
 
                 String addServiceRequestIdSearchClause = createServiceRequestIdSearchClause(sqlFetch, migrationCriteria.getServiceRequestIds());
-                addToPreparedStatement(preparedStmtList, migrationCriteria.getServiceRequestIds());
+                if(!CollectionUtils.isEmpty(migrationCriteria.getServiceRequestIds()))
+                    addToPreparedStatement(preparedStmtList, migrationCriteria.getServiceRequestIds());
 
                 String finalQuery = addPagination(addServiceRequestIdSearchClause);
                 preparedStmtList.add(offset);
