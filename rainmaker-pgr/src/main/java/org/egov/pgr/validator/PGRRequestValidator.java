@@ -409,12 +409,13 @@ public class PGRRequestValidator {
 			return;
 		List<ActionHistory> historys = serviceResponse.getActionHistory();
 		Map<String, ActionHistory> historyMap = new HashMap<>();
-		historys.forEach(a -> historyMap.put(a.getActions().get(0).getBusinessKey(), a));
+		//historys.forEach(a -> historyMap.put(a.getActions().get(0).getBusinessKey(), a));
 		for (int index = 0; index < serviceRequest.getServices().size(); index++) {
 			Service service = serviceRequest.getServices().get(index);
 			ActionHistory history = historyMap.get(service.getServiceRequestId());
 			ActionInfo actionInfo = serviceRequest.getActionInfo().get(index);
-			String currentStatus = pgrUtils.getCurrentStatus(history);
+			String currentStatus = service.getStatus().toString();
+			//String currentStatus = pgrUtils.getCurrentStatus(history);
 			List<String> validStatusList = actioncurrentStatusMap.get(actionInfo.getAction());
 			/**
 			 * if currenstatus isn't available in the validstatus list of that action, then the action is invalid.
