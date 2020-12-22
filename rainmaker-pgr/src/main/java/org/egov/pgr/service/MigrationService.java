@@ -62,6 +62,7 @@ public class MigrationService {
     public void migrateData(RequestInfo requestInfo, MigrationCriteria migrationCriteria){
 
         Set<String> tenantIds = (!CollectionUtils.isEmpty(migrationCriteria.getTenantIds())) ? migrationCriteria.getTenantIds() : getListOfTenantId();
+        Long noOfRecords = 0l;
 
         for(String tenantId : tenantIds){
 
@@ -99,6 +100,8 @@ public class MigrationService {
 
                 List<org.egov.pgr.model.Service> services = jdbcTemplate.query(finalQuery, preparedStmtList.toArray(), svcRowMapper);
 
+                noOfRecords += services.size();
+
                 List<String> addressIds = new ArrayList<>();
                 services.forEach(service -> {
                     addressIds.add(service.getAddressId());
@@ -129,6 +132,7 @@ public class MigrationService {
                         .build();
 
                 if(CollectionUtils.isEmpty(serviceReqResponse.getServices())){
+                    log.info("Total number of records pushed: " + noOfRecords);
                     log.info("Records pushed for tenantId: "+tenantId+" Current offset for the tenant: "+offset);
                     break;
                 }
