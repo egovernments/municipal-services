@@ -409,7 +409,7 @@ public class PGRRequestValidator {
 			return;
 		List<ActionHistory> historys = serviceResponse.getActionHistory();
 		Map<String, ActionHistory> historyMap = new HashMap<>();
-		//historys.forEach(a -> historyMap.put(a.getActions().get(0).getBusinessKey(), a));
+		historys.forEach(a -> historyMap.put(a.getActions().get(0).getBusinessKey(), a));
 		for (int index = 0; index < serviceRequest.getServices().size(); index++) {
 			Service service = serviceRequest.getServices().get(index);
 			ActionHistory history = historyMap.get(service.getServiceRequestId());
