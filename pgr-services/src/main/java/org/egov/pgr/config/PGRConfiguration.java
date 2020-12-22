@@ -188,5 +188,8 @@ public class PGRConfiguration {
     @Value("${persister.save.transition.wf.migration.topic}")
     private String batchWorkflowSaveTopic;
 
+    @Value("${pgr.business.level.sla}")
+    private Long businessLevelSla;
+
 
 }

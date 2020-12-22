@@ -70,8 +70,6 @@ public class MigrationService {
         }
     };
 
-    private final Long businessLevelSla = 432000000l;
-
     @PostConstruct
     private void setStatusToUUIDMap(){
         this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
@@ -398,7 +396,7 @@ public class MigrationService {
         actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
         int totalCount = actionInfos.size();
         if(!CollectionUtils.isEmpty(actionInfos))
-            uuidTOSLAMap.put(actionInfos.get(0).getUuid(), businessLevelSla);
+            uuidTOSLAMap.put(actionInfos.get(0).getUuid(), config.getBusinessLevelSla());
         for(int i = 1; i < totalCount; i++){
 
             ActionInfo actionInfo = actionInfos.get(i);
