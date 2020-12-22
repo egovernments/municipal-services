@@ -14,7 +14,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - tl-services [Stakeholder Registration ( Registration process of Stakeholder is handled by this service)]
 
-- egov-user-event ( What’s New and Events )
+- user-event ( What’s New and Events )
 
 - filestore ( To store the documents uploaded by the user )
 

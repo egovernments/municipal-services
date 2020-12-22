@@ -234,7 +234,7 @@ public class NotificationService {
     
     
     /**
-     * Creates and registers an event at the egov-user-event service at defined trigger points as that of sms notifs.
+     * Creates and registers an event at the user-event service at defined trigger points as that of sms notifs.
      * 
      * Assumption - The PropertyRequest received will always contain only one Property and that Property will have only one PropertyDetail.
      * 

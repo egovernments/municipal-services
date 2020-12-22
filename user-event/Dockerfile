@@ -6,7 +6,7 @@ MAINTAINER Senthil<senthil.kalimuthu@tarento.com>
 # INSTRUCTIONS ON HOW TO BUILD JAR:
 # Move to the location where pom.xml is exist in project and build project using below command
 # "mvn clean package"
-COPY /target/egov-user-event-0.0.1-SNAPSHOT.jar /opt/egov/egov-user-event.jar
+COPY /target/user-event-0.0.1-SNAPSHOT.jar /opt/egov/user-event.jar
 
 COPY start.sh /usr/bin/start.sh
 

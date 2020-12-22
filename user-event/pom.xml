@@ -3,9 +3,9 @@
 	http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.egov</groupId>
-	<artifactId>egov-user-event</artifactId>
+	<artifactId>user-event</artifactId>
 	<packaging>jar</packaging>
-	<name>egov-user-event</name>
+	<name>user-event</name>
 	<version>1.1.1-SNAPSHOT</version>
 	<description>Service to send out notifications to user based on the events</description>
 
