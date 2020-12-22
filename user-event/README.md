@@ -1,4 +1,4 @@
-# egov-user-event
+# user-event
 
 The objective of this service is to create a common point to manage all the events generated for the user in the system. 
 Events include updates from multiple applications like PT, PGR, TL etc, events created by the employee addressing the citizen etc. 
@@ -27,7 +27,7 @@ Events can be created either by an API call or through pushing records to the Ka
 
 **Configurable Properties:**
 
-Following are the properties in application.properties file in egov-user-events service which are configurable.
+Following are the properties in application.properties file in user-events service which are configurable.
 
 | Property                     | Value    | Remarks                    | 
 | -----------------------------| ---------| ---------------------------|

@@ -94,7 +94,7 @@ const envVariables = {
   EGOV_EVENT_HOST:
     process.env.EGOV_EVENT_HOST || "https://egov-micro-dev.egovernments.org",
   EGOV_EVENT_CONTEXT_PATH:
-    process.env.EGOV_EVENT_CONTEXT_PATH || "/egov-user-event/v1/events",
+    process.env.EGOV_EVENT_CONTEXT_PATH || "/user-event/v1/events",
   EGOV_EVENT_CREATE_ENPOINT:
     process.env.EGOV_EVENT_CREATE_ENPOINT || "/_create",
 

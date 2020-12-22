@@ -4,4 +4,4 @@ if [[ -z "${JAVA_OPTS}" ]];then
     export JAVA_OPTS="-Xmx256m -Xms256m"
 fi
 
-java ${JAVA_OPTS} -jar /opt/egov/egov-user-event.jar
+java ${JAVA_OPTS} -jar /opt/egov/user-event.jar

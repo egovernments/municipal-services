@@ -90,7 +90,7 @@ public class BPANotificationService {
 	}
 
 	/**
-	 * Creates and registers an event at the egov-user-event service at defined
+	 * Creates and registers an event at the user-event service at defined
 	 * trigger points as that of sms notifs.
 	 * 
 	 * Assumption - The bpaRequest received will always contain only one BPA.
