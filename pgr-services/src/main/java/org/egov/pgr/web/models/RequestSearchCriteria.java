@@ -31,8 +31,17 @@ public class RequestSearchCriteria {
     @JsonProperty("serviceRequestId")
     private String serviceRequestId;
 
+    @JsonProperty("sortBy")
+    private SortBy sortBy;
+
+    @JsonProperty("sortOrder")
+    private SortOrder sortOrder;
+
     @JsonProperty("ids")
     private Set<String> ids;
+
+    @JsonProperty("locality")
+    private String locality;
 
     @JsonProperty("limit")
     private Integer limit;
@@ -44,10 +53,20 @@ public class RequestSearchCriteria {
     private Set<String> userIds;
 
 
+    public enum SortOrder {
+        ASC,
+        DESC
+    }
+
+    public enum SortBy {
+        locality,
+        applicationStatus,
+        serviceRequestId
+    }
 
     public boolean isEmpty(){
         return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null
-        && this.applicationStatus==null && this.ids==null && this.userIds==null);
+        && this.applicationStatus==null && this.ids==null && this.userIds==null && this.locality==null);
     }
 
 }

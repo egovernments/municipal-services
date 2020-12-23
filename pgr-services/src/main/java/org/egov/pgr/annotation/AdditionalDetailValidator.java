@@ -18,6 +18,9 @@ public class AdditionalDetailValidator  implements ConstraintValidator<Character
     @Override
     public boolean isValid(Object additionalDetails, ConstraintValidatorContext cxt) {
 
+        if(additionalDetails==null)
+            return true;
+
         if(additionalDetails.toString().length() > size)
             return false;
         else
