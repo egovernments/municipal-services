@@ -2,8 +2,10 @@ package org.egov.pgr.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.repository.ServiceRequestRepository;
 import org.egov.pgr.web.models.RequestInfoWrapper;
@@ -17,14 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.egov.pgr.util.PGRConstants.PGR_BUSINESSSERVICE;
-import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
+import static org.egov.pgr.util.PGRConstants.*;
 
 @Slf4j
 @Component
@@ -39,13 +39,18 @@ public class MigrationUtils {
 
     private ServiceRequestRepository repository;
 
+    private MDMSUtils mdmsUtils;
+
     @Autowired
-    public MigrationUtils(UserUtils userUtils, PGRConfiguration config, ObjectMapper mapper, ServiceRequestRepository repository) {
+    public MigrationUtils(UserUtils userUtils, PGRConfiguration config, ObjectMapper mapper, ServiceRequestRepository repository, MDMSUtils mdmsUtils) {
         this.userUtils = userUtils;
         this.config = config;
         this.mapper = mapper;
         this.repository = repository;
+        this.mdmsUtils = mdmsUtils;
     }
+
+
 
 
 
@@ -101,6 +106,32 @@ public class MigrationUtils {
                 .collect(Collectors.toMap(State::getState,State::getUuid));
 
         return statusToUUIDMap;
+    }
+
+
+    public Map<String,Long> getServiceCodeToSLAMap(String tenantId) {
+
+        Map<String, Long> serviceCodeToSLA = new HashMap<>();
+
+        MdmsCriteriaReq mdmsCriteriaReq = mdmsUtils.getMDMSRequest(new RequestInfo(),tenantId);
+        Object result = repository.fetchResult(mdmsUtils.getMdmsSearchUrl(), mdmsCriteriaReq);
+        List<Map<String, Object>> res = new LinkedList<>();
+
+
+        try{
+            res = JsonPath.read(result,MDMS_DATA_JSONPATH);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response");
+        }
+
+        for(Map<String, Object> map : res){
+            Long SLA = TimeUnit.HOURS.toMillis((Integer)map.get(MDMS_DATA_SLA_KEYWORD));
+            serviceCodeToSLA.put((String)map.get(MDMS_DATA_SERVICE_CODE_KEYWORD), SLA);
+        }
+
+        return serviceCodeToSLA;
     }
 
 

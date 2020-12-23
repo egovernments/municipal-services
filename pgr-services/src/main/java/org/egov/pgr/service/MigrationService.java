@@ -42,6 +42,8 @@ public class MigrationService {
 
     private Map<String,String> statusToUUIDMap;
 
+    private Map<String, Long> serviceCodeToSLA;
+
     private final Map<String, String> oldToNewStatus = new HashMap<String, String>() {
         {
 
@@ -73,6 +75,7 @@ public class MigrationService {
     @PostConstruct
     private void setStatusToUUIDMap(){
         this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
+        this.serviceCodeToSLA = migrationUtils.getServiceCodeToSLAMap(config.getTenantId());
     }
 
 
