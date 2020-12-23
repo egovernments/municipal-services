@@ -3,30 +3,26 @@ package org.egov.fsm.web.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * This is acting ID token of the authenticated user on the server. Any value provided by the clients will be ignored and actual user based on authtoken will be used on the server.
  */
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
-@ApiModel(description = "BPA application object to capture the details of land, land owners, and address of the land.")
 @Validated
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+
 
 public class UserInfo   {
   @JsonProperty("tenantId")
@@ -34,9 +30,6 @@ public class UserInfo   {
 
   @JsonProperty("uuid")
   private String uuid = null;
-  
-  @JsonProperty("id")
-  private Long id;
 
   @JsonProperty("userName")
   private String userName = null;
@@ -176,14 +169,6 @@ public class UserInfo   {
   public void setMobile(String mobile) {
     this.mobile = mobile;
   }
-    @ApiModelProperty(value = "Json object to capture any extra information which is not accommodated of model")
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
   public UserInfo email(String email) {
     this.email = email;

@@ -22,7 +22,6 @@ public class FSMConstants {
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
 
-	public static final String INVALID_ONWER_ERROR = "INVALID ONWER ERROR";
 	// mdms path codes
 
 	public static final String FSM_JSONPATH_CODE = "$.MdmsRes.FSM";

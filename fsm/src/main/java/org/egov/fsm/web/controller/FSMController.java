@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.fsm.service.FSMService;
-import org.egov.fsm.service.UserService;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.util.ResponseInfoFactory;
 import org.egov.fsm.web.model.FSM;
@@ -33,15 +32,12 @@ public class FSMController {
 	private FSMUtil fsmUtil;
 
 	@Autowired
-	private UserService userService;
-	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
 
 	@PostMapping(value = "/_create")
 	public ResponseEntity<FSMResponse> create(@Valid @RequestBody FSMRequest fsmRequest) {
 		fsmUtil.defaultJsonPathConfig();
 		FSM fsm = fsmService.create(fsmRequest);
-		
 		List<FSM> fsmm = new ArrayList<FSM>();
 		fsmm.add(fsm);
 		FSMResponse response = FSMResponse.builder().fsm(fsmm)
@@ -50,5 +46,4 @@ public class FSMController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
 }

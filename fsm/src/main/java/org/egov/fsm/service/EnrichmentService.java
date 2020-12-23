@@ -32,6 +32,9 @@ public class EnrichmentService {
 	@Autowired
 	private IdGenRepository idGenRepository;
 	@Autowired
+	private BoundaryService boundaryService ;
+	
+	@Autowired
 	private FSMUtil fsmUtil;
 	/**
 	 * enrich the create FSM request with the required data
@@ -47,6 +50,7 @@ public class EnrichmentService {
 		
 		fsmRequest.getFsm().setAccountId(fsmRequest.getFsm().getAuditDetails().getCreatedBy());
 		
+		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
 		
 		setIdgenIds(fsmRequest);
 	}
