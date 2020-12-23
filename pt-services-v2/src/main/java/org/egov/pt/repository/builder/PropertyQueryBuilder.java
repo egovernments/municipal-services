@@ -88,16 +88,11 @@ public class PropertyQueryBuilder {
 			"    pt.lastModifiedTime as propertylastModifiedTime,pt.createdby as propertyCreatedby,"+
 			"    ptdl.status as propertydetailstatus "+
 			"    FROM eg_pt_property_v2 pt INNER JOIN eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " +
-
-			/*
-			 * "    INNER JOIN (Select max(createdTime) as maxcreatedtime,property from eg_pt_propertydetail_v2 ptd "
-			 * + "	 WHERE_CLAUSE_PLACHOLDER_ASSESSMENT " +
-			 * "	 GROUP BY property,financialyear) as maxasses " +
-			 * "    ON maxasses.property = ptdl.property and maxasses.maxcreatedtime = ptdl.createdtime"
-			 * 
-			 * +
-			 */
-			"    WHERE_CLAUSE_PLACHOLDER_PROPERTY  WHERE_CLAUSE_PLACHOLDER_ASSESSMENT) as asmt "+
+			"    INNER JOIN (Select max(createdTime) as maxcreatedtime,property from eg_pt_propertydetail_v2 ptd " +
+			"	 WHERE_CLAUSE_PLACHOLDER_ASSESSMENT " +
+			"	 GROUP BY property,financialyear) as maxasses " +
+			"    ON maxasses.property = ptdl.property and maxasses.maxcreatedtime = ptdl.createdtime" +
+		"		 WHERE_CLAUSE_PLACHOLDER_PROPERTY) as asmt "+
 				 INNER_JOIN_STRING+
 			"    eg_pt_owner_v2 owner ON asmt.assessmentnumber=owner.propertydetail     " +
 				 INNER_JOIN_STRING+
@@ -157,7 +152,7 @@ public class PropertyQueryBuilder {
 
 		StringBuilder builder = new StringBuilder(NEWQUERY);
 
-		StringBuilder WHERE_CLAUSE_PLACHOLDER_ASSESSMENT = new StringBuilder(" AND ");
+		StringBuilder WHERE_CLAUSE_PLACHOLDER_ASSESSMENT = new StringBuilder("");
 
 		StringBuilder WHERE_CLAUSE_PLACHOLDER_PROPERTY = new StringBuilder("");
 
@@ -176,14 +171,40 @@ public class PropertyQueryBuilder {
 				addToPreparedStatement(preparedStmtList, ownerids);
 			}
 
-			String defaultQuery =  builder.toString()
-					.replace("WHERE_CLAUSE_PLACHOLDER_PROPERTY","")
-					.replace("WHERE_CLAUSE_PLACHOLDER_ASSESSMENT","")
-					.replace("WHERE_CLAUSE_PLACHOLDER",WHERE_CLAUSE_PLACHOLDER);
+			String defaultQuery =  builder.toString().replace("WHERE_CLAUSE_PLACHOLDER_ASSESSMENT",WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.toString())
+					.replace("WHERE_CLAUSE_PLACHOLDER_PROPERTY","").replace("WHERE_CLAUSE_PLACHOLDER",WHERE_CLAUSE_PLACHOLDER);
 
 			return addPaginationWrapper(defaultQuery, preparedStmtList, criteria);
 		}
 
+		
+		if (criteria.getPropertyDetailStatus() != null) {
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
+			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptd.status = ? ");
+			preparedStmtList.add(criteria.getPropertyDetailStatus());
+		}else {
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
+			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptd.status = 'ACTIVE' ");
+		}
+
+		Set<String> propertyDetailids = criteria.getPropertyDetailids();
+		if (!CollectionUtils.isEmpty(propertyDetailids)) {
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
+			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptd.assessmentnumber IN (").append(createQuery(propertyDetailids)).append(")");
+			addToPreparedStatement(preparedStmtList, propertyDetailids);
+		}
+
+		if(criteria.getAsOnDate()!=null){
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
+			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" createdTime <= ?");
+			preparedStmtList.add(criteria.getAsOnDate());
+		}
+
+		if(criteria.getFinancialYear()!=null){
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
+			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" financialYear = ?");
+			preparedStmtList.add(criteria.getFinancialYear());
+		}
 
 		if(criteria.getTenantId()!=null){
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_PROPERTY);
@@ -217,34 +238,6 @@ public class PropertyQueryBuilder {
 		}
 
 
-		if (criteria.getPropertyDetailStatus() != null) {
-			//addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptdl.status = ? ");
-			preparedStmtList.add(criteria.getPropertyDetailStatus());
-		}else {
-			//addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptdl.status = 'ACTIVE' ");
-		}
-
-		Set<String> propertyDetailids = criteria.getPropertyDetailids();
-		if (!CollectionUtils.isEmpty(propertyDetailids)) {
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptdl.assessmentnumber IN (").append(createQuery(propertyDetailids)).append(")");
-			addToPreparedStatement(preparedStmtList, propertyDetailids);
-		}
-
-		if(criteria.getAsOnDate()!=null){
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" createdTime <= ?");
-			preparedStmtList.add(criteria.getAsOnDate());
-		}
-
-		if(criteria.getFinancialYear()!=null){
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" financialYear = ?");
-			preparedStmtList.add(criteria.getFinancialYear());
-		}
-		
 		Set<String> addressids = criteria.getAddressids();
 		if (!CollectionUtils.isEmpty(addressids)) {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER);
