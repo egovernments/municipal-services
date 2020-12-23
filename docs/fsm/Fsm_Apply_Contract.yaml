@@ -1,0 +1,277 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Apply for FSM 
+  description: |
+    ### API specs for FSM ###
+    * Citizen / Employee can Apply for desludging service
+    * Update the details of the existing application
+    * serarch the application based on criteria
+    * Citizen / Employee can take the actions on the perticular applicationbased on the wf configuration
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+x-module: BPA
+x-common-path: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml'
+paths:
+  /fsm/v1/_search:
+    post:
+      summary: Get application details based on below criteria
+      description: |
+        Gets the list of fsm application for a particular ULB based on search criteria.
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/parameters/tenantId'
+        - name: ids
+          in: query
+          description: Search by list of UUID
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: mobileNo
+          in: query
+          description: Search by mobile number of requester
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Successful response sorted by reverse chrnological order of creation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FSMRequest'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+      tags:
+        - FSM
+  /fsm/v1/_create:
+    post:
+      summary: Apply for desludging 
+      description: Apply for desludging 
+      tags:
+        - FSM
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FSMRequest'
+        description: Request schema.
+        required: true
+      responses:
+        '202':
+          description: Application submitted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FSMResponse'
+        '400':
+          description: Failed to process the application
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+  /fsm/v1/_update:
+    post:
+      summary: Update service requests
+      description: Updates service request
+      tags:
+        - FSM
+      responses:
+        '202':
+          description: Application submitted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FSMResponse'
+        '400':
+          description: Failed to process the application
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FSMRequest'
+        description: Request schema.
+        required: true
+components:
+  schemas:
+    Workflow:
+      type: object
+      description: 'BPA application object to capture the details of land, land owners, and address of the land.'
+      properties:
+        action:
+          type: string
+          description: Action on the application in certain
+          minLength: 1
+          maxLength: 64
+        assignes:
+          type: array
+          items:
+            type: string
+        comments:
+          type: string
+          description: Unique Identifier scrutinized number
+          minLength: 1
+          maxLength: 64
+        varificationDocuments:
+          description: Attach the workflow varification documents.
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Document'
+    FSM:
+      type: object
+      description: |
+        Request schema of FSM application. 
+
+      properties:
+        citizen:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/UserInfo'
+        id:
+          type: string
+          readOnly: true
+          description: The server generated unique ID(UUID).
+          minLength: 2
+          maxLength: 64
+        tenantId:
+          type: string
+          description: Unique identifier of the tenant.
+          minLength: 2
+          maxLength: 64
+        applicationNo:
+          type: string
+          readOnly: true
+          description: The unique formatted id for application no.
+          minLength: 2
+          maxLength: 128
+        description:
+          type: string
+          description: Additional information or description of the application
+          minLength: 2
+          maxLength: 256
+        accountId:
+          type: string
+          description: Applier(CItizen) unique id(UUID) from user service. 
+          minLength: 2
+          maxLength: 64
+        additionalDetail:
+          type: object
+          description: This is the json object that will carry the actual input (whereever the metadata requries input). Structure should be same as the schema definition provided in the metadata of the service (schema compliance check to be performed at client/server)
+        applicationStatus:
+          type: string
+          description: The current status of the service request.
+          readOnly: true
+        source:
+          type: string
+          description: 'Source mdms master data. Which captures the source of the service request(ex:- whatsapp, ivr, Swachhata etc)'
+          minLength: 2
+          maxLength: 64
+          example: whatsapp, ivr etc
+        sanitationtype:
+          type: string
+          description: This is the master data defined in MDMS
+          minLength: 2
+          maxLength: 64
+        propertyUsage:
+          type: string
+          description: This is the master data defined in MDMS
+          minLength: 2
+          maxLength: 64
+        noOfTrips:
+          type: integer
+          description: Total no of trips reqired for desludging the PIT
+          minLength: 2
+          maxLength: 64
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+        vehicleId:
+          type: string
+          description: Unique Id of the vehicle which got assigned to the perticular application
+          minLength: 2
+          maxLength: 64
+        pitDetail:
+          $ref: '#/components/schemas/PitDetail'
+        address:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Address'
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
+      required:
+        - tenantId
+    
+    PitDetail:
+      type: object
+      description: |
+        cature the pit details
+      properties:
+        citizen:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/UserInfo'
+        id:
+          type: string
+          readOnly: true
+          description: The server generated unique ID(UUID).
+          minLength: 2
+          maxLength: 64
+        hight:
+          type: number
+          format: double
+          description: Hight of the PIT in meter
+          minLength: 2
+          maxLength: 64
+        length:
+          type: number
+          format: double
+          description: Length of the PIT in meter
+          minLength: 2
+          maxLength: 128
+        width:
+          type: number
+          format: double
+          description: Width of the PIT in meter
+          minLength: 2
+          maxLength: 128
+        distanceFromRoad:
+          type: number
+          format: double
+          description: Distance of the PIT from road in meter
+          minLength: 2
+          maxLength: 128
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
+        
+    
+    FSMRequest:
+      type: object
+      description: Request object for FSM
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
+        fsm:
+          $ref: '#/components/schemas/FSM'
+        workflow:
+          $ref: '#/components/schemas/Workflow'
+      required:
+        - requestInfo
+        - fsm
+    FSMResponse:
+      type: object
+      description: Response of the FSM
+      properties:
+        responseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ResponseInfo'
+        fsm:
+          $ref: '#/components/schemas/FSM'
+        workflow:
+          $ref: '#/components/schemas/Workflow'
+      required:
+        - responseInfo
+        - fsm
