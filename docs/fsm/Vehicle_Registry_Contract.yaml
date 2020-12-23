@@ -1,0 +1,230 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Vehicle Registry
+  description: |
+    ### API specs to capture Vehicle details###
+    * Allow to add the new Vehicle details
+    * Allow to update the existing Vehicle details
+    * Search the Vehicle by unique no
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+x-module: FSM
+x-common-path: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml'
+paths:
+  /vehicle/v1/_search:
+    post:
+      summary: Get the Vehicle details
+      description: |
+        Gets the list of Vehicle for a particular ULB based on search criteria.
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/parameters/tenantId'
+        - name: registrationNumber
+          in: query
+          description: Allows search for service type - comma separated list
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: ids
+          in: query
+          description: Search by list of UUID
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: mobileNo
+          in: query
+          description: Search by mobile number of service requester
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Successful response sorted by reverse chrnological order of creation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+      tags:
+        - Vehicle
+  /vehicle/v1/_create:
+    post:
+      summary: Add new vehicle  
+      description: Add the vehicle details into the system
+      tags:
+        - Vehicle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+        description: Request schema.
+        required: true
+      responses:
+        '202':
+          description: Request submitted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          description: Failed to process the Request
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+  /vehicle/v1/_update:
+    post:
+      summary: Update existing vehicle details
+      description: Updates the details of the vehicle 
+      tags:
+        - Vehicle
+      responses:
+        '202':
+          description: Request submitted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/VehicleResponse'
+        '400':
+          description: Failed to process the application
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+        description: Request schema.
+        required: true
+components:
+  schemas:
+    Vehicle:
+      type: object
+      description: |
+        Instance of Service request raised for a particular service. As per extension propsed in the Service definition "attributes" carry the input values requried by metadata definition in the structure as described by the corresponding schema.
+
+        * Any one of 'address' or '(lat and lang)' or 'addressid' is mandatory
+      properties:
+        vehicleOwner:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/UserInfo'
+        id:
+          type: string
+          readOnly: true
+          description: The server generated unique ID(UUID).
+          minLength: 2
+          maxLength: 64
+        tenantId:
+          type: string
+          description: Unique identifier of the tenant.
+          minLength: 2
+          maxLength: 64
+        registrationNumber: 
+          type: string
+          description: Unique Vehicle registration number.
+          minLength: 2
+          maxLength: 128
+        model:
+          type: string
+          description: Vehicle model number(this the master data defined in MDMS).
+          minLength: 2
+          maxLength: 256
+        type:
+          type: string
+          description: Vehicle Type master, defined in MDMS. 
+          minLength: 2
+          maxLength: 64
+        tankCapicity:
+          type: integer
+          format: int64
+          description: Tank capacity in liters. 
+          minLength: 2
+          maxLength: 64
+        suctionType:
+          type: string
+          description: This is the mdms master data. 
+          minLength: 2
+          maxLength: 64
+        pollutionCertiValidTill:
+          type: integer
+          format: int64
+          description: Pollution certificate valid till for vehicle(epoc date). 
+          minLength: 2
+          maxLength: 64
+        InsuranceCertValidTill:
+          type: integer
+          format: int64
+          description: Vehicle insurance valid till(epoc date). 
+          minLength: 2
+          maxLength: 64
+        fitnessValidTill:
+          type: integer
+          format: int64
+          description: Vehicle fitness valid till(epoc date). 
+          minLength: 2
+          maxLength: 64
+        roadTaxPaidTill:
+          type: integer
+          format: int64
+          description: Road tax paid for the Vehicle. 
+          minLength: 2
+          maxLength: 64
+        gpsEnabled:
+          type: boolean
+          description: Whether Vehicle equipped with GPS device. 
+        additionalDetail:
+          type: object
+          description: This is the json object that will carry the actual input (whereever the metadata requries input). Structure should be same as the schema definition provided in the metadata of the service (schema compliance check to be performed at client/server)
+        source:
+          type: string
+          description: 'Source mdms master data. Which captures the source of the service request(ex:- whatsapp, ivr, Swachhata etc)'
+          minLength: 2
+          maxLength: 64
+          example: whatsapp, ivr etc
+        status:
+          type: string
+          description: Inactive records will be consider as soft deleted 
+          enum:
+           - ACTIVE
+           - INACTIVE
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
+      required:
+        - tenantId
+        - registrationNumber
+        - model
+        - type
+        
+    VehicleRequest:
+      type: object
+      description: Request for vehicle details
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+      required:
+        - RequestInfo
+        - services
+    VehicleResponse:
+      type: object
+      description: Response of vehicle detail
+      properties:
+        responseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ResponseInfo'
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+      required:
+        - ResponseInfo
+        - services
