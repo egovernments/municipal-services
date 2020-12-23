@@ -16,6 +16,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -41,12 +42,14 @@ public class MigrationService {
 
     private Map<String,String> statusToUUIDMap;
 
+    private Map<String, Long> serviceCodeToSLA;
+
     private final Map<String, String> oldToNewStatus = new HashMap<String, String>() {
         {
 
-            put("open", "OPEN");
+            put("open", "PENDINGFORASSIGNMENT");
             put("assigned", "PENDINGATLME");
-            put("closed", "CLOSED");
+            put("closed", "CLOSEDAFTERRESOLUTION");
             put("rejected", "REJECTED");
             put("resolved", "RESOLVED");
             put("reassignrequested", "PENDINGFORREASSIGNMENT");
@@ -54,9 +57,25 @@ public class MigrationService {
         }
     };
 
+    private final Map<String, String> oldToNewAction = new HashMap<String, String>() {
+        {
+
+            put("open", "APPLY");
+            put("ropen", "REOPEN");
+            put("assign", "ASSIGN");
+            put("reassign", "REASSIGN");
+            put("resolve", "RESOLVE");
+            put("close", "PENDINGFORREASSIGNMENT");
+            put("reject", "REJECT");
+            put("requestforreassign", "ASSIGN");
+
+        }
+    };
+
     @PostConstruct
     private void setStatusToUUIDMap(){
         this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
+        this.serviceCodeToSLA = migrationUtils.getServiceCodeToSLAMap(config.getTenantId());
     }
 
 
@@ -80,13 +99,20 @@ public class MigrationService {
 
     /*
      *
-     * Skipping records with empty actionHistory as no linking with service is possible in that case
+     * 1. Skipping records with empty actionHistory as no linking with service is possible in that case
      * Images are added in workflow doument with documentType as PHOTO which is defined in constants file
      * Citizen object is not migrated as it is stored in user service only it's reference i.e accountId is migrated
      * Splitting Role in 'by' in actionInfo and storing only uuid not role in workflow (Why was it stored in that way?)
      * Removed @Pattern in citizen from name, mobileNumber, address from SearchReponse in old pgr so that batch don't fail for any data
      * id field set by generating new uuid as old one didn't have this field
      * Assumed ActionHistory comes in descending order from old pgr search API
+     *
+     *
+     * 2. tenantid, servicecode, servicerequestid, createdby and createdtime were all NOT NULL constraints
+     * in PGR v1 eg_pgr_service table, hence no additional checks have been considered in the migrate flow.
+     * However, there is no such constraint of NOT NULL in case of description attribute, hence, a check has
+     * been placed here which will set the description as "NOT_SPECIFIED" in case description in v1 table is
+     * null.
      *
      *
      * */
@@ -115,6 +141,14 @@ public class MigrationService {
         });
 
         Map<Long, String> idToUuidMap = migrationUtils.getIdtoUUIDMap(new LinkedList<>(ids));
+
+        /*############### FOR LOCAL TESTING ONLY ###########################################
+        Map<Long, String> idToUuidMap = new HashMap<>();
+        for(String id : ids){
+            if(id != null)
+                idToUuidMap.put(Long.parseLong(id), UUID.randomUUID().toString());
+        }
+        //##################################################################################*/
 
         Map<String, Object> response = transform(servicesV1, actionHistories, idToUuidMap);
 
@@ -150,12 +184,15 @@ public class MigrationService {
         for (Service serviceV1 : servicesV1) {
 
             List<ActionInfo> actionInfos = idToActionMap.get(serviceV1.getServiceRequestId());
+
+            Map<String, Long> actionUuidToSlaMap = getActionUUidToSLAMap(actionInfos, serviceV1.getServiceCode());
+
             List<ProcessInstance> workflows = new LinkedList<>();
 
             org.egov.pgr.web.models.Service service = transformService(serviceV1, idToUuidMap);
 
             actionInfos.forEach(actionInfo -> {
-                ProcessInstance workflow = transformAction(actionInfo, idToUuidMap);
+                ProcessInstance workflow = transformAction(actionInfo, idToUuidMap, actionUuidToSlaMap);
                 workflows.add(workflow);
             });
 
@@ -163,9 +200,10 @@ public class MigrationService {
             service.setApplicationStatus(oldToNewStatus.get(actionInfos.get(0).getStatus()));
             ProcessInstanceRequest processInstanceRequest = ProcessInstanceRequest.builder().processInstances(workflows).build();
             ServiceRequest serviceRequest = ServiceRequest.builder().service(service).build();
-
-            //   producer.push(config.getCreateTopic(),serviceRequest);
-            //   producer.push(config.getWorkflowSaveTopic(),processInstanceRequest);
+            //log.info("Pushing service request: " + serviceRequest);
+            /*#################### TEMPORARY FOR TESTING, REMOVE THE COMMENTS*/
+               producer.push(config.getBatchCreateTopic(),serviceRequest);
+               producer.push(config.getBatchWorkflowSaveTopic(),processInstanceRequest);
 
             // Temporary for testing
             services.add(service);
@@ -189,22 +227,24 @@ public class MigrationService {
         String serviceCode = serviceV1.getServiceCode();
         String serviceRequestId = serviceV1.getServiceRequestId();
         String description = serviceV1.getDescription();
-        String source = serviceV1.getSource().toString();
+        String source = (!ObjectUtils.isEmpty(serviceV1.getSource())) ? serviceV1.getSource().toString() : null;
         String rating = serviceV1.getRating();
 
 
         /**
-         * AccountId is id not uuid in old pgr, mapping has to fetched
-         * of id to uuid
+         * AccountId is id, not uuid in old pgr. Mapping has to fetched
+         * of id to uuid i.e. accountId in new PGR is the UUID.
          */
-        String accountId = idToUuidMap.get(Long.parseLong(serviceV1.getAccountId()));
 
+        String accountId = null;
+        if(serviceV1.getAccountId() != null)
+            accountId = idToUuidMap.get(Long.parseLong(serviceV1.getAccountId()));
 
         AuditDetails auditDetails = serviceV1.getAuditDetails();
 
         // Setting uuid in place of id in auditDetails
         auditDetails.setCreatedBy(idToUuidMap.get(Long.parseLong(auditDetails.getCreatedBy())));
-        auditDetails.setLastModifiedBy(idToUuidMap.get(Long.parseLong(auditDetails.getLastModifiedBy())));
+        auditDetails.setLastModifiedBy(auditDetails.getLastModifiedBy() != null ? idToUuidMap.get(Long.parseLong(auditDetails.getLastModifiedBy())):"NOT_SPECIFIED");
 
         Object attributes = serviceV1.getAttributes();
 
@@ -216,15 +256,15 @@ public class MigrationService {
          * Transform address and set geo location
          */
         GeoLocation geoLocation = GeoLocation.builder().longitude(longitutude).latitude(latitude).build();
-        org.egov.pgr.web.models.Address address = transformAddress(serviceV1.getAddressDetail());
+        //log.info("Address details: " + serviceV1.getAddressDetail());
+        org.egov.pgr.web.models.Address address = null;
+        address = transformAddress(serviceV1.getAddressDetail());
         address.setGeoLocation(geoLocation);
         address.setTenantId(tenantId);
 
-        /**
-         * FIXME
-         * Active flag has to be accommodated
-         */
         Boolean active = serviceV1.getActive();
+
+        // ACTIVE FLAG NEEDS TO BE ACCOUNTED FOR BELOW FOR POPULATING v2 POJO --->
 
         org.egov.pgr.web.models.Service service = org.egov.pgr.web.models.Service.builder()
                 .id(UUID.randomUUID().toString())
@@ -236,6 +276,7 @@ public class MigrationService {
                 .description(description)
                 .source(source)
                 .address(address)
+                .active(active)
                 .auditDetails(auditDetails)
                 .build();
 
@@ -258,17 +299,11 @@ public class MigrationService {
     private org.egov.pgr.web.models.Address transformAddress(Address addressV1) {
 
         String id = addressV1.getUuid();
-        String locality = addressV1.getMohalla();
+        String locality = addressV1.getMohalla() != null ? addressV1.getMohalla() : "NOT_AVAILABLE";
         String colony = addressV1.getLocality();
         String city = addressV1.getCity();
         String landmark = addressV1.getLandmark();
         String houseNoAndStreetName = addressV1.getHouseNoAndStreetName();
-
-        /**
-         * FIXME : No auditDetails in new address object
-         */
-
-        AuditDetails auditDetails = addressV1.getAuditDetails();
 
         /**
          * FIXME : houseNoAndStreetName and colony mapping has to be corrected
@@ -288,7 +323,7 @@ public class MigrationService {
     }
 
 
-    private ProcessInstance transformAction(ActionInfo actionInfo, Map<Long, String> idToUuidMap) {
+    private ProcessInstance transformAction(ActionInfo actionInfo, Map<Long, String> idToUuidMap, Map<String, Long> actionUuidToSlaMap) {
 
         String uuid = actionInfo.getUuid();
 
@@ -298,7 +333,7 @@ public class MigrationService {
         String tenantId = actionInfo.getTenantId();
         Long createdTime = actionInfo.getWhen();
         String businessId = actionInfo.getBusinessKey();
-        String action = actionInfo.getAction();
+        String action = (!StringUtils.isEmpty(actionInfo.getAction())) ? oldToNewAction.get(actionInfo.getAction()) : "COMMENT";
         String status = actionInfo.getStatus();
         String assignee = actionInfo.getAssignee();
         String comments = actionInfo.getComment();
@@ -325,6 +360,7 @@ public class MigrationService {
                 .moduleName(PGR_MODULENAME)
                 .state(state)
                 .businessService(PGR_BUSINESSSERVICE)
+                .businesssServiceSla(actionUuidToSlaMap.get(actionInfo.getUuid()))
                 .auditDetails(auditDetails)
                 .build();
 
@@ -345,12 +381,16 @@ public class MigrationService {
         if (!CollectionUtils.isEmpty(fileStoreIds)) {
             List<Document> documents = new LinkedList<>();
             for (String fileStoreId : fileStoreIds) {
-                Document document = Document.builder()
-                        .documentType(IMAGE_DOCUMENT_TYPE)
-                        .fileStoreId(fileStoreId)
-                        .id(UUID.randomUUID().toString())
-                        .build();
-                documents.add(document);
+
+                if(!StringUtils.isEmpty(fileStoreId) && !fileStoreId.equalsIgnoreCase("null")
+                    && fileStoreId.length()<=64){
+                    Document document = Document.builder()
+                            .documentType(IMAGE_DOCUMENT_TYPE)
+                            .fileStoreId(fileStoreId)
+                            .id(UUID.randomUUID().toString())
+                            .build();
+                    documents.add(document);
+                }
             }
             workflow.setDocuments(documents);
         }
@@ -358,5 +398,27 @@ public class MigrationService {
         return workflow;
     }
 
+    private Map<String, Long> getActionUUidToSLAMap(List<ActionInfo> actionInfos, String serviceCode){
+
+        Map<String, Long> uuidTOSLAMap = new HashMap<>();
+
+        if(!CollectionUtils.isEmpty(actionInfos))
+            return uuidTOSLAMap;
+
+        actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
+        int totalCount = actionInfos.size();
+
+        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), serviceCodeToSLA.get(serviceCode));
+
+        for(int i = 1; i < totalCount; i++){
+
+            ActionInfo actionInfo = actionInfos.get(i);
+            ActionInfo previousActionInfo = actionInfos.get(i-1);
+            Long timeSpent = actionInfo.getWhen() - previousActionInfo.getWhen();
+            Long slaLeft = uuidTOSLAMap.get(previousActionInfo.getUuid()) - timeSpent;
+            uuidTOSLAMap.put(actionInfo.getUuid(), slaLeft);
+        }
+        return uuidTOSLAMap;
+    }
 
 }

@@ -100,6 +100,9 @@ public class PGRConfiguration {
     @Value("${pgr.kafka.create.topic}")
     private String createTopic;
 
+    @Value("${pgr.kafka.migration.persister.topic}")
+    private String batchCreateTopic;
+
     @Value("${pgr.kafka.update.topic}")
     private String updateTopic;
 
@@ -181,6 +184,12 @@ public class PGRConfiguration {
 
     @Value("${pgr.statelevel.tenantid}")
     private String tenantId;
+
+    @Value("${persister.save.transition.wf.migration.topic}")
+    private String batchWorkflowSaveTopic;
+
+    @Value("${pgr.business.level.sla}")
+    private Long businessLevelSla;
 
 
 }

@@ -28,6 +28,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder
 public class Service   {
+
+        @JsonProperty("active")
+        private boolean active = true;
+
         @JsonProperty("citizen")
         private User citizen = null;
 
