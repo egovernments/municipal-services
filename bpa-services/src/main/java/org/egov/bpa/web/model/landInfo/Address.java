@@ -279,6 +279,7 @@ public class Address   {
   **/
   @ApiModelProperty(value = "PIN code of the address. Indian pincodes will usually be all numbers.")
   
+  @Size(min=6,max=6)
     public String getPincode() {
     return pincode;
   }

@@ -3,19 +3,23 @@ package org.egov.fsm.web.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * Request schema of FSM application.  
@@ -24,7 +28,11 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
 
-
+@ApiModel(description = "BPA application object to capture the details of land, land owners, and address of the land.")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(of = {"id"})
 public class FSM   {
   @JsonProperty("citizen")
   private UserInfo citizen = null;
@@ -34,6 +42,9 @@ public class FSM   {
 
   @JsonProperty("tenantId")
   private String tenantId = null;
+  @JsonProperty("owners")
+  @Valid
+  private List<OwnerInfo> owners = new ArrayList<OwnerInfo>();
 
   @JsonProperty("applicationNo")
   private String applicationNo = null;
@@ -61,6 +72,22 @@ public class FSM   {
 
   @JsonProperty("noOfTrips")
   private Integer noOfTrips = null;
+  
+  @JsonProperty("distanceOfPit")
+  private Integer distanceOfPit;
+  
+  @JsonProperty("amountPerTrip")
+  private Integer amountPerTrip;
+  
+  @JsonProperty("totalAmountToPay")
+  private Integer totalAmountToPay;
+  
+  @JsonProperty("applicationChannel")
+  private String applicationChannel;
+  
+  
+  
+  
 
   /**
    * Gets or Sets status
@@ -92,6 +119,16 @@ public class FSM   {
       return null;
     }
   }
+  @ApiModelProperty(required = true, value = "Property owners, these will be citizen users in system.")
+  @NotNull
+@Valid
+public List<OwnerInfo> getOwners() {
+return owners;
+}
+
+public void setOwners(List<OwnerInfo> owners) {
+this.owners = owners;
+}
   @JsonProperty("status")
   private StatusEnum status = null;
 
@@ -136,9 +173,9 @@ public class FSM   {
    * The server generated unique ID(UUID).
    * @return id
    **/
+@ApiModelProperty(readOnly = true, value = "Unique Identifier(UUID) of the bpa application for internal reference.")
   
-  
-  @Size(min=2,max=64)   public String getId() {
+  @Size(min=1,max=64)  public String getId() {
     return id;
   }
 
@@ -156,9 +193,10 @@ public class FSM   {
    * @return tenantId
    **/
   
-      @NotNull
+  @ApiModelProperty(required = true, value = "Unique ULB identifier.")
+  @NotNull
 
-  @Size(min=2,max=64)   public String getTenantId() {
+@Size(min=2,max=256)  public String getTenantId() {
     return tenantId;
   }
 
@@ -176,8 +214,9 @@ public class FSM   {
    * @return applicationNo
    **/
   
+ @ApiModelProperty(readOnly = true, value = "Generate formatted Unique Identifier of the building permit application. Keep the format in mdms")
   
-  @Size(min=2,max=128)   public String getApplicationNo() {
+  @Size(min=1,max=64)    public String getApplicationNo() {
     return applicationNo;
   }
 
@@ -213,9 +252,9 @@ public class FSM   {
    * Applier(CItizen) unique id(UUID) from user service.
    * @return accountId
    **/
+@ApiModelProperty(value = "Initiator User UUID")
   
-  
-  @Size(min=2,max=64)   public String getAccountId() {
+  @Size(min=1,max=64)   public String getAccountId() {
     return accountId;
   }
 
@@ -309,8 +348,9 @@ public class FSM   {
    * @return propertyUsage
    **/
   
-  
-  @Size(min=2,max=64)   public String getPropertyUsage() {
+  @NotNull
+  @Size(min=2,max=64)  
+  public String getPropertyUsage() {
     return propertyUsage;
   }
 
@@ -347,7 +387,7 @@ public class FSM   {
    * @return status
    **/
   
-  
+  @ApiModelProperty(value = "status of the application.")
     public StatusEnum getStatus() {
     return status;
   }
@@ -505,4 +545,39 @@ public class FSM   {
     }
     return o.toString().replace("\n", "\n    ");
   }
+
+public Integer getDistanceOfPit() {
+	return distanceOfPit;
+}
+
+public void setDistanceOfPit(Integer distanceOfPit) {
+	this.distanceOfPit = distanceOfPit;
+}
+
+public Integer getAmountPerTrip() {
+	return amountPerTrip;
+}
+
+public void setAmountPerTrip(Integer amountPerTrip) {
+	this.amountPerTrip = amountPerTrip;
+}
+
+public Integer getTotalAmountToPay() {
+	return totalAmountToPay;
+}
+
+public void setTotalAmountToPay(Integer totalAmountToPay) {
+	this.totalAmountToPay = totalAmountToPay;
+}
+@ApiModelProperty(required = true, value = "Application Channel Required .")
+@NotNull
+
+@Size(max = 64)
+public String getApplicationChannel() {
+	return applicationChannel;
+}
+
+public void setApplicationChannel(String applicationChannel) {
+	this.applicationChannel = applicationChannel;
+}
 }

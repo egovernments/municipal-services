@@ -41,6 +41,9 @@ public class FSMService {
 	private ActionValidator actionValidator;
 	
 	@Autowired
+	private UserService userService;
+	
+	@Autowired
 	private WorkflowService workflowService;
 	
 	@Autowired
@@ -53,6 +56,7 @@ public class FSMService {
 			throw new CustomException(FSMErrorConstants.INVALID_TENANT, " Application cannot be create at StateLevel");
 		}
 		fsmValidator.validateCreate(fsmRequest, mdmsData);
+		userService.manageUser(fsmRequest);
 		enrichmentService.enrichFSMCreateRequest(fsmRequest, mdmsData);
 		
 		//wfIntegrator.callWorkFlow(fsmRequest);
