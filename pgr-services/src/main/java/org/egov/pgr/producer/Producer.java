@@ -14,8 +14,6 @@ public class Producer {
     private CustomKafkaTemplate<String, Object> kafkaTemplate;
 
     public void push(String topic, Object value) {
-        log.info("Pushing data to topic: " + topic);
-        log.info("Data: " + value);
         kafkaTemplate.send(topic, value);
     }
 }

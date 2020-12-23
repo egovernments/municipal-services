@@ -185,7 +185,7 @@ public class MigrationService {
 
             List<ActionInfo> actionInfos = idToActionMap.get(serviceV1.getServiceRequestId());
 
-            Map<String, Long> actionUuidToSlaMap = getActionUUidToSLAMap(actionInfos);
+            Map<String, Long> actionUuidToSlaMap = getActionUUidToSLAMap(actionInfos, serviceV1.getServiceCode());
 
             List<ProcessInstance> workflows = new LinkedList<>();
 
@@ -200,7 +200,7 @@ public class MigrationService {
             service.setApplicationStatus(oldToNewStatus.get(actionInfos.get(0).getStatus()));
             ProcessInstanceRequest processInstanceRequest = ProcessInstanceRequest.builder().processInstances(workflows).build();
             ServiceRequest serviceRequest = ServiceRequest.builder().service(service).build();
-            log.info("Pushing service request: " + serviceRequest);
+            //log.info("Pushing service request: " + serviceRequest);
             /*#################### TEMPORARY FOR TESTING, REMOVE THE COMMENTS*/
                producer.push(config.getBatchCreateTopic(),serviceRequest);
                producer.push(config.getBatchWorkflowSaveTopic(),processInstanceRequest);
@@ -256,7 +256,7 @@ public class MigrationService {
          * Transform address and set geo location
          */
         GeoLocation geoLocation = GeoLocation.builder().longitude(longitutude).latitude(latitude).build();
-        log.info("Address details: " + serviceV1.getAddressDetail());
+        //log.info("Address details: " + serviceV1.getAddressDetail());
         org.egov.pgr.web.models.Address address = null;
         address = transformAddress(serviceV1.getAddressDetail());
         address.setGeoLocation(geoLocation);
@@ -381,12 +381,16 @@ public class MigrationService {
         if (!CollectionUtils.isEmpty(fileStoreIds)) {
             List<Document> documents = new LinkedList<>();
             for (String fileStoreId : fileStoreIds) {
-                Document document = Document.builder()
-                        .documentType(IMAGE_DOCUMENT_TYPE)
-                        .fileStoreId(fileStoreId)
-                        .id(UUID.randomUUID().toString())
-                        .build();
-                documents.add(document);
+
+                if(!StringUtils.isEmpty(fileStoreId) && !fileStoreId.equalsIgnoreCase("null")
+                    && fileStoreId.length()<=64){
+                    Document document = Document.builder()
+                            .documentType(IMAGE_DOCUMENT_TYPE)
+                            .fileStoreId(fileStoreId)
+                            .id(UUID.randomUUID().toString())
+                            .build();
+                    documents.add(document);
+                }
             }
             workflow.setDocuments(documents);
         }
@@ -394,12 +398,18 @@ public class MigrationService {
         return workflow;
     }
 
-    private Map<String, Long> getActionUUidToSLAMap(List<ActionInfo> actionInfos){
+    private Map<String, Long> getActionUUidToSLAMap(List<ActionInfo> actionInfos, String serviceCode){
+
         Map<String, Long> uuidTOSLAMap = new HashMap<>();
+
+        if(!CollectionUtils.isEmpty(actionInfos))
+            return uuidTOSLAMap;
+
         actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
         int totalCount = actionInfos.size();
-        if(!CollectionUtils.isEmpty(actionInfos))
-            uuidTOSLAMap.put(actionInfos.get(0).getUuid(), config.getBusinessLevelSla());
+
+        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), serviceCodeToSLA.get(serviceCode));
+
         for(int i = 1; i < totalCount; i++){
 
             ActionInfo actionInfo = actionInfos.get(i);
