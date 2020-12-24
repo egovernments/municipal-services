@@ -39,7 +39,7 @@ public class AddressRowMapper implements ResultSetExtractor<List<Address>> {
                     .landmark(rs.getString("landmark"))
                     .city(rs.getString("city"))
                     .latitude(rs.getDouble("latitude"))
-                    .latitude(rs.getDouble("longitude"))
+                    .longitude(rs.getDouble("longitude"))
                     .auditDetails(auditDetails)
                     .build();
 
