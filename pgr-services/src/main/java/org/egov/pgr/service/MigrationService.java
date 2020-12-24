@@ -402,13 +402,13 @@ public class MigrationService {
 
         Map<String, Long> uuidTOSLAMap = new HashMap<>();
 
-        if(!CollectionUtils.isEmpty(actionInfos))
+        if(CollectionUtils.isEmpty(actionInfos))
             return uuidTOSLAMap;
 
         actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
         int totalCount = actionInfos.size();
 
-        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), serviceCodeToSLA.get(serviceCode));
+        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), (serviceCodeToSLA.get(serviceCode)!=null)?serviceCodeToSLA.get(serviceCode):423000000l);
 
         for(int i = 1; i < totalCount; i++){
 
