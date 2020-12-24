@@ -197,7 +197,7 @@ public class MigrationService {
             });
 
 
-            service.setApplicationStatus(oldToNewStatus.get(actionInfos.get(0).getStatus()));
+            service.setApplicationStatus(oldToNewStatus.get(serviceV1.getStatus().toString()));
             ProcessInstanceRequest processInstanceRequest = ProcessInstanceRequest.builder().processInstances(workflows).build();
             ServiceRequest serviceRequest = ServiceRequest.builder().service(service).build();
             //log.info("Pushing service request: " + serviceRequest);
