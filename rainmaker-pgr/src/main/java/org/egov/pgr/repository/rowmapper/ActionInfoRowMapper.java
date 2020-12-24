@@ -62,6 +62,7 @@ public class ActionInfoRowMapper implements ResultSetExtractor<List<ActionInfo>>
                     .status(rs.getString("status"))
                     .assignee(rs.getString("assignee"))
                     .media(media)
+                    .comment(rs.getString("comments"))
                     .build();
             actionInfoList.add(actionInfo);
         }
