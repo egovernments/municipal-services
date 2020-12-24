@@ -2,6 +2,7 @@ package org.egov.pgr.service;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.User;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
@@ -17,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -230,6 +230,20 @@ public class MigrationService {
         String source = (!ObjectUtils.isEmpty(serviceV1.getSource())) ? serviceV1.getSource().toString() : null;
         String rating = serviceV1.getRating();
 
+        String feedback = serviceV1.getFeedback();
+        String addressInService = serviceV1.getAddress();
+        String landmark = serviceV1.getLandmark();
+
+        Map<String, Object> additionalDetailMap = new HashMap<>();
+
+        if(!StringUtils.isEmpty(feedback))
+            additionalDetailMap.put("feedback", feedback);
+
+        if(!StringUtils.isEmpty(addressInService))
+            additionalDetailMap.put("address", addressInService);
+
+        if(!StringUtils.isEmpty(landmark))
+            additionalDetailMap.put("landmark", landmark);
 
         /**
          * AccountId is id, not uuid in old pgr. Mapping has to fetched
@@ -280,9 +294,14 @@ public class MigrationService {
                 .auditDetails(auditDetails)
                 .build();
 
+        if(!CollectionUtils.isEmpty(additionalDetailMap))
+            service.setAdditionalDetail(additionalDetailMap);
+
         if (org.apache.commons.lang3.StringUtils.isNumeric(rating)) {
             service.setRating(Integer.parseInt(rating));
         }
+
+
 
 
         return service;
@@ -408,7 +427,7 @@ public class MigrationService {
         actionInfos.sort(Comparator.comparing(ActionInfo::getWhen));
         int totalCount = actionInfos.size();
 
-        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), (serviceCodeToSLA.get(serviceCode)!=null)?serviceCodeToSLA.get(serviceCode):423000000l);
+        uuidTOSLAMap.put(actionInfos.get(0).getUuid(), (serviceCodeToSLA.get(serviceCode)!=null)?serviceCodeToSLA.get(serviceCode):432000000l);
 
         for(int i = 1; i < totalCount; i++){
 
