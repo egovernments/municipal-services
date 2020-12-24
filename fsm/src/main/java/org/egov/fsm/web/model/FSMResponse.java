@@ -2,63 +2,64 @@ package org.egov.fsm.web.model;
 
 import java.util.List;
 import java.util.Objects;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
-import org.egov.common.contract.response.ResponseInfo;
-import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.Workflow;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest;
+import org.egov.fsm.web.model.idgen.IdRequest;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest.IdGenerationRequestBuilder;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ResponseInfo;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 
 /**
  * Response of the FSM
  */
-
 @Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
-
-/**
- * Contains the ResponseHeader and the created/updated property
- */
-@ApiModel(description = "Contains the ResponseHeader and the created/updated property")
-
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:52:32.717Z[GMT]")
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-@Getter
-@Setter
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class FSMResponse   {
-  @JsonProperty("ResponseInfo")
+  @JsonProperty("responseInfo")
   private ResponseInfo responseInfo = null;
 
   @JsonProperty("fsm")
-  private List<FSM> fsm = null;
+  private FSM fsm = null;
 
   @JsonProperty("workflow")
   private Workflow workflow = null;
 
- 
+  public FSMResponse responseInfo(ResponseInfo responseInfo) {
+    this.responseInfo = responseInfo;
+    return this;
+  }
 
   /**
    * Get responseInfo
    * @return responseInfo
    **/
- 
-     
+      @NotNull
 
-  
+    @Valid
+    public ResponseInfo getResponseInfo() {
+    return responseInfo;
+  }
 
-  public FSMResponse fsm(List<FSM> fsm) {
+  public void setResponseInfo(ResponseInfo responseInfo) {
+    this.responseInfo = responseInfo;
+  }
+
+  public FSMResponse fsm(FSM fsm) {
     this.fsm = fsm;
     return this;
   }
@@ -67,10 +68,16 @@ public class FSMResponse   {
    * Get fsm
    * @return fsm
    **/
-  
       @NotNull
 
-   
+    @Valid
+    public FSM getFsm() {
+    return fsm;
+  }
+
+  public void setFsm(FSM fsm) {
+    this.fsm = fsm;
+  }
 
   public FSMResponse workflow(Workflow workflow) {
     this.workflow = workflow;
@@ -81,7 +88,6 @@ public class FSMResponse   {
    * Get workflow
    * @return workflow
    **/
-  
   
     @Valid
     public Workflow getWorkflow() {

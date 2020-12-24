@@ -1,4 +1,4 @@
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.notification;
 
 import javax.validation.constraints.NotNull;
 

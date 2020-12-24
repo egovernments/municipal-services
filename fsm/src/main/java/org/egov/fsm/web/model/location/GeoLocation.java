@@ -1,29 +1,27 @@
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.location;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * GeoLocation
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
-
-
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-06-23T05:54:07.373Z[GMT]")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class GeoLocation   {
+	  @JsonProperty("id")
+	  private String id = null;	
   @JsonProperty("latitude")
   private Double latitude = null;
 
@@ -33,6 +31,24 @@ public class GeoLocation   {
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
 
+  public GeoLocation id(String id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * latitude of the address
+   * @return latitude
+  **/
+  @ApiModelProperty(value = "latitude of the address")
+  
+    public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
   public GeoLocation latitude(Double latitude) {
     this.latitude = latitude;
     return this;
@@ -41,8 +57,8 @@ public class GeoLocation   {
   /**
    * latitude of the address
    * @return latitude
-   **/
-  
+  **/
+  @ApiModelProperty(value = "latitude of the address")
   
     public Double getLatitude() {
     return latitude;
@@ -60,8 +76,8 @@ public class GeoLocation   {
   /**
    * longitude of the address
    * @return longitude
-   **/
-  
+  **/
+  @ApiModelProperty(value = "longitude of the address")
   
     public Double getLongitude() {
     return longitude;
@@ -79,8 +95,8 @@ public class GeoLocation   {
   /**
    * Json object to capture any extra information which is not accommodated by model
    * @return additionalDetails
-   **/
-  
+  **/
+  @ApiModelProperty(value = "Json object to capture any extra information which is not accommodated by model")
   
     public Object getAdditionalDetails() {
     return additionalDetails;

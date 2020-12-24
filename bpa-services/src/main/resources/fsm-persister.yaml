@@ -1,0 +1,123 @@
+serviceMaps:
+ serviceName: fsm
+ mappings:
+ - version: 1.0
+   description: Persists FSM Application details in eg_fsm_application  table
+   fromTopic: save-fsm-application
+   isTransaction: true
+   queryMaps:
+
+       - query: INSERT INTO public.eg_fsm_pit_detail( id, tenantid, height, length, width, distancefromroad,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+         basePath: Fsm.pitDetail
+         jsonMaps:
+          - jsonPath: $.Fsm.pitDetail.id
+          
+          - jsonPath: $.Fsm.pitDetail.tenantId
+
+          - jsonPath: $.Fsm.pitDetail.height
+          
+          - jsonPath: $.Fsm.pitDetail.length
+          
+          - jsonPath: $.Fsm.pitDetail.width
+
+          - jsonPath: $.Fsm.pitDetail.distanceFromRoad
+
+          - jsonPath: $.Fsm.pitDetail.auditDetails.createdBy
+
+          - jsonPath: $.Fsm.pitDetail.auditDetails.lastModifiedBy
+
+          - jsonPath: $.Fsm.pitDetail.auditDetails.createdTime
+
+          - jsonPath: $.Fsm.pitDetail.auditDetails.lastModifiedTime
+
+
+       - query: INSERT INTO public.eg_fsm_application( id, applicationno, tenantid, additionaldetails, accountid, description, applicationstatus, source, sanitationtype, propertyusage, nooftrips, status, vehicle_id, pit_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: Fsm.*
+         jsonMaps:
+          - jsonPath: $.Fsm.id
+
+          - jsonPath: $.Fsm.applicationNo
+          
+          - jsonPath: $.Fsm.tenantId
+
+          - jsonPath: $.Fsm.additionalDetails
+            type: JSON
+            dbType: JSONB
+          
+          - jsonPath: $.Fsm.accountId
+
+          - jsonPath: $.Fsm.description
+          
+          - jsonPath: $.Fsm.applicationStatus
+          
+          - jsonPath: $.Fsm.source
+          
+          - jsonPath: $.Fsm.sanitationtype
+          
+          - jsonPath: $.Fsm.propertyUsage
+          
+          - jsonPath: $.Fsm.noOfTrips
+          
+          - jsonPath: $.Fsm.status
+          
+          - jsonPath: $.Fsm.vehicleId
+          
+          - jsonPath: $.Fsm.pitDetail.id
+
+          - jsonPath: $.Fsm.auditDetails.createdBy
+
+          - jsonPath: $.Fsm.auditDetails.lastModifiedBy
+
+          - jsonPath: $.Fsm.auditDetails.createdTime
+
+          - jsonPath: $.Fsm.auditDetails.lastModifiedTime
+          
+          
+       - query: INSERT INTO public.eg_fsm_address( id, tenantid, doorno, plotno, landmark, city, district, region, state, country, locality, pincode, additiondetails, buildingname, street, fsm_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: Fsm.address.*
+         jsonMaps:
+          - jsonPath: $.Fsm.address.id
+
+          - jsonPath: $.Fsm.address.tenantId
+
+          - jsonPath: $.Fsm.address.doorNo
+
+          - jsonPath: $.Fsm.address.plotNo
+
+          - jsonPath: $.Fsm.address.landmark
+
+          - jsonPath: $.Fsm.address.city
+
+          - jsonPath: $.Fsm.address.district
+
+          - jsonPath: $.Fsm.address.region
+
+          - jsonPath: $.Fsm.address.state
+
+          - jsonPath: $.Fsm.address.country
+
+          - jsonPath: $.Fsm.address.locality
+
+          - jsonPath: $.Fsm.address.pincode
+
+          - jsonPath: $.BPA.documents.*.additionalDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.Fsm.address.buildingName
+
+          - jsonPath: $.Fsm.address.street
+
+          - jsonPath: $.Fsm.id
+
+          - jsonPath: $.Fsm.auditDetails.createdBy
+
+          - jsonPath: $.Fsm.auditDetails.lastModifiedBy
+
+          - jsonPath: $.Fsm.auditDetails.createdTime
+
+          - jsonPath: $.Fsm.auditDetails.lastModifiedTime
+
+  
+
+

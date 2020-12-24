@@ -2,6 +2,7 @@ package org.egov.fsm.service;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.repository.FSMRepository;
+import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.validator.FSMValidator;
@@ -42,6 +43,9 @@ public class FSMService {
 	
 	@Autowired
 	private WorkflowService workflowService;
+	
+	@Autowired
+	private UserService userService;
 	
 	@Autowired
 	private FSMRepository repository;

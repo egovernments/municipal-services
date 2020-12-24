@@ -1,4 +1,4 @@
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.location;
 
 import java.util.ArrayList;
 import java.util.List;

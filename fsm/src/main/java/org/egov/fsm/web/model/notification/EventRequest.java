@@ -38,7 +38,7 @@
  *  In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  */
 
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.notification;
 
 import java.util.List;
 

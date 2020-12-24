@@ -38,9 +38,7 @@ public class FSMController {
 	public ResponseEntity<FSMResponse> create(@Valid @RequestBody FSMRequest fsmRequest) {
 		fsmUtil.defaultJsonPathConfig();
 		FSM fsm = fsmService.create(fsmRequest);
-		List<FSM> fsmm = new ArrayList<FSM>();
-		fsmm.add(fsm);
-		FSMResponse response = FSMResponse.builder().fsm(fsmm)
+		FSMResponse response = FSMResponse.builder().fsm(fsm)
 				
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(fsmRequest.getRequestInfo(), true))
 				.build();

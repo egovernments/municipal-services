@@ -1,7 +1,8 @@
 package org.egov.fsm.web.model.user;
 
-import org.egov.fsm.web.model.UserInfo;
+
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,6 +19,6 @@ public class CreateUserRequest {
     private RequestInfo requestInfo;
 
     @JsonProperty("user")
-    private UserInfo user;
+    private User user; 
 
 }

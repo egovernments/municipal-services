@@ -60,13 +60,20 @@ public class FSMUtil {
 			}
 		});
 	}
-	public AuditDetails getAuditDetails(User user, Boolean isCreate) {
+	/**
+	 * Method to return auditDetails for create/update flows
+	 *
+	 * @param by
+	 * @param isCreate
+	 * @return AuditDetails
+	 */
+	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
 		Long time = System.currentTimeMillis();
 		if (isCreate)
-			return AuditDetails.builder().createdTime(time).lastModifiedTime(time)
+			return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time)
 					.build();
 		else
-			return AuditDetails.builder().lastModifiedTime(time).build();
+			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
 	}
 	/**
 	 * makes mdms call with the given criteria and reutrn mdms data
@@ -107,11 +114,19 @@ public class FSMUtil {
 	}
 	public List<ModuleDetail> getFSMModuleRequest() {
 
+		// filter to only get code field from master data
+				final String filterCode = "$.[?(@.active==true)].code";
 		// master details for FSM module
 		List<MasterDetail> fsmMasterDtls = new ArrayList<>();
 
-		// filter to only get code field from master data
-		final String filterCode = "$.[?(@.active==true)].code";
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.APPLICATION_CHANNEL).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
+		
+		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
+				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
+		
+		
+		
 
 
 
@@ -123,10 +138,10 @@ public class FSMUtil {
 		ModuleDetail propertyMasterMDtl = ModuleDetail.builder().masterDetails(propertyMasterDetails)
 				.moduleName(FSMConstants.PROPERTY_MASTER_MODULE).build();
 		
-		// master details for NOC module
+		
 
 
-		return Arrays.asList(propertyMasterMDtl);
+		return Arrays.asList(propertyMasterMDtl,fsmMasterMDtl);
 
 	}
 

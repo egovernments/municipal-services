@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
@@ -32,6 +33,32 @@ public class FSMValidator {
 
 	public void validateCreate(FSMRequest fsmRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
+		FSM fsm = fsmRequest.getFsm();
+		if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN)) {
+			
+			// when user is created for the citizen but name is mepty
+			if( fsm.getCitizen() != null && StringUtils.isEmpty(fsm.getCitizen().getName()) && StringUtils.isEmpty(fsmRequest.getRequestInfo().getUserInfo().getName()) ) {
+				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
+			}
+			// ui does not pass citizen in fsm but userInfo in the request is citizen
+			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
+				fsm.setCitizen( fsmRequest.getRequestInfo().getUserInfo());
+			}
+		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
+			User applicant = fsm.getCitizen();
+			if( applicant == null ||  StringUtils.isEmpty(applicant.getName()) || StringUtils.isEmpty(applicant.getMobileNumber())) {
+				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
+			}
+			mdmsValidator.validateApplicationChannel(fsm.getSource());
+			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+		}else {
+			// incase of anonymous user, citizen is mandatory
+			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
+				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
+			}
+		}
+		
+		
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 	}
 

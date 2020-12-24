@@ -1,17 +1,20 @@
 package org.egov.fsm.web.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.fsm.web.model.Error;
+import org.egov.fsm.web.model.FSMResponse.FSMResponseBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -19,20 +22,21 @@ import javax.validation.constraints.*;
 /**
  * All APIs will return ErrorRes in case of failure which will carry ResponseHeader as metadata and Error object as actual representation of error. In case of bulk apis, some apis may chose to return the array of Error objects to indicate individual failure.
  */
-
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ErrorRes   {
-  @JsonProperty("ResponseHeader")
-  private String responseHeader = null;
+  @JsonProperty("ResponseInfo")
+  private ResponseInfo responseHeader = null;
 
   @JsonProperty("Errors")
   @Valid
   private List<Error> errors = null;
 
-  public ErrorRes responseHeader(String responseHeader) {
+  public ErrorRes responseHeader(ResponseInfo responseHeader) {
     this.responseHeader = responseHeader;
     return this;
   }
@@ -41,15 +45,14 @@ public class ErrorRes   {
    * Get responseHeader
    * @return responseHeader
    **/
-  
       @NotNull
 
     @Valid
-    public String getResponseHeader() {
+    public ResponseInfo getResponseHeader() {
     return responseHeader;
   }
 
-  public void setResponseHeader(String responseHeader) {
+  public void setResponseHeader(ResponseInfo responseHeader) {
     this.responseHeader = responseHeader;
   }
 
@@ -70,8 +73,7 @@ public class ErrorRes   {
    * Error response array corresponding to Request Object array. In case of single object submission or _search related paths this may be an array of one error element
    * @return errors
    **/
-  
-      @Valid
+   @Valid
     public List<Error> getErrors() {
     return errors;
   }

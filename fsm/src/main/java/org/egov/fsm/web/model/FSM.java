@@ -1,18 +1,23 @@
 package org.egov.fsm.web.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.annotation.JsonCreator;
 
-import org.springframework.validation.annotation.Validated;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
+import org.egov.fsm.web.model.location.Address;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
+import org.egov.fsm.web.model.AuditDetails;
+import org.egov.fsm.web.model.PitDetail;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest;
+import org.egov.fsm.web.model.idgen.IdRequest;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest.IdGenerationRequestBuilder;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -20,14 +25,15 @@ import javax.validation.constraints.*;
 /**
  * Request schema of FSM application.  
  */
-
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class FSM   {
   @JsonProperty("citizen")
-  private UserInfo citizen = null;
+  private User citizen = null;
 
   @JsonProperty("id")
   private String id = null;
@@ -44,8 +50,8 @@ public class FSM   {
   @JsonProperty("accountId")
   private String accountId = null;
 
-  @JsonProperty("additionalDetail")
-  private Object additionalDetail = null;
+  @JsonProperty("additionalDetails")
+  private Object additionalDetails = null;
 
   @JsonProperty("applicationStatus")
   private String applicationStatus = null;
@@ -107,7 +113,7 @@ public class FSM   {
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
 
-  public FSM citizen(UserInfo citizen) {
+  public FSM citizen(User citizen) {
     this.citizen = citizen;
     return this;
   }
@@ -117,13 +123,12 @@ public class FSM   {
    * @return citizen
    **/
   
-  
     @Valid
-    public UserInfo getCitizen() {
+    public User getCitizen() {
     return citizen;
   }
 
-  public void setCitizen(UserInfo citizen) {
+  public void setCitizen(User citizen) {
     this.citizen = citizen;
   }
 
@@ -136,7 +141,6 @@ public class FSM   {
    * The server generated unique ID(UUID).
    * @return id
    **/
-  
   
   @Size(min=2,max=64)   public String getId() {
     return id;
@@ -155,7 +159,6 @@ public class FSM   {
    * Unique identifier of the tenant.
    * @return tenantId
    **/
-  
       @NotNull
 
   @Size(min=2,max=64)   public String getTenantId() {
@@ -176,7 +179,6 @@ public class FSM   {
    * @return applicationNo
    **/
   
-  
   @Size(min=2,max=128)   public String getApplicationNo() {
     return applicationNo;
   }
@@ -194,7 +196,6 @@ public class FSM   {
    * Additional information or description of the application
    * @return description
    **/
-  
   
   @Size(min=2,max=256)   public String getDescription() {
     return description;
@@ -214,7 +215,6 @@ public class FSM   {
    * @return accountId
    **/
   
-  
   @Size(min=2,max=64)   public String getAccountId() {
     return accountId;
   }
@@ -223,23 +223,22 @@ public class FSM   {
     this.accountId = accountId;
   }
 
-  public FSM additionalDetail(Object additionalDetail) {
-    this.additionalDetail = additionalDetail;
+  public FSM additionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
     return this;
   }
 
   /**
    * This is the json object that will carry the actual input (whereever the metadata requries input). Structure should be same as the schema definition provided in the metadata of the service (schema compliance check to be performed at client/server)
-   * @return additionalDetail
+   * @return additionalDetails
    **/
-  
-  
-    public Object getAdditionalDetail() {
-    return additionalDetail;
+ 
+    public Object getadditionalDetails() {
+    return additionalDetails;
   }
 
-  public void setAdditionalDetail(Object additionalDetail) {
-    this.additionalDetail = additionalDetail;
+  public void setadditionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
   }
 
   public FSM applicationStatus(String applicationStatus) {
@@ -251,7 +250,6 @@ public class FSM   {
    * The current status of the service request.
    * @return applicationStatus
    **/
-  
   
     public String getApplicationStatus() {
     return applicationStatus;
@@ -270,8 +268,7 @@ public class FSM   {
    * Source mdms master data. Which captures the source of the service request(ex:- whatsapp, ivr, Swachhata etc)
    * @return source
    **/
-  
-  
+ 
   @Size(min=2,max=64)   public String getSource() {
     return source;
   }
@@ -289,8 +286,8 @@ public class FSM   {
    * This is the master data defined in MDMS
    * @return sanitationtype
    **/
-  
-  
+      @NotNull
+
   @Size(min=2,max=64)   public String getSanitationtype() {
     return sanitationtype;
   }
@@ -308,8 +305,8 @@ public class FSM   {
    * This is the master data defined in MDMS
    * @return propertyUsage
    **/
-  
-  
+      @NotNull
+
   @Size(min=2,max=64)   public String getPropertyUsage() {
     return propertyUsage;
   }
@@ -327,7 +324,6 @@ public class FSM   {
    * Total no of trips reqired for desludging the PIT
    * @return noOfTrips
    **/
-  
   
     public Integer getNoOfTrips() {
     return noOfTrips;
@@ -347,7 +343,6 @@ public class FSM   {
    * @return status
    **/
   
-  
     public StatusEnum getStatus() {
     return status;
   }
@@ -365,7 +360,6 @@ public class FSM   {
    * Unique Id of the vehicle which got assigned to the perticular application
    * @return vehicleId
    **/
-  
   
   @Size(min=2,max=64)   public String getVehicleId() {
     return vehicleId;
@@ -385,7 +379,6 @@ public class FSM   {
    * @return pitDetail
    **/
   
-  
     @Valid
     public PitDetail getPitDetail() {
     return pitDetail;
@@ -404,8 +397,6 @@ public class FSM   {
    * Get address
    * @return address
    **/
-  
-  
     @Valid
     public Address getAddress() {
     return address;
@@ -424,7 +415,6 @@ public class FSM   {
    * Get auditDetails
    * @return auditDetails
    **/
-  
   
     @Valid
     public AuditDetails getAuditDetails() {
@@ -451,7 +441,7 @@ public class FSM   {
         Objects.equals(this.applicationNo, FSM.applicationNo) &&
         Objects.equals(this.description, FSM.description) &&
         Objects.equals(this.accountId, FSM.accountId) &&
-        Objects.equals(this.additionalDetail, FSM.additionalDetail) &&
+        Objects.equals(this.additionalDetails, FSM.additionalDetails) &&
         Objects.equals(this.applicationStatus, FSM.applicationStatus) &&
         Objects.equals(this.source, FSM.source) &&
         Objects.equals(this.sanitationtype, FSM.sanitationtype) &&
@@ -466,7 +456,7 @@ public class FSM   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(citizen, id, tenantId, applicationNo, description, accountId, additionalDetail, applicationStatus, source, sanitationtype, propertyUsage, noOfTrips, status, vehicleId, pitDetail, address, auditDetails);
+    return Objects.hash(citizen, id, tenantId, applicationNo, description, accountId, additionalDetails, applicationStatus, source, sanitationtype, propertyUsage, noOfTrips, status, vehicleId, pitDetail, address, auditDetails);
   }
 
   @Override
@@ -480,7 +470,7 @@ public class FSM   {
     sb.append("    applicationNo: ").append(toIndentedString(applicationNo)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    accountId: ").append(toIndentedString(accountId)).append("\n");
-    sb.append("    additionalDetail: ").append(toIndentedString(additionalDetail)).append("\n");
+    sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
     sb.append("    applicationStatus: ").append(toIndentedString(applicationStatus)).append("\n");
     sb.append("    source: ").append(toIndentedString(source)).append("\n");
     sb.append("    sanitationtype: ").append(toIndentedString(sanitationtype)).append("\n");

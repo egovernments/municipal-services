@@ -1,29 +1,33 @@
 package org.egov.fsm.web.model;
 
+import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.egov.fsm.web.model.Document;
+import org.egov.fsm.web.model.FSMResponse.FSMResponseBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * FSM application object to capture the details of land, land owners, and address of the land.
+ * BPA application object to capture the details of land, land owners, and address of the land.
  */
-
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
-
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Workflow   {
   @JsonProperty("action")
   private String action = null;
@@ -48,7 +52,6 @@ public class Workflow   {
    * Action on the application in certain
    * @return action
    **/
-  
   
   @Size(min=1,max=64)   public String getAction() {
     return action;
@@ -76,7 +79,6 @@ public class Workflow   {
    * @return assignes
    **/
   
-  
     public List<String> getAssignes() {
     return assignes;
   }
@@ -94,7 +96,6 @@ public class Workflow   {
    * Unique Identifier scrutinized number
    * @return comments
    **/
-  
   
   @Size(min=1,max=64)   public String getComments() {
     return comments;
@@ -121,7 +122,6 @@ public class Workflow   {
    * Attach the workflow varification documents.
    * @return varificationDocuments
    **/
-  
       @Valid
     public List<Document> getVarificationDocuments() {
     return varificationDocuments;

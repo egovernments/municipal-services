@@ -1,6 +1,5 @@
 package org.egov.fsm.web.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,15 +9,12 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-
+import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.Workflow;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest;
+import org.egov.fsm.web.model.idgen.IdRequest;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest.IdGenerationRequestBuilder;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.fsm.web.model.RequestInfoWrapper.RequestInfoWrapperBuilder;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -26,13 +22,12 @@ import javax.validation.constraints.*;
 /**
  * Request object for FSM
  */
-
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class FSMRequest   {
   @JsonProperty("RequestInfo")
   private RequestInfo RequestInfo = null;
@@ -52,7 +47,6 @@ public class FSMRequest   {
    * Get requestInfo
    * @return requestInfo
    **/
-  
       @NotNull
 
     @Valid
@@ -73,7 +67,6 @@ public class FSMRequest   {
    * Get fsm
    * @return fsm
    **/
-  
       @NotNull
 
     @Valid
@@ -94,7 +87,6 @@ public class FSMRequest   {
    * Get workflow
    * @return workflow
    **/
-  
   
     @Valid
     public Workflow getWorkflow() {
@@ -148,5 +140,3 @@ public class FSMRequest   {
     return o.toString().replace("\n", "\n    ");
   }
 }
-
-

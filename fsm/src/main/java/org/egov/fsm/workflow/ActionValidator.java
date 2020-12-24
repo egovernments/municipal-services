@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.fsm.util.FSMConstants;
+import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.workflow.Action;
@@ -94,7 +95,7 @@ public class ActionValidator {
 		
 		if( !workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService)) {
 			if(fsm.getId() == null) {
-				errorMap.put(FSMConstants.INVALID_UPDATE, "Id of Application cannot be null");
+				errorMap.put(FSMErrorConstants.INVALID_UPDATE, "Id of Application cannot be null");
 			}
 			
 //			 if(!CollectionUtils.isEmpty(fsm.getDocuments())){

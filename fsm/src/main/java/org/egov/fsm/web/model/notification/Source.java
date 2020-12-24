@@ -1,4 +1,4 @@
-package  org.egov.fsm.web.model;
+package  org.egov.fsm.web.model.notification;
 
 import java.util.Objects;
 import io.swagger.annotations.ApiModel;

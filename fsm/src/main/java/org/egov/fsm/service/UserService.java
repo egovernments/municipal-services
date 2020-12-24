@@ -4,26 +4,40 @@ package org.egov.fsm.service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
 import org.egov.fsm.util.FSMConstants;
+import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.user.CreateUserRequest;
 import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.user.UserSearchRequest;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class UserService {
 
 	@Autowired
@@ -36,6 +50,146 @@ public class UserService {
 	private ObjectMapper mapper;
 
 
+	public void manageApplicant(FSMRequest fsmRequest) {
+		FSM fsm = fsmRequest.getFsm();
+		 @Valid RequestInfo requestInfo = fsmRequest.getRequestInfo();
+		 User applicant = fsm.getCitizen();
+			UserDetailResponse userDetailResponse = null;
+			UserDetailResponse applicantDetailResponse = null;
+			if (applicant.getMobileNumber() != null) {
+				if (applicant.getTenantId() == null) {
+					applicant.setTenantId(fsm.getTenantId().split("\\.")[0]);
+				}
+
+				userDetailResponse = userExists(applicant, requestInfo);
+				
+				if (userDetailResponse != null || !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
+					
+					if( userDetailResponse.getUser().size() > 1 ){
+						Boolean foundUser = Boolean.FALSE;
+						for( int j=0;j<userDetailResponse.getUser().size();j++) {
+							User user = userDetailResponse.getUser().get(j);
+							if(!user.getUserName().equalsIgnoreCase(user.getMobileNumber()) && user.getName().equalsIgnoreCase(applicant.getName())){
+								// found user with mobilenumber and username not same and name as equal to the applicnat name provided by ui
+								// then consider that user as applicant
+								applicant  = user;
+								foundUser = Boolean.TRUE;
+								break;
+							}
+						}
+						// users exists with mobile number but non of them have the same name, then create new user
+						if( foundUser == Boolean.FALSE) {
+							applicantDetailResponse = createApplicant(applicant,fsmRequest.getRequestInfo());
+							applicant = applicantDetailResponse.getUser().get(0);
+							
+						}
+					}else {
+						// User exists but only one user with the mobile number and username as same, So create new user
+						
+						applicantDetailResponse = createApplicant(applicant,fsmRequest.getRequestInfo());
+						applicant = applicantDetailResponse.getUser().get(0);
+						
+					}
+					
+					
+				}else {
+					// User with mobile number ifself not found then create new user and consider the new user as applicant.
+					applicantDetailResponse = createApplicant(applicant,fsmRequest.getRequestInfo());
+					applicant = applicantDetailResponse.getUser().get(0);
+				}
+				
+				fsm.setCitizen(applicant);
+				
+			} else {
+				log.debug("MobileNo is not existed in Application.");
+				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR, "MobileNo is mandatory for ownerInfo");
+			}
+
+	}
+	/**
+	 * create user for applicant
+	 * @param applicant
+	 * @param requestInfo
+	 * @return
+	 */
+	private UserDetailResponse createApplicant(User applicant, RequestInfo requestInfo) {
+		Role role = getCitizenRole();
+		addUserDefaultFields(applicant.getTenantId(), role, applicant);
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
+				.append(config.getUserCreateEndpoint());
+		setUserName(applicant);
+		applicant.setType(FSMConstants.CITIZEN);
+		UserDetailResponse userDetailResponse = userCall(new CreateUserRequest(requestInfo, applicant), uri);
+		log.debug("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+		return userDetailResponse;
+	}
+
+	/**
+	 * Creates citizen role
+	 * 
+	 * @return Role object for citizen
+	 */
+	private Role getCitizenRole() {
+		Role role = new Role();
+		role.setCode(FSMConstants.CITIZEN);
+		role.setName("Citizen");
+		return role;
+	}
+
+	/**
+	 * Checks if the user exists in the database
+	 * 
+	 * @param applicant
+	 *            The applicant from the FSM Application
+	 * @param requestInfo
+	 *            The requestInfo of the request
+	 * @return The search response from the user service
+	 */
+	private UserDetailResponse userExists(User applicant, @Valid RequestInfo requestInfo) {
+
+		UserSearchRequest userSearchRequest = new UserSearchRequest();
+		userSearchRequest.setTenantId(applicant.getTenantId().split("\\.")[0]);
+		userSearchRequest.setMobileNumber(applicant.getMobileNumber());
+		if(!StringUtils.isEmpty(applicant.getUuid())) {
+			List<String> uuids = new ArrayList<String>();
+			uuids.add(applicant.getUuid());
+			userSearchRequest.setUuid(uuids);
+		}
+
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+		return userCall(userSearchRequest, uri);
+	}
+
+	/**
+	 * Sets the username as uuid
+	 * 
+	 * @param owner
+	 *            The owner to whom the username is to assigned
+	 */
+	private void setUserName(User owner) {
+		owner.setUserName(UUID.randomUUID().toString());
+	}
+
+
+
+	/**
+	 * Sets the role,type,active and tenantId for a Citizen
+	 * 
+	 * @param tenantId
+	 *            TenantId of the property
+	 * @param role 
+	 * @param role
+	 *            The role of the user set in this case to CITIZEN
+	 * @param applicant
+	 *            The user whose fields are to be set
+	 */
+	private void addUserDefaultFields(String tenantId, Role role, User applicant) {
+//		applicant.setActive(true);
+		applicant.setTenantId(tenantId);
+		applicant.setRoles(Collections.singletonList(role));
+		applicant.setType(FSMConstants.CITIZEN);
+	}
+	
 	/**
 	 * Returns UserDetailResponse by calling user service with given uri and object
 	 * 
@@ -143,4 +297,6 @@ public class UserService {
 			userSearchRequest.setUuid(criteria.getOwnerIds());
 		return userSearchRequest;
 	}
+	
+	
 }

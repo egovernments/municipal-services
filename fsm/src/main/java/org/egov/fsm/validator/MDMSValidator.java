@@ -25,7 +25,7 @@ public class MDMSValidator {
 	public void validateMdmsData(FSMRequest fsmRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { FSMConstants.PROPERTY_TYPE };
+		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE };
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -43,7 +43,7 @@ public class MDMSValidator {
 	}
 	public Map<String, List<String>> getAttributeValues(Object mdmsData) {
 
-		List<String> modulepaths = Arrays.asList(FSMConstants.PROPERTY_MASTER_JSONPATH_CODE);
+		List<String> modulepaths = Arrays.asList(FSMConstants.PROPERTY_MASTER_JSONPATH_CODE,FSMConstants.FSM_JSONPATH_CODE);
 		final Map<String, List<String>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
@@ -57,12 +57,51 @@ public class MDMSValidator {
 		return mdmsResMap;
 	}
 	
+	/**
+	 * validate the existnance of provided property type in MDMS
+	 * @param propertyType
+	 * @throws CustomException
+	 */
 	public void validatePropertyType(String propertyType ) throws CustomException{
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
 		if( !this.mdmsResMap.get(FSMConstants.PROPERTY_TYPE).contains(propertyType) ) {
-			errorMap.put(FSMConstants.INVALID_PROPERTY_TYPE," Property Type is invalid");
+			errorMap.put(FSMErrorConstants.INVALID_PROPERTY_TYPE," Property Type is invalid");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+	
+	/**
+	 * validate the existnance of provided ApplicationChannel  in MDMS
+	 * @param propertyType
+	 * @throws CustomException
+	 */
+	public void validateApplicationChannel(String applicationChannel ) throws CustomException{
+		
+		Map<String, String> errorMap = new HashMap<>();
+		
+		if( !this.mdmsResMap.get(FSMConstants.APPLICATION_CHANNEL).contains(applicationChannel) ) {
+			errorMap.put(FSMErrorConstants.INVALID_APPLICATION_CHANNEL," Application Channel is invalid");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+	}
+	
+	/**
+	 * validate the existnance of provided SanitationType in MDMS
+	 * @param propertyType
+	 * @throws CustomException
+	 */
+	public void validateOnSiteSanitationType(String applicationChannel ) throws CustomException{
+		
+		Map<String, String> errorMap = new HashMap<>();
+		
+		if( !this.mdmsResMap.get(FSMConstants.SANITATION_TYPE).contains(applicationChannel) ) {
+			errorMap.put(FSMErrorConstants.INVALID_SANITATION_TYPE," On Site SanitationType is invalid");
 		}
 
 		if (!errorMap.isEmpty())

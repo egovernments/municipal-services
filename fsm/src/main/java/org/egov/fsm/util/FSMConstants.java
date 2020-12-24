@@ -21,6 +21,8 @@ public class FSMConstants {
 	public static final String PROPERTY_MASTER_MODULE="PropertyTax";
 
 	public static final String NOTIFICATION_LOCALE = "en_IN";
+	
+	public static final String DRAFT="DRAFT";
 
 	// mdms path codes
 
@@ -28,16 +30,16 @@ public class FSMConstants {
 
 	public static final String COMMON_MASTER_JSONPATH_CODE = "$.MdmsRes.common-masters";
 	public static final String PROPERTY_MASTER_JSONPATH_CODE = "$.MdmsRes.PropertyTax";
+	
 
-	// error constants
-	public static final String INVALID_PROPERTY_TYPE ="INVALID_PROPERTY_TYPE";
-	public static final String INVALID_UPDATE ="Invlaid Update";
+
 	
 	
 	// mdms master names
 
 	public static final String PROPERTY_TYPE = "PropertyType";
-
+    public static final String APPLICATION_CHANNEL = "ApplicationChannel";
+    public static final String SANITATION_TYPE = "SanitationType";
 
 
 	// FINANCIAL YEAR

@@ -2,7 +2,7 @@ package org.egov.fsm.web.model.user;
 
 import java.util.List;
 
-import org.egov.fsm.web.model.UserInfo;
+import org.egov.common.contract.request.User;
 import org.egov.common.contract.response.ResponseInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,5 +20,5 @@ public class UserDetailResponse {
     ResponseInfo responseInfo;
 	
     @JsonProperty("user")
-    List<UserInfo> user;
+    List<User> user;
 }

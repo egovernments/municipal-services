@@ -1,35 +1,33 @@
 package org.egov.fsm.web.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
-
+import org.egov.common.contract.request.User;
+import org.egov.fsm.web.model.AuditDetails;
+import org.egov.fsm.web.model.location.Address;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+
 /**
  * cature the pit details 
  */
-
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-09T07:13:46.742Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-23T12:08:13.326Z[GMT]")
 
 
 public class PitDetail   {
   @JsonProperty("citizen")
-  private UserInfo citizen = null;
+  private User citizen = null;
 
   @JsonProperty("id")
   private String id = null;
 
+  @JsonProperty("tenantId")
+  private String tenantId = null;
+  
   @JsonProperty("height")
   private Double height = null;
 
@@ -45,7 +43,7 @@ public class PitDetail   {
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
 
-  public PitDetail citizen(UserInfo citizen) {
+  public PitDetail citizen(User citizen) {
     this.citizen = citizen;
     return this;
   }
@@ -55,13 +53,12 @@ public class PitDetail   {
    * @return citizen
    **/
   
-  
     @Valid
-    public UserInfo getCitizen() {
+    public User getCitizen() {
     return citizen;
   }
 
-  public void setCitizen(UserInfo citizen) {
+  public void setCitizen(User citizen) {
     this.citizen = citizen;
   }
 
@@ -74,7 +71,6 @@ public class PitDetail   {
    * The server generated unique ID(UUID).
    * @return id
    **/
-  
   
   @Size(min=2,max=64)   public String getId() {
     return id;
@@ -89,17 +85,35 @@ public class PitDetail   {
     return this;
   }
 
+  
+
   /**
-   * Hight of the PIT in meter
-   * @return hight
+   * Unique Identifier of the tenant to which user primarily belongs
+   * @return tenantId
    **/
   
-  
+      
+
+    public String getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(String tenantId) {
+    this.tenantId = tenantId;
+  }
+
+
+  /**
+   * Hight of the PIT in meter
+   * @return height
+   **/
+      @NotNull
+
     public Double getHeight() {
     return height;
   }
 
-  public void setHight(Double height) {
+  public void setHeight(Double height) {
     this.height = height;
   }
 
@@ -112,8 +126,8 @@ public class PitDetail   {
    * Length of the PIT in meter
    * @return length
    **/
-  
-  
+      @NotNull
+
     public Double getLength() {
     return length;
   }
@@ -131,8 +145,8 @@ public class PitDetail   {
    * Width of the PIT in meter
    * @return width
    **/
-  
-  
+      @NotNull
+
     public Double getWidth() {
     return width;
   }
@@ -150,8 +164,8 @@ public class PitDetail   {
    * Distance of the PIT from road in meter
    * @return distanceFromRoad
    **/
-  
-  
+      @NotNull
+
     public Double getDistanceFromRoad() {
     return distanceFromRoad;
   }
@@ -169,7 +183,6 @@ public class PitDetail   {
    * Get auditDetails
    * @return auditDetails
    **/
-  
   
     @Valid
     public AuditDetails getAuditDetails() {
@@ -211,7 +224,7 @@ public class PitDetail   {
     
     sb.append("    citizen: ").append(toIndentedString(citizen)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    hight: ").append(toIndentedString(height)).append("\n");
+    sb.append("    height: ").append(toIndentedString(height)).append("\n");
     sb.append("    length: ").append(toIndentedString(length)).append("\n");
     sb.append("    width: ").append(toIndentedString(width)).append("\n");
     sb.append("    distanceFromRoad: ").append(toIndentedString(distanceFromRoad)).append("\n");

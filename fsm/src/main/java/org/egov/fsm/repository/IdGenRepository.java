@@ -8,9 +8,9 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
-import org.egov.fsm.web.model.IdGenerationRequest;
-import org.egov.fsm.web.model.IdGenerationResponse;
-import org.egov.fsm.web.model.IdRequest;
+import org.egov.fsm.web.model.idgen.IdGenerationRequest;
+import org.egov.fsm.web.model.idgen.IdGenerationResponse;
+import org.egov.fsm.web.model.idgen.IdRequest;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;

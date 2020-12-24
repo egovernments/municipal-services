@@ -2,12 +2,13 @@ package org.egov.fsm.service;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
 import org.egov.fsm.util.FSMErrorConstants;
-import org.egov.fsm.web.model.Boundary;
+import org.egov.fsm.web.model.location.Boundary;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.RequestInfoWrapper;
@@ -49,7 +50,6 @@ public class BoundaryService {
 	 * @param hierarchyTypeCode
 	 *            HierarchyTypeCode of the boundaries
 	 */
-	@Autowired
 	public void getAreaType(FSMRequest request, String hierarchyTypeCode) {
 		if (request.getFsm() == null) {
 			return;
@@ -85,9 +85,9 @@ public class BoundaryService {
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		ArrayList<Boundary> boundaryResponse = context.read(fsm.getAddress().getLocality().getCode());
+		List<Boundary> boundaryResponse = context.read("$..boundary[?(@.code==\"{}\")]".replace("{}",fsm.getAddress().getLocality().getCode()));
 
-		if (!(boundaryResponse instanceof ArrayList) || CollectionUtils.isEmpty((ArrayList) boundaryResponse)) {
+		if (boundaryResponse != null &&  CollectionUtils.isEmpty((boundaryResponse) )) {
 			log.debug("The boundary data was not found");
 			throw new CustomException(FSMErrorConstants.BOUNDARY_MDMS_DATA_ERROR, "The boundary data was not found");
 		}

@@ -9,17 +9,20 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
+import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.repository.IdGenRepository;
+import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
-import org.egov.fsm.web.model.IdResponse;
+import org.egov.fsm.web.model.idgen.IdResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,6 +38,12 @@ public class EnrichmentService {
 	private BoundaryService boundaryService ;
 	
 	@Autowired
+	private FSMRepository repository ;
+
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
 	private FSMUtil fsmUtil;
 	/**
 	 * enrich the create FSM request with the required data
@@ -44,15 +53,39 @@ public class EnrichmentService {
 	public void enrichFSMCreateRequest(FSMRequest fsmRequest, Object mdmsData) {
 		//TODO add requied logic
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
-		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo(), true);
+		
+		userService.manageApplicant(fsmRequest);
+		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
+		
+		fsmRequest.getFsm().setApplicationStatus(FSMConstants.DRAFT);
+		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		fsmRequest.getFsm().setAuditDetails(auditDetails);
 		fsmRequest.getFsm().setId(UUID.randomUUID().toString());
 		
-		fsmRequest.getFsm().setAccountId(fsmRequest.getFsm().getAuditDetails().getCreatedBy());
+		fsmRequest.getFsm().setAccountId(fsmRequest.getFsm().getCitizen().getUuid());
 		
-		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
+		if (fsmRequest.getFsm().getAddress() != null) {
+			if (StringUtils.isEmpty(fsmRequest.getFsm().getAddress().getId()))
+				fsmRequest.getFsm().getAddress().setId(UUID.randomUUID().toString());
+			fsmRequest.getFsm().getAddress().setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmRequest.getFsm().getAddress().setAuditDetails(auditDetails);
+			if (fsmRequest.getFsm().getAddress().getGeoLocation() != null
+					&& StringUtils.isEmpty(fsmRequest.getFsm().getAddress().getGeoLocation().getId()))
+				fsmRequest.getFsm().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
+		}else {
+			throw new CustomException(FSMErrorConstants.INVALID_ADDRES," Address is mandatory");
+		}
+		
+		if(fsmRequest.getFsm().getPitDetail() != null) {
+			if (StringUtils.isEmpty(fsmRequest.getFsm().getPitDetail().getId()))
+				fsmRequest.getFsm().getPitDetail().setId(UUID.randomUUID().toString());
+			fsmRequest.getFsm().getPitDetail().setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmRequest.getFsm().getPitDetail().setAuditDetails(auditDetails);
+		}
+		
 		
 		setIdgenIds(fsmRequest);
+		
 	}
 	
 	/**
@@ -103,14 +136,10 @@ public class EnrichmentService {
 	public void enrichFSMUpdateRequest(FSMRequest fsmRequest, Object mdmsData) {
 		//TODO add requied logic
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
-		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo(), true);
+		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		fsmRequest.getFsm().setAuditDetails(auditDetails);
-		fsmRequest.getFsm().setId(UUID.randomUUID().toString());
-		
-		fsmRequest.getFsm().setAccountId(fsmRequest.getFsm().getAuditDetails().getCreatedBy());
-		
-		
-		setIdgenIds(fsmRequest);
+
+
 	}
 
 	/**

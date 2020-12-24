@@ -12,9 +12,9 @@ import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.producer.Producer;
 import org.egov.fsm.repository.ServiceRequestRepository;
 import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.EventRequest;
+import org.egov.fsm.web.model.notification.EventRequest;
 import org.egov.fsm.web.model.RequestInfoWrapper;
-import org.egov.fsm.web.model.SMSRequest;
+import org.egov.fsm.web.model.notification.SMSRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONArray;
@@ -208,7 +208,7 @@ public class NotificationUtil {
 	 * @param smsRequestList
 	 *            The list of SMSRequest to be sent
 	 */
-	public void sendSMS(List< org.egov.fsm.web.model.SMSRequest> smsRequestList, boolean isSMSEnabled) {
+	public void sendSMS(List< SMSRequest> smsRequestList, boolean isSMSEnabled) {
 		if (isSMSEnabled) {
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.debug("Messages from localization couldn't be fetched!");

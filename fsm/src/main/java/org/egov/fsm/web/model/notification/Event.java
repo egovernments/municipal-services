@@ -1,9 +1,9 @@
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.notification;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.egov.fsm.web.model.Source;
+import org.egov.fsm.web.model.notification.Source;
 import org.egov.fsm.web.model.Status;
 import org.egov.fsm.web.model.workflow.Action;
 

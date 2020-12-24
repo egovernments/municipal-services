@@ -1,9 +1,12 @@
-package org.egov.fsm.web.model;
+package org.egov.fsm.web.model.location;
 
 import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
+import org.egov.fsm.web.model.AuditDetails;
+import org.egov.fsm.web.model.FSM;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,6 +16,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -66,8 +70,11 @@ public class Address   {
   @JsonProperty("pincode")
   private String pincode = null;
 
-  @JsonProperty("additionDetails")
-  private String additionDetails = null;
+  @JsonProperty("additionalDetails")
+  private Object additionalDetails = null;
+  
+  @JsonProperty("auditDetails")
+  private AuditDetails auditDetails = null;
 
   @JsonProperty("buildingName")
   private String buildingName = null;
@@ -77,6 +84,7 @@ public class Address   {
 
   @JsonProperty("locality")
   private Boundary locality = null;
+  
 
   @JsonProperty("geoLocation")
   private GeoLocation geoLocation = null;
@@ -283,7 +291,7 @@ public class Address   {
    **/
 
   
-    public String getPincode() {
+  @Size(min=6,max=6)  public String getPincode() {
     return pincode;
   }
 
@@ -291,23 +299,23 @@ public class Address   {
     this.pincode = pincode;
   }
 
-  public Address additionDetails(String additionDetails) {
-    this.additionDetails = additionDetails;
+  public Address additionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
     return this;
   }
 
   /**
    * more address detail as may be needed
-   * @return additionDetails
+   * @return additionalDetails
    **/
   
   
-    public String getAdditionDetails() {
-    return additionDetails;
+    public Object getadditionalDetails() {
+    return additionalDetails;
   }
 
-  public void setAdditionDetails(String additionDetails) {
-    this.additionDetails = additionDetails;
+  public void setadditionalDetails(Object additionalDetails) {
+    this.additionalDetails = additionalDetails;
   }
 
   public Address buildingName(String buildingName) {
@@ -315,12 +323,33 @@ public class Address   {
     return this;
   }
 
+
+  public Address auditDetails(AuditDetails auditDetails) {
+    this.auditDetails = auditDetails;
+    return this;
+  }
+
+  /**
+   * Get auditDetails
+   * @return auditDetails
+   **/
+  
+    @Valid
+    public AuditDetails getAuditDetails() {
+    return auditDetails;
+  }
+
+  public void setAuditDetails(AuditDetails auditDetails) {
+    this.auditDetails = auditDetails;
+  }
+
+  
   /**
    * Name of the building
    * @return buildingName
    **/
   
-  
+  @NonNull
      public String getBuildingName() {
     return buildingName;
   }
@@ -360,6 +389,7 @@ public class Address   {
   
 
     @Valid
+    @NonNull
     public Boundary getLocality() {
     return locality;
   }
@@ -380,6 +410,7 @@ public class Address   {
   
   
     @Valid
+    @NonNull
     public GeoLocation getGeoLocation() {
     return geoLocation;
   }
@@ -409,16 +440,17 @@ public class Address   {
         Objects.equals(this.state, address.state) &&
         Objects.equals(this.country, address.country) &&
         Objects.equals(this.pincode, address.pincode) &&
-        Objects.equals(this.additionDetails, address.additionDetails) &&
+        Objects.equals(this.additionalDetails, address.additionalDetails) &&
         Objects.equals(this.buildingName, address.buildingName) &&
         Objects.equals(this.street, address.street) &&
         Objects.equals(this.locality, address.locality) &&
-        Objects.equals(this.geoLocation, address.geoLocation);
+        Objects.equals(this.geoLocation, address.geoLocation) && 
+        Objects.equals(this.auditDetails, address.auditDetails);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionDetails, buildingName, street, locality, geoLocation);
+    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionalDetails, buildingName, street, locality, geoLocation);
   }
 
   @Override
@@ -437,11 +469,12 @@ public class Address   {
     sb.append("    state: ").append(toIndentedString(state)).append("\n");
     sb.append("    country: ").append(toIndentedString(country)).append("\n");
     sb.append("    pincode: ").append(toIndentedString(pincode)).append("\n");
-    sb.append("    additionDetails: ").append(toIndentedString(additionDetails)).append("\n");
+    sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
     sb.append("    buildingName: ").append(toIndentedString(buildingName)).append("\n");
     sb.append("    street: ").append(toIndentedString(street)).append("\n");
     sb.append("    locality: ").append(toIndentedString(locality)).append("\n");
     sb.append("    geoLocation: ").append(toIndentedString(geoLocation)).append("\n");
+    sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
     sb.append("}");
     return sb.toString();
   }
