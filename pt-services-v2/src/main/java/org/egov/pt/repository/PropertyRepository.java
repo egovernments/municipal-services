@@ -1,23 +1,25 @@
 package org.egov.pt.repository;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import org.egov.pt.repository.builder.PropertyQueryBuilder;
 import org.egov.pt.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.web.models.Property;
 import org.egov.pt.web.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
 public class PropertyRepository {
 
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	@Autowired
 	private PropertyQueryBuilder queryBuilder;
@@ -26,18 +28,18 @@ public class PropertyRepository {
 	private PropertyRowMapper rowMapper;
 	
 	public List<Property> getProperties(PropertyCriteria criteria){
-		List<Object> preparedStmtList = new ArrayList<>();
+		Map<String,Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList);
 		log.info("Query: " + query);
 		log.info("PS: " + preparedStmtList);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 	
 	public List<Property> getPropertiesPlainSearch(PropertyCriteria criteria){
-		List<Object> preparedStmtList = new ArrayList<>();
+		Map<String,Object> preparedStmtList = new HashMap<>();
 		String query = queryBuilder.getPropertyLikeQuery(criteria, preparedStmtList);
 		log.info("Query: " + query);
 		log.info("PS: " + preparedStmtList);
-		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		return namedParameterJdbcTemplate.query(query, preparedStmtList, rowMapper);
 	}
 }
