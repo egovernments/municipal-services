@@ -179,7 +179,7 @@ public class PropertyQueryBuilder {
 				WHERE_CLAUSE_PLACHOLDER.append(" OR ");
 				WHERE_CLAUSE_PLACHOLDER.append(" owner.userid IN ( :ownerids) ");
 //				addToPreparedStatement(preparedStmtList, ownerids);
-				preparedStmtList.put("ownerids", createQuery(ownerids));
+				preparedStmtList.put("ownerids", ownerids);
 
 			}
 
@@ -209,7 +209,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
 			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptd.assessmentnumber IN ( :propertyDetailids)");
 //			addToPreparedStatement(preparedStmtList, propertyDetailids);
-			preparedStmtList.put("propertyDetailids", createQuery(propertyDetailids));
+			preparedStmtList.put("propertyDetailids", propertyDetailids);
 
 		}
 
@@ -249,7 +249,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_PROPERTY);
 			WHERE_CLAUSE_PLACHOLDER_PROPERTY.append(" pt.status IN ( :statuses)");
 //			addToPreparedStatement(preparedStmtList, statuses);
-			preparedStmtList.put("statuses", createQuery(statuses));
+			preparedStmtList.put("statuses", statuses);
 
 		}
 
@@ -260,7 +260,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME);
 			WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME.append(" ptd.property IN ( :ids)");
 //			addToPreparedStatement(preparedStmtList, ids);
-			preparedStmtList.put("ids", createQuery(ids));
+			preparedStmtList.put("ids", ids);
 
 
 		}
@@ -274,7 +274,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY);
 			WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY.append(" pt.oldpropertyid IN ( :oldpropertyids)");
 //			addToPreparedStatement(preparedStmtList, oldpropertyids);
-			preparedStmtList.put("oldpropertyids", createQuery(oldpropertyids));
+			preparedStmtList.put("oldpropertyids", oldpropertyids);
 
 
 		}
@@ -285,7 +285,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER);
 			WHERE_CLAUSE_PLACHOLDER.append(" address.id IN ( :addressids)");
 //			addToPreparedStatement(preparedStmtList, addressids);
-			preparedStmtList.put("addressids", createQuery(addressids));
+			preparedStmtList.put("addressids", addressids);
 
 		}
 
@@ -294,7 +294,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER);
 			WHERE_CLAUSE_PLACHOLDER.append(" owner.userid IN ( :ownerids)");
 //			addToPreparedStatement(preparedStmtList, ownerids);
-			preparedStmtList.put("ownerids", createQuery(ownerids));
+			preparedStmtList.put("ownerids", ownerids);
 
 		}
 
@@ -302,7 +302,7 @@ public class PropertyQueryBuilder {
 		if (!CollectionUtils.isEmpty(unitids)) {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER);
 			WHERE_CLAUSE_PLACHOLDER.append(" unit.id IN ( :unitids )");
-			preparedStmtList.put("unitids", createQuery(unitids));
+			preparedStmtList.put("unitids", unitids);
 		}
 
 		Set<String> documentids = criteria.getDocumentids();
@@ -310,7 +310,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER);
 			WHERE_CLAUSE_PLACHOLDER.append(" doc.id IN ( :documentids)");
 //			addToPreparedStatement(preparedStmtList, documentids);
-			preparedStmtList.put("documentids", createQuery(documentids));
+			preparedStmtList.put("documentids", documentids);
 
 		}
 
