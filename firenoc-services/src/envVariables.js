@@ -44,7 +44,7 @@ const envVariables = {
   // "https://egov-micro-dev.egovernments.org",
   EGOV_WORKFLOW_TRANSITION_ENDPOINT:
     process.env.EGOV_WORKFLOW_TRANSITION_PATH ||
-    "/egov-workflow-v2/egov-wf/process/_transition",
+    "/workflow/egov-wf/process/_transition",
   BUSINESS_SERVICE: process.env.BUSINESS_SERVICE || "FIRENOC",
 
   //location service configurations

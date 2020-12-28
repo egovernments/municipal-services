@@ -20,12 +20,12 @@ To run the firenoc-service services locally, you need to run the below command t
 ```bash
  function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
 
- kubectl port-forward -n egov $(kgpt egov-idgen) 8087:8080 &
- kubectl port-forward -n egov $(kgpt egov-user) 8088:8080 &
- kubectl port-forward -n egov $(kgpt egov-workflow-v2) 8089:8080 &
+ kubectl port-forward -n egov $(kgpt idgen) 8087:8080 &
+ kubectl port-forward -n egov $(kgpt user) 8088:8080 &
+ kubectl port-forward -n egov $(kgpt workflow) 8089:8080 &
  kubectl port-forward -n egov $(kgpt egov-location) 8090:8080 &
  kubectl port-forward -n egov $(kgpt firenoc-calculator) 8091:8080
- kubectl port-forward -n egov $(kgpt egov-mdms-service) 8092:8080
+ kubectl port-forward -n egov $(kgpt mdms) 8092:8080
 ``` 
 
 Update below listed properties in `envVariables.js` before running the project:

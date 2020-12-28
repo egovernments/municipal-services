@@ -18,10 +18,10 @@ To setup the pgr-services service in your local system, clone the [Core Service 
 To run the egov-hrms services in local system, you need to port forward below services.
 
 ```bash
- kubectl port-forward -n egov {egov-idgen} 8087:8080
+ kubectl port-forward -n egov {idgen} 8087:8080
  kubectl port-forward -n egov {egov-mdms} 8088:8080
- kubectl port-forward -n egov {egov-user} 8089:8080
- kubectl port-forward -n egov {egov-workflow-v2} 8090:8080
+ kubectl port-forward -n egov {user} 8089:8080
+ kubectl port-forward -n egov {workflow} 8090:8080
  kubectl port-forward -n egov {egov-localization} 8091:8080
  kubectl port-forward -n egov {egov-url-shortner} 8092:8080
  kubectl port-forward -n egov {egov-hrms} 8093:8080
