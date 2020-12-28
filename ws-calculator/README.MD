@@ -10,7 +10,7 @@ This module created to manage the Bill calculation for the registered water serv
 - persister
 - ws-service
 - user
-- egov-workflow-v2
+- workflow
 
 ### Swagger API Contract
 

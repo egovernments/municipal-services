@@ -24,7 +24,7 @@ kubectl port-forward -n egov $(kgpt billing-service) 8088:8080 &
 kubectl port-forward -n egov $(kgpt idgen) 8089:8080 &
 kubectl port-forward -n egov $(kgpt user) 8090:8080 &
 kubectl port-forward -n egov $(kgpt egov-location) 8091:8080 &  
-kubectl port-forward -n egov $(kgpt egov-workflow-v2) 8092:8080 &  
+kubectl port-forward -n egov $(kgpt workflow) 8092:8080 &  
 kubectl port-forward -n egov $(kgpt url-shortening) 8093:8080 &  
 kubectl port-forward -n egov $(kgpt mdms) 8094:8080 
 ```

@@ -22,7 +22,7 @@ To run the firenoc-service services locally, you need to run the below command t
 
  kubectl port-forward -n egov $(kgpt idgen) 8087:8080 &
  kubectl port-forward -n egov $(kgpt user) 8088:8080 &
- kubectl port-forward -n egov $(kgpt egov-workflow-v2) 8089:8080 &
+ kubectl port-forward -n egov $(kgpt workflow) 8089:8080 &
  kubectl port-forward -n egov $(kgpt egov-location) 8090:8080 &
  kubectl port-forward -n egov $(kgpt firenoc-calculator) 8091:8080
  kubectl port-forward -n egov $(kgpt mdms) 8092:8080

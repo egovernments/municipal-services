@@ -14,7 +14,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - sms-notification
 - email-notification
 - egov-hrms
-- egov-workflow-v2
+- workflow
 - url-shortening
 
 

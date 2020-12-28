@@ -24,7 +24,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 - persister ( Helps to persist the data  )
 
-- egov-workflow-v2 ( Workflow configuration for different BPA application is configured )
+- workflow ( Workflow configuration for different BPA application is configured )
 
 ### Swagger API Contract
 

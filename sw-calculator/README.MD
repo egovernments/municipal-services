@@ -10,7 +10,7 @@ This module created to manage the bill calculation for the registered sewerage s
 - persister
 - sw-service
 - user
-- egov-workflow-v2
+- workflow
 
 ### Swagger API Contract
 
