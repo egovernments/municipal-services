@@ -10,7 +10,7 @@ This service is used to calculate the Tradelicense fees based on the defined bil
 
 - tl-service
 - billing-service
-- egov-mdms-service
+- mdms
 
 ### Swagger API Contract
 

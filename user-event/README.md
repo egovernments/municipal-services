@@ -10,7 +10,7 @@ This service provides APIs to create , update and search such events for the use
 
 ### Service Dependencies
 
-- egov-mdms-service
+- mdms
 - egov-localization
 
 ### Swagger API Contract

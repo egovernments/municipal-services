@@ -18,7 +18,7 @@ const envVariables = {
   EGOV_MDMS_HOST:
     process.env.EGOV_MDMS_HOST || "https://egov-micro-dev.egovernments.org",
   EGOV_MDMS_SEARCH_ENDPOINT:
-    process.env.EGOV_MDMS_SEARCH_ENDPOINT || "/egov-mdms-service/v1/_search",
+    process.env.EGOV_MDMS_SEARCH_ENDPOINT || "/mdms/v1/_search",
 
   BUSINESSSERVICE: process.env.BUSINESSSERVICE || "FIRENOC",
 

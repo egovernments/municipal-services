@@ -87,7 +87,7 @@ const envVariables = {
   EGOV_MDMS_HOST:
     process.env.EGOV_MDMS_HOST || "https://egov-micro-dev.egovernments.org",
   EGOV_MDMS_CONTEXT_PATH:
-    process.env.EGOV_MDMS_CONTEXT_PATH || "/egov-mdms-service/v1",
+    process.env.EGOV_MDMS_CONTEXT_PATH || "/mdms/v1",
   EGOV_MDMS_SEARCH_ENPOINT: process.env.EGOV_MDMS_SEARCH_ENPOINT || "/_search",
 
   //event service configurations
