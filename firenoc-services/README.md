@@ -21,7 +21,7 @@ Please refer to the [Swagger API contarct](https://editor.swagger.io/?url=https:
 
 **MDMS COnfiguration**
 
-Firenoc service makes calls to egov-mdms-service to fetch required masters. These are significant in validations of application.
+Firenoc service makes calls to mdms to fetch required masters. These are significant in validations of application.
 
 
    | Fire-NOC masters                                                                                                                           | Description                                                                                                    |  

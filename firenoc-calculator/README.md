@@ -19,7 +19,7 @@ Please refer to the [Swagger API contarct](https://editor.swagger.io/?url=https:
 
 **MDMS COnfiguration**
 
-Firenoc Calculator makes calls to egov-mdms-service to fetch required masters. These are significant in validations of application.
+Firenoc Calculator makes calls to mdms to fetch required masters. These are significant in validations of application.
 
 
    | Fire-NOC masters                                                                                                                           | Description                                                                                                    |  

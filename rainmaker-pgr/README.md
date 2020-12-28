@@ -121,7 +121,7 @@ The system has a citizen interface and an employee interface.
 
 ### Service Dependencies
 
-- egov-mdms-service
+- mdms
 - egov-localization
 - idgen
 - searcher
