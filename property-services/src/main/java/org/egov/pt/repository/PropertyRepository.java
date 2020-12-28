@@ -104,6 +104,7 @@ public class PropertyRepository {
 		Boolean isPlainSearch = false;
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
+
 		if(isPlainSearch)
 		{
 			Set<String> tenantIds = criteria.getTenantIds();
@@ -113,6 +114,7 @@ public class PropertyRepository {
 				preparedStmtList.add(tenantIds);
 			}
 		}
+
 		else
 		{
 			if(!ObjectUtils.isEmpty(criteria.getTenantId()))

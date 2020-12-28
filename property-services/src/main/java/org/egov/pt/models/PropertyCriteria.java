@@ -51,6 +51,4 @@ public class PropertyCriteria {
 	
 	private String locality;
 	
-	
-	
 }

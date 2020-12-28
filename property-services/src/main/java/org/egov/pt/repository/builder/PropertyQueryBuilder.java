@@ -142,6 +142,7 @@ public class PropertyQueryBuilder {
 				addToPreparedStatement(preparedStmtList,tenantIds);
 			}
 		}
+
 		else
 		{
 			if(criteria.getTenantId()!=null)
@@ -164,6 +165,7 @@ public class PropertyQueryBuilder {
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
 		}
+
 		else
 		{
 			if(criteria.getToDate()!=null)
@@ -256,6 +258,7 @@ public class PropertyQueryBuilder {
 				addToPreparedStatement(preparedStmtList,tenantIds);
 			}
 		}
+
 		else
 		{
 			if(criteria.getTenantId()!=null)
@@ -278,6 +281,7 @@ public class PropertyQueryBuilder {
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
 		}
+
 		else
 		{
 			if(criteria.getToDate()!=null)
