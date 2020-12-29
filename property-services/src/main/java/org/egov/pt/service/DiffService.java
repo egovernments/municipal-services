@@ -22,9 +22,7 @@ import org.javers.core.diff.custom.BigDecimalComparatorWithFixedEquals;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class DiffService {
 	
@@ -55,7 +53,6 @@ public class DiffService {
             if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {                
                 if(!change.getPropertyName().equalsIgnoreCase("_value")) {
                 	updatedFields.add(change.getPropertyName());
-                    log.info("Propertyname Diff" + change.getPropertyName());
         		}
             }
         });
