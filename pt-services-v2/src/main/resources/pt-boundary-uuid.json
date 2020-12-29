@@ -1,6 +1,6 @@
 {
   "tenantId": "pb.sunam",
-  "moduleName": "egov-location",
+  "moduleName": "location",
   "TenantBoundary": [
     {
       "hierarchyType": {

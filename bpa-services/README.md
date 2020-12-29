@@ -24,7 +24,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - localization ( To use the localized messages )
 
-- egov-location ( To store the address locality )
+- location ( To store the address locality )
 
 - egov-mdms ( Configurations/master data used in the application is served by MDMS )
 
