@@ -9,7 +9,7 @@ The main objective of the Fire-NOC module is to provide **No Objection Certifica
 - user
 - idgen
 - egov-workflow
-- egov-location
+- location
 - firenoc-calculator
 
 ### Swagger API Contract
