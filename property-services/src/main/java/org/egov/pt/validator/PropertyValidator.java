@@ -676,10 +676,6 @@ public class PropertyValidator {
 //				.getCurrentState(request.getRequestInfo(), property.getTenantId(), property.getAcknowldgementNumber())
 //				.getIsStateUpdatable();
 
-		if(fieldsUpdated.contains("_value")) {
-			fieldsUpdated.remove("_value");
-		}
-		
 		if (!CollectionUtils.isEmpty(fieldsUpdated)) {
 			log.error("The property mutation doesnt allow change of these fields " + fieldsUpdated);
 			throw new CustomException("EG_PT_MUTATION_ERROR",
