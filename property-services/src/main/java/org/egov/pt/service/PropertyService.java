@@ -273,6 +273,8 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
+		
+		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
 		/*
 		 * throw error if audit request is with no proeprty id or multiple propertyids
