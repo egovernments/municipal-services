@@ -13,7 +13,7 @@ the steps for approval of the application.
 - tl-calculator
 - billing-service
 - mdms
-- egov-localization
+- localization
 - idgen
 - user
 

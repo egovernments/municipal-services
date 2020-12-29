@@ -87,7 +87,7 @@ Note - The artifact id of this service is updated to 0.0.2-SNAPSHOT from 0.0.1-S
 **Changes in Notifications:** 
    1. Notification to Employee on RE-OPEN has been removed.
    2. Notification content on RESOLVE, REOPEN and SUBMIT being sent to the CITIZEN has been modified.
-   3. Needless to say, these changes are done at message table owned by egov-localization.
+   3. Needless to say, these changes are done at message table owned by localization.
    4. Notification code in pgr remains the same as v1, there's no refactoring done except for fetching sla hours which is needed for v1.1 notification.  
 
 **Changes in MDMS:**
@@ -122,7 +122,7 @@ The system has a citizen interface and an employee interface.
 ### Service Dependencies
 
 - mdms
-- egov-localization
+- localization
 - idgen
 - searcher
 - filestore
