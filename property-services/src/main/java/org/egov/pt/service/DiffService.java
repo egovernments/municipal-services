@@ -52,9 +52,11 @@ public class DiffService {
             return updatedFields;
 
         changes.forEach(change -> {
-            if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {
-                updatedFields.add(change.getPropertyName());
-                log.info("Propertyname Diff" + change.getPropertyName());
+            if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {                
+                if(!change.getPropertyName().equalsIgnoreCase("_value")) {
+                	updatedFields.add(change.getPropertyName());
+                    log.info("Propertyname Diff" + change.getPropertyName());
+        		}
             }
         });
         return updatedFields;
