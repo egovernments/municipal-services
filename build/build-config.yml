@@ -86,13 +86,13 @@ config:
       - work-dir: "ws-services/src/main/resources/db"
         image-name: "ws-services-db"
         
-  - name: "builds/municipal-services/property-services"
+  - name: "builds/municipal-services/property"
     build:
-      - work-dir: "property-services"
-        image-name: "property-services"
+      - work-dir: "property"
+        image-name: "property"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "property-services/src/main/resources/db"
-        image-name: "property-services-db"
+      - work-dir: "property/src/main/resources/db"
+        image-name: "property-db"
 
   - name: "builds/municipal-services/ws-calculator"
     build:

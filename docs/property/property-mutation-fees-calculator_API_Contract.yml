@@ -29,7 +29,7 @@ paths:
           application/json:
             schema:
               
-              $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/master/docs/property-services/property-services.yml#/components/schemas/PropertyRequest'
+              $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/master/docs/property/property.yml#/components/schemas/PropertyRequest'
         required: true
       responses:
         201:
