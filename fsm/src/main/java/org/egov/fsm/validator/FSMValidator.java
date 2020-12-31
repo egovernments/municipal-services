@@ -1,6 +1,9 @@
 package org.egov.fsm.validator;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,9 +83,11 @@ public class FSMValidator {
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
 
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) && !criteria.isEmpty()
-				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null)
+				&& !criteria.tenantIdOnly() && criteria.getTenantId() == null) 
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
-
+		if(criteria.getTenantId() == null)
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+			
 		String allowedParamStr = null;
 
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN))
@@ -111,8 +116,6 @@ public class FSMValidator {
 	 */
 	private void validateSearchParams(FSMSearchCriteria criteria, List<String> allowedParams) {
 
-		
-
 		if (criteria.getMobileNumber() != null && !allowedParams.contains("mobileNumber"))
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on mobileNumber is not allowed");
 
@@ -122,7 +125,24 @@ public class FSMValidator {
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
 		
-	
+		if (criteria.getApplicationNumber() != null && !allowedParams.contains("applicationNo")) {
+			System.out.println("app..... "+criteria.getApplicationNumber());
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
+			}
+		if (criteria.getFromDate() != null && !allowedParams.contains("fromDate") && 
+				criteria.getToDate() != null && !allowedParams.contains("toDate") ) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on fromDate and toDate is not allowed");
+		}else if( (criteria.getFromDate() != null && criteria.getToDate() == null ) ||
+				criteria.getFromDate() == null && criteria.getToDate() != null) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search only "+((criteria.getFromDate() == null) ? "fromDate" :"toDate" )+" is not allowed");
+		}if(criteria.getFromDate() != null && criteria.getFromDate() > Calendar.getInstance().getTimeInMillis() ||
+				criteria.getToDate() != null && criteria.getFromDate() > Calendar.getInstance().getTimeInMillis()	) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search in futer dates is not allowed");
+			
+		}
+		
+		
+			
 	}
 
 	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {

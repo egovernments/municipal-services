@@ -1,13 +1,22 @@
 package org.egov.fsm.service;
 
+import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.fsm.repository.FSMRepository;
-import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.validator.FSMValidator;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.workflow.ActionValidator;
 import org.egov.fsm.workflow.WorkflowIntegrator;
@@ -103,5 +112,26 @@ public class FSMService {
 		
 		repository.update(fsmRequest, workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService));
 		return fsmRequest.getFsm();
+	}
+	
+	
+	public List<FSM> FSMsearch(FSMSearchCriteria criteria, RequestInfo requestInfo) {
+		
+		List<FSM> fsmList = new LinkedList<>();
+		List<String> uuids = new ArrayList<String>();
+		UserDetailResponse usersRespnse;
+		
+		fsmValidator.validateSearch(requestInfo, criteria);
+		if( criteria.getMobileNumber() !=null) {
+			usersRespnse = userService.getUser(criteria,requestInfo);
+			if(usersRespnse !=null && usersRespnse.getUser() != null && usersRespnse.getUser().size() >0) {
+				uuids = usersRespnse.getUser().stream().map(User::getUuid).collect(Collectors.toList());
+				criteria.setOwnerIds(uuids);
+			}
+		}
+		fsmList = repository.getFSMData(criteria);
+		if(fsmList.isEmpty())
+			return Collections.emptyList();
+		return fsmList;
 	}
 }

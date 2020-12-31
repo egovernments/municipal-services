@@ -31,14 +31,25 @@ public class FSMSearchCriteria {
     
     @JsonProperty("ownerIds")
     private List<String> ownerIds;
-
+    
+    @JsonProperty("fromDate")
+    private Long fromDate;
+    
+    @JsonProperty("toDate")
+    private Long toDate;
+    
+    @JsonProperty("applicationNumber")
+    private List<String> applicationNumber;
+    
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
-		return false;
+		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
+                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null);
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
-		return false;
+		return (this.tenantId != null && this.offset == null && this.limit == null && this.mobileNumber == null
+                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null);
 	} 
 }

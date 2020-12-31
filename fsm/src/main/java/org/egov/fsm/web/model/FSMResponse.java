@@ -34,7 +34,7 @@ public class FSMResponse   {
   private ResponseInfo responseInfo = null;
 
   @JsonProperty("fsm")
-  private FSM fsm = null;
+  private List<FSM> fsm = null;
 
   @JsonProperty("workflow")
   private Workflow workflow = null;
@@ -59,10 +59,10 @@ public class FSMResponse   {
     this.responseInfo = responseInfo;
   }
 
-  public FSMResponse fsm(FSM fsm) {
-    this.fsm = fsm;
-    return this;
-  }
+	public FSMResponse fsm(List<FSM> fsm) {
+		this.fsm = fsm;
+		return this;
+	}
 
   /**
    * Get fsm
@@ -71,11 +71,11 @@ public class FSMResponse   {
       @NotNull
 
     @Valid
-    public FSM getFsm() {
+    public List<FSM> getFsm() {
     return fsm;
   }
 
-  public void setFsm(FSM fsm) {
+  public void setFsm(List<FSM> fsm) {
     this.fsm = fsm;
   }
 
