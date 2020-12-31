@@ -1,5 +1,5 @@
 serviceMaps:
-  serviceName: property-services
+  serviceName: property
   mappings:
   - version: 1.0
     description: Persists property details in EG_PT_PROPERTY  table

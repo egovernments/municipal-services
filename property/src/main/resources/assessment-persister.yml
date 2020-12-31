@@ -1,5 +1,5 @@
 serviceMaps:
-  serviceName: property-services
+  serviceName: property
   mappings:
   - version: 1.0
     description: Persists assessment details to eg_pt_asmt_assessment table
