@@ -36,7 +36,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - workflow ( Workflow configuration for different BPA application is configured )
 
-- pdf-service ( Receipt’s, permitorder etc.. and prepared )
+- pdfgen ( Receipt’s, permitorder etc.. and prepared )
 
 - billing-service ( Create demands and bills for the fees to be collected )
 
