@@ -11,7 +11,7 @@ This module created to manage Sewerage Service connections against a Property in
 - persister
 - sw-calculator
 - filestore
-- pdf-service
+- pdfgen
 
 ### Swagger API Contract
 

@@ -11,7 +11,7 @@ This module created to manage WaterService connections against a Property in the
 - persister
 - ws-calculator
 - filestore
-- pdf-service
+- pdfgen
 
 ### Swagger API Contract
 
