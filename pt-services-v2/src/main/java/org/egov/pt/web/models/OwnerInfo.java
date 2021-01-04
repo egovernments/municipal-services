@@ -46,7 +46,9 @@ public class OwnerInfo extends User  {
         public enum RelationshipEnum {
                 FATHER("FATHER"),
 
-                HUSBAND("HUSBAND");
+                HUSBAND("HUSBAND"),
+                
+                MOTHER("MOTHER");
 
                 private String value;
 
