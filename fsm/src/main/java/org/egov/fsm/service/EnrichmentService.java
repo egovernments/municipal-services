@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.repository.IdGenRepository;
@@ -17,7 +18,9 @@ import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.idgen.IdResponse;
+import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -149,5 +152,49 @@ public class EnrichmentService {
 	public void postStatusEnrichment(FSMRequest fsmRequest) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	/**
+	 * 
+	 * @param fsms
+	 * @param requestInfo
+	 */
+	public void enrichFSMSearch(List<FSM> fsms, RequestInfo requestInfo, String tenantId) {
+		 
+		enrichBoundarys(fsms, requestInfo);
+		List<String> accountIds = fsms.stream().map(FSM::getAccountId).collect(Collectors.toList());
+		FSMSearchCriteria fsmsearch = new FSMSearchCriteria();
+		fsmsearch.setTenantId(tenantId);
+		fsmsearch.setOwnerIds(accountIds);
+		UserDetailResponse userDetailResponse = userService.getUser(fsmsearch, requestInfo);
+		encrichApplicant(userDetailResponse, fsms);
+	}
+	
+	/**
+	 * enrich the bounday in the FSM Object
+	 * @param fsms
+	 * @param requestInfo
+	 */
+	private void enrichBoundarys(List<FSM> fsms, RequestInfo requestInfo) {
+		fsms.forEach(fsm -> {
+			boundaryService.getAreaType(new FSMRequest(requestInfo, fsm, null), config.getHierarchyTypeCode());
+		});
+		
+			
+	}
+
+	/**
+	 * enrich the applicant information in FSM
+	 * @param userDetailResponse
+	 * @param fsms
+	 */
+	private void encrichApplicant(UserDetailResponse userDetailResponse, List<FSM> fsms) {
+
+		List<User> users = userDetailResponse.getUser();
+		Map<String, User> userIdToApplicantMap = new HashMap<>();
+		users.forEach(user -> userIdToApplicantMap.put(user.getUuid(), user));
+		fsms.forEach(fsm -> {
+			 fsm.setCitizen( userIdToApplicantMap.get(fsm.getAccountId()));
+		});
 	}
 }

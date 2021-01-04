@@ -150,11 +150,7 @@ public class UserService {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(applicant.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(applicant.getMobileNumber());
-		if(!StringUtils.isEmpty(applicant.getUuid())) {
-			List<String> uuids = new ArrayList<String>();
-			uuids.add(applicant.getUuid());
-			userSearchRequest.setUuid(uuids);
-		}
+		
 
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
@@ -167,7 +163,10 @@ public class UserService {
 	 *            The owner to whom the username is to assigned
 	 */
 	private void setUserName(User owner) {
-		owner.setUserName(UUID.randomUUID().toString());
+		String uuid = UUID.randomUUID().toString();
+		owner.setUserName(uuid);
+		owner.setUuid(uuid);
+		
 	}
 
 

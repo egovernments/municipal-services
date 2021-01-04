@@ -58,7 +58,7 @@ public class FSMController {
 	}
 	
 	
-	@PostMapping(value = "/_serch")
+	@PostMapping(value = "/_search")
 	public ResponseEntity<FSMResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute FSMSearchCriteria criteria) {
 		

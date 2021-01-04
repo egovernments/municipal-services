@@ -101,7 +101,7 @@ public class WorkflowIntegrator {
 			obj.put(ASSIGNEEKEY, uuidmaps);
 		}
 		
-		obj.put(DOCUMENTSKEY, fsmRequest.getWorkflow().getVarificationDocuments());
+		obj.put(DOCUMENTSKEY, fsmRequest.getWorkflow().getVerificationDocuments());
 		array.add(obj);
 		JSONObject workFlowRequest = new JSONObject();
 		workFlowRequest.put(REQUESTINFOKEY, fsmRequest.getRequestInfo());

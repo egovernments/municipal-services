@@ -114,7 +114,12 @@ public class FSMService {
 		return fsmRequest.getFsm();
 	}
 	
-	
+	/**
+	 * search the fsm applications based on the search criteria
+	 * @param criteria
+	 * @param requestInfo
+	 * @return
+	 */
 	public List<FSM> FSMsearch(FSMSearchCriteria criteria, RequestInfo requestInfo) {
 		
 		List<FSM> fsmList = new LinkedList<>();
@@ -130,8 +135,13 @@ public class FSMService {
 			}
 		}
 		fsmList = repository.getFSMData(criteria);
-		if(fsmList.isEmpty())
+		if (!fsmList.isEmpty()) {
+			enrichmentService.enrichFSMSearch(fsmList, requestInfo, criteria.getTenantId());
+		}
+
+		if (fsmList.isEmpty()) {
 			return Collections.emptyList();
+		}
 		return fsmList;
 	}
 }

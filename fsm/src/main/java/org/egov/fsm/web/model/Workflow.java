@@ -39,9 +39,9 @@ public class Workflow   {
   @JsonProperty("comments")
   private String comments = null;
 
-  @JsonProperty("varificationDocuments")
+  @JsonProperty("verificationDocuments")
   @Valid
-  private List<Document> varificationDocuments = null;
+  private List<Document> verificationDocuments = null;
 
   public Workflow action(String action) {
     this.action = action;
@@ -105,30 +105,30 @@ public class Workflow   {
     this.comments = comments;
   }
 
-  public Workflow varificationDocuments(List<Document> varificationDocuments) {
-    this.varificationDocuments = varificationDocuments;
+  public Workflow varificationDocuments(List<Document> verificationDocuments) {
+    this.verificationDocuments = verificationDocuments;
     return this;
   }
 
-  public Workflow addVarificationDocumentsItem(Document varificationDocumentsItem) {
-    if (this.varificationDocuments == null) {
-      this.varificationDocuments = new ArrayList<Document>();
+  public Workflow addVerificationDocumentsItem(Document verificationDocuments) {
+    if (this.verificationDocuments == null) {
+      this.verificationDocuments = new ArrayList<Document>();
     }
-    this.varificationDocuments.add(varificationDocumentsItem);
+    this.verificationDocuments.add(verificationDocuments);
     return this;
   }
 
   /**
    * Attach the workflow varification documents.
-   * @return varificationDocuments
+   * @return verificationDocuments
    **/
       @Valid
-    public List<Document> getVarificationDocuments() {
-    return varificationDocuments;
+    public List<Document> getVerificationDocuments() {
+    return verificationDocuments;
   }
 
-  public void setVarificationDocuments(List<Document> varificationDocuments) {
-    this.varificationDocuments = varificationDocuments;
+  public void setVerificationDocuments(List<Document> verificationDocuments) {
+    this.verificationDocuments = verificationDocuments;
   }
 
 
@@ -144,12 +144,12 @@ public class Workflow   {
     return Objects.equals(this.action, workflow.action) &&
         Objects.equals(this.assignes, workflow.assignes) &&
         Objects.equals(this.comments, workflow.comments) &&
-        Objects.equals(this.varificationDocuments, workflow.varificationDocuments);
+        Objects.equals(this.verificationDocuments, workflow.verificationDocuments);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(action, assignes, comments, varificationDocuments);
+    return Objects.hash(action, assignes, comments, verificationDocuments);
   }
 
   @Override
@@ -160,7 +160,7 @@ public class Workflow   {
     sb.append("    action: ").append(toIndentedString(action)).append("\n");
     sb.append("    assignes: ").append(toIndentedString(assignes)).append("\n");
     sb.append("    comments: ").append(toIndentedString(comments)).append("\n");
-    sb.append("    varificationDocuments: ").append(toIndentedString(varificationDocuments)).append("\n");
+    sb.append("    verificationDocuments: ").append(toIndentedString(verificationDocuments)).append("\n");
     sb.append("}");
     return sb.toString();
   }
