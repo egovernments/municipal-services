@@ -108,6 +108,8 @@ public class EnrichmentService {
             criteria.setMobileNumber(citizenMobileNumber);
         }
 
+        criteria.setAccountId(requestInfo.getUserInfo().getUuid());
+
         String tenantId = (criteria.getTenantId()!=null) ? criteria.getTenantId() : requestInfo.getUserInfo().getTenantId();
 
         if(criteria.getMobileNumber()!=null){

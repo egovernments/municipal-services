@@ -32,10 +32,26 @@ public class PGRQueryBuilder {
 
         StringBuilder builder = new StringBuilder(QUERY);
 
-        if (criteria.getTenantId() != null) {
+        if(criteria.getTenantId() != null) {
+            String tenantId = criteria.getTenantId();
+
+            String[] tenantIdChunks = tenantId.split("\\.");
+
+            if (tenantIdChunks.length == 1) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantid LIKE ? ");
+                preparedStmtList.add(criteria.getTenantId() + '%');
+            } else {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantid=? ");
+                preparedStmtList.add(criteria.getTenantId());
+            }
+        }
+
+        if(criteria.getAccountId() != null){
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.tenantid=? ");
-            preparedStmtList.add(criteria.getTenantId());
+            builder.append(" ser.accountId=? ");
+            preparedStmtList.add(criteria.getAccountId());
         }
 
         if (criteria.getServiceCode() != null) {
