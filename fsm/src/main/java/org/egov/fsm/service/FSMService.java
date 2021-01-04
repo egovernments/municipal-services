@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.fsm.repository.FSMRepository;
+import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.validator.FSMValidator;
@@ -127,6 +128,12 @@ public class FSMService {
 		UserDetailResponse usersRespnse;
 		
 		fsmValidator.validateSearch(requestInfo, criteria);
+		
+		if(criteria.tenantIdOnly() && 
+				requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
+			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
+		}
+		
 		if( criteria.getMobileNumber() !=null) {
 			usersRespnse = userService.getUser(criteria,requestInfo);
 			if(usersRespnse !=null && usersRespnse.getUser() != null && usersRespnse.getUser().size() >0) {

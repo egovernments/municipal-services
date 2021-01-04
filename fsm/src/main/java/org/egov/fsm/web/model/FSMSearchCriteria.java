@@ -49,7 +49,7 @@ public class FSMSearchCriteria {
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
-		return (this.tenantId != null && this.offset == null && this.limit == null && this.mobileNumber == null
+		return (this.tenantId != null && this.mobileNumber == null
                 && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null);
 	} 
 }
