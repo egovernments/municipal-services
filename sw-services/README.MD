@@ -15,7 +15,7 @@ This module created to manage Sewerage Service connections against a Property in
 
 ### Swagger API Contract
 
-- Please refer to the [Swagger API contarct](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free) for ws-services to understand the structure of APIs and to have visualization of all internal APIs.
+- Please refer to the [Swagger API contarct](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free) for water to understand the structure of APIs and to have visualization of all internal APIs.
 
 ## Service Details
 

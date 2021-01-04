@@ -10,9 +10,9 @@ public class WCConstants {
 
 	}
 
-	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
+	public static final String JSONPATH_ROOT = "$.MdmsRes.water-masters";
 
-	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.ws-services-calculation";
+	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.water-calculation";
 
 	public static final String PROPERTY_JSONPATH_ROOT = "$.MdmsRes.PropertyTax";
 
@@ -22,9 +22,9 @@ public class WCConstants {
 
 	public static final String JSONPATH_CODE_WATER_SOURCE = "waterSource.code";
 
-	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
+	public static final String MDMS_WC_MOD_NAME = "water-masters";
 
-	public static final String WS_TAX_MODULE = "ws-services-calculation";
+	public static final String WS_TAX_MODULE = "water-calculation";
 
 	public static final String MDMS_WC_CONNECTION_CATEGORY = "connectionCategory";
 
@@ -209,7 +209,7 @@ public class WCConstants {
 
 	public static final String BILLING_PERIOD = "billingPeriod";
 
-	public static final String JSONPATH_ROOT_FOR_BILLING = "$.MdmsRes.ws-services-masters.billingPeriod";
+	public static final String JSONPATH_ROOT_FOR_BILLING = "$.MdmsRes.water-masters.billingPeriod";
 
 	public static final String BILLING_PERIOD_MASTER = "Billing_Period_Master";
 

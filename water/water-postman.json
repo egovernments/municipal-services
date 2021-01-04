@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "https://egov-micro-dev.egovernments.org/ws-services/wc/_search?connectionNumber=WS/107/2019-20/060069&tenantId=pb.amritsar",
+			"name": "https://egov-micro-dev.egovernments.org/water/wc/_search?connectionNumber=WS/107/2019-20/060069&tenantId=pb.amritsar",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -27,14 +27,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8090/ws-services/wc/_search?applicationNumber=WS_AP/107/2020-21/000298&tenantId=pb.amritsar",
+					"raw": "http://localhost:8090/water/wc/_search?applicationNumber=WS_AP/107/2020-21/000298&tenantId=pb.amritsar",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8090",
 					"path": [
-						"ws-services",
+						"water",
 						"wc",
 						"_search"
 					],
@@ -79,7 +79,7 @@
 			"response": []
 		},
 		{
-			"name": "https://egov-micro-dev.egovernments.org/ws-services/wc/_create",
+			"name": "https://egov-micro-dev.egovernments.org/water/wc/_create",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -112,14 +112,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8090/ws-services/wc/_create",
+					"raw": "http://localhost:8090/water/wc/_create",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8090",
 					"path": [
-						"ws-services",
+						"water",
 						"wc",
 						"_create"
 					],
@@ -146,7 +146,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:8090/ws-services/wc/_update",
+			"name": "http://localhost:8090/water/wc/_update",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -167,14 +167,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8090/ws-services/wc/_update",
+					"raw": "http://localhost:8090/water/wc/_update",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8090",
 					"path": [
-						"ws-services",
+						"water",
 						"wc",
 						"_update"
 					]

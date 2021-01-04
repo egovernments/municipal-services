@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.egov</groupId>
-	<artifactId>ws-services</artifactId>
+	<artifactId>water</artifactId>
 	<packaging>jar</packaging>
-	<name>water-services</name>
+	<name>water</name>
 	<version>1.1.0-SNAPSHOT</version>
 	<properties>
 		<java.version>1.8</java.version>
