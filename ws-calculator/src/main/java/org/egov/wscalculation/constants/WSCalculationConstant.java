@@ -117,9 +117,9 @@ public class WSCalculationConstant {
 	
 	public static final String WS_ONE_TIME_FEE_ROUND_OFF = "WS_FEE_ROUND_OFF";
 
-	public static final String WS_TAX_MODULE = "ws-services-calculation";
+	public static final String WS_TAX_MODULE = "water-calculation";
 
-	public static final String WS_MODULE = "ws-services-masters";
+	public static final String WS_MODULE = "water-masters";
 
 	public static final String WC_PENANLTY_MASTER = "Penalty";
 
@@ -148,7 +148,7 @@ public class WSCalculationConstant {
 
 	public static final String ConnectionType = "connectionType";
 
-	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.water-masters.billingPeriod";
 
 	public static final String Quaterly_Billing_Period = "quarterly";
 

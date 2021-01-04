@@ -10,7 +10,7 @@ public class SWConstants {
 
 	}
 
-	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
+	public static final String JSONPATH_ROOT = "$.MdmsRes.water-masters";
 
 	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.sw-services-calculation";
 	
@@ -18,7 +18,7 @@ public class SWConstants {
 
 	public static final String JSONPATH_CODE_CONNECTION_TYPE = "connectionType.code";
 
-	public static final String MDMS_SW_MOD_NAME = "ws-services-masters";
+	public static final String MDMS_SW_MOD_NAME = "water-masters";
 
 	public static final String MDMS_SW_CONNECTION_TYPE = "connectionType";
 

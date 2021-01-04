@@ -1,4 +1,4 @@
-# WS-Services
+# water
 This module created to manage WaterService connections against a Property in the system.
 ### DB UML Diagram
 
@@ -15,7 +15,7 @@ This module created to manage WaterService connections against a Property in the
 
 ### Swagger API Contract
 
-- Please refer to the [Swagger API contarct](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free) for ws-services to understand the structure of APIs and to have visualization of all internal APIs.
+- Please refer to the [Swagger API contarct](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free) for water to understand the structure of APIs and to have visualization of all internal APIs.
 
 ## Service Details
 
@@ -27,19 +27,19 @@ This module created to manage WaterService connections against a Property in the
 
 ### API Details
 
-`BasePath` /ws-services/wc/[API endpoint]
+`BasePath` /water/wc/[API endpoint]
 
 ##### Method
 
 a) `_create`
 
-   - WaterService is created by calling ws-services/wc/_create api.
+   - WaterService is created by calling water/wc/_create api.
    
    - The response contains the WaterConnection object with its assigned ApplicationId of that WaterService Connection.
 
 b) `_update`
 
-   -  Created WaterService application needs to be approved and activated, and these are done by calling the ws-services/wc/_update api.
+   -  Created WaterService application needs to be approved and activated, and these are done by calling the water/wc/_update api.
    
    - Once the application activated new Water Connection Number will be generated, and the same would be updated in the WaterConnection Object.
 
