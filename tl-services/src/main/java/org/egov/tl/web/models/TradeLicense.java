@@ -136,6 +136,10 @@ public class  TradeLicense   {
         @JsonProperty("accountId")
         private String accountId = null;
 
+        
+        @JsonProperty("isLegacy")
+        private Boolean isLegacy;
+        
         @Size(max=256)
         @JsonProperty("tradeName")
         private String tradeName = null;

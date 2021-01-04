@@ -177,8 +177,15 @@ public class WorkflowIntegrator {
 					});
 
 			// setting the status back to TL object from wf response
-			tradeLicenseRequest.getLicenses()
-					.forEach(tlObj -> tlObj.setStatus(idStatusMap.get(tlObj.getApplicationNumber())));
-		}
+			for ( TradeLicense tlObj: tradeLicenseRequest.getLicenses()) {
+				 if(tlObj.getIsLegacy() && tlObj.getAction().equalsIgnoreCase(ACTION_APPLY))
+					 {tlObj.setStatus("APPROVED");
+					 Long time = System.currentTimeMillis();
+	                 tlObj.setIssuedDate(time);
+					 
+					 }
+			     else	 
+					 tlObj.setStatus(idStatusMap.get(tlObj.getApplicationNumber()));
+		}}
 	}
 }
