@@ -78,13 +78,13 @@ config:
       - work-dir: "firenoc-calculator/migration"
         image-name: "firenoc-calculator-db"
 
-  - name: "builds/municipal-services/ws-services"
+  - name: "builds/municipal-services/water"
     build:
-      - work-dir: "ws-services"
-        image-name: "ws-services"
+      - work-dir: "water"
+        image-name: "water"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "ws-services/src/main/resources/db"
-        image-name: "ws-services-db"
+      - work-dir: "water/src/main/resources/db"
+        image-name: "water-db"
         
   - name: "builds/municipal-services/property"
     build:

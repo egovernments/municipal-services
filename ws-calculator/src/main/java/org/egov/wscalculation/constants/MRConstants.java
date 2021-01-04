@@ -6,11 +6,11 @@ public class MRConstants {
 
 	}
 
-	public static final String JSONPATH_ROOT = "$.MdmsRes.ws-services-masters";
+	public static final String JSONPATH_ROOT = "$.MdmsRes.water-masters";
 
 	public static final String JSONPATH_CODE_CONNECTION_CATEGORY = "billingPeriod.code";
 
-	public static final String MDMS_WC_MOD_NAME = "ws-services-masters";
+	public static final String MDMS_WC_MOD_NAME = "water-masters";
 
 	public static final String MDMS_MS_BILLING_PERIOD = "billingPeriod";
 
