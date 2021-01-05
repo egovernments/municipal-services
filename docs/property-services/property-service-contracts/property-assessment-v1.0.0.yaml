@@ -206,7 +206,7 @@ components:
           type: string
           description: | 
            The propertyId against which assessment is done. Below is the referance for the property registry contract.
-           "https://raw.githubusercontent.com/egovernments/municipal-services/property-contracts/docs/property-services/property-registry-v1.0.0.yaml#/components/schemas/Property"
+           "https://raw.githubusercontent.com/egovernments/municipal-services/property-contracts/docs/property-services/property-service-contracts/property-registry-v1.0.0.yaml#/components/schemas/Property"
           minLength: 2
           maxLength: 64
         financialYear:
