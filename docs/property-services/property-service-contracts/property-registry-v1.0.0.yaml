@@ -526,15 +526,11 @@ components:
 
     PropertyType:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the propertytype
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: code of the propertytype
+          description: Unique code of the propertytype
           maxLength: 64
           minLength: 2
         active:
@@ -543,17 +539,13 @@ components:
       required:
         - code
     
-    UsageCategoryMajor:
+    UsageCategory:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the UsageCategoryMajor
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: code of the UsageCategoryMajor
+          description: Unique code of the UsageCategory
           maxLength: 64
           minLength: 2
         active:
@@ -564,15 +556,11 @@ components:
     
     ConstructionType:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the construction type.
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: unique code of the construction type.
+          description: Unique code of the construction type.
           maxLength: 64
           minLength: 2
         active:
@@ -583,15 +571,11 @@ components:
     
     OwnerShipCategory:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the OwnerShipCategory
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: unique code for Ownership category.
+          description: Unique code for Ownership category.
           maxLength: 64
           minLength: 2
         active:
@@ -602,15 +586,11 @@ components:
     
     OwnerType:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: code of the Owner Type.
+          description: Unique code of the Owner Type.
           maxLength: 64
           minLength: 2
         active:
@@ -621,15 +601,11 @@ components:
     
     Floor:
       type: object
+      description: This is master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: Floor Number.
-          maxLength: 64
-          minLength: 2
         code:
           type: string
-          description: Code of Floor Number.
+          description: unique Code of Floor Number.
           maxLength: 64
           minLength: 2
         active:
@@ -639,15 +615,11 @@ components:
         - code
     OccupancyType:
       type: object
+      description: This is the namespaced master data, which is defined in MDMS
       properties:
-        name:
-          type: string
-          description: name of the occupancy
-          maxLength: 128
-          minLength: 2
         code:
           type: string
-          description: code of the OccupancyType
+          description: unique code of the OccupancyType
           maxLength: 64
           minLength: 2
         active:
