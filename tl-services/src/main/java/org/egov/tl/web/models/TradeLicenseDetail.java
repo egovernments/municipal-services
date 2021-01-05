@@ -89,7 +89,9 @@ public class TradeLicenseDetail   {
     
     CITIZEN("CITIZEN"),
     
-    DATAENTRY("DATAENTRY");
+    DATAENTRY("DATAENTRY"),
+	  
+	RENEWAL("RENEWAL");
 
     private String value;
 

@@ -1,6 +1,9 @@
 package org.egov.tl.validator;
 
 import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
@@ -12,6 +15,7 @@ import org.egov.tl.util.BPAConstants;
 import org.egov.tl.util.TLConstants;
 import org.egov.tl.util.TradeUtil;
 import org.egov.tl.web.models.*;
+import org.egov.tl.web.models.TradeLicenseDetail.ChannelEnum;
 import org.egov.tl.web.models.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 import static org.egov.tl.util.TLConstants.businessService_BPA;
 import static org.egov.tl.util.TLConstants.businessService_TL;
 
+@Slf4j
 @Component
 public class TLValidator {
 
@@ -271,6 +276,10 @@ public class TLValidator {
                     
                     }
                    
+                }else if(license.getTradeLicenseDetail().getChannel() != null && ChannelEnum.RENEWAL.toString().equalsIgnoreCase(license.getTradeLicenseDetail().getChannel().toString())) {
+                	log.info("#Ingoring the date validation for the INWORKFLOW RENEWAL application from V1 "
+                			+ "License Number: " + license.getLicenseNumber() + "Appllication Number: " + license.getApplicationNumber());
+                	
                 }else{
                     throw new CustomException("RENEWAL ERROR","The license applied for renewal is not present in the repository");
                 }
