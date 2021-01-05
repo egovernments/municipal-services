@@ -1,0 +1,657 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: eGov Property Registry System.
+  description: |
+    APIs for Property Registry sevice. This supports below features 
+    * Create a new property in the registry
+    * Update the details of the existing property
+    * Search the existing property based on the search criteria
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+x-module: PT
+x-common-path: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml'
+paths:
+  /property/_create:
+    post:
+      summary: Creates new property.
+      description: Creates new property with basic information related to land and owner information. Can be integrated with other modules like Water and Sewerage or Trade License to act as base entity against which water connection or trade license can be issued
+      x-roles: 'PT_CEMP,CITIZEN'
+      responses:
+        '201':
+          description: Property created sucessfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PropertyResponse'
+        '400':
+          description: Failed to process the request
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Property
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+        description: Details for the new property + RequestHeader (meta data of the API).
+        required: true
+  /property/_update:
+    post:
+      summary: Update existing property.
+      description: Updates a given `Property` with newer details.
+      x-roles: 'PT_CEMP,CITIZEN'
+      tags:
+        - Property
+      responses:
+        '200':
+          description: Update Property successful
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PropertyResponse'
+        '400':
+          description: Failed to process the request
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+        description: Request header for the property Request.
+        required: true
+  /property/_search:
+    post:
+      summary: Get the list of properties defined in the system.
+      description: |
+        Get the properties list based on the input parameters.
+      x-roles: 'PT_CEMP,CITIZEN'      
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: ids
+          in: query
+          description: List of system generated ids of properties.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 100
+  
+        - name: oldpropertyids
+          in: query
+          required: false
+          description: List of oldPropertyIds to search..
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 100
+        - name: mobileNumber
+          in: query
+          description: MobileNumber of owner whose property is to be searched.
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful response
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PropertySearchResponse'
+        '400':
+          description: Invalid input.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      tags:
+        - Property
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/RequestHeader'
+        description: RequestHeader meta data.
+        required: true        
+  /property/_delete:
+    post:
+      summary: Delete existing property.
+      description: The API will delete the property associated with the given propertyId from the system  The API works in idempotent manner.
+      x-roles: PT_ADMIN
+      tags:
+        - Property
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: propertyId
+          in: query
+          required: true
+          description: The properrtyId to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 2
+            maxLength: 128
+      responses:
+        '200':
+          description: Property Deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ResponseHeader'
+        '404':
+          description: Delete Property failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/RequestHeader'
+        description: Request header for the property delete Request.
+        required: true
+  /property/_cancel:
+    post:
+      summary: Deactivate/cancel an active property.
+      description: The API will deactivate/cancel the property associated with the given propertyId from the system. The API works in idempotent manner
+      x-roles: PT_ADMIN
+      tags:
+        - Property
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/RequestHeader'
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/parameters/tenantId'
+        - name: propertyId
+          in: query
+          required: true
+          description: The properrtyId to be deactivated
+          schema:
+            type: string
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+            minLength: 4
+            maxLength: 128
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/RequestHeader'
+        description: Request header for the property delete Request.
+        required: true
+      responses:
+        '200':
+          description: Property deactivated successful
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ResponseHeader'
+        '404':
+          description: Property not found
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ErrorRes'
+  
+servers:
+  - url: 'https://egov-micro-dev.egovernments.org'
+components:
+  schemas:
+    
+    PropertyInfo:
+      type: object
+      description: This is lightweight property object that can be used as reference by definitions needing property linking. Actual Property Object extends this to include more elaborate attributes of the property.
+      properties:
+        id:
+          type: string
+          description: Unique Identifier of the Property for internal reference.
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+        propertyId:
+          type: string
+          description: Unique Identifier of the Property.
+          readOnly: true
+          minLength: 1
+          maxLength: 64
+        linkPropertyId:
+          type: string
+          description: Unique Identifier of the Property.
+          minLength: 1
+          maxLength: 64
+        tenantId:
+          type: string
+          description: tenant id of the Property
+          maxLength: 256
+          minLength: 2
+          nullable: false
+        accountId:
+          type: string
+          description: UUID of the user to which the property will be associated.
+          maxLength: 64
+          minLength: 1
+          readOnly: true
+        oldPropertyId:
+          type: string
+          description: 'Old upic no of the Property. ULBs have the existing property in their system/manual records with their identification number, they want to continue the old reference number in this case the same identification number will be captured here.'
+          maxLength: 256
+          minLength: 1
+        status:
+          type: string
+          description: status of the Property
+          enum:
+            - ACTIVE
+            - INACTIVE
+        address:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Address'
+      required:
+        - address
+        - tenantId
+    
+    Property:
+      allOf:
+        - $ref: '#/components/schemas/PropertyInfo'
+        - type: object
+          description: Property object which will contain the all the details of the property, like construction details, owners and units etc
+          properties:
+            acknowldgementNumber:
+              type: string
+              description: Acknowldgement number given to citizen on submitting the application for creation or modification of the property.
+              maxLength: 64
+              minLength: 1
+              readOnly: true
+            propertyType:
+              type: string
+              description: Type of a property like Private, Vacant Land, State Government, Central Government etc(This is master data, defined in MDMS)
+              minLength: 2
+              maxLength: 64
+              example: VACANT
+            ownershipCategory:
+              type: string
+              description: The type of ownership of the property.(This is master data, defined in MDMS)
+              minLength: 2
+              maxLength: 64
+            owners:
+              description: Captures the details of the land owners.
+              type: array
+              items:
+                $ref: '#/components/schemas/OwnerInfo'
+            institution:
+              $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Institution'
+            creationReason:
+              type: string
+              description: New property comes into system either property is newly constructed or existing property got sub divided. Here the reason for creation will be captured.
+              enum:
+                - NEWPROPERTY
+                - SUBDIVISION
+            noOfFloors:
+              type: integer
+              format: int64
+              description: no of floors in the property
+            landArea:
+              type: number
+              format: float
+              description: Land area of the property in sq ft
+            superBuiltUpArea:
+              type: number
+              format: float
+              description: Super builtup area of the property in sq ft
+            source:
+              type: string
+              description: Source of a constructionDetail data. The constructionDetail will be created in a system based on the data avaialble in their manual records or during field survey. There can be more from client to client.
+              enum:
+                - MUNICIPAL_RECORDS
+                - FIELD_SURVEY
+            channel:
+              type: string
+              description: 'constructionDetail details can be created from different channels Eg. System (properties created by ULB officials), CFC Counter (From citizen faciliation counters) etc. Here we are defining some known channels, there can be more client to client.'
+              enum:
+                - SYSTEM
+                - CFC_COUNTER
+                - CITIZEN
+                - DATA_ENTRY
+                - MIGRATION
+            documents:
+              description: The documents attached by owner for exemption.
+              type: array
+              items:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Document'
+            unit:
+              $ref: '#/components/schemas/Unit'
+            additionalDetails:
+              type: object
+              description: 'The json (array of ''#/definitions/Factor'')'
+          required:
+            - propertyType
+            - source
+            - address
+            - owners
+            - tenantId
+            
+    ConstructionDetail:
+      description: Construction/constructionDetail details are captured here. Detail information of the constructionDetail including floor wise usage and area are saved as seperate units .For each financial year construction details may change. constructionDetail object is required for tax calculation
+      type: object
+      properties:
+        id:
+          type: string
+          description: id of the property with which the constructionDetail is associated.
+          maxLength: 64
+          readOnly: true
+        totalUnitArea:
+          type: number
+          format: float
+          description: Area of the defined Unit.
+          nullable: false
+        builtUpArea:
+          type: number
+          format: float
+          description: Total built up area in sq ft(built-up area = carpet area + areas covered by walls)
+        carpetArea:
+          type: number
+          format: float
+          description: Total built up area in sq ft(built-up area = carpet area + areas covered by walls)
+        superBuiltUpArea:
+          type: number
+          format: float
+          description: Total built up area in sq ft(built-up area + Common area = Super built-up area)
+        constructionType:
+          type: string
+          description: Construction type is defined in MDMS ConstructionTypeMaster.
+          maxLength: 64
+          minLength: 1
+        constructionDate:
+          type: integer
+          format: int64
+          description: The date when the property was constructed
+        dimensions:
+          $ref: '#/components/schemas/Dimensions'
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/AuditDetails'
+        additionalDetails:
+          type: object
+          description: 'The json (array of ''#/definitions/Factor'')'
+      required:
+        - financialYear
+        - status
+        - usageCategory
+        - source
+        - buildUpArea
+    
+    OwnerInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the owner.
+          maxLength: 256
+        mobileNumber:
+          type: string
+          description: MobileNumber of the owner.
+          maxLength: 256
+        gender:
+          type: string
+          description: Gender of the owner.
+          maxLength: 256
+        fatherOrHusbandName:
+          type: string
+          description: Father or Husband name of the owner.
+          maxLength: 256
+        correspondenceAddress:
+          type: string
+          description: The current address of the owner for correspondence.
+          maxLength: 1024
+        isPrimaryOwner:
+          type: boolean
+          description: The owner is primary or not
+        ownerShipPercentage:
+          type: number
+          format: double
+          description: Ownership percentage.
+        ownerType:
+          type: string
+          description: 'Type of owner, based on this option Exemptions will be applied. This is master data defined in mdms.'
+          maxLength: 256
+        institutionId:
+          type: string
+          description: The id of the institution if the owner is the authorized person for one
+          maxLength: 64
+        documents:
+          description: The documents attached by owner for exemption.
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/Document'
+        relationship:
+          type: string
+          description: The relationship of gaurdian.
+          enum:
+            - FATHER
+            - HUSBAND
+        additionalDetails:
+          type: object
+          description: Json object to capture any extra information which is not accommodated of model
+      required:
+        - name
+        - mobileNumber
+        - gender
+        - fatherOrHusbandName
+        - relationship
+    
+    Unit:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique Identifier of the Unit(UUID).
+        tenantId:
+          type: string
+          description: tenant id of the Property
+          maxLength: 256
+          minLength: 2
+        floorNo:
+          type: string
+          description: floor number of the Unit
+          maxLength: 64
+          minLength: 1
+          nullable: false
+        unitType:
+          type: string
+          description: |
+            Unit type is master data.
+          example: 'Building, Room, Kitchen etc.'
+        usageCategory:
+          type: string
+          description: 'This is about the usage of the property like Residential, Non-residential, Mixed(Property witch is gettiong used for Residential, Non-residential purpose)'
+          maxLength: 64
+          minLength: 1
+        occupancyType:
+          type: string
+          description: Value denoting if the unit is rented or occupied by owner
+          enum:
+            - OWNER
+            - TENANT
+          maxLength: 64
+          minLength: 1
+        occupancyDate:
+          type: number
+          format: int64
+          description: Date on which unit is occupied.
+        constructionDetail:
+          $ref: '#/components/schemas/ConstructionDetail'
+        isActive:
+          type: boolean
+          description: if the value is false then consider the record as soft deleted.
+        additionalDetails:
+          type: object
+          description: Json object to capture any extra information which is not accommodated by model
+    
+    Dimensions:
+      type: object
+      description: The dimensions of the plot or building or any unit
+    
+    PropertyRequest:
+      description: Contract class to receive request. Array of Property items  are used in case of create . Where as single Property item is used for update
+      properties:
+        RequestHeader:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/RequestHeader'
+        Property:
+          $ref: '#/components/schemas/Property'
+    PropertyResponse:
+      description: Contains the ResponseHeader and the created/updated property
+      properties:
+        ResponseHeader:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ResponseHeader'
+        Property:
+          $ref: '#/components/schemas/Property'
+    PropertySearchResponse:
+      description: 'Contract class to send response.  Property items  is used in case of search results or response for search. '
+      properties:
+        ResponseHeader:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml#/components/schemas/ResponseHeader'
+        Properties:
+          description: Used for search result and create only
+          items:
+            $ref: '#/components/schemas/Property'
+    
+##------------------------Master Data--------------------------###
+
+    PropertyType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the propertytype
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: code of the propertytype
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: describes Whether propertyType is Active or not.
+      required:
+        - code
+    
+    UsageCategoryMajor:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the UsageCategoryMajor
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: code of the UsageCategoryMajor
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: Whether UsageCategoryMajor is Active or not.
+      required:
+        - code
+    
+    ConstructionType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the construction type.
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: unique code of the construction type.
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: 'Whether UsageCategorySubMinor is Active or not. If the value is TRUE, then UsageCategorySubMinor is active, if the value is FALSE then UsageCategorySubMinor is inactive, default value is TRUE'
+      required:
+        - code
+    
+    OwnerShipCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the OwnerShipCategory
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: unique code for Ownership category.
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: 'Whether UsageCategorySubMinor is Active or not. If the value is TRUE, then UsageCategorySubMinor is active, if the value is FALSE then UsageCategorySubMinor is inactive, default value is TRUE'
+      required:
+        - code
+    
+    OwnerType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: code of the Owner Type.
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: 'Whether UsageCategorySubMinor is Active or not. If the value is TRUE, then UsageCategorySubMinor is active, if the value is FALSE then UsageCategorySubMinor is inactive, default value is TRUE'
+      required:
+        - code
+    
+    Floor:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Floor Number.
+          maxLength: 64
+          minLength: 2
+        code:
+          type: string
+          description: Code of Floor Number.
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: 'Whether UsageCategorySubMinor is Active or not. If the value is TRUE, then UsageCategorySubMinor is active, if the value is FALSE then UsageCategorySubMinor is inactive, default value is TRUE'
+      required:
+        - code
+    OccupancyType:
+      type: object
+      properties:
+        name:
+          type: string
+          description: name of the occupancy
+          maxLength: 128
+          minLength: 2
+        code:
+          type: string
+          description: code of the OccupancyType
+          maxLength: 64
+          minLength: 2
+        active:
+          type: boolean
+          description: 'Whether OccupancyType is Active or not. If the value is TRUE, then OccupancyType is active, if the value is FALSE then OccupancyType is inactive, default value is TRUE'
+      required:
+        - code
