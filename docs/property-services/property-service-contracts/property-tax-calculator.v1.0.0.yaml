@@ -1,0 +1,377 @@
+openapi: 3.0.0
+info:
+  title: eGov Property Tax System.
+  description: >
+    * Create billing slabs for propetry tax calculation
+    * Update existing billing slab
+    * Search Billing slabs based on creteria
+    * Estimate the tax by submitting the property and assessment details 
+    * Calculate the tax and generate the demand 
+
+  contact:
+    name: Egovernments Foundation
+    email: contact@egovernments.org
+  version: '1.0.0'
+servers:
+  - url: https://virtserver.swaggerhub.com/egovernmets-faundation/PT-2.0/1.0.0
+    description: SwaggerHub API Auto Mocking
+    variables: {}
+  - url: https://egov-micro-dev.egovernments.org
+    variables: {}
+paths:
+
+  /propertytax/_estimate:
+    post:
+      summary: Generates estimated Property tax that will be incured once this particular property is added in to the system (note- only one property should be sent to the api for estimation, anything more than one will be ignored.)
+      description: Estimates the Property Tax to be paid for given property .
+      tags:
+        - Property Tax Calculation
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationReq'
+      responses:
+        "200":
+          description: Success response is calculated tax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+  /propertytax/_calculate:
+    post:
+      summary: Calculates Property tax and generates the respective demands in the system.
+      description: Calculate Property Tax based on criteria.
+      tags:
+        - Property Tax Calculation
+        
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationReq'
+      responses:
+        "201":
+          description: Success response is calculated tax.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+  /propertytax/_getbill:
+    post:
+      summary: Updates demand with time based penalty if applicable and Generates bill for the given criteria.
+      description: Generates bill for payment.
+      tags:
+        - Property Tax Bill
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/parameters/requestInfo'
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/parameters/tenantId'
+        - name: propertyId
+          in: query
+          description: Primary key of Property object.
+          required: true
+          schema:
+            type: string
+        - name: assessmentNumber
+          in: query
+          description: Unique id of the assessment.
+          required: true
+          schema:
+           type: string
+        - name: assessmentYear
+          in: query
+          description: Year for which the property is being assessed, assessment year should be given in yyyy-yy format (2013-14).
+          required: false
+          schema:
+           type: string
+        - name: billId
+          in: query
+          description: Primary key of bill object.
+          required: false
+          schema:
+           type: string
+      responses:
+        "200":
+          description: Returns the bill 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+
+  /billingslab/_search:
+    post:
+      summary: Get the list of properties defined in the system.
+      description: |
+        Get the properties list based on the input parameters.
+      tags:
+        - BillingSlab
+      parameters:
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/parameters/requestInfo'
+        - $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/parameters/tenantId'
+        - name: active
+          in: query
+          description: True will be sent in case when only active billing slabs are neede to fetched
+          required: false
+          schema:
+            type: boolean
+          allowEmptyValue: true
+        - name: acknowldgementNumber
+          in: query
+          required: false
+          description: The acknowldgement number no for a property.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 64
+            exclusiveMinimum: true
+            exclusiveMaximum: false
+      responses:
+        "200":
+          description: Returns the list of billing slab 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSlabRes'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+  /billingslab/_create:
+    post:
+      summary: Create new properties.
+      description: API to create new properties.
+      tags:
+        - BillingSlab
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSlabReq'
+      responses:
+        "201":
+          description: Billing slab created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSlabRes'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+  /billingslab/_update:
+    post:
+      summary: Update existing properties.
+      description: Updates a given `Property` with newer details.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingSlab'
+      tags:
+        - BillingSlab
+      responses:
+        "200":
+          description: Update billing slab request submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingSlab'
+        "400":
+          description: Failed to process the request
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ErrorRes'
+components:
+  schemas:
+        
+    CalulationCriteria:
+      type: object
+      properties:
+        property:
+          $ref: 'https://raw.githubusercontent.com/GhanshyamRawat92/MyEgovProject/master/yaml/property/property-service.yml#/definitions/Property'
+        assesmentNumber:
+          type: string
+          description: Unique assessment for the assessed property
+          minLength: 2
+          maxLength: 64
+        financialYear:
+          type: string
+          description: Financial year for which tax calculation need to be done
+          minLength: 2
+          maxLength: 64
+        oldAssesmentNumber:
+          type: string
+          description: Unique oldAssesmentNumber for the  property
+          minLength: 2
+          maxLength: 64
+        tenantId:
+          type: string
+          description: Unique ULB identifier
+          minLength: 2
+          maxLength: 256
+      required:
+        - tenantId
+        - property
+    Calculation:
+      type: object
+      properties:
+        connectionNumber:
+          type: string
+        totalAmount:
+          type: number
+          format: double
+          description: Total payable tax amount.
+        penalty:
+          type: number
+          format: double
+          description: Penality if applicable
+        exemption:
+          type: number
+          format: double
+          description: Penality amount if applicable.
+        rebate:
+          type: number
+          format: double
+          description: Rebate amount if applicable.
+        fromDate:
+          type: integer
+          format: int64
+        toDate:
+          type: integer
+          format: int64
+        tenantId:
+          type: string
+          minLength: 2
+          maxLength: 256
+    
+    BillingSlab:
+      type: object
+      properties:
+        tenantId:
+          type: string
+          description: Unique ulb identifier
+          maxLength: 64
+          minLength: 2
+        id:
+          type: string
+          description: unique identifier of the billing slab uuid
+          maxLength: 64
+          minLength: 2
+          readOnly: true
+        propertyType:
+          type: string
+          description: This is the master data from property regitry 
+           "https://raw.githubusercontent.com/egovernments/municipal-services/property-contracts/docs/property-services/property-service-contracts/property-registry-v1.0.0.yaml##/components/schemas/PropertyType"
+          maxLength: 64
+          minLength: 2
+        usageCategory:
+          type: string
+          description: This is the master data from property regitry 
+           "https://raw.githubusercontent.com/egovernments/municipal-services/property-contracts/docs/property-services/property-service-contracts/property-registry-v1.0.0.yaml##/components/schemas/usageCategory"
+          maxLength: 64
+          minLength: 2
+        ownerShipCategory:
+          type: string
+          description: This is the master data from property regitry 
+           "https://raw.githubusercontent.com/egovernments/municipal-services/property-contracts/docs/property-services/property-service-contracts/property-registry-v1.0.0.yaml##/components/schemas/ownerShipCategory"
+          maxLength: 64
+          minLength: 2
+        fromFloor:
+          type: string
+          description: Billing slabs can be defined or one floor or mulltiple floors .
+          maxLength: 64
+          minLength: 2
+        toFloor:
+          type: string
+          description: Billing slabs can be defined or one floor or mulltiple floors .
+          maxLength: 64
+          minLength: 2
+        areaType:
+          type: string
+          description: Billing slabs depends on the area where property is located. 
+          maxLength: 64
+          minLength: 2
+        fromPlotSize:
+          type: string
+          description: Lower limit of the plot size for which billing slab is applicable 
+          maxLength: 64
+          minLength: 2
+        toPlotSize:
+          type: string
+          description: Upper limit of the plot size for which billing slab is applicable 
+          maxLength: 64
+          minLength: 2
+        unitRate:
+          description: Rate for each sq ft land.
+          type: number
+          format: double
+      required:
+        - tenantId
+        - unitRate
+    CalculationReq:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
+        CalulationCriteria:
+          type: array
+          maximum: 100
+          items:
+            $ref: '#/components/schemas/CalulationCriteria'
+      required:
+        - RequestInfo
+        - calulationCriteria
+    CalculationRes:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        Calculation:
+          type: array
+          items:
+            $ref: '#/components/schemas/Calculation'
+    BillingSlabReq:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/RequestInfo'
+        BillingSlab:
+          type: array
+          maximum: 100
+          items:
+            $ref: '#/components/schemas/BillingSlab'
+      required:
+        - RequestInfo
+        - billingSlab
+    BillingSlabRes:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-0-0.yml#/definitions/ResponseInfo'
+        BillingSlab:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingSlab'
