@@ -7,11 +7,11 @@ This module created to manage WaterService connections against a Property in the
 ### Service Dependencies
 - egov-mdms service
 - property-service
-- egov-idgen
-- egov-persister
-- ws-calculator
+- idgen
+- persister
+- water-calculator
 - filestore
-- pdf-service
+- pdfgen
 
 ### Swagger API Contract
 

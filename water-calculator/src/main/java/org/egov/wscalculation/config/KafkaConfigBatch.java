@@ -28,7 +28,7 @@ public class KafkaConfigBatch {
 
     /**
      * Kafka Configuration method.
-     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * water-Calculator service has two type of consumers. With Batch processing and without.
      * This method will provide configuration details for the BatchProcessing Topic Consumers.
      * @return Returns the list of properties.
      */
@@ -46,7 +46,7 @@ public class KafkaConfigBatch {
 
     /**
      * Kafka Configuration method.
-     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * water-Calculator service has two type of consumers. With Batch processing and without.
      * This method will provide configuration details for the BatchProcessing Topic Consumers.
      * @return Returns the Kafka ConsumerFactory object.
      */
@@ -57,7 +57,7 @@ public class KafkaConfigBatch {
 
     /**
      * Kafka Configuration method.
-     * WS-Calculator service has two type of consumers. With Batch processing and without.
+     * water-Calculator service has two type of consumers. With Batch processing and without.
      * This method will provide configuration details for the BatchProcessing Topic Consumers.
      * @return Returns the Kafka ListenerContainerFactory object
      */

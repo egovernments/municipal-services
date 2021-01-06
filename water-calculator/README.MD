@@ -1,4 +1,4 @@
-# WS-Calculator Service
+# water-Calculator Service
 This module created to manage the Bill calculation for the registered water service connections in the system.
 
 ### DB UML Diagram
@@ -26,25 +26,25 @@ This module created to manage the Bill calculation for the registered water serv
 
 ### API Details
 
-`BasePath` /ws-calculator/[API endpoint]
+`BasePath` /water-calculator/[API endpoint]
 
 ##### Method
 
 a) `/meterConnection/_create`
-   - Water Service created by calling the APIs in WS-Service. Once the Application activated for metered-connection, employee can add meter reading details using this API - ws-calculator/meterConnection/_create which in-turn will generate the Demand.
+   - Water Service created by calling the APIs in WS-Service. Once the Application activated for metered-connection, employee can add meter reading details using this API - water-calculator/meterConnection/_create which in-turn will generate the Demand.
    - For the Non-Metered connections, the scheduler APIs need to be called periodically to generate the demand.
 
 b) `/meterConnection/_search`
-   - For the Metered Connection service, to get the previous meter reading ws-calculator/meterConnection/_search API used.
+   - For the Metered Connection service, to get the previous meter reading water-calculator/meterConnection/_search API used.
 
 c) `/waterCalculator/_estimate`
-   - To Activate the Water Service application, the user needs to pay the ONE_TIME_FEE for the connection. To calculate the ONE_TIME_FEE ws-calculator/waterCalculator/_estimate API used.
+   - To Activate the Water Service application, the user needs to pay the ONE_TIME_FEE for the connection. To calculate the ONE_TIME_FEE water-calculator/waterCalculator/_estimate API used.
 
 d) `/waterCalculator/_calculate`
    - This API used to generate /home/rohit/Desktop/Workspace/municipal-services/property the demand for metered or non-metered water connection.
 
 e) `/waterCalculator/_updateDemand`
-   - User can pay partial / full / advance amount for the Metered or Non-Metered connection bill. In these cases, Billing service would call back ws-calculator/waterCalculator/_updateDemand API to update the details of the demand generated.
+   - User can pay partial / full / advance amount for the Metered or Non-Metered connection bill. In these cases, Billing service would call back water-calculator/waterCalculator/_updateDemand API to update the details of the demand generated.
 
 f) `/waterCalculator/_jobscheduler`
    - This API used to generate demand for Non-metered connections. This API can be called periodically!

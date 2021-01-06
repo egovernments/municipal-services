@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.egov</groupId>
-	<artifactId>ws-calculator</artifactId>
+	<artifactId>water-calculator</artifactId>
 	<version>1.2.0-SNAPSHOT</version>
-	<name>ws-calculation</name>
+	<name>water-calculation</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
