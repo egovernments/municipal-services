@@ -178,6 +178,12 @@ consumerGroup.on("message", function(message) {
           You can download your Fire NOC Certificate by clicking on the below link:
           ${downLoadLink}`;
           break;
+        case "SENDBACKTOCITIZEN":
+          smsRequest[
+            "message"
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.`;
+          break;
         case "REJECTED":
           smsRequest[
             "message"

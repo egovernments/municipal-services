@@ -137,6 +137,7 @@ const envVariables = {
   EGOV_HOST_BASE_URL:process.env.EGOV_HOST_BASE_URL|| "https://mseva-uat.lgpunjab.gov.in/",
   EGOV_RECEIPT_URL:process.EGOV_RECEIPT_URL||"citizen/fire-noc/search-preview",
   ACTION_PAY: "PAY",
-  SENDBACK:"SENDBACK"
+  SENDBACK:"SENDBACK",
+  SENDBACKTOCITIZEN:"SENDBACKTOCITIZEN"
 };
 export default envVariables;
