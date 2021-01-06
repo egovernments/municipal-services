@@ -48,13 +48,13 @@ config:
       - work-dir: "pgr/src/main/resources/db"
         image-name: "pgr-db"
 
-  - name: "builds/municipal-services/tl-calculator"
+  - name: "builds/municipal-services/tradelicense-calculator"
     build:
-      - work-dir: "tl-calculator"
-        image-name: "tl-calculator"
+      - work-dir: "tradelicense-calculator"
+        image-name: "tradelicense-calculator"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "tl-calculator/src/main/resources/db"
-        image-name: "tl-calculator-db"
+      - work-dir: "tradelicense-calculator/src/main/resources/db"
+        image-name: "tradelicense-calculator-db"
         
   - name: "builds/municipal-services/tradelicense"
     build:

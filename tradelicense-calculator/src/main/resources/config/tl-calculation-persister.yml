@@ -1,5 +1,5 @@
 serviceMaps:
- serviceName: tl-calculator
+ serviceName: tradelicense-calculator
  mappings:
  - version: 1.0
    description: Persists tradeLicense calculation details in EG_TL_CALCULATION  table

@@ -1,4 +1,4 @@
-# tl-calculator
+# tradelicense-calculator
 
 This service is used to calculate the Tradelicense fees based on the defined billing slabs. The service is designed in such way that it can be used to serve different type of licenses. 
 
@@ -26,13 +26,13 @@ Once the demand is created for the combination, it calls billing-services API to
 
 ### API Details
 
-`tl-calculator/billingslab/_create` : API used to create the billing slabs in the system
+`tradelicense-calculator/billingslab/_create` : API used to create the billing slabs in the system
 
-`tl-calculator/billingslab/_search` : API used to search the billing slabs.
+`tradelicense-calculator/billingslab/_search` : API used to search the billing slabs.
 
-`tl-calculator/billingslab/_update` : API used to update the existing billing slabs.
+`tradelicense-calculator/billingslab/_update` : API used to update the existing billing slabs.
 
-`tl-calculator/v1/_calculate` : Calculates the fees based on the demand created.
+`tradelicense-calculator/v1/_calculate` : Calculates the fees based on the demand created.
 
 
 ### Kafka Consumers

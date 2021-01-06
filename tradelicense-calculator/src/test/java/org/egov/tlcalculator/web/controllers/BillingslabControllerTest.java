@@ -25,42 +25,42 @@ public class BillingslabControllerTest {
 
     @Test
     public void billingslabCreatePostSuccess() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_create").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_create").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
     }
 
     @Test
     public void billingslabCreatePostFailure() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_create").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_create").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isBadRequest());
     }
 
     @Test
     public void billingslabSearchPostSuccess() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_search").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_search").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
     }
 
     @Test
     public void billingslabSearchPostFailure() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_search").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_search").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isBadRequest());
     }
 
     @Test
     public void billingslabUpdatePostSuccess() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_update").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_update").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
     }
 
     @Test
     public void billingslabUpdatePostFailure() throws Exception {
-        mockMvc.perform(post("/tl-calculator//billingslab/_update").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//billingslab/_update").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isBadRequest());
     }

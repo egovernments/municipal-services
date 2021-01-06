@@ -1,6 +1,6 @@
 # Local Setup
 
-To setup the tl-calculator in your local system, clone the [Muncipal Service repository](https://github.com/egovernments/municipal-services).
+To setup the tradelicense-calculator in your local system, clone the [Muncipal Service repository](https://github.com/egovernments/municipal-services).
 
 ## Dependencies
 
@@ -24,7 +24,7 @@ To run the tradelicense locally, you need to port forward below services locally
 
 
 
-To run the tl-calculator locally, update below listed properties in `application.properties` prior to running the project:
+To run the tradelicense-calculator locally, update below listed properties in `application.properties` prior to running the project:
 
 ```ini
 `egov.demand.minimum.payable.amount` : Specifies the Minimum amount to be paid

@@ -10,7 +10,7 @@ the steps for approval of the application.
 
 ### Service Dependencies
 
-- tl-calculator
+- tradelicense-calculator
 - billing-service
 - mdms
 - localization

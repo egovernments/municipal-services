@@ -28,28 +28,28 @@ public class V1ApiControllerTest {
 
     @Test
     public void v1CalculatePostSuccess() throws Exception {
-        mockMvc.perform(post("/tl-calculator//v1/_calculate").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//v1/_calculate").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
     }
 
     @Test
     public void v1CalculatePostFailure() throws Exception {
-        mockMvc.perform(post("/tl-calculator//v1/_calculate").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//v1/_calculate").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isBadRequest());
     }
 
     @Test
     public void v1GetbillPostSuccess() throws Exception {
-        mockMvc.perform(post("/tl-calculator//v1/_getbill").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//v1/_getbill").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isOk());
     }
 
     @Test
     public void v1GetbillPostFailure() throws Exception {
-        mockMvc.perform(post("/tl-calculator//v1/_getbill").contentType(MediaType
+        mockMvc.perform(post("/tradelicense-calculator//v1/_getbill").contentType(MediaType
         .APPLICATION_JSON_UTF8))
         .andExpect(status().isBadRequest());
     }
