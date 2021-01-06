@@ -9,7 +9,7 @@ This module created to manage WaterService connections against a Property in the
 - property-service
 - idgen
 - persister
-- ws-calculator
+- water-calculator
 - filestore
 - pdfgen
 

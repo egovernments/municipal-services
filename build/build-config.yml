@@ -94,13 +94,13 @@ config:
       - work-dir: "property/src/main/resources/db"
         image-name: "property-db"
 
-  - name: "builds/municipal-services/ws-calculator"
+  - name: "builds/municipal-services/water-calculator"
     build:
-      - work-dir: "ws-calculator"
-        image-name: "ws-calculator"
+      - work-dir: "water-calculator"
+        image-name: "water-calculator"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "ws-calculator/src/main/resources/db"
-        image-name: "ws-calculator-db"
+      - work-dir: "water-calculator/src/main/resources/db"
+        image-name: "water-calculator-db"
 
   - name: "builds/municipal-services/sw-services"
     build:
