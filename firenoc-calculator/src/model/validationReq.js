@@ -417,7 +417,8 @@ const FireNOCDetails = {
         "FORWARD",
         "REFER",
         "SENDBACK",
-        "SENDBACKTOCITIZEN"
+        "SENDBACKTOCITIZEN",
+        "RESUBMIT"
       ]
     },
     channel: {
