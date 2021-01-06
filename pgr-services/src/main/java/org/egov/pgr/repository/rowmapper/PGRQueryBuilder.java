@@ -48,12 +48,6 @@ public class PGRQueryBuilder {
             }
         }
 
-        if(criteria.getAccountId() != null){
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.accountId=? ");
-            preparedStmtList.add(criteria.getAccountId());
-        }
-
         if (criteria.getServiceCode() != null) {
             addClauseIfRequired(preparedStmtList, builder);
             builder.append(" ser.serviceCode=? ");
