@@ -11,6 +11,7 @@ import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.collections.Payment;
+import org.egov.pt.calculator.web.models.collections.PaymentDetail;
 import org.egov.pt.calculator.web.models.demand.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import net.minidev.json.JSONArray;
 
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT;
 import static org.egov.pt.calculator.util.CalculatorConstants.TIMEZONE_OFFSET;
 import static org.egov.pt.calculator.util.CalculatorUtils.getEODEpoch;
 
@@ -261,6 +263,32 @@ public class PayService {
 					interestAmt = interestAmt.add(interestCalculated);
 				} else {
 
+
+                   // we need consider what ever  payment related finanical year which is iterating currently
+					Payment currentFinanicalPayment=null;
+					for(Payment paymentObject : filteredPaymentsAfterIntersetDate) {
+						
+						for(PaymentDetail paymentDetail: paymentObject.getPaymentDetails()) {
+							
+							for(BillDetail billDetails: paymentDetail.getBill().getBillDetails()) {
+								
+								if(billDetails.getFromPeriod().equals(taxPeriod.getFromDate())&& billDetails.getToPeriod().equals(taxPeriod.getToDate())) {
+									currentFinanicalPayment=paymentObject;
+									break;
+								}
+							}
+							
+							if(currentFinanicalPayment!=null) {
+								break;
+							}
+						}
+						if(currentFinanicalPayment!=null) {
+							break;
+						}
+						
+					}
+					
+					
 					for (int i = 0; i < numberOfPeriods; i++) {
 
 						if (i != numberOfPeriods - 1)
@@ -276,15 +304,19 @@ public class PayService {
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else if (i == numberOfPeriods - 1) {
-
-							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(payment, taxPeriod);
+                           if(currentFinanicalPayment==null) {
+                        	   currentFinanicalPayment=payment;
+                           }
+                           
+                           // we need to pass current iterating financial year payment for getting applicable amount.
+							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod);
 							numberOfDaysInMillies = getEODEpoch(currentUTC) - getEODEpoch(payment.getTransactionDate());
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else {
 
 							Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
-							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(paymentPrev,
+							applicableAmount = utils.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment,
 									taxPeriod);
 							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
 									- getEODEpoch(paymentPrev.getTransactionDate());
