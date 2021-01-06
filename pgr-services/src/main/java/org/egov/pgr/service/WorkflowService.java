@@ -111,7 +111,7 @@ public class WorkflowService {
     public List<ServiceWrapper> enrichWorkflow(RequestInfo requestInfo, List<ServiceWrapper> serviceWrappers) {
 
         // FIX ME FOR BULK SEARCH
-        Map<String, List<ServiceWrapper>> tenantIdToServiceWrapperMap = new HashMap<>();
+        Map<String, List<ServiceWrapper>> tenantIdToServiceWrapperMap = getTenantIdToServiceWrapperMap(serviceWrappers);
 
         List<ServiceWrapper> enrichedServiceWrappers = new ArrayList<>();
 
@@ -152,6 +152,20 @@ public class WorkflowService {
 
         return enrichedServiceWrappers;
 
+    }
+
+    private Map<String, List<ServiceWrapper>> getTenantIdToServiceWrapperMap(List<ServiceWrapper> serviceWrappers) {
+        Map<String, List<ServiceWrapper>> resultMap = new HashMap<>();
+        for(ServiceWrapper serviceWrapper : serviceWrappers){
+            if(resultMap.containsKey(serviceWrapper.getService().getTenantId())){
+                resultMap.get(serviceWrapper.getService().getTenantId()).add(serviceWrapper);
+            }else{
+                List<ServiceWrapper> serviceWrapperList = new ArrayList<>();
+                serviceWrapperList.add(serviceWrapper);
+                resultMap.put(serviceWrapper.getService().getTenantId(), serviceWrapperList);
+            }
+        }
+        return resultMap;
     }
 
     /**
