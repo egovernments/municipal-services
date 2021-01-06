@@ -91,8 +91,8 @@ public class PGRService {
             return new ArrayList<>();;
 
         userService.enrichUsers(serviceWrappers);
-        workflowService.enrichWorkflow(requestInfo,serviceWrappers);
-        return serviceWrappers;
+        List<ServiceWrapper> enrichedServiceWrappers = workflowService.enrichWorkflow(requestInfo,serviceWrappers);
+        return enrichedServiceWrappers;
     }
 
 
