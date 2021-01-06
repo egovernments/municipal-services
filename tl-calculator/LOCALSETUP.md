@@ -15,11 +15,11 @@ To setup the tl-calculator in your local system, clone the [Muncipal Service rep
 
 ## Running Locally
 
-To run the tl-services locally, you need to port forward below services locally
+To run the tradelicense locally, you need to port forward below services locally
 
 ```bash
 - kubectl -n egov port-forward <billing-service pod id> 8081:8080
-- kubectl -n egov port-forward <tl-services pod id> 8082:8080
+- kubectl -n egov port-forward <tradelicense pod id> 8082:8080
 - kubectl -n egov port-forward <egov-mdms pod id> 8083:8080
 
 

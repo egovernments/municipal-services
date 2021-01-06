@@ -12,7 +12,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - user  ( Manage user )
 
-- tl-services [Stakeholder Registration ( Registration process of Stakeholder is handled by this service)]
+- tradelicense [Stakeholder Registration ( Registration process of Stakeholder is handled by this service)]
 
 - user-event ( What’s New and Events )
 

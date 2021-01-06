@@ -8,7 +8,7 @@ This service is used to calculate the Tradelicense fees based on the defined bil
 
 ### Service Dependencies
 
-- tl-service
+- tradelicense
 - billing-service
 - mdms
 

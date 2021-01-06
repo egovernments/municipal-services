@@ -1,4 +1,4 @@
-# tl-services
+# tradelicense
 
 This service is used to issue license to user after verification. The service is designed in such way that it can be used to serve different type of licenses. 
 Currently used to issue trade licenses, perform stakeholder registration and issue lock down pass.  The service is integrated with workflow where we can define 
@@ -50,9 +50,9 @@ All the details and configurations on the services are explained in the document
 
 ### Kafka Producers
 
-`save-tl-tradelicense` : tl-services sends data to this topic to push to the database table.
-`update-tl-tradelicense` : tl-services sends data to this topic to update the entries to the database table.
-`update-tl-workflow` : tl-services sends data to this topic to update the workflow data.
+`save-tl-tradelicense` : tradelicense sends data to this topic to push to the database table.
+`update-tl-tradelicense` : tradelicense sends data to this topic to update the entries to the database table.
+`update-tl-workflow` : tradelicense sends data to this topic to update the workflow data.
 `egov.collection.payment-create` : Service sneds dats to this topic when the payments is triggered.
 `notification.sms` : This topic is used to send the sms notification
 `persist-user-events-async` : TL uses this topic to save the event notification

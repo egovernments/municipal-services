@@ -95,7 +95,7 @@ public class CalculationUtils {
 
 
     /**
-     * Call tl-services to get tradeLicense for the given applicationNumber and tenantID
+     * Call tradelicense to get tradeLicense for the given applicationNumber and tenantID
      * @param requestInfo The RequestInfo of the incoming request
      * @param applicationNumber The applicationNumber whose tradeLicense has to be fetched
      * @param tenantId The tenantId of the tradeLicense
