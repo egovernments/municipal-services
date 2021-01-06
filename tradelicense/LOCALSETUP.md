@@ -1,6 +1,6 @@
 # Local Setup
 
-To setup the tl-services in your local system, clone the [Muncipal Service repository](https://github.com/egovernments/municipal-services).
+To setup the tradelicense in your local system, clone the [Muncipal Service repository](https://github.com/egovernments/municipal-services).
 
 ## Dependencies
 
