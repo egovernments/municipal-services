@@ -61,8 +61,8 @@ public class TradeUtil {
 
 
     /**
-     * Creates url for tl-calculator service
-     * @return url for tl-calculator service
+     * Creates url for tradelicense-calculator service
+     * @return url for tradelicense-calculator service
      */
     public StringBuilder getCalculationURI(String businessService) {
         StringBuilder uri = new StringBuilder();

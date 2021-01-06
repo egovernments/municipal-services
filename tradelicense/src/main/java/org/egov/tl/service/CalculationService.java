@@ -68,10 +68,10 @@ public class CalculationService {
 
 
     /**
-     * Call tl-calculator to get the calculation Object for the given license
+     * Call tradelicense-calculator to get the calculation Object for the given license
      * @param requestInfo The requestInfo of the incoming request
      * @param licenses The tradeLicense to whom the calculation object has to be added
-     * @return CalculationRes from the tl-calculator
+     * @return CalculationRes from the tradelicense-calculator
      */
     private CalculationRes getCalculation(RequestInfo requestInfo,List<TradeLicense> licenses){
         StringBuilder uri = utils.getCalculationURI(licenses.get(0).getBusinessService());

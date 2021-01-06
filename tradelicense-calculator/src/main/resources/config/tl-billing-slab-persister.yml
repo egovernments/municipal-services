@@ -2,7 +2,7 @@ serviceMaps:
  serviceName: tradelicense Calculator
  mappings:
  - version: 1.0
-   name: tl-calculator
+   name: tradelicense-calculator
    description: Persists the billing slabs of tl into db
    fromTopic: save-tl-billingslab
    isTransaction: true
@@ -45,7 +45,7 @@ serviceMaps:
        - jsonPath: $.billingSlab.*.applicationType
        
  - version: 1.0
-   name: tl-calculator
+   name: tradelicense-calculator
    description: Updates the billing slabs of tl into db
    fromTopic: update-tl-billingslab
    isTransaction: true
