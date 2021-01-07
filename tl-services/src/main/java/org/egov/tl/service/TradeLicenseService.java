@@ -1,8 +1,9 @@
 package org.egov.tl.service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import org.egov.common.contract.request.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
@@ -22,6 +23,9 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.egov.tl.util.TLConstants.*;
 
@@ -104,6 +108,31 @@ public class TradeLicenseService {
         if (businessServicefromPath == null)
             businessServicefromPath = businessService_TL;
         tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
+
+		List<String> roles = tradeLicenseRequest.getRequestInfo().getUserInfo().getRoles().stream()
+				.map(Role::getCode).collect(Collectors.toList());
+		
+		
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String json;
+    	if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\" } ";	
+    	}
+    	else
+    	{
+    		json = "{ \"islegacy\" : \"false\" } ";
+    	}
+		JsonNode additionalDetail;
+		try {
+			additionalDetail = objectMapper.readTree(json);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+		}
+	
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+
         Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
         enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
@@ -266,6 +295,32 @@ public class TradeLicenseService {
         if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
         		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
                 && licence.getStatus().equals(TLConstants.STATUS_APPROVED)){
+
+		List<String> roles = tradeLicenseRequest.getRequestInfo().getUserInfo().getRoles().stream()
+				.map(Role::getCode).collect(Collectors.toList());
+		
+		
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String json;
+    	if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\" } ";	
+    	}
+    	else
+    	{
+    		json = "{ \"islegacy\" : \"false\" } ";
+    	}
+		JsonNode additionalDetail;
+		try {
+			additionalDetail = objectMapper.readTree(json);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+		}
+	
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+
+        if (applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL) && licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)) {
             List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
             licenceResponse = createResponse;
         } else {
