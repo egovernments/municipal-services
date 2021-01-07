@@ -90,15 +90,15 @@ public class PGRQueryBuilder {
         //When UI tries to fetch "escalated" complaints count.
         if(criteria.getSlaDeltaMaxLimit() != null && criteria.getSlaDeltaMinLimit() == null){
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" (NOW() - ser.createdtime) > ? ");
+            builder.append(" ((extract(epoch FROM NOW())*1000) - ser.createdtime) > ? ");
             preparedStmtList.add(criteria.getSlaDeltaMaxLimit());
         }
         //When UI tries to fetch "other" complaints count.
         if(criteria.getSlaDeltaMaxLimit() != null && criteria.getSlaDeltaMinLimit() != null){
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" (NOW() - ser.createdtime) > ? ");
+            builder.append(" ((extract(epoch FROM NOW())*1000) - ser.createdtime) > ? ");
             preparedStmtList.add(criteria.getSlaDeltaMinLimit());
-            builder.append(" (NOW() - ser.createdtime) < ? ");
+            builder.append(" ((extract(epoch FROM NOW())*1000) - ser.createdtime) < ? ");
             preparedStmtList.add(criteria.getSlaDeltaMaxLimit());
         }
 
