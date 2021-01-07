@@ -96,11 +96,11 @@ public class MDMSValidator {
 	 * @param propertyType
 	 * @throws CustomException
 	 */
-	public void validateOnSiteSanitationType(String applicationChannel ) throws CustomException{
+	public void validateOnSiteSanitationType(String sanitationType ) throws CustomException{
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.SANITATION_TYPE).contains(applicationChannel) ) {
+		if( !this.mdmsResMap.get(FSMConstants.SANITATION_TYPE).contains(sanitationType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_SANITATION_TYPE," On Site SanitationType is invalid");
 		}
 

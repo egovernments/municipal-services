@@ -50,6 +50,16 @@ public class FSMQueryBuilder {
 			addToPreparedStatement(preparedStmtList, application_number);
 			
 		}
+		
+		List<String> ids = criteria.getIds();
+		if (!CollectionUtils.isEmpty(ids)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
+			addToPreparedStatement(preparedStmtList, application_number);
+			
+		}
+		
+		
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.createdtime BETWEEN ").append(criteria.getFromDate()).append(" AND ")

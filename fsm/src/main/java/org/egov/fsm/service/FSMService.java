@@ -58,6 +58,9 @@ public class FSMService {
 	private UserService userService;
 	
 	@Autowired
+	private CalculationService calculationService ;
+	
+	@Autowired
 	private FSMRepository repository;
 	public FSM create(FSMRequest fsmRequest) {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
@@ -70,8 +73,11 @@ public class FSMService {
 		enrichmentService.enrichFSMCreateRequest(fsmRequest, mdmsData);
 		
 		//wfIntegrator.callWorkFlow(fsmRequest);
-		
 		repository.save(fsmRequest);
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
+			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
+		}
+		
 		return fsmRequest.getFsm();
 	}
 	
@@ -96,22 +102,26 @@ public class FSMService {
 		
 		//TODO get the FSM object with ID
 		// not find throw error
-		
-		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
-				fsm.getApplicationNo());
+
+		List<String> ids = new ArrayList<String>();
+		ids.add( fsm.getId());
+		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
+		List<FSM> fsms = repository.getFSMData(criteria);
+//		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
+//				fsm.getApplicationNo());
 		
 		// TODO write business logic 
 		// fill the audit details
 		
-		enrichmentService.enrichFSMUpdateRequest(fsmRequest, businessService);
+		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData);
 		
-		wfIntegrator.callWorkFlow(fsmRequest);
+//		wfIntegrator.callWorkFlow(fsmRequest);
 
 		enrichmentService.postStatusEnrichment(fsmRequest);
 		
 		fsmValidator.validateWorkflowActions(fsmRequest);
 		
-		repository.update(fsmRequest, workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService));
+		repository.update(fsmRequest, true); //workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService)
 		return fsmRequest.getFsm();
 	}
 	

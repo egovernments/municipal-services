@@ -100,6 +100,9 @@ public class FSMConfiguration {
 		private Integer maxSearchLimit;
 
 
+		// APPLICATION CONFIGS
+		@Value("${fsm.emp.create.tripamount.required}")
+		private Boolean tripAmtRequired;
 
 		// Reciept
 		@Value("${kafka.topics.receipt.create}")
@@ -107,16 +110,6 @@ public class FSMConfiguration {
 
 		@Value("${egov.receipt.businessservice}")
 		private String businessService;
-
-		// Property Service
-		@Value("${egov.property.service.host}")
-		private String propertyHost;
-
-		@Value("${egov.property.service.context.path}")
-		private String propertyContextPath;
-
-		@Value("${egov.property.endpoint}")
-		private String propertySearchEndpoint;
 
 		// SMS
 		@Value("${kafka.topics.notification.sms}")

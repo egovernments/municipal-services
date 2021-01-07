@@ -41,15 +41,18 @@ public class FSMSearchCriteria {
     @JsonProperty("applicationNumber")
     private List<String> applicationNumber;
     
+    @JsonProperty("ids")
+    private List <String> ids;
+    
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
 		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
-                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null);
+                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null && this.ids == null);
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
 		return (this.tenantId != null && this.mobileNumber == null
-                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null);
+                && this.ownerIds == null && this.fromDate == null && this.toDate == null && this.applicationNumber == null && this.ids == null);
 	} 
 }

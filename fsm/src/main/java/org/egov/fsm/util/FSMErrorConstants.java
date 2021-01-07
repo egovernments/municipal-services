@@ -22,6 +22,7 @@ public class FSMErrorConstants {
 	
 	
 	public static final String INVALID_APPLICANT_ERROR ="INVALID_APPLICANT_ERROR";
+	public static final String INVALID_TRIP_AMOUNT ="INVALID_TRIP_AMOUNT";
 	
 	public static final String RECEIPT_ERROR = "RECEIPT ERROR";
 	

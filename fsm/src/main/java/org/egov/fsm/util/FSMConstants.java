@@ -72,6 +72,8 @@ public class FSMConstants {
 	public static final String CITIZEN = "CITIZEN";
 	
 	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
+	
+	public static final String APPLICATION_FEE ="APPLICATION_FEE";
 
 
 }

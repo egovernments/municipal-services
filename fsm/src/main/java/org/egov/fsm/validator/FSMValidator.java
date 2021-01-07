@@ -1,5 +1,6 @@
 package org.egov.fsm.validator;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -47,11 +48,34 @@ public class FSMValidator {
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
 				fsm.setCitizen( fsmRequest.getRequestInfo().getUserInfo());
 			}
+			
+			if(!StringUtils.isEmpty(fsm.getSource())) {
+				mdmsValidator.validateApplicationChannel(fsm.getSource());
+				
+			}
+			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
+				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			}
+			
 		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
 			User applicant = fsm.getCitizen();
 			if( applicant == null ||  StringUtils.isEmpty(applicant.getName()) || StringUtils.isEmpty(applicant.getMobileNumber())) {
 				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
 			}
+			
+			Map<String, String> additionalDetails = fsm.getadditionalDetails() != null ? (Map<String,String>)fsm.getadditionalDetails()
+					: new HashMap<String, String>();
+			if(config.getTripAmtRequired() &&  additionalDetails.get("tripAmount") == null   ) {
+				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+			}else {
+				try {
+					BigDecimal tripAmt = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
+				}catch(Exception e) {
+					throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+				}
+			}
+			
+			
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 		}else {
@@ -59,8 +83,15 @@ public class FSMValidator {
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
 				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
 			}
+			
+			if(!StringUtils.isEmpty(fsm.getSource())) {
+				mdmsValidator.validateApplicationChannel(fsm.getSource());
+				
+			}
+			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
+				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			}
 		}
-		
 		
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 	}
