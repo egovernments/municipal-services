@@ -1,8 +1,9 @@
 package org.egov.tl.service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-
+import org.egov.common.contract.request.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
@@ -23,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.egov.tl.util.TLConstants.*;
 import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
@@ -103,19 +107,43 @@ public class TradeLicenseService {
     public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest,String businessServicefromPath){
        if(businessServicefromPath==null)
             businessServicefromPath = businessService_TL;
-       tlValidator.validateBusinessService(tradeLicenseRequest,businessServicefromPath);
-       Object mdmsData = util.mDMSCall(tradeLicenseRequest);
-       actionValidator.validateCreateRequest(tradeLicenseRequest);
-       enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
-       tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
-       switch(businessServicefromPath)
-       {
-           case businessService_BPA:
-               validateMobileNumberUniqueness(tradeLicenseRequest);
-               break;
-       }
-       userService.createUser(tradeLicenseRequest, false);
-       calculationService.addCalculation(tradeLicenseRequest);
+        tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
+
+		List<String> roles = tradeLicenseRequest.getRequestInfo().getUserInfo().getRoles().stream()
+				.map(Role::getCode).collect(Collectors.toList());
+		
+		
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String json;
+    	if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\" } ";	
+    	}
+    	else
+    	{
+    		json = "{ \"islegacy\" : \"false\" } ";
+    	}
+		JsonNode additionalDetail;
+		try {
+			additionalDetail = objectMapper.readTree(json);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+		}
+	
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+
+        Object mdmsData = util.mDMSCall(tradeLicenseRequest);
+        actionValidator.validateCreateRequest(tradeLicenseRequest);
+        enrichmentService.enrichTLCreateRequest(tradeLicenseRequest, mdmsData);
+        tlValidator.validateCreate(tradeLicenseRequest, mdmsData);
+        switch (businessServicefromPath) {
+            case businessService_BPA:
+                validateMobileNumberUniqueness(tradeLicenseRequest);
+                break;
+        }
+        userService.createUser(tradeLicenseRequest, false);
+        calculationService.addCalculation(tradeLicenseRequest);
 
         /*
          * call workflow service if it's enable else uses internal workflow process
@@ -261,8 +289,32 @@ public class TradeLicenseService {
         TradeLicense licence = tradeLicenseRequest.getLicenses().get(0);
         TradeLicense.ApplicationTypeEnum applicationType = licence.getApplicationType();
         List<TradeLicense> licenceResponse = null;
-        if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) &&
-                licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) && licence.getStatus().equals(TLConstants.STATUS_APPROVED)){
+
+		List<String> roles = tradeLicenseRequest.getRequestInfo().getUserInfo().getRoles().stream()
+				.map(Role::getCode).collect(Collectors.toList());
+		
+		
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		String json;
+    	if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\" } ";	
+    	}
+    	else
+    	{
+    		json = "{ \"islegacy\" : \"false\" } ";
+    	}
+		JsonNode additionalDetail;
+		try {
+			additionalDetail = objectMapper.readTree(json);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+		}
+	
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+
+        if (applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL) && licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)) {
             List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
             licenceResponse =  createResponse;
         }
