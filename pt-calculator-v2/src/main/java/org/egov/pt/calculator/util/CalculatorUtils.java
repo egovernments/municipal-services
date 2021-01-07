@@ -524,7 +524,7 @@ public class CalculatorUtils {
 		BigDecimal amtPaid = BigDecimal.ZERO;
 
 		List<BillAccountDetail> billAccountDetails = new LinkedList<>();
-
+        if(payment!=null) {
 		payment.getPaymentDetails().forEach(paymentDetail -> {
 			if (paymentDetail.getBusinessService().equalsIgnoreCase(SERVICE_FIELD_VALUE_PT)) {
 				paymentDetail.getBill().getBillDetails().forEach(billDetail -> {
@@ -543,6 +543,9 @@ public class CalculatorUtils {
 			}
 		}
 		return taxAmt.subtract(amtPaid);
+        }else {
+        	return BigDecimal.ZERO;
+        }
 	}
 
 	/**
