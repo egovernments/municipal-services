@@ -22,12 +22,12 @@ const envVariables = {
 
   BUSINESSSERVICE: process.env.BUSINESSSERVICE || "FIRENOC",
 
-  //firenoc service
+  //firenoc
   EGOV_FIRENOC_SERVICE_HOST:
     process.env.EGOV_FIRENOC_SERVICE_HOST ||
     "https://egov-micro-dev.egovernments.org",
   EGOV_FIRENOC_SEARCH_ENDPOINT:
-    process.env.EGOV_FIRENOC_SEARCH_ENDPOINT || "firenoc-services/v1/_search",
+    process.env.EGOV_FIRENOC_SEARCH_ENDPOINT || "firenoc/v1/_search",
 
   //billing sercice urls
   EGOV_BILLINGSERVICE_HOST:

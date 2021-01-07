@@ -1,4 +1,4 @@
-# Fire-NOC Service
+# Fire-NOC 
 
 The main objective of the Fire-NOC module is to provide **No Objection Certificate** indicating that the building is designed as per fire safety norms and regulation.
 ### DB UML Diagram
@@ -14,14 +14,14 @@ The main objective of the Fire-NOC module is to provide **No Objection Certifica
 
 ### Swagger API Contract
 
-Please refer to the [Swagger API contarct](https://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/municipal-services/master/firenoc-services/docs/contract/fire_noc_contract.yaml#!/) for Fire-NOC service to understand the structure of APIs and to have visualization of all internal APIs.
+Please refer to the [Swagger API contarct](https://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/municipal-services/master/firenoc/docs/contract/fire_noc_contract.yaml#!/) for Fire-NOC service to understand the structure of APIs and to have visualization of all internal APIs.
 
 
 ## Service Details
 
 **MDMS COnfiguration**
 
-Firenoc service makes calls to mdms to fetch required masters. These are significant in validations of application.
+Firenoc makes calls to mdms to fetch required masters. These are significant in validations of application.
 
 
    | Fire-NOC masters                                                                                                                           | Description                                                                                                    |  
@@ -35,7 +35,7 @@ Firenoc service makes calls to mdms to fetch required masters. These are signifi
 
 ### API Details
 
-`BasePath` /firenoc-services/v1/[API endpoint]
+`BasePath` /firenoc/v1/[API endpoint]
 
 ##### Method
 a) `_create`

@@ -22,7 +22,7 @@ To run the firenoc-calculator services locally, you need to run the below comman
 
  kubectl port-forward -n egov $(kgpt billing-service) 8084:8080 &
  kubectl port-forward -n egov $(kgpt mdms) 8085:8080 &
- kubectl port-forward -n egov $(kgpt firenoc-service) 8086:8080
+ kubectl port-forward -n egov $(kgpt firenoc) 8086:8080
 ``` 
 
 Update below listed properties in `envVariables.js` before running the project:
@@ -30,7 +30,7 @@ Update below listed properties in `envVariables.js` before running the project:
 ```ini
 EGOV_BILLINGSERVICE_HOST: process.env.EGOV_BILLINGSERVICE_HOST || "http://localhost:8084"
 EGOV_MDMS_HOST: process.env.EGOV_MDMS_HOST || "http://localhost:8085"
-#  If you are running firenoc service in your local system then mention server port of it
+#  If you are running firenoc in your local system then mention server port of it
 EGOV_FIRENOC_SERVICE_HOST: process.env.EGOV_FIRENOC_SERVICE_HOST || "http://localhost:8086",
 ```
 

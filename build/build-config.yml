@@ -64,12 +64,12 @@ config:
       - work-dir: "tradelicense/src/main/resources/db"
         image-name: "tradelicense-db"
 
-  - name: "builds/municipal-services/firenoc-services"
+  - name: "builds/municipal-services/firenoc"
     build:
-      - work-dir: "firenoc-services"
-        image-name: "firenoc-services"
-      - work-dir: "firenoc-services/migration"
-        image-name: "firenoc-services-db"
+      - work-dir: "firenoc"
+        image-name: "firenoc"
+      - work-dir: "firenoc/migration"
+        image-name: "firenoc-db"
 
   - name: "builds/municipal-services/firenoc-calculator"
     build:

@@ -221,7 +221,7 @@
       "type": "object",
       "properties": {
         "fireNOC": {
-          "$ref": "https://raw.githubusercontent.com/egovernments/egov-services/noc/rainmaker/firenoc-services/docs/contract/fire_noc_contract.yaml#/definitions/FireNOC"
+          "$ref": "https://raw.githubusercontent.com/egovernments/egov-services/noc/rainmaker/firenoc-/docs/contract/fire_noc_contract.yaml#/definitions/FireNOC"
         },
         "applicationNumber": {
           "type": "string",
