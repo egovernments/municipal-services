@@ -1,6 +1,6 @@
 # Local Setup
 
-To setup the firenoc-service in your local system, clone the [Core Service repository](https://github.com/egovernments/core-services).
+To setup the firenoc in your local system, clone the [Core Service repository](https://github.com/egovernments/core-services).
 
 ## Dependencies
 
@@ -15,7 +15,7 @@ To setup the firenoc-service in your local system, clone the [Core Service repos
 
 ## Running Locally
 
-To run the firenoc-service services locally, you need to run the below command to port forward below services
+To run the firenoc locally, you need to run the below command to port forward below services
 
 ```bash
  function kgpt(){kubectl get pods -n egov --selector=app=$1 --no-headers=true | head -n1 | awk '{print $1}'}
@@ -40,4 +40,4 @@ EGOV_FN_CALCULATOR_HOST: process.env.EGOV_FN_CALCULATOR_HOST || "http://localhos
 EGOV_MDMS_HOST: process.env.EGOV_MDMS_HOST || "http://localhost:8092"
 ```
 
-After updating the properties mentioned above, now start the fire-noc service by running the command **npm run dev** in terminal.
+After updating the properties mentioned above, now start the fire-noc by running the command **npm run dev** in terminal.
