@@ -12,7 +12,7 @@ public class SWConstants {
 
 	public static final String JSONPATH_ROOT = "$.MdmsRes.water-masters";
 
-	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.sw-services-calculation";
+	public static final String TAX_JSONPATH_ROOT = "$.MdmsRes.sewerage-calculation";
 	
 	public static final String PROPERTY_JSONPATH_ROOT = "$.MdmsRes.PropertyTax";
 
@@ -120,7 +120,7 @@ public class SWConstants {
 
 	public static final String PROPERTY_MASTER_MODULE = "PropertyTax";
 
-	public static final String SW_TAX_MODULE = "sw-services-calculation";
+	public static final String SW_TAX_MODULE = "sewerage-calculation";
 
 	public static final String SW_EDIT_SMS = "SW_EDIT_SMS_MESSAGE";
 

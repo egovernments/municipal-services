@@ -80,7 +80,7 @@ public class CalculatorUtils {
 	}
 
 	/**
-	 * Call SW-services to get sewerage for the given connectionNo and tenantID
+	 * Call sewerage to get sewerage for the given connectionNo and tenantID
 	 * 
 	 * @param requestInfo
 	 *            The RequestInfo of the incoming request

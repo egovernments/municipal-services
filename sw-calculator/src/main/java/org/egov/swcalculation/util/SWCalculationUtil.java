@@ -73,7 +73,7 @@ public class SWCalculationUtil {
 
 
 	/**
-	 * Returns the tax head search Url with tenantId and SW service name
+	 * Returns the tax head search Url with tenantId and sewerage name
 	 * parameters
 	 *
 	 * @param tenantId - Tenant ID
@@ -89,7 +89,7 @@ public class SWCalculationUtil {
 	}
 
 	/**
-	 * Returns the tax head search Url with tenantId and SW service name
+	 * Returns the tax head search Url with tenantId and sewerage name
 	 * parameters
 	 *
 	 * @param tenantId - Tenant ID
