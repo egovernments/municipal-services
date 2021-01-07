@@ -40,6 +40,12 @@ public class RequestSearchCriteria {
     @JsonProperty("offset")
     private Integer offset;
 
+    @JsonProperty("slaDeltaMaxLimit")
+    private Integer slaDeltaMaxLimit;
+
+    @JsonProperty("slaDeltaMinLimit")
+    private Integer slaDeltaMinLimit;
+
     @JsonIgnore
     private Set<String> userIds;
 
