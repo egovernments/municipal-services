@@ -43,7 +43,7 @@ public class SWCalculationConstant {
 
 	public static final String FINANCIAL_MODULE = "egf-master";
 
-	public static final String SW_TAX_MODULE = "sw-services-calculation";
+	public static final String SW_TAX_MODULE = "sewerage-calculation";
 
 	public static final String SW_REBATE_MASTER = "Rebate";
 
@@ -127,13 +127,13 @@ public class SWCalculationConstant {
 
 	public static final String Demand_Expiry_Date_String = "demandExpiryDate";
 
-	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.sw-services-calculation.billingPeriod";
+	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.sewerage-calculation.billingPeriod";
 
 	public static final String BILLING_PERIOD = "billingPeriod";
 
 	public static final String ConnectionType = "connectionType";
 
-	public static final String SW_MODULE = "sw-services-calculation";
+	public static final String SW_MODULE = "sewerage-calculation";
 
 	public static final String Demand_Generate_Date_String = "demandGenerationDateMillis";
 

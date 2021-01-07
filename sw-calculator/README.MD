@@ -6,9 +6,9 @@ This module created to manage the bill calculation for the registered sewerage s
 
 ### Service Dependencies
 - egov-mdms service
-- property-service
+- property
 - persister
-- sw-service
+- sewerage
 - user
 - workflow
 

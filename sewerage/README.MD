@@ -1,4 +1,4 @@
-# SW-Services
+# sewerage
 This module created to manage Sewerage Service connections against a Property in the system.
 
 ### DB UML Diagram
@@ -27,19 +27,19 @@ This module created to manage Sewerage Service connections against a Property in
 
 ### API Details
 
-`BasePath` /sw-services/swc/[API endpoint]
+`BasePath` /sewerage/swc/[API endpoint]
 
 ##### Method
 
 a) `_create`
 
-   - Sewerage Service connection created by calling sw-services/swc/_create api.
+   - Sewerage Service connection created by calling sewerage/swc/_create api.
    
    - The response contains the SewerageConnection object with its assigned ApplicationId of that SewerageService Connection.
    
 b) `_update`
 
-  -  Created SewerageService application needs to be approved and activated, and these are done by calling the sw-services/swc/_update api.
+  -  Created SewerageService application needs to be approved and activated, and these are done by calling the sewerage/swc/_update api.
   
   - Once the application activated new Sewerage Connection Number will be generated, and the same would be updated in the SewerageConnection Object.
 
