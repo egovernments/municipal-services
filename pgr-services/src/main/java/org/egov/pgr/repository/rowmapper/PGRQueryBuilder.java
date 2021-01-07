@@ -98,6 +98,7 @@ public class PGRQueryBuilder {
             addClauseIfRequired(preparedStmtList, builder);
             builder.append(" ((extract(epoch FROM NOW())*1000) - ser.createdtime) > ? ");
             preparedStmtList.add(criteria.getSlaDeltaMinLimit());
+            addClauseIfRequired(preparedStmtList, builder);
             builder.append(" ((extract(epoch FROM NOW())*1000) - ser.createdtime) < ? ");
             preparedStmtList.add(criteria.getSlaDeltaMaxLimit());
         }
