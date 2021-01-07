@@ -41,10 +41,10 @@ public class RequestSearchCriteria {
     private Integer offset;
 
     @JsonProperty("slaDeltaMaxLimit")
-    private Integer slaDeltaMaxLimit;
+    private Long slaDeltaMaxLimit;
 
     @JsonProperty("slaDeltaMinLimit")
-    private Integer slaDeltaMinLimit;
+    private Long slaDeltaMinLimit;
 
     @JsonIgnore
     private Set<String> userIds;
