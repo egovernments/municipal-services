@@ -1,10 +1,13 @@
 package org.egov.fsm.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -99,19 +102,34 @@ public class FSMService {
 		if (fsm.getId() == null) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		}
-		
-		//TODO get the FSM object with ID
-		// not find throw error
 
 		List<String> ids = new ArrayList<String>();
 		ids.add( fsm.getId());
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria);
+		
+		if(fsms.size() <= 0 && fsms.size() > 1) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
+		}
+		FSM oldFSM = fsms.get(0);
+		//TODO should be modified later after implementing the workflow , based on workflow state calculation should be generated
+		if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
+			
+			Map<String, String> newAdditionalDetails = fsm.getadditionalDetails() != null ? (Map<String, String>)fsm.getadditionalDetails()
+					: new HashMap<String, String>();
+			BigDecimal newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
+			
+			Map<String, String> oldAdditionalDetails = oldFSM.getadditionalDetails() != null ? (Map<String, String>)oldFSM.getadditionalDetails()
+					: new HashMap<String, String>();
+			BigDecimal oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
+			if( oldTripAmount.compareTo(newTripAmount) != 0) {
+				calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
+			}
+			
+		}
 //		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 //				fsm.getApplicationNo());
-		
-		// TODO write business logic 
-		// fill the audit details
+
 		
 		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData);
 		
@@ -119,7 +137,7 @@ public class FSMService {
 
 		enrichmentService.postStatusEnrichment(fsmRequest);
 		
-		fsmValidator.validateWorkflowActions(fsmRequest);
+//		fsmValidator.validateWorkflowActions(fsmRequest);
 		
 		repository.update(fsmRequest, true); //workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService)
 		return fsmRequest.getFsm();

@@ -29,11 +29,18 @@
                     "actions": [
                         {
                             "tenantId": "pb",
-                            "action": "INITIATE",
+                            "action": "APPLY",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
+                            "roles": [
+                                "FSM_CREATOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CREATE",
                             "nextState": "CREATED",
                             "roles": [
-                                "CITIZEN",
-                                "FSM_CREATOR_EMP"
+                                "CITIZEN"
                             ]
                         }
                     ]
@@ -146,6 +153,43 @@
                     "tenantId": "pb",
                     "sla": null,
                     "state": null,
+                    "currentState": "DSO_REJECTED",
+                    "applicationStatus": "DSO_REJECTED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "ASSIGN",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_EDITOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": null,
                     "currentState": "PENDING_DSO_APPROVAL",
                     "applicationStatus": "PENDING_DSO_APPROVAL",
                     "docUploadRequired": false,
@@ -172,7 +216,7 @@
                         {
                             "tenantId": "pb",
                             "action": "SENDBACK",
-                            "nextState": "ASSING_DSO",
+                            "nextState": "DSO_REJECTED",
                             "roles": [
                                 "FSM_ADMIN"
                             ]

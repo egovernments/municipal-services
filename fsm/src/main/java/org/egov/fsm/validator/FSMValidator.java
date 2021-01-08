@@ -184,7 +184,15 @@ public class FSMValidator {
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
 		
-//		setFieldsFromSearch(fsmRequest, searchResult, mdmsData);
+		if(!StringUtils.isEmpty(fsm.getSource())) {
+			mdmsValidator.validateApplicationChannel(fsm.getSource());
+			
+		}
+		if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
+			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+		}
+		
+		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 
 	}
 	

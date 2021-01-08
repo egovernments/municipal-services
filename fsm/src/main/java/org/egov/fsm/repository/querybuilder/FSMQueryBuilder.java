@@ -55,7 +55,7 @@ public class FSMQueryBuilder {
 		if (!CollectionUtils.isEmpty(ids)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
-			addToPreparedStatement(preparedStmtList, application_number);
+			addToPreparedStatement(preparedStmtList, ids);
 			
 		}
 		
