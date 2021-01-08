@@ -292,9 +292,6 @@ public class TradeLicenseService {
         TradeLicense licence = tradeLicenseRequest.getLicenses().get(0);
         TradeLicense.ApplicationTypeEnum applicationType = licence.getApplicationType();
         List<TradeLicense> licenceResponse = null;
-        if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
-        		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
-                && licence.getStatus().equals(TLConstants.STATUS_APPROVED)){
 
 		List<String> roles = tradeLicenseRequest.getRequestInfo().getUserInfo().getRoles().stream()
 				.map(Role::getCode).collect(Collectors.toList());
@@ -320,8 +317,10 @@ public class TradeLicenseService {
 	
     	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
 
-        if (applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL) && licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)) {
-            List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
+    	if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
+        		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
+                && licence.getStatus().equals(TLConstants.STATUS_APPROVED)){
+    		List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
             licenceResponse = createResponse;
         } else {
             if (businessServicefromPath == null)
