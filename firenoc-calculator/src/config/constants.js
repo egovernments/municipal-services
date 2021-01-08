@@ -6,7 +6,7 @@ export const constants = {
   MDMS_MASTERNAME_FIRENOCSTATECONST: "FireNocStateConstats",
   MDMS_MASTERNAME_UOMS: "UOMs",
   MDMS_MASTERNAME_TENANTS: "tenants",
-  MDMS_EGF_MASTER: "egf-master",
+  MDMS_EGF_MASTER: "finance-master",
   MDMS_FINANCIALYEAR: "FinancialYear",
   MDMS_FINANCIALYEAR_FILTER: "$.[?(@.active==true && @.module=='FIRENOC')]"
 };

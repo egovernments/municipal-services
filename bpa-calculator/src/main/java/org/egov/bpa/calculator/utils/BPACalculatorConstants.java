@@ -4,11 +4,11 @@ public class BPACalculatorConstants {
 
 	
 
-    public static final String MDMS_EGF_MASTER = "egf-master";
+    public static final String MDMS_EGF_MASTER = "finance-master";
 
     public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
 
-    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear[?(@.code==\"{}\")]";
 
     public static final String MDMS_STARTDATE  = "startingDate";
 

@@ -18,7 +18,7 @@ export const validateFireNOCModel = (data, mdmsData) => {
     []
   );
   const buildingType = get(mdmsData, "MdmsRes.firenoc.BuildingType", []);
-  const financialYear = get(mdmsData, "MdmsRes.egf-master.FinancialYear", []);
+  const financialYear = get(mdmsData, "MdmsRes.finance-master.FinancialYear", []);
   const boundary = get(mdmsData, "MdmsRes.firenoc.boundary", []);
   // const gender = [
   //   {

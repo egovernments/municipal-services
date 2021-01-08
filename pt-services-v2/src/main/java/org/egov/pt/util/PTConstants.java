@@ -33,11 +33,11 @@ public class PTConstants {
 
     public static final String MDMS_PT_OWNERTYPE = "OwnerType";
 
-    public static final String MDMS_PT_EGF_MASTER = "egf-master";
+    public static final String MDMS_PT_EGF_MASTER = "finance-master";
 
     public static final String MDMS_PT_FINANCIALYEAR = "FinancialYear";
 
-    public static final String JSONPATH_FINANCIALYEAR = "$.MdmsRes.egf-master";
+    public static final String JSONPATH_FINANCIALYEAR = "$.MdmsRes.finance-master";
 
     public static final String BOUNDARY_HEIRARCHY_CODE = "REVENUE";
 

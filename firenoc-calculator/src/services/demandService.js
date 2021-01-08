@@ -41,7 +41,7 @@ export const generateDemand = async (requestInfo, tenantId, calculations) => {
 
 const createDemand = async (requestInfo, calculations, mdms) => {
   //  let financeYear = mdms.
-  let FinancialYearsData = get(mdms, "MdmsRes.egf-master.FinancialYear");
+  let FinancialYearsData = get(mdms, "MdmsRes.finance-master.FinancialYear");
   let demands = [];
   calculations.map(calculation => {
     let tenantId = calculation.tenantId;
@@ -84,7 +84,7 @@ const createDemand = async (requestInfo, calculations, mdms) => {
 };
 
 const updateDemand = async (requestInfo, calculations, demandsSearch, mdms) => {
-  let FinancialYearsData = get(mdms, "MdmsRes.egf-master.FinancialYear");
+  let FinancialYearsData = get(mdms, "MdmsRes.finance-master.FinancialYear");
 
   let demandMap = {};
   demandsSearch.Demands.map(demand => {

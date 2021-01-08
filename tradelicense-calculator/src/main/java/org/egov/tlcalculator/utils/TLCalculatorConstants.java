@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class TLCalculatorConstants {
 
 
-    public static final String MDMS_EGF_MASTER = "egf-master";
+    public static final String MDMS_EGF_MASTER = "finance-master";
 
     public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
 
@@ -13,7 +13,7 @@ public class TLCalculatorConstants {
 
     public static final String MDMS_BILLINGSERVICE  = "BillingService";
 
-    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\" && @.module == 'TL')]";
+    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear[?(@.code==\"{}\" && @.module == 'TL')]";
 
     public static final String MDMS_TL_RENEWAL_TAX_PERIODS = "$.MdmsRes.BillingService.TaxPeriod[?(@.financialYear==\"{}\")]";
 
