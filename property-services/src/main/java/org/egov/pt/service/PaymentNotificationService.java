@@ -556,7 +556,6 @@ public class PaymentNotificationService {
                 items.add(item);
 
                 action = Action.builder().actionUrls(items).build();
-                System.out.println("\naction-->"+action.toString()+"\n");
 
             }
 
@@ -564,6 +563,7 @@ public class PaymentNotificationService {
                     .eventType(PTConstants.USREVENTS_EVENT_TYPE).name(PTConstants.USREVENTS_EVENT_NAME)
                     .postedBy(PTConstants.USREVENTS_EVENT_POSTEDBY).source(Source.WEBAPP).recepient(recepient)
                     .eventDetails(null).actions(action).build());
+            System.out.println("\naction-->"+events.toString()+"\n");
 
         }
 
