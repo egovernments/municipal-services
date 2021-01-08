@@ -43,7 +43,8 @@ public class RequestSearchCriteria {
     @JsonIgnore
     private Set<String> userIds;
 
-
+    @JsonProperty("accountId")
+    private String accountId;
 
     public boolean isEmpty(){
         return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null
