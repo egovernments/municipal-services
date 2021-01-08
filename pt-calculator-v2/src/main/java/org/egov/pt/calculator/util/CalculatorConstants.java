@@ -119,7 +119,7 @@ public class CalculatorConstants {
 	 * Module names
 	 */
 
-	public static final String FINANCIAL_MODULE = "egf-master";
+	public static final String FINANCIAL_MODULE = "finance-master";
 
 	public static final String PROPERTY_TAX_MODULE = "PropertyTax";
 
@@ -208,7 +208,7 @@ public class CalculatorConstants {
 
 	public static final String ASSESSMENTNUMBER_FIELD_SEARCH = "propertyDetailids=";
 
-	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear[?(@.code==\"{}\")]";
 
 	public static final String FINANCIALYEAR_MASTER_KEY = "FINANCIALYEAR";
 

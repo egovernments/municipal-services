@@ -31,7 +31,7 @@ public class SWCalculationConstant {
 
 	public static final String SERVICE_FIELD_VALUE_SW = "SW";
 
-	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear[?(@.code==\"{}\")]";
 
 	public static final String EG_SW_FINANCIAL_MASTER_NOT_FOUND = "EG_SW_FINANCIAL_MASTER_NOT_FOUND";
 
@@ -41,7 +41,7 @@ public class SWCalculationConstant {
 
 	public static final String FINANCIAL_YEAR_RANGE_FEILD_NAME = "finYearRange";
 
-	public static final String FINANCIAL_MODULE = "egf-master";
+	public static final String FINANCIAL_MODULE = "finance-master";
 
 	public static final String SW_TAX_MODULE = "sewerage-calculation";
 

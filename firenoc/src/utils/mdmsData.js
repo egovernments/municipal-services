@@ -21,7 +21,7 @@ export default async (requestInfo = {},tenantId) => {
           ]
         },
         {
-          moduleName: "egf-master",
+          moduleName: "finance-master",
           masterDetails: [{ name: "FinancialYear" }]
         },
         { moduleName: "tenant", masterDetails: [{ name: "tenants" }] }

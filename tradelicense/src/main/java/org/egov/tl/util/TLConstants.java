@@ -128,15 +128,15 @@ public class TLConstants {
 
     //FINANCIAL YEAR
 
-    public static final String MDMS_EGF_MASTER = "egf-master";
+    public static final String MDMS_EGF_MASTER = "finance-master";
 
     public static final String MDMS_FINANCIALYEAR  = "FinancialYear";
 
-    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear[?(@.code==\"{}\")]";
 
-    public static final String MDMS_TL_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear";
+    public static final String MDMS_TL_FINACIALYEAR_PATH = "$.MdmsRes.finance-master.FinancialYear";
 
-    public static final String MDMS_TL_FINACIALYEAR_START_DATE = "$.MdmsRes.egf-master.FinancialYear[?(@.startingDate==\"{}\")]";
+    public static final String MDMS_TL_FINACIALYEAR_START_DATE = "$.MdmsRes.finance-master.FinancialYear[?(@.startingDate==\"{}\")]";
 
     public static final String MDMS_STARTDATE  = "startingDate";
 
