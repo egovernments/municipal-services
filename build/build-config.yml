@@ -110,13 +110,13 @@ config:
       - work-dir: "sewerage/src/main/resources/db"
         image-name: "sewerage-db"
 
-  - name: "builds/municipal-services/sw-calculator"
+  - name: "builds/municipal-services/sewerage-calculator"
     build:
-      - work-dir: "sw-calculator"
-        image-name: "sw-calculator"
+      - work-dir: "sewerage-calculator"
+        image-name: "sewerage-calculator"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "sw-calculator/src/main/resources/db"
-        image-name: "sw-calculator-db"     
+      - work-dir: "sewerage-calculator/src/main/resources/db"
+        image-name: "sewerage-calculator-db"
 
   - name: "builds/municipal-services/bpa-services"
     build:

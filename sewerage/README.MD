@@ -9,7 +9,7 @@ This module created to manage Sewerage Service connections against a Property in
 - property-service
 - idgen
 - persister
-- sw-calculator
+- sewerage-calculator
 - filestore
 - pdfgen
 

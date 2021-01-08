@@ -22,7 +22,7 @@
 					"raw": "{\n  \"RequestInfo\": {\n    \"apiId\": \"Rainmaker\",\n    \"ver\": \".01\",\n    \"action\": \"_estimate\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"requesterId\": \"\",\n    \"authToken\": \"af598296-731b-4f97-9614-d77e3afd3bc1\"\n  },\n  \"isconnectionCalculation\": false,\n  \"CalculationCriteria\": [\n    {\n      \"applicationNo\": \"WS_AP/107/2020-21/000006\",\n      \"tenantId\": \"pb.amritsar\"\n    }\n  ]\n}"
 				},
 				"url": {
-					"raw": "https://egov-micro-dev.egovernments.org/water-calculator/waterCalculator/_estimate",
+					"raw": "https://egov-micro-dev.egovernments.org/sewerage-calculator/sewerageCalculator/_estimate",
 					"protocol": "https",
 					"host": [
 						"egov-micro-dev",
@@ -55,7 +55,7 @@
 					"raw": "{\n  \"RequestInfo\": {\n    \"action\": \"_estimate\",\n    \"apiId\": \"Rainmaker\",\n    \"authToken\": \"af598296-731b-4f97-9614-d77e3afd3bc1\",\n    \"did\": \"1\",\n    \"key\": \"\",\n    \"msgId\": \"20170310130900|en_IN\",\n    \"requesterId\": \"\",\n    \"ver\": \".01\"\n  },\n  \"CalculationCriteria\": [\n    {\n      \"applicationNo\": \"WS_AP/107/2020-21/064459\",\n      \"tenantId\": \"pb.amritsar\",\n      \"assessmentYear\":\"2019-20\"\n    }\n  ]\n}"
 				},
 				"url": {
-					"raw": "https://egov-micro-dev.egovernments.org/water-calculator/waterCalculator/_calculate",
+					"raw": "https://egov-micro-dev.egovernments.org/sewerage-calculator/sewerageCalculator/_calculate",
 					"protocol": "https",
 					"host": [
 						"egov-micro-dev",
@@ -89,14 +89,14 @@
 					"raw": " {\n  \"RequestInfo\": {\n    \"apiId\": \"string\",\n    \"ver\": \"string\",\n    \"ts\": 0,\n    \"action\": \"string\",\n    \"did\": \"string\",\n    \"key\": \"string\",\n    \"msgId\": \"amit|en_IN\",\n    \"requesterId\": \"string\",\n    \"authToken\": \"63b275f2-e2f1-4abd-9862-dd90c782d691\",\n    \"userInfo\": {\n            \"id\": 28039,\n            \"uuid\": \"e0c9e6b1-f813-44b7-a843-423cb89a247f\",\n            \"userName\": \"EMP-107-000258\",\n            \"name\": \"WSEmp1\",\n            \"type\": \"EMPLOYEE\",\n            \"mobileNumber\": \"7382193319\",\n            \"emailId\": null,\n            \"tenantId\": \"pb.amritsar\",\n            \"roles\": [\n                {\n                    \"id\": null,\n                    \"name\": \"Employee\",\n                    \"code\": \"EMPLOYEE\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"WS Document Verifier\",\n                    \"code\": \"WS_DOC_VERIFIER\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"WS Counter Employee\",\n                    \"code\": \"WS_CEMP\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"SW Field Inspector\",\n                    \"code\": \"SW_FIELD_INSPECTOR\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"SW Counter Employee\",\n                    \"code\": \"SW_CEMP\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"WS Field Inspector\",\n                    \"code\": \"WS_FIELD_INSPECTOR\",\n                    \"tenantId\": \"pb.amritsar\"\n                },\n                {\n                    \"id\": null,\n                    \"name\": \"SW Document Verifier\",\n                    \"code\": \"SW_DOC_VERIFIER\",\n                    \"tenantId\": \"pb.amritsar\"\n                }\n            ]\n        }\n  }\n }"
 				},
 				"url": {
-					"raw": "http://localhost:8090/sw-calculator/sewerageCalculator/_jobscheduler",
+					"raw": "http://localhost:8090/sewerage-calculator/sewerageCalculator/_jobscheduler",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8090",
 					"path": [
-						"sw-calculator",
+						"sewerage-calculator",
 						"sewerageCalculator",
 						"_jobscheduler"
 					]

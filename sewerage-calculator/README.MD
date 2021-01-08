@@ -1,4 +1,4 @@
-# SW-Calculator Service
+# Sewerage-Calculator Service
 This module created to manage the bill calculation for the registered sewerage service connections in the system.
 
 ### DB UML Diagram
@@ -25,18 +25,18 @@ This module created to manage the bill calculation for the registered sewerage s
 
 ### API Details
 
-`BasePath` /sw-calculator/sewerageCalculator/[API endpoint]
+`BasePath` /sewerage-calculator/sewerageCalculator/[API endpoint]
 
 ##### Method
 
 a) `_estimate`
-   - To Activate the Sewerage Service application, the user needs to pay the ONE_TIME_FEE for the connection. To calculate the ONE_TIME_FEE sw-calculator/sewerageCalculator/_estimate API used.
+   - To Activate the Sewerage Service application, the user needs to pay the ONE_TIME_FEE for the connection. To calculate the ONE_TIME_FEE sewerage-calculator/sewerageCalculator/_estimate API used.
 
 b) `_calculate`
    - This API used to generate the demand for metered or non-metered Sewerage connection.
 
 c) `_updateDemand`
-   - User can pay partial / full / advance amount for the Metered or Non-Metered connection bill. In these cases, Billing service would call back sw-calculator/sewerageCalculator/_updateDemand API to update the details of the demand generated.
+   - User can pay partial / full / advance amount for the Metered or Non-Metered connection bill. In these cases, Billing service would call back sewerage-calculator/sewerageCalculator/_updateDemand API to update the details of the demand generated.
 
 d) `_jobscheduler`
    - This API used to generate demand for Non-metered connections. This API can be called periodically.
