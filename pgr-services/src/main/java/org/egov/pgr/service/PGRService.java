@@ -1,14 +1,12 @@
 package org.egov.pgr.service;
 
 
-import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.PGRRepository;
 import org.egov.pgr.util.MDMSUtils;
 import org.egov.pgr.validator.ServiceRequestValidator;
-import org.egov.pgr.web.models.Document;
 import org.egov.pgr.web.models.ServiceWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.ServiceRequest;
@@ -17,7 +15,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
-@Slf4j
 @org.springframework.stereotype.Service
 public class PGRService {
 
@@ -41,6 +38,7 @@ public class PGRService {
 
     private MDMSUtils mdmsUtils;
 
+
     @Autowired
     public PGRService(EnrichmentService enrichmentService, UserService userService, WorkflowService workflowService,
                       ServiceRequestValidator serviceRequestValidator, ServiceRequestValidator validator, Producer producer,
@@ -63,10 +61,6 @@ public class PGRService {
      * @return
      */
     public ServiceRequest create(ServiceRequest request){
-        List<Document> documents = request.getWorkflow().getVerificationDocuments();
-        for(Document document : documents){
-            log.info("FILESTOREID in create method: " + document.getFileStore());
-        }
         Object mdmsData = mdmsUtils.mDMSCall(request);
         validator.validateCreate(request, mdmsData);
         enrichmentService.enrichCreateRequest(request);

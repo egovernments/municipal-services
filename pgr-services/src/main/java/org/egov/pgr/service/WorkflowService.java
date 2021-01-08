@@ -66,12 +66,20 @@ public class WorkflowService {
      *
      * */
     public String updateWorkflowStatus(ServiceRequest serviceRequest) {
-        List<Document> documents =serviceRequest.getWorkflow().getVerificationDocuments();
+        List<Document> documents = serviceRequest.getWorkflow().getVerificationDocuments();
         for(Document document : documents){
-            log.info("FILESTOREID in update workflow method: " + document.getFileStore());
+            log.info("FILESTORE ID BEFORE WORKFLOW CALL: " + document.getFileStore());
         }
         ProcessInstance processInstance = getProcessInstanceForPGR(serviceRequest);
+        List<Document> documents1 = processInstance.getDocuments();
+        for(Document document : documents1){
+            log.info("FILESTORE ID IN PROCESS INSTANCE OBJECT: " + document.getFileStore());
+        }
         ProcessInstanceRequest workflowRequest = new ProcessInstanceRequest(serviceRequest.getRequestInfo(), Collections.singletonList(processInstance));
+        List<Document> documents2 = workflowRequest.getProcessInstances().get(0).getDocuments();
+        for(Document document : documents2){
+            log.info("FILESTORE ID IN FINAL WORKFLOW REQUEST OBJECT: " + document.getFileStore());
+        }
         State state = callWorkFlow(workflowRequest);
         serviceRequest.getService().setApplicationStatus(state.getApplicationStatus());
         return state.getApplicationStatus();
