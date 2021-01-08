@@ -171,7 +171,7 @@ public class PropertyConfiguration {
 	@Value("${egov.usr.events.create.topic}")
 	private String saveUserEventsTopic;
 		
-	@Value("${egov.usr.events.pay.link}")
+	@Value("${egov.usr.event.pay.link}")
 	private String payLink;
 	
 	@Value("${egov.usr.events.pay.code}")
