@@ -1,6 +1,7 @@
 package org.egov.pgr.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 import static org.egov.pgr.util.PGRConstants.*;
 
+@Slf4j
 @org.springframework.stereotype.Service
 public class WorkflowService {
 
@@ -64,6 +66,10 @@ public class WorkflowService {
      *
      * */
     public String updateWorkflowStatus(ServiceRequest serviceRequest) {
+        List<Document> documents =serviceRequest.getWorkflow().getVerificationDocuments();
+        for(Document document : documents){
+            log.info("FILESTOREID in update workflow method: " + document.getFileStore());
+        }
         ProcessInstance processInstance = getProcessInstanceForPGR(serviceRequest);
         ProcessInstanceRequest workflowRequest = new ProcessInstanceRequest(serviceRequest.getRequestInfo(), Collections.singletonList(processInstance));
         State state = callWorkFlow(workflowRequest);
