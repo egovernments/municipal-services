@@ -94,7 +94,7 @@ public class PGRService {
         Map<Long, List<ServiceWrapper>> sortedWrappers = new TreeMap<>(Collections.reverseOrder());
         for(ServiceWrapper svc : enrichedServiceWrappers){
             if(sortedWrappers.containsKey(svc.getService().getAuditDetails().getCreatedTime())){
-                sortedWrappers.get(svc.getService().getAuditDetails().getCreatedTime());
+                sortedWrappers.get(svc.getService().getAuditDetails().getCreatedTime()).add(svc);
             }else{
                 List<ServiceWrapper> serviceWrapperList = new ArrayList<>();
                 serviceWrapperList.add(svc);
