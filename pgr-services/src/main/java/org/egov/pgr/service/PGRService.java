@@ -1,6 +1,7 @@
 package org.egov.pgr.service;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
 import org.egov.pgr.producer.Producer;
@@ -16,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @org.springframework.stereotype.Service
 public class PGRService {
 
@@ -87,8 +89,10 @@ public class PGRService {
 
         List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
 
-        if(CollectionUtils.isEmpty(serviceWrappers))
-            return new ArrayList<>();;
+        if(CollectionUtils.isEmpty(serviceWrappers)) {
+            log.info("No Service Wrappers found for the given criteria ");
+            return new ArrayList<>();
+        }
 
         userService.enrichUsers(serviceWrappers);
         List<ServiceWrapper> enrichedServiceWrappers = workflowService.enrichWorkflow(requestInfo,serviceWrappers);
