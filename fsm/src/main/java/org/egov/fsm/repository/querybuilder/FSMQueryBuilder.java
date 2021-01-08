@@ -20,7 +20,7 @@ public class FSMQueryBuilder {
 					+ "	 FROM eg_fsm_application fsm"
 					+ "	 INNER JOIN   eg_fsm_address fsm_address on fsm_address.fsm_id = fsm.id"
 					+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
-					+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fms_id = fsm.id";
+					+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
 			
 	private final String paginationWrapper = "SELECT * FROM "
 					+ "(SELECT *, DENSE_RANK() OVER (ORDER BY fsm_lastModifiedTime DESC) offset_ FROM " + "({})"
