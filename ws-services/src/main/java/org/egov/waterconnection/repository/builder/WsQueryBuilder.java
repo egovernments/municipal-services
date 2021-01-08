@@ -170,6 +170,11 @@ public class WsQueryBuilder {
 			query.append(" conn.isoldapplication = ? ");
 			preparedStatement.add(Boolean.FALSE);
 		}
+		if (!StringUtils.isEmpty(criteria.getLocality())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.locality = ? ");
+			preparedStatement.add(criteria.getLocality());
+		}
 		query.append(ORDER_BY_CLAUSE);
 		return addPaginationWrapper(query.toString(), preparedStatement, criteria);
 	}
