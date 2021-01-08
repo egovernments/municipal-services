@@ -43,6 +43,10 @@ public class RequestsApiController{
     @RequestMapping(value="/request/_create", method = RequestMethod.POST)
     public ResponseEntity<ServiceResponse> requestsCreatePost(@Valid @RequestBody ServiceRequest request) throws IOException {
 
+        List<Document> documents = request.getWorkflow().getVerificationDocuments();
+        for(Document document : documents){
+            log.info("FILESTORE ID IN PGR CREATE: " + document.getFileStore());
+        }
         ServiceRequest enrichedReq = pgrService.create(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         ServiceWrapper serviceWrapper = ServiceWrapper.builder().service(enrichedReq.getService()).workflow(enrichedReq.getWorkflow()).build();
