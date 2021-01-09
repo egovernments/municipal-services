@@ -48,10 +48,11 @@ public class PGRQueryBuilder {
             }
         }
 
-        if (criteria.getServiceCode() != null) {
+        Set<String> serviceCodes = criteria.getServiceCode();
+        if (!CollectionUtils.isEmpty(serviceCodes)) {
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.serviceCode=? ");
-            preparedStmtList.add(criteria.getServiceCode());
+            builder.append(" ser.serviceCode IN (").append(createQuery(serviceCodes)).append(")");
+            addToPreparedStatement(preparedStmtList, serviceCodes);
         }
 
         Set<String> applicationStatuses = criteria.getApplicationStatus();
