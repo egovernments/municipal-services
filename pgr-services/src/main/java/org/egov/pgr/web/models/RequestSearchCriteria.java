@@ -31,6 +31,9 @@ public class RequestSearchCriteria {
     @JsonProperty("serviceRequestId")
     private String serviceRequestId;
 
+    @JsonProperty("locality")
+    private String locality;
+
     @JsonProperty("ids")
     private Set<String> ids;
 
