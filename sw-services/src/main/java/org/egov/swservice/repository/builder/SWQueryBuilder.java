@@ -166,7 +166,7 @@ public class SWQueryBuilder {
 			query.append(" conn.isoldapplication = ? ");
 			preparedStatement.add(Boolean.FALSE);
 		}
-		if (!!StringUtils.isEmpty(criteria.getLocality())) {
+		if (!StringUtils.isEmpty(criteria.getLocality())) {
 			addClauseIfRequired(preparedStatement, query);
 			query.append(" conn.locality = ? ");
 			preparedStatement.add(criteria.getLocality());
