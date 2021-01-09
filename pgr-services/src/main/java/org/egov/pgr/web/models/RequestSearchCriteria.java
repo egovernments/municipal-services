@@ -20,7 +20,7 @@ public class RequestSearchCriteria {
     private String tenantId;
 
     @JsonProperty("serviceCode")
-    private String serviceCode;
+    private Set<String> serviceCode;
 
     @JsonProperty("applicationStatus")
     private Set<String> applicationStatus;
