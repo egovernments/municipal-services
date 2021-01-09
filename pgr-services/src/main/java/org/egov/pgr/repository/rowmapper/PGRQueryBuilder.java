@@ -81,10 +81,11 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
-        if(criteria.getLocality() != null){
+        Set<String> localities = criteria.getLocality();
+        if(!CollectionUtils.isEmpty(localities)){
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ads.locality = ? ");
-            preparedStmtList.add(criteria.getLocality());
+            builder.append(" ads.locality IN (").append(createQuery(localities)).append(")");
+            addToPreparedStatement(preparedStmtList, localities);
         }
 
         addOrderByClause(builder);

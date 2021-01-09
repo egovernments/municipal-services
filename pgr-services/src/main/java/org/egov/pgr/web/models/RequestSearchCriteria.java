@@ -32,7 +32,7 @@ public class RequestSearchCriteria {
     private String serviceRequestId;
 
     @JsonProperty("locality")
-    private String locality;
+    private Set<String> locality;
 
     @JsonProperty("ids")
     private Set<String> ids;
