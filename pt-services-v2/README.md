@@ -35,7 +35,7 @@ Module is used to register property in the system.
 
 
 ### Resources
-- Granular details about the API's can be found in the [swagger api definition](https://raw.githubusercontent.com/egovernments/egov-services/master/docs/rainmaker/property-tax/property-service.yml)
+- Granular details about the API's can be found in the [swagger api definition](https://raw.githubusercontent.com/egovernments/egov-services/master/docs/rainmaker/property-tax/property.yml)
 - Postman collection for all the API's can be found in the [postman collection](https://raw.githubusercontent.com/egovernments/egov-services/master/rainmaker/pt-services-v2/pt-services-v2-dev.postman_collection.json)
 
 

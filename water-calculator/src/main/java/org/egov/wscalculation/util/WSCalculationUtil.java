@@ -51,7 +51,7 @@ public class WSCalculationUtil {
 	private final String uuids = "uuids=";
 
 	/**
-	 * Returns the tax head search Url with tenantId and WS service name parameters
+	 * Returns the tax head search Url with tenantId and Water name parameters
 	 * 
 	 * @param tenantId Tenant Id
 	 * @param serviceFieldValue Service Field Value
@@ -66,7 +66,7 @@ public class WSCalculationUtil {
 	}
 
 	/**
-	 * Returns the tax head search Url with tenantId and WS service name parameters
+	 * Returns the tax head search Url with tenantId and Water name parameters
 	 * 
 	 * @param tenantId TenantId
 	 * @param serviceFieldValue Service Field Value
@@ -227,7 +227,7 @@ public class WSCalculationUtil {
 	/**
 	 * 
 	 * @param result
-	 *            Response object from property service call
+	 *            Response object from property call
 	 * @return List of property
 	 */
 	private List<Property> getPropertyDetails(Object result) {

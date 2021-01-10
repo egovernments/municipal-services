@@ -108,7 +108,7 @@ const envVariables = {
   EGOV_FN_CALCULATOR_GETBILL_ENPOINT:
     process.env.EGOV_FN_GETBILLE_CALCULATOR_ENPOINT || "/_getbill",
 
-  //property service configurations
+  //property configurations
   EGOV_PROPERTY_HOST:
     process.env.EGOV_PROPERTY_HOST || "https://egov-micro-dev.egovernments.org",
   EGOV_PROPERTY_CONTEXT_PATH:

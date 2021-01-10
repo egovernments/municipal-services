@@ -6,7 +6,7 @@ This module created to manage WaterService connections against a Property in the
 
 ### Service Dependencies
 - mdms service
-- property-service
+- property
 - idgen
 - persister
 - water-calculator

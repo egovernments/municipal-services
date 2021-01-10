@@ -1,6 +1,6 @@
 # Local Setup
 
-To setup the property-service in your local system, clone the git repo(https://github.com/egovernments/municipal-services).
+To setup the property in your local system, clone the git repo(https://github.com/egovernments/municipal-services).
 
 ## Dependencies
 

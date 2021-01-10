@@ -6,9 +6,9 @@ This module created to manage the Bill calculation for the registered water serv
 
 ### Service Dependencies
 - mdms service
-- property-service
+- property
 - persister
-- ws-service
+- water
 - user
 - workflow
 

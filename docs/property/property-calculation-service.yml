@@ -221,7 +221,7 @@ definitions:
     type: object
     properties:
       property:
-        $ref: 'https://raw.githubusercontent.com/GhanshyamRawat92/MyEgovProject/master/yaml/property/property-service.yml#/definitions/Property'
+        $ref: 'https://raw.githubusercontent.com/GhanshyamRawat92/MyEgovProject/master/yaml/property/property.yml#/definitions/Property'
       assesmentNumber:
         type: string
         minLength: 2
