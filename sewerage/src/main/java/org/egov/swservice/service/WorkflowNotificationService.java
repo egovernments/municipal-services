@@ -520,7 +520,7 @@ public class WorkflowNotificationService {
 	}
 
 	/**
-	 * Get file store id from PDF service
+	 * Get file store id from PDFGEN
 	 * 
 	 * @param sewerageObject - Sewerage Connection JSON Object
 	 * @param requestInfo - Request Info
@@ -544,7 +544,7 @@ public class WorkflowNotificationService {
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
 			if (CollectionUtils.isEmpty(fileStoreIds)) {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
-						"No file store id found from pdf service");
+						"No file store id found from pdfgen");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
@@ -569,7 +569,7 @@ public class WorkflowNotificationService {
 			List<Object> fileStoreIds = responseContext.read("$.fileStoreIds");
 			if (CollectionUtils.isEmpty(fileStoreIds)) {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
-						"No file store id found from pdf service");
+						"No file store id found from pdfgen");
 			}
 			JSONObject object = mapper.convertValue(fileStoreIds.get(0), JSONObject.class);
 			return object.get(urlReplacer).toString();

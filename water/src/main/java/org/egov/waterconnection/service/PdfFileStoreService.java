@@ -137,7 +137,7 @@ public class PdfFileStoreService {
 	}
 
 	/**
-	 * Get file store id from PDF service
+	 * Get file store id from PDFGEN
 	 * 
 	 * @param waterObject WaterConnection Json Object
 	 * @param requestInfo RequestInfo
@@ -163,7 +163,7 @@ public class PdfFileStoreService {
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
 			if (CollectionUtils.isEmpty(fileStoreIds)) {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
-						"NO file store id found from pdf service");
+						"NO file store id found from pdfgen");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
