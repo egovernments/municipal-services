@@ -208,6 +208,7 @@ public class PaymentUpdateService {
 					}
 					List<WaterConnection> waterConnections = waterService.search(criteria,
 							paymentRequest.getRequestInfo());
+					System.out.println("\nwaterConnections-->"+waterConnections.toString()+"\n");
 					if (CollectionUtils.isEmpty(waterConnections)) {
 						throw new CustomException("INVALID_RECEIPT",
 								"No waterConnection found for the consumerCode " + paymentDetail.getBill().getConsumerCode());
