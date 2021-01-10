@@ -21,7 +21,7 @@ http://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/ego
 
 ## Service Details
 
-Tl calculator application is used to calculate the Tradelicense Fees based on the different billing slabs in the DB. Every Billing Slab combination has its own demand configurations.
+Tradelicense calculator application is used to calculate the Tradelicense Fees based on the different billing slabs in the DB. Every Billing Slab combination has its own demand configurations.
 Once the demand is created for the combination, it calls billing-services API to generate the fees.
 
 ### API Details
