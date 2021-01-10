@@ -26,7 +26,7 @@ http://editor.swagger.io/?url=https://github.com/egovernments/egov-services/blob
 
 ## Service Details
 
-Tl service in integrated with Workflow steps. We can as many internal states/action to be performed on the applications which is configurable.
+Tradelicense service in integrated with Workflow steps. We can as many internal states/action to be performed on the applications which is configurable.
 The license is generated once the application is approved. The notifications are sent over every steps in the workflow.
 
 ### API Details
