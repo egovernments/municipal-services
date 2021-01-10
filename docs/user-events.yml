@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 1.0.0
-  title: eGov User Event System.
+  title: User Event System.
   description: |
     APIs for Events information. This module handles Below functionality. 
     1. Create/Update new event
