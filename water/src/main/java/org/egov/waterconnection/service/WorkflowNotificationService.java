@@ -515,7 +515,7 @@ public class WorkflowNotificationService {
 		}
 	}
 	/**
-	 * Get file store id from PDF service
+	 * Get file store id from PDFGEN
 	 * 
 	 * @param waterObject Water Connection Object
 	 * @param requestInfo Request Information
@@ -538,7 +538,7 @@ public class WorkflowNotificationService {
 			DocumentContext responseContext = JsonPath.parse(response);
 			List<Object> fileStoreIds = responseContext.read("$.filestoreIds");
 			if(CollectionUtils.isEmpty(fileStoreIds)) {
-				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "File Store Id doesn't exist in pdf service");
+				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "File Store Id doesn't exist in pdfgen");
 			}
 			return fileStoreIds.get(0).toString();
 		} catch (Exception ex) {
@@ -563,7 +563,7 @@ public class WorkflowNotificationService {
 			List<Object> fileStoreIds = responseContext.read("$.fileStoreIds");
 			if (CollectionUtils.isEmpty(fileStoreIds)) {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE",
-						"NO file store id found from pdf service");
+						"NO file store id found from pdfgen");
 			}
 			JSONObject obje = mapper.convertValue(fileStoreIds.get(0), JSONObject.class);
 			return obje.get(urlReplacer).toString();
