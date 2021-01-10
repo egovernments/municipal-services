@@ -9,7 +9,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - user
 - localization
 - idgen
-- egov-mdms
+- mdms
 - persister
 - sms-notification
 - email-notification

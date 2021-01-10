@@ -5,7 +5,7 @@ This module created to manage Sewerage Service connections against a Property in
 - To Do
 
 ### Service Dependencies
-- egov-mdms service
+- mdms service
 - property-service
 - idgen
 - persister
