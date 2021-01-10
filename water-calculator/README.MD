@@ -8,7 +8,7 @@ This module created to manage the Bill calculation for the registered water serv
 - egov-mdms service
 - property
 - persister
-- ws-service
+- water
 - user
 - workflow
 
@@ -31,7 +31,7 @@ This module created to manage the Bill calculation for the registered water serv
 ##### Method
 
 a) `/meterConnection/_create`
-   - Water Service created by calling the APIs in WS-Service. Once the Application activated for metered-connection, employee can add meter reading details using this API - water-calculator/meterConnection/_create which in-turn will generate the Demand.
+   - Water Service created by calling the APIs in Water. Once the Application activated for metered-connection, employee can add meter reading details using this API - water-calculator/meterConnection/_create which in-turn will generate the Demand.
    - For the Non-Metered connections, the scheduler APIs need to be called periodically to generate the demand.
 
 b) `/meterConnection/_search`
