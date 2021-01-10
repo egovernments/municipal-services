@@ -15,7 +15,7 @@ servers:
 - url: https://egov-micro-dev.egovernments.org
   variables: {}
 paths:
-  /pt-calculator-v2/propertytax/mutation/_calculate:
+  /propertytax-calculator/propertytax/mutation/_calculate:
     post:
       tags:
       - Property
@@ -49,7 +49,7 @@ paths:
                 $ref: "https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ErrorRes"
                 description: Error in Property mutation fees calculation
       deprecated: false
-  /pt-calculator-v2/billingslab/mutation/_search:
+  /propertytax-calculator/billingslab/mutation/_search:
     post:
       tags:
       - Mutation BillingSlab
@@ -134,7 +134,7 @@ paths:
                 $ref: "https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ErrorRes"
                 description: Error in Property mutation fees calculation
       deprecated: false
-  /pt-calculator-v2/billingslab/mutation/_create:
+  /propertytax-calculator/billingslab/mutation/_create:
     post:
       tags:
       - Mutation BillingSlab
@@ -168,7 +168,7 @@ paths:
                 $ref: "https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ErrorRes"
                 description: Error in creating mutation billing slab
       deprecated: false
-  /pt-calculator-v2/billingslab/mutation/_update:
+  /propertytax-calculator/billingslab/mutation/_update:
     post:
       tags:
       - Mutation BillingSlab

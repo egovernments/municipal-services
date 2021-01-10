@@ -10,7 +10,7 @@ NA
 
 - user
 - ID-GEN
-- pt-calculator
+- propertytax-calculator
 - MDMS
 - Location
 - localisation

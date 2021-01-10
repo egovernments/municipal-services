@@ -57,7 +57,7 @@ Module is used to register property in the system.
 
 - Persister module for persistence.
 
-- PT calculator module to calculate tax for the given property.
+- propertytax calculator module to calculate tax for the given property.
 
 - MDMS service to verify master data
 

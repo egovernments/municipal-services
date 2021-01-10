@@ -2,8 +2,8 @@ serviceMaps:
  serviceName: PropertyTax Calculator
  mappings:
  - version: 1.0
-   name: pt-calculator
-   description: Persists the pt-calculator related records to db
+   name: propertytax-calculator
+   description: Persists the propertytax-calculator related records to db
    fromTopic: save-pt-billingslab
    isTransaction: true
    queryMaps:
@@ -62,8 +62,8 @@ serviceMaps:
 
 
  - version: 1.0
-   name: pt-calculator
-   description: Persists the pt-calculator related records to db
+   name: propertytax-calculator
+   description: Persists the propertytax-calculator related records to db
    fromTopic: update-pt-billingslab
    isTransaction: true
    queryMaps:
