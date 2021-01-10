@@ -36,7 +36,6 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
             String id = rs.getString("ser_id");
             Service currentService = serviceMap.get(id);
             String tenantId = rs.getString("ser_tenantId");
-            Boolean active = rs.getBoolean("active");
 
             if(currentService == null){
 
@@ -57,7 +56,7 @@ public class PGRRowMapper implements ResultSetExtractor<List<Service>> {
                 AuditDetails auditDetails = AuditDetails.builder().createdBy(createdby).createdTime(createdtime)
                                                 .lastModifiedBy(lastmodifiedby).lastModifiedTime(lastmodifiedtime).build();
 
-                currentService = Service.builder().id(id).active(active)
+                currentService = Service.builder().id(id)
                         .serviceCode(serviceCode)
                         .serviceRequestId(serviceRequestId)
                         .description(description)
