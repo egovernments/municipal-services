@@ -103,6 +103,7 @@ public class WaterServicesUtil {
 		if (waterConnectionRequest.getRequestInfo().getUserInfo() != null
 				&& "SYSTEM".equalsIgnoreCase(waterConnectionRequest.getRequestInfo().getUserInfo().getType())) {
 			waterConnectionRequest.getRequestInfo().getUserInfo().setType("EMPLOYEE");
+			System.out.println("\nWaterConnectionRequest-->"+waterConnectionRequest.toString()+"\n");
 			List<Role> oldRoles = waterConnectionRequest.getRequestInfo().getUserInfo().getRoles();
 			List<Role>  newRoles = new ArrayList<>();
 			for(Role role:oldRoles){
