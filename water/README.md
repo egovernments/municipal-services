@@ -5,7 +5,7 @@ This module created to manage WaterService connections against a Property in the
 - NA
 
 ### Service Dependencies
-- egov-mdms service
+- mdms service
 - property
 - idgen
 - persister

@@ -11,7 +11,7 @@ bpa-calculator service used to generate Application Fee, Sanction Fee, Low Appli
 
 - dcr-services (Use Edcr data )
 
-- egov-mdms ( Configurations/master by MDMS )
+- mdms ( Configurations/master by MDMS )
 
 - billing-service ( Generate and update demands )
 

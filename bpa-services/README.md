@@ -26,7 +26,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - location ( To store the address locality )
 
-- egov-mdms ( Configurations/master data used in the application is served by MDMS )
+- mdms ( Configurations/master data used in the application is served by MDMS )
 
 - sms-notification ( Service to send SMS to the users involved in the application )
 

@@ -19,7 +19,7 @@ To run the egov-hrms services in local system, you need to port forward below se
 
 ```bash
  kubectl port-forward -n egov {idgen} 8087:8080
- kubectl port-forward -n egov {egov-mdms} 8088:8080
+ kubectl port-forward -n egov {mdms} 8088:8080
  kubectl port-forward -n egov {user} 8089:8080
  kubectl port-forward -n egov {workflow} 8090:8080
  kubectl port-forward -n egov {localization} 8091:8080

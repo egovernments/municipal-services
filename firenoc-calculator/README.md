@@ -7,7 +7,7 @@ The main objective of the Firenoc calculator module is to create, update, search
 
 ### Service Dependencies
 - billing-service
-- egov-mdms
+- mdms
 - firenoc
 
 ### Swagger API Contract

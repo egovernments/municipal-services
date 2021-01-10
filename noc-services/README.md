@@ -18,7 +18,7 @@ Module is used to apply NOC application for approval of respective noc users.
 
 - location ( To store the address locality )
 
-- egov-mdms ( Configurations/master data used in the application is served by MDMS )
+- mdms ( Configurations/master data used in the application is served by MDMS )
 
 - sms-notification ( Service to send SMS to the users involved in the application )
 

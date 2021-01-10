@@ -20,7 +20,7 @@ To run the tradelicense locally, you need to port forward below services locally
 ```bash
 - kubectl -n egov port-forward <billing-service pod id> 8081:8080
 - kubectl -n egov port-forward <tradelicense pod id> 8082:8080
-- kubectl -n egov port-forward <egov-mdms pod id> 8083:8080
+- kubectl -n egov port-forward <mdms pod id> 8083:8080
 
 
 

@@ -21,7 +21,7 @@ This service is the major service supporting bpa-services which handles the data
 
 - location ( To store the address locality )
 
-- egov-mdms ( Configurations/master data used in the application is served by MDMS )
+- mdms ( Configurations/master data used in the application is served by MDMS )
 
 - persister ( Helps to persist the data )
 
