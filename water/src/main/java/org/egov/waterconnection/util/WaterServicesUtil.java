@@ -172,7 +172,7 @@ public class WaterServicesUtil {
 	/**
 	 * 
 	 * @param result
-	 *            Response object from property service call
+	 *            Response object from property call
 	 * @return List of property
 	 */
 	private List<Property> getPropertyDetails(Object result) {

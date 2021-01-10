@@ -120,7 +120,7 @@ public class BPAConfiguration {
 	@Value("${egov.receipt.businessservice}")
 	private String businessService;
 
-	// Property Service
+	// Property
 	@Value("${egov.property.service.host}")
 	private String propertyHost;
 
