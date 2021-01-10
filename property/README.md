@@ -1,6 +1,6 @@
-# Property-Service
+# Property
 
- Property services creates property and stores in registry on top of which municipal activities like assessment, mutation and amalgamation can be performed. keeps tracks of the properties and the taxes paid for them.
+ Property creates property and stores in registry on top of which municipal activities like assessment, mutation and amalgamation can be performed. keeps tracks of the properties and the taxes paid for them.
 
 ### DB UML Diagram
 
