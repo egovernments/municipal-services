@@ -16,13 +16,13 @@ config:
       - work-dir: "user-event/src/main/resources/db"
         image-name: "user-event-db"
 
-  - name: "builds/municipal-services/pt-calculator-v2"
+  - name: "builds/municipal-services/propertytax-calculator"
     build:
-      - work-dir: "pt-calculator-v2"
-        image-name: "pt-calculator-v2"
+      - work-dir: "propertytax-calculator"
+        image-name: "propertytax-calculator"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "pt-calculator-v2/src/main/resources/db"
-        image-name: "pt-calculator-v2-db"
+      - work-dir: "propertytax-calculator/src/main/resources/db"
+        image-name: "propertytax-calculator-db"
 
   - name: "builds/municipal-services/pt-services-v2"
     build:

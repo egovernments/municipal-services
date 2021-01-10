@@ -10,7 +10,7 @@ info:
     email: ghanshyam.rawat@egovernments.org
 schemes:
   - https
-basePath: /pt-calculator-v2/
+basePath: /propertytax-calculator/
 paths:
   /propertytax/_estimate:
     post:
