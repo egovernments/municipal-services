@@ -189,14 +189,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		String tenantId = property.getTenantId();
 
 
-		if(rs.getString("documentid")!=null)
-		{Document document = Document.builder().id(rs.getString("documentid"))
-				.documentType(rs.getString("documentType"))
-				.fileStore(rs.getString("fileStore"))
-				.documentUid(rs.getString("documentuid"))
-				.build();
-			detail.addDocumentsItem(document);
-		}
+//		if(rs.getString("documentid")!=null)
+//		{Document document = Document.builder().id(rs.getString("documentid"))
+//				.documentType(rs.getString("documentType"))
+//				.fileStore(rs.getString("fileStore"))
+//				.documentUid(rs.getString("documentuid"))
+//				.build();
+//			detail.addDocumentsItem(document);
+//		}
 
 
 		if(rs.getString("unitid")!=null)
@@ -228,11 +228,11 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 
 
 
-		Document ownerDocument = Document.builder().id(rs.getString("ownerdocid"))
-				.documentType(rs.getString("ownerdocType"))
-				.fileStore(rs.getString("ownerfileStore"))
-				.documentUid(rs.getString("ownerdocuid"))
-				.build();
+//		Document ownerDocument = Document.builder().id(rs.getString("ownerdocid"))
+//				.documentType(rs.getString("ownerdocType"))
+//				.fileStore(rs.getString("ownerfileStore"))
+//				.documentUid(rs.getString("ownerdocuid"))
+//				.build();
 
 		Double ownerShipPercentage = rs.getDouble("ownerShipPercentage");
 		if(rs.wasNull()){ ownerShipPercentage = null;}
@@ -256,14 +256,14 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 		detail.addOwnersItem(owner);
 
 		// Add owner document to the specific propertyDetail for which it was used
-		String docuserid = rs.getString("docuserid");
-		String docAssessmentNumber = rs.getString("docassessmentnumber");
-		if(assessmentNumber.equalsIgnoreCase(docAssessmentNumber) && docuserid!=null) {
-			detail.getOwners().forEach(ownerInfo -> {
-				if (docuserid.equalsIgnoreCase(ownerInfo.getUuid()))
-					ownerInfo.addDocumentsItem(ownerDocument);
-			});
-		}
+//		String docuserid = rs.getString("docuserid");
+//		String docAssessmentNumber = rs.getString("docassessmentnumber");
+//		if(assessmentNumber.equalsIgnoreCase(docAssessmentNumber) && docuserid!=null) {
+//			detail.getOwners().forEach(ownerInfo -> {
+//				if (docuserid.equalsIgnoreCase(ownerInfo.getUuid()))
+//					ownerInfo.addDocumentsItem(ownerDocument);
+//			});
+//		}
 	}
 
 

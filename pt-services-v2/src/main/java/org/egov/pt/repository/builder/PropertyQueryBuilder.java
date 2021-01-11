@@ -70,15 +70,13 @@ public class PropertyQueryBuilder {
 
 
     private static final String LocalityQuery = "SELECT property FROM eg_pt_address_v2 addr WHERE_CLAUSE_PLACEHOLDER_LOCALITY";
-    private static final String OldPropertyQuery = "SELECT property FROM eg_pt_property_v2 addr WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY";
+    private static final String OldPropertyQuery = "SELECT property FROM eg_pt_property_v2 prop WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY";
     private static final String CreatedTimeQuery = "select maxassess.createdtime from (select distinct property, max(createdtime) as createdtime from eg_pt_propertydetail_v2 ptd"
     		+ "WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME group by ptd.property) as maxassess";
-	private static final String NEWQUERY = "SELECT asmt.*,address.*,owner.*,doc.*,unit.*,insti.*,doc.id as documentid,unit.id as unitid,"+
+	private static final String NEWQUERY = "SELECT asmt.*,address.*,owner.*,unit.*,insti.*,unit.id as unitid,"+
 			"  	 address.id as addresskeyid,insti.id as instiid, "+
-			"    ownerdoc.id as ownerdocid,ownerdoc.documenttype as ownerdocType,ownerdoc.filestore as ownerfileStore,  "+
-			"    ownerdoc.documentuid as ownerdocuid, unit.occupancyDate as unitoccupancyDate, "+
+			"    unit.occupancyDate as unitoccupancyDate, "+
 			"    insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId, "+
-			"    ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber, "+
 			"    unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor,"+
 			"    unit.additionalDetails as unit_additionalDetails,owner.additionalDetails as ownerInfo_additionalDetails,"+
 			"    insti.additionalDetails as insti_additionalDetails,address.additionalDetails as add_additionalDetails "+
@@ -98,10 +96,6 @@ public class PropertyQueryBuilder {
 			"    eg_pt_address_v2 address on address.property=asmt.ptid      " +
 				 LEFT_OUTER_JOIN_STRING+
 			"    eg_pt_unit_v2 unit ON asmt.assessmentnumber=unit.propertydetail      " +
-				 LEFT_OUTER_JOIN_STRING+
-			"    eg_pt_document_propertydetail_v2 doc ON asmt.assessmentnumber=doc.propertydetail  "+
-				 LEFT_OUTER_JOIN_STRING+
-			"    eg_pt_document_owner_v2 ownerdoc ON ownerdoc.userid=owner.userid and owner.propertydetail=asmt.assessmentnumber "+
 				 LEFT_OUTER_JOIN_STRING+
 			"    eg_pt_institution_v2 insti ON asmt.assessmentnumber=insti.propertydetail WHERE_CLAUSE_PLACHOLDER ";
 	
@@ -206,24 +200,24 @@ public class PropertyQueryBuilder {
 
 		Set<String> propertyDetailids = criteria.getPropertyDetailids();
 		if (!CollectionUtils.isEmpty(propertyDetailids)) {
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" ptd.assessmentnumber IN ( :propertyDetailids)");
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_PROPERTY);
+			WHERE_CLAUSE_PLACHOLDER_PROPERTY.append(" ptdl.assessmentnumber IN ( :propertyDetailids)");
 //			addToPreparedStatement(preparedStmtList, propertyDetailids);
 			preparedStmtList.put("propertyDetailids", propertyDetailids);
 
 		}
 
 		if(criteria.getAsOnDate()!=null){
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" createdTime <= :createdTime");
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_PROPERTY);
+			WHERE_CLAUSE_PLACHOLDER_PROPERTY.append(" createdTime <= :createdTime");
 //			preparedStmtList.add(criteria.getAsOnDate());
 			preparedStmtList.put("createdTime", criteria.getAsOnDate());
 
 		}
 
 		if(criteria.getFinancialYear()!=null){
-			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_ASSESSMENT);
-			WHERE_CLAUSE_PLACHOLDER_ASSESSMENT.append(" financialYear = :financialYear");
+			addClauseIfRequired(WHERE_CLAUSE_PLACHOLDER_PROPERTY);
+			WHERE_CLAUSE_PLACHOLDER_PROPERTY.append(" financialYear = :financialYear");
 //			preparedStmtList.add(criteria.getFinancialYear());
 			preparedStmtList.put("financialYear", criteria.getFinancialYear());
 
@@ -272,7 +266,7 @@ public class PropertyQueryBuilder {
 			addClauseIfRequired(WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME);
 			WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME.append(" ptd.property IN (").append(OldPropertyQuery).append(")");
 			addClauseIfRequired(WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY);
-			WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY.append(" pt.oldpropertyid IN ( :oldpropertyids)");
+			WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY.append(" prop.oldpropertyid IN ( :oldpropertyids)");
 //			addToPreparedStatement(preparedStmtList, oldpropertyids);
 			preparedStmtList.put("oldpropertyids", oldpropertyids);
 
