@@ -3,6 +3,7 @@ package org.egov.pgr.repository.rowmapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -82,6 +83,7 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
+
         Set<String> localities = criteria.getLocality();
         if(!CollectionUtils.isEmpty(localities)){
             addClauseIfRequired(preparedStmtList, builder);
@@ -103,8 +105,24 @@ public class PGRQueryBuilder {
         return countQuery;
     }
 
-    private void addOrderByClause(StringBuilder builder){
-        builder.append( " ORDER BY ser_createdtime DESC ");
+    private void addOrderByClause(StringBuilder builder, RequestSearchCriteria criteria){
+
+        if(StringUtils.isEmpty(criteria.getSortBy()))
+            builder.append( " ORDER BY ser_createdtime ");
+
+        else if(criteria.getSortBy()== RequestSearchCriteria.SortBy.locality)
+            builder.append(" ORDER BY ads.locality ");
+
+        else if(criteria.getSortBy()== RequestSearchCriteria.SortBy.applicationStatus)
+            builder.append(" ORDER BY ser.applicationStatus ");
+
+        else if(criteria.getSortBy()== RequestSearchCriteria.SortBy.serviceRequestId)
+            builder.append(" ORDER BY ser.serviceRequestId ");
+
+        if(criteria.getSortOrder()== RequestSearchCriteria.SortOrder.ASC)
+            builder.append(" ASC ");
+        else builder.append(" DESC ");
+
     }
 
     private void addLimitAndOffset(StringBuilder builder, RequestSearchCriteria criteria, List<Object> preparedStmtList){
