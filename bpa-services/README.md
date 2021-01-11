@@ -40,7 +40,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - billing-service ( Create demands and bills for the fees to be collected )
 
-- collection-services ( Create receipt for the payment received for the bills )
+- collection ( Create receipt for the payment received for the bills )
 
 - bpa-calculator ( Calculates the fees to be collected at different stages)
 
