@@ -15,7 +15,7 @@ bpa-calculator service used to generate Application Fee, Sanction Fee, Low Appli
 
 - billing ( Generate and update demands )
 
-- bpa-services (Get the bpa application data for fee calculation )
+- building-plan (Get the bpa application data for fee calculation )
 
 ### Swagger API Contract
 

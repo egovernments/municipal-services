@@ -1,5 +1,5 @@
 serviceMaps:
- serviceName: bpa-services
+ serviceName: building-plan
  mappings:
  - version: 1.0
    description: Persists buildingplan details in EG_BPA_BuildingPlan  table

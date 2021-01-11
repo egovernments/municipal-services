@@ -118,13 +118,13 @@ config:
       - work-dir: "sewerage-calculator/src/main/resources/db"
         image-name: "sewerage-calculator-db"
 
-  - name: "builds/municipal-services/bpa-services"
+  - name: "builds/municipal-services/building-plan"
     build:
-      - work-dir: "bpa-services"
-        image-name: "bpa-services"
+      - work-dir: "building-plan"
+        image-name: "building-plan"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "bpa-services/src/main/resources/db"
-        image-name: "bpa-services-db"         
+      - work-dir: "building-plan/src/main/resources/db"
+        image-name: "building-plan-db"
 
   - name: "builds/municipal-services/bpa-calculator"
     build:

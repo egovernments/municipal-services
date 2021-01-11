@@ -14,7 +14,7 @@
     {
       "tenantId": "pb",
       "businessService": "BPA_LOW",
-      "business": "bpa-services",
+      "business": "building-plan",
       "businessServiceSla": 5184000000,
       "states": [
         {
