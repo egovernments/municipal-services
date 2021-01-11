@@ -141,6 +141,31 @@ public class OwnerInfo extends User {
 		this.documents = documents;
 		this.relationship = relationship;
 	}
+	
+	
+	public OwnerInfo(OwnerInfo ownerInfo) {
+
+		super(ownerInfo.getId(), ownerInfo.getUuid(), ownerInfo.getUserName(), ownerInfo.getPassword(), ownerInfo.getSalutation(),
+				ownerInfo.getName(), ownerInfo.getGender(), ownerInfo.getMobileNumber(), ownerInfo.getEmailId(),
+				ownerInfo.getAltContactNumber(), ownerInfo.getPan(), ownerInfo.getAadhaarNumber(), ownerInfo.getPermanentAddress(),
+				ownerInfo.getPermanentCity(), ownerInfo.getPermanentPincode(), ownerInfo.getCorrespondenceCity(),
+				ownerInfo.getCorrespondencePincode(), ownerInfo.getCorrespondenceAddress(), ownerInfo.getActive(), ownerInfo.getDob(),
+				ownerInfo.getPwdExpiryDate(), ownerInfo.getLocale(), ownerInfo.getType(), ownerInfo.getSignature(),
+				ownerInfo.getAccountLocked(), ownerInfo.getRoles(), ownerInfo.getFatherOrHusbandName(), ownerInfo.getBloodGroup(),
+				ownerInfo.getIdentificationMark(), ownerInfo.getPhoto(), ownerInfo.getCreatedBy(), ownerInfo.getCreatedDate(),
+				ownerInfo.getLastModifiedBy(), ownerInfo.getLastModifiedDate(), ownerInfo.getTenantId());
+
+		this.ownerInfoUuid = ownerInfo.getOwnerInfoUuid();
+		this.fatherOrHusbandName = ownerInfo.getFatherOrHusbandName();
+		this.correspondenceAddress = ownerInfo.getCorrespondenceAddress();
+		this.isPrimaryOwner = ownerInfo.getIsPrimaryOwner();
+		this.ownerShipPercentage = ownerInfo.getOwnerShipPercentage();
+		this.ownerType = ownerInfo.getOwnerType();
+		this.institutionId = ownerInfo.getInstitutionId();
+		this.status = ownerInfo.getStatus();
+		this.documents = ownerInfo.getDocuments();
+		this.relationship = ownerInfo.getRelationship();
+	}
 
 
 	public OwnerInfo(OwnerInfo ownerInfo) {
