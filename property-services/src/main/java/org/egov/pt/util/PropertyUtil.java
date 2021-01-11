@@ -41,21 +41,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class PropertyUtil extends CommonUtils {
-	
+
 	@Autowired
 	private PropertyConfiguration configs;
-	
+
 	@Autowired
 	private ServiceRequestRepository restRepo;
-	
+
 	@Autowired
 	private ObjectMapper mapper;
-	
-    /**
+
+	/**
 	 * Populates the owner fields inside of property objects from the response by user api
-	 * 
+	 *
 	 * Ignoring if now user is not found in user response, no error will be thrown
-	 * 
+	 *
 	 * @param userDetailResponse response from user api which contains list of user
 	 *                           which are used to populate owners in properties
 	 * @param properties         List of property whose owner's are to be populated
@@ -87,7 +87,7 @@ public class PropertyUtil extends CommonUtils {
 			});
 		});
 	}
-	
+
 	/**
 	 * nullifying the PII's for open search
 	 * @param info
@@ -101,16 +101,16 @@ public class PropertyUtil extends CommonUtils {
 		info.setGender(null);
 		info.setAltContactNumber(null);
 		info.setPwdExpiryDate(null);
-		
+
 		return info;
 	}
 
 
 	public ProcessInstanceRequest getProcessInstanceForMutationPayment(PropertyRequest propertyRequest) {
 
-			Property property = propertyRequest.getProperty();
-			
-			ProcessInstance process = ProcessInstance.builder()
+		Property property = propertyRequest.getProperty();
+
+		ProcessInstance process = ProcessInstance.builder()
 				.businessService(configs.getMutationWfName())
 				.businessId(property.getAcknowldgementNumber())
 				.comment("Payment for property processed")
@@ -118,55 +118,55 @@ public class PropertyUtil extends CommonUtils {
 				.tenantId(property.getTenantId())
 				.action(PTConstants.ACTION_PAY)
 				.build();
-			
-			return ProcessInstanceRequest.builder()
-					.requestInfo(propertyRequest.getRequestInfo())
-					.processInstances(Arrays.asList(process))
-					.build();
+
+		return ProcessInstanceRequest.builder()
+				.requestInfo(propertyRequest.getRequestInfo())
+				.processInstances(Arrays.asList(process))
+				.build();
 	}
-	
+
 	public ProcessInstanceRequest getWfForPropertyRegistry(PropertyRequest request, CreationReason creationReasonForWorkflow) {
-		
+
 		Property property = request.getProperty();
 		ProcessInstance wf = null != property.getWorkflow() ? property.getWorkflow() : new ProcessInstance();
-	
+
 		wf.setBusinessId(property.getAcknowldgementNumber());
 		wf.setTenantId(property.getTenantId());
-	
+
 		switch (creationReasonForWorkflow) {
-		
-		case CREATE :
-			if(property.getSource().equals(Source.WATER_CHARGES)){
-				JSONObject response=getWnsPTworkflowConfig(request);
-				wf.setBusinessService(response.get("businessService").toString());
-				wf.setModuleName(configs.getPropertyModuleName());
-				wf.setAction(response.get("initialAction").toString());
-			}
-			else{
-				wf.setBusinessService(configs.getCreatePTWfName());
+
+			case CREATE :
+				if(property.getSource().equals(Source.WATER_CHARGES)){
+					JSONObject response=getWnsPTworkflowConfig(request);
+					wf.setBusinessService(response.get("businessService").toString());
+					wf.setModuleName(configs.getPropertyModuleName());
+					wf.setAction(response.get("initialAction").toString());
+				}
+				else{
+					wf.setBusinessService(configs.getCreatePTWfName());
+					wf.setModuleName(configs.getPropertyModuleName());
+					wf.setAction("OPEN");
+				}
+				break;
+
+			case LEGACY_ENTRY :
+
+				wf.setBusinessService(configs.getLegacyPTWfName());
 				wf.setModuleName(configs.getPropertyModuleName());
 				wf.setAction("OPEN");
-			}
-			break;
-			
-		case LEGACY_ENTRY :
-			
-			wf.setBusinessService(configs.getLegacyPTWfName());
-			wf.setModuleName(configs.getPropertyModuleName());
-			wf.setAction("OPEN");
-			break;
-			
+				break;
 
-		case UPDATE :
-			break;
 
-		case MUTATION :
-			break;
-			
-		default:
-			break;
+			case UPDATE :
+				break;
+
+			case MUTATION :
+				break;
+
+			default:
+				break;
 		}
-		
+
 		property.setWorkflow(wf);
 		return ProcessInstanceRequest.builder()
 				.processInstances(Arrays.asList(wf))
@@ -175,7 +175,7 @@ public class PropertyUtil extends CommonUtils {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param request
 	 * @param propertyFromSearch
 	 */
@@ -211,17 +211,17 @@ public class PropertyUtil extends CommonUtils {
 		property.getOwners().forEach(owner -> owner.setMobileNumber(null));
 	}
 
-/**
- * Utility method to fetch bill for validation of payment
- * 
- * @param propertyId
- * @param tenantId
- * @param request
- */
+	/**
+	 * Utility method to fetch bill for validation of payment
+	 *
+	 * @param propertyId
+	 * @param tenantId
+	 * @param request
+	 */
 	public Boolean isBillUnpaid(String propertyId, String tenantId, RequestInfo request) {
 
 		Object res = null;
-		
+
 		StringBuilder uri = new StringBuilder(configs.getEgbsHost())
 				.append(configs.getEgbsFetchBill())
 				.append("?tenantId=").append(tenantId)
@@ -231,11 +231,11 @@ public class PropertyUtil extends CommonUtils {
 		try {
 			res = restRepo.fetchResult(uri, new RequestInfoWrapper(request)).get();
 		} catch (ServiceCallException e) {
-			
+
 			if(!(e.getError().contains(BILL_NO_DEMAND_ERROR_CODE) || e.getError().contains(BILL_NO_PAYABLE_DEMAND_ERROR_CODE)))
 				throw e;
 		}
-		
+
 		if (res != null) {
 			JsonNode node = mapper.convertValue(res, JsonNode.class);
 			Double amount = node.at(BILL_AMOUNT_PATH).asDouble();
@@ -247,7 +247,7 @@ public class PropertyUtil extends CommonUtils {
 
 	/**
 	 * Public method to infer whether the search is for open or authenticated user
-	 * 
+	 *
 	 * @param userInfo
 	 * @return
 	 */
@@ -279,4 +279,5 @@ public class PropertyUtil extends CommonUtils {
 		}
 		return response;
 	}
+
 }
