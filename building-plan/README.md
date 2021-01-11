@@ -65,9 +65,9 @@ Process:
 
 ### API Details
 
-- Create : Building Plan Approval application with bpa-services/v1/bpa/_create api. The response contains the BPA object with its assigned applicationNumber  and application Fee Generated.
-- Update : On created BPA multiple assessments can be done by calling the bpa-services/v1/bpa/_update api.  Validations are carried out to verify the authenticity of the request and generate application fee which will be paid by the architect and gets approval number generated on approval .
-- Search : BPA can be searched based on several search parameters by calling  bpa-services/v1/bpa/_search.
+- Create : Building Plan Approval application with building-plan/v1/bpa/_create api. The response contains the BPA object with its assigned applicationNumber  and application Fee Generated.
+- Update : On created BPA multiple assessments can be done by calling the building-plan/v1/bpa/_update api.  Validations are carried out to verify the authenticity of the request and generate application fee which will be paid by the architect and gets approval number generated on approval .
+- Search : BPA can be searched based on several search parameters by calling  building-plan/v1/bpa/_search.
 
 
 

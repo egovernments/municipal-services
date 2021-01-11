@@ -1,7 +1,7 @@
 
 # land-services
 
-This service is the major service supporting bpa-services which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
+This service is the major service supporting building-plan which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
 
 ### DB UML Diagram
 
@@ -31,7 +31,7 @@ This service is the major service supporting bpa-services which handles the data
 
 ## Service Details
 
-This service is the major service supporting bpa-services which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
+This service is the major service supporting building-plan which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
 
 ### API Details
 - Create : land detail in land registry with land-services/v1/land/_create api.

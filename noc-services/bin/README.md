@@ -8,7 +8,7 @@ Module is used to apply for Buildin Plan Approval as well as Bulding Plan Occupa
 
 ### Building Plan Approval Flow
 - Create
-   - Bulidling Plan Approval application with bpa-services/v1/bpa/_create api.
+   - Bulidling Plan Approval application with building-plan/v1/bpa/_create api.
    - The response contains the BPA object with its assigned applicationNumber  and application Fee Genrated.
 - Update
    -  On created BPA multiple assessments can be done by calling the bpa-servcies/v1bpa//_update api.
@@ -43,7 +43,7 @@ Module is used to apply for Buildin Plan Approval as well as Bulding Plan Occupa
 
 
     mvn clean install
-    java -jar target/bpa-services-1.1.0-SNAPSHOT.jar
+    java -jar target/building-plan-1.1.0-SNAPSHOT.jar
 
 
 ## Dependencies
