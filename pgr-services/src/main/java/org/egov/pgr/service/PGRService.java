@@ -84,6 +84,9 @@ public class PGRService {
         if(criteria.isEmpty())
             return new ArrayList<>();
 
+        if(criteria.getMobileNumber()!=null && CollectionUtils.isEmpty(criteria.getUserIds()))
+            return new ArrayList<>();
+
         List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
 
         if(CollectionUtils.isEmpty(serviceWrappers))
