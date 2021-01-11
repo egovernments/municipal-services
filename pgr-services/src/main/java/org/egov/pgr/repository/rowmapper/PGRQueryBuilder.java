@@ -91,7 +91,7 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, localities);
         }
 
-        addOrderByClause(builder);
+        addOrderByClause(builder, criteria);
 
         addLimitAndOffset(builder, criteria, preparedStmtList);
 
