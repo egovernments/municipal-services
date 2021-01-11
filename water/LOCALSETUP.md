@@ -23,7 +23,7 @@ To run the water in local system, you need to port forward below services.
  kubectl port-forward -n egov $(kgpt mdms) 8085:8080 &
  kubectl port-forward -n egov $(kgpt idgen) 8086:8080 &
  kubectl port-forward -n egov $(kgpt water-calculator) 8087:8080 &
- kubectl port-forward -n egov $(kgpt billing-service) 8088:8080 &
+ kubectl port-forward -n egov $(kgpt billing) 8088:8080 &
  kubectl port-forward -n egov $(kgpt filestore) 8089:8080 &
  kubectl port-forward -n egov $(kgpt pdfgen) 8090:8080 &
  kubectl port-forward -n egov $(kgpt user) 8091:8080

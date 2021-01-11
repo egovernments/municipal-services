@@ -13,7 +13,7 @@ bpa-calculator service used to generate Application Fee, Sanction Fee, Low Appli
 
 - mdms ( Configurations/master by MDMS )
 
-- billing-service ( Generate and update demands )
+- billing ( Generate and update demands )
 
 - bpa-services (Get the bpa application data for fee calculation )
 
