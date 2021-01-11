@@ -126,7 +126,7 @@ The system has a citizen interface and an employee interface.
 - idgen
 - searcher
 - filestore
-- egov-hrms
+- hrms
 - user
 
 ### Swagger API Contract

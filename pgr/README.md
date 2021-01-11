@@ -13,7 +13,7 @@ the citizen and will be updated by notifications whenever the status of the comp
 - persister
 - sms-notification
 - email-notification
-- egov-hrms
+- hrms
 - workflow
 - url-shortening
 
