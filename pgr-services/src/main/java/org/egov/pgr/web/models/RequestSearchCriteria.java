@@ -20,7 +20,7 @@ public class RequestSearchCriteria {
     private String tenantId;
 
     @JsonProperty("serviceCode")
-    private String serviceCode;
+    private Set<String> serviceCode;
 
     @JsonProperty("applicationStatus")
     private Set<String> applicationStatus;
@@ -36,12 +36,12 @@ public class RequestSearchCriteria {
 
     @JsonProperty("sortOrder")
     private SortOrder sortOrder;
+  
+    @JsonProperty("locality")
+    private Set<String> locality;
 
     @JsonProperty("ids")
     private Set<String> ids;
-
-    @JsonProperty("locality")
-    private String locality;
 
     @JsonProperty("limit")
     private Integer limit;
@@ -63,6 +63,9 @@ public class RequestSearchCriteria {
         applicationStatus,
         serviceRequestId
     }
+  
+    @JsonProperty("accountId")
+    private String accountId;
 
     public boolean isEmpty(){
         return (this.tenantId==null && this.serviceCode==null && this.mobileNumber==null && this.serviceRequestId==null

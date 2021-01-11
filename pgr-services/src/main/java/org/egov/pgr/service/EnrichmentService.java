@@ -21,6 +21,7 @@ import static org.egov.pgr.util.PGRConstants.USERTYPE_CITIZEN;
 @org.springframework.stereotype.Service
 public class EnrichmentService {
 
+
     private PGRUtils utils;
 
     private IdGenRepository idGenRepository;
@@ -108,6 +109,8 @@ public class EnrichmentService {
             String citizenMobileNumber = requestInfo.getUserInfo().getUserName();
             criteria.setMobileNumber(citizenMobileNumber);
         }
+
+        criteria.setAccountId(requestInfo.getUserInfo().getUuid());
 
         String tenantId = (criteria.getTenantId()!=null) ? criteria.getTenantId() : requestInfo.getUserInfo().getTenantId();
 

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
+public class OpenSewerageRowMapper implements ResultSetExtractor<List<SewerageConnection>> {
 	
 	@Override
     public List<SewerageConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -36,28 +36,10 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
                 sewarageConnection.setStatus(StatusEnum.fromValue(rs.getString("status")));
                 sewarageConnection.setConnectionNo(rs.getString("connectionNo"));
                 sewarageConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
-                sewarageConnection.setConnectionExecutionDate(rs.getLong("connectionExecutionDate"));
-                sewarageConnection.setNoOfToilets(rs.getInt("noOfToilets"));
-                sewarageConnection.setNoOfWaterClosets(rs.getInt("noOfWaterClosets"));
-                sewarageConnection.setProposedToilets(rs.getInt("proposedToilets"));
-                sewarageConnection.setProposedWaterClosets(rs.getInt("proposedWaterClosets"));
-                sewarageConnection.setConnectionType(rs.getString("connectionType"));
-                sewarageConnection.setRoadCuttingArea(rs.getFloat("roadcuttingarea"));
-                sewarageConnection.setRoadType(rs.getString("roadtype"));
                 sewarageConnection.setOldApplication(rs.getBoolean("isoldapplication"));
                 // get property id and get property object
                 HashMap<String, Object> addtionalDetails = new HashMap<>();
-                addtionalDetails.put(SWConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
-                addtionalDetails.put(SWConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
-                addtionalDetails.put(SWConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
-                addtionalDetails.put(SWConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
-                addtionalDetails.put(SWConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
-                addtionalDetails.put(SWConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
                 addtionalDetails.put(SWConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
-                addtionalDetails.put(SWConstants.DETAILS_PROVIDED_BY, rs.getString("detailsprovidedby"));
-                addtionalDetails.put(SWConstants.ESTIMATION_FILESTORE_ID, rs.getString("estimationfileStoreId"));
-                addtionalDetails.put(SWConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
-                addtionalDetails.put(SWConstants.ESTIMATION_DATE_CONST, rs.getBigDecimal("estimationLetterDate"));
                 addtionalDetails.put(SWConstants.LOCALITY, rs.getString("locality"));
                 sewarageConnection.setAdditionalDetails(addtionalDetails);
                 sewarageConnection.processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
@@ -76,46 +58,13 @@ public class SewerageRowMapper implements ResultSetExtractor<List<SewerageConnec
                 // Add documents id's
                 connectionListMap.put(Id, sewarageConnection);
             }
-			addDocumentToSewerageConnection(rs, sewarageConnection);
-			addPlumberInfoToSewerageConnection(rs, sewarageConnection);
+
 			addHoldersDeatilsToSewerageConnection(rs, sewarageConnection);
         }
         return new ArrayList<>(connectionListMap.values());
     }
 
-    private void addDocumentToSewerageConnection(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
-        String document_Id = rs.getString("doc_Id");
-        String isActive = rs.getString("doc_active");
-        boolean documentActive = false;
-        if (isActive != null) {
-            documentActive = Status.ACTIVE.name().equalsIgnoreCase(isActive);
-        }
-        if (document_Id != null && documentActive) {
-            Document applicationDocument = new Document();
-            applicationDocument.setId(document_Id);
-            applicationDocument.setDocumentType(rs.getString("documenttype"));
-            applicationDocument.setFileStoreId(rs.getString("filestoreid"));
-            applicationDocument.setDocumentUid(rs.getString("doc_Id"));
-            applicationDocument.setStatus(Status.fromValue(isActive));
-            sewerageConnection.addDocumentsItem(applicationDocument);
-        }
-    }
 
-    private void addPlumberInfoToSewerageConnection(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
-        String plumber_id = rs.getString("plumber_id");
-        if (plumber_id != null) {
-            PlumberInfo plumber = new PlumberInfo();
-            plumber.setId(plumber_id);
-            plumber.setName(rs.getString("plumber_name"));
-            plumber.setGender(rs.getString("plumber_gender"));
-            plumber.setLicenseNo(rs.getString("licenseno"));
-            plumber.setMobileNumber(rs.getString("plumber_mobileNumber"));
-            plumber.setRelationship(rs.getString("relationship"));
-            plumber.setCorrespondenceAddress(rs.getString("correspondenceaddress"));
-            plumber.setFatherOrHusbandName(rs.getString("fatherorhusbandname"));
-            sewerageConnection.addPlumberInfoItem(plumber);
-        }
-    }
 
     private void addHoldersDeatilsToSewerageConnection(ResultSet rs, SewerageConnection sewerageConnection) throws SQLException {
         String uuid = rs.getString("userid");

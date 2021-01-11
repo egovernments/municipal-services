@@ -33,16 +33,27 @@ public class PGRQueryBuilder {
 
         StringBuilder builder = new StringBuilder(QUERY);
 
-        if (criteria.getTenantId() != null) {
-            addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.tenantid=? ");
-            preparedStmtList.add(criteria.getTenantId());
+        if(criteria.getTenantId() != null) {
+            String tenantId = criteria.getTenantId();
+
+            String[] tenantIdChunks = tenantId.split("\\.");
+
+            if (tenantIdChunks.length == 1) {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantid LIKE ? ");
+                preparedStmtList.add(criteria.getTenantId() + '%');
+            } else {
+                addClauseIfRequired(preparedStmtList, builder);
+                builder.append(" ser.tenantid=? ");
+                preparedStmtList.add(criteria.getTenantId());
+            }
         }
 
-        if (criteria.getServiceCode() != null) {
+        Set<String> serviceCodes = criteria.getServiceCode();
+        if (!CollectionUtils.isEmpty(serviceCodes)) {
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ser.serviceCode=? ");
-            preparedStmtList.add(criteria.getServiceCode());
+            builder.append(" ser.serviceCode IN (").append(createQuery(serviceCodes)).append(")");
+            addToPreparedStatement(preparedStmtList, serviceCodes);
         }
 
         Set<String> applicationStatuses = criteria.getApplicationStatus();
@@ -72,14 +83,15 @@ public class PGRQueryBuilder {
             addToPreparedStatement(preparedStmtList, userIds);
         }
 
-        if(criteria.getLocality()!=null)
-        {
+
+        Set<String> localities = criteria.getLocality();
+        if(!CollectionUtils.isEmpty(localities)){
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" ads.locality=? ");
-            preparedStmtList.add(criteria.getLocality());
+            builder.append(" ads.locality IN (").append(createQuery(localities)).append(")");
+            addToPreparedStatement(preparedStmtList, localities);
         }
 
-        addOrderByClause(builder, criteria);
+        addOrderByClause(builder);
 
         addLimitAndOffset(builder, criteria, preparedStmtList);
 
