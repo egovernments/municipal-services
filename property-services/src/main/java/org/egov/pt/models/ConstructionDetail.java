@@ -34,7 +34,6 @@ public class ConstructionDetail {
 	private BigDecimal carpetArea;
 
 	@Digits(integer = 8, fraction = 2)
-	@NotNull
 	@JsonProperty("builtUpArea")
 	private BigDecimal builtUpArea;
 

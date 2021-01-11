@@ -118,9 +118,30 @@ public class PropertyValidator {
 			
 			ConstructionDetail consDtl = unit.getConstructionDetail();
 			
-			if (consDtl.getCarpetArea() != null && !property.getPropertyType().contains(PTConstants.PT_TYPE_VACANT)
-					&& consDtl.getCarpetArea().compareTo(consDtl.getBuiltUpArea()) >= 0)
-				errorMap.put("UNIT INFO ERROR ", "Carpet area cannot be greater or equal than builtUp area");
+			Boolean isBuiltUpAreaNull = consDtl.getBuiltUpArea() == null;
+			
+			if (isBuiltUpAreaNull) {
+
+				if (consDtl.getPlinthArea() == null || consDtl.getSuperBuiltUpArea() == null)
+					errorMap.put("EG_PT_UNIT_AREA_ERROR",
+							"Any one of the following either builtUpArea or (plinthArea + superBuiltUpArea) should be provided");
+
+				if (consDtl.getPlinthArea() != null && consDtl.getSuperBuiltUpArea() != null) {
+					consDtl.setBuiltUpArea(consDtl.getSuperBuiltUpArea().subtract(consDtl.getPlinthArea()));
+					isBuiltUpAreaNull = false;
+					
+				}
+
+			} else if(!isBuiltUpAreaNull) {
+
+				if (consDtl.getBuiltUpArea().compareTo(configs.getMinUnitArea()) <= 0)
+					errorMap.put("EG_PT_UNIT_BUILTUPAREA_ERROR", "BuiltUpArea cannot be lesser than minimum value of : "
+							+ configs.getMinUnitArea() + " " + configs.getLandAreaUnit());
+
+				if (consDtl.getCarpetArea() != null && !property.getPropertyType().contains(PTConstants.PT_TYPE_VACANT)
+						&& consDtl.getCarpetArea().compareTo(consDtl.getBuiltUpArea()) >= 0)
+					errorMap.put("UNIT INFO ERROR ", "Carpet area cannot be greater or equal than builtUp area");
+			}
 		}
 	}
 
