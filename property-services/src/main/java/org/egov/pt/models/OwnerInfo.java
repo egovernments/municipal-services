@@ -10,6 +10,7 @@ import org.egov.common.contract.request.Role;
 import org.egov.pt.models.enums.Relationship;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.User;
+import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -22,12 +23,12 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
 public class OwnerInfo extends User {
 
+	
 	@JsonProperty("ownerInfoUuid")
 	private String ownerInfoUuid;
 	
@@ -162,8 +163,111 @@ public class OwnerInfo extends User {
 		this.ownerType = ownerInfo.getOwnerType();
 		this.institutionId = ownerInfo.getInstitutionId();
 		this.status = ownerInfo.getStatus();
-		this.documents = ownerInfo.getDocuments();
+		this.documents = copyDocuments(ownerInfo.getDocuments());
 		this.relationship = ownerInfo.getRelationship();
 	}
 
+	private List<Document> copyDocuments(List<Document> documents) {
+		
+		if(CollectionUtils.isEmpty(documents))
+			return null;
+		
+		List<Document> newDocs = new ArrayList<>();
+		documents.forEach(doc -> {
+			newDocs.add(doc.toBuilder().build());
+		});
+		return newDocs;
+	}
+	
+	public boolean mutationEquals(OwnerInfo otherOwner) {
+		
+		
+		if (this == otherOwner)
+			return true;
+
+		if (fatherOrHusbandName == null) {
+			if (otherOwner.fatherOrHusbandName != null)
+				return false;
+		} else if (!fatherOrHusbandName.equals(otherOwner.fatherOrHusbandName))
+			return false;
+
+		if (gender == null) {
+			if (otherOwner.gender != null)
+				return false;
+		} else if (!gender.equals(otherOwner.gender))
+			return false;
+
+		if (institutionId == null) {
+			if (otherOwner.institutionId != null)
+				return false;
+		} else if (!institutionId.equals(otherOwner.institutionId))
+			return false;
+
+		if (isPrimaryOwner == null) {
+			if (otherOwner.isPrimaryOwner != null)
+				return false;
+		} else if (!isPrimaryOwner.equals(otherOwner.isPrimaryOwner))
+			return false;
+
+		if (ownerShipPercentage == null) {
+			if (otherOwner.ownerShipPercentage != null)
+				return false;
+		} else if (!ownerShipPercentage.equals(otherOwner.ownerShipPercentage))
+			return false;
+		
+		if (ownerType == null) {
+			if (otherOwner.ownerType != null)
+				return false;
+		} else if (!ownerType.equals(otherOwner.ownerType))
+			return false;
+		
+		if (relationship != otherOwner.relationship)
+			return false;
+		
+		if (status != otherOwner.status)
+			return false;
+		
+		
+		if (this.getName() == null) {
+			if (otherOwner.getName() != null)
+				return false;
+		} else if (!this.getName().equals(otherOwner.getName()))
+			return false;
+		
+		if (this.getMobileNumber() == null) {
+			if (otherOwner.getMobileNumber() != null)
+				return false;
+		} else if (!this.getMobileNumber().equals(otherOwner.getMobileNumber()))
+			return false;
+		
+		
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "OwnerInfo [ownerInfoUuid=" + ownerInfoUuid + ", gender=" + gender + ", fatherOrHusbandName="
+				+ fatherOrHusbandName + ", correspondenceAddress=" + correspondenceAddress + ", isPrimaryOwner="
+				+ isPrimaryOwner + ", ownerShipPercentage=" + ownerShipPercentage + ", ownerType=" + ownerType
+				+ ", institutionId=" + institutionId + ", status=" + status + ", documents=" + documents
+				+ ", relationship=" + relationship + ", hashCode=" + hashCode() + ", Id=" + getId()
+				+ ", Uuid=" + getUuid() + ", UserName=" + getUserName() + ", Password=" + getPassword()
+				+ ", Salutation=" + getSalutation() + ", Name=" + getName() + ", MobileNumber="
+				+ getMobileNumber() + ", EmailId=" + getEmailId() + ", AltContactNumber="
+				+ getAltContactNumber() + ", Pan=" + getPan() + ", AadhaarNumber=" + getAadhaarNumber()
+				+ ", PermanentAddress=" + getPermanentAddress() + ", PermanentCity=" + getPermanentCity()
+				+ ", PermanentPincode=" + getPermanentPincode() + ", CorrespondenceCity="
+				+ getCorrespondenceCity() + ", CorrespondencePincode=" + getCorrespondencePincode()
+				+ ", Active=" + getActive() + ", Dob=" + getDob() + ", PwdExpiryDate="
+				+ getPwdExpiryDate() + ", Locale=" + getLocale() + ", Type=" + getType() + ", Signature="
+				+ getSignature() + ", AccountLocked=" + getAccountLocked() + ", Roles=" + getRoles()
+				+ ", BloodGroup=" + getBloodGroup() + ", IdentificationMark=" + getIdentificationMark()
+				+ ", Photo=" + getPhoto() + ", CreatedBy=" + getCreatedBy() + ", CreatedDate="
+				+ getCreatedDate() + ", LastModifiedBy=" + getLastModifiedBy() + ", LastModifiedDate="
+				+ getLastModifiedDate() + ", TenantId=" + getTenantId() + "]";
+	}
+
+
+
+	
 }
