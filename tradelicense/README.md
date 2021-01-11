@@ -11,7 +11,7 @@ the steps for approval of the application.
 ### Service Dependencies
 
 - tradelicense-calculator
-- billing-service
+- billing
 - mdms
 - localization
 - idgen

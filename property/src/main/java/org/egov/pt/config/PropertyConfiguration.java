@@ -243,7 +243,7 @@ public class PropertyConfiguration {
     @Value("${egov.mdms.search.endpoint}")
     private String mdmsEndpoint;
     
-    // Billing-Service
+    // Billing
     
     
     @Value("${egbs.host}")

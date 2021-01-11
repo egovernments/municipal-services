@@ -9,7 +9,7 @@ This service is used to calculate the Tradelicense fees based on the defined bil
 ### Service Dependencies
 
 - tradelicense
-- billing-service
+- billing
 - mdms
 
 ### Swagger API Contract
@@ -22,7 +22,7 @@ http://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/ego
 ## Service Details
 
 Tradelicense calculator application is used to calculate the Tradelicense Fees based on the different billing slabs in the DB. Every Billing Slab combination has its own demand configurations.
-Once the demand is created for the combination, it calls billing-services API to generate the fees.
+Once the demand is created for the combination, it calls billing API to generate the fees.
 
 ### API Details
 

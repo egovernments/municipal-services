@@ -38,7 +38,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - pdfgen ( Receipt’s, permitorder etc.. and prepared )
 
-- billing-service ( Create demands and bills for the fees to be collected )
+- billing ( Create demands and bills for the fees to be collected )
 
 - collection ( Create receipt for the payment received for the bills )
 

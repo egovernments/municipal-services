@@ -23,7 +23,7 @@ To run the sewerage-calculator in local system, you need to port forward below s
  kubectl port-forward -n egov $(kgpt mdms) 8085:8080 &
  kubectl port-forward -n egov $(kgpt sewerage) 8086:8080 &
  kubectl port-forward -n egov $(kgpt user) 8087:8080
- kubectl port-forward -n egov $(kgpt billing-service) 8088:8080
+ kubectl port-forward -n egov $(kgpt billing) 8088:8080
  kubectl port-forward -n egov $(kgpt workflow) 8089:8080
 ``` 
 

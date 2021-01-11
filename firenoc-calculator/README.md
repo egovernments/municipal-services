@@ -6,7 +6,7 @@ The main objective of the Firenoc calculator module is to create, update, search
 - To Do
 
 ### Service Dependencies
-- billing-service
+- billing
 - mdms
 - firenoc
 
