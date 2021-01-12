@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
+import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
@@ -18,6 +18,7 @@ import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -46,7 +47,9 @@ public class FSMValidator {
 			}
 			// ui does not pass citizen in fsm but userInfo in the request is citizen
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
-				fsm.setCitizen( fsmRequest.getRequestInfo().getUserInfo());
+				User citzen = new User();
+				BeanUtils.copyProperties(fsmRequest.getRequestInfo().getUserInfo(), citzen);
+				fsm.setCitizen( citzen);
 			}
 			
 			if(!StringUtils.isEmpty(fsm.getSource())) {

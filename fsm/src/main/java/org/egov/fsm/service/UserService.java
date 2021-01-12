@@ -21,11 +21,11 @@ import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.user.CreateUserRequest;
+import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.user.UserSearchRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
-import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +53,7 @@ public class UserService {
 	public void manageApplicant(FSMRequest fsmRequest) {
 		FSM fsm = fsmRequest.getFsm();
 		 @Valid RequestInfo requestInfo = fsmRequest.getRequestInfo();
-		 User applicant = fsm.getCitizen();
+		 User applicant =  fsm.getCitizen();
 			UserDetailResponse userDetailResponse = null;
 			UserDetailResponse applicantDetailResponse = null;
 			if (applicant.getMobileNumber() != null) {
@@ -65,7 +65,7 @@ public class UserService {
 				
 				if (userDetailResponse != null || !CollectionUtils.isEmpty(userDetailResponse.getUser())) {
 					
-					if( userDetailResponse.getUser().size() > 1 ){
+					if( userDetailResponse.getUser().size() > 0 ){
 						Boolean foundUser = Boolean.FALSE;
 						for( int j=0;j<userDetailResponse.getUser().size();j++) {
 							User user = userDetailResponse.getUser().get(j);
@@ -150,6 +150,9 @@ public class UserService {
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setTenantId(applicant.getTenantId().split("\\.")[0]);
 		userSearchRequest.setMobileNumber(applicant.getMobileNumber());
+		if( !StringUtils.isEmpty(applicant.getName())) {
+			userSearchRequest.setName(applicant.getName());
+		}
 		
 
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
@@ -164,7 +167,7 @@ public class UserService {
 	 */
 	private void setUserName(User owner) {
 		String uuid = UUID.randomUUID().toString();
-		owner.setUserName(owner.getName());
+		owner.setUserName(uuid);
 		owner.setUuid(uuid);
 		
 	}
@@ -183,7 +186,7 @@ public class UserService {
 	 *            The user whose fields are to be set
 	 */
 	private void addUserDefaultFields(String tenantId, Role role, User applicant) {
-//		applicant.setActive(true);
+		applicant.setActive(true);
 		applicant.setTenantId(tenantId);
 		applicant.setRoles(Collections.singletonList(role));
 		applicant.setType(FSMConstants.CITIZEN);
@@ -208,6 +211,7 @@ public class UserService {
 			dobFormat = "dd/MM/yyyy";
 		try {
 //			System.out.println("user search url: " + uri + userRequest);
+			
 			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
 			parseResponse(responseMap, dobFormat);
 			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);

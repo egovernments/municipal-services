@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 
 import org.egov.fsm.web.model.location.Address;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
+import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.PitDetail;
 import org.egov.fsm.web.model.idgen.IdGenerationRequest;

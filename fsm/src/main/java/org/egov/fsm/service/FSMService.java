@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
@@ -21,6 +20,7 @@ import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.user.UserDetailResponse;
+import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.workflow.ActionValidator;
 import org.egov.fsm.workflow.WorkflowIntegrator;
@@ -177,6 +177,10 @@ public class FSMService {
 		if(criteria.tenantIdOnly() && 
 				requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
 			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
+		}
+		
+		if(!requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN)  && criteria.tenantIdOnly() ){
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH," Aleast one criteria is need to search");
 		}
 		
 		if( criteria.getMobileNumber() !=null) {

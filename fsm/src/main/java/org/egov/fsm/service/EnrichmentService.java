@@ -8,7 +8,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.repository.IdGenRepository;
@@ -22,7 +21,9 @@ import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.idgen.IdResponse;
 import org.egov.fsm.web.model.user.UserDetailResponse;
+import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -59,7 +60,9 @@ public class EnrichmentService {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		
 		if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN)) {
-			fsmRequest.getFsm().setCitizen(fsmRequest.getRequestInfo().getUserInfo());
+			User citzen = new User();
+			BeanUtils.copyProperties(fsmRequest.getRequestInfo().getUserInfo(), citzen);
+			fsmRequest.getFsm().setCitizen(citzen);
 		}else {
 			userService.manageApplicant(fsmRequest);
 		}

@@ -9,6 +9,7 @@ public class FSMErrorConstants {
 	// MDMS
 
 	public static final String INVALID_SEARCH = "INVALID SEARCH";
+	public static final String INVALID_SEARCH_1 = "INVALID SEARCH";
 	public static final String INVALID_ADDRES = "INVALID ADDRESS";
 	public static final String BOUNDARY_ERROR ="BOUNDARY ERROR";
 	public static final String BOUNDARY_MDMS_DATA_ERROR ="BOUNDARY MDMS DATA ERROR";
@@ -26,8 +27,6 @@ public class FSMErrorConstants {
 	
 	public static final String RECEIPT_ERROR = "RECEIPT ERROR";
 	
-	public static final String LANDINFO_EXCEPTION = "LANDINFO EXCEPTION";
-	
 	public static final String INVALID_RECEIPT = "INVALID RECEIPT";
 	
 	public static final String INVALID_TENANT = "INVALID TENANT";
@@ -41,9 +40,6 @@ public class FSMErrorConstants {
 	public static final String INVALID_REQUEST = "INVALID REQUEST";
 
 	public static final String INVALID_FILE = "INVALID FILE";
-	
-
-	public static final String INVALID_EDCR_NUMBER = "INVALID EDCR NUMBER";
 
 	public static final String FSM_UNKNOWN_DATE = "FSM UNKNOWN DATE";
 
