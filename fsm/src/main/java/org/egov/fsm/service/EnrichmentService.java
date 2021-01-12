@@ -58,7 +58,12 @@ public class EnrichmentService {
 		//TODO add requied logic
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		
-		userService.manageApplicant(fsmRequest);
+		if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN)) {
+			fsmRequest.getFsm().setCitizen(fsmRequest.getRequestInfo().getUserInfo());
+		}else {
+			userService.manageApplicant(fsmRequest);
+		}
+		
 		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
 		
 		fsmRequest.getFsm().setApplicationStatus(FSMConstants.DRAFT);
