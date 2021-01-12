@@ -70,8 +70,13 @@ public class FSMConstants {
 
 
 	public static final String CITIZEN = "CITIZEN";
+	public static final String FSM_EDITOR_EMP = "FSM_EDITOR_EMP";
 	
 	public static final String ACTION_SENDBACKTOCITIZEN = "SEND_BACK_TO_CITIZEN";
+	
+	public static final String WF_ACTION_APPLY = "APPLY";
+	public static final String WF_ACTION_CREATE ="CREATE";
+	public static final String WF_ACTION_SUBMIT="SUBMIT";
 	
 	public static final String APPLICATION_FEE ="APPLICATION_FEE";
 

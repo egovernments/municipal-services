@@ -57,6 +57,18 @@ public class FSMController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	@PostMapping(value = "/_update")
+	public ResponseEntity<FSMResponse> update(@Valid @RequestBody FSMRequest fsmRequest) {
+		
+		fsmUtil.defaultJsonPathConfig();
+		FSM fsm = fsmService.update(fsmRequest);
+		List<FSM> fsmList = new ArrayList<FSM>();
+		fsmList.add(fsm);
+		FSMResponse response = FSMResponse.builder().fsm(fsmList)				
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(fsmRequest.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@PostMapping(value = "/_search")
 	public ResponseEntity<FSMResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,

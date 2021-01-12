@@ -54,7 +54,8 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 			String sanitationtype = rs.getString("sanitationtype");
 			String propertyUsage = rs.getString("propertyUsage");
 			int noOfTrips = rs.getInt("noOfTrips");
-			String applicationStatus = rs.getString("status");
+			String applicationStatus = rs.getString("applicationStatus");
+			String status = rs.getString("status");
 			String vehicleId = rs.getString("vehicle_id");
 			if (currentfsm == null) {
 				Long lastModifiedTime = rs.getLong("lastmodifiedtime");
@@ -65,7 +66,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 				currentfsm = FSM.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
 						.description(description).accountId(accountId).additionalDetails(additionalDetails)
 						.source(source).sanitationtype(sanitationtype).propertyUsage(propertyUsage).noOfTrips(noOfTrips)
-						.vehicleId(vehicleId).applicationStatus(applicationStatus)
+						.vehicleId(vehicleId).applicationStatus(applicationStatus).status(StatusEnum.valueOf(status))
 						.build();
 
 				fmsMap.put(id, currentfsm);
@@ -93,18 +94,18 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 
 		Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 
-		GeoLocation geoLocation = GeoLocation.builder().id(rs.getString("id")).latitude(latitude).longitude(longitude)
+		GeoLocation geoLocation = GeoLocation.builder().id(rs.getString("fsm_geo_id")).latitude(latitude).longitude(longitude)
 				.build();
 
 		Address address = Address.builder().buildingName(rs.getString("buildingName")).city(rs.getString("city"))
 				.plotNo(rs.getString("plotno")).district(rs.getString("district")).region(rs.getString("region"))
 				.state(rs.getString("state")).country(rs.getString("country")).landmark(rs.getString("landmark"))
-				.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno"))
-				.additionalDetails(rs.getString("additionalDetails")).street(rs.getString("street")).tenantId(tenantId).locality(locality).auditDetails(auditdetails)
+				.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno")).id(rs.getString("fsm_address_id"))
+				.additionalDetails(rs.getString("additionalDetails")).street(rs.getString("street")).tenantId(rs.getString("tenantid")).locality(locality).auditDetails(auditdetails)
 				.build();
 
 		PitDetail pitDetail = PitDetail.builder().height(rs.getDouble("height")).width(rs.getDouble("width"))
-				.length(rs.getDouble("length")).distanceFromRoad(rs.getDouble("distanceFromRoad")).build();
+				.length(rs.getDouble("length")).distanceFromRoad(rs.getDouble("distanceFromRoad")).id(rs.getString("fsm_pit_id")).tenantId(rs.getString("tenantid")).build();
 		
 		
 		

@@ -162,7 +162,7 @@ public class CalculationService {
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
 		Map<String, String> additionalDetails = fsm.getadditionalDetails() != null ? (Map<String, String>)fsm.getadditionalDetails()
 				: new HashMap<String, String>();
-		BigDecimal tripAmount  = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));;
+		BigDecimal tripAmount  = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
 		
 		
 //		}catch( Exception e) {

@@ -19,6 +19,7 @@ import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.idgen.IdResponse;
 import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
@@ -86,6 +87,10 @@ public class EnrichmentService {
 			fsmRequest.getFsm().getPitDetail().setAuditDetails(auditDetails);
 		}
 		
+		if(fsmRequest.getWorkflow() == null) {
+			String action =  fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE) ? FSMConstants.WF_ACTION_APPLY : FSMConstants.WF_ACTION_CREATE; 
+			fsmRequest.setWorkflow( Workflow.builder().action(action).build());
+		}
 		
 		setIdgenIds(fsmRequest);
 		
@@ -141,7 +146,24 @@ public class EnrichmentService {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
 		fsmRequest.getFsm().setAuditDetails(auditDetails);
-
+		if (fsmRequest.getFsm().getAddress() != null) {
+			if (StringUtils.isEmpty(fsmRequest.getFsm().getAddress().getId()))
+				fsmRequest.getFsm().getAddress().setId(UUID.randomUUID().toString());
+			fsmRequest.getFsm().getAddress().setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmRequest.getFsm().getAddress().setAuditDetails(auditDetails);
+			if (fsmRequest.getFsm().getAddress().getGeoLocation() != null
+					&& StringUtils.isEmpty(fsmRequest.getFsm().getAddress().getGeoLocation().getId()))
+				fsmRequest.getFsm().getAddress().getGeoLocation().setId(UUID.randomUUID().toString());
+		}else {
+			throw new CustomException(FSMErrorConstants.INVALID_ADDRES," Address is mandatory");
+		}
+		
+		if(fsmRequest.getFsm().getPitDetail() != null) {
+			if (StringUtils.isEmpty(fsmRequest.getFsm().getPitDetail().getId()))
+				fsmRequest.getFsm().getPitDetail().setId(UUID.randomUUID().toString());
+			fsmRequest.getFsm().getPitDetail().setTenantId(fsmRequest.getFsm().getTenantId());
+			fsmRequest.getFsm().getPitDetail().setAuditDetails(auditDetails);
+		}
 
 	}
 

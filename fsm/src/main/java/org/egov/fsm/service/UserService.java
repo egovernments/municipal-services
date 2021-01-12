@@ -164,7 +164,7 @@ public class UserService {
 	 */
 	private void setUserName(User owner) {
 		String uuid = UUID.randomUUID().toString();
-		owner.setUserName(uuid);
+		owner.setUserName(owner.getName());
 		owner.setUuid(uuid);
 		
 	}

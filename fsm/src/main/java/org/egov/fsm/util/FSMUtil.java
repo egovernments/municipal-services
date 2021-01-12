@@ -3,8 +3,10 @@ package org.egov.fsm.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -12,12 +14,14 @@ import org.egov.common.contract.request.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
 import org.egov.fsm.web.model.AuditDetails;
+import org.egov.fsm.web.model.FSMRequest;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -144,5 +148,55 @@ public class FSMUtil {
 		return Arrays.asList(propertyMasterMDtl,fsmMasterMDtl);
 
 	}
+	
+	/**
+	 * Check if the logged in user has the role for the FSM application tenantId
+	 * @param fsmRequest
+	 * @param role
+	 * @return
+	 */
+	public Boolean isRoleAvailale(FSMRequest fsmRequest, String role) {
+		Boolean flag = false;
+		Map<String,List<String>> tenantIdToUserRoles = getTenantIdToUserRolesMap(fsmRequest.getRequestInfo());
+		 flag = isRoleAvailable(tenantIdToUserRoles.get(fsmRequest.getFsm().getTenantId()), role);
+		
+		return flag;
+	}
 
+	  /**
+     * Checks if the user has role allowed for the action
+     * @param userRoles The roles available with the user
+     * @pram role  The role to verified
+     * @return True if user can perform the action else false
+     */
+    private Boolean isRoleAvailable(List<String> userRoles, String role){
+        Boolean flag = false;
+        //       List<String> allowedRoles = Arrays.asList(actionRoles.get(0).split(","));
+        if(CollectionUtils.isEmpty(userRoles))
+            return false;
+
+       userRoles.contains(role);
+        return flag;
+    }
+    
+    /**
+     * Gets the map of tenantId to roles the user is assigned
+     * @param requestInfo RequestInfo of the request
+     * @return Map of tenantId to roles for user in the requestInfo
+     */
+    public Map<String,List<String>> getTenantIdToUserRolesMap(RequestInfo requestInfo){
+        Map<String,List<String>> tenantIdToUserRoles = new HashMap<>();
+        requestInfo.getUserInfo().getRoles().forEach(role -> {
+            if(tenantIdToUserRoles.containsKey(role.getTenantId())){
+                tenantIdToUserRoles.get(role.getTenantId()).add(role.getCode());
+            }
+            else {
+                List<String> roleCodes = new LinkedList<>();
+                roleCodes.add(role.getCode());
+                tenantIdToUserRoles.put(role.getTenantId(),roleCodes);
+            }
+
+        });
+        return tenantIdToUserRoles;
+    }
 }

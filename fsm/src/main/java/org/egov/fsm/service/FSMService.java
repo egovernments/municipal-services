@@ -75,7 +75,7 @@ public class FSMService {
 		fsmValidator.validateCreate(fsmRequest, mdmsData);
 		enrichmentService.enrichFSMCreateRequest(fsmRequest, mdmsData);
 		
-		//wfIntegrator.callWorkFlow(fsmRequest);
+		wfIntegrator.callWorkFlow(fsmRequest);
 		repository.save(fsmRequest);
 		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
 			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
@@ -112,34 +112,51 @@ public class FSMService {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		}
 		FSM oldFSM = fsms.get(0);
-		//TODO should be modified later after implementing the workflow , based on workflow state calculation should be generated
-		if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
+		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
+				FSMConstants.FSM_BusinessService,null);
+		actionValidator.validateUpdateRequest(fsmRequest, businessService);
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
 			
 			Map<String, String> newAdditionalDetails = fsm.getadditionalDetails() != null ? (Map<String, String>)fsm.getadditionalDetails()
 					: new HashMap<String, String>();
-			BigDecimal newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
+			BigDecimal newTripAmount  = new BigDecimal(0);
+			try {
+				if( newAdditionalDetails != null || newAdditionalDetails.get("tripAmount") != null) {
+					 newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
+				}
+			}catch( Exception e) {
+				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+			}
 			
-			Map<String, String> oldAdditionalDetails = oldFSM.getadditionalDetails() != null ? (Map<String, String>)oldFSM.getadditionalDetails()
-					: new HashMap<String, String>();
-			BigDecimal oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
+			
+			BigDecimal oldTripAmount  = new BigDecimal(0);
+			try {
+				Map<String, String> oldAdditionalDetails = oldFSM.getadditionalDetails() != null ? (Map<String, String>)oldFSM.getadditionalDetails()
+						: new HashMap<String, String>();
+				if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
+					 oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
+				}
+			}catch( Exception e) {
+				 oldTripAmount  = new BigDecimal(0);
+			}
+			
+			 
 			if( oldTripAmount.compareTo(newTripAmount) != 0) {
 				calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
 			}
 			
 		}
-//		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
-//				fsm.getApplicationNo());
+
 
 		
 		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData);
 		
-//		wfIntegrator.callWorkFlow(fsmRequest);
+		wfIntegrator.callWorkFlow(fsmRequest);
 
 		enrichmentService.postStatusEnrichment(fsmRequest);
 		
-//		fsmValidator.validateWorkflowActions(fsmRequest);
-		
-		repository.update(fsmRequest, true); //workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService)
+		repository.update(fsmRequest, workflowService.isStateUpdatable(fsm.getApplicationStatus(), businessService)); 
 		return fsmRequest.getFsm();
 	}
 	

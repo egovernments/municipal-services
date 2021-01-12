@@ -42,15 +42,15 @@ public class WorkflowService {
 	 *            The RequestInfo object of the request
 	 * @return BusinessService for the the given tenantId
 	 */
-	public BusinessService getBusinessService(FSM fsm, RequestInfo requestInfo, String applicationNo) {
-		StringBuilder url = getSearchURLWithParams(fsm, true, null);
+	public BusinessService getBusinessService(FSM fsm, RequestInfo requestInfo, String businessServceName, String applicationNo) {
+		StringBuilder url = getSearchURLWithParams(fsm, businessServceName, applicationNo);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
 		BusinessServiceResponse response = null;
 		try {
 			response = mapper.convertValue(result, BusinessServiceResponse.class);
 		} catch (IllegalArgumentException e) {
-			throw new CustomException(FSMErrorConstants.PARSING_ERROR, "Failed to parse response of calculate");
+			throw new CustomException(FSMErrorConstants.PARSING_ERROR, "Failed to parse response of Workflow");
 		}
 		return response.getBusinessServices().get(0);
 	}
@@ -62,18 +62,23 @@ public class WorkflowService {
 	 *            The tenantId for which url is generated
 	 * @return The search url
 	 */
-	private StringBuilder getSearchURLWithParams(FSM fsm, boolean businessService, String applicationNo) {
+	private StringBuilder getSearchURLWithParams(FSM fsm, String businessService, String applicationNo) {
 		StringBuilder url = new StringBuilder(config.getWfHost());
-		if (businessService) {
+		
+		
+		
+		if (businessService != null) {
 			url.append(config.getWfBusinessServiceSearchPath());
+			url.append("?businessServices=");
+			url.append(businessService);
 		} else {
 			url.append(config.getWfProcessPath());
+			url.append("?businessIds=");
+			url.append(applicationNo); 
 		}
-		url.append("?tenantId=");
+		
+		url.append("&tenantId=");
 		url.append(fsm.getTenantId());
-	
-		url.append("&businessIds=");
-		url.append(applicationNo);
 		
 		return url;
 	}
@@ -96,23 +101,7 @@ public class WorkflowService {
 		return Boolean.FALSE;
 	}
 
-	/**
-	 * Returns State name fo the current state of the document
-	 * 
-	 * @param statusEnum
-	 *            The stateCode of the fsm
-	 * @param businessService
-	 *            The BusinessService of the application flow
-	 * @return State String to be fetched
-	 */
-	public String getCurrentState(String status, BusinessService businessService) {
-		for (State state : businessService.getStates()) {
-			if (state.getApplicationStatus() != null
-					&& state.getApplicationStatus().equalsIgnoreCase(status.toString()))
-				return state.getState();
-		}
-		return null;
-	}
+	
 
 	/**
 	 * Returns State Obj fo the current state of the document
