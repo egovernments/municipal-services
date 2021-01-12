@@ -66,7 +66,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 				currentfsm = FSM.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
 						.description(description).accountId(accountId).additionalDetails(additionalDetails)
 						.source(source).sanitationtype(sanitationtype).propertyUsage(propertyUsage).noOfTrips(noOfTrips)
-						.vehicleId(vehicleId).applicationStatus(applicationStatus).status(StatusEnum.valueOf(status))
+						.vehicleId(vehicleId).applicationStatus(applicationStatus)
 						.build();
 
 				fmsMap.put(id, currentfsm);
