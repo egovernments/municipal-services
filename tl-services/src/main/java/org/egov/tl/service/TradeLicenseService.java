@@ -361,6 +361,9 @@ public class TradeLicenseService {
                 case businessService_TL:
                     if (config.getIsExternalWorkFlowEnabled()) {
                         wfIntegrator.callWorkFlow(tradeLicenseRequest);
+			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()) {
+                       	tradeLicenseRequest.getLicenses().get(0).setAction("APPROVE");
+                       	wfIntegrator.callWorkFlow(tradeLicenseRequest);}
                     } else {
                         TLWorkflowService.updateStatus(tradeLicenseRequest);
                     }
