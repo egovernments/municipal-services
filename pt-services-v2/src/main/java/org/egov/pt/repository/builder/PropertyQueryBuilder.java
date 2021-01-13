@@ -70,7 +70,7 @@ public class PropertyQueryBuilder {
 
 
     private static final String LocalityQuery = "SELECT property FROM eg_pt_address_v2 addr WHERE_CLAUSE_PLACEHOLDER_LOCALITY";
-    private static final String OldPropertyQuery = "SELECT property FROM eg_pt_property_v2 prop WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY";
+    private static final String OldPropertyQuery = "SELECT propertyid FROM eg_pt_property_v2 prop WHERE_CLAUSE_PLACEHOLDER_OLDPROPERTY";
     private static final String CreatedTimeQuery = "select maxassess.createdtime from (select distinct property, max(createdtime) as createdtime from eg_pt_propertydetail_v2 ptd"
     		+ "WHERE_CLAUSE_PLACEHOLDER_CREATEDTIME group by ptd.property) as maxassess";
 	private static final String NEWQUERY = "SELECT asmt.*,address.*,owner.*,unit.*,insti.*,unit.id as unitid,"+
