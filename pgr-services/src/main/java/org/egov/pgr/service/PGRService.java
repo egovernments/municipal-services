@@ -135,6 +135,7 @@ public class PGRService {
      * @return
      */
     public Integer count(RequestInfo requestInfo, RequestSearchCriteria criteria){
+        criteria.setIsPlainSearch(false);
         Integer count = repository.getCount(criteria);
         return count;
     }
