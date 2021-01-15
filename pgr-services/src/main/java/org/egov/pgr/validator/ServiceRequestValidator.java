@@ -276,5 +276,9 @@ public class ServiceRequestValidator {
     }
 
 
-
+    public void validatePlainSearch(RequestSearchCriteria criteria) {
+        if(CollectionUtils.isEmpty(criteria.getTenantIds())){
+            throw new CustomException("TENANT_ID_LIST_EMPTY", "Tenant ids not provided for searching.");
+        }
+    }
 }
