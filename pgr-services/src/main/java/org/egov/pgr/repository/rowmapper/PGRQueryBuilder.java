@@ -35,7 +35,7 @@ public class PGRQueryBuilder {
 
         StringBuilder builder = new StringBuilder(QUERY);
 
-        if(criteria.getIsPlainSearch()){
+        if(criteria.getIsPlainSearch() != null && criteria.getIsPlainSearch()){
             Set<String> tenantIds = criteria.getTenantIds();
             if(!CollectionUtils.isEmpty(tenantIds)){
                 addClauseIfRequired(preparedStmtList, builder);

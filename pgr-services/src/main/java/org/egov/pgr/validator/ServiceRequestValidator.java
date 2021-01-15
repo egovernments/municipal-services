@@ -63,6 +63,7 @@ public class ServiceRequestValidator {
         validateDepartment(request, mdmsData);
         validateReOpen(request);
         RequestSearchCriteria criteria = RequestSearchCriteria.builder().ids(Collections.singleton(id)).build();
+        criteria.setIsPlainSearch(false);
         List<ServiceWrapper> serviceWrappers = repository.getServiceWrappers(criteria);
 
         if(CollectionUtils.isEmpty(serviceWrappers))
