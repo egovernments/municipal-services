@@ -38,7 +38,7 @@ public class DemandService {
     @Autowired
     private DemandRepository demandRepository;
 
-    public static final String MDMS_ROUNDOFF_TAXHEAD= "TL_ROUNDOFF";
+    public static final String MDMS_ROUNDOFF_TAXHEAD= "_ROUNDOFF";
     /**
      * Creates or updates Demand
      * @param requestInfo The RequestInfo of the calculation request
@@ -116,7 +116,7 @@ public class DemandService {
             Long taxPeriodFrom = challan.getTaxPeriodFrom();
             Long taxPeriodTo = challan.getTaxPeriodTo();
             String businessService = challan.getBusinessService();
-            addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
+            addRoundOffTaxHead(calculation.getTenantId(), demandDetails,businessService);
             Demand singleDemand = Demand.builder()
                     .consumerCode(consumerCode)
                     .demandDetails(demandDetails)
@@ -282,7 +282,7 @@ public class DemandService {
         }
         List<DemandDetail> combinedBillDetials = new LinkedList<>(demandDetails);
         combinedBillDetials.addAll(newDemandDetails);
-        addRoundOffTaxHead(calculation.getTenantId(),combinedBillDetials);
+        addRoundOffTaxHead(calculation.getTenantId(),combinedBillDetials,calculation.getChallan().getBusinessService());
         return combinedBillDetials;
     }
 
@@ -293,7 +293,7 @@ public class DemandService {
      * @param tenantId The tenantId of the demand
      * @param demandDetails The list of demandDetail
      */
-    private void addRoundOffTaxHead(String tenantId,List<DemandDetail> demandDetails){
+    private void addRoundOffTaxHead(String tenantId,List<DemandDetail> demandDetails,String businessService){
         BigDecimal totalTax = BigDecimal.ZERO;
 
         DemandDetail prevRoundOffDemandDetail = null;
@@ -302,7 +302,7 @@ public class DemandService {
         * Sum all taxHeads except RoundOff as new roundOff will be calculated
         * */
         for (DemandDetail demandDetail : demandDetails){
-            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(MDMS_ROUNDOFF_TAXHEAD))
+            if(!demandDetail.getTaxHeadMasterCode().equalsIgnoreCase(businessService+MDMS_ROUNDOFF_TAXHEAD))
                 totalTax = totalTax.add(demandDetail.getTaxAmount());
             else prevRoundOffDemandDetail = demandDetail;
         }
@@ -341,7 +341,7 @@ public class DemandService {
         if(roundOff.compareTo(BigDecimal.ZERO)!=0){
                  DemandDetail roundOffDemandDetail = DemandDetail.builder()
                     .taxAmount(roundOff)
-                    .taxHeadMasterCode(MDMS_ROUNDOFF_TAXHEAD)
+                    .taxHeadMasterCode(businessService+MDMS_ROUNDOFF_TAXHEAD)
                     .tenantId(tenantId)
                     .collectionAmount(BigDecimal.ZERO)
                     .build();
