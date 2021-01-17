@@ -408,11 +408,11 @@ public class EstimationService {
 			taxAndCessPercentage = new BigDecimal(
 					feeObj.getAsNumber(WSCalculationConstant.TAX_PERCENTAGE_CONST).toString());
 		}
-		BigDecimal meterCost = BigDecimal.ZERO;
-		if (feeObj.get(WSCalculationConstant.METER_COST_CONST) != null
+		BigDecimal meterTestingFee = BigDecimal.ZERO;
+		if (feeObj.get(WSCalculationConstant.METER_TESTING_FEE_CONST) != null
 				&& criteria.getWaterConnection().getConnectionType() != null && criteria.getWaterConnection()
 						.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
-			meterCost = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_COST_CONST).toString());
+			meterTestingFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.METER_TESTING_FEE_CONST).toString());
 		}
 		BigDecimal roadCuttingCharge = BigDecimal.ZERO;
 		if (criteria.getWaterConnection().getRoadType() != null)
@@ -426,7 +426,7 @@ public class EstimationService {
 //			usageTypeCharge = getUsageTypeFee(masterData,
 //					property.getUsageCategory(),
 //					criteria.getWaterConnection().getRoadCuttingArea());
-		BigDecimal totalCharge = formFee.add(securityCharge).add(otherCharges).add(meterCost).add(roadCuttingCharge);
+		BigDecimal totalCharge = formFee.add(securityCharge).add(otherCharges).add(meterTestingFee).add(roadCuttingCharge);
 //				.add(roadPlotCharge).add(usageTypeCharge);
 		BigDecimal tax = totalCharge.multiply(taxAndCessPercentage.divide(WSCalculationConstant.HUNDRED));
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
@@ -440,9 +440,9 @@ public class EstimationService {
 		if (!(connectionFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CONNECTION_FEE)
 					.estimateAmount(connectionFee.setScale(2, 2)).build());
-		if (!(meterCost.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_CHARGE)
-					.estimateAmount(meterCost.setScale(2, 2)).build());
+		if (!(meterTestingFee.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_TESTING_FEE)
+					.estimateAmount(meterTestingFee.setScale(2, 2)).build());
 		if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_OTHER_CHARGE)
 					.estimateAmount(otherCharges.setScale(2, 2)).build());

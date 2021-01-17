@@ -209,7 +209,7 @@ public class WSCalculationConstant {
 
 	public static final String WS_ROAD_CUTTING_CHARGE = "WS_ROAD_CUTTING_CHARGE";
 
-	public static final String WS_METER_CHARGE = "WS_METER_CHARGE";
+	public static final String WS_METER_TESTING_FEE = "WS_METER_TESTING_FEE";
 	
 	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
 	
@@ -231,7 +231,7 @@ public class WSCalculationConstant {
 
 	public static final String SCRUTINY_FEE_CONST = "scrutinyFee";
 	
-	public static final String METER_COST_CONST = "meterCost";
+	public static final String METER_TESTING_FEE_CONST = "meterTestingFee";
 	
 	public static final String OTHER_CHARGE_CONST = "other";
 	
