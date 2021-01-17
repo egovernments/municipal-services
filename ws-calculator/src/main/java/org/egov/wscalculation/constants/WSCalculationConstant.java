@@ -213,6 +213,12 @@ public class WSCalculationConstant {
 	
 	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
 	
+	public static final String WS_SECURITY_CHARGE_CONST = "securityCharge";
+	
+	public static final String WS_CONNECTION_FEE = "WS_CONNECTION_FEE";
+	
+	public static final String WS_CONNECTION_FEE_CONST = "connectionFee";
+	
 	public static final String WS_OTHER_CHARGE = "WS_OTHER_CHARGE";
 	
 	public static final String WS_TAX_AND_CESS = "WS_TAX_AND_CESS";
