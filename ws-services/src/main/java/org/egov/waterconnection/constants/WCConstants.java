@@ -184,6 +184,18 @@ public class WCConstants {
 	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
 
 	public static final String LOCALITY = "locality";
+	
+	public static final String BILLING_TYPE = "billingType";
+
+	public static final String BILLING_AMOUNT = "billingAmount";
+
+	public static final String CONNECTION_CATEGORY = "connectionCategory";
+
+	public static final String LEDGER_ID = "ledgerId";
+
+	public static final String AVERAGE_MAKE = "averageMake";
+
+	public static final String METER_MAKE = "meterMake";
 
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections
 			.unmodifiableList(Arrays.asList(ADHOC_PENALTY, ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT,

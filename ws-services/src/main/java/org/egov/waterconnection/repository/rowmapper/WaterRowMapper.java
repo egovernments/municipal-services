@@ -59,6 +59,13 @@ public class WaterRowMapper implements ResultSetExtractor<List<WaterConnection>>
                 additionalDetails.put(WCConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
                 additionalDetails.put(WCConstants.ESTIMATION_DATE_CONST, rs.getBigDecimal("estimationLetterDate"));
                 additionalDetails.put(WCConstants.LOCALITY, rs.getString("locality"));
+                additionalDetails.put(WCConstants.BILLING_TYPE, rs.getBigDecimal("billing_type"));
+                additionalDetails.put(WCConstants.BILLING_AMOUNT, rs.getBigDecimal("billing_amount"));
+                additionalDetails.put(WCConstants.CONNECTION_CATEGORY, rs.getString("connection_category"));
+                additionalDetails.put(WCConstants.LEDGER_ID, rs.getString("ledger_id"));
+                additionalDetails.put(WCConstants.AVERAGE_MAKE, rs.getString("average_make"));
+                additionalDetails.put(WCConstants.METER_MAKE, rs.getString("meter_make"));
+
                 currentWaterConnection.setAdditionalDetails(additionalDetails);
                 currentWaterConnection
                         .processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
