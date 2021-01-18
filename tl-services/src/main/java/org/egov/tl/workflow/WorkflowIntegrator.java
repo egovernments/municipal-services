@@ -180,7 +180,7 @@ public class WorkflowIntegrator {
 
 			for ( TradeLicense tlObj: tradeLicenseRequest.getLicenses()) {
 				Boolean islegacy=tlObj.getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean();
-				 if(islegacy && tlObj.getAction().equalsIgnoreCase(ACTION_APPLY))
+				 if(islegacy && tlObj.getAction().equalsIgnoreCase(ACTION_APPROVE))
 					 {tlObj.setStatus("APPROVED");
 					 Long time = System.currentTimeMillis();
 	                 tlObj.setIssuedDate(time);
