@@ -90,12 +90,12 @@ public class EnrichmentService {
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
 					SWConstants.ADHOC_REBATE, SWConstants.APP_CREATED_DATE, SWConstants.ESTIMATION_DATE_CONST);
-			for (String constKey : SWConstants.ADDITIONAL_OBJECT) {
-				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
-					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
-					additionalDetail.put(constKey, big);
+			for (Map.Entry<String, Object> entrySet: addDetail.entrySet()) {
+				if (addDetail.getOrDefault(entrySet.getKey(), null) != null && adhocPenalityAndRebateConst.contains(entrySet.getKey())) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(entrySet.getKey())));
+					additionalDetail.put(entrySet.getKey(), big);
 				} else {
-					additionalDetail.put(constKey, addDetail.get(constKey));
+					additionalDetail.put(entrySet.getKey(), addDetail.get(entrySet.getKey()));
 				}
 			}
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
