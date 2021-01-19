@@ -430,7 +430,7 @@ public class EstimationService {
 //			usageTypeCharge = getUsageTypeFee(masterData,
 //					property.getUsageCategory(),
 //					criteria.getWaterConnection().getRoadCuttingArea());
-		BigDecimal totalCharge = formFee.add(securityCharge).add(otherCharges).add(meterTestingFee).add(roadCuttingCharge);
+		BigDecimal totalCharge = formFee.add(securityCharge).add(meterTestingFee).add(roadCuttingCharge);
 //				.add(roadPlotCharge).add(usageTypeCharge);
 		BigDecimal tax = totalCharge.multiply(taxAndCessPercentage.divide(WSCalculationConstant.HUNDRED));
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
@@ -447,9 +447,11 @@ public class EstimationService {
 		if (!(meterTestingFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_METER_TESTING_FEE)
 					.estimateAmount(meterTestingFee.setScale(2, 2)).build());
-		if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_OTHER_CHARGE)
-					.estimateAmount(otherCharges.setScale(2, 2)).build());
+		/*
+		 * if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
+		 * estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.
+		 * WS_OTHER_CHARGE) .estimateAmount(otherCharges.setScale(2, 2)).build());
+		 */
 		if (!(roadCuttingCharge.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_ROAD_CUTTING_CHARGE)
 					.estimateAmount(roadCuttingCharge.setScale(2, 2)).build());
