@@ -68,7 +68,7 @@ public class EnrichmentService {
 		}
 		
 		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
-		
+		fsmRequest.getFsm().setStatus(FSM.StatusEnum.ACTIVE);
 		fsmRequest.getFsm().setApplicationStatus(FSMConstants.DRAFT);
 		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
 		fsmRequest.getFsm().setAuditDetails(auditDetails);

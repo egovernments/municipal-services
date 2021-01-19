@@ -347,6 +347,7 @@ public class FSM   {
     return status;
   }
 
+    @Valid
   public void setStatus(StatusEnum status) {
     this.status = status;
   }
