@@ -85,6 +85,8 @@ public class PGRRequestValidator {
 	 */
 	public void validateCreate(ServiceRequest serviceRequest) {
 		log.info("Validating create request");
+		if(serviceRequest.getServices().get(0).getCitizen().getEmailId() !=null)
+			serviceRequest.getServices().get(0).getCitizen().setEmailId(serviceRequest.getServices().get(0).getCitizen().getEmailId().trim());
 		Map<String, String> errorMap = new HashMap<>();
 		validateDataSanity(serviceRequest, errorMap, true);
 		validateUserRBACProxy(errorMap, serviceRequest.getRequestInfo());
@@ -109,6 +111,8 @@ public class PGRRequestValidator {
 	 */
 	public void validateUpdate(ServiceRequest serviceRequest) {
 		log.info("Validating update request");
+		if(serviceRequest.getServices().get(0).getCitizen().getEmailId() !=null)
+			serviceRequest.getServices().get(0).getCitizen().setEmailId(serviceRequest.getServices().get(0).getCitizen().getEmailId().trim());
 		Map<String, String> errorMap = new HashMap<>();
 		validateDataSanity(serviceRequest, errorMap, false);
 		validateIfArraysEqual(serviceRequest, errorMap);
