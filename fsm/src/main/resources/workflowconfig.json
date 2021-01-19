@@ -1,0 +1,367 @@
+{
+    "RequestInfo": {
+        "apiId": "Rainmaker",
+        "action": "",
+        "did": 1,
+        "key": "",
+        "msgId": "20170310130900|en_IN",
+        "requesterId": "",
+        "ts": 1513579888683,
+        "ver": ".01",
+        "authToken": "1cfcae86-b964-439f-9aa3-f0df97ef3265"
+    },
+    "BusinessServices": [
+        {
+            "tenantId": "pb",
+            "businessService": "FSM",
+            "business": "fsm",
+            "businessServiceSla": 5184000000,
+            "states": [
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": null,
+                    "applicationStatus": null,
+                    "docUploadRequired": false,
+                    "isStartState": true,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "APPLY",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
+                            "roles": [
+                                "FSM_CREATOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CREATE",
+                            "nextState": "CREATED",
+                            "roles": [
+                                "CITIZEN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "CREATED",
+                    "applicationStatus": "CREATED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "SUBMIT",
+                            "currentState": "CREATED",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
+                            "roles": [
+                                "FSM_EDITOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "REJECT",
+                            "currentState": "CREATED",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "PENDING_APPL_FEE_PAYMENT",
+                    "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "PAY",
+                            "currentState": "PENDING_APPL_FEE_PAYMENT",
+                            "nextState": "ASSING_DSO",
+                            "roles": [
+                                "CITIZEN",
+                                "FSM_COLLECTOR"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "REJECT",
+                            "currentState": "PENDING_APPL_FEE_PAYMENT",
+                            "nextState": "REJECTED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "PENDING_APPL_FEE_PAYMENT",
+                            "nextState": "CREATED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "ASSING_DSO",
+                    "applicationStatus": "ASSING_DSO",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "ASSIGN",
+                            "currentState": "ASSING_DSO",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_EDITOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "currentState": "ASSING_DSO",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "ASSING_DSO",
+                            "nextState": "PENDING_APPL_FEE_PAYMENT",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "DSO_REJECTED",
+                    "applicationStatus": "DSO_REJECTED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "ASSIGN",
+                            "currentState": "DSO_REJECTED",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_EDITOR_EMP"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "currentState": "DSO_REJECTED",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "DSO_REJECTED",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "DSO_INPROGRESS",
+                    "applicationStatus": "DSO_INPROGRESS",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "DECLINE",
+                            "currentState": "DSO_INPROGRESS",
+                            "nextState": "ASSING_DSO",
+                            "roles": [
+                                "FSM_DSO"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "COMPLETED",
+                            "currentState": "DSO_INPROGRESS",
+                            "nextState": "COMPLETED",
+                            "roles": [
+                                "FSM_DSO"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "ADDITIONAL_PAY_REQUEST",
+                            "currentState": "DSO_INPROGRESS",
+                            "nextState": "PENDING_ADDITIONAL_PAYMENT",
+                            "roles": [
+                                "FSM_DSO"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "currentState": "DSO_INPROGRESS",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "DSO_INPROGRESS",
+                            "nextState": "PENDING_DSO_APPROVAL",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "PENDING_DSO_APPROVAL",
+                    "applicationStatus": "PENDING_DSO_APPROVAL",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "ACCEPT",
+                            "currentState": "PENDING_DSO_APPROVAL",
+                            "nextState": "DSO_INPROGRESS",
+                            "roles": [
+                                "FSM_DSO"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "currentState": "PENDING_DSO_APPROVAL",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "PENDING_DSO_APPROVAL",
+                            "nextState": "DSO_REJECTED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "PENDING_ADDITIONAL_PAYMENT",
+                    "applicationStatus": "PENDING_ADDITIONAL_PAYMENT",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": false,
+                    "isStateUpdatable": true,
+                    "actions": [
+                        {
+                            "tenantId": "pb",
+                            "action": "PAY",
+                            "currentState": "PENDING_ADDITIONAL_PAYMENT",
+                            "nextState": "DSO_INPROGRESS",
+                            "roles": [
+                                "CITIZEN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "CANCEL",
+                            "currentState": "PENDING_ADDITIONAL_PAYMENT",
+                            "nextState": "CANCELED",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        },
+                        {
+                            "tenantId": "pb",
+                            "action": "SENDBACK",
+                            "currentState": "PENDING_ADDITIONAL_PAYMENT",
+                            "nextState": "DSO_INPROGRESS",
+                            "roles": [
+                                "FSM_ADMIN"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "COMPLETED",
+                    "applicationStatus": "COMPLETED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": []
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "REJECTED",
+                    "applicationStatus": "REJECTED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": []
+                },
+                {
+                    "tenantId": "pb",
+                    "sla": null,
+                    "state": "CANCELED",
+                    "applicationStatus": "CANCELED",
+                    "docUploadRequired": false,
+                    "isStartState": false,
+                    "isTerminateState": true,
+                    "isStateUpdatable": false,
+                    "actions": []
+                }
+            ]
+        }
+    ]
+}
