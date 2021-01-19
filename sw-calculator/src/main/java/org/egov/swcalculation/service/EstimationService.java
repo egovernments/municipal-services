@@ -341,10 +341,13 @@ public class EstimationService {
 			connectionFee = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.SW_CONNECTION_FEE_CONST).toString());
 		}
 		
-		BigDecimal otherCharges = BigDecimal.ZERO;
-		if (feeObj.get(SWCalculationConstant.OTHER_CHARGE_CONST) != null) {
-			otherCharges = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.OTHER_CHARGE_CONST).toString());
-		}
+		/*
+		 * BigDecimal otherCharges = BigDecimal.ZERO; if
+		 * (feeObj.get(SWCalculationConstant.OTHER_CHARGE_CONST) != null) { otherCharges
+		 * = new
+		 * BigDecimal(feeObj.getAsNumber(SWCalculationConstant.OTHER_CHARGE_CONST).
+		 * toString()); }
+		 */
 		BigDecimal taxAndCessPercentage = BigDecimal.ZERO;
 		if (feeObj.get(SWCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
 			taxAndCessPercentage = new BigDecimal(
@@ -372,7 +375,7 @@ public class EstimationService {
 //					criteria.getSewerageConnection().getRoadCuttingArea());
 //		}
 
-		BigDecimal totalCharge = formFee.add(securityDeposite).add(otherCharges).add(roadCuttingCharge).add(connectionFee);
+		BigDecimal totalCharge = formFee.add(securityDeposite).add(roadCuttingCharge).add(connectionFee);
 //				.add(meterCost).add(roadPlotCharge).add(usageTypeCharge);
 		BigDecimal tax = totalCharge.multiply(taxAndCessPercentage.divide(SWCalculationConstant.HUNDRED));
 		//
@@ -383,9 +386,11 @@ public class EstimationService {
 		if (!(securityDeposite.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_SECURITY_DEPOSITE)
 					.estimateAmount(securityDeposite.setScale(2, 2)).build());
-		if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_OTHER_CHARGE)
-					.estimateAmount(otherCharges.setScale(2, 2)).build());
+		/*
+		 * if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
+		 * estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.
+		 * SW_OTHER_CHARGE) .estimateAmount(otherCharges.setScale(2, 2)).build());
+		 */
 		if (!(roadCuttingCharge.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_ROAD_CUTTING_CHARGE)
 					.estimateAmount(roadCuttingCharge.setScale(2, 2)).build());
@@ -431,6 +436,29 @@ public class EstimationService {
 								.estimateAmount(new BigDecimal(
 										additionalDetails.get(SWCalculationConstant.ADHOC_REBATE).toString()).negate())
 								.build());
+			}
+			
+			if(additionalDetails.getOrDefault(SWCalculationConstant.COMPOSITION_FEE_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.COMPOSITION_FEE)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(SWCalculationConstant.COMPOSITION_FEE_CONST).toString()).negate())
+						.build());
+			}
+			if(additionalDetails.getOrDefault(SWCalculationConstant.USER_CHARGES_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.USER_CHARGES)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(SWCalculationConstant.USER_CHARGES_CONST).toString()).negate())
+						.build());
+			}
+
+			if(additionalDetails.getOrDefault(SWCalculationConstant.OTHER_FEE_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.OTHER_FEE)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(SWCalculationConstant.OTHER_FEE_CONST).toString()).negate())
+						.build());
 			}
 		}
 	}

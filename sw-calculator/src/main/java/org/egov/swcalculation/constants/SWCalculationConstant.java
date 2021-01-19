@@ -258,7 +258,7 @@ public class SWCalculationConstant {
 
 	public static final String METER_COST_CONST = "meterCost";
 
-	public static final String OTHER_CHARGE_CONST = "other";
+	public static final String OTHER_FEE_CONST = "othersFee";
 
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
 	
@@ -289,5 +289,15 @@ public class SWCalculationConstant {
 	public static final String SW_TIME_ADHOC_PENALTY = "SW_TIME_ADHOC_PENALTY";
 
 	public static final String SW_TIME_ADHOC_REBATE = "SW_TIME_ADHOC_REBATE";
+
+	public static final String COMPOSITION_FEE_CONST = "compositionFee";
+
+	public static final String COMPOSITION_FEE = "SW_COMPOSITION_FEE";
+
+	public static final String USER_CHARGES_CONST = "userCharges";
+
+	public static final String USER_CHARGES = "SW_USER_CHARGE";
+	
+	public static final String OTHER_FEE = "SW_OTHER_FEE";
 
 }
