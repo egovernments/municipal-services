@@ -240,7 +240,13 @@ public class SWCalculationConstant {
 
 	public static final String SW_METER_CHARGE = "SW_METER_CHARGE";
 
-	public static final String SW_SECURITY_CHARGE = "SW_SECURITY_CHARGE";
+	public static final String SW_SECURITY_DEPOSITE = "SW_SECURITY_DEPOSITE";
+	
+	public static final String SW_SECURITY_DEPOSITE_CONST = "securityDeposite";
+
+	public static final String SW_CONNECTION_FEE = "SW_CONNECTION_FEE";
+
+	public static final String SW_CONNECTION_FEE_CONST = "connectionFee";
 
 	public static final String SW_OTHER_CHARGE = "SW_OTHER_CHARGE";
 
