@@ -31,7 +31,6 @@ public class Citizen {
 	private String aadhaarNumber;
 	private String pan;
 	
-	@Email
 	private String emailId;
 	private String userName;
 	private String password;
