@@ -384,6 +384,7 @@ public class EstimationService {
 		if (feeObj.get(WSCalculationConstant.FORM_FEE_CONST) != null) {
 			formFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.FORM_FEE_CONST).toString());
 		}
+		
 //		BigDecimal scrutinyFee = BigDecimal.ZERO;
 //		if (feeObj.get(WSCalculationConstant.SCRUTINY_FEE_CONST) != null) {
 //			scrutinyFee = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.SCRUTINY_FEE_CONST).toString());
@@ -400,9 +401,12 @@ public class EstimationService {
 		}
 		
 		BigDecimal otherCharges = BigDecimal.ZERO;
-		if (feeObj.get(WSCalculationConstant.OTHER_CHARGE_CONST) != null) {
-			otherCharges = new BigDecimal(feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).toString());
-		}
+		/*
+		 * if (feeObj.get(WSCalculationConstant.OTHER_CHARGE_CONST) != null) {
+		 * otherCharges = new
+		 * BigDecimal(feeObj.getAsNumber(WSCalculationConstant.OTHER_CHARGE_CONST).
+		 * toString()); }
+		 */
 		BigDecimal taxAndCessPercentage = BigDecimal.ZERO;
 		if (feeObj.get(WSCalculationConstant.TAX_PERCENTAGE_CONST) != null) {
 			taxAndCessPercentage = new BigDecimal(
@@ -435,7 +439,7 @@ public class EstimationService {
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_FORM_FEE)
 					.estimateAmount(formFee.setScale(2, 2)).build());
 		if (!(securityCharge.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_CHARGE)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_DEPOSITE)
 					.estimateAmount(securityCharge.setScale(2, 2)).build());
 		if (!(connectionFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CONNECTION_FEE)
@@ -553,6 +557,29 @@ public class EstimationService {
 								.estimateAmount(new BigDecimal(
 										additionalDetails.get(WSCalculationConstant.ADHOC_REBATE).toString()).negate())
 								.build());
+			}
+			
+			if(additionalDetails.getOrDefault(WSCalculationConstant.COMPOSITION_FEE_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.COMPOSITION_FEE)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(WSCalculationConstant.COMPOSITION_FEE_CONST).toString()).negate())
+						.build());
+			}
+			if(additionalDetails.getOrDefault(WSCalculationConstant.USER_CHARGES_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.USER_CHARGES)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(WSCalculationConstant.USER_CHARGES_CONST).toString()).negate())
+						.build());
+			}
+
+			if(additionalDetails.getOrDefault(WSCalculationConstant.OTHER_FEE_CONST, null)!=null) {
+				estimates
+				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.OTHER_FEE)
+						.estimateAmount(new BigDecimal(
+								additionalDetails.get(WSCalculationConstant.OTHER_FEE_CONST).toString()).negate())
+						.build());
 			}
 		}
 	}
