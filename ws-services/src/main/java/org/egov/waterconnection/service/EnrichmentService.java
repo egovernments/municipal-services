@@ -95,12 +95,12 @@ public class EnrichmentService {
 			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY, WCConstants.ADHOC_REBATE,
 					WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE,
 					WCConstants.ESTIMATION_DATE_CONST);
-			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
-				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
-					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
-					additionalDetail.put(constKey, big);
+			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
+				if (addDetail.getOrDefault(entry.getKey(), null) != null && numberConstants.contains(entry.getKey())) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(entry.getKey())));
+					additionalDetail.put(entry.getKey(), big);
 				} else {
-					additionalDetail.put(constKey, addDetail.get(constKey));
+					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 				}
 			}
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
