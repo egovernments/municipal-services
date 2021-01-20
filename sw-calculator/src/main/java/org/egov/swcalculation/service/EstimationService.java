@@ -331,9 +331,9 @@ public class EstimationService {
 //			scrutinyFee = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.SCRUTINY_FEE_CONST).toString());
 //		}
 		
-		BigDecimal securityDeposite = BigDecimal.ZERO;
-		if (feeObj.get(SWCalculationConstant.SW_SECURITY_DEPOSITE_CONST) != null) {
-			securityDeposite = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.SW_SECURITY_DEPOSITE_CONST).toString());
+		BigDecimal securityDeposit = BigDecimal.ZERO;
+		if (feeObj.get(SWCalculationConstant.SW_SECURITY_DEPOSIT_CONST) != null) {
+			securityDeposit = new BigDecimal(feeObj.getAsNumber(SWCalculationConstant.SW_SECURITY_DEPOSIT_CONST).toString());
 		}
 		
 		BigDecimal connectionFee = BigDecimal.ZERO;
@@ -375,7 +375,7 @@ public class EstimationService {
 //					criteria.getSewerageConnection().getRoadCuttingArea());
 //		}
 
-		BigDecimal totalCharge = formFee.add(securityDeposite).add(roadCuttingCharge).add(connectionFee);
+		BigDecimal totalCharge = formFee.add(securityDeposit).add(roadCuttingCharge).add(connectionFee);
 //				.add(meterCost).add(roadPlotCharge).add(usageTypeCharge);
 		BigDecimal tax = totalCharge.multiply(taxAndCessPercentage.divide(SWCalculationConstant.HUNDRED));
 		//
@@ -383,9 +383,9 @@ public class EstimationService {
 		if (!(formFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_FORM_FEE)
 					.estimateAmount(formFee.setScale(2, 2)).build());
-		if (!(securityDeposite.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_SECURITY_DEPOSITE)
-					.estimateAmount(securityDeposite.setScale(2, 2)).build());
+		if (!(securityDeposit.compareTo(BigDecimal.ZERO) == 0))
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_SECURITY_DEPOSIT)
+					.estimateAmount(securityDeposit.setScale(2, 2)).build());
 		/*
 		 * if (!(otherCharges.compareTo(BigDecimal.ZERO) == 0))
 		 * estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.
