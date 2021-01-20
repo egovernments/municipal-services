@@ -439,7 +439,7 @@ public class EstimationService {
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_FORM_FEE)
 					.estimateAmount(formFee.setScale(2, 2)).build());
 		if (!(securityCharge.compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_DEPOSITE)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_SECURITY_DEPOSIT)
 					.estimateAmount(securityCharge.setScale(2, 2)).build());
 		if (!(connectionFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_CONNECTION_FEE)

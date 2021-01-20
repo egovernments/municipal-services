@@ -211,7 +211,7 @@ public class WSCalculationConstant {
 
 	public static final String WS_METER_TESTING_FEE = "WS_METER_TESTING_FEE";
 	
-	public static final String WS_SECURITY_DEPOSITE = "WS_SECURITY_DEPOSITE";
+	public static final String WS_SECURITY_DEPOSIT= "WS_SECURITY_DEPOSIT";
 	
 	public static final String WS_SECURITY_CHARGE_CONST = "securityCharge";
 	
