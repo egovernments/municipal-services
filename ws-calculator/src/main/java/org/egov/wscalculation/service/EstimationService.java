@@ -565,14 +565,14 @@ public class EstimationService {
 				estimates
 				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.COMPOSITION_FEE)
 						.estimateAmount(new BigDecimal(
-								additionalDetails.get(WSCalculationConstant.COMPOSITION_FEE_CONST).toString()).negate())
+								additionalDetails.get(WSCalculationConstant.COMPOSITION_FEE_CONST).toString()))
 						.build());
 			}
 			if(additionalDetails.getOrDefault(WSCalculationConstant.USER_CHARGES_CONST, null)!=null) {
 				estimates
 				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.USER_CHARGES)
 						.estimateAmount(new BigDecimal(
-								additionalDetails.get(WSCalculationConstant.USER_CHARGES_CONST).toString()).negate())
+								additionalDetails.get(WSCalculationConstant.USER_CHARGES_CONST).toString()))
 						.build());
 			}
 
@@ -580,7 +580,7 @@ public class EstimationService {
 				estimates
 				.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.OTHER_FEE)
 						.estimateAmount(new BigDecimal(
-								additionalDetails.get(WSCalculationConstant.OTHER_FEE_CONST).toString()).negate())
+								additionalDetails.get(WSCalculationConstant.OTHER_FEE_CONST).toString()))
 						.build());
 			}
 		}

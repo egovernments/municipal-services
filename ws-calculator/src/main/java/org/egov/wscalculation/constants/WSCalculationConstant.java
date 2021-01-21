@@ -233,7 +233,7 @@ public class WSCalculationConstant {
 	
 	public static final String METER_TESTING_FEE_CONST = "meterTestingFee";
 	
-	public static final String OTHER_FEE_CONST = "othersFEE";
+	public static final String OTHER_FEE_CONST = "othersFee";
 	
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
 
