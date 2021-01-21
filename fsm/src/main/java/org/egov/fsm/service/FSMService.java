@@ -108,9 +108,13 @@ public class FSMService {
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria);
 		
-		if(fsms.size() <= 0 && fsms.size() > 1) {
+		if(fsms.size() <= 0 ) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
+		} 
+		if(fsms.size() > 1) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Found multiple application(s)" + fsm);
 		}
+		
 		FSM oldFSM = fsms.get(0);
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				FSMConstants.FSM_BusinessService,null);

@@ -50,6 +50,26 @@ public class FSMSearchCriteria {
     @JsonProperty("ids")
     private List <String> ids;
     
+    @JsonProperty("sortBy")
+    private SortBy sortBy;
+    
+    @JsonProperty("sortOrder")
+    private SortOrder sortOrder;
+    
+    public enum SortOrder {
+        ASC,
+        DESC
+    }
+
+    public enum SortBy {
+        applicationStatus,
+        applicationNumber,
+        propertyUsage,
+        vehicle,
+        locality,
+        createdTime
+    }
+    
     public boolean isEmpty() {
 		// TODO Auto-generated method stub
 		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null

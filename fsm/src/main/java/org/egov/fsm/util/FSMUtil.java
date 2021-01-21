@@ -125,27 +125,14 @@ public class FSMUtil {
 
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.APPLICATION_CHANNEL).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
-		
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
 		
 		
-		
 
 
-
-		// master details for proeprty module
-		List<MasterDetail> propertyMasterDetails = new ArrayList<>();
-		propertyMasterDetails
-				.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
-		
-		ModuleDetail propertyMasterMDtl = ModuleDetail.builder().masterDetails(propertyMasterDetails)
-				.moduleName(FSMConstants.PROPERTY_MASTER_MODULE).build();
-		
-		
-
-
-		return Arrays.asList(propertyMasterMDtl,fsmMasterMDtl);
+		return Arrays.asList(fsmMasterMDtl);
 
 	}
 	
@@ -157,8 +144,22 @@ public class FSMUtil {
 	 */
 	public Boolean isRoleAvailale(FSMRequest fsmRequest, String role) {
 		Boolean flag = false;
-		Map<String,List<String>> tenantIdToUserRoles = getTenantIdToUserRolesMap(fsmRequest.getRequestInfo());
+		Map<String,List<String>> tenantIdToUserRoles = getTenantIdToUserRolesMap(fsmRequest.getRequestInfo().getUserInfo());
 		 flag = isRoleAvailable(tenantIdToUserRoles.get(fsmRequest.getFsm().getTenantId()), role);
+		
+		return flag;
+	}
+	
+	/**
+	 * Check if the logged in user has the role for the FSM application tenantId
+	 * @param fsmRequest
+	 * @param role
+	 * @return
+	 */
+	public Boolean isRoleAvailale(User user, String role, String tenantId) {
+		Boolean flag = false;
+		Map<String,List<String>> tenantIdToUserRoles = getTenantIdToUserRolesMap(user);
+		 flag = isRoleAvailable(tenantIdToUserRoles.get(tenantId), role);
 		
 		return flag;
 	}
@@ -184,9 +185,9 @@ public class FSMUtil {
      * @param requestInfo RequestInfo of the request
      * @return Map of tenantId to roles for user in the requestInfo
      */
-    public Map<String,List<String>> getTenantIdToUserRolesMap(RequestInfo requestInfo){
+    public Map<String,List<String>> getTenantIdToUserRolesMap(User user){
         Map<String,List<String>> tenantIdToUserRoles = new HashMap<>();
-        requestInfo.getUserInfo().getRoles().forEach(role -> {
+        user.getRoles().forEach(role -> {
             if(tenantIdToUserRoles.containsKey(role.getTenantId())){
                 tenantIdToUserRoles.get(role.getTenantId()).add(role.getCode());
             }

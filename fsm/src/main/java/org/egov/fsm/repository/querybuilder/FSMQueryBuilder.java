@@ -15,7 +15,7 @@ public class FSMQueryBuilder {
 	private FSMConfiguration config;
 				
 			private static final String Query = "select fsm.*,fsm_address.*,fsm_geo.*,fsm_pit.*,fsm.id as fsm_id, fsm.createdby as fsm_createdby,"
-					+ " fsm.lastmodifiedby as fsm_lastmodifiedby, fsm.createdtime as fsm_createdtime, fsm.lastmodifiedtime as fsm_lastmodifiedtime,"
+					+ "  fsm.lastmodifiedby as fsm_lastmodifiedby, fsm.createdtime as fsm_createdtime, fsm.lastmodifiedtime as fsm_lastmodifiedtime,"
 					+ "	 fsm.additionaldetails,fsm_address.id as fsm_address_id,fsm_geo.id as fsm_geo_id,"
 					+ "	 fsm_pit.id as fsm_pit_id"
 					+ "	 FROM eg_fsm_application fsm"
@@ -23,9 +23,7 @@ public class FSMQueryBuilder {
 					+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
 					+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
 			
-	private final String paginationWrapper = "SELECT * FROM "
-					+ "(SELECT *, DENSE_RANK() OVER (ORDER BY fsm_lastModifiedTime DESC) offset_ FROM " + "({})"
-					+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
+	private final String paginationWrapper = "{} {orderby} {pagination}";
 	
 
 	
@@ -112,9 +110,14 @@ public class FSMQueryBuilder {
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
+		StringBuilder orderQuery = new StringBuilder();
+		addOrderByClause(orderQuery,criteria);
+		finalQuery = finalQuery.replace("{orderby}", orderQuery.toString()); 
+		
 		if (limit == -1) {
-			finalQuery = finalQuery.replace("WHERE offset_ > ? AND offset_ <= ?", "");
+			finalQuery = finalQuery.replace("{pagination}", ""); 
 		} else {
+			finalQuery = finalQuery.replace("{pagination}", " offset ?  limit ?  "); 
 			preparedStmtList.add(offset);
 			preparedStmtList.add(limit + offset);
 		}
@@ -148,4 +151,40 @@ public class FSMQueryBuilder {
 		}
 		return builder.toString();
 	}
+	
+	
+	
+	/**
+	 * 
+	 * @param builder
+	 * @param criteria
+	 */
+	 private void addOrderByClause(StringBuilder builder, FSMSearchCriteria criteria){
+
+	        if(StringUtils.isEmpty(criteria.getSortBy()))
+	            builder.append( " ORDER BY fsm_lastmodifiedtime ");
+
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.locality)
+	            builder.append(" ORDER BY fsm_address.locality ");
+
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.applicationStatus)
+	            builder.append(" ORDER BY fsm.applicationStatus ");
+
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.applicationNumber)
+	            builder.append(" ORDER BY fsm.applicationno ");
+	        
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.propertyUsage)
+	            builder.append(" ORDER BY fsm.propertyUsage ");
+	        
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.vehicle)
+	            builder.append(" ORDER BY fsm.vehicle_id ");
+	        
+	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.createdTime)
+	            builder.append(" ORDER BY fsm.createdtime ");
+
+	        if(criteria.getSortOrder()== FSMSearchCriteria.SortOrder.ASC)
+	            builder.append(" ASC ");
+	        else builder.append(" DESC ");
+
+	    }
 }

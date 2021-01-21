@@ -89,8 +89,8 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 				.createdTime(rs.getLong("createdTime")).lastModifiedBy(rs.getString("lastModifiedBy"))
 				.lastModifiedTime(rs.getLong("lastModifiedTime")).build();
 
-		Double latitude = (Double) rs.getObject("latitude");
-		Double longitude = (Double) rs.getObject("longitude");
+		Double latitude =  rs.getDouble("latitude");
+		Double longitude =  rs.getDouble("longitude");
 
 		Boundary locality = Boundary.builder().code(rs.getString("locality")).build();
 

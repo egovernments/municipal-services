@@ -1,6 +1,7 @@
 package org.egov.fsm.calculator.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import org.egov.fsm.calculator.config.CalculatorConfig;
@@ -49,6 +50,10 @@ public class FSMService {
 			fsmResponse = mapper.convertValue(responseMap, FSMResponse.class);
 		} catch (IllegalArgumentException e) {
 			throw new CustomException(CalculatorConstants.PARSING_ERROR, "Error while parsing response of FSM Application Search");
+		}
+		
+		if (fsmResponse.getFsm().isEmpty()) {
+			throw new CustomException(CalculatorConstants.APPLICATION_NOT_FOUND, "Application with applicationNo: "+ applicationNo + " not found !");
 		}
 
 		return fsmResponse.getFsm().get(0);

@@ -32,4 +32,8 @@ public class CalculatorConstants {
 	
 	public static final String CALCULATION_ERROR = "CALCULATION ERROR";
 	
+	public static final String MDMS_ROUNDOFF_TAXHEAD="TL_ROUNDOFF";
+	
+	public static final String APPLICATION_NOT_FOUND="APPLICATION_NOT_FOUND";
+	
 }
