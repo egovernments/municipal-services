@@ -91,7 +91,9 @@ public class TradeLicenseDetail   {
     
     DATAENTRY("DATAENTRY"),
 	  
-	RENEWAL("RENEWAL");
+    EODB("EODB"),	
+	  
+    RENEWAL("RENEWAL");
 
     private String value;
 
