@@ -126,10 +126,10 @@ config:
       - work-dir: "building-plan/src/main/resources/db"
         image-name: "building-plan-db"
 
-  - name: "builds/municipal-services/bpa-calculator"
+  - name: "builds/municipal-services/building-plan-calculator"
     build:
-      - work-dir: "bpa-calculator"
-        image-name: "bpa-calculator"
+      - work-dir: "building-plan-calculator"
+        image-name: ""
         dockerfile: "build/maven/Dockerfile"     
 
   - name: "builds/municipal-services/land"

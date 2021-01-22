@@ -3,7 +3,7 @@ info:
   version: "1.0.0"
   title: eGov Building Plan Application System v1.1
   description: |
-    The bpa-calculator is one of the services in the building plan approval system which is used for fee calculation and demand generation.
+    The building-plan-calculator is one of the services in the building plan approval system which is used for fee calculation and demand generation.
     
   contact:
     name: Egovernments Foundation
@@ -12,7 +12,7 @@ x-module: BPA
 x-common-path: 'https://raw.githubusercontent.com/egovernments/egov-services/PT_APPLY_PAY/docs/common/contracts/v1-1-1.yml'
 paths:
   
-  /bpa-calculator/v1/_calculate:
+  /building-plan-calculator/v1/_calculate:
     post:
       summary: Calculate the Fee and create Demand for the building plan application
       description: Calculate the Fee and create Demand for the building plan application
