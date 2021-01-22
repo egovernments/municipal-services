@@ -132,13 +132,13 @@ config:
         image-name: "bpa-calculator"
         dockerfile: "build/maven/Dockerfile"     
 
-  - name: "builds/municipal-services/land-services"
+  - name: "builds/municipal-services/land"
     build:
-      - work-dir: "land-services"
-        image-name: "land-services"
+      - work-dir: "land"
+        image-name: "land"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "land-services/src/main/resources/db"
-        image-name: "land-services-db"
+      - work-dir: "land/src/main/resources/db"
+        image-name: "land-db"
 
   - name: "builds/municipal-services/noc-services"
     build:

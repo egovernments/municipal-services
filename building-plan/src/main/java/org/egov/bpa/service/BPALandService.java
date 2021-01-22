@@ -34,7 +34,7 @@ public class BPALandService {
 	private ObjectMapper mapper;
 
 	/**
-	 * create landInfo calling land-services/_create api and update the landid to
+	 * create landInfo calling land/_create api and update the landid to
 	 * the BPA
 	 * 
 	 * @param bpaRequest
@@ -119,7 +119,7 @@ public class BPALandService {
 	}
 
 	/**
-	 * parepre the land-info search url with the parameters for land-services
+	 * parepre the land-info search url with the parameters for land
 	 * 
 	 * @param requestInfo
 	 * @param landcriteria

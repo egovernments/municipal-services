@@ -1,5 +1,5 @@
 
-# land-services
+# land
 
 This service is the major service supporting building-plan which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
 
@@ -34,9 +34,9 @@ This service is the major service supporting building-plan which handles the dat
 This service is the major service supporting building-plan which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
 
 ### API Details
-- Create : land detail in land registry with land-services/v1/land/_create api.
-- Update : land detail in land registry with land-services/v1/land/_update api. 
-- Search : land detail in land registry can be searched based on several search parameters by calling land-services/v1/land/_search.
+- Create : land detail in land registry with land/v1/land/_create api.
+- Update : land detail in land registry with land/v1/land/_update api. 
+- Search : land detail in land registry can be searched based on several search parameters by calling land/v1/land/_search.
 
 ### Kafka Consumers
 
