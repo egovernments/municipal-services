@@ -42,7 +42,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - collection ( Create receipt for the payment received for the bills )
 
-- bpa-calculator ( Calculates the fees to be collected at different stages)
+- building-plan-calculator ( Calculates the fees to be collected at different stages)
 
 - land ( land information related to BPA application is stored )
 

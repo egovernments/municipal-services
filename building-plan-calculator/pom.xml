@@ -8,9 +8,9 @@
 	  <version>2.2.6.RELEASE</version>
 	</parent>
 	<groupId>egov.bpa</groupId>
-	<artifactId>bpa-calculator</artifactId>
+	<artifactId>building-plan-calculator</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>bpa-calculator</name>
+	<name>building-plan-calculator</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
