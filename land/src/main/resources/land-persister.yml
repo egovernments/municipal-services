@@ -1,5 +1,5 @@
 serviceMaps:
- serviceName: land-services
+ serviceName: land
  mappings:
  - version: 1.0
    description: Persists landinfo details in EG_LandInfo_BuildingPlan  table

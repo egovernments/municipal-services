@@ -44,7 +44,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 - bpa-calculator ( Calculates the fees to be collected at different stages)
 
-- land-services ( land information related to BPA application is stored )
+- land ( land information related to BPA application is stored )
 
 - dcr-services ( get and validate Edcr data ) 
 
