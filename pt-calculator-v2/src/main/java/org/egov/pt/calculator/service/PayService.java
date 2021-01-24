@@ -248,7 +248,7 @@ public class PayService {
 
 				if (lastPaymentBeforeIntersetStart != null && isTaxPeriodPresent) {
 					firstApplicableAmount = utils
-							.getTaxAmtFromPaymentForApplicablesGeneration(lastPaymentBeforeIntersetStart, taxPeriod);
+							.getTaxAmtFromPaymentForApplicablesGeneration(lastPaymentBeforeIntersetStart, taxPeriod,taxAmt);
 				}
 				BigDecimal applicableAmount;
 				BigDecimal interestCalculated;
@@ -305,7 +305,7 @@ public class PayService {
 							// we need to pass current iterating financial year payment for getting
 							// applicable amount.
 							applicableAmount = utils
-									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod);
+									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod,firstApplicableAmount);
 							numberOfDaysInMillies = getEODEpoch(currentUTC) - getEODEpoch(payment.getTransactionDate());
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
@@ -313,7 +313,7 @@ public class PayService {
 
 							Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
 							applicableAmount = utils
-									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod);
+									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod,firstApplicableAmount);
 							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
 									- getEODEpoch(paymentPrev.getTransactionDate());
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,

@@ -519,7 +519,7 @@ public class CalculatorUtils {
 	 * @param payment
 	 * @return
 	 */
-	public BigDecimal getTaxAmtFromPaymentForApplicablesGeneration(Payment payment, TaxPeriod taxPeriod) {
+	public BigDecimal getTaxAmtFromPaymentForApplicablesGeneration(Payment payment, TaxPeriod taxPeriod,BigDecimal actualTax) {
 		BigDecimal taxAmt = BigDecimal.ZERO;
 		BigDecimal amtPaid = BigDecimal.ZERO;
 
@@ -536,6 +536,9 @@ public class CalculatorUtils {
 			}
 		});
 
+		if(billAccountDetails.isEmpty()){
+			return actualTax;
+		}
 		for (BillAccountDetail detail : billAccountDetails) {
 			if (TAXES_TO_BE_CONSIDERD.contains(detail.getTaxHeadCode())) {
 				taxAmt = taxAmt.add(detail.getAmount());
