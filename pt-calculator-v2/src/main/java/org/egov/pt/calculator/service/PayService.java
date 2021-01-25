@@ -208,15 +208,17 @@ public class PayService {
 		long currentIST = System.currentTimeMillis() + TIMEZONE_OFFSET;
 		long interestStart = cal.getTimeInMillis();
 		List<Payment> filteredPaymentsAfterIntersetDate = null;
-		if (!CollectionUtils.isEmpty(payments)) {
-			filteredPaymentsAfterIntersetDate = payments.stream()
+		List<Payment> actualPayments = filterPaymentForAssessmentYear(payments, taxPeriod);
+
+		if (!CollectionUtils.isEmpty(actualPayments)) {
+			filteredPaymentsAfterIntersetDate = actualPayments.stream()
 					.filter(payment -> payment.getTransactionDate() >= interestStart).collect(Collectors.toList());
 
 		}
 
 		if (interestStart < currentIST) {
 
-			if (CollectionUtils.isEmpty(payments)) {
+			if (CollectionUtils.isEmpty(actualPayments)) {
 
 				long numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
 				return calculateInterest(numberOfDaysInMillies, taxAmt, interestMap);
@@ -225,9 +227,9 @@ public class PayService {
 				Integer indexOfLastPaymentBeforeIntersetStart = null;
 				Payment lastPaymentBeforeIntersetStart = null;
 
-				for (int i = 0; i < payments.size(); i++) {
+				for (int i = 0; i < actualPayments.size(); i++) {
 
-					if (payments.get(i).getTransactionDate() >= interestStart) {
+					if (actualPayments.get(i).getTransactionDate() >= interestStart) {
 
 						indexOfLastPaymentBeforeIntersetStart = i - 1;
 						break;
@@ -239,7 +241,7 @@ public class PayService {
 				}
 
 				if (indexOfLastPaymentBeforeIntersetStart != null && indexOfLastPaymentBeforeIntersetStart >= 0) {
-					lastPaymentBeforeIntersetStart = payments.get(indexOfLastPaymentBeforeIntersetStart);
+					lastPaymentBeforeIntersetStart = actualPayments.get(indexOfLastPaymentBeforeIntersetStart);
 				}
 
 				Boolean isTaxPeriodPresent = utils.isTaxPeriodAvaialble(lastPaymentBeforeIntersetStart, taxPeriod);
@@ -327,6 +329,22 @@ public class PayService {
 		return interestAmt;
 	}
 
+	private List<Payment> filterPaymentForAssessmentYear(List<Payment> payments, TaxPeriod taxPeriod) {
+		List<Payment> actualPayments = new ArrayList<>();
+		for (Payment payment : payments) {
+			for (PaymentDetail paymentDetail : payment.getPaymentDetails()) {
+				for (BillDetail billDetails : paymentDetail.getBill().getBillDetails()) {
+
+					if (billDetails.getFromPeriod().equals(taxPeriod.getFromDate())
+							&& billDetails.getToPeriod().equals(taxPeriod.getToDate())) {
+						actualPayments.add(payment);
+
+					}
+				}
+			}
+		}
+		return actualPayments;
+	}
 	/**
 	 * Apportions the amount paid to the bill account details based on the tax head
 	 * codes priority
