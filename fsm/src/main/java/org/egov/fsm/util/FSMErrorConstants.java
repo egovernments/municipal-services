@@ -62,5 +62,6 @@ public class FSMErrorConstants {
 	public static final String EG_WF_ERROR = "EG WF ERROR";
 
 	public static final String NOC_SERVICE_EXCEPTION = "NOC_SERVICE_EXCEPTION";
+	public static final String EMPLOYEE_INVALID_SEARCH = "EMPLOYEE_INVALID_SEARCH";
 
 }

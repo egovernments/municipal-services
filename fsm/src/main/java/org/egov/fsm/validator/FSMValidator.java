@@ -109,6 +109,10 @@ public class FSMValidator {
 	 */
 //TODO need to make the changes in the data
 	public void validateSearch(RequestInfo requestInfo, FSMSearchCriteria criteria) {
+		
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE) && criteria.getTenantId().split("\\.").length == 1) {
+			throw new CustomException(FSMErrorConstants.EMPLOYEE_INVALID_SEARCH, "Employee cannot search at state level");
+		}
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) && criteria.isEmpty())
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search without any paramters is not allowed");
 
@@ -176,7 +180,15 @@ public class FSMValidator {
 		}
 		
 		
-		if (criteria.getApplicationStatus() != null && !allowedParams.contains("applicationStatus")) {
+		if (CollectionUtils.isEmpty(criteria.getApplicationStatus())&& !allowedParams.contains("applicationStatus")) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationStatus is not allowed");
+			}
+		
+		if (CollectionUtils.isEmpty(criteria.getLocality()) && !allowedParams.contains("locality")) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationStatus is not allowed");
+			}
+		
+		if (CollectionUtils.isEmpty(criteria.getOwnerIds()) && !allowedParams.contains("ownerIds")) {
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationStatus is not allowed");
 			}
 		

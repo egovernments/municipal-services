@@ -290,7 +290,7 @@ serviceMaps:
          jsonMaps: 
             - jsonPath: $.fsm.id
              
-       - query: UPDATE public.eg_fsm_application SET additionaldetails=?, applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? where id=? 
+       - query: UPDATE public.eg_fsm_application SET additionaldetails=?, applicationstatus=?, vehicle_id =?, lastmodifiedby=?, lastmodifiedtime=? where id=? 
          basePath: fsm
          jsonMaps:          
                 - jsonPath: $.fsm.additionalDetails
@@ -298,6 +298,8 @@ serviceMaps:
                   dbType: JSONB
                 
                 - jsonPath: $.fsm.applicationStatus
+                
+                - jsonPath: $.fsm.vehicleId
       
                 - jsonPath: $.fsm.auditDetails.lastModifiedBy
       

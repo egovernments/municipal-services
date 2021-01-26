@@ -19,7 +19,7 @@ public class VendorConfiguration {
 	
 
 	// Persister Config
-	@Value("${persister.save.vendor-registory.topic}")
+	@Value("${persister.save.vendor.topic}")
 	private String saveTopic;
 
 	// MDMS

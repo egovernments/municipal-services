@@ -28,6 +28,7 @@ import org.egov.fsm.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -183,15 +184,18 @@ public class FSMService {
 			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 		}
 		
-		if(!requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN)  && criteria.tenantIdOnly() ){
-			throw new CustomException(FSMErrorConstants.INVALID_SEARCH," Aleast one criteria is need to search");
-		}
+
 		
 		if( criteria.getMobileNumber() !=null) {
 			usersRespnse = userService.getUser(criteria,requestInfo);
 			if(usersRespnse !=null && usersRespnse.getUser() != null && usersRespnse.getUser().size() >0) {
 				uuids = usersRespnse.getUser().stream().map(User::getUuid).collect(Collectors.toList());
-				criteria.setOwnerIds(uuids);
+				if(CollectionUtils.isEmpty(criteria.getOwnerIds())) {
+					criteria.setOwnerIds(uuids);
+				}else {
+					criteria.getOwnerIds().addAll(uuids);
+				}
+				
 			}
 		}
 		fsmList = repository.getFSMData(criteria);

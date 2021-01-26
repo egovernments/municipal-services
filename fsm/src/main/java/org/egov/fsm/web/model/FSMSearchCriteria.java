@@ -33,7 +33,11 @@ public class FSMSearchCriteria {
     private String mobileNumber; 
     
     @JsonProperty("applicationStatus")
-    private String applicationStatus; 
+    private List<String> applicationStatus;
+    
+    @JsonProperty("locality")
+    private List<String> locality;
+    
     
     @JsonProperty("ownerIds")
     private List<String> ownerIds;
@@ -49,6 +53,8 @@ public class FSMSearchCriteria {
     
     @JsonProperty("ids")
     private List <String> ids;
+    
+    
     
     @JsonProperty("sortBy")
     private SortBy sortBy;
@@ -73,12 +79,12 @@ public class FSMSearchCriteria {
     public boolean isEmpty() {
 		// TODO Auto-generated method stub
 		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
-				 && StringUtils.isEmpty(this.applicationStatus)  && this.ownerIds == null && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
+				 && CollectionUtils.isEmpty(this.applicationStatus)  && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
 		return (this.tenantId != null && this.mobileNumber == null
-                && StringUtils.isEmpty(this.applicationStatus) && this.ownerIds == null && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
+                && CollectionUtils.isEmpty(this.applicationStatus) && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
 	} 
 }

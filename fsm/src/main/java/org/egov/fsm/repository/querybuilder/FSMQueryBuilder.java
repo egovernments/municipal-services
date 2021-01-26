@@ -50,11 +50,19 @@ public class FSMQueryBuilder {
 			
 		}
 		
-		String applicationStatus = criteria.getApplicationStatus();
-		if (!StringUtils.isEmpty(applicationStatus)) {
+		List<String> applicationStatus = criteria.getApplicationStatus();
+		if (!CollectionUtils.isEmpty(applicationStatus)) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" fsm.applicationStatus = ? ");
-			preparedStmtList.add( applicationStatus);
+			builder.append(" fsm.applicationStatus IN (").append(createQuery(applicationStatus)).append(")");
+			addToPreparedStatement(preparedStmtList, applicationStatus);
+			
+		}
+		
+		List<String> locality = criteria.getLocality();
+		if (!CollectionUtils.isEmpty(locality)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm_address.locality IN (").append(createQuery(locality)).append(")");
+			addToPreparedStatement(preparedStmtList, locality);
 			
 		}
 		
