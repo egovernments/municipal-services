@@ -278,5 +278,31 @@ serviceMaps:
             - jsonPath: $.fsm.pitDetail.auditDetails.lastModifiedTime
                
             - jsonPath: $.fsm.pitDetail.id
+
+ - version: 1.0
+   description: Persists FSM Application details in eg_fsm_application  table
+   fromTopic: update-fsm-workflow-application
+   isTransaction: true
+   queryMaps: 
+   
+       - query: INSERT INTO eg_fsm_application_auditlog SELECT * FROM eg_fsm_application WHERE id =?
+         basePath:  fsm
+         jsonMaps: 
+            - jsonPath: $.fsm.id
+             
+       - query: UPDATE public.eg_fsm_application SET additionaldetails=?, applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? where id=? 
+         basePath: fsm
+         jsonMaps:          
+                - jsonPath: $.fsm.additionalDetails
+                  type: JSON
+                  dbType: JSONB
+                
+                - jsonPath: $.fsm.applicationStatus
+      
+                - jsonPath: $.fsm.auditDetails.lastModifiedBy
+      
+                - jsonPath: $.fsm.auditDetails.lastModifiedTime
+                
+                - jsonPath: $.fsm.id
   
 
