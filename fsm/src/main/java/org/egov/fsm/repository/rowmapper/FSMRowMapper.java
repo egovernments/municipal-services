@@ -109,9 +109,9 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 		
 		
 		
-		fsm.address(address);
-		fsm.pitDetail(pitDetail);
-		fsm.auditDetails(auditdetails);
+		fsm.setAddress(address);
+		fsm.setPitDetail(pitDetail);
+		fsm.setAuditDetails(auditdetails);
 		
 	}
 

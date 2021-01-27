@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO public.eg_fsm_application( id, applicationno, tenantid, additionaldetails, accountid, description, applicationstatus, source, sanitationtype, propertyusage, nooftrips, status, vehicle_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO  eg_fsm_application( id, applicationno, tenantid, additionaldetails, accountid, description, applicationstatus, source, sanitationtype, propertyusage, nooftrips, status, vehicle_id, vehicletype=?, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: fsm
          jsonMaps:
           - jsonPath: $.fsm.id
@@ -37,6 +37,8 @@ serviceMaps:
           - jsonPath: $.fsm.status
           
           - jsonPath: $.fsm.vehicleId
+          
+          - jsonPath: $.fsm.vehicleType
 
           - jsonPath: $.fsm.auditDetails.createdBy
 
@@ -47,7 +49,7 @@ serviceMaps:
           - jsonPath: $.fsm.auditDetails.lastModifiedTime
           
           
-       - query: INSERT INTO public.eg_fsm_address(id, tenantid, doorno, plotno, landmark, city, district, region, state, country, locality, pincode, additionalDetails, buildingname, street, fsm_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO  eg_fsm_address(id, tenantid, doorno, plotno, landmark, city, district, region, state, country, locality, pincode, additionalDetails, buildingname, street, fsm_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: fsm.address
          jsonMaps:
           - jsonPath: $.fsm.address.id
@@ -113,7 +115,7 @@ serviceMaps:
 
           - jsonPath: $.fsm.address.id
           
-       - query: INSERT INTO public.eg_fsm_pit_detail( id, tenantid, height, length, width, distancefromroad, fsm_id,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+       - query: INSERT INTO  eg_fsm_pit_detail( id, tenantid, height, length, width, distancefromroad, fsm_id,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
          basePath: fsm.pitDetail
          jsonMaps:
           - jsonPath: $.fsm.pitDetail.id
@@ -150,7 +152,7 @@ serviceMaps:
          jsonMaps: 
             - jsonPath: $.fsm.id
              
-       - query: UPDATE public.eg_fsm_application SET additionaldetails=?, description=?, applicationstatus=?, source=?, sanitationtype=?, propertyusage=?, nooftrips=?, status=?, vehicle_id=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? where id=? 
+       - query: UPDATE  eg_fsm_application SET additionaldetails=?, description=?, applicationstatus=?, source=?, sanitationtype=?, propertyusage=?, nooftrips=?, status=?, vehicle_id=?, vehicletype=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? where id=? 
          basePath: fsm
          jsonMaps:          
                 - jsonPath: $.fsm.additionalDetails
@@ -172,6 +174,8 @@ serviceMaps:
                 - jsonPath: $.fsm.status
                 
                 - jsonPath: $.fsm.vehicleId
+                
+                - jsonPath: $.fsm.vehicleType
                   
                 - jsonPath: $.fsm.auditDetails.createdBy
       
@@ -188,7 +192,7 @@ serviceMaps:
          jsonMaps: 
             - jsonPath: $.fsm.address.id
                 
-       - query: UPDATE public.eg_fsm_address SET  doorno=?, plotno=?, landmark=?, city=?, district=?, region=?, state=?, country=?, locality=?, pincode=?, additionalDetails=?, buildingname=?, street=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? where id=?  
+       - query: UPDATE  eg_fsm_address SET  doorno=?, plotno=?, landmark=?, city=?, district=?, region=?, state=?, country=?, locality=?, pincode=?, additionalDetails=?, buildingname=?, street=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? where id=?  
          basePath: fsm.address
          jsonMaps:
                 
@@ -235,7 +239,7 @@ serviceMaps:
          jsonMaps: 
           - jsonPath: $.fsm.address.geoLocation.id
                 
-       - query: UPDATE public.eg_fsm_geolocation SET latitude=?, longitude=?, additionaldetails=? where id=?  
+       - query: UPDATE  eg_fsm_geolocation SET latitude=?, longitude=?, additionaldetails=? where id=?  
          basePath: fsm.address.geoLocation
          jsonMaps:
           - jsonPath: $.fsm.address.geoLocation.latitude
@@ -257,7 +261,7 @@ serviceMaps:
          jsonMaps: 
           - jsonPath: $.fsm.pitDetail.id
           
-       - query: UPDATE public.eg_fsm_pit_detail SET height=?, length=?, width=?, distancefromroad=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?  where id=?  
+       - query: UPDATE  eg_fsm_pit_detail SET height=?, length=?, width=?, distancefromroad=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?  where id=?  
          basePath: fsm.pitDetail
          jsonMaps:
             
@@ -290,7 +294,8 @@ serviceMaps:
          jsonMaps: 
             - jsonPath: $.fsm.id
              
-       - query: UPDATE public.eg_fsm_application SET additionaldetails=?, applicationstatus=?, vehicle_id =?, lastmodifiedby=?, lastmodifiedtime=? where id=? 
+
+       - query: UPDATE eg_fsm_application SET additionaldetails=?, applicationstatus=?, vehicle_id =?, vehicletype=?, lastmodifiedby=?,  lastmodifiedtime=? where id=? 
          basePath: fsm
          jsonMaps:          
                 - jsonPath: $.fsm.additionalDetails
@@ -300,6 +305,8 @@ serviceMaps:
                 - jsonPath: $.fsm.applicationStatus
                 
                 - jsonPath: $.fsm.vehicleId
+                
+                - jsonPath: $.fsm.vehicleType
       
                 - jsonPath: $.fsm.auditDetails.lastModifiedBy
       
@@ -307,4 +314,3 @@ serviceMaps:
                 
                 - jsonPath: $.fsm.id
   
-

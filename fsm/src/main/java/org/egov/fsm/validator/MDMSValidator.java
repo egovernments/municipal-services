@@ -25,7 +25,7 @@ public class MDMSValidator {
 	public void validateMdmsData(FSMRequest fsmRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE };
+		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_TYPE };
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -106,6 +106,17 @@ public class MDMSValidator {
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+	}
+	public void validateVehicleType(String vehicleType) {
+		Map<String, String> errorMap = new HashMap<>();
+		
+		if( !this.mdmsResMap.get(FSMConstants.VEHICLE_TYPE).contains(vehicleType) ) {
+			errorMap.put(FSMErrorConstants.INVALID_VEHICLE_TYPE," VehicleType  is invalid");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
+		
 	}
 
 }

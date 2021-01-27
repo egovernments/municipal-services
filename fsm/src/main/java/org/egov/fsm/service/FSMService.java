@@ -128,7 +128,7 @@ public class FSMService {
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
 			
-			Map<String, String> newAdditionalDetails = fsm.getadditionalDetails() != null ? (Map<String, String>)fsm.getadditionalDetails()
+			Map<String, String> newAdditionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
 					: new HashMap<String, String>();
 			BigDecimal newTripAmount  = new BigDecimal(0);
 			try {
@@ -142,7 +142,7 @@ public class FSMService {
 			
 			BigDecimal oldTripAmount  = new BigDecimal(0);
 			try {
-				Map<String, String> oldAdditionalDetails = oldFSM.getadditionalDetails() != null ? (Map<String, String>)oldFSM.getadditionalDetails()
+				Map<String, String> oldAdditionalDetails = oldFSM.getAdditionalDetails() != null ? (Map<String, String>)oldFSM.getAdditionalDetails()
 						: new HashMap<String, String>();
 				if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
 					 oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));

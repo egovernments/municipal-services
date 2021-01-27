@@ -66,7 +66,7 @@ public class FSMValidator {
 				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
 			}
 			
-			Map<String, String> additionalDetails = fsm.getadditionalDetails() != null ? (Map<String,String>)fsm.getadditionalDetails()
+			Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()
 					: new HashMap<String, String>();
 			if(config.getTripAmtRequired() &&  additionalDetails.get("tripAmount") == null   ) {
 				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
@@ -78,7 +78,7 @@ public class FSMValidator {
 				}
 			}
 			
-			
+			mdmsValidator.validateVehicleType(fsm.getVehicleType());
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 		}else {
@@ -196,14 +196,14 @@ public class FSMValidator {
 			
 	}
 
-	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData, String currentState, Map<String, String> edcrResponse) {
+	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
 
 		FSM fsm = fsmRequest.getFsm();
 		
-//		validateAllIds(searchResult, fsm);
+		validateAllIds(searchResult, fsm);
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
-		
+		mdmsValidator.validateVehicleType(fsm.getVehicleType());
 		if(!StringUtils.isEmpty(fsm.getSource())) {
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			

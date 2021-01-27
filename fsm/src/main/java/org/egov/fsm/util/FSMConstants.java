@@ -41,6 +41,8 @@ public class FSMConstants {
     public static final String APPLICATION_CHANNEL = "ApplicationChannel";
     public static final String SANITATION_TYPE = "SanitationType";
 
+	public static final String VEHICLE_TYPE = "VehicleType";
+
 
 	// FINANCIAL YEAR
 
