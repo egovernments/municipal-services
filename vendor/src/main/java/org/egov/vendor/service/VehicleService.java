@@ -17,7 +17,10 @@ import org.egov.vendor.util.VendorConstants;
 import org.egov.vendor.web.model.RequestInfoWrapper;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
+import org.egov.vendor.web.model.VendorSearchCriteria;
 import org.egov.vendor.web.model.user.User;
+import org.egov.vendor.web.model.user.UserDetailResponse;
+import org.egov.vendor.web.model.user.UserSearchRequest;
 import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.egov.vendor.web.model.vehicle.VehicleRequest;
 import org.egov.vendor.web.model.vehicle.VehicleResponse;
@@ -69,6 +72,7 @@ public class VehicleService {
 		
 	}
 	
+	
 	/**
 	 * 
 	 * @param vehicleIds
@@ -76,15 +80,15 @@ public class VehicleService {
 	 * @param tenantId
 	 * @return
 	 */
-	private List<Vehicle> getVehicles(List<String> vehicleIds,List<String> registrationNumbers,RequestInfo requestInfo,String tenantId){
+	public List<Vehicle> getVehicles(List<String> vehicleIds,List<String> registrationNumbers,RequestInfo requestInfo,String tenantId){
 		List<Vehicle> vehicles = null;
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getVehicleHost()).append(config.getVehicleContextPath()).append(config.getVehicleSearchEndpoint()).append("?tenantId="+tenantId);
 		if( !CollectionUtils.isEmpty(vehicleIds)) {
-			uri.append("&id="+String.join(",",vehicleIds));
+			uri.append("&id="+String.join(",",vehicleIds)); 
 		}
-		if( !CollectionUtils.isEmpty(vehicleIds)) {
-			uri.append("&registrationNumber="+String.join(",",registrationNumbers));
+		if( !CollectionUtils.isEmpty(registrationNumbers)) {
+			uri.append("&registrationNumber="+String.join(",", registrationNumbers));
 		}
 		RequestInfoWrapper reqwraper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, reqwraper);

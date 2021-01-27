@@ -67,8 +67,8 @@ public class VendorValidator {
 		// I am in doute
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.EMPLOYEE))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
-		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.EMPLOYEE))
-			allowedParamStr = config.getAllowedEmployeeSearchParameters();
+		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.CITIZEN))
+			allowedParamStr = config.getAllowedCitizenSearchParameters();
 		else
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH,
 					"The userType: " + requestInfo.getUserInfo().getType() + " does not have any search config");
@@ -88,7 +88,7 @@ public class VendorValidator {
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on offset is not allowed");
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
-		if (criteria.getOwnerName() != null && !allowedParams.contains("ownerName")) {
+		if (criteria.getName() != null && !allowedParams.contains("name")) {
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on ownerName is not allowed");
 		}
 		if (criteria.getTenantId() != null && !allowedParams.contains("tenantId")) {
@@ -96,7 +96,14 @@ public class VendorValidator {
 		}
 		if (criteria.getIds() != null && !allowedParams.contains("ids"))
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on ids is not allowed");
-
+		
+		if (criteria.getVehicleRegistrationNumber() != null && !allowedParams.contains("vehicleRegistrationNumber"))
+			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on vehicleRegistrationNumber is not allowed");
+		
+		if (criteria.getVehicleIds() != null && !allowedParams.contains("vehicleIds"))
+			throw new CustomException(VendorErrorConstants.INVALID_SEARCH, "Search on vehicleIds is not allowed");
+		
+		
 	}
 
 	/**

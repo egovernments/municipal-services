@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.validation.Valid;
 import org.egov.vehicle.util.Constants;
@@ -27,6 +28,7 @@ import org.egov.vehicle.web.model.VehicleSearchCriteria;
 import org.egov.vehicle.web.model.hrms.*;
 import org.egov.vehicle.web.model.user.User;
 import org.egov.vehicle.web.model.user.UserDetailResponse;
+import org.egov.vehicle.web.model.user.UserRequest;
 import org.egov.vehicle.web.model.user.UserSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,6 +118,113 @@ public class UserService {
 			owner.setRoles(Arrays.asList(getRolObj(Constants.DSO_DRIVER, Constants.DSO_DRIVER_ROLE_NAME)));
 		}
 		
+		
+		//Role role = getCitizenRole();
+		addUserDefaultFields(owner.getTenantId(), null, owner);
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserContextPath())
+				.append(config.getUserCreateEndpoint());
+		setUserName(owner);
+		owner.setType(Constants.CITIZEN);
+		UserDetailResponse userDetailResponse = userCall(new UserRequest(requestInfo, owner), uri);
+		log.debug("owner created --> " + userDetailResponse.getUser().get(0).getUuid());
+		return userDetailResponse.getUser().get(0);
+	}
+	/**
+	 * Creates citizen role
+	 * 
+	 * @return Role object for citizen
+	 */
+	private Role getCitizenRole() {
+		Role role = new Role();
+		role.setCode(Constants.CITIZEN);
+		role.setName("Citizen");
+		return role;
+	}
+	
+	/**
+	 * Sets the role,type,active and tenantId for a Citizen
+	 * 
+	 * @param tenantId
+	 *            TenantId of the property
+	 * @param role 
+	 * @param role
+	 *            The role of the user set in this case to CITIZEN
+	 * @param applicant
+	 *            The user whose fields are to be set
+	 */
+	private void addUserDefaultFields(String tenantId, Role role, User applicant) {
+		applicant.setActive(true);
+		applicant.setTenantId(tenantId);
+		
+		if(role != null)
+		applicant.setRoles(Collections.singletonList(role));
+		
+		applicant.setType(Constants.CITIZEN);
+	}
+	
+	/**
+	 * Sets the username as uuid
+	 * 
+	 * @param owner
+	 *            The owner to whom the username is to assigned
+	 */
+	private void setUserName(User owner) {
+		String uuid = UUID.randomUUID().toString();
+		owner.setUserName(owner.getMobileNumber());
+		owner.setUuid(uuid);
+		
+	}
+	
+	/**
+	 * Returns UserDetailResponse by calling user service with given uri and object
+	 * 
+	 * @param userRequest
+	 *            Request object for user service
+	 * @param uri
+	 *            The address of the end point
+	 * @return Response from user service as parsed as userDetailResponse
+	 */
+	@SuppressWarnings("rawtypes")
+	UserDetailResponse userCall(Object userRequest, StringBuilder uri) {
+		String dobFormat = null;
+		if (uri.toString().contains(config.getUserSearchEndpoint())
+				|| uri.toString().contains(config.getUserUpdateEndpoint()))
+			dobFormat = "yyyy-MM-dd";
+		else if (uri.toString().contains(config.getUserCreateEndpoint()))
+			dobFormat = "dd/MM/yyyy";
+		try {
+//			System.out.println("user search url: " + uri + userRequest);
+			
+			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
+			parseResponse(responseMap, dobFormat);
+			UserDetailResponse userDetailResponse = mapper.convertValue(responseMap, UserDetailResponse.class);
+			return userDetailResponse;
+		} catch (IllegalArgumentException e) {
+			throw new CustomException("IllegalArgumentException", "ObjectMapper not able to convertValue in userCall");
+		}
+	}
+	/**
+	 * create Employee in HRMS for Vendor owner
+	 * 
+	 * @param owner
+	 * @param requestInfo
+	 * @return
+	 */
+	private User createEmpVehicleOwner(User owner, RequestInfo requestInfo) {
+
+		if(!isUserValid(owner)) {
+			throw new CustomException(VehicleErrorConstants.INVALID_OWNER_ERROR,
+					"Dob, relationShip, relation ship name and gender are mandaotry !");
+		}
+		
+		//TODO once the role for vehicle ownere is confirmed, then need to add the role as well
+		
+		if( owner.getRoles() != null ) {
+			owner.getRoles().add(getRolObj(Constants.DSO_DRIVER, Constants.DSO_DRIVER_ROLE_NAME));
+		}else {
+			owner.setRoles(Arrays.asList(getRolObj(Constants.DSO_DRIVER, Constants.DSO_DRIVER_ROLE_NAME)));
+		}
+		
 		Jurisdiction juridiction = Jurisdiction.builder().hierarchy(constants.JURIDICTION_HIERARAHY)
 				.boundaryType(constants.JURIDICTION_BOUNDARYTYPE).boundary(owner.getTenantId())
 				.tenantId(owner.getTenantId()).build();
@@ -167,7 +276,7 @@ public class UserService {
 	private UserDetailResponse userExists(User owner, @Valid RequestInfo requestInfo) {
 
 		UserSearchRequest ownerSearchRequest = new UserSearchRequest();
-		ownerSearchRequest.setTenantId(owner.getTenantId());
+		ownerSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
 		
 		if (!StringUtils.isEmpty(owner.getMobileNumber())) {
 			ownerSearchRequest.setMobileNumber(owner.getMobileNumber());
@@ -279,7 +388,7 @@ public class UserService {
 		userSearchRequest.setTenantId(criteria.getTenantId());
 		userSearchRequest.setMobileNumber(criteria.getMobileNumber());
 		userSearchRequest.setActive(true);
-		userSearchRequest.setUserType(constants.EMPLOYEE);
+//		userSearchRequest.setUserType(constants.EMPLOYEE);
 		if (!CollectionUtils.isEmpty(criteria.getOwnerId()))
 			userSearchRequest.setUuid(criteria.getOwnerId());
 		return userSearchRequest;

@@ -40,9 +40,24 @@ public class VendorRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = vendorQueryBuilder.getVendorSearchQuery(vendorSearchCriteria, preparedStmtList);
 		List<Vendor> vendorData = jdbcTemplate.query(query, preparedStmtList.toArray(), vendorrowMapper);
-		System.out.println("query is "+query);
+		System.out.println("query is " + query);
 		return vendorData;
 	}
 
-	
+	public List<String> getDrivers(String id) {
+		List<String> ids = null;
+		List<List> preparedStmtList = new ArrayList<>();
+		String query = vendorQueryBuilder.getDriverSearchQuery(id);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getDriverSearchQuery(id), String.class);
+		return ids;
+	}
+
+	public List<String> getVehicles(String id) {
+		List<String> ids = null;
+		List<List> preparedStmtList = new ArrayList<>();
+		String query = vendorQueryBuilder.getDriverSearchQuery(id);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getVehicleSearchQuery(id), String.class);
+		return ids;
+	}
+
 }

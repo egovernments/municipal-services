@@ -102,6 +102,8 @@ public class VendorConfiguration {
 	@Value("${employee.allowed.search.params}")
 	private String allowedEmployeeSearchParameters;
 	
+	@Value("${citizen.allowed.search.params}")
+	private String allowedCitizenSearchParameters;
 	
 
 	@Value("${egov.vendorregistory.default.limit}")

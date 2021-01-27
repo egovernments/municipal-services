@@ -49,7 +49,7 @@ public class VendorRowMapper implements ResultSetExtractor<List<Vendor>> {
 				}
 
 				currentvendor = Vendor.builder().id(id).name(name).tenantId(tenantId).additionalDetails(additionalDetail)
-						.description(description).source(source).build();
+						.description(description).source(source).ownerId(owner_id).build();
 
 				vendorMap.put(id, currentvendor);
 			}

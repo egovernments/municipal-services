@@ -1,17 +1,24 @@
 package org.egov.vendor.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.vendor.config.VendorConfiguration;
+import org.egov.vendor.repository.VendorRepository;
 import org.egov.vendor.util.VendorErrorConstants;
 import org.egov.vendor.util.VendorUtil;
 import org.egov.vendor.web.model.AuditDetails;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
+import org.egov.vendor.web.model.VendorSearchCriteria;
+import org.egov.vendor.web.model.user.UserDetailResponse;
+import org.javers.common.collections.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +33,18 @@ public class EnrichmentService {
 	@Autowired
 	private VendorUtil vendorUtil;
 
+	@Autowired
+	private VendorRepository vendorRepository;
+	
+	@Autowired
+	private VehicleService vehicleService;
+	
+	@Autowired
+	private BoundaryService boundaryService;
+	
+	@Autowired
+	private UserService userService;
+	
 	/**
 	 * enriches the request object for create, assigns random ids for vedor, vehicles and drivers and audit details
 	 * @param vendorRequest
@@ -63,22 +82,43 @@ public class EnrichmentService {
 			});
 		}
 		
-//		if(vendorRequest.getVendor().getDrivers() != null && vendorRequest.getVendor().getDrivers().size() >0) {
-//			vendorRequest.getVendor().getDrivers().forEach(driver->{
-//				if(StringUtils.isEmpty(driver.getId())) {
-//					driver.setId(Long.parseLong(UUID.randomUUID().toString()));
-//					driver.setTenantId(vendorRequest.getVendor().getTenantId());
-//				}
-//			});
-//		}
 		
-//		if(vendorRequest.getVendor().getOwner() != null ) {
-//			if(StringUtils.isEmpty(vendorRequest.getVendor().getOwner().getId())) {
-//				vendorRequest.getVendor().getOwner().setId(Long.parseLong(UUID.randomUUID().toString()));
-//				vendorRequest.getVendor().getOwner().setTenantId(vendorRequest.getVendor().getTenantId());
-//			}
-//		}
+	}
+	
+	public void enrichVendorSearch(List<Vendor> vendorList, RequestInfo requestInfo, String tenantId) {
 		
+		vendorList.forEach(vendor -> {
+			VendorSearchCriteria vendorDriverSearchCriteria = new VendorSearchCriteria();
+			List<String> ownerIds = new ArrayList<String>();
+			ownerIds.add(vendor.getOwnerId());
+			vendorDriverSearchCriteria.setIds(ownerIds);
+			vendorDriverSearchCriteria.setTenantId(tenantId);
+			 vendor.setOwner(userService.getUsers(vendorDriverSearchCriteria, requestInfo).getUser().get(0));;
+			addDrivers(requestInfo, vendor, tenantId);
+			addVehicles(requestInfo, vendor, tenantId);
+			boundaryService.getAreaType(VendorRequest.builder().vendor(vendor).build(), config.getHierarchyTypeCode());
+		});
+	}
+	
+	private void addDrivers(RequestInfo requestInfo, Vendor vendor, String tenantId) {
+		List<String> driverIds = vendorRepository.getDrivers(vendor.getId());
+		
+		if(!CollectionUtils.isEmpty(driverIds)) {
+			VendorSearchCriteria vendorDriverSearchCriteria = new VendorSearchCriteria();
+			vendorDriverSearchCriteria.setIds(driverIds);
+			vendorDriverSearchCriteria.setTenantId(tenantId);
+			UserDetailResponse  userDetailResponse = userService.getUsers(vendorDriverSearchCriteria, requestInfo);
+			vendor.setDrivers(userDetailResponse.getUser());
+		}
+		
+	}
+	
+	private void addVehicles(RequestInfo requestInfo, Vendor vendor, String tenantId) {
+		VendorSearchCriteria vendorDriverSearchCriteria = new VendorSearchCriteria();
+		List<String> vehicleIds = vendorRepository.getVehicles(vendor.getId());
+		if(!CollectionUtils.isEmpty(vehicleIds)) {
+			vendor.setVehicles(vehicleService.getVehicles(vehicleIds, null, requestInfo, tenantId));
+		}
 		
 	}
 

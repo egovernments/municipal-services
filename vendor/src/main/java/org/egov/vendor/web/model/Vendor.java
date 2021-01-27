@@ -2,22 +2,24 @@ package org.egov.vendor.web.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.egov.vendor.web.model.location.Address;
+import org.egov.vendor.web.model.user.User;
 import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 
 
@@ -26,12 +28,12 @@ import lombok.Setter;
  * Capture the vendor information in the system.
  */
 @Validated
-@Getter
-@Setter
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:34:12.238Z[GMT]")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
+@Setter
 public class Vendor {
 
 	@JsonProperty("id")
@@ -40,17 +42,14 @@ public class Vendor {
 	@JsonProperty("tenantId")
 	private String tenantId = null;
 
-	@NonNull
 	@JsonProperty("name")
 	private String name = null;
 
 	@JsonProperty("address")
 	private Address address = null;
 
-	@Valid
-	@NonNull
 	@JsonProperty("owner")
-	private org.egov.vendor.web.model.user.User owner = null;
+	private User owner = null;
 
 	@JsonProperty("vehicles")
 	@Valid
@@ -58,7 +57,7 @@ public class Vendor {
 
 	@JsonProperty("drivers")
 	@Valid
-	private List<org.egov.vendor.web.model.user.User> drivers = null;
+	private List<User> drivers = null;
 
 	@JsonProperty("additionalDetails")
 	private Object additionalDetails = null;
@@ -68,6 +67,9 @@ public class Vendor {
 
 	@JsonProperty("description")
 	private String description = null;
+	
+	@JsonProperty("ownerId")
+	private String ownerId = null;
 
 	/**
 	 * Inactive records will be consider as soft deleted
@@ -86,6 +88,7 @@ public class Vendor {
 		@Override
 		@JsonValue
 		public String toString() {
+		
 			return String.valueOf(value);
 		}
 
@@ -106,5 +109,4 @@ public class Vendor {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
-	
 }

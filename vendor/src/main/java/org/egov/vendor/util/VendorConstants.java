@@ -34,7 +34,9 @@ public class VendorConstants {
 
 	public static final String DSO_DRIVER_ROLE_NAME = "DSO Driver role";
 
-	public static final String COULD_NOT_CREATE_VEHICLE = "COULD_NOT_CREATE_VEHICLE";	
+	public static final String COULD_NOT_CREATE_VEHICLE = "COULD_NOT_CREATE_VEHICLE";
+
+	public static final String CITIZEN = "CITIZEN";	
 	
 	
 	
