@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMConstants;
@@ -114,6 +115,10 @@ public class FSMService {
 		} 
 		if(fsms.size() > 1) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Found multiple application(s)" + fsm);
+		}
+		
+		if(fsmRequest.getWorkflow() == null || StringUtils.isEmpty(fsmRequest.getWorkflow().getAction() )) {
+			throw new CustomException(FSMErrorConstants.INVALID_ACTION," Workflow Action is mandatory!");
 		}
 		
 		FSM oldFSM = fsms.get(0);
