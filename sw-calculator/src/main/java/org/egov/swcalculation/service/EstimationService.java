@@ -154,6 +154,15 @@ public class EstimationService {
 					"More than one billing slab found");
 		// Add Billing Slab Ids
 		billingSlabIds.add(billingSlabs.get(0).getId());
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		additionalDetail = mapper.convertValue(sewerageConnection.getAdditionalDetails(), HashMap.class);
+		String billingType = (String) additionalDetail.getOrDefault(SWCalculationConstant.BILLINGTYPE, null);
+		if (sewerageConnection.getConnectionType().equalsIgnoreCase(SWCalculationConstant.nonMeterdConnection)
+				&& billingType.equalsIgnoreCase(SWCalculationConstant.CUSTOM)) {
+			 sewerageCharge = (BigDecimal) additionalDetail
+					.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT, BigDecimal.ZERO);
+			return sewerageCharge;
+		}
 
 		// Sewerage Charge Calculation
 		Double totalUnite = getCalculationUnit(sewerageConnection, calculationAttribute, criteria);
@@ -162,7 +171,8 @@ public class EstimationService {
 		BillingSlab billSlab = billingSlabs.get(0);
 		if (isRangeCalculation(calculationAttribute)) {
 			for (Slab slab : billSlab.getSlabs()) {
-				if (totalUnite >= slab.getFrom() && totalUnite < slab.getTo()) {
+				if (totalUnite >= slab.getFrom() && totalUnite < slab.getTo()  && slab.getEffectiveFrom() 
+						<=System.currentTimeMillis() && slab.getEffectiveTo()>=System.currentTimeMillis()) {
 					sewerageCharge = BigDecimal.valueOf((totalUnite * slab.getCharge()));
 					if (billSlab.getMinimumCharge() > sewerageCharge.doubleValue()) {
 						sewerageCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());

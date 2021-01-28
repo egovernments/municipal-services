@@ -300,4 +300,10 @@ public class SWCalculationConstant {
 	
 	public static final String OTHER_FEE = "SW_OTHER_FEE";
 
+	public static final String BILLINGTYPE = "billingType";
+
+	public static final String CUSTOM = "CUSTOM";
+
+	public static final String CUSTOM_BILL_AMOUNT = "billingAmount";
+
 }
