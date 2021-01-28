@@ -7,6 +7,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.util.concurrent.CompletableToListenableFutureAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -180,37 +182,47 @@ public class EstimationService {
 			if (totalUOM == 0.0)
 				return waterCharge;
 			BillingSlab billSlab = billingSlabs.get(0);
+			
+			List<Slab> filteredSlabs=billSlab.getSlabs().stream().filter(slab->slab.getFrom()<=totalUOM && slab.getTo()>=totalUOM && slab.getEffectiveFrom()<=System.currentTimeMillis() 
+					&& slab.getEffectiveTo()>=System.currentTimeMillis()).collect(Collectors.toList());
 			// IF calculation type is flat then take flat rate else take slab and calculate
 			// the charge
 			// For metered connection calculation on graded fee slab
 			// For Non metered connection calculation on normal connection
 			if (isRangeCalculation(calculationAttribute)) {
 				if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
-					for (Slab slab : billSlab.getSlabs()) {
-						if (totalUOM > slab.getTo()) {
-							waterCharge = waterCharge
-									.add(BigDecimal.valueOf(((slab.getTo()) - (slab.getFrom())) * slab.getCharge()));
-							totalUOM = totalUOM - ((slab.getTo()) - (slab.getFrom()));
-						} else if (totalUOM < slab.getTo()) {
-							waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * slab.getCharge()));
-							totalUOM = ((slab.getTo()) - (slab.getFrom())) - totalUOM;
-							break;
-						}
+					String meterStatus = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE,
+							null);
+        
+					waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
+					
+					if (meterStatus.equalsIgnoreCase(WSCalculationConstant.LOCKED)) {
+						waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}
+
+					 if (meterStatus.equalsIgnoreCase(WSCalculationConstant.NO_METER)
+							|| meterStatus.equalsIgnoreCase(WSCalculationConstant.BREAKDOWN)) {
+
+						String avarageMeterReading=(String) additionalDetail.getOrDefault(WSCalculationConstant.AVARAGEMETERREADING, null);
+						
+						if(avarageMeterReading!=null) {
+							waterCharge =BigDecimal.valueOf(Double.parseDouble(avarageMeterReading)*filteredSlabs.get(0).getCharge());
+						}
+						
+					}
+
 					if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
 						waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}
+
 				} else if (waterConnection.getConnectionType()
 						.equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
-					for (Slab slab : billSlab.getSlabs()) {
-						if (totalUOM >= slab.getFrom() && totalUOM < slab.getTo()) {
-							waterCharge = BigDecimal.valueOf((totalUOM * slab.getCharge()));
-							if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
-								waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
-							}
-							break;
-						}
+					waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
+					
+					if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
+						waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}
+					
 				}
 			} else {
 				waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());

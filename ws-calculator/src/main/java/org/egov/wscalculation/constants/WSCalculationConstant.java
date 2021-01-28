@@ -270,6 +270,14 @@ public class WSCalculationConstant {
 	public static final String CUSTOM = "CUSTOM";
 
 	public static final String  CUSTOM_BILL_AMOUNT = "billingAmount";
+
+	public static final String LOCKED = "LOCKED";
+
+	public static final String NO_METER = "NO_METER";
+	
+	public static final String BREAKDOWN= "BREAKDOWN";
+
+	public static final Object AVARAGEMETERREADING = "avarageMeterReading";
 	
 
 
