@@ -25,7 +25,7 @@ public class MDMSValidator {
 	public void validateMdmsData(FSMRequest fsmRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_TYPE };
+		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_TYPE, FSMConstants.PIT_TYPE };
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -100,8 +100,8 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.SANITATION_TYPE).contains(sanitationType) ) {
-			errorMap.put(FSMErrorConstants.INVALID_SANITATION_TYPE," On Site SanitationType is invalid");
+		if( !this.mdmsResMap.get(FSMConstants.PIT_TYPE).contains(sanitationType) ) {
+			errorMap.put(FSMErrorConstants.INVALID_PIT_TYPE," On Site PitType is invalid");
 		}
 
 		if (!errorMap.isEmpty())

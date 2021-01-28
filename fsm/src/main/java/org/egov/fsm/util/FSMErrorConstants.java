@@ -18,7 +18,7 @@ public class FSMErrorConstants {
 	public static final String INVALID_PROPERTY_TYPE ="INVALID_PROPERTY_TYPE";
 
 	public static final String INVALID_APPLICATION_CHANNEL ="INVALID_APPLICATION_CHANNEL";
-	public static final String INVALID_SANITATION_TYPE ="INVALID_SANITATION_TYPE";
+	public static final String INVALID_PIT_TYPE ="INVALID_PIT_TYPE";
 	public static final String INVALID_UPDATE ="Invlaid Update";
 	public static final String INVALID_VEHICLE_TYPE = "INVALID_VEHICLE_TYPE";
 	

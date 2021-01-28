@@ -40,6 +40,7 @@ public class FSMConstants {
 	public static final String PROPERTY_TYPE = "PropertyType";
     public static final String APPLICATION_CHANNEL = "ApplicationChannel";
     public static final String SANITATION_TYPE = "SanitationType";
+    public static final String PIT_TYPE = "PitType";
 
 	public static final String VEHICLE_TYPE = "VehicleType";
 
@@ -81,6 +82,8 @@ public class FSMConstants {
 	public static final String WF_ACTION_SUBMIT="SUBMIT";
 	
 	public static final String APPLICATION_FEE ="APPLICATION_FEE";
+
+	
 
 
 }

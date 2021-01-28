@@ -125,6 +125,7 @@ public class FSMUtil {
 
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.APPLICATION_CHANNEL).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PIT_TYPE).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
