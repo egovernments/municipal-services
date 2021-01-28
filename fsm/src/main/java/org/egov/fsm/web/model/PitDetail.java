@@ -55,6 +55,9 @@ public class PitDetail   {
 
   @JsonProperty("width")
   private Double width = null;
+  
+  @JsonProperty("diameter")
+  private Double diameter = null;
 
   @JsonProperty("distanceFromRoad")
   private Double distanceFromRoad = null;

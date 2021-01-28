@@ -120,12 +120,13 @@ public class FSMUtil {
 
 		// filter to only get code field from master data
 				final String filterCode = "$.[?(@.active==true)].code";
+				final String pitTypeFiltter = "$.[?(@.active==true)].code";
 		// master details for FSM module
 		List<MasterDetail> fsmMasterDtls = new ArrayList<>();
 
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.APPLICATION_CHANNEL).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PIT_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PIT_TYPE).filter(pitTypeFiltter).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)

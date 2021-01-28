@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO  eg_fsm_application( id, applicationno, tenantid, additionaldetails, accountid, description, applicationstatus, source, sanitationtype, propertyusage, nooftrips, status, vehicle_id, vehicletype=?, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO  eg_fsm_application( id, applicationno, tenantid, additionaldetails, accountid, description, applicationstatus, source, sanitationtype, propertyusage, nooftrips, status, vehicle_id, vehicletype, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?, ?, ?, ?);
          basePath: fsm
          jsonMaps:
           - jsonPath: $.fsm.id
@@ -115,7 +115,7 @@ serviceMaps:
 
           - jsonPath: $.fsm.address.id
           
-       - query: INSERT INTO  eg_fsm_pit_detail( id, tenantid, height, length, width, distancefromroad, fsm_id,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
+       - query: INSERT INTO  eg_fsm_pit_detail( id, tenantid, height, length, width, diameter, distancefromroad, fsm_id,  createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?); 
          basePath: fsm.pitDetail
          jsonMaps:
           - jsonPath: $.fsm.pitDetail.id
@@ -127,6 +127,8 @@ serviceMaps:
           - jsonPath: $.fsm.pitDetail.length
           
           - jsonPath: $.fsm.pitDetail.width
+          
+          - jsonPath: $.fsm.pitDetail.diameter
 
           - jsonPath: $.fsm.pitDetail.distanceFromRoad
 
@@ -261,7 +263,7 @@ serviceMaps:
          jsonMaps: 
           - jsonPath: $.fsm.pitDetail.id
           
-       - query: UPDATE  eg_fsm_pit_detail SET height=?, length=?, width=?, distancefromroad=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?  where id=?  
+       - query: UPDATE  eg_fsm_pit_detail SET height=?, length=?, width=?, diameter=?, distancefromroad=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?  where id=?  
          basePath: fsm.pitDetail
          jsonMaps:
             
@@ -270,6 +272,8 @@ serviceMaps:
             - jsonPath: $.fsm.pitDetail.length
              
             - jsonPath: $.fsm.pitDetail.width
+             
+            - jsonPath: $.fsm.pitDetail.diameter
              
             - jsonPath: $.fsm.pitDetail.distanceFromRoad
 

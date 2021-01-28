@@ -83,6 +83,9 @@ public class FSMConstants {
 	
 	public static final String APPLICATION_FEE ="APPLICATION_FEE";
 
+	public static final String PIT_TYPE_DIAMETER = "dd";
+	public static final String PIT_TYPE_LDB = "lbd";
+
 	
 
 
