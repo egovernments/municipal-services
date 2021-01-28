@@ -264,6 +264,12 @@ public class WSCalculationConstant {
 	public static final String  USER_CHARGES = "WS_USER_CHARGE";
 	
 	public static final String OTHER_FEE="WS_OTHER_FEE";
+
+	public static final String  BILLINGTYPE = "billingType";
+
+	public static final String CUSTOM = "CUSTOM";
+
+	public static final String  CUSTOM_BILL_AMOUNT = "billingAmount";
 	
 
 
