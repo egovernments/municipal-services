@@ -52,8 +52,8 @@ public class DiffService {
             return updatedFields;
 
         changes.forEach(change -> {
-        	log.info("Field  " + change.getPropertyName() + " changed from " + change.getLeft() + " to "
-					+ change.getRight());
+        	log.info("Field  " + change.getPropertyName() + " changed from " + change.getRight() + " to "
+					+ change.getLeft());
             if (!FIELDS_TO_IGNORE.contains(change.getPropertyName())) {                
                 if(!change.getPropertyName().equalsIgnoreCase("_value")) {
                 	updatedFields.add(change.getPropertyName());
