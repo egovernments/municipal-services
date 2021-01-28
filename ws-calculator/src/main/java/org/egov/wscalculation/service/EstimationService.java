@@ -145,7 +145,7 @@ public class EstimationService {
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		additionalDetail = mapper.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
 		String billingType = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE, null);
-		if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)
+		if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)
 				&& billingType.equalsIgnoreCase(WSCalculationConstant.CUSTOM)) {
 			BigDecimal customWaterCharges = (BigDecimal) additionalDetail
 					.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, BigDecimal.ZERO);
