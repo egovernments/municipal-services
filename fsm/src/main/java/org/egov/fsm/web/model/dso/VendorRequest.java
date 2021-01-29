@@ -1,11 +1,9 @@
-package org.egov.fsm.calculator.web.models;
-
-import java.util.List;
+package org.egov.fsm.web.model.dso;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,21 +13,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
-@Getter
-@Setter
+@Validated
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-01-06T05:34:12.238Z[GMT]")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CalculationReq {
+@Getter
+@Setter
+public class VendorRequest {
 
 	@JsonProperty("RequestInfo")
-	@NotNull
-	@Valid
 	private RequestInfo requestInfo = null;
 
-	@JsonProperty("CalulationCriteria")
 	@Valid
-	private List<CalulationCriteria> calulationCriteria = null;
+	@JsonProperty("vendor")
+	private Vendor vendor = null;
+	
+	 
 
 }

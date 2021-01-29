@@ -201,7 +201,7 @@ public class QueryBuilder {
 			addToPreparedStatement(preparedStmtList, registrationNumber);
 		}
 		
-		List<String> ids = criteria.getId();
+		List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" id IN (").append(createQuery(ids)).append(")");

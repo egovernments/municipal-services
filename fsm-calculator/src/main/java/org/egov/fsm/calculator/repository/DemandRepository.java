@@ -2,18 +2,17 @@ package org.egov.fsm.calculator.repository;
 
 import java.util.List;
 
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.fsm.calculator.config.CalculatorConfig;
+import org.egov.fsm.calculator.utils.CalculatorConstants;
 import org.egov.fsm.calculator.web.models.demand.Demand;
 import org.egov.fsm.calculator.web.models.demand.DemandRequest;
 import org.egov.fsm.calculator.web.models.demand.DemandResponse;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.egov.fsm.calculator.config.CalculatorConfig;
-import org.egov.fsm.calculator.utils.CalculatorConstants;
 
 @Repository
 public class DemandRepository {

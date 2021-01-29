@@ -65,5 +65,9 @@ public class FSMErrorConstants {
 	public static final String NOC_SERVICE_EXCEPTION = "NOC_SERVICE_EXCEPTION";
 	public static final String EMPLOYEE_INVALID_SEARCH = "EMPLOYEE_INVALID_SEARCH";
 	public static final String INVALID_ACTION = "INVALID_ACTION";
+	public static final String INVALID_DSO = "INVALID_DSO";
+	public static final String INVALID_POSSIBLE_DATE = "INVALID_POSSIBLE_DATE";
+	public static final String VEHICLE_NOT_FOUND = "VEHICLE_NOT_FOUND";
+	public static final String INVALID_DSO_VEHICLE = "INVALID_DSO_VEHICLE";
 
 }

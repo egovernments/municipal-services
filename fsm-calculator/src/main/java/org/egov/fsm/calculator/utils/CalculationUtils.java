@@ -3,12 +3,8 @@ package org.egov.fsm.calculator.utils;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.repository.ServiceRequestRepository;
 import org.egov.fsm.calculator.web.models.AuditDetails;
-import org.egov.fsm.calculator.web.models.RequestInfoWrapper;
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

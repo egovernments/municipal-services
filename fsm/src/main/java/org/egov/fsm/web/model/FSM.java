@@ -100,6 +100,12 @@ public class FSM   {
 
   @JsonProperty("vehicleId")
   private String vehicleId = null;
+  
+  @JsonProperty("dsoId")
+  private String dsoId = null;
+  
+  @JsonProperty("possibleServiceDate")
+  private Long possibleServiceDate = null;
 
   @JsonProperty("pitDetail")
   private PitDetail pitDetail = null;

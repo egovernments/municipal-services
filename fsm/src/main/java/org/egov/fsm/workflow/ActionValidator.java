@@ -55,7 +55,6 @@ public class ActionValidator {
 		FSM fsm = request.getFsm();
 		Map<String, String> errorMap = new HashMap<>();
 		RequestInfo requestInfo = request.getRequestInfo();
-//		}
 		State state = workflowService.getCurrentStateObj(fsm.getApplicationStatus(), businessService);
 		if(state != null ) {
 			List<Action> actions = state.getActions();

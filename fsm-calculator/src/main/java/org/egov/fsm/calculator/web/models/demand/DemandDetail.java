@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 
 import org.egov.fsm.calculator.web.models.AuditDetails;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @AllArgsConstructor

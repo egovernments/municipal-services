@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.egov.fsm.calculator.web.models.demand.TaxHeadEstimate;
 
-import lombok.Data;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Data;
 
 @Data
 public class EstimatesAndSlabs {

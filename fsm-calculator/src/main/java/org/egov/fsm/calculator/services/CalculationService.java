@@ -2,13 +2,12 @@ package org.egov.fsm.calculator.services;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.kafka.broker.CalculatorProducer;
 import org.egov.fsm.calculator.utils.CalculationUtils;
@@ -21,20 +20,11 @@ import org.egov.fsm.calculator.web.models.EstimatesAndSlabs;
 import org.egov.fsm.calculator.web.models.FSM;
 import org.egov.fsm.calculator.web.models.demand.Category;
 import org.egov.fsm.calculator.web.models.demand.TaxHeadEstimate;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.NumberUtils;
-
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
 
 @Service
 @Slf4j
@@ -160,7 +150,7 @@ public class CalculationService {
 		EstimatesAndSlabs estimatesAndSlabs = new EstimatesAndSlabs();
 		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		Map<String, String> additionalDetails = fsm.getadditionalDetails() != null ? (Map<String, String>)fsm.getadditionalDetails()
+		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
 				: new HashMap<String, String>();
 		BigDecimal tripAmount  = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
 		

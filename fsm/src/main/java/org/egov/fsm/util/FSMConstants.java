@@ -80,6 +80,7 @@ public class FSMConstants {
 	public static final String WF_ACTION_APPLY = "APPLY";
 	public static final String WF_ACTION_CREATE ="CREATE";
 	public static final String WF_ACTION_SUBMIT="SUBMIT";
+	public static final String WF_ACTION_ASSIGN_DSO="ASSIGN";
 	
 	public static final String APPLICATION_FEE ="APPLICATION_FEE";
 

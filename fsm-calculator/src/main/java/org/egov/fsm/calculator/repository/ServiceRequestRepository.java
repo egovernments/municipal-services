@@ -2,8 +2,6 @@ package org.egov.fsm.calculator.repository;
 
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -12,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Repository

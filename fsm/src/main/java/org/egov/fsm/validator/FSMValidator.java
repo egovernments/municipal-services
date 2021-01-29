@@ -200,6 +200,17 @@ public class FSMValidator {
 
 		FSM fsm = fsmRequest.getFsm();
 		
+		if(searchResult.size() <= 0 ) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
+		} 
+		if(searchResult.size() > 1) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Found multiple application(s)" + fsm);
+		}
+		
+		if(fsmRequest.getWorkflow() == null || StringUtils.isEmpty(fsmRequest.getWorkflow().getAction() )) {
+			throw new CustomException(FSMErrorConstants.INVALID_ACTION," Workflow Action is mandatory!");
+		}
+		
 		validateAllIds(searchResult, fsm);
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);

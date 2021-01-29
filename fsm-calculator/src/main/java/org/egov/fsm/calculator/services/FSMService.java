@@ -1,26 +1,19 @@
 package org.egov.fsm.calculator.services;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.repository.ServiceRequestRepository;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
 import org.egov.fsm.calculator.web.models.FSM;
 import org.egov.fsm.calculator.web.models.FSMResponse;
 import org.egov.fsm.calculator.web.models.RequestInfoWrapper;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
 
 @Service
 public class FSMService {

@@ -2,7 +2,6 @@ package org.egov.fsm.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,8 +19,8 @@ import org.egov.fsm.validator.FSMValidator;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
-import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.user.User;
+import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.workflow.ActionValidator;
 import org.egov.fsm.workflow.WorkflowIntegrator;
@@ -30,6 +29,8 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.ibm.icu.util.Calendar;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,7 +64,10 @@ public class FSMService {
 	private UserService userService;
 	
 	@Autowired
-	private CalculationService calculationService ;
+	private CalculationService calculationService;
+	
+	@Autowired
+	private DSOService dsoService;
 	
 	@Autowired
 	private FSMRepository repository;
@@ -110,55 +114,20 @@ public class FSMService {
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria);
 		
-		if(fsms.size() <= 0 ) {
-			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
-		} 
-		if(fsms.size() > 1) {
-			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Found multiple application(s)" + fsm);
-		}
+		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
 		
-		if(fsmRequest.getWorkflow() == null || StringUtils.isEmpty(fsmRequest.getWorkflow().getAction() )) {
-			throw new CustomException(FSMErrorConstants.INVALID_ACTION," Workflow Action is mandatory!");
-		}
-		
-		FSM oldFSM = fsms.get(0);
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				FSMConstants.FSM_BusinessService,null);
 		actionValidator.validateUpdateRequest(fsmRequest, businessService);
-		
+		FSM oldFSM = fsms.get(0);
+
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
-			
-			Map<String, String> newAdditionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
-					: new HashMap<String, String>();
-			BigDecimal newTripAmount  = new BigDecimal(0);
-			try {
-				if( newAdditionalDetails != null || newAdditionalDetails.get("tripAmount") != null) {
-					 newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
-				}
-			}catch( Exception e) {
-				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-			}
-			
-			
-			BigDecimal oldTripAmount  = new BigDecimal(0);
-			try {
-				Map<String, String> oldAdditionalDetails = oldFSM.getAdditionalDetails() != null ? (Map<String, String>)oldFSM.getAdditionalDetails()
-						: new HashMap<String, String>();
-				if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
-					 oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
-				}
-			}catch( Exception e) {
-				 oldTripAmount  = new BigDecimal(0);
-			}
-			
-			 
-			if( oldTripAmount.compareTo(newTripAmount) != 0) {
-				calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
-			}
-			
+			handleApplicationSubmit(fsmRequest,oldFSM);
 		}
-
-
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_ASSIGN_DSO) ) {
+			handleAssignDSO(fsmRequest);
+		}
 		
 		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData);
 		
@@ -170,6 +139,30 @@ public class FSMService {
 		return fsmRequest.getFsm();
 	}
 	
+	
+	/**
+	 * 
+	 * @param fsmRequest
+	 */
+	private void handleAssignDSO(FSMRequest fsmRequest) {
+		
+		FSM fsm = fsmRequest.getFsm();
+		if(StringUtils.isEmpty(fsm.getDsoId())) {
+			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid");
+		}
+		
+		if(fsm.getPossibleServiceDate() != null) {
+			Calendar psd = Calendar.getInstance();
+			psd.setTimeInMillis(fsm.getPossibleServiceDate());
+			if(Calendar.getInstance().compareTo(psd) >0) {
+				throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
+			}
+		}
+		dsoService.validateDSO(fsmRequest);
+		
+		
+	}
+
 	/**
 	 * search the fsm applications based on the search criteria
 	 * @param criteria
@@ -188,8 +181,6 @@ public class FSMService {
 				requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
 			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 		}
-		
-
 		
 		if( criteria.getMobileNumber() !=null) {
 			usersRespnse = userService.getUser(criteria,requestInfo);
@@ -212,5 +203,42 @@ public class FSMService {
 			return Collections.emptyList();
 		}
 		return fsmList;
+	}
+	
+	/**
+	 * hanles the application submit, identify the tripAmount and call calculation service.
+	 * @param fsmRequest
+	 * @param oldFSM
+	 */
+	public void handleApplicationSubmit(FSMRequest fsmRequest,FSM oldFSM) {
+		
+		FSM fsm = fsmRequest.getFsm();
+		Map<String, String> newAdditionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
+				: new HashMap<String, String>();
+		BigDecimal newTripAmount  = new BigDecimal(0);
+		try {
+			if( newAdditionalDetails != null || newAdditionalDetails.get("tripAmount") != null) {
+				 newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
+			}
+		}catch( Exception e) {
+			throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+		}
+		
+		
+		BigDecimal oldTripAmount  = new BigDecimal(0);
+		try {
+			Map<String, String> oldAdditionalDetails = oldFSM.getAdditionalDetails() != null ? (Map<String, String>)oldFSM.getAdditionalDetails()
+					: new HashMap<String, String>();
+			if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
+				 oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
+			}
+		}catch( Exception e) {
+			 oldTripAmount  = new BigDecimal(0);
+		}
+		
+		 
+		if( oldTripAmount.compareTo(newTripAmount) != 0) {
+			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
+		}
 	}
 }

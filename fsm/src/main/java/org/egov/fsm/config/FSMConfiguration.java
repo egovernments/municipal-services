@@ -203,6 +203,39 @@ public class FSMConfiguration {
 
 		
 		
+		// DSO Config
+		@Value("${egov.vendor.host}")
+		private String vendorHost;
+
+		@Value("${egov.vendor.context.path}")
+		private String vendorContextPath;
+
+		@Value("${egov.vendor.create.path}")
+		private String vendorCreateEndpoint;
+
+		@Value("${egov.vendor.search.path}")
+		private String vendorSearchEndpoint;
+
+		@Value("${egov.vendor.update.path}")
+		private String vendorUpdateEndpoint;
+		
+		
+		// Vehicle Config
+		@Value("${egov.vehicle.host}")
+		private String vehicleHost;
+
+		@Value("${egov.vehicle.context.path}")
+		private String vehicleContextPath;
+
+		@Value("${egov.vehicle.create.path}")
+		private String vehicleCreateEndpoint;
+
+		@Value("${egov.vehicle.search.path}")
+		private String vehicleSearchEndpoint;
+
+		@Value("${egov.vehicle.update.path}")
+		private String vehicleUpdateEndpoint;
+		
 		
 		
 }

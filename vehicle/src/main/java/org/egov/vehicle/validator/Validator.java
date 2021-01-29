@@ -113,7 +113,7 @@ public class Validator {
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
 		
-		if (criteria.getId() != null && !allowedParams.contains("id"))
+		if (criteria.getIds() != null && !allowedParams.contains("ids"))
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH, "Search on ids is not allowed");
 		
 		if (criteria.getRegistrationNumber() != null && !allowedParams.contains("registrationNumber"))

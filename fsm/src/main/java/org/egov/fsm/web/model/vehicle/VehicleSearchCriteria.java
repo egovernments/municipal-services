@@ -1,4 +1,4 @@
-package org.egov.vehicle.web.model;
+package org.egov.fsm.web.model.vehicle;
 
 import java.util.List;
 
@@ -35,8 +35,8 @@ public class VehicleSearchCriteria {
 	@JsonProperty("ownerId")
 	private List<String> ownerId;
 	
-	@JsonProperty("ids")
-	private List<String> ids;
+	@JsonProperty("id")
+	private List<String> id;
 	
 	@JsonProperty("registrationNumber")
 	private List<String> registrationNumber;
@@ -84,7 +84,7 @@ public class VehicleSearchCriteria {
 		// TODO Auto-generated method stub
 		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null && this.tankCapicity ==null
 				&&  CollectionUtils.isEmpty(this.ownerId)  && CollectionUtils.isEmpty(this.type)
-				&& CollectionUtils.isEmpty(this.ids) && CollectionUtils.isEmpty(this.registrationNumber)
+				&& CollectionUtils.isEmpty(this.id) && CollectionUtils.isEmpty(this.registrationNumber)
 				&& CollectionUtils.isEmpty(this.model) && CollectionUtils.isEmpty(this.suctionType));
 	}
 
@@ -92,7 +92,7 @@ public class VehicleSearchCriteria {
 		// TODO Auto-generated method stub
 		return (this.tenantId != null && this.mobileNumber == null && this.tankCapicity ==null
 				&&  CollectionUtils.isEmpty(this.ownerId)  && CollectionUtils.isEmpty(this.type)
-				&& CollectionUtils.isEmpty(this.ids) && CollectionUtils.isEmpty(this.registrationNumber)
+				&& CollectionUtils.isEmpty(this.id) && CollectionUtils.isEmpty(this.registrationNumber)
 				&& CollectionUtils.isEmpty(this.model) && CollectionUtils.isEmpty(this.suctionType));
 	}
 }
