@@ -191,8 +191,7 @@ public class EstimationService {
 			// For Non metered connection calculation on normal connection
 			if (isRangeCalculation(calculationAttribute)) {
 				if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
-					String meterStatus = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE,
-							null);
+					String meterStatus = criteria.getMeterStatus().toString();
         
 					waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
 					

@@ -271,11 +271,11 @@ public class WSCalculationConstant {
 
 	public static final String  CUSTOM_BILL_AMOUNT = "billingAmount";
 
-	public static final String LOCKED = "LOCKED";
+	public static final String LOCKED = "Locked";
 
-	public static final String NO_METER = "NO_METER";
+	public static final String NO_METER = "No-meter";
 	
-	public static final String BREAKDOWN= "BREAKDOWN";
+	public static final String BREAKDOWN= "Breakdown";
 
 	public static final Object AVARAGEMETERREADING = "avarageMeterReading";
 	
