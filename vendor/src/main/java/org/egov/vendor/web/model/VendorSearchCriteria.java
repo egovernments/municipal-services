@@ -45,15 +45,15 @@ public class VendorSearchCriteria {
 
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
-		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
-				&& this.ownerIds == null && CollectionUtils.isEmpty(this.name)
+		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null && CollectionUtils.isEmpty(this.vehicleRegistrationNumber)
+				&& this.ownerIds == null && CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.vehicleIds)
 				&& CollectionUtils.isEmpty(this.ids));
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
-		return (this.tenantId != null && this.mobileNumber == null && this.ownerIds == null
-				&& CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.ids));
+		return (this.tenantId != null && this.mobileNumber == null && this.ownerIds == null && CollectionUtils.isEmpty(this.vehicleRegistrationNumber)
+				&& CollectionUtils.isEmpty(this.vehicleIds) && CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.ids));
 	}
 	
 

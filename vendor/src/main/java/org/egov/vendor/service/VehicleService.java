@@ -85,7 +85,7 @@ public class VehicleService {
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getVehicleHost()).append(config.getVehicleContextPath()).append(config.getVehicleSearchEndpoint()).append("?tenantId="+tenantId);
 		if( !CollectionUtils.isEmpty(vehicleIds)) {
-			uri.append("&id="+String.join(",",vehicleIds)); 
+			uri.append("&ids="+String.join(",",vehicleIds)); 
 		}
 		if( !CollectionUtils.isEmpty(registrationNumbers)) {
 			uri.append("&registrationNumber="+String.join(",", registrationNumbers));

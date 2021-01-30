@@ -93,7 +93,11 @@ public class EnrichmentService {
 			ownerIds.add(vendor.getOwnerId());
 			vendorDriverSearchCriteria.setIds(ownerIds);
 			vendorDriverSearchCriteria.setTenantId(tenantId);
-			 vendor.setOwner(userService.getUsers(vendorDriverSearchCriteria, requestInfo).getUser().get(0));;
+			UserDetailResponse userResponse = userService.getUsers(vendorDriverSearchCriteria, requestInfo);
+			if(userResponse != null && !CollectionUtils.isEmpty(userResponse.getUser())) {
+				 vendor.setOwner(userResponse.getUser().get(0));
+			}
+			
 			addDrivers(requestInfo, vendor, tenantId);
 			addVehicles(requestInfo, vendor, tenantId);
 			boundaryService.getAreaType(VendorRequest.builder().vendor(vendor).build(), config.getHierarchyTypeCode());
