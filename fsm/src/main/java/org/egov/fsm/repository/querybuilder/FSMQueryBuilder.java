@@ -1,6 +1,8 @@
 package org.egov.fsm.repository.querybuilder;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,16 @@ public class FSMQueryBuilder {
 			
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 	
+	private static final String QUERY_FSM_APPLICATION_COUNT = "SELECT count(id) FROM eg_fsm_application where id IN (%s)";
+	
 
+	public String getFSMApplicationCountQuery(List<String> applicationNos) {
+		return String.format(QUERY_FSM_APPLICATION_COUNT, convertListToString(applicationNos));
+	}
+	
+	private String convertListToString(List<String> namesList) {
+		return String.join(",", namesList.stream().map(name -> ("'" + name + "'")).collect(Collectors.toList()));
+	}
 	
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, List<Object> preparedStmtList) {
 		

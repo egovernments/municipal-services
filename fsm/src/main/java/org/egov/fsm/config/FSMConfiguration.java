@@ -236,6 +236,12 @@ public class FSMConfiguration {
 		@Value("${egov.vehicle.update.path}")
 		private String vehicleUpdateEndpoint;
 		
+		@Value("${persister.save.vehicle.log.topic}")
+		private String saveVehicleLogTopic;
+		
+		@Value("${persister.update.vehicle.log.topic}")
+		private String updateVehicleLogTopic;
+		
 		
 		
 }
