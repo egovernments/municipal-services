@@ -80,9 +80,6 @@ public class PropertyUtil {
             tenantId = tenantId.split("\\.")[0];
 
         String locale = NOTIFICATION_LOCALE;
-        if(!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("\\|").length>=2)
-            locale = requestInfo.getMsgId().split("\\|")[1];
-
         StringBuilder uri = new StringBuilder();
         uri.append(config.getLocalizationHost())
                 .append(config.getLocalizationContextPath()).append(config.getLocalizationSearchEndpoint());
@@ -97,9 +94,6 @@ public class PropertyUtil {
             tenantId = tenantId.split("\\.")[0];
 
         String locale = NOTIFICATION_LOCALE;
-        if(!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("\\|").length>=2)
-            locale = requestInfo.getMsgId().split("\\|")[1];
-
         StringBuilder uri = new StringBuilder();
         uri.append(config.getLocalizationHost())
                 .append(config.getLocalizationContextPath()).append(config.getLocalizationSearchEndpoint());
