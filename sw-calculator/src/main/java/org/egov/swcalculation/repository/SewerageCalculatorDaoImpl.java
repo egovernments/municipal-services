@@ -3,8 +3,10 @@ package org.egov.swcalculation.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.repository.builder.SWCalculatorQueryBuilder;
 import org.egov.swcalculation.repository.rowMapper.DemandSchedulerRowMapper;
+import org.egov.swcalculation.web.models.SewerageDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -32,9 +34,9 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 	}
 
 	@Override
-	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+	public List<SewerageDetails> getConnectionsNoList(String tenantId, String connectionType) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,SWCalculationConstant.ACTIVE, preparedStatement);
 		StringBuilder builder = new StringBuilder();
 		builder.append("sewerage ").append(connectionType).append(" connection list : ").append(query);
 		log.info(builder.toString());

@@ -306,4 +306,6 @@ public class SWCalculationConstant {
 
 	public static final String CUSTOM_BILL_AMOUNT = "billingAmount";
 
+	public static final String ACTIVE = "Active";
+
 }

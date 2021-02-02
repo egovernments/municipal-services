@@ -2,10 +2,12 @@ package org.egov.swcalculation.repository;
 
 import java.util.List;
 
+import org.egov.swcalculation.web.models.SewerageDetails;
+
 public interface SewerageCalculatorDao {
 
 	List<String> getTenantId();
 	
-	List<String> getConnectionsNoList(String tenantId, String connectionType);
+	List<SewerageDetails> getConnectionsNoList(String tenantId, String connectionType);
 	
 }

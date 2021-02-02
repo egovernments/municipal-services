@@ -16,6 +16,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.web.models.BillingSlab;
 import org.egov.swcalculation.web.models.CalculationCriteria;
+import org.egov.swcalculation.web.models.CalculationReq;
 import org.egov.swcalculation.web.models.Property;
 import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.SearchCriteria;
@@ -66,11 +67,11 @@ public class EstimationService {
 	 * @return Map<String, Double>
 	 */
 	@SuppressWarnings("rawtypes")
-	public Map<String, List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo,
+	public Map<String, List> getEstimationMap(CalculationCriteria criteria, CalculationReq request,
 			Map<String, Object> masterData) {
 		if (StringUtils.isEmpty((criteria.getSewerageConnection()))
 				&& !StringUtils.isEmpty(criteria.getConnectionNo())) {
-			List<SewerageConnection> sewerageConnectionList = calculatorUtil.getSewerageConnection(requestInfo, criteria.getConnectionNo(),
+			List<SewerageConnection> sewerageConnectionList = calculatorUtil.getSewerageConnection(request.getRequestInfo(), criteria.getConnectionNo(),
 					criteria.getTenantId());
 			SewerageConnection sewerageConnection = calculatorUtil.getSewerageConnectionObject(sewerageConnectionList);
 			criteria.setSewerageConnection(sewerageConnection);
@@ -92,9 +93,9 @@ public class EstimationService {
 		timeBasedExemptionMasterMap.put(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER,
 				(JSONArray) (masterData.getOrDefault(SWCalculationConstant.SW_SEWERAGE_CESS_MASTER, null)));
 		BigDecimal sewerageCharge = getSewerageEstimationCharge(criteria.getSewerageConnection(), criteria,
-				billingSlabMaster, billingSlabIds, requestInfo);
+				billingSlabMaster, billingSlabIds, request);
 		List<TaxHeadEstimate> taxHeadEstimates = getEstimatesForTax(sewerageCharge, criteria.getSewerageConnection(),
-				timeBasedExemptionMasterMap, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				timeBasedExemptionMasterMap, RequestInfoWrapper.builder().requestInfo(request.getRequestInfo()).build());
 
 		Map<String, List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
@@ -127,7 +128,7 @@ public class EstimationService {
 	 */
 
 	public BigDecimal getSewerageEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria,
-			Map<String, JSONArray> billingSlabMaster, ArrayList<String> billingSlabIds, RequestInfo requestInfo) {
+			Map<String, JSONArray> billingSlabMaster, ArrayList<String> billingSlabIds, CalculationReq request) {
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
 		if (billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("INVALID_BILLING_SLAB", "Billing Slab are Empty");
@@ -145,7 +146,7 @@ public class EstimationService {
 		String calculationAttribute = getCalculationAttribute(calculationAttributeMaster,
 				sewerageConnection.getConnectionType());
 		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnection, mappingBillingSlab, calculationAttribute,
-				requestInfo);
+				request.getRequestInfo());
 
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("INVALID_BILLING_SLAB", "Billing Slab are Empty");
@@ -174,6 +175,14 @@ public class EstimationService {
 				if (totalUnite >= slab.getFrom() && totalUnite < slab.getTo()  && slab.getEffectiveFrom() 
 						<=System.currentTimeMillis() && slab.getEffectiveTo()>=System.currentTimeMillis()) {
 					sewerageCharge = BigDecimal.valueOf((totalUnite * slab.getCharge()));
+					if(request.getTaxPeriodFrom()>0 && request.getTaxPeriodTo()>0) {
+						if(sewerageConnection.getConnectionExecutionDate()> request.getTaxPeriodFrom()) {
+							long daysDifference=(request.getTaxPeriodTo()-sewerageConnection.getConnectionExecutionDate())/(request.getTaxPeriodTo()-request.getTaxPeriodFrom());
+							sewerageCharge=BigDecimal.valueOf((totalUnite * slab.getCharge()*daysDifference));
+						}
+						
+					}
+					
 					if (billSlab.getMinimumCharge() > sewerageCharge.doubleValue()) {
 						sewerageCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}

@@ -63,7 +63,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			Map<String, Object> masterMap = mDataService.loadMasterData(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getCalculations(request, masterMap);
-			demandService.generateDemand(request.getRequestInfo(), calculations, masterMap,
+			demandService.generateDemand(request, calculations, masterMap,
 					request.getIsconnectionCalculation());
 			unsetSewerageConnection(calculations);
 		} else {
@@ -71,7 +71,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			Map<String, Object> masterData = mDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getFeeCalculation(request, masterData);
-			demandService.generateDemand(request.getRequestInfo(), calculations, masterData,
+			demandService.generateDemand(request, calculations, masterData,
 					request.getIsconnectionCalculation());
 			unsetSewerageConnection(calculations);
 		}
@@ -169,7 +169,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
-	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo) {
+	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo, long taxperiodfrom, long taxperiodto) {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
@@ -177,7 +177,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
-		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo));
+		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo,taxperiodfrom,taxperiodto));
 	}
 
 	/**
@@ -191,7 +191,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo(),
+			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
 					masterMap);
 			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
 					.get(SWCalculationConstant.Billing_Period_Master);
@@ -211,7 +211,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, true);
+		demandService.generateDemand(request, calculations, masterMap, true);
 		return calculations;
 	}
 
