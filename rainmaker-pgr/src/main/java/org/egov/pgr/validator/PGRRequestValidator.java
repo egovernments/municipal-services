@@ -287,7 +287,7 @@ public class PGRRequestValidator {
 	 * 2. Checks if the details like id, role and tenant are available of the requester
 	 * 3. Checks if the requester has a valid role to perform any action on the complaint.
 	 * 
-	 * NOTE: We go with an assumption that zuul always replaces this info, but sometimes when port forwarding or any such bypass is done,
+	 * NOTE: We go with an assumption that api-gateway always replaces this info, but sometimes when port forwarding or any such bypass is done,
 	 * This information will be missing and application will not function.
 	 * 
 	 * @param errorMap
