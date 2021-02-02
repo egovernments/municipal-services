@@ -30,6 +30,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import static org.egov.swservice.util.SWConstants.APPROVE_CONNECTION;
+
 @Component
 public class SewerageServiceImpl implements SewerageService {
 
@@ -95,7 +97,7 @@ public class SewerageServiceImpl implements SewerageService {
 		}
 		sewerageConnectionValidator.validateSewerageConnection(sewerageConnectionRequest, reqType);
 		Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
-		validateProperty.validatePropertyFields(property);
+		validateProperty.validatePropertyFields(property,sewerageConnectionRequest.getRequestInfo());
 		mDMSValidator.validateMasterForCreateRequest(sewerageConnectionRequest);
 		enrichmentService.enrichSewerageConnection(sewerageConnectionRequest, reqType);
 		userService.createUser(sewerageConnectionRequest);
@@ -153,7 +155,7 @@ public class SewerageServiceImpl implements SewerageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewerageConnectionRequest, SWConstants.UPDATE_APPLICATION);
 		mDMSValidator.validateMasterData(sewerageConnectionRequest, SWConstants.UPDATE_APPLICATION);
 		Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
-		validateProperty.validatePropertyFields(property);
+		validateProperty.validatePropertyFields(property,sewerageConnectionRequest.getRequestInfo());
 		String previousApplicationStatus = workflowService.getApplicationStatus(
 				sewerageConnectionRequest.getRequestInfo(),
 				sewerageConnectionRequest.getSewerageConnection().getApplicationNo(),
@@ -219,7 +221,7 @@ public class SewerageServiceImpl implements SewerageService {
 		sewerageConnectionValidator.validateSewerageConnection(sewerageConnectionRequest, SWConstants.MODIFY_CONNECTION);
 		mDMSValidator.validateMasterData(sewerageConnectionRequest, SWConstants.MODIFY_CONNECTION);
 		Property property = validateProperty.getOrValidateProperty(sewerageConnectionRequest);
-		validateProperty.validatePropertyFields(property);
+		validateProperty.validatePropertyFields(property,sewerageConnectionRequest.getRequestInfo());
 		String previousApplicationStatus = workflowService.getApplicationStatus(
 				sewerageConnectionRequest.getRequestInfo(),
 				sewerageConnectionRequest.getSewerageConnection().getApplicationNo(),
@@ -237,6 +239,24 @@ public class SewerageServiceImpl implements SewerageService {
 		// Call workflow
 		wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 		sewerageDaoImpl.updateSewerageConnection(sewerageConnectionRequest, sewerageServicesUtil.getStatusForUpdate(businessService, previousApplicationStatus));
+		// setting oldApplication Flag
+		markOldApplication(sewerageConnectionRequest);
 		return Arrays.asList(sewerageConnectionRequest.getSewerageConnection());
+	}
+
+	public void markOldApplication(SewerageConnectionRequest sewerageConnectionRequest) {
+		if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction().equalsIgnoreCase(APPROVE_CONNECTION)) {
+			String currentModifiedApplicationNo = sewerageConnectionRequest.getSewerageConnection().getApplicationNo();
+			List<SewerageConnection> sewerageConnectionList = getAllSewerageApplications(sewerageConnectionRequest);
+
+			for(SewerageConnection sewerageConnection:sewerageConnectionList){
+				if(!sewerageConnection.getOldApplication() && !(sewerageConnection.getApplicationNo().equalsIgnoreCase(currentModifiedApplicationNo))){
+					sewerageConnection.setOldApplication(Boolean.TRUE);
+					SewerageConnectionRequest previousSewerageConnectionRequest = SewerageConnectionRequest.builder().requestInfo(sewerageConnectionRequest.getRequestInfo())
+							.sewerageConnection(sewerageConnection).build();
+					sewerageDaoImpl.updateSewerageConnection(previousSewerageConnectionRequest,Boolean.TRUE);
+				}
+			}
+		}
 	}
 }
