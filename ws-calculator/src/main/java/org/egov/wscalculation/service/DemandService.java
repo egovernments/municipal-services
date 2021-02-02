@@ -42,6 +42,7 @@ import org.egov.wscalculation.web.models.TaxHeadEstimate;
 import org.egov.wscalculation.web.models.TaxPeriod;
 import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionRequest;
+import org.egov.wscalculation.web.models.WaterDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -106,7 +107,7 @@ public class DemandService {
 	 *            The Calculation Objects for which demand has to be generated
 	 *            or updated
 	 */
-	public List<Demand> generateDemand(RequestInfo requestInfo, List<Calculation> calculations,
+	public List<Demand> generateDemand(CalculationReq request, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNo) {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
@@ -125,8 +126,8 @@ public class DemandService {
 			Long toDateSearch = null;
 			Set<String> consumerCodes;
 			if (isForConnectionNo) {
-				fromDateSearch = fromDate;
-				toDateSearch = toDate;
+				fromDateSearch = request.getTaxPeriodFrom();
+				toDateSearch = request.getTaxPeriodTo();
 				consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 						.collect(Collectors.toSet());
 			} else {
@@ -134,7 +135,7 @@ public class DemandService {
 						.collect(Collectors.toSet());
 			}
 			
-			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDateSearch, toDateSearch, requestInfo);
+			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDateSearch, toDateSearch, request.getRequestInfo());
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
 				connectionNumbersFromDemands = demands.stream().map(Demand::getConsumerCode)
@@ -151,10 +152,10 @@ public class DemandService {
 		}
 		List<Demand> createdDemands = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(createCalculations))
-			createdDemands = createDemand(requestInfo, createCalculations, masterMap, isForConnectionNo);
+			createdDemands = createDemand(request.getRequestInfo(), createCalculations, masterMap, isForConnectionNo,request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(requestInfo, updateCalculations, fromDate, toDate, isForConnectionNo);
+			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, fromDate, toDate, isForConnectionNo);
 		return createdDemands;
 	}
 	
@@ -166,7 +167,7 @@ public class DemandService {
 	 * @return Returns list of demands
 	 */
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
-			Map<String, Object> masterMap, boolean isForConnectionNO) {
+			Map<String, Object> masterMap, boolean isForConnectionNO, long taxPeriodFrom, long taxPeriodTo) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 			WaterConnection connection = calculation.getWaterConnection();
@@ -195,19 +196,21 @@ public class DemandService {
 			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(WSCalculationConstant.BILLING_PERIOD);
 
-			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
-			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
-			Long expiryDate = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
-			BigDecimal minimumPayableAmount = isForConnectionNO ? configs.getMinimumPayableAmount()
-					: calculation.getTotalAmount();
+			//Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+			//Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+			Long expiryDaysInmillies = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			Long expiryDate=System.currentTimeMillis()+expiryDaysInmillies;
+			
+			
+			BigDecimal minimumPayableAmount =  calculation.getTotalAmount();
 			String businessService = isForConnectionNO ? configs.getBusinessService()
 					: WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
 
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
-					.minimumAmountPayable(minimumPayableAmount).tenantId(tenantId).taxPeriodFrom(fromDate)
-					.taxPeriodTo(toDate).consumerType("waterConnection").businessService(businessService)
+					.minimumAmountPayable(minimumPayableAmount).tenantId(tenantId).taxPeriodFrom(taxPeriodFrom)
+					.taxPeriodTo(taxPeriodTo).consumerType("waterConnection").businessService(businessService)
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
@@ -634,10 +637,10 @@ public class DemandService {
 	 * @param tenantId
 	 *            TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo,long taxPeriodFrom, long taxPeriodTo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		generateDemandForULB(billingMasterData, requestInfo, tenantId);
+		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom,  taxPeriodTo);
 	}
 
 	/**
@@ -646,25 +649,43 @@ public class DemandService {
 	 * @param requestInfo Request Info
 	 * @param tenantId Tenant Id
 	 */
-	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
+	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,long taxPeriodFrom, long taxPeriodTo) {
 		log.info("Billing master data values for non metered connection:: {}", master);
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if(isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
-			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
+			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
-			for (String connectionNo : connectionNos) {
+			for (WaterDetails waterConnection : connectionNos) {
+				boolean isConnectionValid=validateWaterConnection(waterConnection,requestInfo,tenantId,taxPeriodFrom,taxPeriodTo);
+				if(isConnectionValid) {
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
+						.assessmentYear(assessmentYear).connectionNo(waterConnection.getConnectionNo()).build();
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
-				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
 						.requestInfo(requestInfo).isconnectionCalculation(true).build();
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+			}
 				// log.info("Prepared Statement" + calculationRes.toString());
 
 			}
 		}
+	}
+
+	
+	
+	private boolean validateWaterConnection(WaterDetails waterConnection, RequestInfo requestInfo, String tenantId,
+			long taxPeriodFrom, long taxPeriodTo) {
+		// TODO Auto-generated method stub
+		
+		boolean isConnectionValid=true;
+		
+		if(waterConnection.getConnectionExecutionDate()>taxPeriodTo)
+			isConnectionValid=false;
+		
+		return isConnectionValid;
+		
 	}
 
 	/**

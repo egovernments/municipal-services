@@ -59,5 +59,7 @@ public class CalculationCriteria {
 	private String applicationNo;
 	
 	private MeterStatusEnum meterStatus;
+	
+	
 
 }

@@ -5,11 +5,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.wscalculation.repository.builder.WSCalculatorQueryBuilder;
 import org.egov.wscalculation.web.models.MeterConnectionRequest;
 import org.egov.wscalculation.web.models.MeterReading;
 import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.WaterDetails;
+import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.repository.rowmapper.DemandSchedulerRowMapper;
 import org.egov.wscalculation.repository.rowmapper.MeterReadingCurrentReadingRowMapper;
@@ -119,15 +122,15 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		if (query == null)
 			return connectionNos;
 		log.info("Query: " + query);
-
-		connectionNos = (ArrayList<String>)jdbcTemplate.query(query,preparedStatement.toArray(),demandSchedulerRowMapper);
+List<WaterDetails> waterDetails=jdbcTemplate.query(query,preparedStatement.toArray(),demandSchedulerRowMapper);
+		connectionNos = (ArrayList<String>) waterDetails.stream().map(waterdetail->waterdetail.getConnectionNo()).collect(Collectors.toList());
 		return connectionNos;
 	}
 	
 	@Override
-	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+	public List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,WSCalculationConstant.ACTIVE_CONNECTION, preparedStatement);
 		log.info("water " + connectionType + " connection list : " + query);
 		return jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 	}

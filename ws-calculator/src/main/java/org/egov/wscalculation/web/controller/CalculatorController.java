@@ -83,8 +83,8 @@ public class CalculatorController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
-		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
+	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,long taxPeriodFrom, long taxPeriodTo) {
+		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo(), taxPeriodFrom,  taxPeriodTo);
 	}
 	
 	@PostMapping("/_applyAdhocTax")
