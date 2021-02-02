@@ -10,12 +10,20 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.IdGenRepository;
+import org.egov.fsm.service.DSOService;
 import org.egov.fsm.service.EnrichmentService;
+import org.egov.fsm.service.FSMService;
+import org.egov.fsm.service.VehicleService;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.AuditDetails;
+import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.idgen.IdResponse;
+import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
+import org.egov.vehiclelog.config.VehicleLogConfiguration;
+import org.egov.vehiclelog.util.VehicleLogConstants;
 import org.egov.vehiclelog.util.VehicleLogUtil;
 import org.egov.vehiclelog.web.model.VehicleLog;
 import org.egov.vehiclelog.web.model.VehicleLogRequest;
@@ -28,29 +36,68 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class VehicleLogEnrichmentService {
-	
+
 	@Autowired
 	private IdGenRepository idGenRepository;
-	
+
 	@Autowired
 	private VehicleLogUtil vehicleLogUtil;
+
+	@Autowired
+	private VehicleLogConfiguration config;
 	
 	@Autowired
-	private FSMConfiguration config;
+	private DSOService dsoService;
 	
-	public static final String VEHICLE_LOG_APPLICATION_STATUS = "CREATED";
+	@Autowired
+	private VehicleService vehicleService;
 	
+	@Autowired
+	private FSMService fsmService;
+
 	public void setInsertData(VehicleLogRequest request) {
 		request.getVehicleLog().setId(UUID.randomUUID().toString());
 		request.getVehicleLog().setStatus(VehicleLog.StatusEnum.ACTIVE);
-		request.getVehicleLog().setApplicationStatus(VEHICLE_LOG_APPLICATION_STATUS);
+		request.getVehicleLog().setApplicationStatus(VehicleLogConstants.VEHICLE_LOG_APPLICATION_CREATED_STATUS);
 		setIdgenIds(request);
-		AuditDetails auditDetails = vehicleLogUtil.getAuditDetails(request.getRequestInfo().getUserInfo().getUuid(), true);
+		AuditDetails auditDetails = vehicleLogUtil.getAuditDetails(request.getRequestInfo().getUserInfo().getUuid(),
+				true);
 		request.getVehicleLog().setAuditDetails(auditDetails);
 	}
+
+	public void setUpdateData(VehicleLogRequest request) {
+		request.getVehicleLog().setApplicationStatus(VehicleLogConstants.VEHICLE_LOG_APPLICATION_UPDATED_STATUS);
+		AuditDetails auditDetails = vehicleLogUtil.getAuditDetails(request.getRequestInfo().getUserInfo().getUuid(),
+				false);
+		request.getVehicleLog().setAuditDetails(auditDetails);
+	}
+
+	public void enrichSearch(List<VehicleLog> vehicleLogList, RequestInfo requestInfo) {
+		vehicleLogList.forEach(vehicleLog -> {
+			addVehicle(vehicleLog, requestInfo);
+			addDSO(vehicleLog, requestInfo);	
+			addFSMList(vehicleLog, requestInfo);
+		});
+	}
+
+	private void addVehicle(VehicleLog vehicleLog, RequestInfo requestInfo) {
+		vehicleLog.setVehicle(vehicleService.getVehicle(vehicleLog.getVehicleId(), vehicleLog.getTenantId(), requestInfo));
+	}
+
+	private void addDSO(VehicleLog vehicleLog, RequestInfo requestInfo) {
+		vehicleLog.setDso(dsoService.getVendor(vehicleLog.getDsoId(),  vehicleLog.getTenantId(), requestInfo));
+	}
 	
+	private void addFSMList(VehicleLog vehicleLog, RequestInfo requestInfo) {
+		FSMSearchCriteria fsmCriteria = new FSMSearchCriteria();
+		fsmCriteria.setTenantId(vehicleLog.getTenantId());;
+		fsmCriteria.setIds(vehicleLog.getFsms().stream().map(FSM::getId).collect(Collectors.toList()));
+		vehicleLog.setFsms(fsmService.FSMsearch(fsmCriteria, requestInfo));
+	}
+
 	/**
-	 *  generate the applicationNo using the idGen serivce and populate
+	 * generate the applicationNo using the idGen serivce and populate
+	 * 
 	 * @param request
 	 */
 	private void setIdgenIds(VehicleLogRequest request) {
@@ -69,9 +116,10 @@ public class VehicleLogEnrichmentService {
 
 		vehicleLog.setApplicationNo(itr.next());
 	}
-	
+
 	/**
 	 * Generate the id
+	 * 
 	 * @param requestInfo
 	 * @param tenantId
 	 * @param idKey
@@ -84,10 +132,9 @@ public class VehicleLogEnrichmentService {
 				.getIdResponses();
 
 		if (CollectionUtils.isEmpty(idResponses))
-			throw new CustomException(FSMErrorConstants.IDGEN_ERROR, "No ids returned from idgen Service");
+			throw new CustomException(VehicleLogConstants.IDGEN_ERROR, "No ids returned from idgen Service");
 
 		return idResponses.stream().map(IdResponse::getId).collect(Collectors.toList());
 	}
-
 
 }

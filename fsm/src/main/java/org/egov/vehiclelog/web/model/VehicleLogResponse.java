@@ -29,7 +29,7 @@ public class VehicleLogResponse {
 	@JsonProperty("responseInfo")
 	private ResponseInfo responseInfo = null;
 	
-	 @JsonProperty("vehicleLog")
+	 @JsonProperty("vendor")
 	 private List<VehicleLog> vehicleLog = null;
 	 
 	 
