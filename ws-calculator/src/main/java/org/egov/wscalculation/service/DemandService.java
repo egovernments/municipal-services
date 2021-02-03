@@ -196,8 +196,10 @@ public class DemandService {
 			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(WSCalculationConstant.BILLING_PERIOD);
 
-			//Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
-			//Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+			if(taxPeriodFrom==0 && taxPeriodTo==0) {
+			taxPeriodFrom = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+			taxPeriodTo = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+			}
 			Long expiryDaysInmillies = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
 			Long expiryDate=System.currentTimeMillis()+expiryDaysInmillies;
 			
