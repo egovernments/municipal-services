@@ -204,11 +204,13 @@ public class DemandService {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(SWCalculationConstant.BILLING_PERIOD);
-
-			// Long fromDate = (Long)
-			// financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
-			// Long toDate = (Long)
-			// financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+			if (request.getTaxPeriodFrom() == 0 && request.getTaxPeriodTo() == 0) {
+				 Long fromDate = (Long)financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+				 request.setTaxPeriodFrom(fromDate);
+				 Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+				 request.setTaxPeriodFrom(fromDate);
+				 request.setTaxPeriodTo(toDate);
+			}
 			Long expiryDays = (Long) financialYearMaster.get(SWCalculationConstant.Demand_Expiry_Date_String);
 			Long expiryDate = System.currentTimeMillis() + expiryDays;
 			BigDecimal minimumPayableAmount = calculation.getTotalAmount();
