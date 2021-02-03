@@ -24,7 +24,7 @@ public class MDMSValidator {
 	public void validateMdmsData(VehicleRequest vehicleRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { Constants.VEHICLE_TYPE };
+		String[] masterArray = { Constants.VEHICLE_TYPE , Constants.VEHICLE_SUCTION_TYPE};
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -42,7 +42,7 @@ public class MDMSValidator {
 	}
 	public Map<String, List<String>> getAttributeValues(Object mdmsData) {
 
-		List<String> modulepaths = Arrays.asList(Constants.VEHICLE_TYPE_MASTER_JSONPATH_CODE);
+		List<String> modulepaths = Arrays.asList(Constants.VEHICLE_JSONPATH_CODE,Constants.FSM_JSONPATH_CODE);
 		final Map<String, List<String>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
@@ -78,12 +78,12 @@ public class MDMSValidator {
 	 * @param propertyType
 	 * @throws CustomException
 	 */
-	public void validateVehicleModel(String vehicleModel ) throws CustomException{
+	public void validateSuctionType(String suctionType ) throws CustomException{
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(Constants.VEHICLE_MODEL).contains(vehicleModel) ) {
-			errorMap.put(VehicleErrorConstants.INVALID_VEHICLE_TYPE," Vehicle Model is invalid");
+		if( !this.mdmsResMap.get(Constants.VEHICLE_SUCTION_TYPE).contains(suctionType) ) {
+			errorMap.put(VehicleErrorConstants.INVALID_VEHICLE_SUCTION_TYPE," Vehicle SuctionType is invalid");
 		}
 
 		if (!errorMap.isEmpty())

@@ -8,8 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.fsm.web.model.AuditDetails;
-import org.egov.fsm.web.model.FSM;
+import org.egov.vehicle.web.model.AuditDetails;
 import org.egov.vehiclelog.web.model.VehicleLog;
 import org.egov.vehiclelog.web.model.VehicleLog.StatusEnum;
 import org.postgresql.util.PGobject;
@@ -67,23 +66,23 @@ public class VehicleLogRowMapper implements ResultSetExtractor<List<VehicleLog>>
 						.applicationStatus(applicationStatus).dsoId(dsoId).vehicleId(vehicleId).wasteDumped(wasteDumped)
 						.dumpTime(dumpTime).status(StatusEnum.valueOf(status)).auditDetails(audit).build();
 			}
-			addChildrenToProperty(rs, vehicleLog);
+//			addChildrenToProperty(rs, vehicleLog);
 			vehicleLogMap.put(id, vehicleLog);
 		}
 
 		return new ArrayList<>(vehicleLogMap.values());
 	}
 
-	private void addChildrenToProperty(ResultSet rs, VehicleLog vehicleLog) throws SQLException {
-		String fsmId = rs.getString("fsm_id");
-		List<FSM> fsmList = vehicleLog.getFsms();
-		if(fsmList==null) {
-			fsmList = new ArrayList<FSM>();
-		}
-		FSM fsm = new FSM();
-		fsm.setId(fsmId);
-		fsmList.add(fsm);
-		vehicleLog.setFsms(fsmList);
-	}
+//	private void addChildrenToProperty(ResultSet rs, VehicleLog vehicleLog) throws SQLException {
+//		String fsmId = rs.getString("fsm_id");
+//		List<FSM> fsmList = vehicleLog.getFsms();
+//		if(fsmList==null) {
+//			fsmList = new ArrayList<FSM>();
+//		}
+//		FSM fsm = new FSM();
+//		fsm.setId(fsmId);
+//		fsmList.add(fsm);
+//		vehicleLog.setFsms(fsmList);
+//	}
 
 }

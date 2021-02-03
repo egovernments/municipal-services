@@ -7,9 +7,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.egov.common.contract.request.User;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.Document;
-import org.egov.common.contract.request.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

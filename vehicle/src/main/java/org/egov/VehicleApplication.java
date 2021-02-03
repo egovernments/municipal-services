@@ -1,4 +1,4 @@
-package org.egov.vehicle;
+package org.egov;
 
 import org.egov.tracer.config.TracerConfiguration;
 import org.springframework.boot.SpringApplication;

@@ -20,8 +20,8 @@ import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.idgen.IdResponse;
-import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.user.User;
+import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -149,10 +149,12 @@ public class EnrichmentService {
 	 * @param fsmRequest
 	 * @param mdmsData
 	 */
-	public void enrichFSMUpdateRequest(FSMRequest fsmRequest, Object mdmsData) {
+	public void enrichFSMUpdateRequest(FSMRequest fsmRequest, Object mdmsData, FSM oldFsm) {
 		//TODO add requied logic
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		AuditDetails auditDetails = fsmUtil.getAuditDetails(requestInfo.getUserInfo().getUuid(), false);
+		auditDetails.setCreatedBy(oldFsm.getAuditDetails().getCreatedBy());
+		auditDetails.setCreatedTime(oldFsm.getAuditDetails().getCreatedTime());
 		fsmRequest.getFsm().setAuditDetails(auditDetails);
 		if (fsmRequest.getFsm().getAddress() != null) {
 			if (StringUtils.isEmpty(fsmRequest.getFsm().getAddress().getId()))

@@ -1,23 +1,20 @@
 package org.egov.fsm.web.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import org.egov.common.contract.response.ResponseInfo;
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-
-import org.egov.common.contract.response.ResponseInfo;
-import org.egov.fsm.web.model.Error;
-import org.egov.fsm.web.model.FSMResponse.FSMResponseBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * All APIs will return ErrorRes in case of failure which will carry ResponseHeader as metadata and Error object as actual representation of error. In case of bulk apis, some apis may chose to return the array of Error objects to indicate individual failure.

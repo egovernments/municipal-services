@@ -2,10 +2,8 @@ package org.egov.fsm.web.model;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -48,8 +46,8 @@ public class FSMSearchCriteria {
     @JsonProperty("toDate")
     private Long toDate;
     
-    @JsonProperty("applicationNumber")
-    private List<String> applicationNumber;
+    @JsonProperty("applicationNos")
+    private List<String> applicationNos;
     
     @JsonProperty("ids")
     private List <String> ids;
@@ -79,12 +77,12 @@ public class FSMSearchCriteria {
     public boolean isEmpty() {
 		// TODO Auto-generated method stub
 		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
-				 && CollectionUtils.isEmpty(this.applicationStatus)  && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
+				 && CollectionUtils.isEmpty(this.applicationStatus)  && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNos) && CollectionUtils.isEmpty(this.ids));
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
 		return (this.tenantId != null && this.mobileNumber == null
-                && CollectionUtils.isEmpty(this.applicationStatus) && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNumber) && CollectionUtils.isEmpty(this.ids));
+                && CollectionUtils.isEmpty(this.applicationStatus) && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNos) && CollectionUtils.isEmpty(this.ids));
 	} 
 }

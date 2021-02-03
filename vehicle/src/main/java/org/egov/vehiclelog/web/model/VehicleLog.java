@@ -5,10 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.fsm.web.model.AuditDetails;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.dso.Vendor;
-import org.egov.fsm.web.model.vehicle.Vehicle;
+import org.egov.vehicle.web.model.AuditDetails;
+import org.egov.vehicle.web.model.Vehicle;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -81,9 +79,7 @@ public class VehicleLog   {
   
   @JsonProperty("vehicleId")
   private String vehicleId = null;
-  
-  @JsonProperty("dsoId")
-  private String dsoId = null;
+
 
   @JsonProperty("wasteDumped")
   private Integer wasteDumped = null;
@@ -94,12 +90,11 @@ public class VehicleLog   {
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
   
-  @JsonProperty("fsms")
-  @Valid
-  private List<FSM> fsms = new ArrayList<FSM>();
+//  @JsonProperty("fsms")
+//  @Valid
+//  private List<FSM> fsms = new ArrayList<FSM>();
   
-  @JsonProperty("dso")
-  private Vendor dso;
+
   
   @JsonProperty("vehicle")
   private Vehicle vehicle;

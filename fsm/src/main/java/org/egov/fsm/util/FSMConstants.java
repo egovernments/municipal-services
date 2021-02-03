@@ -81,11 +81,26 @@ public class FSMConstants {
 	public static final String WF_ACTION_CREATE ="CREATE";
 	public static final String WF_ACTION_SUBMIT="SUBMIT";
 	public static final String WF_ACTION_ASSIGN_DSO="ASSIGN";
+	public static final String WF_ACTION_DSO_ACCEPT="DSO_ACCEPT";
 	
 	public static final String APPLICATION_FEE ="APPLICATION_FEE";
 
 	public static final String PIT_TYPE_DIAMETER = "dd";
 	public static final String PIT_TYPE_LDB = "lbd";
+
+	public static final String ROLE_FSM_DSO = "FSM_DSO";
+
+	public static final String WF_ACTION_COMPLETE = "COMPLETED";
+
+	public static final String WF_ACTION_SUBMIT_FEEDBACK = "SUBMIT_FEEDBACK";
+
+	public static final String WF_ACTION_ADDITIONAL_PAY_REQUEST = "ADDITIONAL_PAY_REQUEST";
+
+	public static final String WF_ACTION_REJECT = "REJECT";
+
+	public static final String WF_ACTION_CANCEL = "CANCEL";
+
+	public static final String WF_ACTION_SEND_BACK = "SENDBACK";
 
 	
 

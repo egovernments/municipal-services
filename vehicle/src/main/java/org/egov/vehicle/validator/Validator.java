@@ -44,9 +44,9 @@ public class Validator {
 		if( StringUtils.isEmpty( vehicle.getRegistrationNumber())) {
 			throw new CustomException(VehicleErrorConstants.INVALID_REGISTRATION_NUMBER,"Registation is mandatory");
 		}
-//		mdmsValidator.validateMdmsData(vehicleRequest, mdmsData);
-//		mdmsValidator.validateVehicleType(vehicle.getType());
-//		mdmsValidator.validateVehicleModel(vehicle.getModel());
+		mdmsValidator.validateMdmsData(vehicleRequest, mdmsData);
+		mdmsValidator.validateVehicleType(vehicle.getType());
+		mdmsValidator.validateSuctionType(vehicle.getSuctionType());
 		userService.manageOwner(vehicleRequest);
 		
 		

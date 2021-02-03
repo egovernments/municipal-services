@@ -21,8 +21,10 @@ public class Constants {
 
 	public static final String VEHICLE_TYPE = "VehicleType";
 
-	public static final String VEHICLE_TYPE_MASTER_JSONPATH_CODE = "$.MdmsRes.Vehicle";
+	public static final String FSM_JSONPATH_CODE = "$.MdmsRes.FSM";
+	public static final String VEHICLE_JSONPATH_CODE = "$.MdmsRes.Vehicle";
 	public static final String VEHICLE_MODULE_CODE = "Vehicle";
+	public static final String FSM_MODULE_CODE = "FSM";
 
 	public static final String VEHICLE_MODEL = "Model";
 
@@ -30,6 +32,8 @@ public class Constants {
 	public static final String DSO_DRIVER = "FSM_DRIVER";
 
 	public static final String CITIZEN = "CITIZEN";
+
+	public static final String VEHICLE_SUCTION_TYPE = "SuctionType";
 
 	
 

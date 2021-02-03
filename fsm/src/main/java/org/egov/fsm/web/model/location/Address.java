@@ -6,7 +6,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
 import org.egov.fsm.web.model.AuditDetails;
-import org.egov.fsm.web.model.FSM;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

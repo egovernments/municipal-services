@@ -8,15 +8,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.fsm.config.FSMConfiguration;
-import org.egov.fsm.repository.querybuilder.FSMQueryBuilder;
-import org.egov.fsm.service.DSOService;
-import org.egov.fsm.service.VehicleService;
-import org.egov.fsm.util.FSMErrorConstants;
-import org.egov.fsm.validator.FSMValidator;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.tracer.model.CustomException;
+import org.egov.vehicle.service.VehicleService;
 import org.egov.vehiclelog.config.VehicleLogConfiguration;
 import org.egov.vehiclelog.querybuilder.VehicleLogQueryBuilder;
 import org.egov.vehiclelog.repository.VehicleLogRepository;
@@ -34,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class VehicleLogValidator {
 
-	@Autowired
-	private DSOService dsoService;
+//	@Autowired
+//	private DSOService dsoService;
 
 	@Autowired
 	private VehicleService vehicleService;
@@ -62,16 +55,16 @@ public class VehicleLogValidator {
 		if (StringUtils.isEmpty(request.getVehicleLog().getVehicleId())) {
 			throw new CustomException(VehicleLogConstants.INVALID_VEHICLELOG_ERROR, "vehicleId is mandatory");
 		}
-		if (dsoService.getVendor(request.getVehicleLog().getDsoId(), request.getVehicleLog().getTenantId(),
-				request.getRequestInfo()) == null) {
-			throw new CustomException(VehicleLogConstants.INVALID_DSO, "Invalid DSO");
-		}
-		if (vehicleService.getVehicle(request.getVehicleLog().getVehicleId(), request.getVehicleLog().getTenantId(),
-				request.getRequestInfo()) == null) {
-			throw new CustomException(VehicleLogConstants.INVALID_VEHICLE, "Invalid Vehicle");
-		}
-		validateFSMApplicationNumbers(
-				request.getVehicleLog().getFsms().stream().map(FSM::getId).collect(Collectors.toList()));
+//		if (dsoService.getVendor(request.getVehicleLog().getDsoId(), request.getVehicleLog().getTenantId(),
+//				request.getRequestInfo()) == null) {
+//			throw new CustomException(VehicleLogConstants.INVALID_DSO, "Invalid DSO");
+//		}
+//		if (vehicleService.getVehicle(request.getVehicleLog().getVehicleId(), request.getVehicleLog().getTenantId(),
+//				request.getRequestInfo()) == null) {
+//			throw new CustomException(VehicleLogConstants.INVALID_VEHICLE, "Invalid Vehicle");
+//		}
+//		validateFSMApplicationNumbers(
+//				request.getVehicleLog().getFsms().stream().map(FSM::getId).collect(Collectors.toList()));
 	}
 
 	public void validateFSMApplicationNumbers (List<String> applicationsNos ) {

@@ -10,8 +10,6 @@ import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.RequestInfoWrapper;
-import org.egov.fsm.web.model.dso.Vendor;
-import org.egov.fsm.web.model.dso.VendorResponse;
 import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.fsm.web.model.vehicle.VehicleResponse;
 import org.egov.tracer.model.CustomException;

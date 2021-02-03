@@ -114,10 +114,11 @@ public class VendorValidator {
 
 		RequestInfo requestInfo = vendorRequest.getRequestInfo();
 		Vendor vendor = vendorRequest.getVendor();
-		ownerService.manageOwner(vendorRequest);
-		ownerService.manageDrivers(vendorRequest);
+		
 		boundaryService.getAreaType(vendorRequest, config.getHierarchyTypeCode());
 		vehicleService.manageVehicle(vendorRequest);
+		ownerService.manageOwner(vendorRequest);
+		ownerService.manageDrivers(vendorRequest);
 		
 		
 

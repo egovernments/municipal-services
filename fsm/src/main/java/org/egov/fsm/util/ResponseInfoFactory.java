@@ -1,6 +1,5 @@
 package org.egov.fsm.util;
 
-import org.springframework.stereotype.Component;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.stereotype.Component;

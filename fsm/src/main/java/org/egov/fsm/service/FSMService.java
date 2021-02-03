@@ -2,14 +2,15 @@ package org.egov.fsm.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMConstants;
@@ -19,8 +20,10 @@ import org.egov.fsm.validator.FSMValidator;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.user.UserDetailResponse;
+import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.workflow.ActionValidator;
 import org.egov.fsm.workflow.WorkflowIntegrator;
@@ -29,8 +32,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-
-import java.util.Calendar;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,6 +70,10 @@ public class FSMService {
 	
 	@Autowired
 	private DSOService dsoService;
+	
+
+	@Autowired
+	VehicleService vehicleService;
 	
 	@Autowired
 	private FSMRepository repository;
@@ -129,7 +135,32 @@ public class FSMService {
 			handleAssignDSO(fsmRequest);
 		}
 		
-		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData);
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_DSO_ACCEPT) ) {
+			handleDSOAccept(fsmRequest,oldFSM);
+		}
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_COMPLETE) ) {
+			handleFSMComplete(fsmRequest,oldFSM);
+		}
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT_FEEDBACK) ) {
+			handleFSMSubmitFeeback(fsmRequest,oldFSM);
+		}
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_ADDITIONAL_PAY_REQUEST) ) {
+			handleAdditionalPayRequest(fsmRequest,oldFSM);
+		}
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_REJECT) || 
+				fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_CANCEL)) {
+			handleRejectCancel(fsmRequest,oldFSM);
+		}
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SEND_BACK) ) {
+			handleSendBack(fsmRequest,oldFSM);
+		}
+		
+		enrichmentService.enrichFSMUpdateRequest(fsmRequest, mdmsData,oldFSM);
 		
 		wfIntegrator.callWorkFlow(fsmRequest);
 
@@ -147,7 +178,7 @@ public class FSMService {
 	private void handleAssignDSO(FSMRequest fsmRequest) {
 		
 		FSM fsm = fsmRequest.getFsm();
-		if(StringUtils.isEmpty(fsm.getDsoId())) {
+		if(!StringUtils.hasLength(fsm.getDsoId())) {
 			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid");
 		}
 		
@@ -162,7 +193,65 @@ public class FSMService {
 		
 		
 	}
+	
+	private void handleDSOAccept(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
+		Vendor vendor = dsoService.getVendor(oldFSM.getDsoId(),fsm.getTenantId(), dsoUser.getUuid(),fsmRequest.getRequestInfo());
+		if(vendor == null) {
+			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid, cannot take an action, Application is not assigned to current logged in user !");
+		}
+		
+		if(!StringUtils.hasLength(fsm.getVehicleId())) {
+			throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE,"Vehicle should be assigned to accept the Request !");
+			
+		}else {
+			
+			vehicleService.validateVehicle(fsmRequest);
+			Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
+			if(!CollectionUtils.isEmpty(vehilceIdMap) && vehilceIdMap.get(fsm.getVehicleId()) == null ) {
+				throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehicle Does not belong to DSO!");
+			}else {
+				Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
+				if(!vehicle.getType().equalsIgnoreCase(fsm.getVehicleType())) {
+					throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehilce Type of FSM and vehilceType of the assigned vehicle does not match !");
+				}
+			}
+		}
+	}
+	
+	private void handleFSMComplete(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
+		//TODO on complete mark the vehicleLog as Ready for Disposal
+		
+//		if(!dsoUser.getUuid().equalsIgnoreCase(oldFSM.getDsoId())) {
+//			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid, cannot take an action as it is not assigned to the current user");
+//		}
+	}
+	
+	private void handleFSMSubmitFeeback(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		org.egov.common.contract.request.User citizen = fsmRequest.getRequestInfo().getUserInfo();
+		if(!citizen.getUuid().equalsIgnoreCase(fsmRequest.getRequestInfo().getUserInfo().getUuid())) {
+			throw new CustomException(FSMErrorConstants.INVALID_UPDATE," Only owner of the application can submit the feedback !.");
+		}
+		//TODO handle the citizen rating and checklist.
+	}
+	
+	private void handleAdditionalPayRequest(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		//TODO if additionalcharge is allowed then allow this action and then call calculator
+	}
+	
+	private void handleRejectCancel(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+	}
 
+	private void handleSendBack(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		//TODO based on the old application Status DSO or vehicle has to removed
+	}
 	/**
 	 * search the fsm applications based on the search criteria
 	 * @param criteria

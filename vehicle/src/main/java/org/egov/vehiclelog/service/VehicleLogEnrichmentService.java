@@ -8,25 +8,16 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.fsm.config.FSMConfiguration;
-import org.egov.fsm.repository.IdGenRepository;
-import org.egov.fsm.service.DSOService;
-import org.egov.fsm.service.EnrichmentService;
-import org.egov.fsm.service.FSMService;
-import org.egov.fsm.service.VehicleService;
-import org.egov.fsm.util.FSMConstants;
-import org.egov.fsm.util.FSMErrorConstants;
-import org.egov.fsm.web.model.AuditDetails;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSMSearchCriteria;
-import org.egov.fsm.web.model.idgen.IdResponse;
-import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
+import org.egov.vehicle.service.VehicleService;
+import org.egov.vehicle.web.model.AuditDetails;
 import org.egov.vehiclelog.config.VehicleLogConfiguration;
+import org.egov.vehiclelog.repository.IdGenRepository;
 import org.egov.vehiclelog.util.VehicleLogConstants;
 import org.egov.vehiclelog.util.VehicleLogUtil;
 import org.egov.vehiclelog.web.model.VehicleLog;
 import org.egov.vehiclelog.web.model.VehicleLogRequest;
+import org.egov.vehiclelog.web.model.idgen.IdResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -46,14 +37,14 @@ public class VehicleLogEnrichmentService {
 	@Autowired
 	private VehicleLogConfiguration config;
 	
-	@Autowired
-	private DSOService dsoService;
+//	@Autowired
+//	private DSOService dsoService;
 	
 	@Autowired
 	private VehicleService vehicleService;
 	
-	@Autowired
-	private FSMService fsmService;
+//	@Autowired
+//	private FSMService fsmService;
 
 	public void setInsertData(VehicleLogRequest request) {
 		request.getVehicleLog().setId(UUID.randomUUID().toString());
@@ -74,26 +65,26 @@ public class VehicleLogEnrichmentService {
 
 	public void enrichSearch(List<VehicleLog> vehicleLogList, RequestInfo requestInfo) {
 		vehicleLogList.forEach(vehicleLog -> {
-			addVehicle(vehicleLog, requestInfo);
-			addDSO(vehicleLog, requestInfo);	
-			addFSMList(vehicleLog, requestInfo);
+//			addVehicle(vehicleLog, requestInfo);
+//			addDSO(vehicleLog, requestInfo);	
+//			addFSMList(vehicleLog, requestInfo);
 		});
 	}
 
-	private void addVehicle(VehicleLog vehicleLog, RequestInfo requestInfo) {
-		vehicleLog.setVehicle(vehicleService.getVehicle(vehicleLog.getVehicleId(), vehicleLog.getTenantId(), requestInfo));
-	}
-
-	private void addDSO(VehicleLog vehicleLog, RequestInfo requestInfo) {
-		vehicleLog.setDso(dsoService.getVendor(vehicleLog.getDsoId(),  vehicleLog.getTenantId(), requestInfo));
-	}
-	
-	private void addFSMList(VehicleLog vehicleLog, RequestInfo requestInfo) {
-		FSMSearchCriteria fsmCriteria = new FSMSearchCriteria();
-		fsmCriteria.setTenantId(vehicleLog.getTenantId());;
-		fsmCriteria.setIds(vehicleLog.getFsms().stream().map(FSM::getId).collect(Collectors.toList()));
-		vehicleLog.setFsms(fsmService.FSMsearch(fsmCriteria, requestInfo));
-	}
+//	private void addVehicle(VehicleLog vehicleLog, RequestInfo requestInfo) {
+//		vehicleLog.setVehicle(vehicleService.getVehicle(vehicleLog.getVehicleId(), vehicleLog.getTenantId(), requestInfo));
+//	}
+//
+//	private void addDSO(VehicleLog vehicleLog, RequestInfo requestInfo) {
+//		vehicleLog.setDso(dsoService.getVendor(vehicleLog.getDsoId(),  vehicleLog.getTenantId(), requestInfo));
+//	}
+//	
+//	private void addFSMList(VehicleLog vehicleLog, RequestInfo requestInfo) {
+//		FSMSearchCriteria fsmCriteria = new FSMSearchCriteria();
+//		fsmCriteria.setTenantId(vehicleLog.getTenantId());;
+//		fsmCriteria.setIds(vehicleLog.getFsms().stream().map(FSM::getId).collect(Collectors.toList()));
+//		vehicleLog.setFsms(fsmService.FSMsearch(fsmCriteria, requestInfo));
+//	}
 
 	/**
 	 * generate the applicationNo using the idGen serivce and populate

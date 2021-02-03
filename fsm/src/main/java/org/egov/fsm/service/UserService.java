@@ -3,16 +3,16 @@ package org.egov.fsm.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
 import org.egov.fsm.util.FSMConstants;
@@ -24,8 +24,6 @@ import org.egov.fsm.web.model.user.CreateUserRequest;
 import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.user.UserSearchRequest;
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

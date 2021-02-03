@@ -1,6 +1,5 @@
 package org.egov.vehiclelog.config;
 
-import org.egov.fsm.config.FSMConfiguration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,18 +16,26 @@ import lombok.Setter;
 @Builder
 @Component
 public class VehicleLogConfiguration {
+	
+	// Idgen Config
+	@Value("${egov.idgen.host}")
+	private String idGenHost;
+
+	@Value("${egov.idgen.path}")
+	private String idGenPath;
 
 	@Value("${egov.idgen.fsm.applicationNum.name}")
 	private String applicationNoIdgenName;
+
+	@Value("${egov.idgen.fsm.applicationNum.format}")
+	private String applicationNoIdgenFormat;
+
 
 	@Value("${persister.save.vehicle.log.topic}")
 	private String saveVehicleLogTopic;
 
 	@Value("${persister.update.vehicle.log.topic}")
 	private String updateVehicleLogTopic;
-
-	@Value("${egov.idgen.vehiclelog.applicationNum.format}")
-	private String applicationNoIdgenFormat;
 
 	// Allowed Search Parameters
 	@Value("${vehicle.log.allowed.search.params}")

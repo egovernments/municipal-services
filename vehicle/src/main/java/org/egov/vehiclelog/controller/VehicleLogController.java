@@ -5,12 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.fsm.util.ResponseInfoFactory;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSMRequest;
-import org.egov.fsm.web.model.FSMResponse;
-import org.egov.fsm.web.model.FSMSearchCriteria;
-import org.egov.fsm.web.model.RequestInfoWrapper;
+import org.egov.vehicle.util.ResponseInfoFactory;
+import org.egov.vehicle.web.model.RequestInfoWrapper;
 import org.egov.vehiclelog.service.VehicleLogService;
 import org.egov.vehiclelog.util.VehicleLogUtil;
 import org.egov.vehiclelog.web.model.VehicleLog;

@@ -108,6 +108,7 @@ public class VehicleUtil {
 
 		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria).requestInfo(requestInfo)
 				.build();
+		
 		return mdmsCriteriaReq;
 	}
 	public List<ModuleDetail> getVehicleModuleRequest() {
@@ -116,17 +117,25 @@ public class VehicleUtil {
 				final String filterCode = "$.[?(@.active==true)].code";
 		// master details for FSM module
 		List<MasterDetail> masterDtls = new ArrayList<>();
-
+		List<ModuleDetail> moduleDtls = new ArrayList<>();
 		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_TYPE).filter(filterCode).build());
-		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_MODEL).filter(filterCode).build());
-		
 		ModuleDetail masterMDtl = ModuleDetail.builder().masterDetails(masterDtls)
 				.moduleName(Constants.VEHICLE_MODULE_CODE).build();
 		
+		moduleDtls.add(ModuleDetail.builder().masterDetails(masterDtls)
+				.moduleName(Constants.FSM_MODULE_CODE).build());
+		
+		masterDtls = new ArrayList<>();
+		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_SUCTION_TYPE).filter(filterCode).build());
+		moduleDtls.add(ModuleDetail.builder().masterDetails(masterDtls)
+				.moduleName(Constants.VEHICLE_MODULE_CODE).build());
+		
+		
+		
 		
 		
 
-		return Arrays.asList(masterMDtl);
+		return moduleDtls;
 
 	}
 

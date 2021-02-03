@@ -1,10 +1,14 @@
 package org.egov.fsm.service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Arrays;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
@@ -40,10 +44,18 @@ public class DSOService {
 	@Autowired
 	VehicleService vehicleService;
 	
-	public Vendor getVendor(String dsoId, String tenantId, RequestInfo requestInfo) {
+	public Vendor getVendor(String dsoId, String tenantId, String ownerId,RequestInfo requestInfo) {
 		
 		StringBuilder uri  = new StringBuilder(config.getVendorHost()).append(config.getVendorContextPath())
-				.append(config.getVendorSearchEndpoint()).append("?tenantId=").append(tenantId).append("&ids=").append(dsoId);
+				.append(config.getVendorSearchEndpoint()).append("?tenantId=").append(tenantId);
+		if(!StringUtils.isEmpty(dsoId)) {
+			uri.append("&ids=").append(dsoId);
+		}
+		
+		if(!StringUtils.isEmpty(ownerId)) {
+			uri.append("&ownerIds=").append(ownerId);
+		}
+		
 		
 		RequestInfoWrapper requestInfoWrpr = new RequestInfoWrapper();
 		requestInfoWrpr.setRequestInfo(requestInfo);
@@ -65,13 +77,36 @@ public class DSOService {
 	
 	public void validateDSO(FSMRequest fsmRequest) {
 		FSM fsm = fsmRequest.getFsm();
-		Vendor vendor = this.getVendor(fsm.getDsoId(), fsm.getTenantId(), fsmRequest.getRequestInfo());
+		Vendor vendor = this.getVendor(fsm.getDsoId(), fsm.getTenantId(), null,fsmRequest.getRequestInfo());
+		if(vendor == null) {
+			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO Does not belong to DSO!");
+		}else {
+			if( CollectionUtils.isEmpty(fsmRequest.getWorkflow().getAssignes())) {
+				List<String> assignes = new ArrayList<String>();
+				assignes.add(vendor.getOwner().getUuid());
+				fsmRequest.getWorkflow().setAssignes(assignes);
+			}else {
+				if(fsmRequest.getWorkflow().getAssignes().size() >1) {
+					throw new CustomException(FSMErrorConstants.INVALID_DSO," Cannot assign to multiple DSO's !");
+				}else {
+					if(!fsmRequest.getWorkflow().getAssignes().get(0).equalsIgnoreCase(vendor.getOwner().getUuid())) {
+						throw new CustomException(FSMErrorConstants.INVALID_DSO," Assignee Does not belong to DSO!");
+					}
+				}
+			}
+			
+		}
 		
 		if(!StringUtils.isEmpty(fsm.getVehicleId())) {
 			vehicleService.validateVehicle(fsmRequest);
-			List<String> vehicleIds = vendor.getVehicles().stream().map(Vehicle::getId).collect(Collectors.toList());
-			if(!CollectionUtils.isEmpty(vehicleIds) && vehicleIds.contains(fsm.getVehicleId())) {
+			Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
+			if(!CollectionUtils.isEmpty(vehilceIdMap) && vehilceIdMap.get(fsm.getVehicleId()) == null ) {
 				throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehicle Does not belong to DSO!");
+			}else {
+				Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
+				if(!vehicle.getType().equalsIgnoreCase(fsm.getVehicleType())) {
+					throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehilce Type of FSM and vehilceType of the assigned vehicle does not match !");
+				}
 			}
 		}
 		

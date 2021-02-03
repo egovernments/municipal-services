@@ -53,7 +53,7 @@ public class FSMQueryBuilder {
 			}
 		}
 		
-		List<String> application_number = criteria.getApplicationNumber();
+		List<String> application_number = criteria.getApplicationNos();
 		if (!CollectionUtils.isEmpty(application_number)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.applicationNo IN (").append(createQuery(application_number)).append(")");

@@ -5,19 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.fsm.util.FSMConstants;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.workflow.Action;
 import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.web.model.workflow.State;
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 
 @Component

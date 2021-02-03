@@ -1,7 +1,9 @@
 package org.egov.fsm.web.model.dso;
 
 import java.util.List;
+
 import org.springframework.util.CollectionUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

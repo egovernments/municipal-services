@@ -3,7 +3,6 @@ package org.egov.vehiclelog.querybuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.vehiclelog.config.VehicleLogConfiguration;
 import org.egov.vehiclelog.web.model.VehicleLogSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;

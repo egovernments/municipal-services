@@ -4,13 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.fsm.config.FSMConfiguration;
-import org.egov.fsm.producer.Producer;
-import org.egov.fsm.repository.querybuilder.FSMQueryBuilder;
-import org.egov.fsm.repository.rowmapper.FSMRowMapper;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSMRequest;
-import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.vehicle.producer.VehicleProducer;
 import org.egov.vehiclelog.config.VehicleLogConfiguration;
 import org.egov.vehiclelog.querybuilder.VehicleLogQueryBuilder;
 import org.egov.vehiclelog.repository.rowmapper.VehicleLogRowMapper;
@@ -25,7 +19,7 @@ import org.springframework.stereotype.Repository;
 public class VehicleLogRepository {
 	
 	@Autowired
-	private Producer producer;
+	private VehicleProducer producer;
 	
 	@Autowired
 	private VehicleLogConfiguration config;

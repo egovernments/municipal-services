@@ -75,12 +75,12 @@ public class PaymentUpdateService {
 					FSMSearchCriteria searchCriteria = new FSMSearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> applNos = Arrays.asList(paymentDetail.getBill().getConsumerCode());
-					searchCriteria.setApplicationNumber(applNos);
+					searchCriteria.setApplicationNos(applNos);
 					List<FSM> fsms = repository.getFSMData(searchCriteria);
 					if (CollectionUtils.isEmpty(fsms)) {
 						throw new CustomException(FSMErrorConstants.INVALID_RECEIPT,
 								"No Building Plan Application found for the comsumerCode "
-										+ searchCriteria.getApplicationNumber());
+										+ searchCriteria.getApplicationNos());
 					}
 					Workflow workflow = Workflow.builder().action("PAY").build();
 					fsms.forEach(fsm -> {

@@ -1,22 +1,20 @@
 package org.egov.fsm.validator;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,8 +161,8 @@ public class FSMValidator {
 		if (criteria.getLimit() != null && !allowedParams.contains("limit"))
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
 		
-		if (criteria.getApplicationNumber() != null && !allowedParams.contains("applicationNo")) {
-			System.out.println("app..... "+criteria.getApplicationNumber());
+		if (criteria.getApplicationNos() != null && !allowedParams.contains("applicationNos")) {
+			System.out.println("app..... "+criteria.getApplicationNos());
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
 			}
 		if (criteria.getFromDate() != null && !allowedParams.contains("fromDate") && 

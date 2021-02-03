@@ -54,8 +54,16 @@ public class VehicleService {
 		List<Vehicle> reqVehicles= vendor.getVehicles();
 		List<Vehicle> newVehicles = new ArrayList<Vehicle>();
 		reqVehicles.forEach(reqVehicle->{
-			if(StringUtils.isEmpty(reqVehicle.getId()) && StringUtils.isEmpty(reqVehicle.getRegistrationNumber())) {
-				newVehicles.add(createVehicle(reqVehicle, requestInfo));
+			
+			if(!StringUtils.hasLength(reqVehicle.getId()) && StringUtils.hasLength(reqVehicle.getRegistrationNumber())) {
+				
+				List<Vehicle> vehicles = getVehicles(null,Arrays.asList(reqVehicle.getRegistrationNumber()) ,requestInfo, vendor.getTenantId());
+				if( vehicles.size() >0 ) {
+					newVehicles.add(vehicles.get(0));
+					//TODO comparing search result and request vehicle and callig update is peding
+				}else {
+					newVehicles.add(createVehicle(reqVehicle, requestInfo));
+				}
 			}else {
 				List<Vehicle> vehicles = getVehicles(Arrays.asList(reqVehicle.getId()),Arrays.asList(reqVehicle.getRegistrationNumber()) ,requestInfo, vendor.getTenantId());
 				if( vehicles.size() >0 ) {

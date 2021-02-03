@@ -3,7 +3,7 @@ package org.egov.vehiclelog.util;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.egov.fsm.web.model.AuditDetails;
+import org.egov.vehicle.web.model.AuditDetails;
 import org.springframework.stereotype.Component;
 
 import com.jayway.jsonpath.Configuration;
