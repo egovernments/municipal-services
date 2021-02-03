@@ -11,11 +11,14 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.repository.IdGenRepository;
+import org.egov.fsm.util.ComparisionUtility;
+import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMAudit;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.Workflow;
@@ -50,6 +53,9 @@ public class EnrichmentService {
 	
 	@Autowired
 	private FSMUtil fsmUtil;
+	
+	@Autowired
+	private ComparisionUtility comparisionUtility;
 	/**
 	 * enrich the create FSM request with the required data
 	 * @param fsmRequest
@@ -228,5 +234,9 @@ public class EnrichmentService {
 		fsms.forEach(fsm -> {
 			 fsm.setCitizen( userIdToApplicantMap.get(fsm.getAccountId()));
 		});
+	}
+	
+	public List<FSMAudit> enrichFSMAudit(FSMAuditUtil  sourceObject, List<FSMAuditUtil> targetObjects) {
+		return comparisionUtility.compareData(sourceObject, targetObjects);
 	}
 }

@@ -11,13 +11,17 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.repository.FSMRepository;
+import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.validator.FSMValidator;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMAudit;
+import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.dso.Vendor;
@@ -329,5 +333,18 @@ public class FSMService {
 		if( oldTripAmount.compareTo(newTripAmount) != 0) {
 			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
 		}
+	}
+	
+	public List<FSMAudit> auditSearch(FSMAuditSearchCriteria criteria, RequestInfo requestInfo) {
+		fsmValidator.validateAudit(criteria);
+		List<FSMAudit> auditList = null;
+		List<FSMAuditUtil> sourceObjects = repository.getFSMActualData(criteria);
+		if (!CollectionUtils.isEmpty(sourceObjects)) {
+			FSMAuditUtil sourceObject = repository.getFSMActualData(criteria).get(NumberUtils.INTEGER_ZERO);
+			List<FSMAuditUtil> targetObjects = repository.getFSMAuditData(criteria);
+			auditList = enrichmentService.enrichFSMAudit(sourceObject, targetObjects);
+		}
+		return auditList;
+
 	}
 }

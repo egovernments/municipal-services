@@ -7,9 +7,13 @@ import java.util.List;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.producer.Producer;
+import org.egov.fsm.repository.querybuilder.FSMAuditQueryBuilder;
 import org.egov.fsm.repository.querybuilder.FSMQueryBuilder;
+import org.egov.fsm.repository.rowmapper.FSMAuditRowMapper;
 import org.egov.fsm.repository.rowmapper.FSMRowMapper;
+import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +39,12 @@ public class FSMRepository {
     
     @Autowired
 	private FSMRowMapper FSMrowMapper;
+    
+    @Autowired
+    private FSMAuditQueryBuilder auditQueryBuilder;
+    
+    @Autowired
+   	private FSMAuditRowMapper auditRowMapper;
 	
 	
 	public void save(FSMRequest fsmRequest) {
@@ -70,4 +80,15 @@ public class FSMRepository {
 		List<FSM> FSMData = jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
 		return FSMData;
 	}
+	
+	public List<FSMAuditUtil> getFSMActualData(FSMAuditSearchCriteria criteria) {
+		String query = auditQueryBuilder.getFSMActualDataQuery(criteria);
+		return jdbcTemplate.query(query, auditRowMapper);
+	}
+	
+	public List<FSMAuditUtil> getFSMAuditData(FSMAuditSearchCriteria criteria) {
+		String query = auditQueryBuilder.getFSMAuditDataQuery(criteria);
+		return jdbcTemplate.query(query, auditRowMapper);
+	}
+	
 }

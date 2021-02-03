@@ -12,6 +12,7 @@ import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.user.User;
@@ -268,6 +269,17 @@ public class FSMValidator {
 	public void validateWorkflowActions(FSMRequest fsmRequest) {
 		FSM fsm = fsmRequest.getFsm();
 		// TODO Validate the the current workflow action is valid according to business
+	}
+	
+	public void validateAudit(FSMAuditSearchCriteria criteria) {
+		if(criteria.getTenantId()==null) {
+			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
+		}
+		else {
+			 if(StringUtils.isEmpty(criteria.getApplicationNumber()) && StringUtils.isEmpty(criteria.getId())) {
+				 throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "applicationNo or id is mandatory in search");
+			 }
+		}
 	}
 	
 

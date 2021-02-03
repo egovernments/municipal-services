@@ -10,6 +10,9 @@ import org.egov.fsm.service.UserService;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.util.ResponseInfoFactory;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMAudit;
+import org.egov.fsm.web.model.FSMAuditResponse;
+import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
@@ -78,6 +81,18 @@ public class FSMController {
 				.build();
 		
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/_audit")
+	public ResponseEntity<FSMAuditResponse> audit(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+			@Valid @ModelAttribute FSMAuditSearchCriteria criteria) {
+		
+		List<FSMAudit> fsmAuditList = fsmService.auditSearch(criteria, requestInfoWrapper.getRequestInfo());
+		FSMAuditResponse response = FSMAuditResponse.builder().fsmAuditList(fsmAuditList).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+		
 	}
 	
 }
