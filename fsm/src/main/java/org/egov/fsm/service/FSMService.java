@@ -143,6 +143,10 @@ public class FSMService {
 			handleDSOAccept(fsmRequest,oldFSM);
 		}
 		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_DSO_REJECT) ) {
+			handleDSOReject(fsmRequest,oldFSM);
+		}
+		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_COMPLETE) ) {
 			handleFSMComplete(fsmRequest,oldFSM);
 		}
@@ -224,6 +228,12 @@ public class FSMService {
 		}
 	}
 	
+	private void handleDSOReject(FSMRequest fsmRequest, FSM oldFSM) {
+		FSM fsm = fsmRequest.getFsm();
+		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
+		fsm.setDsoId(null);
+		fsm.setVehicleId(null);
+	}
 	private void handleFSMComplete(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
 		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();

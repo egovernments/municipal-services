@@ -49,9 +49,9 @@ public class VehicleLogValidator {
 		if (request.getVehicleLog().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(VehicleLogConstants.INVALID_TENANT, " Invalid TenantId");
 		}
-		if (StringUtils.isEmpty(request.getVehicleLog().getDsoId())) {
-			throw new CustomException(VehicleLogConstants.INVALID_VEHICLELOG_ERROR, "dsoId is mandatory");
-		}
+//		if (StringUtils.isEmpty(request.getVehicleLog().getDsoId())) {
+//			throw new CustomException(VehicleLogConstants.INVALID_VEHICLELOG_ERROR, "dsoId is mandatory");
+//		}
 		if (StringUtils.isEmpty(request.getVehicleLog().getVehicleId())) {
 			throw new CustomException(VehicleLogConstants.INVALID_VEHICLELOG_ERROR, "vehicleId is mandatory");
 		}

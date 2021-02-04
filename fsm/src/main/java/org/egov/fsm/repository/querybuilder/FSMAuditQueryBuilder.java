@@ -36,8 +36,8 @@ public class FSMAuditQueryBuilder {
 		if (StringUtils.isNotEmpty(criteria.getId())) {
 			fsmDataQuery = fsmDataQuery.append(String.format(FSM_ID, criteria.getId()));
 		}
-		if (StringUtils.isNotEmpty(criteria.getApplicationNumber())) {
-			fsmDataQuery = fsmDataQuery.append(String.format(APPLICATION_NO, criteria.getApplicationNumber()));
+		if (StringUtils.isNotEmpty(criteria.getApplicationNo())) {
+			fsmDataQuery = fsmDataQuery.append(String.format(APPLICATION_NO, criteria.getApplicationNo()));
 		}
 		fsmDataQuery.append(" order by fsm.lastmodifiedtime desc");
 		return fsmDataQuery.toString();

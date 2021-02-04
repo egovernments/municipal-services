@@ -24,9 +24,9 @@ public class FSMAuditSearchCriteria {
     @JsonProperty("tenantId")
     private String tenantId;
     
-    @JsonProperty("applicationNumber")
-    private String applicationNumber;
+    @JsonProperty("applicationNo")
+    private String applicationNo;
     
-    @JsonProperty("ids")
+    @JsonProperty("id")
     private String id;
 }

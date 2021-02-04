@@ -102,6 +102,8 @@ public class FSMConstants {
 
 	public static final String WF_ACTION_SEND_BACK = "SENDBACK";
 
+	public static final String WF_ACTION_DSO_REJECT = "DSO_REJECT";
+
 	
 
 

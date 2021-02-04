@@ -129,7 +129,7 @@ public class Validator {
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH, "Search on suctionType is not allowed");
 		
 
-		if (criteria.getTankCapicity() != null && !allowedParams.contains("tankCapacity"))
+		if (criteria.getTankCapacity() != null && !allowedParams.contains("tankCapacity"))
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH, "Search on tankCapacity is not allowed");
 		
 		
