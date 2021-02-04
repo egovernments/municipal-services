@@ -48,7 +48,7 @@ public class TradeLicenseDetail   {
     @JsonProperty("operationalArea")
     @Pattern(regexp="^[a-zA-Z0-9!@#.,-/: ()&']*$")
     @Size(max=64)
-    private Double operationalArea;
+    private String operationalArea;
 
     @JsonProperty("noOfEmployees")
     private Integer noOfEmployees;
