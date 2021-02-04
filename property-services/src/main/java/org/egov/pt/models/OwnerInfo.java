@@ -19,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
@@ -266,8 +265,4 @@ public class OwnerInfo extends User {
 				+ getCreatedDate() + ", LastModifiedBy=" + getLastModifiedBy() + ", LastModifiedDate="
 				+ getLastModifiedDate() + ", TenantId=" + getTenantId() + "]";
 	}
-
-
-
-
 }
