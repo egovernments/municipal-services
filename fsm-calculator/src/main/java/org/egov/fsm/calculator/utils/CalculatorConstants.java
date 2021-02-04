@@ -17,6 +17,14 @@ public class CalculatorConstants {
     public static final String MDMS_CALCULATIONTYPE_FINANCIALYEAR_PATH = "$.MdmsRes.BPA.CalculationType[?(@.financialYear=='{}')]";
     
     public static final String APPLICATION_FEE="APPLICATION_FEE";
+        
+    public static final String MODULE_CODE = "FSM";
+    
+    public static final String FSM_JSONPATH_CODE = "$.MdmsRes.FSM";
+    
+ // mdms master names
+
+ 	public static final String PROPERTY_TYPE = "PropertyType";
 	
 	// Error messages in FSM Calculator
 	
@@ -35,5 +43,13 @@ public class CalculatorConstants {
 	public static final String MDMS_ROUNDOFF_TAXHEAD="TL_ROUNDOFF";
 	
 	public static final String APPLICATION_NOT_FOUND="APPLICATION_NOT_FOUND";
+	
+	public static final String INVALID_BILLING_SLAB_ERROR ="INVALID_BILLING_SLAB_ERROR";
+	
+	public static final String INVALID_PROPERTY_TYPE = "INVALID_PROPERTY_TYPE";
+	
+	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
+
+	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
 	
 }
