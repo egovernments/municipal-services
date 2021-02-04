@@ -157,7 +157,7 @@ public class MDMSService {
     }
 
 
-    @Cacheable(value = "mdmsCache", key = "tenantId", sync = true)
+    @Cacheable(value = "mdmsCache", key = "'tenantId'", sync = true)
     public Object mDMSCall(RequestInfo requestInfo,String tenantId){
         MdmsCriteriaReq mdmsCriteriaReq = getMDMSRequest(requestInfo,tenantId);
         StringBuilder url = getMdmsSearchUrl();
