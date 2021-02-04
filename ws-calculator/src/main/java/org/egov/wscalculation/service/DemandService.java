@@ -602,6 +602,8 @@ public class DemandService {
 		if (null == interestPenaltyEstimates)
 			return isCurrentDemand;
 
+		System.out.println("\ninterestPenaltyEstimates-->"+interestPenaltyEstimates.toString()+"\n");
+
 		BigDecimal penalty = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_PENALTY);
 		BigDecimal interest = interestPenaltyEstimates.get(WSCalculationConstant.WS_TIME_INTEREST);
 
