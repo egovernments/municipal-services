@@ -156,6 +156,7 @@ config:
       - work-dir: "fsm/src/main/resources/db"
         image-name: "fsm-db"
 
+
   - name: "builds/municipal-services/vehicle"
     build:
       - work-dir: "vehicle"
@@ -171,7 +172,7 @@ config:
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "vendor/src/main/resources/db"
         image-name: "vendor-db"
-        
+
   - name: "builds/municipal-services/fsm-calculator"
     build:
       - work-dir: "fsm-calculator"
