@@ -54,7 +54,7 @@ public class Vehicle {
 	@JsonProperty("type")
 	private String type = null;
 
-	@JsonProperty("tankCapicity")
+	@JsonProperty("tankCapacity")
 	private Long tankCapicity = null;
 
 	@JsonProperty("suctionType")

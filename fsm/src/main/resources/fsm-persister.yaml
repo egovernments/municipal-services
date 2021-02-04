@@ -317,4 +317,3 @@ serviceMaps:
                 - jsonPath: $.fsm.auditDetails.lastModifiedTime
                 
                 - jsonPath: $.fsm.id
-  

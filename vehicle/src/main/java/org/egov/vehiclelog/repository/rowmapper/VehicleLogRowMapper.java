@@ -62,9 +62,9 @@ public class VehicleLogRowMapper implements ResultSetExtractor<List<VehicleLog>>
 				audit = audit.builder().createdBy(createdBy).lastModifiedBy(lastModifiedBy).createdTime(createdTime)
 						.lastModifiedTime(lastModifiedTime).build();
 
-				vehicleLog = VehicleLog.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
-						.applicationStatus(applicationStatus).dsoId(dsoId).vehicleId(vehicleId).wasteDumped(wasteDumped)
-						.dumpTime(dumpTime).status(StatusEnum.valueOf(status)).auditDetails(audit).build();
+//				vehicleLog = VehicleLog.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
+//						.applicationStatus(applicationStatus).dsoId(dsoId).vehicleId(vehicleId).wasteDumped(wasteDumped)
+//						.dumpTime(dumpTime).status(StatusEnum.valueOf(status)).auditDetails(audit).build();
 			}
 //			addChildrenToProperty(rs, vehicleLog);
 			vehicleLogMap.put(id, vehicleLog);

@@ -55,7 +55,7 @@ public class RowMapper  implements ResultSetExtractor<List<Vehicle>> {
 					lastModifiedTime = null;
 				}
 
-				currentVehicle = Vehicle.builder().tenantId(tenantId).registrationNumber(registrationNumber).model(model).type(type).tankCapicity(tankCapicity)
+				currentVehicle = Vehicle.builder().tenantId(tenantId).registrationNumber(registrationNumber).model(model).type(type).tankCapacity(tankCapicity)
 						.suctionType(suctionType).pollutionCertiValidTill(pollutionCertiValidTill).InsuranceCertValidTill(InsuranceCertValidTill)
 						.fitnessValidTill(fitnessValidTill).roadTaxPaidTill(roadTaxPaidTill).gpsEnabled(gpsEnabled).source(source).ownerId(owner_id)
 						.status(Vehicle.StatusEnum.valueOf(status)).additionalDetails(additionalDetails).id(id).build();

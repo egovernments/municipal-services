@@ -47,8 +47,8 @@ public class VehicleSearchCriteria {
 	@JsonProperty("model")
 	private List<String> model;
 	
-	@JsonProperty("tankCapicity")
-	private Double tankCapicity;
+	@JsonProperty("tankCapacity")
+	private Double tankCapacity;
 	
 	@JsonProperty("suctionType")
 	private List<String> suctionType;
@@ -82,7 +82,7 @@ public class VehicleSearchCriteria {
 
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
-		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null && this.tankCapicity ==null
+		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null && this.tankCapacity ==null
 				&&  CollectionUtils.isEmpty(this.ownerId)  && CollectionUtils.isEmpty(this.type)
 				&& CollectionUtils.isEmpty(this.ids) && CollectionUtils.isEmpty(this.registrationNumber)
 				&& CollectionUtils.isEmpty(this.model) && CollectionUtils.isEmpty(this.suctionType));
@@ -90,7 +90,7 @@ public class VehicleSearchCriteria {
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
-		return (this.tenantId != null && this.mobileNumber == null && this.tankCapicity ==null
+		return (this.tenantId != null && this.mobileNumber == null && this.tankCapacity ==null
 				&&  CollectionUtils.isEmpty(this.ownerId)  && CollectionUtils.isEmpty(this.type)
 				&& CollectionUtils.isEmpty(this.ids) && CollectionUtils.isEmpty(this.registrationNumber)
 				&& CollectionUtils.isEmpty(this.model) && CollectionUtils.isEmpty(this.suctionType));

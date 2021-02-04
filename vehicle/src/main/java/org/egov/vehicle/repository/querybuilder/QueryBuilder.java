@@ -153,10 +153,10 @@ public class QueryBuilder {
 			}
 		}
 		
-		if( criteria.getTankCapicity() !=null) {
+		if( criteria.getTankCapacity() !=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" tankcapacity = ?");
-			preparedStmtList.add(criteria.getTankCapicity());
+			builder.append(" tankcapicity = ?");
+			preparedStmtList.add(criteria.getTankCapacity());
 		}
 		
 		List<String> ownerIds = criteria.getOwnerId();

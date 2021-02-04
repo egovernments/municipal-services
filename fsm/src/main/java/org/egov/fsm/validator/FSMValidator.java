@@ -276,7 +276,7 @@ public class FSMValidator {
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "TenantId is mandatory in search");
 		}
 		else {
-			 if(StringUtils.isEmpty(criteria.getApplicationNumber()) && StringUtils.isEmpty(criteria.getId())) {
+			 if(StringUtils.isEmpty(criteria.getApplicationNo()) && StringUtils.isEmpty(criteria.getId())) {
 				 throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "applicationNo or id is mandatory in search");
 			 }
 		}
