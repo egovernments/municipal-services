@@ -209,9 +209,15 @@ public class WSCalculationConstant {
 
 	public static final String WS_ROAD_CUTTING_CHARGE = "WS_ROAD_CUTTING_CHARGE";
 
-	public static final String WS_METER_CHARGE = "WS_METER_CHARGE";
+	public static final String WS_METER_TESTING_FEE = "WS_METER_TESTING_FEE";
 	
-	public static final String WS_SECURITY_CHARGE = "WS_SECURITY_CHARGE";
+	public static final String WS_SECURITY_DEPOSIT= "WS_SECURITY_DEPOSIT";
+	
+	public static final String WS_SECURITY_CHARGE_CONST = "securityCharge";
+	
+	public static final String WS_CONNECTION_FEE = "WS_CONNECTION_FEE";
+	
+	public static final String WS_CONNECTION_FEE_CONST = "connectionFee";
 	
 	public static final String WS_OTHER_CHARGE = "WS_OTHER_CHARGE";
 	
@@ -225,9 +231,9 @@ public class WSCalculationConstant {
 
 	public static final String SCRUTINY_FEE_CONST = "scrutinyFee";
 	
-	public static final String METER_COST_CONST = "meterCost";
+	public static final String METER_TESTING_FEE_CONST = "meterTestingFee";
 	
-	public static final String OTHER_CHARGE_CONST = "other";
+	public static final String OTHER_FEE_CONST = "othersFee";
 	
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
 
@@ -248,6 +254,33 @@ public class WSCalculationConstant {
 	public static final String WS_TIME_ADHOC_PENALTY = "WS_TIME_ADHOC_PENALTY";
 	
 	public static final String WS_TIME_ADHOC_REBATE = "WS_TIME_ADHOC_REBATE";
+
+	public static final String  COMPOSITION_FEE= "WS_COMPOSITION_FEE";
+	
+	public static final String COMPOSITION_FEE_CONST = "compositionFee";
+
+	public static final String  USER_CHARGES_CONST = "userCharges";
+	
+	public static final String  USER_CHARGES = "WS_USER_CHARGE";
+	
+	public static final String OTHER_FEE="WS_OTHER_FEE";
+
+	public static final String  BILLINGTYPE = "billingType";
+
+	public static final String CUSTOM = "CUSTOM";
+
+	public static final String  CUSTOM_BILL_AMOUNT = "billingAmount";
+
+	public static final String LOCKED = "Locked";
+
+	public static final String NO_METER = "No-meter";
+	
+	public static final String BREAKDOWN= "Breakdown";
+
+	public static final String AVARAGEMETERREADING = "avarageMeterReading";
+
+	public static final String  ACTIVE_CONNECTION = "Active";
+	
 
 
 	
