@@ -25,6 +25,7 @@ import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
+import org.egov.swcalculation.web.models.BillResponseV2;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
@@ -654,7 +655,7 @@ public class DemandService {
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (SewerageDetails detail : connectionNos) {
-				boolean isValidConnection = validateSewerageConnection(detail);
+				boolean isValidConnection = validateSewerageConnection(detail,taxperiodfrom,taxperiodto,tenantId,requestInfo);
 				if (isValidConnection) {
 					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 							.assessmentYear(estimationService.getAssessmentYear())
@@ -670,15 +671,48 @@ public class DemandService {
 		}
 	}
 
-	private boolean validateSewerageConnection(SewerageDetails detail) {
+	private boolean validateSewerageConnection(SewerageDetails detail,long taxPeriodFrom,long taxPeriodTo,String tenantId,RequestInfo requestInfo) {
 		boolean isValidSewerageConnection = true;
 
 		if (System.currentTimeMillis() < detail.getConnectionExecutionDate()) {
 
 			isValidSewerageConnection = false;
 		}
+		
+		if (detail.getConnectionExecutionDate() < taxPeriodFrom) {
+
+			isValidSewerageConnection = fetchBill(detail, taxPeriodFrom, taxPeriodTo, tenantId, requestInfo);
+
+		}
 
 		return isValidSewerageConnection;
+	}
+	
+	
+	
+	private boolean fetchBill(SewerageDetails sewerageDetails, long taxPeriodFrom, long taxPeriodTo, String tenantId,
+			RequestInfo requestInfo) {
+
+		final boolean[] isConnectionValid = { false };
+
+		Object result = serviceRequestRepository.fetchResult(
+				calculatorUtils.getFetchBillURL(tenantId, sewerageDetails.getConnectionNo()),
+				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+		BillResponseV2 billResponse = mapper.convertValue(result, BillResponseV2.class);
+		billResponse.getBill().forEach(bill -> {
+			bill.getBillDetails().forEach(billDetail -> {
+
+				long previousBillingCycleToDate = taxPeriodFrom - 86400000;
+				if (billDetail.getToPeriod() == previousBillingCycleToDate) {
+					isConnectionValid[0] = true;
+				}
+
+			});
+
+		});
+
+		return isConnectionValid[0];
+
 	}
 
 	/**
