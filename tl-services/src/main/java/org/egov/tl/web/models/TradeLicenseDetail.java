@@ -57,7 +57,9 @@ public class TradeLicenseDetail   {
         private String structureType;
 
         @JsonProperty("operationalArea")
-        private Double operationalArea;
+        @Pattern(regexp="^[a-zA-Z0-9 .+_-/]*$")
+    	@Size(max=64)
+        private String operationalArea;
 
         @JsonProperty("noOfEmployees")
         private Integer noOfEmployees;

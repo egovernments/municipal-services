@@ -1,0 +1,1 @@
+ALTER TABLE eg_tl_address ALTER COLUMN operationalArea TYPE character varying(64);
