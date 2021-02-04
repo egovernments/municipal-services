@@ -144,7 +144,7 @@ public class TLRowMapper  implements ResultSetExtractor<List<TradeLicense>> {
                     .lastModifiedTime(rs.getLong("tld_createdTime"))
                     .build();
 
-            Double operationalArea = (Double) rs.getObject("operationalArea");
+            String operationalArea = (String) rs.getObject("operationalArea");
             Integer noOfEmployees = (Integer) rs.getObject("noOfEmployees");
             PGobject pgObj = (PGobject) rs.getObject("additionaldetail");
             try {
