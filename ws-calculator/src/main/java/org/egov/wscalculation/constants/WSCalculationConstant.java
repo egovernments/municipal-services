@@ -145,10 +145,15 @@ public class WSCalculationConstant {
 	public static final String pipeSizeConst = "Pipe Size";
 
 	public static final String BILLING_PERIOD = "billingPeriod";
+	
+	public static final String SCHEDULER_BILLING_PERIOD = "schedulerBillingPeriod";
 
 	public static final String ConnectionType = "connectionType";
 
 	public static final String JSONPATH_ROOT_FOR_BilingPeriod = "$.MdmsRes.ws-services-masters.billingPeriod";
+	
+	public static final String JSONPATH_ROOT_FOR_SCHEDULER_BilingPeriod = "$.MdmsRes.ws-services-masters.schedulerBillingPeriod";
+
 
 	public static final String Quaterly_Billing_Period = "quarterly";
 

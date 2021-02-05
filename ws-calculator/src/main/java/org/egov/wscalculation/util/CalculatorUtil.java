@@ -315,6 +315,30 @@ public class CalculatorUtil {
 		List<Map<String, Object>> jsonOutput = JsonPath.read(res, WSCalculationConstant.JSONPATH_ROOT_FOR_BilingPeriod);
 		return jsonOutput.get(0);
 	}
+	
+	public Map<String, Object> getSchedulerBillingMasterData(RequestInfo requestInfo, String tenantId) {
+		MdmsCriteriaReq mdmsCriteriaReq = getBillingPeriodForScheduler(requestInfo, tenantId);
+		Object res = serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsCriteriaReq);
+		if (res == null) {
+			throw new CustomException("MDMS_ERROR_FOR_SCHEDULER_BILLING_PERIOD", "ERROR IN FETCHING THE SCHEDULER BILLING PERIOD");
+		}
+		List<Map<String, Object>> jsonOutput = JsonPath.read(res, WSCalculationConstant.JSONPATH_ROOT_FOR_SCHEDULER_BilingPeriod);
+		return jsonOutput.get(0);
+	}
+	
+	
+	private  MdmsCriteriaReq getBillingPeriodForScheduler(RequestInfo requestInfo, String tenantId) {
+
+		MasterDetail masterDetail = MasterDetail.builder().name(WSCalculationConstant.SCHEDULER_BILLING_PERIOD)
+				.filter("[?(@.active== " + true + " && @.connectionType== '" + WSCalculationConstant.nonMeterdConnection
+						+ "')]")
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(WSCalculationConstant.WS_MODULE)
+				.masterDetails(Arrays.asList(masterDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
 
 	public Property getProperty(RequestInfo requestInfo, String tenantId, String propertyId) {
 		String propertySearchURL = getPropertySearchURL(propertyId, tenantId);
