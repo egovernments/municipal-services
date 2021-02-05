@@ -639,10 +639,14 @@ public class DemandService {
 	 * @param tenantId
 	 *            TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo,long taxPeriodFrom, long taxPeriodTo) {
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom,  taxPeriodTo);
+		Map<String, Object> billingPeriod = calculatorUtils.getSchedulerBillingMasterData(requestInfo, tenantId);
+		long taxPeriodFrom = billingPeriod.get("taxPeriodFrom") == null ? 0l
+				: (long) billingMasterData.get("taxPeriodFrom");
+		long taxPeriodTo = billingPeriod.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
+		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
 	}
 
 	/**
