@@ -12,5 +12,5 @@ public interface WSCalculationService {
 
 	void jobScheduler();
 
-	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo,long taxPeriodFrom, long taxPeriodTo);
+	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
 }
