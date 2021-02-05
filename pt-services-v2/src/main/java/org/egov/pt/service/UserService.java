@@ -1,21 +1,41 @@
 package org.egov.pt.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.pt.repository.ServiceRequestRepository;
-import org.egov.pt.web.models.*;
+import org.egov.pt.web.models.CreateUserRequest;
+import org.egov.pt.web.models.OwnerInfo;
+import org.egov.pt.web.models.Property;
+import org.egov.pt.web.models.PropertyCriteria;
+import org.egov.pt.web.models.PropertyDetail;
+import org.egov.pt.web.models.PropertyRequest;
+import org.egov.pt.web.models.Role;
+import org.egov.pt.web.models.UserDetailResponse;
+import org.egov.pt.web.models.UserSearchRequest;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -47,48 +67,44 @@ public class UserService {
      * @param request PropertyRequest received for creating properties
      */
     public void createUser(PropertyRequest request){
-        List<Property> properties = request.getProperties();
-        RequestInfo requestInfo = request.getRequestInfo();
-        Role role = getCitizenRole();
-        properties.forEach(property -> {
-            property.getPropertyDetails().forEach(propertyDetail -> {
-                // Fetches the unique mobileNumbers from all the owners
-                Set<String> listOfMobileNumbers = getMobileNumbers(propertyDetail,requestInfo,property.getTenantId());
-                propertyDetail.getOwners().forEach(owner -> {
-                        addUserDefaultFields(property.getTenantId(),role,owner);
-                        // Checks if the user is already present based on name of the owner and mobileNumber
-                        UserDetailResponse userDetailResponse = userExists(owner,requestInfo);
-                        // If user not present new user is created
-                        if(CollectionUtils.isEmpty(userDetailResponse.getUser()))
-                        {   /* Sets userName equal to mobileNumber if mobileNumber already assigned as username
-                          random number is assigned as username */
-                            StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
-                            setUserName(owner,listOfMobileNumbers);
+		RequestInfo requestInfo = request.getRequestInfo();
 
-                            userDetailResponse = userCall(new CreateUserRequest(requestInfo,owner),uri);
-                            if(userDetailResponse.getUser().get(0).getUuid()==null){
-                                throw new CustomException("INVALID USER RESPONSE","The user created has uuid as null");
-                            }
-                        }
-                        else
-                        {
-                          owner.setId(userDetailResponse.getUser().get(0).getId());
-                          owner.setUuid(userDetailResponse.getUser().get(0).getUuid());
-                          addUserDefaultFields(property.getTenantId(),role,owner);
+		for (Property property : request.getProperties()) {
+			Role role = getCitizenRole();
+			for (PropertyDetail propertydetail : property.getPropertyDetails()) {
+				Set<OwnerInfo> owners = propertydetail.getOwners();
 
-                          StringBuilder uri = new StringBuilder(userHost).append(userContextPath)
-                                              .append(userUpdateEndpoint);
-                          userDetailResponse = userCall( new CreateUserRequest(requestInfo,owner),uri);
-                            if(userDetailResponse.getUser().get(0).getUuid()==null){
-                                throw new CustomException("INVALID USER RESPONSE","The user updated has uuid as null");
-                            }
-                        }
-                        // Assigns value of fields from user got from userDetailResponse to owner object
-                        setOwnerFields(owner,userDetailResponse,requestInfo);
-                });
-            });
-        });
-    }
+				for (OwnerInfo ownerFromRequest : owners) {
+
+					addUserDefaultFields(property.getTenantId(), role, ownerFromRequest);
+					UserDetailResponse userDetailResponse = userExists(ownerFromRequest, requestInfo);
+					List<OwnerInfo> existingUsersFromService = userDetailResponse.getUser();
+					Map<String, OwnerInfo> ownerMapFromSearch = existingUsersFromService.stream()
+							.collect(Collectors.toMap(OwnerInfo::getUuid, Function.identity()));
+
+					if (CollectionUtils.isEmpty(existingUsersFromService)) {
+
+						ownerFromRequest.setUserName(UUID.randomUUID().toString());
+						userDetailResponse = createUser(requestInfo, ownerFromRequest);
+
+					} else {
+
+						String uuid = ownerFromRequest.getUuid();
+						if (uuid != null && ownerMapFromSearch.containsKey(uuid)) {
+							userDetailResponse = updateExistingUser(property, requestInfo, role, ownerFromRequest,
+									ownerMapFromSearch.get(uuid));
+						} else {
+
+							ownerFromRequest.setUserName(UUID.randomUUID().toString());
+							userDetailResponse = createUser(requestInfo, ownerFromRequest);
+						}
+					}
+					// Assigns value of fields from user got from userDetailResponse to owner object
+					setOwnerFields(ownerFromRequest, userDetailResponse, requestInfo);
+				}
+			}
+		}
+	}
 
 
     /**
@@ -379,6 +395,42 @@ public class UserService {
 
     }
 
+	private UserDetailResponse createUser(RequestInfo requestInfo, OwnerInfo owner) {
+		UserDetailResponse userDetailResponse;
+		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userCreateEndpoint);
 
+		CreateUserRequest userRequest = CreateUserRequest.builder().requestInfo(requestInfo).user(owner).build();
+
+		userDetailResponse = userCall(userRequest, uri);
+
+		if (ObjectUtils.isEmpty(userDetailResponse)) {
+
+			throw new CustomException("INVALID USER RESPONSE",
+					"The user create has failed for the mobileNumber : " + owner.getUserName());
+
+		}
+		return userDetailResponse;
+	}
+
+	/**
+	 * update existing user
+	 * 
+	 */
+	private UserDetailResponse updateExistingUser(Property property, RequestInfo requestInfo, Role role,
+			OwnerInfo ownerFromRequest, OwnerInfo ownerInfoFromSearch) {
+
+		UserDetailResponse userDetailResponse;
+
+		ownerFromRequest.setId(ownerInfoFromSearch.getId());
+		ownerFromRequest.setUuid(ownerInfoFromSearch.getUuid());
+		addUserDefaultFields(property.getTenantId(), role, ownerFromRequest);
+
+		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
+		userDetailResponse = userCall(new CreateUserRequest(requestInfo, ownerFromRequest), uri);
+		if (userDetailResponse.getUser().get(0).getUuid() == null) {
+			throw new CustomException("INVALID USER RESPONSE", "The user updated has uuid as null");
+		}
+		return userDetailResponse;
+	}
 
 }
