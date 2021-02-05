@@ -24,6 +24,7 @@ import org.egov.fsm.web.model.FSMAudit;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.user.UserDetailResponse;
@@ -233,6 +234,10 @@ public class FSMService {
 		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
 		fsm.setDsoId(null);
 		fsm.setVehicleId(null);
+		Workflow workflow = fsmRequest.getWorkflow();
+		if(!StringUtils.hasLength(workflow.getComments())) {
+			throw new CustomException(FSMErrorConstants.INVALID_COMMENT_CANCEL_REJECT," Comment is mandatory to reject or cancel the application !.");
+		}
 	}
 	private void handleFSMComplete(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
@@ -260,6 +265,10 @@ public class FSMService {
 	
 	private void handleRejectCancel(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
+		Workflow workflow = fsmRequest.getWorkflow();
+		if(!StringUtils.hasLength(workflow.getComments())) {
+			throw new CustomException(FSMErrorConstants.INVALID_COMMENT_CANCEL_REJECT," Comment is mandatory to reject or cancel the application !.");
+		}
 	}
 
 	private void handleSendBack(FSMRequest fsmRequest, FSM oldFSM) {
@@ -285,7 +294,7 @@ public class FSMService {
 			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 		}
 		
-		if( criteria.getMobileNumber() !=null) {
+		if( criteria.getMobileNumber() !=null && StringUtils.hasText(criteria.getMobileNumber() )) {
 			usersRespnse = userService.getUser(criteria,requestInfo);
 			if(usersRespnse !=null && usersRespnse.getUser() != null && usersRespnse.getUser().size() >0) {
 				uuids = usersRespnse.getUser().stream().map(User::getUuid).collect(Collectors.toList());

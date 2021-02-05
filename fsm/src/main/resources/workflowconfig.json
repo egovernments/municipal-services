@@ -1,669 +1,367 @@
 {
-    "RequestInfo": {
-        "apiId": "Rainmaker",
-        "action": "",
-        "did": 1,
-        "key": "",
-        "msgId": "20170310130900|en_IN",
-        "requesterId": "",
-        "ts": 1513579888683,
-        "ver": ".01",
-        "authToken": "1cfcae86-b964-439f-9aa3-f0df97ef3265"
-    },
-    "BusinessServices": [
+    "tenantId": "pb.amritsar",
+    "uuid": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
+    "businessService": "FSM",
+    "business": "fsm",
+    "businessServiceSla": 5184000000,
+    "states": [
         {
             "tenantId": "pb.amritsar",
-            "uuid": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-            "businessService": "FSM",
-            "business": "fsm",
-            "businessServiceSla": 5184000000,
-            "states": [
+            
+            "sla": null,
+            "state": null,
+            "applicationStatus": null,
+            "docUploadRequired": false,
+            "isStartState": true,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
                 {
-                    "uuid": "1793c657-4235-44f4-b2b7-fe6d057cebaf",
+                   
                     "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": null,
-                    "applicationStatus": null,
-                    "docUploadRequired": false,
-                    "isStartState": true,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "8e8a4fc1-f447-4d14-b7c2-1599266670a8",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "1793c657-4235-44f4-b2b7-fe6d057cebaf",
-                            "action": "APPLY",
-                            "nextState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "roles": [
-                                "FSM_CREATOR_EMP"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "08b36439-c885-42cd-ab8f-5f5755836ec3",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "1793c657-4235-44f4-b2b7-fe6d057cebaf",
-                            "action": "CREATE",
-                            "nextState": "acf0f0b9-a94d-4fde-8ecf-1fd2b2715f96",
-                            "roles": [
-                                "CITIZEN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
+                    "action": "CREATE",
+                    "nextState": "CREATED",
+                    "roles": [
+                        "CITIZEN"
+                    ]
                 },
                 {
-                    "uuid": "acf0f0b9-a94d-4fde-8ecf-1fd2b2715f96",
+                  
                     "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "CREATED",
-                    "applicationStatus": "CREATED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "ba4e58c5-6bbe-4815-b934-62ac43a855a0",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "acf0f0b9-a94d-4fde-8ecf-1fd2b2715f96",
-                            "action": "SUBMIT",
-                            "nextState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "roles": [
-                                "FSM_EDITOR_EMP"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "7c16bea0-d355-4484-ab90-4c11fbf99de9",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "acf0f0b9-a94d-4fde-8ecf-1fd2b2715f96",
-                            "action": "REJECT",
-                            "nextState": "ee107e87-2330-4a35-9d2e-8c20b51dc28c",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "PENDING_APPL_FEE_PAYMENT",
-                    "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "ac56770f-f8a6-4710-a10c-4dab0c357428",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "action": "PAY",
-                            "nextState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "roles": [
-                                "CITIZEN",
-                                "FSM_COLLECTOR"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "1a2cb341-96bb-403b-b851-5716f5de06c0",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "action": "CANCEL",
-                            "nextState": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "53b7bc91-1514-4cbb-90c9-283d04afd439",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "action": "SENDBACK",
-                            "nextState": "acf0f0b9-a94d-4fde-8ecf-1fd2b2715f96",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "ASSING_DSO",
-                    "applicationStatus": "ASSING_DSO",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "de8a4973-30a6-4ed9-83b7-02d604d4bbca",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "action": "ASSIGN",
-                            "nextState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "roles": [
-                                "FSM_EDITOR_EMP"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "59325a57-0e82-42a1-9d19-b395f4f5c714",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "action": "CANCEL",
-                            "nextState": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "82660709-27e3-4efb-a6af-ba3c8698293e",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "action": "SENDBACK",
-                            "nextState": "dea34a3a-9b9a-4173-b59b-77c4afce870f",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "1fe19e77-0f44-4a77-8741-6cdd04777f8d",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "DSO_REJECTED",
-                    "applicationStatus": "DSO_REJECTED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "50e402cb-1e4e-4bb3-992e-470ca74fc44c",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "1fe19e77-0f44-4a77-8741-6cdd04777f8d",
-                            "action": "ASSIGN",
-                            "nextState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "roles": [
-                                "FSM_EDITOR_EMP"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "1cc34fe1-e09d-4237-9539-bf4da5c18bfc",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "1fe19e77-0f44-4a77-8741-6cdd04777f8d",
-                            "action": "SENDBACK",
-                            "nextState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1610213317315
-                            }
-                        },
-                        {
-                            "uuid": "41e696b7-8a14-4abd-9f0d-f0615ef06ff8",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "1fe19e77-0f44-4a77-8741-6cdd04777f8d",
-                            "action": "CANCEL",
-                            "nextState": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "DSO_INPROGRESS",
-                    "applicationStatus": "DSO_INPROGRESS",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "3a388559-2ea2-4ed2-bf91-0b331088d1ff",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "action": "ADDITIONAL_PAY_REQUEST",
-                            "nextState": "65d887aa-8152-4b86-a5cc-03d595694e0a",
-                            "roles": [
-                                "FSM_DSO"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "84668198-6fd0-43f1-9080-40a5ab32a4a2",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "action": "CANCEL",
-                            "nextState": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "ce308143-dcbe-4c8e-9a8d-eb181c04f3ef",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "action": "SENDBACK",
-                            "nextState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "d86fb899-93d6-4246-b187-2ce46025ac40",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "action": "DECLINE",
-                            "nextState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "roles": [
-                                "FSM_DSO"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1610213317315
-                            }
-                        },
-                        {
-                            "uuid": "72c9901f-5d61-48a9-bec6-d54f3183a492",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "action": "COMPLETED",
-                            "nextState": "8a33317f-6366-4738-999b-b9453e7f498f",
-                            "roles": [
-                                "FSM_DSO",
-                                "FSM_EDITOR_EMP"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "PENDING_DSO_APPROVAL",
-                    "applicationStatus": "PENDING_DSO_APPROVAL",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "4c2173db-b7b8-4d81-a2fb-fe547bd62cbb",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "action": "SENDBACK",
-                            "nextState": "43dfba5b-e72a-4ef8-a51b-c24e8bf4dddb",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "67172a39-8389-49d6-a664-2c61db36f26b",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "action": "DSO_ACCEPT",
-                            "nextState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "roles": [
-                                "FSM_DSO"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "386ab703-14b3-49a7-9408-fbe0e174d2b8",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "43ecfb31-5e8b-4fe1-a8db-cdf77f5805a8",
-                            "action": "DSO_REJECT",
-                            "nextState": "1fe19e77-0f44-4a77-8741-6cdd04777f8d",
-                            "roles": [
-                                "FSM_DSO"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "65d887aa-8152-4b86-a5cc-03d595694e0a",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "PENDING_ADDITIONAL_PAYMENT",
-                    "applicationStatus": "PENDING_ADDITIONAL_PAYMENT",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": true,
-                    "actions": [
-                        {
-                            "uuid": "3e241417-1290-4ab5-948e-119f66ab39fe",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "65d887aa-8152-4b86-a5cc-03d595694e0a",
-                            "action": "PAY",
-                            "nextState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "roles": [
-                                "CITIZEN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "b678c229-bb3b-490a-b8fe-8c45634c3ce8",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "65d887aa-8152-4b86-a5cc-03d595694e0a",
-                            "action": "CANCEL",
-                            "nextState": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        },
-                        {
-                            "uuid": "0fd18843-e1b5-42f7-9a87-3e3c994b636c",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "65d887aa-8152-4b86-a5cc-03d595694e0a",
-                            "action": "SENDBACK",
-                            "nextState": "dfedd46b-1901-4875-9102-e2cf8b23efb3",
-                            "roles": [
-                                "FSM_ADMIN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1610213317315,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "8a33317f-6366-4738-999b-b9453e7f498f",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "CITIZEN_FEEDBACK_PENDING",
-                    "applicationStatus": "COMPLETED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": false,
-                    "isStateUpdatable": false,
-                    "actions": [
-                        {
-                            "uuid": "9b0e0ae1-fd85-425d-9e4e-65f5e1f1aabc",
-                            "tenantId": "pb.amritsar",
-                            "currentState": "8a33317f-6366-4738-999b-b9453e7f498f",
-                            "action": "SUBMIT_FEEDBACK",
-                            "nextState": "c6c25705-dd32-49ce-b709-2e2920055c00",
-                            "roles": [
-                                "CITIZEN"
-                            ],
-                            "auditDetails": {
-                                "createdBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                                "createdTime": 1611994563855,
-                                "lastModifiedTime": 1611994563855
-                            }
-                        }
-                    ],
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "ee107e87-2330-4a35-9d2e-8c20b51dc28c",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "REJECTED",
-                    "applicationStatus": "REJECTED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": true,
-                    "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "9ca650b3-418d-40d8-89e5-29e03f36a713",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "CANCELED",
-                    "applicationStatus": "CANCELED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": true,
-                    "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1610213317315,
-                        "lastModifiedTime": 1611994563855
-                    }
-                },
-                {
-                    "uuid": "c6c25705-dd32-49ce-b709-2e2920055c00",
-                    "tenantId": "pb.amritsar",
-                    "businessServiceId": "047a541b-ed5e-46aa-9fee-24c9674be9c3",
-                    "sla": null,
-                    "state": "COMPLETE",
-                    "applicationStatus": "COMPLETED",
-                    "docUploadRequired": false,
-                    "isStartState": false,
-                    "isTerminateState": true,
-                    "isStateUpdatable": false,
-                    "actions": null,
-                    "auditDetails": {
-                        "createdBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                        "createdTime": 1611994563855,
-                        "lastModifiedTime": 1611994563855
-                    }
+                    "action": "APPLY",
+                    "nextState": "PENDING_APPL_FEE_PAYMENT",
+                    "roles": [
+                        "FSM_CREATOR_EMP"
+                    ]
                 }
-            ],
-            "auditDetails": {
-                "createdBy": "609a634f-3120-4c3f-9d02-e9bf6af32713",
-                "lastModifiedBy": "5674253d-9c2a-4d47-88ae-450f3fbbcad2",
-                "createdTime": 1610213317315,
-                "lastModifiedTime": 1611994563855
+            ]
+        },
+        {
+           
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "CREATED",
+            "applicationStatus": "CREATED",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SUBMIT",
+                    "nextState": "PENDING_APPL_FEE_PAYMENT",
+                    "roles": [
+                        "FSM_EDITOR_EMP"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "REJECT",
+                    "nextState": "REJECTED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+            
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "PENDING_APPL_FEE_PAYMENT",
+            "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "PAY",
+                    "nextState": "ASSIGN_DS0",
+                    "roles": [
+                        "CITIZEN",
+                        "FSM_COLLECTOR"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "CREATED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "ASSING_DSO",
+            "applicationStatus": "ASSING_DSO",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "ASSIGN",
+                    "nextState": "PENDING_DSO_APPROVAL",
+                    "roles": [
+                        "FSM_EDITOR_EMP"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "PENDING_APPL_FEE_PAYMENT",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "DSO_REJECTED",
+            "applicationStatus": "DSO_REJECTED",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "ASSIGN",
+                    "nextState": "PENDING_DSO_APPROVAL",
+                    "roles": [
+                        "FSM_EDITOR_EMP"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "PENDING_DSO_APPROVAL",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "DSO_INPROGRESS",
+            "applicationStatus": "DSO_INPROGRESS",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "COMPLETED",
+                    "nextState": "CITIZEN_FEEDBACK_PENDING",
+                    "roles": [
+                        "FSM_DSO",
+                        "FSM_EDITOR_EMP"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "DECLINE",
+                    "nextState": "ASSIGN_DS0",
+                    "roles": [
+                        "FSM_DSO"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "ADDITIONAL_PAY_REQUEST",
+                    "nextState": "PENDING_ADDITIONAL_PAYMENT",
+                    "roles": [
+                        "FSM_DSO"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "PENDING_DSO_APPROVAL",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "PENDING_DSO_APPROVAL",
+            "applicationStatus": "PENDING_DSO_APPROVAL",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "DSO_ACCEPT",
+                    "nextState": "DSO_INPROGRESS",
+                    "roles": [
+                        "FSM_DSO"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "ASSIGN_DS0",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "DSO_REJECT",
+                    "nextState": "DSO_REJECTED",
+                    "roles": [
+                        "FSM_DSO"
+                    ]
+                }
+            ]
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "PENDING_ADDITIONAL_PAYMENT",
+            "applicationStatus": "PENDING_ADDITIONAL_PAYMENT",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": false,
+            "isStateUpdatable": true,
+            "actions": [
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "PAY",
+                    "nextState": "DSO_INPROGRESS",
+                    "roles": [
+                        "CITIZEN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "CANCEL",
+                    "nextState": "CANCELED",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                },
+                {
+                    "tenantId": "pb.amritsar",
+                    "action": "SENDBACK",
+                    "nextState": "DSO_INPROGRESS",
+                    "roles": [
+                        "FSM_ADMIN"
+                    ]
+                }
+            ]
+        },
+        {
+           
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "COMPLETED",
+            "applicationStatus": "COMPLETED",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": true,
+            "isStateUpdatable": false,
+            "actions": null
+        },
+        {
+            "tenantId": "pb.amritsar",
+            "sla": null,
+            "state": "REJECTED",
+            "applicationStatus": "REJECTED",
+            "docUploadRequired": false,
+            "isStartState": false,
+            "isTerminateState": true,
+            "isStateUpdatable": false,
+            "actions": null
+        },
+            {
+                "tenantId": "pb.amritsar",
+                "sla": null,
+                "state": "CANCELED",
+                "applicationStatus": "CANCELED",
+                "docUploadRequired": false,
+                "isStartState": false,
+                "isTerminateState": true,
+                "isStateUpdatable": false,
+                "actions": null
+            },
+            {
+                
+                "tenantId": "pb.amritsar",
+                "sla": null,
+                "state": "CITIZEN_FEEDBACK_PENDING",
+                "applicationStatus": "COMPLETED",
+                "docUploadRequired": false,
+                "isStartState": false,
+                "isTerminateState": false,
+                "isStateUpdatable": false,
+                "actions": [
+                    {
+                        "tenantId": "pb.amritsar",
+                        "action": "SUBMIT_FEEDBACK",
+                        "nextState": "COMPLETED",
+                        "roles": [
+                            "CITIZEN"
+                        ]
+                    }
+                ]
             }
-        }
     ]
 }

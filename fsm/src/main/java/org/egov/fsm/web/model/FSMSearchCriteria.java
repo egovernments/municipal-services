@@ -3,6 +3,7 @@ package org.egov.fsm.web.model;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -76,13 +77,13 @@ public class FSMSearchCriteria {
     
     public boolean isEmpty() {
 		// TODO Auto-generated method stub
-		 return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null
+		 return (this.tenantId == null && this.offset == null && this.limit == null && !StringUtils.hasText(this.mobileNumber)
 				 && CollectionUtils.isEmpty(this.applicationStatus)  && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNos) && CollectionUtils.isEmpty(this.ids));
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
-		return (this.tenantId != null && this.mobileNumber == null
+		return (this.tenantId != null && !StringUtils.hasText(this.mobileNumber)
                 && CollectionUtils.isEmpty(this.applicationStatus) && CollectionUtils.isEmpty(this.ownerIds) && this.fromDate == null && this.toDate == null && CollectionUtils.isEmpty(this.applicationNos) && CollectionUtils.isEmpty(this.ids));
 	} 
 }

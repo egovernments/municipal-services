@@ -13,7 +13,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * BPA application object to capture the details of land, land owners, and address of the land.
@@ -24,6 +26,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Workflow   {
   @JsonProperty("action")
   private String action = null;
@@ -39,136 +43,9 @@ public class Workflow   {
   @Valid
   private List<Document> verificationDocuments = null;
 
-  public Workflow action(String action) {
-    this.action = action;
-    return this;
-  }
-
-  /**
-   * Action on the application in certain
-   * @return action
-   **/
   
-  @Size(min=1,max=64)   public String getAction() {
-    return action;
-  }
+  @JsonProperty("rating")
+  private Integer rating = null;
 
-  public void setAction(String action) {
-    this.action = action;
-  }
-
-  public Workflow assignes(List<String> assignes) {
-    this.assignes = assignes;
-    return this;
-  }
-
-  public Workflow addAssignesItem(String assignesItem) {
-    if (this.assignes == null) {
-      this.assignes = new ArrayList<String>();
-    }
-    this.assignes.add(assignesItem);
-    return this;
-  }
-
-  /**
-   * Get assignes
-   * @return assignes
-   **/
   
-    public List<String> getAssignes() {
-    return assignes;
-  }
-
-  public void setAssignes(List<String> assignes) {
-    this.assignes = assignes;
-  }
-
-  public Workflow comments(String comments) {
-    this.comments = comments;
-    return this;
-  }
-
-  /**
-   * Unique Identifier scrutinized number
-   * @return comments
-   **/
-  
-  @Size(min=1,max=64)   public String getComments() {
-    return comments;
-  }
-
-  public void setComments(String comments) {
-    this.comments = comments;
-  }
-
-  public Workflow varificationDocuments(List<Document> verificationDocuments) {
-    this.verificationDocuments = verificationDocuments;
-    return this;
-  }
-
-  public Workflow addVerificationDocumentsItem(Document verificationDocuments) {
-    if (this.verificationDocuments == null) {
-      this.verificationDocuments = new ArrayList<Document>();
-    }
-    this.verificationDocuments.add(verificationDocuments);
-    return this;
-  }
-
-  /**
-   * Attach the workflow varification documents.
-   * @return verificationDocuments
-   **/
-      @Valid
-    public List<Document> getVerificationDocuments() {
-    return verificationDocuments;
-  }
-
-  public void setVerificationDocuments(List<Document> verificationDocuments) {
-    this.verificationDocuments = verificationDocuments;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Workflow workflow = (Workflow) o;
-    return Objects.equals(this.action, workflow.action) &&
-        Objects.equals(this.assignes, workflow.assignes) &&
-        Objects.equals(this.comments, workflow.comments) &&
-        Objects.equals(this.verificationDocuments, workflow.verificationDocuments);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(action, assignes, comments, verificationDocuments);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Workflow {\n");
-    
-    sb.append("    action: ").append(toIndentedString(action)).append("\n");
-    sb.append("    assignes: ").append(toIndentedString(assignes)).append("\n");
-    sb.append("    comments: ").append(toIndentedString(comments)).append("\n");
-    sb.append("    verificationDocuments: ").append(toIndentedString(verificationDocuments)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 }
