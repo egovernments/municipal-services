@@ -335,6 +335,9 @@ public class EstimationService {
 
 		boolean isUnitCommercial = unit.getUsageCategoryMajor().equalsIgnoreCase(configs.getUsageMajorNonResidential());
 		boolean isUnitRented = unit.getOccupancyType().equalsIgnoreCase(configs.getOccupancyTypeRented());
+		
+		boolean isUnitResidential = unit.getUsageCategoryMajor().equalsIgnoreCase(configs.getUsageMajorResidential());
+		boolean isUnitPG = unit.getOccupancyType().equalsIgnoreCase(configs.getOccupancyTypePG());
 		BigDecimal currentUnitTax;
 
         if (null == slab) {
@@ -346,7 +349,7 @@ public class EstimationService {
             throw new CustomException(BILLING_SLAB_MATCH_ERROR_CODE, msg);
         }
 
-		if (isUnitCommercial && isUnitRented) {
+		if ((isUnitCommercial && isUnitRented) || (isUnitResidential && isUnitPG)) {
 
 			if (unit.getArv() == null)
                 throw new CustomException(EG_PT_ESTIMATE_ARV_NULL, EG_PT_ESTIMATE_ARV_NULL_MSG);

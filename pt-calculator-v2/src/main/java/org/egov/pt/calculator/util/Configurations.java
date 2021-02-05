@@ -91,6 +91,12 @@ public class Configurations {
 	@Value("${billingslab.value.occupancytype.rented}")
 	private String occupancyTypeRented;
 	
+	@Value("${billingslab.value.usagemajor.residential}")
+	private String usageMajorResidential;
+	
+	@Value("${billingslab.value.occupancytype.pg}")
+	private String occupancyTypePG;
+	
 	@Value("${billingslab.value.arv.percent}")
 	private Double arvPercent;
 	
