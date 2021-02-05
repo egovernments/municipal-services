@@ -49,6 +49,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 			String applicationStatus = rs.getString("applicationStatus");
 			String status = rs.getString("status");
 			String vehicleId = rs.getString("vehicle_id");
+			String vehicleType = rs.getString("vehicletype");
 			String dsoid = rs.getString("dso_id");
 			Long possiblesrvdate = rs.getLong("possible_srv_date");
 			if (currentfsm == null) {
@@ -60,7 +61,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 				currentfsm = FSM.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
 						.description(description).accountId(accountId).additionalDetails(additionalDetails)
 						.source(source).sanitationtype(sanitationtype).propertyUsage(propertyUsage).noOfTrips(noOfTrips)
-						.vehicleId(vehicleId).applicationStatus(applicationStatus).dsoId(dsoid).possibleServiceDate(possiblesrvdate)
+						.vehicleId(vehicleId).applicationStatus(applicationStatus).dsoId(dsoid).possibleServiceDate(possiblesrvdate).vehicleType(vehicleType)
 						.build();
 
 				fmsMap.put(id, currentfsm);
