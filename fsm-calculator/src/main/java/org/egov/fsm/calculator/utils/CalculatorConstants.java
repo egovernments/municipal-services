@@ -51,5 +51,13 @@ public class CalculatorConstants {
 	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
 
 	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
+
+	public static final String INVALID_SEARCH = "INVALID_SEARCH";
+
+	public static final String EMPLOYEE_INVALID_SEARCH = "EMPLOYEE_INVALID_SEARCH";
+
+	public static final String EMPLOYEE = "EMPLOYEE";
+
+	public static final String CITIZEN = "CITIZEN";
 	
 }

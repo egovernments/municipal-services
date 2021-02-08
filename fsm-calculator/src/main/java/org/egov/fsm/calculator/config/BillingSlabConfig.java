@@ -32,4 +32,10 @@ public class BillingSlabConfig {
 
 	@Value("${egov.fsm.max.limit}")
 	private Integer maxSearchLimit;
+	
+	@Value("${citizen.allowed.search.params}")
+	private String allowedCitizenSearchParameters;
+	
+	@Value("${employee.allowed.search.params}")
+	private String allowedEmployeeSearchParameters;
 }

@@ -41,16 +41,16 @@ public class BillingSlab {
 	private String tenantId = null;
 
 	@JsonProperty("capacityFrom")
-	private Integer capacityFrom = null;
+	private BigDecimal capacityFrom = null;
 	
 	@JsonProperty("capacityTo")
-	private Integer capacityTo = null;
+	private BigDecimal capacityTo = null;
 	
 	@JsonProperty("propertyType")
 	private String propertyType = null;
 	
 	@JsonProperty("slum")
-	private String slum = null;
+	private SlumEnum slum = null;
 
 	@JsonProperty("price")
 	private BigDecimal price = null;
@@ -86,6 +86,38 @@ public class BillingSlab {
 		}
 	}
 
+	/**
+	 * Gets or Sets SLUM
+	 */
+	public enum SlumEnum {
+		YES("YES"),
+
+		NO("NO"),
+		
+		YESNO("YESNO");
+
+		private String value;
+
+		SlumEnum(String value) {
+			this.value = value;
+		}
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		@JsonCreator
+		public static SlumEnum fromValue(String text) {
+			for (SlumEnum b : SlumEnum.values()) {
+				if (String.valueOf(b.value).equals(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
 	@JsonProperty("status")
 	private StatusEnum status = null;
 

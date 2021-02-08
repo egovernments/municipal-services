@@ -2,6 +2,10 @@ package org.egov.fsm.calculator.web.models;
 
 import java.util.List;
 
+import org.egov.fsm.calculator.web.models.BillingSlab.SlumEnum;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -34,13 +38,19 @@ public class BillingSlabSearchCriteria {
 	private String propertyType;
 	
 	@JsonProperty("capacity")
-	private Long capacity;
+	private Double capacity;
 	
 	@JsonProperty("sortBy")
     private SortBy sortBy;
     
     @JsonProperty("sortOrder")
     private SortOrder sortOrder;
+    
+
+    @JsonProperty("slum")
+    private SlumEnum slum;
+    
+    
     
     public enum SortOrder {
         ASC,
@@ -52,5 +62,15 @@ public class BillingSlabSearchCriteria {
     	propertyType,
         capacity
     }
-	
+
+    public boolean isEmpty() {
+		// TODO Auto-generated method stub
+		 return (this.tenantId == null && this.offset == null && this.limit == null && !StringUtils.hasText(this.propertyType)
+				 && CollectionUtils.isEmpty(this.ids)  && this.capacity == null);
+	}
+    public boolean tenantIdOnly() {
+		// TODO Auto-generated method stub
+		 return (this.tenantId != null && this.offset == null && this.limit == null && !StringUtils.hasText(this.propertyType)
+				 && CollectionUtils.isEmpty(this.ids)  && this.capacity == null);
+	}
 }

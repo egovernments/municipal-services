@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
+import org.egov.vehicle.repository.VehicleRepository;
 import org.egov.vehicle.service.UserService;
 import org.egov.vehicle.util.Constants;
 import org.egov.vehicle.util.VehicleErrorConstants;
@@ -37,6 +38,9 @@ public class Validator {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private VehicleRepository repository;
+	
 	public void validateCreate(VehicleRequest vehicleRequest, Object mdmsData) {
 
 		RequestInfo requestInfo = vehicleRequest.getRequestInfo();
@@ -44,6 +48,7 @@ public class Validator {
 		if( StringUtils.isEmpty( vehicle.getRegistrationNumber())) {
 			throw new CustomException(VehicleErrorConstants.INVALID_REGISTRATION_NUMBER,"Registation is mandatory");
 		}
+		validateVehicle(vehicleRequest);
 		mdmsValidator.validateMdmsData(vehicleRequest, mdmsData);
 		mdmsValidator.validateVehicleType(vehicle.getType());
 		mdmsValidator.validateSuctionType(vehicle.getSuctionType());
@@ -53,6 +58,14 @@ public class Validator {
 
 	}
 	
+	private void validateVehicle(VehicleRequest vehicleRequest) {
+		Integer count = repository.getVehicleCount(vehicleRequest);
+		if(count >0 ) {
+			throw new CustomException(VehicleErrorConstants.INVALID_REGISTRATION_NUMBER,"Vehicle already exists ");
+		}
+		
+	}
+
 	/**
 	 * Validates if the search parameters are valid
 	 * 

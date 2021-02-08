@@ -1,5 +1,6 @@
 package org.egov.fsm.calculator.repository.querybuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,8 +15,8 @@ import org.springframework.util.StringUtils;
 @Component
 public class BillingSlabQueryBuilder {
 
-	private static final String QUERY_BILLINGSLAB_COMBINATION_COUNT = "SELECT count(*) FROM eg_billing_slab where capacityfrom=%s AND capacityto=%s AND propertytype='%s' AND slum='%s'";
-	private static final String QUERY_BILLINGSLAB_COMBINATION_For_UPDATE_COUNT = "SELECT count(*) FROM eg_billing_slab where capacityfrom=%s AND capacityto=%s AND propertytype='%s' AND slum='%s' AND id!='%s'";
+	private static final String QUERY_BILLINGSLAB_COMBINATION_COUNT = "SELECT count(*) FROM eg_billing_slab where tenantid='%s' AND capacityfrom=%s AND capacityto=%s AND propertytype='%s' AND slum='%s'";
+	private static final String QUERY_BILLINGSLAB_COMBINATION_For_UPDATE_COUNT = "SELECT count(*) FROM eg_billing_slab where tenantid='%s' AND  capacityfrom=%s AND capacityto=%s AND propertytype='%s' AND slum='%s' AND id!='%s'";
 	private static final String QUERY_BILLINGSLAB_EXIST = "SELECT count(*) FROM eg_billing_slab where id ='%s'";
 	private static final String QUERY_BILLING_SLAB_SEARCH = "SELECT * FROM eg_billing_slab where tenantid='%s'";
 	private final String paginationWrapper = "{} {orderby} OFFSET %s LIMIT %s";
@@ -23,14 +24,14 @@ public class BillingSlabQueryBuilder {
 	@Autowired
 	private BillingSlabConfig config;
 
-	public String getBillingSlabCombinationCountQuery(Integer capacityFrom, Integer capacityTo, String propertType,
+	public String getBillingSlabCombinationCountQuery(String tenantId, BigDecimal capacityFrom, BigDecimal capacityTo, String propertType,
 			String slum) {
-		return String.format(QUERY_BILLINGSLAB_COMBINATION_COUNT, capacityFrom, capacityTo, propertType, slum);
+		return String.format(QUERY_BILLINGSLAB_COMBINATION_COUNT,tenantId, capacityFrom, capacityTo, propertType, slum);
 	}
 
-	public String getBillingSlabCombinationCountForUpdateQuery(Integer capacityFrom, Integer capacityTo,
+	public String getBillingSlabCombinationCountForUpdateQuery(String tenantId, BigDecimal capacityFrom, BigDecimal capacityTo,
 			String propertType, String slum, String id) {
-		return String.format(QUERY_BILLINGSLAB_COMBINATION_For_UPDATE_COUNT, capacityFrom, capacityTo, propertType,
+		return String.format(QUERY_BILLINGSLAB_COMBINATION_For_UPDATE_COUNT, tenantId, capacityFrom, capacityTo, propertType,
 				slum, id);
 	}
 
@@ -52,6 +53,10 @@ public class BillingSlabQueryBuilder {
 		}
 		if(criteria.getCapacity() != null) {
 			query.append(String.format(" AND capacityto>=%s AND capacityfrom<=%s", criteria.getCapacity(), criteria.getCapacity()));
+		}
+		
+		if(criteria.getSlum() != null) {
+			query.append(String.format(" AND slum='%s'",criteria.getSlum().toString()));
 		}
 		return addPaginationWrapper(query.toString(), criteria);
 	}

@@ -5,6 +5,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.vehicle.config.VehicleConfiguration;
+import org.egov.vehicle.web.model.Vehicle;
+import org.egov.vehicle.web.model.VehicleRequest;
 import org.egov.vehicle.web.model.VehicleSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ public class QueryBuilder {
 	
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 	private static final String Query = " SELECT * FROM eg_vehicle ";
+	private static final String VEH_EXISTS_QUERY=" SELECT COUNT(*) FROM eg_vehicle WHERE tenantid='%s' AND registrationNumber='%s'";
 	
 	/**
 	 * 
@@ -211,5 +214,10 @@ public class QueryBuilder {
 		
 		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+	}
+	
+	public String vehicleExistsQuery(VehicleRequest vehicleReq) {
+		Vehicle vehicle = vehicleReq.getVehicle();
+		return String.format(VEH_EXISTS_QUERY,vehicle.getTenantId(), vehicle.getRegistrationNumber());
 	}
 }

@@ -34,9 +34,6 @@ public class BillingSlabResponse   {
 
   @JsonProperty("billingSlab")
   private List<BillingSlab> billingSlab = null;
-
-  @JsonProperty("workflow")
-  private Workflow workflow = null;
   
 } 
 

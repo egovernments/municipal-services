@@ -48,6 +48,17 @@ public class VehicleRepository {
 			return vehicles;
 		}
 
+		public Integer getVehicleCount(VehicleRequest vehicleRequest) {
+			String query = queryBuilder.vehicleExistsQuery(vehicleRequest);
+			Integer count = null;
+			try {
+				count = jdbcTemplate.queryForObject(query, Integer.class);
+			} catch (Exception e) {
+				throw e;
+			}
+			return count;
+		}
+
 
 
 }

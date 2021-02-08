@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.egov.fsm.calculator.web.models.AuditDetails;
 import org.egov.fsm.calculator.web.models.BillingSlab;
+import org.egov.fsm.calculator.web.models.BillingSlab.SlumEnum;
 import org.egov.fsm.calculator.web.models.BillingSlab.StatusEnum;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -24,8 +25,8 @@ public class BillingSlabRowMapper implements ResultSetExtractor<List<BillingSlab
 			
 			String id = rs.getString("id");
 			String tenantId = rs.getString("tenantid");
-			int capacityFrom = rs.getInt("capacityfrom");
-			int capacityTo = rs.getInt("capacityto");
+			BigDecimal capacityFrom = rs.getBigDecimal("capacityfrom");
+			BigDecimal capacityTo = rs.getBigDecimal("capacityto");
 			String propertyType = rs.getString("propertytype");
 			String slum = rs.getString("slum");
 			BigDecimal price = rs.getBigDecimal("price");
@@ -41,7 +42,7 @@ public class BillingSlabRowMapper implements ResultSetExtractor<List<BillingSlab
 			audit = audit.builder().createdBy(createdBy).lastModifiedBy(lastModifiedBy).createdTime(createdTime)
 					.lastModifiedTime(lastModifiedTime).build();
 			
-			billingSlab = BillingSlab.builder().id(id).tenantId(tenantId).capacityFrom(capacityFrom).capacityTo(capacityTo).propertyType(propertyType).price(price).slum(slum).status(StatusEnum.valueOf(status)).auditDetails(audit).build();
+			billingSlab = BillingSlab.builder().id(id).tenantId(tenantId).capacityFrom(capacityFrom).capacityTo(capacityTo).propertyType(propertyType).price(price).slum(SlumEnum.valueOf(slum)).status(StatusEnum.valueOf(status)).auditDetails(audit).build();
 			billingSlabList.add(billingSlab);
 			
 		}
