@@ -392,12 +392,10 @@ public class EnrichmentService {
 			return finalConnectionList;
 
 		Set<String> propertyIds = new HashSet<>();
-		Map<String,String> connectionToPropertyMap = new HashMap<>();
 		Map<String,List<OwnerInfo>> propertyToOwner = new HashMap<>();
 		for(WaterConnection waterConnection : waterConnectionList){
 			if(!StringUtils.isEmpty(waterConnection.getPropertyId()))
 				propertyIds.add(waterConnection.getPropertyId());
-				connectionToPropertyMap.put(waterConnection.getPropertyId(),waterConnection.getConnectionNo());
 		}
 		if(!CollectionUtils.isEmpty(propertyIds)){
 			PropertyCriteria propertyCriteria = new PropertyCriteria();
@@ -418,14 +416,12 @@ public class EnrichmentService {
 				HashMap<String, Object> additionalDetail = new HashMap<>();
 				HashMap<String, Object> addDetail = mapper
 						.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
-				System.out.println("\naddDetail-->"+addDetail.toString()+"\n");
 
 				for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
 					if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
 						additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 					}
 				}
-				System.out.println("\nadditionalDetail-->"+additionalDetail.toString()+"\n");
 				List<OwnerInfo> ownerInfoList = propertyToOwner.get(waterConnection.getPropertyId());
 				if(!CollectionUtils.isEmpty(ownerInfoList)){
 					additionalDetail.put("ownerName",ownerInfoList.get(0).getName());
