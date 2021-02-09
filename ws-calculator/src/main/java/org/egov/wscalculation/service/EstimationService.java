@@ -255,6 +255,7 @@ public class EstimationService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs,
 			String calculationAttribute, RequestInfo requestInfo) {
 
@@ -267,11 +268,22 @@ public class EstimationService {
 		// final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
 
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		additionalDetail = mapper.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
+		final String waterSubUsageType = (String) additionalDetail
+				.getOrDefault(WSCalculationConstant.WATER_SUBUSAGE_TYPE, null);
+
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
+
+			if (waterSubUsageType != null) {
+				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
+				return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching
+						&& isWaterSubUsageType;
+			}
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}

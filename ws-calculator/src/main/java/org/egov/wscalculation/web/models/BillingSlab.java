@@ -10,6 +10,15 @@ public class BillingSlab {
 	private String id;
 	private String buildingType = null;
 	private String connectionType = null;
+	private String waterSubUsageType=null;
+
+	public String getWaterSubUsageType() {
+		return waterSubUsageType;
+	}
+
+	public void setWaterSubUsageType(String waterSubUsageType) {
+		this.waterSubUsageType = waterSubUsageType;
+	}
 
 	public String getId() {
 		return id;
@@ -50,6 +59,8 @@ public class BillingSlab {
 	public void setMinimumCharge(double minimumCharge) {
 		this.minimumCharge = minimumCharge;
 	}
+	
+
 
 	public List<Slab> getSlabs() {
 		return slabs;

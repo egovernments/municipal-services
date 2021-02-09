@@ -285,6 +285,8 @@ public class WSCalculationConstant {
 	public static final String AVARAGEMETERREADING = "avarageMeterReading";
 
 	public static final String  ACTIVE_CONNECTION = "Active";
+
+	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
 	
 
 
