@@ -116,12 +116,12 @@ public class TradeLicenseService {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		String json;
-    	if(roles.contains("TL_CEMP_FORLEGACY")) {
-    		json = "{ \"islegacy\" : \"true\" } ";	
+		if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
     	}
     	else
     	{
-    		json = "{ \"islegacy\" : \"false\" } ";
+    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
     	}
 		JsonNode additionalDetail;
 		try {
@@ -297,12 +297,12 @@ public class TradeLicenseService {
 
 		ObjectMapper objectMapper = new ObjectMapper();
 		String json;
-    	if(roles.contains("TL_CEMP_FORLEGACY")) {
-    		json = "{ \"islegacy\" : \"true\" } ";	
+		if(roles.contains("TL_CEMP_FORLEGACY")) {
+    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
     	}
     	else
     	{
-    		json = "{ \"islegacy\" : \"false\" } ";
+    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
     	}
 		JsonNode additionalDetail;
 		try {
