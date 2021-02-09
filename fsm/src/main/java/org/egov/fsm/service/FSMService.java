@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
@@ -76,6 +77,9 @@ public class FSMService {
 	@Autowired
 	private DSOService dsoService;
 	
+	@Autowired
+	private FSMConfiguration config;
+	
 
 	@Autowired
 	VehicleService vehicleService;
@@ -131,7 +135,7 @@ public class FSMService {
 				FSMConstants.FSM_BusinessService,null);
 		actionValidator.validateUpdateRequest(fsmRequest, businessService);
 		FSM oldFSM = fsms.get(0);
-
+		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
 			handleApplicationSubmit(fsmRequest,oldFSM);
 		}
@@ -153,7 +157,7 @@ public class FSMService {
 		}
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT_FEEDBACK) ) {
-			handleFSMSubmitFeeback(fsmRequest,oldFSM);
+			handleFSMSubmitFeeback(fsmRequest,oldFSM, mdmsData);
 		}
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_ADDITIONAL_PAY_REQUEST) ) {
@@ -249,12 +253,21 @@ public class FSMService {
 //		}
 	}
 	
-	private void handleFSMSubmitFeeback(FSMRequest fsmRequest, FSM oldFSM) {
+	private void handleFSMSubmitFeeback(FSMRequest fsmRequest, FSM oldFSM,Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 		org.egov.common.contract.request.User citizen = fsmRequest.getRequestInfo().getUserInfo();
 		if(!citizen.getUuid().equalsIgnoreCase(fsmRequest.getRequestInfo().getUserInfo().getUuid())) {
 			throw new CustomException(FSMErrorConstants.INVALID_UPDATE," Only owner of the application can submit the feedback !.");
 		}
+		if(fsmRequest.getWorkflow().getRating() == null) {
+			throw new CustomException(FSMErrorConstants.INVALID_UPDATE," Rating has to be provided!");
+		}else if(config.getAverageRatingCommentMandatory() !=null && Integer.parseInt(config.getAverageRatingCommentMandatory() ) > fsmRequest.getWorkflow().getRating()) {
+			if(!StringUtils.hasLength(fsmRequest.getWorkflow().getComments())) {
+				throw new CustomException(FSMErrorConstants.INVALID_UPDATE," Comment mandatory for rating "+ fsmRequest.getWorkflow().getRating());
+			}
+		}
+		fsmValidator.validateCheckList(fsmRequest, mdmsData);
+			
 		//TODO handle the citizen rating and checklist.
 	}
 	

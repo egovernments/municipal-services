@@ -14,7 +14,7 @@ serviceMaps:
             - jsonPath: $.vehicle.registrationNumber
             - jsonPath: $.vehicle.model
             - jsonPath: $.vehicle.type
-            - jsonPath: $.vehicle.tankCapicity
+            - jsonPath: $.vehicle.tankCapacity
             - jsonPath: $.vehicle.suctionType
             - jsonPath: $.vehicle.pollutionCertiValidTill
             - jsonPath: $.vehicle.InsuranceCertValidTill

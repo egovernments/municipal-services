@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
@@ -16,13 +18,15 @@ import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.user.User;
+import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
@@ -280,6 +284,46 @@ public class FSMValidator {
 				 throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "applicationNo or id is mandatory in search");
 			 }
 		}
+	}
+	
+	public void validateCheckList(FSMRequest fsmRequest, Object mdmsData) {
+		FSM fsm = fsmRequest.getFsm();
+		Map additonalDetails = (Map)fsm.getAdditionalDetails();
+		List<Map<String,String>> requestCheckList = (List<Map<String, String>>) additonalDetails.get(FSMConstants.CHECKLIST);
+		List<Map<String,Object>> mdmsCheckList = JsonPath.read(mdmsData, FSMConstants.REQ_CHECKLIST_PATH);
+		if(mdmsCheckList.size() > 0 && (requestCheckList == null || requestCheckList.size() ==0)) {
+			throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, " Mandatory checlist is not provided!");
+		}
+		mdmsCheckList.forEach(mdmsClItem->{
+			Map<String,String> reqClItem = null;
+			for( int j=0;j<requestCheckList.size();j++) {
+				if(requestCheckList.get(j).get("code").equalsIgnoreCase((String) mdmsClItem.get("code") )) {
+					reqClItem = requestCheckList.get(j);
+				}
+			}
+			if(reqClItem != null) {
+				String[] reqOptions =reqClItem.get("value").split(",");
+				List<String> mdmsClOptions =(List<String>) mdmsClItem.get("options");
+				if(((String) mdmsClItem.get("type")).equalsIgnoreCase(FSMConstants.CHECK_LIST_SINGLE_SELECT) ) {
+					if(reqOptions.length > 1) {
+						 throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, "Checklist "+ mdmsClItem.get("code")+" is SINGLE SELECT, cannot select multiple options.");
+					}else if(!mdmsClOptions.contains(reqOptions[0])){
+						 throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, " Value provided is not checklist options.");
+					}
+				}else if(((String) mdmsClItem.get("type")).equalsIgnoreCase(FSMConstants.CHECK_LIST_MULTI_SELECT)) {
+					for( int h=0;h<reqOptions.length;h++) {
+						if(!mdmsClOptions.contains(reqOptions[h])) {
+							 throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, "Checklist "+mdmsClItem.get("code")+" does not allow option "+reqOptions[h]);
+						}
+					}
+					
+				}else {
+					throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, " Value provided is not checklist options.");
+				}
+			}else{
+				throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, " Required CheckList "+mdmsClItem.get("code")+ " is not answered ");
+			}
+		});
 	}
 	
 

@@ -126,14 +126,19 @@ public class FSMUtil {
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PIT_TYPE).filter(pitTypeFiltter).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
+//		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.CHECKLIST).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
 		
-		
+
+		List<MasterDetail> vehicleMasterDtls = new ArrayList<>();
+		vehicleMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_MAKE_MODEL).filter(filterCode).build());
+		ModuleDetail vehicleMasterMDtl = ModuleDetail.builder().masterDetails(vehicleMasterDtls)
+				.moduleName(FSMConstants.VEHICLE_MODULE_CODE).build();
 
 
-		return Arrays.asList(fsmMasterMDtl);
+		return Arrays.asList(fsmMasterMDtl,vehicleMasterMDtl);
 
 	}
 	

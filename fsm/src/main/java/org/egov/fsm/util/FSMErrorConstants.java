@@ -70,5 +70,6 @@ public class FSMErrorConstants {
 	public static final String INVALID_POSSIBLE_DATE = "INVALID_POSSIBLE_DATE";
 	public static final String VEHICLE_NOT_FOUND = "VEHICLE_NOT_FOUND";
 	public static final String INVALID_DSO_VEHICLE = "INVALID_DSO_VEHICLE";
+	public static final String INVALID_CHECKLIST = "INVALID_CHECKLIST";
 
 }

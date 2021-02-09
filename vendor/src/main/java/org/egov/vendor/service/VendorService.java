@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.vendor.repository.VendorRepository;
+import org.egov.vendor.util.VendorConstants;
+import org.egov.vendor.util.VendorErrorConstants;
 import org.egov.vendor.validator.VendorValidator;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
@@ -19,6 +21,7 @@ import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,12 +83,28 @@ public class VendorService {
 			}
 		}
 		
-		if(!CollectionUtils.isEmpty(criteria.getVehicleRegistrationNumber())) {
-			List<Vehicle> vehicles = vehicleService.getVehicles(null, criteria.getVehicleRegistrationNumber(), requestInfo, criteria.getTenantId());
+		if(!CollectionUtils.isEmpty(criteria.getVehicleRegistrationNumber()) || StringUtils.hasLength(criteria.getVehicleType())) {
+			List<Vehicle> vehicles = vehicleService.getVehicles(null, criteria.getVehicleRegistrationNumber(), criteria.getVehicleType(), requestInfo, criteria.getTenantId());
+			if(CollectionUtils.isEmpty(vehicles)) {
+				return new ArrayList<Vendor>();
+			}
 			if(CollectionUtils.isEmpty(criteria.getVehicleIds())) {
 				criteria.setVehicleIds(vehicles.stream().map(Vehicle::getId).collect(Collectors.toList()));
 			}else {
 				criteria.getVehicleIds().addAll(vehicles.stream().map(Vehicle::getId).collect(Collectors.toList()));
+			}
+			
+			if(!CollectionUtils.isEmpty(criteria.getVehicleIds())) {
+				List<String> vendorIds  = repository.getVendorWithVehicles(criteria.getVehicleIds());
+				if(CollectionUtils.isEmpty(vendorIds)) {
+					return new ArrayList<Vendor>();
+				}else {
+					if(CollectionUtils.isEmpty(criteria.getIds())) {
+						criteria.setIds(vendorIds);
+					}else {
+						criteria.getIds().addAll(vendorIds);
+					}					
+				}
 			}
 		}
 		

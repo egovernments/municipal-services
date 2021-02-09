@@ -57,7 +57,7 @@ public class VehicleService {
 			
 			if(!StringUtils.hasLength(reqVehicle.getId()) && StringUtils.hasLength(reqVehicle.getRegistrationNumber())) {
 				
-				List<Vehicle> vehicles = getVehicles(null,Arrays.asList(reqVehicle.getRegistrationNumber()) ,requestInfo, vendor.getTenantId());
+				List<Vehicle> vehicles = getVehicles(null,Arrays.asList(reqVehicle.getRegistrationNumber()) ,null,requestInfo, vendor.getTenantId());
 				if( vehicles.size() >0 ) {
 					newVehicles.add(vehicles.get(0));
 					//TODO comparing search result and request vehicle and callig update is peding
@@ -65,7 +65,7 @@ public class VehicleService {
 					newVehicles.add(createVehicle(reqVehicle, requestInfo));
 				}
 			}else {
-				List<Vehicle> vehicles = getVehicles(Arrays.asList(reqVehicle.getId()),Arrays.asList(reqVehicle.getRegistrationNumber()) ,requestInfo, vendor.getTenantId());
+				List<Vehicle> vehicles = getVehicles(Arrays.asList(reqVehicle.getId()),Arrays.asList(reqVehicle.getRegistrationNumber()) ,null,requestInfo, vendor.getTenantId());
 				if( vehicles.size() >0 ) {
 					newVehicles.add(vehicles.get(0));
 					//TODO comparing search result and request vehicle and callig update is peding
@@ -88,7 +88,7 @@ public class VehicleService {
 	 * @param tenantId
 	 * @return
 	 */
-	public List<Vehicle> getVehicles(List<String> vehicleIds,List<String> registrationNumbers,RequestInfo requestInfo,String tenantId){
+	public List<Vehicle> getVehicles(List<String> vehicleIds,List<String> registrationNumbers,String vehicleType, RequestInfo requestInfo,String tenantId){
 		List<Vehicle> vehicles = null;
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getVehicleHost()).append(config.getVehicleContextPath()).append(config.getVehicleSearchEndpoint()).append("?tenantId="+tenantId);
@@ -97,6 +97,10 @@ public class VehicleService {
 		}
 		if( !CollectionUtils.isEmpty(registrationNumbers)) {
 			uri.append("&registrationNumber="+String.join(",", registrationNumbers));
+		}
+		
+		if(StringUtils.hasLength(vehicleType)) {
+			uri.append("&type="+vehicleType);
 		}
 		RequestInfoWrapper reqwraper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, reqwraper);

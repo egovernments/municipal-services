@@ -1,6 +1,7 @@
 package org.egov.fsm.validator;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,32 +20,32 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class MDMSValidator {
-	private Map<String, List<String>> mdmsResMap ;
+	private Map<String, Object> mdmsResMap ;
 	
 		// TODO Auto-generated method stub
 	public void validateMdmsData(FSMRequest fsmRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_TYPE, FSMConstants.PIT_TYPE };
+		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_MAKE_MODEL, FSMConstants.PIT_TYPE };
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
 		
 	}
-	private void validateIfMasterPresent(String[] masterNames, Map<String, List<String>> codes) {
+	private void validateIfMasterPresent(String[] masterNames, Map<String, Object> codes) {
 		Map<String, String> errorMap = new HashMap<>();
 		for (String masterName : masterNames) {
-			if (CollectionUtils.isEmpty(codes.get(masterName))) {
+			if (codes.get(masterName) ==null || CollectionUtils.isEmpty((Collection<?>) codes.get(masterName))) {
 				errorMap.put("MDMS DATA ERROR ", "Unable to fetch " + masterName + " codes from MDMS");
 			}
 		}
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
-	public Map<String, List<String>> getAttributeValues(Object mdmsData) {
+	public Map<String, Object> getAttributeValues(Object mdmsData) {
 
-		List<String> modulepaths = Arrays.asList(FSMConstants.FSM_JSONPATH_CODE);
-		final Map<String, List<String>> mdmsResMap = new HashMap<>();
+		List<String> modulepaths = Arrays.asList(FSMConstants.FSM_JSONPATH_CODE,FSMConstants.VEHICLE_JSONPATH_CODE);
+		final Map<String, Object> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
@@ -66,7 +67,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.PROPERTY_TYPE).contains(propertyType) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.PROPERTY_TYPE)).contains(propertyType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_PROPERTY_TYPE," Property Type is invalid");
 		}
 
@@ -83,7 +84,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.APPLICATION_CHANNEL).contains(applicationChannel) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.APPLICATION_CHANNEL)).contains(applicationChannel) ) {
 			errorMap.put(FSMErrorConstants.INVALID_APPLICATION_CHANNEL," Application Channel is invalid");
 		}
 
@@ -100,7 +101,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.PIT_TYPE).contains(sanitationType) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.PIT_TYPE)).contains(sanitationType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_PIT_TYPE," On Site PitType is invalid");
 		}
 
@@ -110,7 +111,7 @@ public class MDMSValidator {
 	public void validateVehicleType(String vehicleType) {
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(FSMConstants.VEHICLE_TYPE).contains(vehicleType) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.VEHICLE_MAKE_MODEL)).contains(vehicleType) ) { 
 			errorMap.put(FSMErrorConstants.INVALID_VEHICLE_TYPE," VehicleType  is invalid");
 		}
 

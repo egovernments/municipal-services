@@ -27,6 +27,9 @@ public class VendorSearchCriteria {
 
 	@JsonProperty("mobileNumber")
 	private String mobileNumber;
+	
+	@JsonProperty("vehicleType")
+	private String vehicleType;
 
 	@JsonProperty("ownerIds")
 	private List<String> ownerIds;
@@ -47,13 +50,13 @@ public class VendorSearchCriteria {
 		// TODO Auto-generated method stub
 		return (this.tenantId == null && this.offset == null && this.limit == null && this.mobileNumber == null && CollectionUtils.isEmpty(this.vehicleRegistrationNumber)
 				&& this.ownerIds == null && CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.vehicleIds)
-				&& CollectionUtils.isEmpty(this.ids));
+				&& CollectionUtils.isEmpty(this.ids) && this.vehicleType == null);
 	}
 
 	public boolean tenantIdOnly() {
 		// TODO Auto-generated method stub
 		return (this.tenantId != null && this.mobileNumber == null && this.ownerIds == null && CollectionUtils.isEmpty(this.vehicleRegistrationNumber)
-				&& CollectionUtils.isEmpty(this.vehicleIds) && CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.ids));
+				&& CollectionUtils.isEmpty(this.vehicleIds) && CollectionUtils.isEmpty(this.name) && CollectionUtils.isEmpty(this.ids) && this.vehicleType == null);
 	}
 	
 
