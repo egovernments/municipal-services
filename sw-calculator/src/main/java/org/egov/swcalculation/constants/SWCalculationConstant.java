@@ -311,4 +311,6 @@ public class SWCalculationConstant {
 
 	public static final String ACTIVE = "Active";
 
+	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
+
 }
