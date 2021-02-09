@@ -421,7 +421,7 @@ public class EnrichmentService {
 				System.out.println("\naddDetail-->"+addDetail.toString()+"\n");
 
 				for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
-					if (additionalDetail.getOrDefault(entry.getKey(), null) != null) {
+					if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
 						additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 					}
 				}
