@@ -119,34 +119,43 @@ public class TradeLicenseService {
 		if(roles.contains("TL_CEMP_FORLEGACY"))
 		{
 			
-			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-		
-	    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-			}
-			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-				
-				json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-			}
-			else {
-		    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-			}
+	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+	    			
+		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+				}
+				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+					
+					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+				}
+				else {
+			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+
+				}	
+	    	}else
+				json = "{ \"islegacy\" : \"true\"}";
 		}
 		
     	else
     	{
-    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-    			
-	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-			}
-			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-				
-				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-			}
-			else {
-		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-			}	
+        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+        			
+    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+    			}
+    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+    				
+    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+    			}
+    			else {
+    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+
+    			}	
+        	}else
+    			json = "{ \"islegacy\" : \"false\"}";
+	
     	}
 		JsonNode additionalDetail;
 		try {
@@ -325,34 +334,44 @@ public class TradeLicenseService {
 		if(roles.contains("TL_CEMP_FORLEGACY"))
 		{
 			
-			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-		
-	    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-			}
-			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-				
-				json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-			}
-			else {
-		    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-			}
+	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+	    			
+		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+				}
+				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+					
+					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+				}
+				else {
+			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+
+				}	
+	    	}else
+				json = "{ \"islegacy\" : \"true\"}";
+
 		}
 		
     	else
     	{
-    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-    			
-	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-			}
-			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-				
-				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-			}
-			else {
-		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-			}	
+        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+        			
+    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+    			}
+    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+    				
+    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+    			}
+    			else {
+    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+
+    			}	
+        	}else
+    			json = "{ \"islegacy\" : \"false\"}";
+
     	}
 		JsonNode additionalDetail;
 		try {
