@@ -125,15 +125,16 @@ public class EstimationService {
 				.estimateAmount(waterCharge.setScale(2, 2)).build());
 
 		// Water_cess
-		if (timeBasedExemptionsMasterMap.get(WSCalculationConstant.WC_WATER_CESS_MASTER) != null) {
-			List<Object> waterCessMasterList = timeBasedExemptionsMasterMap
-					.get(WSCalculationConstant.WC_WATER_CESS_MASTER);
-			BigDecimal waterCess;
-			waterCess = waterCessUtil.getWaterCess(waterCharge, WSCalculationConstant.Assessment_Year,
-					waterCessMasterList);
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.WS_WATER_CESS)
-					.estimateAmount(waterCess.setScale(2, 2)).build());
-		}
+		/*
+		 * if
+		 * (timeBasedExemptionsMasterMap.get(WSCalculationConstant.WC_WATER_CESS_MASTER)
+		 * != null) { List<Object> waterCessMasterList = timeBasedExemptionsMasterMap
+		 * .get(WSCalculationConstant.WC_WATER_CESS_MASTER); BigDecimal waterCess;
+		 * waterCess = waterCessUtil.getWaterCess(waterCharge,
+		 * WSCalculationConstant.Assessment_Year, waterCessMasterList);
+		 * estimates.add(TaxHeadEstimate.builder().taxHeadCode(WSCalculationConstant.
+		 * WS_WATER_CESS) .estimateAmount(waterCess.setScale(2, 2)).build()); }
+		 */
 		return estimates;
 	}
 
