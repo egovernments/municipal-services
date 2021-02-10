@@ -83,6 +83,8 @@ public class WorkflowService {
 	 * @return State object to be fetched
 	 */
 	public Boolean isStateUpdatable(String stateCode, BusinessService businessService) {
+		System.out.println("\nbusinessService-->"+businessService.toString()+"\n");
+		System.out.println("\nstateCode-->"+stateCode+"\n");
 		for (State state : businessService.getStates()) {
 			if (state.getApplicationStatus() != null && state.getApplicationStatus().equalsIgnoreCase(stateCode))
 				return state.getIsStateUpdatable();
