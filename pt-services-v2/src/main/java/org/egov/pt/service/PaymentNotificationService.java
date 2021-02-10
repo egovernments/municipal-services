@@ -132,9 +132,9 @@ public class PaymentNotificationService {
 						customMessage = getCustomizedMessage(valMap, message, path);
 						smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
 					}
-					if (valMap.get("oldPropertyId") == null
-							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
-						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
+//					if (valMap.get("oldPropertyId") == null
+//							&& topic.equalsIgnoreCase(propertyConfiguration.getPaymentTopic()))
+//						smsRequests.addAll(addOldpropertyIdAbsentSMS(messagejson, valMap, mobileNumbers));
 					if (!CollectionUtils.isEmpty(smsRequests)) {
 						sendSMS(smsRequests);
 						if (null == propertyConfiguration.getIsUserEventsNotificationEnabled())
@@ -466,8 +466,8 @@ public class PaymentNotificationService {
 			customMessage = getCustomizedOfflinePaymentMessage(message, valMap);
 		if (path.contains(PTConstants.NOTIFICATION_PAYMENT_FAIL))
 			customMessage = getCustomizedPaymentFailMessage(message, valMap);
-		if (path.contains(PTConstants.NOTIFICATION_OLDPROPERTYID_ABSENT))
-			customMessage = getCustomizedOldPropertyIdAbsentMessage(message, valMap);
+//		if (path.contains(PTConstants.NOTIFICATION_OLDPROPERTYID_ABSENT))
+//			customMessage = getCustomizedOldPropertyIdAbsentMessage(message, valMap);
 		return customMessage;
 	}
 

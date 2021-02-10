@@ -83,7 +83,7 @@ public class PropertyUtil {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getLocalizationHost())
                 .append(config.getLocalizationContextPath()).append(config.getLocalizationSearchEndpoint());
-        uri.append("?").append("locale=").append(locale)
+        uri.append("?").append("locale=").append("en_IN")
                 .append("&tenantId=").append(tenantId)
                 .append("&module=").append(PTConstants.MODULE);
         return uri;
@@ -97,7 +97,7 @@ public class PropertyUtil {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getLocalizationHost())
                 .append(config.getLocalizationContextPath()).append(config.getLocalizationSearchEndpoint());
-        uri.append("?").append("locale=").append(locale)
+        uri.append("?").append("locale=").append("en_IN")
                 .append("&tenantId=").append(tenantId)
                 .append("&module=").append("rainmaker-common");
         return uri;
