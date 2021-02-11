@@ -196,8 +196,7 @@ public class  TradeLicense   {
         @JsonProperty("fileStoreId")
         private String fileStoreId = null;
 
-        @JsonProperty("fileStoreId")
-        private String fileStoreId = null;
+       
 
 }
 
