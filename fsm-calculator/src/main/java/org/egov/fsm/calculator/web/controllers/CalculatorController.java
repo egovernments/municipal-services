@@ -56,6 +56,14 @@ public class CalculatorController {
 		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
 	}
+	
+	@PostMapping(value = "/_estimate")
+	public ResponseEntity<CalculationRes> estimate(@Valid @RequestBody CalculationReq calculationReq) {
+		log.debug("CalculationReaquest:: " + calculationReq);
+		 List<Calculation> calculations = calculationService.estimate(calculationReq);
+		 CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
+		 return new ResponseEntity<CalculationRes>(calculationRes,HttpStatus.OK);
+	}
 
 
 }

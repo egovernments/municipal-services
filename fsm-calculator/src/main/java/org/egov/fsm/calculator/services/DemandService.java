@@ -45,9 +45,6 @@ public class DemandService {
     private ObjectMapper mapper;
     
     @Autowired
-    private MDMSService mdmsService;
-    
-    @Autowired
     private CalculatorConfig config;
     
     @Autowired

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.kafka.broker.CalculatorProducer;
@@ -23,6 +24,8 @@ import org.egov.fsm.calculator.web.models.demand.TaxHeadEstimate;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,12 +66,32 @@ public class CalculationService {
 	 */
 	public List<Calculation> calculate(CalculationReq calculationReq) {
 		String tenantId = calculationReq.getCalulationCriteria().get(0)
-				.getTenantId();
+				.getTenantId().split("\\.")[0];
 		Object mdmsData = mdmsService.mDMSCall(calculationReq, tenantId);
-		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsData);
+		List<Map> mdmsMap = JsonPath.read(mdmsData, CalculatorConstants.VEHICLE_MAKE_MODEL_JSON_PATH);
+		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsMap);
 		demandService.generateDemand(calculationReq.getRequestInfo(),calculations, mdmsData);
 		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 //		producer.push(config.getSaveTopic(), calculationRes);
+		return calculations;
+	}
+	
+	
+	/**
+	 * Calculates tax estimates
+	 * 
+	 * @param calculationReq
+	 *            The calculationCriteria request
+	 * @return List of calculations for all applicationNumbers or tradeLicenses
+	 *         in calculationReq
+	 */
+	public List<Calculation> estimate(CalculationReq calculationReq) {
+		String tenantId = calculationReq.getCalulationCriteria().get(0)
+				.getTenantId().split("\\.")[0];
+		Object mdmsData = mdmsService.mDMSCall(calculationReq, tenantId);
+		List<Map> mdmsMap = JsonPath.read(mdmsData, CalculatorConstants.VEHICLE_MAKE_MODEL_JSON_PATH);
+		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsMap);
+		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		return calculations;
 	}
 
@@ -84,7 +107,7 @@ public class CalculationService {
 	 *         in criterias
 	 */
 	public List<Calculation> getCalculation(RequestInfo requestInfo,
-			List<CalulationCriteria> criterias, Object mdmsData) {
+			List<CalulationCriteria> criterias, List<Map> mdmsData) {
 		List<Calculation> calculations = new LinkedList<>();
 		for (CalulationCriteria criteria : criterias) {
 			FSM fsm;
@@ -123,7 +146,7 @@ public class CalculationService {
 	 */
 	private EstimatesAndSlabs getTaxHeadEstimates(
 			CalulationCriteria calulationCriteria, RequestInfo requestInfo,
-			Object mdmsData) {
+			List<Map> mdmsData) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 		EstimatesAndSlabs estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
 		estimates.addAll(estimatesAndSlabs.getEstimates());
@@ -145,21 +168,20 @@ public class CalculationService {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria, RequestInfo requestInfo,
-			Object mdmsData) {
+			List<Map> mdmsData) {
 		FSM fsm = calulationCriteria.getFsm();
 		EstimatesAndSlabs estimatesAndSlabs = new EstimatesAndSlabs();
 		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
-		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
-				: new HashMap<String, String>();
-		BigDecimal tripAmount  = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
+		
+		String amount = getAmountForVehicleType(fsm.getVehicleType(), mdmsData);
+		if(amount == null ||! NumberUtils.isCreatable(amount)) {
+			throw new CustomException(CalculatorConstants.INVALID_AMOUNT, "Amount is Invalid for the given vehicleType");
+		}
 		
 		
-//		}catch( Exception e) {
-//			throw new CustomException(CalculatorConstants.INVALID_AMOUNT, "Trip Amouont is Invalid");
-//		}
 		
-		BigDecimal calculatedAmout = BigDecimal.valueOf(calulationCriteria.getFsm().getNoOfTrips()).multiply( tripAmount) ;
+		BigDecimal calculatedAmout = BigDecimal.valueOf(calulationCriteria.getFsm().getNoOfTrips()).multiply( NumberUtils.toScaledBigDecimal(amount)) ;
 
 		
 		if (calculatedAmout.compareTo(BigDecimal.ZERO) == -1)
@@ -173,6 +195,17 @@ public class CalculationService {
 		estimates.add(estimate);
 		estimatesAndSlabs.setEstimates(estimates);
 		return estimatesAndSlabs;
+	}
+	
+	public String getAmountForVehicleType(String vehicleType, List<Map> vehicleTypeList) {
+		String  amount = null;
+		for(Map vehicleTypeMap : vehicleTypeList) {
+			if(vehicleTypeMap.get("code").equals(vehicleType)) {
+				amount = (String) vehicleTypeMap.get("amount");
+				break;
+			}
+		}
+		return amount;
 	}
 
 }

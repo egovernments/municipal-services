@@ -60,4 +60,8 @@ public class CalculatorConstants {
 
 	public static final String CITIZEN = "CITIZEN";
 	
+	public static final String VEHICLE_MODULE_CODE = "Vehicle";
+	public static final String VEHICLE_MAKE_MODEL = "VehicleMakeModel";
+	public static final String VEHICLE_MAKE_MODEL_JSON_PATH = "$.MdmsRes.Vehicle.VehicleMakeModel";
+	
 }
