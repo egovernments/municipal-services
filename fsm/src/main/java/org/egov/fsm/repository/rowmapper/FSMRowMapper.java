@@ -96,7 +96,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 				.plotNo(rs.getString("plotno")).district(rs.getString("district")).region(rs.getString("region"))
 				.state(rs.getString("state")).country(rs.getString("country")).landmark(rs.getString("landmark"))
 				.geoLocation(geoLocation).pincode(rs.getString("pincode")).doorNo(rs.getString("doorno")).id(rs.getString("fsm_address_id"))
-				.additionalDetails(rs.getString("additionalDetails")).street(rs.getString("street")).tenantId(rs.getString("tenantid")).locality(locality).auditDetails(auditdetails)
+				.additionalDetails(rs.getString("additionalDetails")).street(rs.getString("street")).slumName(rs.getString("slumname")).tenantId(rs.getString("tenantid")).locality(locality).auditDetails(auditdetails)
 				.build();
 
 		PitDetail pitDetail = PitDetail.builder().height(rs.getDouble("height")).width(rs.getDouble("width")).diameter(rs.getDouble("diameter"))

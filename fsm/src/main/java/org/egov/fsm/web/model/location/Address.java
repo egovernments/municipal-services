@@ -80,6 +80,9 @@ public class Address   {
 
   @JsonProperty("street")
   private String street = null;
+  
+  @JsonProperty("slumName")
+  private String slumName = null;
 
   @JsonProperty("locality")
   private Boundary locality = null;
@@ -375,6 +378,8 @@ public class Address   {
   public void setStreet(String street) {
     this.street = street;
   }
+  
+  
 
   public Address locality(Boundary locality) {
     this.locality = locality;
@@ -442,6 +447,7 @@ public class Address   {
         Objects.equals(this.additionalDetails, address.additionalDetails) &&
         Objects.equals(this.buildingName, address.buildingName) &&
         Objects.equals(this.street, address.street) &&
+        Objects.equals(this.slumName, address.slumName) &&
         Objects.equals(this.locality, address.locality) &&
         Objects.equals(this.geoLocation, address.geoLocation) && 
         Objects.equals(this.auditDetails, address.auditDetails);
@@ -449,7 +455,7 @@ public class Address   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionalDetails, buildingName, street, locality, geoLocation);
+    return Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionalDetails, buildingName, street, slumName, locality, geoLocation);
   }
 
   @Override
@@ -471,6 +477,7 @@ public class Address   {
     sb.append("    additionalDetails: ").append(toIndentedString(additionalDetails)).append("\n");
     sb.append("    buildingName: ").append(toIndentedString(buildingName)).append("\n");
     sb.append("    street: ").append(toIndentedString(street)).append("\n");
+    sb.append("    slumName: ").append(toIndentedString(slumName)).append("\n");
     sb.append("    locality: ").append(toIndentedString(locality)).append("\n");
     sb.append("    geoLocation: ").append(toIndentedString(geoLocation)).append("\n");
     sb.append("    auditDetails: ").append(toIndentedString(auditDetails)).append("\n");
