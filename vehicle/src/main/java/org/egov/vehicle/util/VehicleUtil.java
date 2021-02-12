@@ -64,13 +64,15 @@ public class VehicleUtil {
 	 * @param isCreate
 	 * @return AuditDetails
 	 */
-	public AuditDetails getAuditDetails(String by, Boolean isCreate) {
+	public AuditDetails getAuditDetails(String by, Boolean isCreate, AuditDetails existingAudit) {
 		Long time = System.currentTimeMillis();
 		if (isCreate)
 			return AuditDetails.builder().createdBy(by).lastModifiedBy(by).createdTime(time).lastModifiedTime(time)
 					.build();
-		else
-			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).build();
+		else {
+			return AuditDetails.builder().lastModifiedBy(by).lastModifiedTime(time).createdBy(existingAudit.getCreatedBy()).createdTime(existingAudit.getCreatedTime()).build();
+		}
+			
 	}
 	
     /**

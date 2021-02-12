@@ -75,6 +75,9 @@ public class FSMService {
 	private UserService userService;
 	
 	@Autowired
+	private VehicleTripService vehicleTripService;
+	
+	@Autowired
 	private CalculationService calculationService;
 	
 	@Autowired
@@ -217,23 +220,26 @@ public class FSMService {
 		if(vendor == null) {
 			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid, cannot take an action, Application is not assigned to current logged in user !");
 		}
+		fsm.setDso(vendor);
 		
 		if(!StringUtils.hasLength(fsm.getVehicleId())) {
 			throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE,"Vehicle should be assigned to accept the Request !");
 			
 		}else {
 			
-			vehicleService.validateVehicle(fsmRequest);
+			Vehicle vehicle = vehicleService.validateVehicle(fsmRequest);
 			Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
 			if(!CollectionUtils.isEmpty(vehilceIdMap) && vehilceIdMap.get(fsm.getVehicleId()) == null ) {
 				throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehicle Does not belong to DSO!");
 			}else {
-				Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
+				 vehicle = vehilceIdMap.get(fsm.getVehicleId());
+				 fsm.setVehicle(vehicle);
 				if(!vehicle.getType().equalsIgnoreCase(fsm.getVehicleType())) {
 					throw new CustomException(FSMErrorConstants.INVALID_DSO_VEHICLE," Vehilce Type of FSM and vehilceType of the assigned vehicle does not match !");
 				}
 			}
 		}
+		vehicleTripService.scheduleVehicleTrip(fsmRequest);
 	}
 	
 	private void handleDSOReject(FSMRequest fsmRequest, FSM oldFSM) {
@@ -248,12 +254,12 @@ public class FSMService {
 	}
 	private void handleFSMComplete(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
+		if(fsm.getWasteCollected() == null  || fsm.getWasteCollected() <=0 ) {
+			throw new CustomException(FSMErrorConstants.INVALID_WASTER_COLLECTED," Wastecollected is invalid to complete the application !.");
+		}
 		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
-		//TODO on complete mark the vehicleLog as Ready for Disposal
-		
-//		if(!dsoUser.getUuid().equalsIgnoreCase(oldFSM.getDsoId())) {
-//			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid, cannot take an action as it is not assigned to the current user");
-//		}
+		vehicleTripService.vehicleTripReadyForDisposal(fsmRequest);
+
 	}
 	
 	private void handleFSMSubmitFeeback(FSMRequest fsmRequest, FSM oldFSM,Object mdmsData) {

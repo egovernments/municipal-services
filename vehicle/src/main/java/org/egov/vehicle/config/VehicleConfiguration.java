@@ -71,5 +71,52 @@ public class VehicleConfiguration {
 
 		@Value("${egov.vehicle.max.limit}")
 		private Integer maxSearchLimit;
+		
+		// Idgen Config
+		@Value("${egov.idgen.host}")
+		private String idGenHost;
+
+		@Value("${egov.idgen.path}")
+		private String idGenPath;
+
+		@Value("${egov.idgen.vehicle.trip.applicationNum.name}")
+		private String applicationNoIdgenName;
+
+		@Value("${egov.idgen.vehicle.trip.applicationNum.format}")
+		private String applicationNoIdgenFormat;
+
+
+		@Value("${persister.save.vehicle.trip.topic}")
+		private String saveVehicleLogTopic;
+
+		@Value("${persister.update.vehicle.trip.topic}")
+		private String updateVehicleLogTopic;
+		
+		@Value("${persister.update.vehicle.trip.workflow.topic}")
+		private String updateWorkflowVehicleLogTopic;
+
+		// Allowed Search Parameters
+		@Value("${vehicle.log.allowed.search.params}")
+		private String allowedVehicleLogSearchParameters;
+		
+		// Workflow
+		@Value("${vehicle.trip.workflow.name}")
+		private String businessServiceValue;
+		public String getBusinessServiceValue() {
+			return null;
+		}
+
+		@Value("${workflow.context.path}")
+		private String wfHost;
+
+		@Value("${workflow.transition.path}")
+		private String wfTransitionPath;
+
+		@Value("${workflow.businessservice.search.path}")
+		private String wfBusinessServiceSearchPath;
+
+		@Value("${workflow.process.path}")
+		private String wfProcessPath;
+
 	
 }

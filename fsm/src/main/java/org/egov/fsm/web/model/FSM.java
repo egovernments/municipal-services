@@ -1,7 +1,9 @@
 package org.egov.fsm.web.model;
 
+import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.location.Address;
 import org.egov.fsm.web.model.user.User;
+import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -101,8 +103,14 @@ public class FSM   {
   @JsonProperty("vehicleId")
   private String vehicleId = null;
   
+  @JsonProperty("vehicle")
+  private Vehicle vehicle = null;
+  
   @JsonProperty("dsoId")
   private String dsoId = null;
+  
+  @JsonProperty("dso")
+  private Vendor dso = null;
   
   @JsonProperty("possibleServiceDate")
   private Long possibleServiceDate = null;
@@ -115,5 +123,8 @@ public class FSM   {
 
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
+  
+  @JsonProperty("wasteCollected")
+  private Double wasteCollected = null;
 
 }

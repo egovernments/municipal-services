@@ -114,6 +114,10 @@ public class FSMConstants {
 	public static final String CHECK_LIST_SINGLE_SELECT = "SINGLE_SELECT";
 	public static final String CHECK_LIST_MULTI_SELECT = "MULTI_SELECT";
 
+	public static final String VEHICLETRIP_BUSINESSSERVICE_NAME = "FSM_VEHICLE_TRIP";
+
+	public static final String TRIP_READY_FOR_DISPOSAL = "READY_FOR_DISPOSAL";
+
 
 	
 

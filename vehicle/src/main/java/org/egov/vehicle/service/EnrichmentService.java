@@ -31,7 +31,7 @@ public class EnrichmentService {
     public void enrichVehicleCreateRequest(VehicleRequest vehicleRequest) {
         RequestInfo requestInfo = vehicleRequest.getRequestInfo();
         
-        AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+        AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true,null);
 		vehicleRequest.getVehicle().setAuditDetails(auditDetails);
 		vehicleRequest.getVehicle().setStatus(Vehicle.StatusEnum.ACTIVE);
 		

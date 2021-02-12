@@ -237,6 +237,19 @@ public class FSMConfiguration {
 		private String vehicleUpdateEndpoint;
 		
 		
+		@Value("${egov.vehicle.trip.context.path}")
+		private String vehicleTripContextPath;
+
+		@Value("${egov.vehicle.trip.create.path}")
+		private String vehicleTripCreateEndpoint;
+
+		@Value("${egov.vehicle.trip.search.path}")
+		private String vehicleTripSearchEndpoint;
+
+		@Value("${egov.vehicle.trip.update.path}")
+		private String vehicleTripUpdateEndpoint;
+		
+		
 		// CONFIGURATIONS
 		
 

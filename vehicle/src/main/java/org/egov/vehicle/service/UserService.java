@@ -273,7 +273,7 @@ public class UserService {
 		owner.setType(constants.EMPLOYEE);
 	}
 
-	private UserDetailResponse userExists(User owner, @Valid RequestInfo requestInfo) {
+	public UserDetailResponse userExists(User owner, @Valid RequestInfo requestInfo) {
 
 		UserSearchRequest ownerSearchRequest = new UserSearchRequest();
 		ownerSearchRequest.setTenantId(owner.getTenantId().split("\\.")[0]);
@@ -378,6 +378,23 @@ public class UserService {
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		UserDetailResponse ownerDetailResponse = ownerCall(ownerSearchRequest, uri);
 		return ownerDetailResponse;
+	}
+	
+	public User getUser(String uuid, String tenantId, RequestInfo requestInfo) {
+		UserSearchRequest ownerSearchRequest  = new UserSearchRequest();
+		ownerSearchRequest.setRequestInfo(requestInfo);
+		ownerSearchRequest.setTenantId(tenantId.split("\\.")[0]);
+		ownerSearchRequest.setActive(true);
+		List ids = new ArrayList<String>();
+		ids.add(uuid);
+		ownerSearchRequest.setUuid(ids);
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+		UserDetailResponse ownerDetailResponse = ownerCall(ownerSearchRequest, uri);
+		if(ownerDetailResponse != null && ownerDetailResponse.getUser() != null  && ownerDetailResponse.getUser().size() > 0) {
+			return ownerDetailResponse.getUser().get(0);
+		}else {
+			return null;
+		}
 	}
 
 	// Dont Know what and all parameters need to be add in

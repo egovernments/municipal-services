@@ -57,14 +57,16 @@ public class VehicleService {
 		}
 	}
 	
-	public void validateVehicle(FSMRequest fsmRequest) {
+	public Vehicle validateVehicle(FSMRequest fsmRequest) {
 		FSM fsm = fsmRequest.getFsm();
+		Vehicle vehicle = null;
 		if(!StringUtils.isEmpty(fsm.getVehicleId())) {
-			Vehicle vehicle = getVehicle(fsm.getVehicleId(), fsm.getTenantId(), fsmRequest.getRequestInfo());
+			 vehicle = getVehicle(fsm.getVehicleId(), fsm.getTenantId(), fsmRequest.getRequestInfo());
 			if(vehicle == null) {
 				throw new CustomException(FSMErrorConstants.VEHICLE_NOT_FOUND," Vehicle Does not exists !");
 			}
 		}
+		return vehicle;
 		
 	}
 }
