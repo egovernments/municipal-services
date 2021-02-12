@@ -314,7 +314,16 @@ public class FSMService {
 		
 		if(criteria.tenantIdOnly() && 
 				requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
-			criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
+			List<Role> roles = requestInfo.getUserInfo().getRoles();
+			if( roles.stream().anyMatch(role -> Objects.equals(role.getCode(), FSMConstants.ROLE_FSM_DSO))) {
+			  	Vendor dso = dsoService.getVendor(null, criteria.getTenantId(), null, requestInfo.getUserInfo().getMobileNumber(), requestInfo);
+			  	if(dso!=null && org.apache.commons.lang3.StringUtils.isNotEmpty(dso.getId())) {
+			  		dsoId = dso.getId();
+			  	}
+			}else {
+				criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
+			}
+			
 		}
 		
 		if( criteria.getMobileNumber() !=null && StringUtils.hasText(criteria.getMobileNumber() )) {
@@ -330,13 +339,7 @@ public class FSMService {
 			}
 		}
 		
-		List<Role> roles = requestInfo.getUserInfo().getRoles();
-		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) && roles.stream().anyMatch(role -> Objects.equals(role.getCode(), FSMConstants.ROLE_FSM_DSO))) {
-		  	Vendor dso = dsoService.getVendor(null, criteria.getTenantId(), null, requestInfo.getUserInfo().getMobileNumber(), requestInfo);
-		  	if(dso!=null && org.apache.commons.lang3.StringUtils.isNotEmpty(dso.getId())) {
-		  		dsoId = dso.getId();
-		  	}
-		}
+
 		
 		fsmList = repository.getFSMData(criteria, dsoId);
 		if (!fsmList.isEmpty()) {

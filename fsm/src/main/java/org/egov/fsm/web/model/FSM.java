@@ -1,5 +1,7 @@
 package org.egov.fsm.web.model;
 
+import javax.validation.Valid;
+
 import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.location.Address;
 import org.egov.fsm.web.model.user.User;
@@ -118,6 +120,7 @@ public class FSM   {
   @JsonProperty("pitDetail")
   private PitDetail pitDetail = null;
 
+  @Valid
   @JsonProperty("address")
   private Address address = null;
 

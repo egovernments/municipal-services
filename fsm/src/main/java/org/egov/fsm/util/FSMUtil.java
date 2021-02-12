@@ -128,6 +128,7 @@ public class FSMUtil {
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
 //		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
 		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.CHECKLIST).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_CONFIG).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
 		

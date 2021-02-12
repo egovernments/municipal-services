@@ -27,6 +27,7 @@ public class FSMRequest   {
   @JsonProperty("RequestInfo")
   private RequestInfo RequestInfo = null;
 
+  @Valid
   @JsonProperty("fsm")
   private FSM fsm = null;
 

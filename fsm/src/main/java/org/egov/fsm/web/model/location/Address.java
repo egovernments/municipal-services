@@ -3,6 +3,7 @@ package org.egov.fsm.web.model.location;
 import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.egov.fsm.web.model.AuditDetails;
@@ -66,6 +67,8 @@ public class Address   {
   @JsonProperty("country")
   private String country = null;
 
+  @Size(min=6,max=6)
+  @Pattern( regexp = "[^0]")
   @JsonProperty("pincode")
   private String pincode = null;
 

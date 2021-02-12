@@ -118,6 +118,8 @@ public class FSMConstants {
 
 	public static final String TRIP_READY_FOR_DISPOSAL = "READY_FOR_DISPOSAL";
 
+	public static final String MDMS_CONFIG = "Config";
+
 
 	
 
