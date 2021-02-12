@@ -15,6 +15,8 @@ import org.egov.fsm.calculator.repository.BillingSlabRepository;
 import org.egov.fsm.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.fsm.calculator.utils.CalculationUtils;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
+import org.egov.fsm.calculator.web.models.BillingSlab;
+import org.egov.fsm.calculator.web.models.BillingSlab.SlumEnum;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.egov.fsm.calculator.web.models.Calculation;
 import org.egov.fsm.calculator.web.models.CalculationReq;
@@ -190,9 +192,13 @@ public class CalculationService {
 			throw new CustomException(CalculatorConstants.INVALID_CAPACITY, "Capacity is Invalid for the given vehicleType");
 		}
 		
-		String slumName = fsm.getAddress().getSlumName();
+		SlumEnum slumName = ((fsm.getAddress().getSlumName() == null ) ? SlumEnum.NO : SlumEnum.YES); 
 		
-		amount = billingSlabRepository.getBillingSlabPrice(billingSlabQueryBuilder.getBillingSlabPriceQuery(fsm.getTenantId(), NumberUtils.toDouble(capacity), slumName));
+		List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+		if(billingSlabs.size() >0) {
+			amount = billingSlabs.get(0).getPrice();
+		}
+//		amount = billingSlabRepository.getBillingSlabPrice(billingSlabQueryBuilder.getBillingSlabPriceQuery(fsm.getTenantId(), NumberUtils.toDouble(capacity), slumName));
 		
 		if(amount == null) {
 			throw new CustomException(CalculatorConstants.INVALID_PRICE, "Price not found in Billing Slab for the given vehicleType and slumName");

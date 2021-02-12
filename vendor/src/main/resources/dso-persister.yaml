@@ -7,7 +7,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO public.eg_vendor( id, name, tenantid, additionaldetails, owner_id, description, source, status,createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
+       - query: INSERT INTO eg_vendor( id, name, tenantid, additionaldetails, owner_id, description, source, status,createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );
          basePath: vendor
          jsonMaps:
           - jsonPath: $.vendor.id
@@ -37,7 +37,7 @@ serviceMaps:
           - jsonPath: $.vendor.auditDetails.lastModifiedTime
           
           
-       - query: INSERT INTO public.eg_vendor_address(id, tenantid, doorno, plotno, landmark, city, district, region, state, country, locality, pincode, additionalDetails, buildingname, street, vendor_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_vendor_address(id, tenantid, doorno, plotno, landmark, city, district, region, state, country, locality, pincode, additionalDetails, buildingname, street, vendor_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: vendor.address
          jsonMaps:
           - jsonPath: $.vendor.address.id
@@ -93,7 +93,7 @@ serviceMaps:
 
           - jsonPath: $.vendor.drivers.*.uuid
           
-       - query: INSERT INTO public.eg_vendor_vehicle(  vendor_id,vechile_id) VALUES ( ?, ?); 
+       - query: INSERT INTO eg_vendor_vehicle(  vendor_id,vechile_id) VALUES ( ?, ?); 
          basePath: vendor.vehicles.*
          jsonMaps:
           
