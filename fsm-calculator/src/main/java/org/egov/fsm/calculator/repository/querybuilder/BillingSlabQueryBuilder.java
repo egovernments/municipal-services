@@ -29,7 +29,9 @@ public class BillingSlabQueryBuilder {
 
 	public String getBillingSlabPriceQuery(String tenantId, Double capacity, String slumName) {
 		String query = String.format(QUERY_BILLINGSLAB_PRICE, tenantId, capacity, capacity);
-		if(org.apache.commons.lang3.StringUtils.isNotBlank(slumName)) {
+		if(org.apache.commons.lang3.StringUtils.isEmpty(slumName)) {
+			query = query + String.format(QUERY_PARAM_FOR_SLUM, "NO");
+		}else {
 			query = query + String.format(QUERY_PARAM_FOR_SLUM, "YES");
 		}
 		return query;
