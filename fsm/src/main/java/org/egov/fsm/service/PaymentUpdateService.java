@@ -76,7 +76,7 @@ public class PaymentUpdateService {
 					searchCriteria.setTenantId(tenantId);
 					List<String> applNos = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(applNos);
-					List<FSM> fsms = repository.getFSMData(searchCriteria);
+					List<FSM> fsms = repository.getFSMData(searchCriteria, null);
 					if (CollectionUtils.isEmpty(fsms)) {
 						throw new CustomException(FSMErrorConstants.INVALID_RECEIPT,
 								"No Building Plan Application found for the comsumerCode "

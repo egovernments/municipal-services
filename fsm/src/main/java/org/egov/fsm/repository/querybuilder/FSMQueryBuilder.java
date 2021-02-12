@@ -38,7 +38,7 @@ public class FSMQueryBuilder {
 		return String.join(",", namesList.stream().map(name -> ("'" + name + "'")).collect(Collectors.toList()));
 	}
 	
-	public String getFSMSearchQuery(FSMSearchCriteria criteria, List<Object> preparedStmtList) {
+	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
 		
 		StringBuilder builder = new StringBuilder(Query);
 		if(criteria.getTenantId() != null) {
@@ -83,8 +83,7 @@ public class FSMQueryBuilder {
 			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 			
-		}
-		
+		}		
 		
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
@@ -99,6 +98,12 @@ public class FSMQueryBuilder {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.accountId IN (").append(createQuery(ownerIds)).append(")");
 			addToPreparedStatement(preparedStmtList, ownerIds);
+		}
+		
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(dsoId)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm.dso_id = ?");
+			preparedStmtList.add(dsoId);
 		}
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 		

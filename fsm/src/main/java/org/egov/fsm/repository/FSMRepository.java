@@ -74,9 +74,9 @@ public class FSMRepository {
 	
 	
 	
-	public List<FSM> getFSMData(FSMSearchCriteria fsmSearchCriteria) {
+	public List<FSM> getFSMData(FSMSearchCriteria fsmSearchCriteria, String dsoId) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = fsmQueryBuilder.getFSMSearchQuery(fsmSearchCriteria, preparedStmtList);
+		String query = fsmQueryBuilder.getFSMSearchQuery(fsmSearchCriteria, dsoId, preparedStmtList);
 		List<FSM> FSMData = jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
 		return FSMData;
 	}

@@ -8,11 +8,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMAuditUtil;
@@ -38,6 +40,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -127,7 +130,7 @@ public class FSMService {
 		List<String> ids = new ArrayList<String>();
 		ids.add( fsm.getId());
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
-		List<FSM> fsms = repository.getFSMData(criteria);
+		List<FSM> fsms = repository.getFSMData(criteria, null);
 		
 		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
 		
@@ -210,7 +213,7 @@ public class FSMService {
 	private void handleDSOAccept(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
 		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
-		Vendor vendor = dsoService.getVendor(oldFSM.getDsoId(),fsm.getTenantId(), dsoUser.getUuid(),fsmRequest.getRequestInfo());
+		Vendor vendor = dsoService.getVendor(oldFSM.getDsoId(),fsm.getTenantId(), dsoUser.getUuid(),null, fsmRequest.getRequestInfo());
 		if(vendor == null) {
 			throw new CustomException(FSMErrorConstants.INVALID_DSO," DSO is invalid, cannot take an action, Application is not assigned to current logged in user !");
 		}
@@ -299,6 +302,7 @@ public class FSMService {
 		List<FSM> fsmList = new LinkedList<>();
 		List<String> uuids = new ArrayList<String>();
 		UserDetailResponse usersRespnse;
+		String dsoId = null;
 		
 		fsmValidator.validateSearch(requestInfo, criteria);
 		
@@ -319,7 +323,16 @@ public class FSMService {
 				
 			}
 		}
-		fsmList = repository.getFSMData(criteria);
+		
+		List<Role> roles = requestInfo.getUserInfo().getRoles();
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) && roles.stream().anyMatch(role -> Objects.equals(role.getCode(), FSMConstants.ROLE_FSM_DSO))) {
+		  	Vendor dso = dsoService.getVendor(null, criteria.getTenantId(), null, requestInfo.getUserInfo().getMobileNumber(), requestInfo);
+		  	if(dso!=null && org.apache.commons.lang3.StringUtils.isNotEmpty(dso.getId())) {
+		  		dsoId = dso.getId();
+		  	}
+		}
+		
+		fsmList = repository.getFSMData(criteria, dsoId);
 		if (!fsmList.isEmpty()) {
 			enrichmentService.enrichFSMSearch(fsmList, requestInfo, criteria.getTenantId());
 		}
