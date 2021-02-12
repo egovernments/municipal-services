@@ -66,6 +66,9 @@ public class Address   {
 
   @JsonProperty("street")
   private String street = null;
+  
+  @JsonProperty("slumName")
+  private String slumName = null;
 
   @JsonProperty("locality")
   private Boundary locality = null;

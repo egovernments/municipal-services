@@ -1,5 +1,6 @@
 package org.egov.fsm.calculator.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.egov.fsm.calculator.config.BillingSlabConfig;
@@ -48,6 +49,18 @@ public class BillingSlabRepository {
 			throw e;
 		}
 		return count;
+	}
+	
+	public BigDecimal getBillingSlabPrice(String query) {
+		BigDecimal billingSlabPrice = null;
+		try {
+			billingSlabPrice = jdbcTemplate.queryForObject(query, BigDecimal.class);
+		} catch (Exception e) {
+			if(!e.getMessage().equalsIgnoreCase("Incorrect result size: expected 1, actual 0")) {
+				throw e;
+			}
+		}
+		return billingSlabPrice;
 	}
 	
 	public List<BillingSlab> getBillingSlabData(BillingSlabSearchCriteria criteria) {

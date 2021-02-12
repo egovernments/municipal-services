@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.fsm.calculator.config.BillingSlabConfig;
+import org.egov.fsm.calculator.web.models.BillingSlab;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,10 +21,20 @@ public class BillingSlabQueryBuilder {
 	private static final String QUERY_BILLINGSLAB_EXIST = "SELECT count(*) FROM eg_billing_slab where id ='%s'";
 	private static final String QUERY_BILLING_SLAB_SEARCH = "SELECT * FROM eg_billing_slab where tenantid='%s'";
 	private final String paginationWrapper = "{} {orderby} OFFSET %s LIMIT %s";
+	private static final String QUERY_BILLINGSLAB_PRICE = "SELECT price FROM eg_billing_slab where tenantid='%s' AND capacityto>=%s AND capacityfrom<=%s";
+	private static final String QUERY_PARAM_FOR_SLUM = " AND slum='%s'";
 
 	@Autowired
 	private BillingSlabConfig config;
 
+	public String getBillingSlabPriceQuery(String tenantId, Double capacity, String slumName) {
+		String query = String.format(QUERY_BILLINGSLAB_PRICE, tenantId, capacity, capacity);
+		if(org.apache.commons.lang3.StringUtils.isNotBlank(slumName)) {
+			query = query + String.format(QUERY_PARAM_FOR_SLUM, "YES");
+		}
+		return query;
+	} 
+	
 	public String getBillingSlabCombinationCountQuery(String tenantId, BigDecimal capacityFrom, BigDecimal capacityTo, String propertType,
 			String slum) {
 		return String.format(QUERY_BILLINGSLAB_COMBINATION_COUNT,tenantId, capacityFrom, capacityTo, propertType, slum);

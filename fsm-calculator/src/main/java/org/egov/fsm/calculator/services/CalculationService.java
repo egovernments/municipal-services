@@ -11,8 +11,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.kafka.broker.CalculatorProducer;
+import org.egov.fsm.calculator.repository.BillingSlabRepository;
+import org.egov.fsm.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.fsm.calculator.utils.CalculationUtils;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
+import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.egov.fsm.calculator.web.models.Calculation;
 import org.egov.fsm.calculator.web.models.CalculationReq;
 import org.egov.fsm.calculator.web.models.CalculationRes;
@@ -55,6 +58,13 @@ public class CalculationService {
 
 	@Autowired
 	private FSMService fsmService;
+	
+	@Autowired
+	private BillingSlabQueryBuilder billingSlabQueryBuilder;
+	
+	@Autowired
+	private BillingSlabRepository billingSlabRepository;
+	
 
 	/**
 	 * Calculates tax estimates and creates demand
@@ -174,18 +184,27 @@ public class CalculationService {
 		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
 		TaxHeadEstimate estimate = new TaxHeadEstimate();
 		
-		String amount = getAmountForVehicleType(fsm.getVehicleType(), mdmsData);
-		if(amount == null ||! NumberUtils.isCreatable(amount)) {
-			throw new CustomException(CalculatorConstants.INVALID_AMOUNT, "Amount is Invalid for the given vehicleType");
+		BigDecimal amount = null;
+		String capacity = getAmountForVehicleType(fsm.getVehicleType(), mdmsData);
+		if (capacity ==null || !NumberUtils.isCreatable(capacity)) {
+			throw new CustomException(CalculatorConstants.INVALID_CAPACITY, "Capacity is Invalid for the given vehicleType");
+		}
+		
+		String slumName = fsm.getAddress().getSlumName();
+		
+		amount = billingSlabRepository.getBillingSlabPrice(billingSlabQueryBuilder.getBillingSlabPriceQuery(fsm.getTenantId(), NumberUtils.toDouble(capacity), slumName));
+		
+		if(amount == null) {
+			throw new CustomException(CalculatorConstants.INVALID_PRICE, "Price not found in Billing Slab for the given vehicleType and slumName");
 		}
 		
 		
 		
-		BigDecimal calculatedAmout = BigDecimal.valueOf(calulationCriteria.getFsm().getNoOfTrips()).multiply( NumberUtils.toScaledBigDecimal(amount)) ;
+		BigDecimal calculatedAmout = BigDecimal.valueOf(calulationCriteria.getFsm().getNoOfTrips()).multiply( amount) ;
 
 		
 		if (calculatedAmout.compareTo(BigDecimal.ZERO) == -1)
-			throw new CustomException(CalculatorConstants.INVALID_AMOUNT, "Tax amount is negative");
+			throw new CustomException(CalculatorConstants.INVALID_PRICE, "Tax amount is negative");
 
 		estimate.setEstimateAmount(calculatedAmout);
 		estimate.setCategory(Category.FEE);
@@ -201,7 +220,7 @@ public class CalculationService {
 		String  amount = null;
 		for(Map vehicleTypeMap : vehicleTypeList) {
 			if(vehicleTypeMap.get("code").equals(vehicleType)) {
-				amount = (String) vehicleTypeMap.get("amount");
+				amount = (String) vehicleTypeMap.get("capacity");
 				break;
 			}
 		}
