@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-vehicle-application
       isTransaction: true
       queryMaps:
-        - query : INSERT INTO public.eg_vehicle( id, tenantId, registrationNumber, model, type, tankCapicity, suctionType, pollutionCertiValidTill, InsuranceCertValidTill, fitnessValidTill, roadTaxPaidTill, gpsEnabled, source, status, additionalDetails, owner_id , createdBy, lastModifiedBy, createdTime, lastModifiedTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query : INSERT INTO eg_vehicle( id, tenantId, registrationNumber, model, type, tankCapicity, suctionType, pollutionCertiValidTill, InsuranceCertValidTill, fitnessValidTill, roadTaxPaidTill, gpsEnabled, source, status, additionalDetails, owner_id , createdBy, lastModifiedBy, createdTime, lastModifiedTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: vehicle
           jsonMaps:
             - jsonPath: $.vehicle.id
@@ -151,7 +151,7 @@ serviceMaps:
             
             - jsonPath: $.vehicleTrip.id
             
-        - query: UPDATE public.eg_vehicle_trip_detail SET  referencestatus=?, additionaldetails=?, status=?, itemstarttime=?, itemendtime=?, volume=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
+        - query: UPDATE eg_vehicle_trip_detail SET  referencestatus=?, additionaldetails=?, status=?, itemstarttime=?, itemendtime=?, volume=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
           basePath: vehicleTrip.tripDetails.*
           jsonMaps:
           
@@ -218,7 +218,7 @@ serviceMaps:
             
             - jsonPath: $.vehicleTrip.id
             
-        - query: UPDATE public.eg_vehicle_trip_detail SET  referencestatus=?, additionaldetails=?, status=?, itemstarttime=?, itemendtime=?, volume=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
+        - query: UPDATE eg_vehicle_trip_detail SET  referencestatus=?, additionaldetails=?, status=?, itemstarttime=?, itemendtime=?, volume=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
           basePath: vehicleTrip.tripDetails.*
           jsonMaps:
           
