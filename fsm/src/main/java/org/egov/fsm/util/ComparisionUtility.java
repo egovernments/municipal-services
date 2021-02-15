@@ -17,7 +17,7 @@ public class ComparisionUtility {
 		List<FSMAudit> auditDataList = new LinkedList<FSMAudit>();
 		auditDataList.add(prepareFSMInfo(fsm));
 		for (FSMAuditUtil target : auditList) {
-			List<GraphComparator.Delta> deltas = GraphComparator.compare(source, target, new GraphComparator.ID() {
+			List<GraphComparator.Delta> deltas = GraphComparator.compare(target, source, new GraphComparator.ID() {
 				@Override
 				public Object getId(Object o) {
 					return "id";
@@ -44,7 +44,7 @@ public class ComparisionUtility {
 	public FSMAudit prepareFSMInfo(FSMAuditUtil fsm) {
 		FSMAudit audit = new FSMAudit();
 		Map<String, Object> fsmMap = new LinkedHashMap<>(0);
-		fsmMap.put("fsmApplication", fsm.getId());
+		fsmMap.put("fsmApplicationId", fsm.getId());
 		audit.setWho(fsm.getCreatedBy());
 		audit.setWhen(fsm.getCreatedTime());
 		audit.setWhat(fsmMap);
