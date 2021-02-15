@@ -56,20 +56,24 @@ public class BillingSlabQueryBuilder {
 		return String.format(QUERY_BILLINGSLAB_EXIST, id);
 	}
 	
-	public String getBillingSlabSearchQuery(BillingSlabSearchCriteria criteria) {
+	public String getBillingSlabSearchQuery(BillingSlabSearchCriteria criteria, List<Object> preparedStmtList) {
 		StringBuilder query = new StringBuilder(String.format(QUERY_BILLING_SLAB_SEARCH, criteria.getTenantId()));
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			query.append(" AND id IN(").append(convertListToString(criteria.getIds())).append(")");
 		}
 		if (org.apache.commons.lang3.StringUtils.isNotEmpty(criteria.getPropertyType())) {
-			query.append(String.format(" AND propertytype='%s'", criteria.getPropertyType()));
+			query.append(" AND propertytype=?");
+			preparedStmtList.add(criteria.getPropertyType());
 		}
 		if(criteria.getCapacity() != null) {
-			query.append(String.format(" AND capacityto>=%s AND capacityfrom<=%s", criteria.getCapacity(), criteria.getCapacity()));
+			query.append(" AND capacityto>=? AND capacityfrom<=?");
+			preparedStmtList.add(criteria.getCapacity());
+			preparedStmtList.add(criteria.getCapacity());
 		}
 		
 		if(criteria.getSlum() != null) {
-			query.append(String.format(" AND slum='%s'",criteria.getSlum().toString()));
+			query.append(" AND slum=?");
+			preparedStmtList.add(criteria.getSlum().toString());
 		}
 		return addPaginationWrapper(query.toString(), criteria);
 	}

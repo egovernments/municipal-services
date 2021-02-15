@@ -1,6 +1,7 @@
 package org.egov.fsm.calculator.repository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.egov.fsm.calculator.config.BillingSlabConfig;
@@ -67,9 +68,10 @@ public class BillingSlabRepository {
 	
 	public List<BillingSlab> getBillingSlabData(BillingSlabSearchCriteria criteria) {
 		List<BillingSlab> billingSlabList = null;
-		String query = queryBuilder.getBillingSlabSearchQuery(criteria);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getBillingSlabSearchQuery(criteria, preparedStmtList);
 		try {
-			billingSlabList = jdbcTemplate.query(query, mapper);
+			billingSlabList = jdbcTemplate.query(query, preparedStmtList.toArray(), mapper);
 		} catch (Exception e) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Data");
 		}
