@@ -7,9 +7,11 @@ import org.egov.fsm.calculator.config.BillingSlabConfig;
 import org.egov.fsm.calculator.kafka.broker.BillingSlabProducer;
 import org.egov.fsm.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.fsm.calculator.repository.rowmapper.BillingSlabRowMapper;
+import org.egov.fsm.calculator.utils.CalculatorConstants;
 import org.egov.fsm.calculator.web.models.BillingSlab;
 import org.egov.fsm.calculator.web.models.BillingSlabRequest;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -46,7 +48,7 @@ public class BillingSlabRepository {
 		try {
 			count = jdbcTemplate.queryForObject(query, Integer.class);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab");
 		}
 		return count;
 	}
@@ -57,7 +59,7 @@ public class BillingSlabRepository {
 			billingSlabPrice = jdbcTemplate.queryForObject(query, BigDecimal.class);
 		} catch (Exception e) {
 			if(!e.getMessage().equalsIgnoreCase("Incorrect result size: expected 1, actual 0")) {
-				throw e;
+				throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Price");
 			}
 		}
 		return billingSlabPrice;
@@ -69,7 +71,7 @@ public class BillingSlabRepository {
 		try {
 			billingSlabList = jdbcTemplate.query(query, mapper);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Data");
 		}
 		return billingSlabList;
 	}
