@@ -29,7 +29,7 @@ public class VendorQueryBuilder {
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 
 	private static final String DRIVER_VEHICLE_QUERY = "SELECT %s FROM %s where %s = ?";
-	private static final String VEHICLE_EXISTS = "SELECT vendor_id FROM eg_vendor_vehicle where vechile_id IN ?";
+	private static final String VEHICLE_EXISTS = "SELECT vendor_id FROM eg_vendor_vehicle where vechile_id IN ";
 
 	private static final String DRIVER_ID = "driver_id";
 	private static final String VEHICLE_ID = "vechile_id";
@@ -45,8 +45,11 @@ public class VendorQueryBuilder {
 		return String.format(DRIVER_VEHICLE_QUERY, VEHICLE_ID, VENDOR_VEHICLE, VENDOR_ID);
 	}
 	
-	public String vendorsForVehicles() {
-		return VEHICLE_EXISTS;
+	public String vendorsForVehicles(List<String> vehicleIds, List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(VEHICLE_EXISTS);		
+		builder.append("(").append(createQuery(vehicleIds)).append(")");
+		addToPreparedStatement(preparedStmtList, vehicleIds);
+		return builder.toString();
 	}
 
 

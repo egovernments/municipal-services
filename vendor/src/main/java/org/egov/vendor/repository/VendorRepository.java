@@ -63,11 +63,8 @@ public class VendorRepository {
 	public List<String> getVendorWithVehicles(List<String> vehicleIds){
 		List<String> vendorIds = null;
 		List<Object> preparedStmtList = new ArrayList<>();
-		preparedStmtList.add(vehicleIds);
-		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(), preparedStmtList.toArray(), String.class);
-		
-		return vendorIds;
-		
+		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(vehicleIds, preparedStmtList), preparedStmtList.toArray(), String.class);		
+		return vendorIds;		
 	}
 
 }
