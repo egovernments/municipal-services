@@ -1,6 +1,5 @@
 package org.egov.fsm.repository;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,37 +19,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public class FSMRepository {
 
 	@Autowired
 	private FSMConfiguration config;
-	
-    @Autowired
+
+	@Autowired
 	private Producer producer;
-    
-    @Autowired
-    private FSMQueryBuilder fsmQueryBuilder;
-    
-    @Autowired
+
+	@Autowired
+	private FSMQueryBuilder fsmQueryBuilder;
+
+	@Autowired
 	private JdbcTemplate jdbcTemplate;
-    
-    
-    @Autowired
+
+	@Autowired
 	private FSMRowMapper FSMrowMapper;
-    
-    @Autowired
-    private FSMAuditQueryBuilder auditQueryBuilder;
-    
-    @Autowired
-   	private FSMAuditRowMapper auditRowMapper;
-	
-	
+
+	@Autowired
+	private FSMAuditQueryBuilder auditQueryBuilder;
+
+	@Autowired
+	private FSMAuditRowMapper auditRowMapper;
+
 	public void save(FSMRequest fsmRequest) {
 		producer.push(config.getSaveTopic(), fsmRequest);
 	}
-	
+
 	public void update(FSMRequest fsmRequest, boolean isStateUpdatable) {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 
@@ -68,27 +64,27 @@ public class FSMRepository {
 			producer.push(config.getUpdateTopic(), new FSMRequest(requestInfo, fsmForUpdate, null));
 
 		if (fsmForStatusUpdate != null)
-			producer.push(config.getUpdateWorkflowTopic(), new FSMRequest(requestInfo, fsmForStatusUpdate,null));
+			producer.push(config.getUpdateWorkflowTopic(), new FSMRequest(requestInfo, fsmForStatusUpdate, null));
 
 	}
-	
-	
-	
+
 	public List<FSM> getFSMData(FSMSearchCriteria fsmSearchCriteria, String dsoId) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = fsmQueryBuilder.getFSMSearchQuery(fsmSearchCriteria, dsoId, preparedStmtList);
 		List<FSM> FSMData = jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
 		return FSMData;
 	}
-	
+
 	public List<FSMAuditUtil> getFSMActualData(FSMAuditSearchCriteria criteria) {
-		String query = auditQueryBuilder.getFSMActualDataQuery(criteria);
-		return jdbcTemplate.query(query, auditRowMapper);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = auditQueryBuilder.getFSMActualDataQuery(criteria, preparedStmtList);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), auditRowMapper);
 	}
-	
+
 	public List<FSMAuditUtil> getFSMAuditData(FSMAuditSearchCriteria criteria) {
-		String query = auditQueryBuilder.getFSMAuditDataQuery(criteria);
-		return jdbcTemplate.query(query, auditRowMapper);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = auditQueryBuilder.getFSMAuditDataQuery(criteria, preparedStmtList);
+		return jdbcTemplate.query(query, preparedStmtList.toArray(), auditRowMapper);
 	}
-	
+
 }

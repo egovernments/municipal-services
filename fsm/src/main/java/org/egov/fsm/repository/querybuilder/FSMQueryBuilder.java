@@ -26,10 +26,11 @@ public class FSMQueryBuilder {
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 
-	private static final String QUERY_FSM_APPLICATION_COUNT = "SELECT count(id) FROM eg_fsm_application where id IN (%s)";
+	private static final String QUERY_FSM_APPLICATION_COUNT = "SELECT count(id) FROM eg_fsm_application where id IN ";
 
 	public String getFSMApplicationCountQuery(List<String> applicationNos) {
-		return String.format(QUERY_FSM_APPLICATION_COUNT, convertListToString(applicationNos));
+		StringBuilder builder = new StringBuilder(QUERY_FSM_APPLICATION_COUNT);
+		return builder.append("(").append(convertListToString(applicationNos)).append(")").toString();
 	}
 
 	private String convertListToString(List<String> namesList) {

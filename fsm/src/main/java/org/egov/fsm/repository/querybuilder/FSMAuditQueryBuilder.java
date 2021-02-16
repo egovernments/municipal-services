@@ -22,29 +22,32 @@ public class FSMAuditQueryBuilder {
 			+ "	 fsm_pit.id as fsm_pit_id" + "	 FROM eg_fsm_application fsm"
 			+ "	 INNER JOIN   eg_fsm_address fsm_address on fsm_address.fsm_id = fsm.id"
 			+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
-			+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id where fsm.tenantid='%s'";
+			+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id where fsm.tenantid=?";
 	
-	private static final String FSM_ID = " AND fsm.id='%s'";
-	private static final String APPLICATION_NO = " AND fsm.applicationno='%s'";
+	private static final String FSM_ID = " AND fsm.id=?";
+	private static final String APPLICATION_NO = " AND fsm.applicationno=?";
 
-	public String getFSMActualDataQuery(FSMAuditSearchCriteria criteria) {
-		return generateQuery(criteria);
+	public String getFSMActualDataQuery(FSMAuditSearchCriteria criteria, List<Object> preparedStmtList) {
+		return generateQuery(criteria, preparedStmtList);
 	}
 	
-	private String generateQuery(FSMAuditSearchCriteria criteria) {
-		StringBuilder fsmDataQuery = new StringBuilder(String.format(Query, criteria.getTenantId()));
+	private String generateQuery(FSMAuditSearchCriteria criteria, List<Object> preparedStmtList) {
+		StringBuilder fsmDataQuery = new StringBuilder(Query);
+		preparedStmtList.add(criteria.getTenantId());
 		if (StringUtils.isNotEmpty(criteria.getId())) {
-			fsmDataQuery = fsmDataQuery.append(String.format(FSM_ID, criteria.getId()));
+			fsmDataQuery = fsmDataQuery.append(FSM_ID);
+			preparedStmtList.add(criteria.getId());
 		}
 		if (StringUtils.isNotEmpty(criteria.getApplicationNo())) {
-			fsmDataQuery = fsmDataQuery.append(String.format(APPLICATION_NO, criteria.getApplicationNo()));
+			fsmDataQuery = fsmDataQuery.append(APPLICATION_NO);
+			preparedStmtList.add(criteria.getApplicationNo());
 		}
 		fsmDataQuery.append(" order by fsm.lastmodifiedtime desc");
 		return fsmDataQuery.toString();
 	}
 	
-	public String getFSMAuditDataQuery(FSMAuditSearchCriteria criteria) {
-		return generateQuery(criteria).replace("eg_fsm_application", "eg_fsm_application_auditlog").replace("eg_fsm_address", "eg_fsm_address_auditlog").replace("eg_fsm_geolocation", "eg_fsm_geolocation_auditlog").replace("eg_fsm_pit_detail", "eg_fsm_pit_detail_auditlog");
+	public String getFSMAuditDataQuery(FSMAuditSearchCriteria criteria, List<Object> preparedStmtList) {
+		return generateQuery(criteria, preparedStmtList).replace("eg_fsm_application", "eg_fsm_application_auditlog").replace("eg_fsm_address", "eg_fsm_address_auditlog").replace("eg_fsm_geolocation", "eg_fsm_geolocation_auditlog").replace("eg_fsm_pit_detail", "eg_fsm_pit_detail_auditlog");
 	}
 
 }
