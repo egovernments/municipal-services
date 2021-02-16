@@ -15,81 +15,79 @@ public class FSMQueryBuilder {
 
 	@Autowired
 	private FSMConfiguration config;
-				
-			private static final String Query = "select fsm.*,fsm_address.*,fsm_geo.*,fsm_pit.*,fsm.id as fsm_id, fsm.createdby as fsm_createdby,"
-					+ "  fsm.lastmodifiedby as fsm_lastmodifiedby, fsm.createdtime as fsm_createdtime, fsm.lastmodifiedtime as fsm_lastmodifiedtime,"
-					+ "	 fsm.additionaldetails,fsm_address.id as fsm_address_id,fsm_geo.id as fsm_geo_id,"
-					+ "	 fsm_pit.id as fsm_pit_id"
-					+ "	 FROM eg_fsm_application fsm"
-					+ "	 INNER JOIN   eg_fsm_address fsm_address on fsm_address.fsm_id = fsm.id"
-					+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
-					+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
-			
+
+	private static final String Query = "select fsm.*,fsm_address.*,fsm_geo.*,fsm_pit.*,fsm.id as fsm_id, fsm.createdby as fsm_createdby,"
+			+ "  fsm.lastmodifiedby as fsm_lastmodifiedby, fsm.createdtime as fsm_createdtime, fsm.lastmodifiedtime as fsm_lastmodifiedtime,"
+			+ "	 fsm.additionaldetails,fsm_address.id as fsm_address_id,fsm_geo.id as fsm_geo_id,"
+			+ "	 fsm_pit.id as fsm_pit_id" + "	 FROM eg_fsm_application fsm"
+			+ "	 INNER JOIN   eg_fsm_address fsm_address on fsm_address.fsm_id = fsm.id"
+			+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
+			+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
+
 	private final String paginationWrapper = "{} {orderby} {pagination}";
-	
+
 	private static final String QUERY_FSM_APPLICATION_COUNT = "SELECT count(id) FROM eg_fsm_application where id IN (%s)";
-	
 
 	public String getFSMApplicationCountQuery(List<String> applicationNos) {
 		return String.format(QUERY_FSM_APPLICATION_COUNT, convertListToString(applicationNos));
 	}
-	
+
 	private String convertListToString(List<String> namesList) {
 		return String.join(",", namesList.stream().map(name -> ("'" + name + "'")).collect(Collectors.toList()));
 	}
-	
+
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
-		
+
 		StringBuilder builder = new StringBuilder(Query);
-		if(criteria.getTenantId() != null) {
-			if(criteria.getTenantId().split("\\.").length == 1) {
+		if (criteria.getTenantId() != null) {
+			if (criteria.getTenantId().split("\\.").length == 1) {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" fsm.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
-			}else {
+			} else {
 				addClauseIfRequired(preparedStmtList, builder);
 				builder.append(" fsm.tenantid=? ");
 				preparedStmtList.add(criteria.getTenantId());
 			}
 		}
-		
+
 		List<String> application_number = criteria.getApplicationNos();
 		if (!CollectionUtils.isEmpty(application_number)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.applicationNo IN (").append(createQuery(application_number)).append(")");
 			addToPreparedStatement(preparedStmtList, application_number);
-			
+
 		}
-		
+
 		List<String> applicationStatus = criteria.getApplicationStatus();
 		if (!CollectionUtils.isEmpty(applicationStatus)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.applicationStatus IN (").append(createQuery(applicationStatus)).append(")");
 			addToPreparedStatement(preparedStmtList, applicationStatus);
-			
+
 		}
-		
+
 		List<String> locality = criteria.getLocality();
 		if (!CollectionUtils.isEmpty(locality)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm_address.locality IN (").append(createQuery(locality)).append(")");
 			addToPreparedStatement(preparedStmtList, locality);
-			
+
 		}
-		
+
 		List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
-			
-		}		
-		
+
+		}
+
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.createdtime BETWEEN ").append(criteria.getFromDate()).append(" AND ")
 					.append(criteria.getToDate());
-		}else if (criteria.getFromDate() != null && criteria.getToDate() == null) {
+		} else if (criteria.getFromDate() != null && criteria.getToDate() == null) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.createdtime >= ").append(criteria.getFromDate());
 		}
@@ -99,27 +97,25 @@ public class FSMQueryBuilder {
 			builder.append(" fsm.accountId IN (").append(createQuery(ownerIds)).append(")");
 			addToPreparedStatement(preparedStmtList, ownerIds);
 		}
-		
-		if(org.apache.commons.lang3.StringUtils.isNotBlank(dsoId)) {
+
+		if (org.apache.commons.lang3.StringUtils.isNotBlank(dsoId)) {
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" fsm.dso_id = ?");
 			preparedStmtList.add(dsoId);
 		}
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
-		
+
 	}
+
 	/**
 	 * 
-	 * @param query
-	 *            prepared Query
-	 * @param preparedStmtList
-	 *            values to be replased on the query
-	 * @param criteria
-	 *            fsm search criteria
+	 * @param query            prepared Query
+	 * @param preparedStmtList values to be replased on the query
+	 * @param criteria         fsm search criteria
 	 * @return the query by replacing the placeholders with preparedStmtList
 	 */
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, FSMSearchCriteria criteria) {
-		
+
 		int limit = config.getDefaultLimit();
 		int offset = config.getDefaultOffset();
 		String finalQuery = paginationWrapper.replace("{}", query);
@@ -135,17 +131,17 @@ public class FSMQueryBuilder {
 			offset = criteria.getOffset();
 
 		StringBuilder orderQuery = new StringBuilder();
-		addOrderByClause(orderQuery,criteria);
-		finalQuery = finalQuery.replace("{orderby}", orderQuery.toString()); 
-		
+		addOrderByClause(orderQuery, criteria);
+		finalQuery = finalQuery.replace("{orderby}", orderQuery.toString());
+
 		if (limit == -1) {
-			finalQuery = finalQuery.replace("{pagination}", ""); 
+			finalQuery = finalQuery.replace("{pagination}", "");
 		} else {
-			finalQuery = finalQuery.replace("{pagination}", " offset ?  limit ?  "); 
+			finalQuery = finalQuery.replace("{pagination}", " offset ?  limit ?  ");
 			preparedStmtList.add(offset);
 			preparedStmtList.add(limit + offset);
 		}
-		
+
 		return finalQuery;
 
 	}
@@ -175,40 +171,40 @@ public class FSMQueryBuilder {
 		}
 		return builder.toString();
 	}
-	
-	
-	
+
 	/**
 	 * 
 	 * @param builder
 	 * @param criteria
 	 */
-	 private void addOrderByClause(StringBuilder builder, FSMSearchCriteria criteria){
+	private void addOrderByClause(StringBuilder builder, FSMSearchCriteria criteria) {
 
-	        if(StringUtils.isEmpty(criteria.getSortBy()))
-	            builder.append( " ORDER BY fsm_lastmodifiedtime ");
+		if (StringUtils.isEmpty(criteria.getSortBy()))
+			builder.append(" ORDER BY fsm_lastmodifiedtime ");
 
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.locality)
-	            builder.append(" ORDER BY fsm_address.locality ");
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.locality)
+			builder.append(" ORDER BY fsm_address.locality ");
 
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.applicationStatus)
-	            builder.append(" ORDER BY fsm.applicationStatus ");
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.applicationStatus)
+			builder.append(" ORDER BY fsm.applicationStatus ");
 
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.applicationNumber)
-	            builder.append(" ORDER BY fsm.applicationno ");
-	        
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.propertyUsage)
-	            builder.append(" ORDER BY fsm.propertyUsage ");
-	        
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.vehicle)
-	            builder.append(" ORDER BY fsm.vehicle_id ");
-	        
-	        else if(criteria.getSortBy()== FSMSearchCriteria.SortBy.createdTime)
-	            builder.append(" ORDER BY fsm.createdtime ");
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.applicationNumber)
+			builder.append(" ORDER BY fsm.applicationno ");
 
-	        if(criteria.getSortOrder()== FSMSearchCriteria.SortOrder.ASC)
-	            builder.append(" ASC ");
-	        else builder.append(" DESC ");
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.propertyUsage)
+			builder.append(" ORDER BY fsm.propertyUsage ");
 
-	    }
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.vehicle)
+			builder.append(" ORDER BY fsm.vehicle_id ");
+
+		else if (criteria.getSortBy() == FSMSearchCriteria.SortBy.createdTime)
+			builder.append(" ORDER BY fsm.createdtime ");
+
+		if (criteria.getSortOrder() == FSMSearchCriteria.SortOrder.ASC)
+			builder.append(" ASC ");
+		else
+			builder.append(" DESC ");
+
+	}
+
 }

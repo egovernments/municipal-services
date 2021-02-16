@@ -2,6 +2,7 @@ package org.egov.fsm.calculator.validator;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,13 +51,14 @@ public class BillingSlabValidator {
 
 	public void validateCreate(BillingSlabRequest request) {
 		validateInputs(request);
+		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getBillingSlabCombinationCountQuery(
 				request.getBillingSlab().getTenantId(),
 				request.getBillingSlab().getCapacityFrom(),
 				request.getBillingSlab().getCapacityTo(), request.getBillingSlab().getPropertyType(),
-				request.getBillingSlab().getSlum().toString());
+				request.getBillingSlab().getSlum().toString(), preparedStmtList);
 		
-		int count = repository.getDataCount(query);
+		int count = repository.getDataCount(query, preparedStmtList);
 		if (count >= 1) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,
 					"Billing Slab already exits with the given combination of capacityType, capacityFrom, propertyType and slum");
@@ -69,19 +71,21 @@ public class BillingSlabValidator {
 		}
 		
 		validateInputs(request);
-		String queryForBillingSlab = queryBuilder.getBillingSlabExistQuery(request.getBillingSlab().getId());
-		int count = repository.getDataCount(queryForBillingSlab);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String queryForBillingSlab = queryBuilder.getBillingSlabExistQuery(request.getBillingSlab().getId(), preparedStmtList);
+		int count = repository.getDataCount(queryForBillingSlab, preparedStmtList);
 		if (count <= 0) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR, "Billing Slab not found");
 		}
 
+		preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getBillingSlabCombinationCountForUpdateQuery(
 				request.getBillingSlab().getTenantId(),
 				request.getBillingSlab().getCapacityFrom(), request.getBillingSlab().getCapacityTo(),
 				request.getBillingSlab().getPropertyType(), request.getBillingSlab().getSlum().toString(),
-				request.getBillingSlab().getId());
+				request.getBillingSlab().getId(), preparedStmtList);
 		
-		int combinationCount = repository.getDataCount(query);
+		int combinationCount = repository.getDataCount(query, preparedStmtList);
 		if (combinationCount >= 1) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,
 					"Billing Slab already exits with the given combination of capacityType, capacityFrom, propertyType and slum");

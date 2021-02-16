@@ -44,20 +44,20 @@ public class BillingSlabRepository {
 		producer.push(config.getUpdateBillingSlabTopic(), request);
 	}
 
-	public Integer getDataCount(String query) {
+	public Integer getDataCount(String query, List<Object> preparedStmtList) {
 		Integer count = null;
 		try {
-			count = jdbcTemplate.queryForObject(query, Integer.class);
+			count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
 		} catch (Exception e) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab");
 		}
 		return count;
 	}
 	
-	public BigDecimal getBillingSlabPrice(String query) {
+	public BigDecimal getBillingSlabPrice(String query, List<Object> preparedStmtList) {
 		BigDecimal billingSlabPrice = null;
 		try {
-			billingSlabPrice = jdbcTemplate.queryForObject(query, BigDecimal.class);
+			billingSlabPrice = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(),  BigDecimal.class);
 		} catch (Exception e) {
 			if(!e.getMessage().equalsIgnoreCase("Incorrect result size: expected 1, actual 0")) {
 				throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Price");
