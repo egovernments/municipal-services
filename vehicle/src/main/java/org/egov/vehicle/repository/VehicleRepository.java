@@ -49,10 +49,11 @@ public class VehicleRepository {
 		}
 
 		public Integer getVehicleCount(VehicleRequest vehicleRequest) {
-			String query = queryBuilder.vehicleExistsQuery(vehicleRequest);
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.vehicleExistsQuery(vehicleRequest, preparedStmtList);
 			Integer count = null;
 			try {
-				count = jdbcTemplate.queryForObject(query, Integer.class);
+				count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
 			} catch (Exception e) {
 				throw e;
 			}

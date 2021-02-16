@@ -1,5 +1,6 @@
 package org.egov.vehicle.trip.validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -133,8 +134,9 @@ public class VehicleTripValidator {
 					throw new CustomException(VehicleTripConstants.INVALID_TRIDETAIL_ERROR, "Invalid Volume for  tripDetails referenceNo: " + tripDetail.getReferenceNo());
 				}
 			});
-			
-			int vehicleLogCount = vehicleTripRepository.getDataCount(queryBuilder.getVehicleLogExistQuery(request.getVehicleTrip().getId()));
+			List<Object> preparedStmtList = new ArrayList<>();
+			String query = queryBuilder.getVehicleLogExistQuery(request.getVehicleTrip().getId(), preparedStmtList);
+			int vehicleLogCount = vehicleTripRepository.getDataCount(query, preparedStmtList);
 			if(vehicleLogCount <= 0) {
 				throw new CustomException(VehicleTripConstants.UPDATE_VEHICLELOG_ERROR, "VehicleLog Not found in the System" + request.getVehicleTrip());
 			}

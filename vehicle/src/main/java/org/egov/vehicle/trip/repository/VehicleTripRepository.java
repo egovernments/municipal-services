@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.egov.vehicle.producer.VehicleProducer;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.trip.querybuilder.VehicleTripQueryBuilder;
 import org.egov.vehicle.trip.repository.rowmapper.TripDetailRowMapper;
@@ -63,34 +64,36 @@ public class VehicleTripRepository {
 			producer.push(config.getUpdateWorkflowVehicleLogTopic(), new VehicleTripRequest(requestInfo, tripForStatusUpdate,null));
 	}
 	
-	public Integer getDataCount(String query) {
+	public Integer getDataCount(String query, List<Object> preparedStmtList) {
 		Integer count = null;
 		try {
-			count = jdbcTemplate.queryForObject(query, Integer.class);
+			count = jdbcTemplate.queryForObject(query,preparedStmtList.toArray(), Integer.class);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException("INVALID_DATA", "INVALID_DATA");
 		}
 		return count;
 	}
 	
 	public List<VehicleTrip> getVehicleLogData(VehicleTripSearchCriteria criteria) {
 		List<VehicleTrip> vehicleTrips = null;
-		String query = queryBuilder.getVehicleLogSearchQuery(criteria);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getVehicleLogSearchQuery(criteria, preparedStmtList);
 		try {
-			vehicleTrips = jdbcTemplate.query(query, mapper);
+			vehicleTrips = jdbcTemplate.query(query,preparedStmtList.toArray(), mapper);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException("INVALID_VEHICLELOG_DATA", "INVALID_VEHICLELOG_DATA");
 		}
 		return vehicleTrips;
 	}
 	
 	public List<VehicleTripDetail> getTrpiDetails(String tripId){
 		List<VehicleTripDetail> tripDetails = null;
-		String query = queryBuilder.getTripDetailSarchQuery(tripId);
+		List<Object> preparedStmtList = new ArrayList<>();
+		String query = queryBuilder.getTripDetailSarchQuery(tripId, preparedStmtList);
 		try {
-			tripDetails = jdbcTemplate.query(query, detailMapper);
+			tripDetails = jdbcTemplate.query(query, preparedStmtList.toArray(), detailMapper);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException("INVALID_VEHICLE_TRIP_DETAILS", "INVALID_VEHICLE_TRIP_DETAILS");
 		}
 		
 		return tripDetails;
@@ -103,7 +106,7 @@ public class VehicleTripRepository {
 		try {
 			ids = jdbcTemplate.queryForList(query,String.class);
 		} catch (Exception e) {
-			throw e;
+			throw new CustomException("INVALID_TRIP_FROM_REFERENCES", "INVALID_TRIP_FROM_REFERENCES");
 		}
 		
 		return ids;

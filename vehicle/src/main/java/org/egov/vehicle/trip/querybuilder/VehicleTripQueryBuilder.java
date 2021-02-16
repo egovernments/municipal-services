@@ -13,11 +13,11 @@ import org.springframework.util.StringUtils;
 @Component
 public class VehicleTripQueryBuilder {
 
-	private static final String QUERY_VEHICLE_LOG_EXIST = "SELECT count(*) FROM eg_vehicle_trip where id ='%s' AND status='ACTIVE'";
-	private static final String Query_SEARCH_VEHICLE_LOG = "select * from eg_vehicle_trip WHERE tenantid='%s'";
-	private final String paginationWrapper = "{} {orderby} OFFSET %s LIMIT %s";
+	private static final String QUERY_VEHICLE_LOG_EXIST = "SELECT count(*) FROM eg_vehicle_trip where id =? AND status='ACTIVE'";
+	private static final String Query_SEARCH_VEHICLE_LOG = "select * from eg_vehicle_trip WHERE tenantid=?";
+	private final String paginationWrapper = "{} {orderby}  OFFSET ? LIMIT ?";
 	private static final String QUERY_TRIP_FROM_REF= "SELECT trip_id from eg_vehicle_trip_detail WHERE referenceno in ( %s )";
-	private static final String QUERY_TRIP_DTL= "SELECT * FROM eg_vehicle_trip_detail WHERE trip_id = '%s' ";
+	private static final String QUERY_TRIP_DTL= "SELECT * FROM eg_vehicle_trip_detail WHERE trip_id = ? ";
 	
 
 	@Autowired
@@ -31,11 +31,12 @@ public class VehicleTripQueryBuilder {
 
 
 
-	public String getVehicleLogExistQuery(String vehicleLogId) {
-		return String.format(QUERY_VEHICLE_LOG_EXIST, vehicleLogId);
+	public String getVehicleLogExistQuery(String vehicleLogId, List<Object> preparedStmtList) {
+		preparedStmtList.add(vehicleLogId);
+		return QUERY_VEHICLE_LOG_EXIST;
 	}
 
-	public String getVehicleLogSearchQuery(VehicleTripSearchCriteria criteria) {
+	public String getVehicleLogSearchQuery(VehicleTripSearchCriteria criteria, List<Object> preparedStmtList) {
 		StringBuilder query = new StringBuilder(String.format(Query_SEARCH_VEHICLE_LOG, criteria.getTenantId()));
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
 			query.append(" AND id IN(").append(convertListToString(criteria.getIds())).append(")");
@@ -65,10 +66,10 @@ public class VehicleTripQueryBuilder {
 					.append(")");
 		}
 		
-		return addPaginationWrapper(query.toString(), criteria);
+		return addPaginationWrapper(query.toString(), criteria, preparedStmtList);
 	}
 
-	private String addPaginationWrapper(String query, VehicleTripSearchCriteria criteria) {
+	private String addPaginationWrapper(String query, VehicleTripSearchCriteria criteria, List<Object> preparedStmtList) {
 
 		int limit = config.getDefaultLimit();
 		int offset = config.getDefaultOffset();
@@ -89,9 +90,10 @@ public class VehicleTripQueryBuilder {
 		finalQuery = finalQuery.replace("{orderby}", orderQuery.toString());
 
 		if (limit == -1) {
-			finalQuery = finalQuery.replace("OFFSET %s LIMIT %s", "");
+			finalQuery = finalQuery.replace("OFFSET ? LIMIT ?", "");
 		} else {
-			finalQuery = String.format(finalQuery, offset, offset+limit);
+			preparedStmtList.add(offset);
+			preparedStmtList.add(limit + offset);
 		}
 
 		return finalQuery;
@@ -128,8 +130,9 @@ public class VehicleTripQueryBuilder {
 
 
 
-	public String getTripDetailSarchQuery(String tripId) {
-		return String.format(QUERY_TRIP_DTL,tripId);
+	public String getTripDetailSarchQuery(String tripId, List<Object> preparedStmtList) {
+		preparedStmtList.add(tripId);
+		return QUERY_TRIP_DTL;
 	}
 
 }

@@ -25,7 +25,7 @@ public class QueryBuilder {
 	
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 	private static final String Query = " SELECT * FROM eg_vehicle ";
-	private static final String VEH_EXISTS_QUERY=" SELECT COUNT(*) FROM eg_vehicle WHERE tenantid='%s' AND registrationNumber='%s'";
+	private static final String VEH_EXISTS_QUERY=" SELECT COUNT(*) FROM eg_vehicle WHERE tenantid=?' AND registrationNumber=?";
 	
 	/**
 	 * 
@@ -216,8 +216,10 @@ public class QueryBuilder {
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 	
-	public String vehicleExistsQuery(VehicleRequest vehicleReq) {
+	public String vehicleExistsQuery(VehicleRequest vehicleReq, List<Object> preparedStmtList) {
 		Vehicle vehicle = vehicleReq.getVehicle();
-		return String.format(VEH_EXISTS_QUERY,vehicle.getTenantId(), vehicle.getRegistrationNumber());
+		preparedStmtList.add(vehicle.getTenantId());
+		preparedStmtList.add(vehicle.getRegistrationNumber());
+		return VEH_EXISTS_QUERY;
 	}
 }
