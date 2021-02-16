@@ -22,6 +22,7 @@ import org.egov.wscalculation.web.models.CalculationCriteria;
 import org.egov.wscalculation.web.models.CalculationReq;
 import org.egov.wscalculation.web.models.Property;
 import org.egov.wscalculation.web.models.RequestInfoWrapper;
+import org.egov.wscalculation.web.models.RoadCuttingInfo;
 import org.egov.wscalculation.web.models.SearchCriteria;
 import org.egov.wscalculation.web.models.Slab;
 import org.egov.wscalculation.web.models.TaxHeadEstimate;
@@ -485,9 +486,16 @@ public class EstimationService {
 					feeObj.getAsNumber(WSCalculationConstant.METER_TESTING_FEE_CONST).toString());
 		}
 		BigDecimal roadCuttingCharge = BigDecimal.ZERO;
-		if (criteria.getWaterConnection().getRoadType() != null)
-			roadCuttingCharge = getChargeForRoadCutting(masterData, criteria.getWaterConnection().getRoadType(),
-					criteria.getWaterConnection().getRoadCuttingArea());
+		if (criteria.getWaterConnection().getRoadCuttingInfo() != null) {
+			for (RoadCuttingInfo roadCuttingInfo : criteria.getWaterConnection().getRoadCuttingInfo()) {
+				BigDecimal singleRoadCuttingCharge = BigDecimal.ZERO;
+				if (roadCuttingInfo.getRoadType() != null)
+					singleRoadCuttingCharge = getChargeForRoadCutting(masterData, roadCuttingInfo.getRoadType(),
+							roadCuttingInfo.getRoadCuttingArea());
+				roadCuttingCharge = roadCuttingCharge.add(singleRoadCuttingCharge);
+
+			}
+		}
 //		BigDecimal roadPlotCharge = BigDecimal.ZERO;
 //		if (property.getLandArea() != null)
 //			roadPlotCharge = getPlotSizeFee(masterData, property.getLandArea());
