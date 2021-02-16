@@ -116,7 +116,7 @@ public class BillingSlabQueryBuilder {
 		finalQuery = finalQuery.replace("{orderby}", orderQuery.toString());
 
 		if (limit == -1) {
-			finalQuery = finalQuery.replace("WHERE offset_ > ? AND offset_ <= ?", "");
+			finalQuery = finalQuery.replace("OFFSET ? LIMIT ?", "");
 		} else {
 			preparedStmtList.add(offset);
 			preparedStmtList.add(limit + offset);
