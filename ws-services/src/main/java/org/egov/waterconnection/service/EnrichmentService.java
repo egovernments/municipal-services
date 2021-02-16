@@ -185,6 +185,15 @@ public class EnrichmentService {
 				plumberInfo.setAuditDetails(auditDetails);
 			});
 		}
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				if (roadCuttingInfo.getId() == null) {
+					roadCuttingInfo.setId(UUID.randomUUID().toString());
+					roadCuttingInfo.setStatus(Status.ACTIVE);
+				}
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 		enrichingAdditionalDetails(waterConnectionRequest);
 	}
 	
