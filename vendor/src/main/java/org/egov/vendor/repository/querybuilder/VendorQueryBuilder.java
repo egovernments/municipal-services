@@ -28,8 +28,8 @@ public class VendorQueryBuilder {
 			+ "(SELECT *, DENSE_RANK() OVER (ORDER BY vendor_lastModifiedTime DESC) offset_ FROM " + "({})"
 			+ " result) result_offset " + "WHERE offset_ > ? AND offset_ <= ?";
 
-	private static final String DRIVER_VEHICLE_QUERY = "SELECT %s FROM %s where %s = '%s'";
-	private static final String VEHICLE_EXISTS = "SELECT vendor_id FROM eg_vendor_vehicle where vechile_id IN (%s)";
+	private static final String DRIVER_VEHICLE_QUERY = "SELECT %s FROM %s where %s = ?";
+	private static final String VEHICLE_EXISTS = "SELECT vendor_id FROM eg_vendor_vehicle where vechile_id IN ?";
 
 	private static final String DRIVER_ID = "driver_id";
 	private static final String VEHICLE_ID = "vechile_id";
@@ -37,24 +37,16 @@ public class VendorQueryBuilder {
 	private static final String VENDOR_DRIVER = "eg_vendor_driver";
 	private static final String VENDOR_VEHICLE = "eg_vendor_vehicle";
 
-	public String getDriverSearchQuery(String vendorId) {
-		return String.format(DRIVER_VEHICLE_QUERY, DRIVER_ID, VENDOR_DRIVER, VENDOR_ID, vendorId);
+	public String getDriverSearchQuery() {
+		return String.format(DRIVER_VEHICLE_QUERY, DRIVER_ID, VENDOR_DRIVER, VENDOR_ID);
 	}
 
-	public String getVehicleSearchQuery(String vendorId) {
-		return String.format(DRIVER_VEHICLE_QUERY, VEHICLE_ID, VENDOR_VEHICLE, VENDOR_ID, vendorId);
+	public String getVehicleSearchQuery() {
+		return String.format(DRIVER_VEHICLE_QUERY, VEHICLE_ID, VENDOR_VEHICLE, VENDOR_ID);
 	}
 	
-	public String vendorsForVehicles(List<String> vehicleIds) {
-		StringBuilder vehilceIdsString = new StringBuilder();
-		for(int t=0;t<vehicleIds.size();t++) {
-			if(t!=0 && t < vehicleIds.size()) {
-				vehilceIdsString.append(",");
-			}
-			vehilceIdsString.append("'"+vehicleIds.get(t)+"'");
-		}
-		
-		return String.format(VEHICLE_EXISTS, String.join(",", vehilceIdsString ));
+	public String vendorsForVehicles() {
+		return VEHICLE_EXISTS;
 	}
 
 

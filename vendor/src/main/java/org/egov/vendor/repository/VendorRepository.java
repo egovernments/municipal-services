@@ -46,19 +46,25 @@ public class VendorRepository {
 
 	public List<String> getDrivers(String id) {
 		List<String> ids = null;
-		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getDriverSearchQuery(id), String.class);
+		List<Object> preparedStmtList = new ArrayList<>();
+		preparedStmtList.add(id);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getDriverSearchQuery(), preparedStmtList.toArray(), String.class);
 		return ids;
 	}
 
 	public List<String> getVehicles(String id) {
 		List<String> ids = null;
-		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getVehicleSearchQuery(id), String.class);
+		List<Object> preparedStmtList = new ArrayList<>();
+		preparedStmtList.add(id);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getVehicleSearchQuery(), preparedStmtList.toArray(), String.class);
 		return ids;
 	}
 	
 	public List<String> getVendorWithVehicles(List<String> vehicleIds){
 		List<String> vendorIds = null;
-		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(vehicleIds),String.class);
+		List<Object> preparedStmtList = new ArrayList<>();
+		preparedStmtList.add(vehicleIds);
+		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(), preparedStmtList.toArray(), String.class);
 		
 		return vendorIds;
 		
