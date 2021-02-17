@@ -430,7 +430,7 @@ public class TradeLicenseService {
                 case businessService_TL:
                     if (config.getIsExternalWorkFlowEnabled()) {
                         
-			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()) 
+			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()  && !tradeLicenseRequest.getLicenses().get(0).getAction().equalsIgnoreCase("INITIATE")) 
                        	tradeLicenseRequest.getLicenses().get(0).setAction("APPROVE");
                        	wfIntegrator.callWorkFlow(tradeLicenseRequest);
 			
