@@ -175,9 +175,10 @@ public class EnrichmentService {
 		}
 		
 		if(fsmRequest.getFsm().getPitDetail() != null) {
-			if (StringUtils.isEmpty(fsmRequest.getFsm().getPitDetail().getId()))
-				fsmRequest.getFsm().getPitDetail().setId(UUID.randomUUID().toString());
-			fsmRequest.getFsm().getPitDetail().setTenantId(fsmRequest.getFsm().getTenantId());
+			if (StringUtils.isEmpty(fsmRequest.getFsm().getPitDetail().getId())) {
+					fsmRequest.getFsm().getPitDetail().setId(UUID.randomUUID().toString());
+					fsmRequest.getFsm().getPitDetail().setTenantId(fsmRequest.getFsm().getTenantId());
+			}			
 			fsmRequest.getFsm().getPitDetail().setAuditDetails(auditDetails);
 		}
 

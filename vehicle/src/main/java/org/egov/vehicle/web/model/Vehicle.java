@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import javax.validation.constraints.Size;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -30,18 +32,22 @@ public class Vehicle {
     @JsonProperty("id")
     private String id = null;
 
+	@Size(max=64)
     @JsonProperty("tenantId")
     private String tenantId = null;
 
     @NonNull
+	@Size(max=64)
     @JsonProperty("registrationNumber")
     private String registrationNumber  = null;
 
     @NonNull
+	@Size(max=64)
     @JsonProperty("model")
     private String model = null;
 
     @NonNull
+	@Size(max=64)
     @JsonProperty("type")
     private String type = null;
 
