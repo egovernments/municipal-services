@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.ServiceRequestRepository;
@@ -36,10 +38,13 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class NotificationService {
 
+	@Autowired
 	private FSMConfiguration config;
 
+	@Autowired
 	private ServiceRequestRepository serviceRequestRepository;
 
+	@Autowired
 	private NotificationUtil util;
 
 	@Autowired

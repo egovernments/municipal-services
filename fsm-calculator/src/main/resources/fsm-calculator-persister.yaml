@@ -45,7 +45,7 @@ serviceMaps:
          jsonMaps: 
             - jsonPath: $.billingSlab.id
              
-       - query: UPDATE public.eg_billing_slab SET tenantid=?, capacityfrom=?, capacityto=?, propertytype=?, slum=?, price=?, status=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? where id=? 
+       - query: UPDATE public.eg_billing_slab SET tenantid=?, capacityfrom=?, capacityto=?, propertytype=?, slum=?, price=?, status=?, lastmodifiedby=?, lastmodifiedtime=? where id=? 
          basePath: billingSlab
          jsonMaps:    
                 - jsonPath: $.billingSlab.tenantId
@@ -61,12 +61,8 @@ serviceMaps:
                 - jsonPath: $.billingSlab.price
                 
                 - jsonPath: $.billingSlab.status
-                  
-                - jsonPath: $.billingSlab.auditDetails.createdBy
       
                 - jsonPath: $.billingSlab.auditDetails.lastModifiedBy
-      
-                - jsonPath: $.billingSlab.auditDetails.createdTime
       
                 - jsonPath: $.billingSlab.auditDetails.lastModifiedTime
                 
