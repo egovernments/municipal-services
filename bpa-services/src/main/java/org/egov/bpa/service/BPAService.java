@@ -540,7 +540,7 @@ public class BPAService {
 			this.addDataToPdf(document, bpaRequest, permitNo, generatedOn,fileName);
 
 		} catch (Exception ex) {
-			log.debug("Exception occured while downloading pdf", ex.getMessage());
+			//log.debug("Exception occured while downloading pdf", ex.getMessage());
 			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		} finally {
 			try {
