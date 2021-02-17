@@ -58,7 +58,7 @@ public class OCService {
 				data.add(response);
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("VALIDATION_ERROR","Execption in validating additional details:"+e);
 			}
 		});
 		ArrayList<String> riskType = new ArrayList<String>();

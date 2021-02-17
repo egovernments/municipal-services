@@ -119,7 +119,7 @@ public class PaymentNotificationService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("KAFKA_PROCESS_ERROR","Execption in processing kafka data:"+e);
 		}
 	}
 
@@ -156,7 +156,6 @@ public class PaymentNotificationService {
 									.get(0));
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new CustomException(BPAErrorConstants.RECEIPT_ERROR, "Unable to fetch values from receipt");
 		}
 		return valMap;
