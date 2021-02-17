@@ -175,8 +175,10 @@ public class EstimationService {
 					request.getRequestInfo());
 			if (billingSlabs == null || billingSlabs.isEmpty())
 				throw new CustomException("BILLING_SLAB_NOT_FOUND", "Billing Slab are Empty");
-			if (billingSlabs.size() > 1)
-				throw new CustomException("INVALID_BILLING_SLAB", "More than one billing slab found");
+			/*
+			 * if (billingSlabs.size() > 1) throw new
+			 * CustomException("INVALID_BILLING_SLAB", "More than one billing slab found");
+			 */
 			billingSlabIds.add(billingSlabs.get(0).getId());
 			log.debug(" Billing Slab Id For Water Charge Calculation --->  " + billingSlabIds.toString());
 
