@@ -3,6 +3,10 @@ package org.egov.vendor.web.model.user;
 import java.util.Collections;
 import java.util.List;
 
+import org.egov.common.contract.request.RequestInfo;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -10,14 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import org.apache.kafka.common.requests.RequestHeader;
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.vendor.web.model.vehicle.Vehicle;
-import org.egov.vendor.web.model.vehicle.VehicleRequest;
-import org.egov.vendor.web.model.vehicle.VehicleRequest.VehicleRequestBuilder;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @AllArgsConstructor
 @EqualsAndHashCode

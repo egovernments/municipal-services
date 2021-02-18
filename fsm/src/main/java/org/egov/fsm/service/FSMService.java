@@ -1,10 +1,8 @@
 package org.egov.fsm.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,6 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -360,33 +357,8 @@ public class FSMService {
 	public void handleApplicationSubmit(FSMRequest fsmRequest,FSM oldFSM) {
 		
 		FSM fsm = fsmRequest.getFsm();
-		Map<String, String> newAdditionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
-				: new HashMap<String, String>();
-		BigDecimal newTripAmount  = new BigDecimal(0);
-		try {
-			if( newAdditionalDetails != null || newAdditionalDetails.get("tripAmount") != null) {
-				 newTripAmount  = BigDecimal.valueOf(Double.valueOf((String)newAdditionalDetails.get("tripAmount")));
-			}
-		}catch( Exception e) {
-			throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-		}
 		
-		
-		BigDecimal oldTripAmount  = new BigDecimal(0);
-		try {
-			Map<String, String> oldAdditionalDetails = oldFSM.getAdditionalDetails() != null ? (Map<String, String>)oldFSM.getAdditionalDetails()
-					: new HashMap<String, String>();
-			if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
-				 oldTripAmount  = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
-			}
-		}catch( Exception e) {
-			 oldTripAmount  = new BigDecimal(0);
-		}
-		
-		 
-		if( oldTripAmount.compareTo(newTripAmount) != 0) {
-			calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
-		}
+		calculationService.addCalculation(fsmRequest, FSMConstants.APPLICATION_FEE);
 	}
 	
 	public List<FSMAudit> auditSearch(FSMAuditSearchCriteria criteria, RequestInfo requestInfo) {

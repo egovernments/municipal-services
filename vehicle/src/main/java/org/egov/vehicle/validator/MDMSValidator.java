@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.util.Constants;
 import org.egov.vehicle.util.VehicleErrorConstants;
@@ -24,7 +25,7 @@ public class MDMSValidator {
 	public void validateMdmsData(VehicleRequest vehicleRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { Constants.VEHICLE_TYPE , Constants.VEHICLE_SUCTION_TYPE};
+		String[] masterArray = { Constants.VEHICLE_MAKE_MODEL , Constants.VEHICLE_SUCTION_TYPE};
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -42,7 +43,7 @@ public class MDMSValidator {
 	}
 	public Map<String, List<String>> getAttributeValues(Object mdmsData) {
 
-		List<String> modulepaths = Arrays.asList(Constants.VEHICLE_JSONPATH_CODE,Constants.FSM_JSONPATH_CODE);
+		List<String> modulepaths = Arrays.asList(Constants.VEHICLE_JSONPATH_CODE);
 		final Map<String, List<String>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
@@ -65,7 +66,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !this.mdmsResMap.get(Constants.VEHICLE_TYPE).contains(vehicleType) ) {
+		if( !this.mdmsResMap.get(Constants.VEHICLE_MAKE_MODEL).contains(vehicleType) ) {
 			errorMap.put(VehicleErrorConstants.INVALID_VEHICLE_TYPE," Vehicle Type is invalid");
 		}
 

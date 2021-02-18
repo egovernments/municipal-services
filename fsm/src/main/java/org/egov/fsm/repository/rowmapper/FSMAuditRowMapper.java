@@ -1,34 +1,17 @@
 package org.egov.fsm.repository.rowmapper;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.egov.fsm.service.FSMService;
 import org.egov.fsm.util.FSMAuditUtil;
-import org.egov.fsm.web.model.AuditDetails;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSM.StatusEnum;
-import org.egov.fsm.web.model.FSMAudit;
-import org.egov.fsm.web.model.FSMSearchCriteria;
-import org.egov.fsm.web.model.FSMSearchCriteria.FSMSearchCriteriaBuilder;
-import org.egov.fsm.web.model.PitDetail;
-import org.egov.fsm.web.model.location.Address;
-import org.egov.fsm.web.model.location.Boundary;
-import org.egov.fsm.web.model.location.GeoLocation;
-import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 @Component
 public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>> {

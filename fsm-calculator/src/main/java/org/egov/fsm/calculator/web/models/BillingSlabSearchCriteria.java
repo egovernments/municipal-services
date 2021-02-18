@@ -6,7 +6,6 @@ import org.egov.fsm.calculator.web.models.BillingSlab.SlumEnum;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

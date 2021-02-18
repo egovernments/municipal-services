@@ -2,9 +2,7 @@ package org.egov.vehicle.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import javax.validation.Valid;
-
 
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.producer.VehicleProducer;

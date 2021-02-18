@@ -1,12 +1,6 @@
 package org.egov.fsm.web.model;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.egov.fsm.web.model.FSM.StatusEnum;
-import org.egov.fsm.web.model.location.Address;
-import org.egov.fsm.web.model.user.User;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

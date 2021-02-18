@@ -1,11 +1,5 @@
 package org.egov.vendor.web.model.location;
 
-import java.util.Objects;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.egov.vendor.web.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
@@ -16,7 +10,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 

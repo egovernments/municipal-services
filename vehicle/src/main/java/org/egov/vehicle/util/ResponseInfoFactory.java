@@ -3,6 +3,7 @@ package org.egov.vehicle.util;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.stereotype.Component;
+
 import net.logstash.logback.encoder.org.apache.commons.lang.StringUtils;
 
 @Component

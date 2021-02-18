@@ -1,18 +1,27 @@
 package org.egov.vehicle.web.controller;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.egov.vehicle.service.VehicleService;
 import org.egov.vehicle.util.ResponseInfoFactory;
 import org.egov.vehicle.util.VehicleUtil;
-import org.egov.vehicle.web.model.*;
+import org.egov.vehicle.web.model.RequestInfoWrapper;
+import org.egov.vehicle.web.model.Vehicle;
+import org.egov.vehicle.web.model.VehicleRequest;
+import org.egov.vehicle.web.model.VehicleResponse;
+import org.egov.vehicle.web.model.VehicleSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/v1")

@@ -1,27 +1,19 @@
 package org.egov.fsm.calculator.validator;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.BillingSlabConfig;
 import org.egov.fsm.calculator.repository.BillingSlabRepository;
 import org.egov.fsm.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.fsm.calculator.utils.BillingSlabUtil;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
-import org.egov.fsm.calculator.web.models.BillingSlab;
 import org.egov.fsm.calculator.web.models.BillingSlabRequest;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.egov.tracer.model.CustomException;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

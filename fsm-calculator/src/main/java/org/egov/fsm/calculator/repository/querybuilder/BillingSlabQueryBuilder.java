@@ -2,11 +2,8 @@ package org.egov.fsm.calculator.repository.querybuilder;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.fsm.calculator.config.BillingSlabConfig;
-import org.egov.fsm.calculator.web.models.BillingSlab;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,26 +18,11 @@ public class BillingSlabQueryBuilder {
 	private static final String QUERY_BILLINGSLAB_EXIST = "SELECT count(*) FROM eg_billing_slab where id =?";
 	private static final String QUERY_BILLING_SLAB_SEARCH = "SELECT * FROM eg_billing_slab where tenantid=?";
 	private final String paginationWrapper = "{} {orderby} OFFSET ? LIMIT ?";
-	private static final String QUERY_BILLINGSLAB_PRICE = "SELECT price FROM eg_billing_slab where tenantid=? AND capacityto>=? AND capacityfrom<=?";
-	private static final String QUERY_PARAM_FOR_SLUM = " AND slum=?";
 
 	@Autowired
 	private BillingSlabConfig config;
 
-	public String getBillingSlabPriceQuery(String tenantId, Double capacity, String slumName, List<Object> preparedStmtList) {
-		String query = QUERY_BILLINGSLAB_PRICE;
-		preparedStmtList.add(tenantId);
-		preparedStmtList.add(capacity);
-		preparedStmtList.add(capacity);
-		if(org.apache.commons.lang3.StringUtils.isEmpty(slumName)) {
-			query = query + QUERY_PARAM_FOR_SLUM;
-			preparedStmtList.add("NO");
-		}else {
-			query = query + QUERY_PARAM_FOR_SLUM;
-			preparedStmtList.add("YES");
-		}
-		return QUERY_BILLINGSLAB_PRICE;
-	} 
+
 	
 	public String getBillingSlabCombinationCountQuery(String tenantId, BigDecimal capacityFrom, BigDecimal capacityTo, String propertType,
 			String slum, List<Object> preparedStmtList) {
@@ -64,9 +46,7 @@ public class BillingSlabQueryBuilder {
 		return QUERY_BILLINGSLAB_COMBINATION_For_UPDATE_COUNT;
 	}
 
-	private String convertListToString(List<String> namesList) {
-		return String.join(",", namesList.stream().map(name -> ("'" + name + "'")).collect(Collectors.toList()));
-	}
+	
 
 	public String getBillingSlabExistQuery(String id, List<Object> preparedStmtList) {
 		preparedStmtList.add(id);
@@ -74,9 +54,19 @@ public class BillingSlabQueryBuilder {
 	}
 	
 	public String getBillingSlabSearchQuery(BillingSlabSearchCriteria criteria, List<Object> preparedStmtList) {
-		StringBuilder query = new StringBuilder(String.format(QUERY_BILLING_SLAB_SEARCH, criteria.getTenantId()));
+		StringBuilder query = new StringBuilder(QUERY_BILLING_SLAB_SEARCH);
+		if (criteria.getTenantId() != null) {
+			if (criteria.getTenantId().split("\\.").length == 1) {
+				
+				preparedStmtList.add('%' + criteria.getTenantId() + '%');
+			} else {
+				
+				preparedStmtList.add(criteria.getTenantId());
+			}
+		}
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
-			query.append(" AND id IN(").append(convertListToString(criteria.getIds())).append(")");
+			query.append(" AND id IN(").append(createQuery(criteria.getIds())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getIds());
 		}
 		if (org.apache.commons.lang3.StringUtils.isNotEmpty(criteria.getPropertyType())) {
 			query.append(" AND propertytype=?");
@@ -119,7 +109,7 @@ public class BillingSlabQueryBuilder {
 			finalQuery = finalQuery.replace("OFFSET ? LIMIT ?", "");
 		} else {
 			preparedStmtList.add(offset);
-			preparedStmtList.add(limit + offset);
+			preparedStmtList.add(limit );
 		}
 
 		return finalQuery;

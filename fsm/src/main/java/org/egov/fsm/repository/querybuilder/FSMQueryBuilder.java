@@ -1,7 +1,6 @@
 package org.egov.fsm.repository.querybuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.web.model.FSMSearchCriteria;
@@ -26,16 +25,7 @@ public class FSMQueryBuilder {
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 
-	private static final String QUERY_FSM_APPLICATION_COUNT = "SELECT count(id) FROM eg_fsm_application where id IN ";
-
-	public String getFSMApplicationCountQuery(List<String> applicationNos) {
-		StringBuilder builder = new StringBuilder(QUERY_FSM_APPLICATION_COUNT);
-		return builder.append("(").append(convertListToString(applicationNos)).append(")").toString();
-	}
-
-	private String convertListToString(List<String> namesList) {
-		return String.join(",", namesList.stream().map(name -> ("'" + name + "'")).collect(Collectors.toList()));
-	}
+	
 
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
 
@@ -140,7 +130,7 @@ public class FSMQueryBuilder {
 		} else {
 			finalQuery = finalQuery.replace("{pagination}", " offset ?  limit ?  ");
 			preparedStmtList.add(offset);
-			preparedStmtList.add(limit + offset);
+			preparedStmtList.add(limit);
 		}
 
 		return finalQuery;

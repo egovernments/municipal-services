@@ -1,7 +1,6 @@
 package org.egov.vehicle.trip.workflow;
 
 import org.egov.common.contract.request.RequestInfo;
-
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.repository.ServiceRequestRepository;

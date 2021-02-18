@@ -15,7 +15,6 @@ import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
 import org.egov.vendor.web.model.VendorSearchCriteria;
 import org.egov.vendor.web.model.user.UserDetailResponse;
-import org.javers.common.collections.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;

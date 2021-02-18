@@ -1,10 +1,11 @@
 package org.egov.fsm.calculator.web.models;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
@@ -12,14 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.egov.fsm.calculator.web.models.Address;
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
-import org.egov.fsm.calculator.web.models.AuditDetails;
-import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * Request schema of Billing Slab.

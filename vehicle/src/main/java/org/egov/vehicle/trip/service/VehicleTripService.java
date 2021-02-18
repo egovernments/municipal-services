@@ -1,13 +1,8 @@
 package org.egov.vehicle.trip.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -18,7 +13,6 @@ import org.egov.vehicle.trip.validator.VehicleTripValidator;
 import org.egov.vehicle.trip.web.model.VehicleTrip;
 import org.egov.vehicle.trip.web.model.VehicleTripRequest;
 import org.egov.vehicle.trip.web.model.VehicleTripSearchCriteria;
-import org.egov.vehicle.trip.web.model.idgen.IdResponse;
 import org.egov.vehicle.trip.web.model.workflow.BusinessService;
 import org.egov.vehicle.trip.workflow.ActionValidator;
 import org.egov.vehicle.trip.workflow.WorkflowIntegrator;

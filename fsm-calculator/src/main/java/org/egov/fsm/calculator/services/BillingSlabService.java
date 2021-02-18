@@ -44,6 +44,7 @@ public class BillingSlabService {
 	
 	public List<BillingSlab> search(BillingSlabSearchCriteria criteria, RequestInfo requestInfo) {
 		validator.validateSearch( requestInfo,criteria);
+		
 		return repository.getBillingSlabData(criteria);
 
 	}

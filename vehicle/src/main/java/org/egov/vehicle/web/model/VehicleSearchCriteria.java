@@ -2,7 +2,6 @@ package org.egov.vehicle.web.model;
 
 import java.util.List;
 
-
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -53,8 +52,6 @@ public class VehicleSearchCriteria {
 	@JsonProperty("suctionType")
 	private List<String> suctionType;
 
-    @JsonProperty("mobileIds")
-    private List <String> mobileIds;
 
 	  @JsonProperty("sortBy")
 	    private SortBy sortBy;

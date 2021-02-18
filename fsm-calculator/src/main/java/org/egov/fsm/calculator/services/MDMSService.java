@@ -2,11 +2,8 @@ package org.egov.fsm.calculator.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.repository.ServiceRequestRepository;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
@@ -17,8 +14,6 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,15 +68,19 @@ public class MDMSService {
 
 		// filter to only get code field from master data
 				final String filterCode = "$.[?(@.active==true)]";
-		
+				List<MasterDetail> fsmMasterDtls = new ArrayList<>();
+				fsmMasterDtls.add(MasterDetail.builder().name(CalculatorConstants.FSM_CONFIG).filter(filterCode).build());
 
-		List<MasterDetail> vehicleMasterDtls = new ArrayList<>();
-		vehicleMasterDtls.add(MasterDetail.builder().name(CalculatorConstants.VEHICLE_MAKE_MODEL).filter(filterCode).build());
-		ModuleDetail vehicleMasterMDtl = ModuleDetail.builder().masterDetails(vehicleMasterDtls)
-				.moduleName(CalculatorConstants.VEHICLE_MODULE_CODE).build();
+				ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
+						.moduleName(CalculatorConstants.MODULE_CODE).build();
+				
+				List<MasterDetail> vehicleMasterDtls = new ArrayList<>();
+				vehicleMasterDtls.add(MasterDetail.builder().name(CalculatorConstants.VEHICLE_MAKE_MODEL).filter(filterCode).build());
+				ModuleDetail vehicleMasterMDtl = ModuleDetail.builder().masterDetails(vehicleMasterDtls)
+						.moduleName(CalculatorConstants.VEHICLE_MODULE_CODE).build();
 
 
-		return Arrays.asList(vehicleMasterMDtl);
+		return Arrays.asList(vehicleMasterMDtl,fsmMasterMDtl);
 
 	}
 	

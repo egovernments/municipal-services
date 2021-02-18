@@ -1,13 +1,12 @@
 package org.egov.vehicle.trip.repository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.egov.vehicle.producer.VehicleProducer;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
+import org.egov.vehicle.producer.VehicleProducer;
 import org.egov.vehicle.trip.querybuilder.VehicleTripQueryBuilder;
 import org.egov.vehicle.trip.repository.rowmapper.TripDetailRowMapper;
 import org.egov.vehicle.trip.repository.rowmapper.VehicleTripRowMapper;

@@ -26,7 +26,7 @@ public class MDMSValidator {
 	public void validateMdmsData(FSMRequest fsmRequest, Object mdmsData) {
 
 		this.mdmsResMap  = getAttributeValues(mdmsData);
-		String[] masterArray = { FSMConstants.PROPERTY_TYPE, FSMConstants.APPLICATION_CHANNEL, FSMConstants.SANITATION_TYPE, FSMConstants.VEHICLE_MAKE_MODEL, FSMConstants.PIT_TYPE };
+		String[] masterArray = { FSMConstants.MDMS_PROPERTY_TYPE, FSMConstants.MDMS_APPLICATION_CHANNEL, FSMConstants.MDMS_SANITATION_TYPE, FSMConstants.MDMS_VEHICLE_MAKE_MODEL, FSMConstants.MDMS_PIT_TYPE,FSMConstants.MDMS_CONFIG,FSMConstants.MDMS_SLUM_NAME };
 
 		validateIfMasterPresent(masterArray,this.mdmsResMap);
 	
@@ -67,7 +67,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !((List<String>) this.mdmsResMap.get(FSMConstants.PROPERTY_TYPE)).contains(propertyType) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.MDMS_PROPERTY_TYPE)).contains(propertyType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_PROPERTY_TYPE," Property Type is invalid");
 		}
 
@@ -84,7 +84,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !((List<String>) this.mdmsResMap.get(FSMConstants.APPLICATION_CHANNEL)).contains(applicationChannel) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.MDMS_APPLICATION_CHANNEL)).contains(applicationChannel) ) {
 			errorMap.put(FSMErrorConstants.INVALID_APPLICATION_CHANNEL," Application Channel is invalid");
 		}
 
@@ -101,7 +101,7 @@ public class MDMSValidator {
 		
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !((List<String>) this.mdmsResMap.get(FSMConstants.PIT_TYPE)).contains(sanitationType) ) {
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.MDMS_PIT_TYPE)).contains(sanitationType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_PIT_TYPE," On Site PitType is invalid");
 		}
 
@@ -111,7 +111,7 @@ public class MDMSValidator {
 	public void validateVehicleType(String vehicleType) {
 		Map<String, String> errorMap = new HashMap<>();
 		
-		if( !((List<String>) this.mdmsResMap.get(FSMConstants.VEHICLE_MAKE_MODEL)).contains(vehicleType) ) { 
+		if( !((List<String>) this.mdmsResMap.get(FSMConstants.MDMS_VEHICLE_MAKE_MODEL)).contains(vehicleType) ) { 
 			errorMap.put(FSMErrorConstants.INVALID_VEHICLE_TYPE," VehicleType  is invalid");
 		}
 

@@ -15,17 +15,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.validation.Valid;
-import org.egov.vehicle.util.Constants;
-import org.egov.vehicle.util.VehicleErrorConstants;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.repository.ServiceRequestRepository;
+import org.egov.vehicle.util.Constants;
+import org.egov.vehicle.util.VehicleErrorConstants;
 import org.egov.vehicle.web.model.Vehicle;
 import org.egov.vehicle.web.model.VehicleRequest;
 import org.egov.vehicle.web.model.VehicleSearchCriteria;
-import org.egov.vehicle.web.model.hrms.*;
+import org.egov.vehicle.web.model.hrms.Assignment;
+import org.egov.vehicle.web.model.hrms.Employee;
+import org.egov.vehicle.web.model.hrms.EmployeeRequest;
+import org.egov.vehicle.web.model.hrms.EmployeeResponse;
+import org.egov.vehicle.web.model.hrms.Jurisdiction;
 import org.egov.vehicle.web.model.user.User;
 import org.egov.vehicle.web.model.user.UserDetailResponse;
 import org.egov.vehicle.web.model.user.UserRequest;
@@ -34,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -2,11 +2,8 @@ package org.egov.vendor.web.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.egov.vendor.web.model.location.Address;
 import org.egov.vendor.web.model.user.User;
@@ -16,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

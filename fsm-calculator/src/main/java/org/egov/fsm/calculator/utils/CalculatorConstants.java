@@ -25,6 +25,7 @@ public class CalculatorConstants {
  // mdms master names
 
  	public static final String PROPERTY_TYPE = "PropertyType";
+ 	public static final String FSM_CONFIG = "Config";
 	
 	// Error messages in FSM Calculator
 	
@@ -65,5 +66,9 @@ public class CalculatorConstants {
 	public static final String VEHICLE_MODULE_CODE = "Vehicle";
 	public static final String VEHICLE_MAKE_MODEL = "VehicleMakeModel";
 	public static final String VEHICLE_MAKE_MODEL_JSON_PATH = "$.MdmsRes.Vehicle.VehicleMakeModel";
+
+	public static final String FSM_SLUM_OVERRIDE_ALLOWED = "$.MdmsRes.FSM.Config[?(@.active==true && @.code==\"slumName\" && @.override==true )]";
+	public static final String FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED = "$.MdmsRes.FSM.Config[?(@.active==true && @.code==\"additionalDetails.tripAmount\" && @.override==true )]";
+	public static final String FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED = "$.MdmsRes.FSM.Config[?(@.active==true && @.code==\"noOfTrips\" && @.override==true )]";
 	
 }

@@ -19,7 +19,7 @@ public class Constants {
 
 	public static final String EMPLOYEE = "EMPLOYEE";
 
-	public static final String VEHICLE_TYPE = "VehicleType";
+	public static final String VEHICLE_MAKE_MODEL = "VehicleMakeModel";
 
 	public static final String FSM_JSONPATH_CODE = "$.MdmsRes.FSM";
 	public static final String VEHICLE_JSONPATH_CODE = "$.MdmsRes.Vehicle";

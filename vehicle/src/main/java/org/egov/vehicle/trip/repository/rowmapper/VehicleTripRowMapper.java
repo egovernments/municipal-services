@@ -1,6 +1,5 @@
 package org.egov.vehicle.trip.repository.rowmapper;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,18 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.egov.vehicle.web.model.AuditDetails;
 import org.egov.vehicle.trip.web.model.VehicleTrip;
 import org.egov.vehicle.trip.web.model.VehicleTrip.StatusEnum;
-import org.postgresql.util.PGobject;
+import org.egov.vehicle.web.model.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 @Component
 public class VehicleTripRowMapper implements ResultSetExtractor<List<VehicleTrip>> {

@@ -3,14 +3,11 @@ package org.egov.fsm.calculator.utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.fsm.calculator.config.CalculatorConfig;
 import org.egov.fsm.calculator.repository.ServiceRequestRepository;
 import org.egov.fsm.calculator.web.models.AuditDetails;
@@ -20,7 +17,6 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
@@ -28,8 +24,6 @@ import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-
-import lombok.Builder;
 
 @Component
 public class BillingSlabUtil {
@@ -124,6 +118,7 @@ public class BillingSlabUtil {
 		// master details for FSM module
 		List<MasterDetail> fsmMasterDtls = new ArrayList<>();
 		fsmMasterDtls.add(MasterDetail.builder().name(CalculatorConstants.PROPERTY_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(CalculatorConstants.FSM_CONFIG).filter(null).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(CalculatorConstants.MODULE_CODE).build();
 

@@ -37,33 +37,50 @@ public class VehicleTripQueryBuilder {
 	}
 
 	public String getVehicleLogSearchQuery(VehicleTripSearchCriteria criteria, List<Object> preparedStmtList) {
-		StringBuilder query = new StringBuilder(String.format(Query_SEARCH_VEHICLE_LOG, criteria.getTenantId()));
+		StringBuilder query = new StringBuilder(Query_SEARCH_VEHICLE_LOG);
+		if (criteria.getTenantId() != null) {
+			if (criteria.getTenantId().split("\\.").length == 1) {
+				
+				preparedStmtList.add('%' + criteria.getTenantId() + '%');
+			} else {
+				
+				preparedStmtList.add(criteria.getTenantId());
+			}
+		}
+		
 		if (!CollectionUtils.isEmpty(criteria.getIds())) {
-			query.append(" AND id IN(").append(convertListToString(criteria.getIds())).append(")");
+			query.append(" AND id IN(").append(createQuery(criteria.getIds())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getIds());
 		}
 		if (!CollectionUtils.isEmpty(criteria.getVehicleIds())) {
-			query.append(" AND vehicle_id IN(").append(convertListToString(criteria.getVehicleIds())).append(")");
+			query.append(" AND vehicle_id IN(").append(createQuery(criteria.getVehicleIds())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getVehicleIds());
 		}
 		
 		if (!CollectionUtils.isEmpty(criteria.getDriverIds())) {
-			query.append(" AND driver_id IN(").append(convertListToString(criteria.getDriverIds())).append(")");
+			query.append(" AND driver_id IN(").append(createQuery(criteria.getDriverIds())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getDriverIds());
 		}
 		
 		if (!CollectionUtils.isEmpty(criteria.getTripOwnerIds())) {
-			query.append(" AND owner_id IN(").append(convertListToString(criteria.getTripOwnerIds())).append(")");
+			query.append(" AND owner_id IN(").append(createQuery(criteria.getTripOwnerIds())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getTripOwnerIds());
 		}
 		
 		if (!CollectionUtils.isEmpty(criteria.getApplicationNos())) {
-			query.append(" AND applicationno IN(").append(convertListToString(criteria.getApplicationNos())).append(")");
+			query.append(" AND applicationno IN(").append(createQuery(criteria.getApplicationNos())).append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getApplicationNos());
 		}
 		
 		if (!StringUtils.isEmpty(criteria.getBusinessService())) {
-			query.append(" AND businessservice = ").append(criteria.getBusinessService());
+			query.append(" AND businessservice = ?");
+			preparedStmtList.add(criteria.getBusinessService());
 		}
 	
 		if (!CollectionUtils.isEmpty(criteria.getApplicationStatus())) {
-			query.append(" AND applicationstatus IN(").append(convertListToString(criteria.getApplicationStatus()))
+			query.append(" AND applicationstatus IN(").append(createQuery(criteria.getApplicationStatus()))
 					.append(")");
+			addToPreparedStatement(preparedStmtList, criteria.getApplicationStatus());
 		}
 		
 		return addPaginationWrapper(query.toString(), criteria, preparedStmtList);
@@ -93,7 +110,7 @@ public class VehicleTripQueryBuilder {
 			finalQuery = finalQuery.replace("OFFSET ? LIMIT ?", "");
 		} else {
 			preparedStmtList.add(offset);
-			preparedStmtList.add(limit + offset);
+			preparedStmtList.add(limit );
 		}
 
 		return finalQuery;
@@ -122,7 +139,23 @@ public class VehicleTripQueryBuilder {
 
     }
 
+	private void addToPreparedStatement(List<Object> preparedStmtList, List<String> ids) {
+		ids.forEach(id -> {
+			preparedStmtList.add(id);
+		});
 
+	}
+
+	private Object createQuery(List<String> ids) {
+		StringBuilder builder = new StringBuilder();
+		int length = ids.size();
+		for (int i = 0; i < length; i++) {
+			builder.append(" ?");
+			if (i != length - 1)
+				builder.append(",");
+		}
+		return builder.toString();
+	}
 
 	public String getTripIdFromReferenceNosQuery(List<String> refernceNos) {
 		return String.format(QUERY_TRIP_FROM_REF,convertListToString(refernceNos));

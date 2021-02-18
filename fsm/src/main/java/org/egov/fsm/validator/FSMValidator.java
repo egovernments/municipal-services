@@ -6,11 +6,10 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
+import org.egov.fsm.service.BoundaryService;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
@@ -18,15 +17,15 @@ import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.user.User;
-import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
+
 import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
@@ -35,6 +34,9 @@ public class FSMValidator {
 	@Autowired
 	private MDMSValidator mdmsValidator;
 	
+
+	@Autowired
+	private BoundaryService boundaryService ;
 
 	@Autowired
 	private FSMConfiguration config;
@@ -69,21 +71,14 @@ public class FSMValidator {
 				throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR,"Applicant Name and mobile number mandatory");
 			}
 			
-			Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()
-					: new HashMap<String, String>();
-			if(config.getTripAmtRequired() &&  additionalDetails.get("tripAmount") == null   ) {
-				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-			}else {
-				try {
-					BigDecimal tripAmt = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
-				}catch(Exception e) {
-					throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-				}
-			}
+			
 			
 			mdmsValidator.validateVehicleType(fsm.getVehicleType());
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			validateTripAmount(fsmRequest, mdmsData);
+			validateSlum(fsmRequest, mdmsData);
+			validateNoOfTrips(fsmRequest, mdmsData);
 		}else {
 			// incase of anonymous user, citizen is mandatory
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
@@ -98,7 +93,6 @@ public class FSMValidator {
 				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 			}
 		}
-		
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 	}
 
@@ -227,9 +221,56 @@ public class FSMValidator {
 		}
 		
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
+		validateSlum(fsmRequest, mdmsData);
+		validateNoOfTrips(fsmRequest, mdmsData);
+		validateTripAmount(fsmRequest, mdmsData);
 
 	}
 	
+	private void validateTripAmount(FSMRequest fsmRequest, Object mdmsData) {
+		FSM fsm = fsmRequest.getFsm();
+
+		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED);
+		
+		
+		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()
+				: new HashMap<String, String>();
+		if(!CollectionUtils.isEmpty(tripAountAllowed) &&  additionalDetails.get("tripAmount") == null   ) {
+			throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+		}else if(!CollectionUtils.isEmpty(tripAountAllowed)){
+			try {
+				BigDecimal tripAmt = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
+			}catch(Exception e) {
+				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
+			}
+		}
+	}
+	private void validateNoOfTrips(FSMRequest fsmRequest, Object mdmsData) {
+		FSM fsm = fsmRequest.getFsm();
+		Integer noOfTrips  = fsm.getNoOfTrips();
+		List<Map<String,Object>> noOftripsAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
+		
+		if(CollectionUtils.isEmpty(noOftripsAllowed) ) {
+			if(noOfTrips != 1) {
+				 throw new CustomException(FSMErrorConstants.INVALID_NO_OF_TRIPS, "Not allowed to modify No of Trips");
+			}
+		}
+	}
+	private void validateSlum(FSMRequest fsmRequest, Object mdmsData) {
+		FSM fsm = fsmRequest.getFsm();
+		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
+		String locality = fsm.getAddress().getLocality().getCode();
+		List<Map<String,Object>> slumNameAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_SLUM_OVERRIDE_ALLOWED);
+
+		
+		if(!CollectionUtils.isEmpty(slumNameAllowed) && !StringUtils.isEmpty(fsm.getAddress().getSlumName())) {
+			List<Map<String,Object>> slumNameMapping = JsonPath.read(mdmsData, FSMConstants.SLUM_CODE_PATH.replace("{1}", locality).replace("{2}", fsm.getAddress().getSlumName().trim()));
+			if(CollectionUtils.isEmpty(slumNameMapping)) {
+				 throw new CustomException(FSMErrorConstants.INVALID_SLUM, "Slum Name is Invalid!");
+			}
+		}
+		
+	}
 	private void validateAllIds(List<FSM> searchResult, FSM fsm) {
 
 		Map<String, FSM> idTofsmFromSearch = new HashMap<>();
@@ -289,7 +330,7 @@ public class FSMValidator {
 	public void validateCheckList(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 		Map additonalDetails = (Map)fsm.getAdditionalDetails();
-		List<Map<String,String>> requestCheckList = (List<Map<String, String>>) additonalDetails.get(FSMConstants.CHECKLIST);
+		List<Map<String,String>> requestCheckList = (List<Map<String, String>>) additonalDetails.get(FSMConstants.MDMS_CHECKLIST);
 		List<Map<String,Object>> mdmsCheckList = JsonPath.read(mdmsData, FSMConstants.REQ_CHECKLIST_PATH);
 		if(mdmsCheckList.size() > 0 && (requestCheckList == null || requestCheckList.size() ==0)) {
 			throw new CustomException(FSMErrorConstants.INVALID_CHECKLIST, " Mandatory checlist is not provided!");

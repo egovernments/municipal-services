@@ -1,6 +1,5 @@
 package org.egov.vehicle.trip.web.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;

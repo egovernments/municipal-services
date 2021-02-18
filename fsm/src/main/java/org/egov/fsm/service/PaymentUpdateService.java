@@ -8,6 +8,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.FSMRepository;
+import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
@@ -72,6 +73,9 @@ public class PaymentUpdateService {
 
 			for (PaymentDetail paymentDetail : paymentDetails) {
 
+				if(paymentDetail.getBusinessService().equalsIgnoreCase(FSMConstants.FSM_PAY_BUSINESS_SERVICE)) {
+					
+				
 					FSMSearchCriteria searchCriteria = new FSMSearchCriteria();
 					searchCriteria.setTenantId(tenantId);
 					List<String> applNos = Arrays.asList(paymentDetail.getBill().getConsumerCode());
@@ -108,7 +112,7 @@ public class PaymentUpdateService {
 
 						repository.update(updateRequest, false);
 					});
-					
+				}
 					
 
 				

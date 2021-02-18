@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.vendor.repository.VendorRepository;
-import org.egov.vendor.util.VendorConstants;
-import org.egov.vendor.util.VendorErrorConstants;
 import org.egov.vendor.validator.VendorValidator;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
@@ -94,17 +92,19 @@ public class VendorService {
 				criteria.getVehicleIds().addAll(vehicles.stream().map(Vehicle::getId).collect(Collectors.toList()));
 			}
 			
-			if(!CollectionUtils.isEmpty(criteria.getVehicleIds())) {
-				List<String> vendorIds  = repository.getVendorWithVehicles(criteria.getVehicleIds());
-				if(CollectionUtils.isEmpty(vendorIds)) {
-					return new ArrayList<Vendor>();
+			
+		}
+		
+		if(!CollectionUtils.isEmpty(criteria.getVehicleIds())) {
+			List<String> vendorIds  = repository.getVendorWithVehicles(criteria.getVehicleIds());
+			if(CollectionUtils.isEmpty(vendorIds)) {
+				return new ArrayList<Vendor>();
+			}else {
+				if(CollectionUtils.isEmpty(criteria.getIds())) {
+					criteria.setIds(vendorIds);
 				}else {
-					if(CollectionUtils.isEmpty(criteria.getIds())) {
-						criteria.setIds(vendorIds);
-					}else {
-						criteria.getIds().addAll(vendorIds);
-					}					
-				}
+					criteria.getIds().addAll(vendorIds);
+				}					
 			}
 		}
 		

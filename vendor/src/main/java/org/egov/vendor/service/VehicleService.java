@@ -2,12 +2,8 @@ package org.egov.vendor.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -17,10 +13,6 @@ import org.egov.vendor.util.VendorConstants;
 import org.egov.vendor.web.model.RequestInfoWrapper;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
-import org.egov.vendor.web.model.VendorSearchCriteria;
-import org.egov.vendor.web.model.user.User;
-import org.egov.vendor.web.model.user.UserDetailResponse;
-import org.egov.vendor.web.model.user.UserSearchRequest;
 import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.egov.vendor.web.model.vehicle.VehicleRequest;
 import org.egov.vendor.web.model.vehicle.VehicleResponse;

@@ -1,12 +1,10 @@
 package org.egov.fsm.repository.querybuilder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
-import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

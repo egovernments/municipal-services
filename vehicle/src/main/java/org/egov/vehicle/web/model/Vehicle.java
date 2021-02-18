@@ -1,13 +1,13 @@
 package org.egov.vehicle.web.model;
 
+import javax.validation.constraints.Size;
+
 import org.egov.vehicle.web.model.user.User;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-
-import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

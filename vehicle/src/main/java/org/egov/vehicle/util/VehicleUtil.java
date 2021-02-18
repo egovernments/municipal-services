@@ -1,11 +1,10 @@
 package org.egov.vehicle.util;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.Option;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MasterDetail;
@@ -18,12 +17,12 @@ import org.egov.vehicle.web.model.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.jayway.jsonpath.spi.mapper.MappingProvider;
 
 @Component
 public class VehicleUtil {
@@ -120,15 +119,11 @@ public class VehicleUtil {
 		// master details for FSM module
 		List<MasterDetail> masterDtls = new ArrayList<>();
 		List<ModuleDetail> moduleDtls = new ArrayList<>();
-		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_TYPE).filter(filterCode).build());
-		ModuleDetail masterMDtl = ModuleDetail.builder().masterDetails(masterDtls)
-				.moduleName(Constants.VEHICLE_MODULE_CODE).build();
-		
-		moduleDtls.add(ModuleDetail.builder().masterDetails(masterDtls)
-				.moduleName(Constants.FSM_MODULE_CODE).build());
+	
 		
 		masterDtls = new ArrayList<>();
 		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_SUCTION_TYPE).filter(filterCode).build());
+		masterDtls.add(MasterDetail.builder().name(Constants.VEHICLE_MAKE_MODEL).filter(filterCode).build());
 		moduleDtls.add(ModuleDetail.builder().masterDetails(masterDtls)
 				.moduleName(Constants.VEHICLE_MODULE_CODE).build());
 		

@@ -1,7 +1,9 @@
 package org.egov.vendor.web.model;
 
 import java.util.List;
+
 import org.springframework.util.CollectionUtils;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

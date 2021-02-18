@@ -1,11 +1,17 @@
 package org.egov.vehicle.web.model.hrms;
 
-import lombok.*;
+import javax.validation.constraints.NotNull;
 
 import org.egov.vehicle.web.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Validated
 @EqualsAndHashCode(exclude = {"auditDetails"})

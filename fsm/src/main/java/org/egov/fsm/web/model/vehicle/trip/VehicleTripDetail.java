@@ -1,11 +1,8 @@
 package org.egov.fsm.web.model.vehicle.trip;
 
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.egov.common.contract.request.User;
 import org.egov.fsm.web.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 

@@ -3,7 +3,6 @@ package org.egov.fsm.calculator.kafka.broker;
 import org.egov.tracer.kafka.CustomKafkaTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 public class BillingSlabProducer {

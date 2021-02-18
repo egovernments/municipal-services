@@ -4,6 +4,7 @@ package org.egov.vehicle.web.model.hrms;
 import java.util.List;
 
 import org.egov.common.contract.response.ResponseInfo;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;

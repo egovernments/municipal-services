@@ -25,7 +25,7 @@ public class QueryBuilder {
 	
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 	private static final String Query = " SELECT * FROM eg_vehicle ";
-	private static final String VEH_EXISTS_QUERY=" SELECT COUNT(*) FROM eg_vehicle WHERE tenantid=?' AND registrationNumber=?";
+	private static final String VEH_EXISTS_QUERY=" SELECT COUNT(*) FROM eg_vehicle WHERE tenantid=? AND registrationNumber=?";
 	
 	/**
 	 * 
@@ -62,7 +62,7 @@ public class QueryBuilder {
 		} else {
 			finalQuery = finalQuery.replace("{pagination}", " offset ?  limit ?  "); 
 			preparedStmtList.add(offset);
-			preparedStmtList.add(limit + offset);
+			preparedStmtList.add(limit );
 		}
 		
 		return finalQuery;
@@ -169,12 +169,7 @@ public class QueryBuilder {
 			addToPreparedStatement(preparedStmtList, ownerIds);
 		}
 		
-		ownerIds = criteria.getMobileIds();
-		if (!CollectionUtils.isEmpty(ownerIds)) {
-			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" owner_id IN (").append(createQuery(ownerIds)).append(")");
-			addToPreparedStatement(preparedStmtList, ownerIds);
-		}
+		
 		
 		List<String> suctionTypes = criteria.getSuctionType();
 		if (!CollectionUtils.isEmpty(suctionTypes)) {

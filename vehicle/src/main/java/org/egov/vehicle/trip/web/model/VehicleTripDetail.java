@@ -1,15 +1,9 @@
 package org.egov.vehicle.trip.web.model;
 
-import java.util.List;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.egov.common.contract.request.User;
-import org.egov.vehicle.trip.web.model.VehicleTrip.StatusEnum;
-import org.egov.vehicle.trip.web.model.VehicleTrip.VehicleTripBuilder;
 import org.egov.vehicle.web.model.AuditDetails;
-import org.egov.vehicle.web.model.Vehicle;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

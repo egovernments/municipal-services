@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
-
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.trip.util.VehicleTripConstants;
 import org.egov.vehicle.trip.web.model.VehicleTrip;

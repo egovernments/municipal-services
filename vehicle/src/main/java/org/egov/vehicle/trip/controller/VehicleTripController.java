@@ -6,13 +6,13 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.vehicle.trip.service.VehicleTripService;
-import org.egov.vehicle.util.ResponseInfoFactory;
-import org.egov.vehicle.util.VehicleUtil;
-import org.egov.vehicle.web.model.RequestInfoWrapper;
 import org.egov.vehicle.trip.web.model.VehicleTrip;
 import org.egov.vehicle.trip.web.model.VehicleTripRequest;
 import org.egov.vehicle.trip.web.model.VehicleTripResponse;
 import org.egov.vehicle.trip.web.model.VehicleTripSearchCriteria;
+import org.egov.vehicle.util.ResponseInfoFactory;
+import org.egov.vehicle.util.VehicleUtil;
+import org.egov.vehicle.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

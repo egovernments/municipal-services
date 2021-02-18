@@ -2,10 +2,6 @@ package org.egov.vendor.validator;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
@@ -16,7 +12,6 @@ import org.egov.vendor.service.VehicleService;
 import org.egov.vendor.util.VendorConstants;
 import org.egov.vendor.util.VendorErrorConstants;
 import org.egov.vendor.util.VendorUtil;
-import org.egov.vendor.web.model.AuditDetails;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
 import org.egov.vendor.web.model.VendorSearchCriteria;

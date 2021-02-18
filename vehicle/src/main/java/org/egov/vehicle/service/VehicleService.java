@@ -1,7 +1,5 @@
 package org.egov.vehicle.service;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +19,9 @@ import org.egov.vehicle.web.model.user.User;
 import org.egov.vehicle.web.model.user.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -70,7 +71,11 @@ public class VehicleService {
 			usersRespnse = userService.getOwner(criteria,requestInfo);
 			if(usersRespnse !=null && usersRespnse.getUser() != null && usersRespnse.getUser().size() >0) {
 				uuids = usersRespnse.getUser().stream().map(User::getUuid).collect(Collectors.toList());
-				criteria.setMobileIds(uuids);
+				if(CollectionUtils.isEmpty(criteria.getOwnerId())) {
+					criteria.setOwnerId(uuids);
+				}else {
+					criteria.getOwnerId().addAll(uuids);
+				}
 			}
 		}
 		

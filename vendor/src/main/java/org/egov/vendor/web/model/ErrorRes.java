@@ -1,15 +1,16 @@
 package org.egov.vendor.web.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * All APIs will return ErrorRes in case of failure which will carry

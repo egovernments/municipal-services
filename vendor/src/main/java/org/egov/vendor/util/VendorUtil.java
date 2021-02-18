@@ -1,6 +1,5 @@
 package org.egov.vendor.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;

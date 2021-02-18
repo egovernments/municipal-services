@@ -2,22 +2,18 @@ package org.egov.vehicle.trip.validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
+import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.service.UserService;
 import org.egov.vehicle.service.VehicleService;
-import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.trip.querybuilder.VehicleTripQueryBuilder;
 import org.egov.vehicle.trip.repository.VehicleTripRepository;
 import org.egov.vehicle.trip.util.VehicleTripConstants;
-import org.egov.vehicle.trip.web.model.VehicleTrip;
 import org.egov.vehicle.trip.web.model.VehicleTripRequest;
 import org.egov.vehicle.trip.web.model.VehicleTripSearchCriteria;
 import org.egov.vehicle.web.model.Vehicle;

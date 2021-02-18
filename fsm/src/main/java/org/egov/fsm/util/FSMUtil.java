@@ -118,23 +118,23 @@ public class FSMUtil {
 
 		// filter to only get code field from master data
 				final String filterCode = "$.[?(@.active==true)].code";
-				final String pitTypeFiltter = "$.[?(@.active==true)].code";
+				final String activeFilter = "$.[?(@.active==true)]";
 		// master details for FSM module
 		List<MasterDetail> fsmMasterDtls = new ArrayList<>();
 
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.APPLICATION_CHANNEL).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.SANITATION_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PIT_TYPE).filter(pitTypeFiltter).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.PROPERTY_TYPE).filter(filterCode).build());
-//		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.CHECKLIST).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_CONFIG).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_APPLICATION_CHANNEL).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SANITATION_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_PIT_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_PROPERTY_TYPE).filter(filterCode).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_CHECKLIST).filter(activeFilter).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_CONFIG).filter(activeFilter).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SLUM_NAME).filter(activeFilter).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
 		
 
 		List<MasterDetail> vehicleMasterDtls = new ArrayList<>();
-		vehicleMasterDtls.add(MasterDetail.builder().name(FSMConstants.VEHICLE_MAKE_MODEL).filter(filterCode).build());
+		vehicleMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_VEHICLE_MAKE_MODEL).filter(filterCode).build());
 		ModuleDetail vehicleMasterMDtl = ModuleDetail.builder().masterDetails(vehicleMasterDtls)
 				.moduleName(FSMConstants.VEHICLE_MODULE_CODE).build();
 

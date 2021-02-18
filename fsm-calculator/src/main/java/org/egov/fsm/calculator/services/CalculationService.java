@@ -29,6 +29,7 @@ import org.egov.fsm.calculator.web.models.demand.TaxHeadEstimate;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -80,8 +81,8 @@ public class CalculationService {
 		String tenantId = calculationReq.getCalulationCriteria().get(0)
 				.getTenantId().split("\\.")[0];
 		Object mdmsData = mdmsService.mDMSCall(calculationReq, tenantId);
-		List<Map> mdmsMap = JsonPath.read(mdmsData, CalculatorConstants.VEHICLE_MAKE_MODEL_JSON_PATH);
-		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsMap);
+		
+		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsData);
 		demandService.generateDemand(calculationReq.getRequestInfo(),calculations, mdmsData);
 		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 //		producer.push(config.getSaveTopic(), calculationRes);
@@ -101,8 +102,7 @@ public class CalculationService {
 		String tenantId = calculationReq.getCalulationCriteria().get(0)
 				.getTenantId().split("\\.")[0];
 		Object mdmsData = mdmsService.mDMSCall(calculationReq, tenantId);
-		List<Map> mdmsMap = JsonPath.read(mdmsData, CalculatorConstants.VEHICLE_MAKE_MODEL_JSON_PATH);
-		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsMap);
+		List<Calculation> calculations = getCalculation(calculationReq.getRequestInfo(),calculationReq.getCalulationCriteria(), mdmsData);
 		CalculationRes calculationRes = CalculationRes.builder().calculations(calculations).build();
 		return calculations;
 	}
@@ -119,7 +119,7 @@ public class CalculationService {
 	 *         in criterias
 	 */
 	public List<Calculation> getCalculation(RequestInfo requestInfo,
-			List<CalulationCriteria> criterias, List<Map> mdmsData) {
+			List<CalulationCriteria> criterias, Object mdmsData) {
 		List<Calculation> calculations = new LinkedList<>();
 		for (CalulationCriteria criteria : criterias) {
 			FSM fsm;
@@ -158,7 +158,7 @@ public class CalculationService {
 	 */
 	private EstimatesAndSlabs getTaxHeadEstimates(
 			CalulationCriteria calulationCriteria, RequestInfo requestInfo,
-			List<Map> mdmsData) {
+			Object mdmsData) {
 		List<TaxHeadEstimate> estimates = new LinkedList<>();
 		EstimatesAndSlabs estimatesAndSlabs = getBaseTax(calulationCriteria, requestInfo, mdmsData);
 		estimates.addAll(estimatesAndSlabs.getEstimates());
@@ -180,7 +180,7 @@ public class CalculationService {
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private EstimatesAndSlabs getBaseTax(CalulationCriteria calulationCriteria, RequestInfo requestInfo,
-			List<Map> mdmsData) {
+			Object mdmsData) {
 		FSM fsm = calulationCriteria.getFsm();
 		EstimatesAndSlabs estimatesAndSlabs = new EstimatesAndSlabs();
 		ArrayList<TaxHeadEstimate> estimates = new ArrayList<TaxHeadEstimate>();
@@ -192,21 +192,47 @@ public class CalculationService {
 			throw new CustomException(CalculatorConstants.INVALID_CAPACITY, "Capacity is Invalid for the given vehicleType");
 		}
 		
-		SlumEnum slumName = ((fsm.getAddress().getSlumName() == null ) ? SlumEnum.NO : SlumEnum.YES); 
+		List<Map<String,Object>> slumNameAllowed = JsonPath.read(mdmsData, CalculatorConstants.FSM_SLUM_OVERRIDE_ALLOWED);
+		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, CalculatorConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED);
+		List<Map<String,Object>> noOftripsAllowed = JsonPath.read(mdmsData, CalculatorConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
 		
-		List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
-		if(billingSlabs.size() >0) {
-			amount = billingSlabs.get(0).getPrice();
+		
+		
+		SlumEnum slumName = null;
+		if(!CollectionUtils.isEmpty(slumNameAllowed)) {
+			 slumName = ((fsm.getAddress().getSlumName() == null ) ? SlumEnum.NO : SlumEnum.YES);
 		}
-//		amount = billingSlabRepository.getBillingSlabPrice(billingSlabQueryBuilder.getBillingSlabPriceQuery(fsm.getTenantId(), NumberUtils.toDouble(capacity), slumName));
+		 
+		if(!CollectionUtils.isEmpty(tripAountAllowed)) {
+			Map<String, String> oldAdditionalDetails = fsm.getAdditionalDetails() != null ? (Map<String, String>)fsm.getAdditionalDetails()
+					: new HashMap<String, String>();
+			if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
+				amount = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
+			}else {
+				List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+				if(billingSlabs.size() >0) {
+					amount = billingSlabs.get(0).getPrice();
+				}
+			}
+			
+		}else {
+			List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+			if(billingSlabs.size() >0) {
+				amount = billingSlabs.get(0).getPrice();
+			}
+		}
 		
 		if(amount == null) {
 			throw new CustomException(CalculatorConstants.INVALID_PRICE, "Price not found in Billing Slab for the given vehicleType and slumName");
 		}
 		
 		
+		Integer noOfTrips = 1;
+		if(!CollectionUtils.isEmpty(noOftripsAllowed)) {
+			noOfTrips = calulationCriteria.getFsm().getNoOfTrips();
+		}
 		
-		BigDecimal calculatedAmout = BigDecimal.valueOf(calulationCriteria.getFsm().getNoOfTrips()).multiply( amount) ;
+		BigDecimal calculatedAmout = BigDecimal.valueOf(noOfTrips).multiply( amount) ;
 
 		
 		if (calculatedAmout.compareTo(BigDecimal.ZERO) == -1)
@@ -222,8 +248,9 @@ public class CalculationService {
 		return estimatesAndSlabs;
 	}
 	
-	public String getAmountForVehicleType(String vehicleType, List<Map> vehicleTypeList) {
+	public String getAmountForVehicleType(String vehicleType, Object mdmsData) {
 		String  amount = null;
+		List<Map> vehicleTypeList = JsonPath.read(mdmsData, CalculatorConstants.VEHICLE_MAKE_MODEL_JSON_PATH);
 		for(Map vehicleTypeMap : vehicleTypeList) {
 			if(vehicleTypeMap.get("code").equals(vehicleType)) {
 				amount = (String) vehicleTypeMap.get("capacity");

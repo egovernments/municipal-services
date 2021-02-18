@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.User;
 import org.egov.vendor.service.VendorService;
 import org.egov.vendor.util.ResponseInfoFactory;
 import org.egov.vendor.util.VendorUtil;

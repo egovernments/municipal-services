@@ -1,18 +1,16 @@
 package org.egov.vendor.web.model.location;
 
 
-import org.springframework.validation.annotation.Validated;
 import java.util.Objects;
+
+import org.springframework.validation.annotation.Validated;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import javax.validation.Valid;
-import javax.validation.constraints.*;
 
 /**
  * GeoLocation
