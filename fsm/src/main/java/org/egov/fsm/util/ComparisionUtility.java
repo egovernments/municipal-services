@@ -23,7 +23,7 @@ public class ComparisionUtility {
 					return "id";
 				}
 			});
-			auditDataList.add(prepareAuditInfo(deltas, target.getModifiedBy(), target.getModifiedTime()));
+			auditDataList.add(prepareAuditInfo(deltas, source.getModifiedBy(), source.getModifiedTime()));
 			source = target;
 		}
 		return auditDataList;
