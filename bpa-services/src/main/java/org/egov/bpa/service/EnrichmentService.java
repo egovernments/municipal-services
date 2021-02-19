@@ -303,26 +303,30 @@ public class EnrichmentService {
 	 */
 	public void enrichAssignes(BPA bpa) {
 		Workflow wf = bpa.getWorkflow();
-		if (wf != null && (wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)
-				|| wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_ARCHITECT)
-				|| wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_CITIZEN))) {
-
-			Set<String> assignes = new HashSet<>();
+		Set<String> assignes = new HashSet<>();
+		if (wf != null && wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)
+				|| wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_CITIZEN)) {
 
 			// Adding owners to assignes list
 			bpa.getLandInfo().getOwners().forEach(ownerInfo -> {
 				assignes.add(ownerInfo.getUuid());
 			});
 
-			// Adding creator of BPA
-			if (bpa.getAccountId() != null)
-				assignes.add(bpa.getAccountId());
-
 			Set<String> registeredUUIDS = userService.getUUidFromUserName(bpa);
 
 			if (!CollectionUtils.isEmpty(registeredUUIDS))
 				assignes.addAll(registeredUUIDS);
 
+		} else if (wf != null && wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_ARCHITECT)) {
+			// Adding creator of BPA(Licensee)
+			if (bpa.getAccountId() != null)
+				assignes.add(bpa.getAccountId());
+		}
+		if(bpa.getWorkflow() == null) {
+			Workflow wfNew = new Workflow();
+			wfNew.setAssignes(new LinkedList<>(assignes));
+			bpa.setWorkflow(wfNew);
+		} else {
 			bpa.getWorkflow().setAssignes(new LinkedList<>(assignes));
 		}
 	}
