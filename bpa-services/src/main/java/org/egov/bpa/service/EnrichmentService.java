@@ -317,7 +317,9 @@ public class EnrichmentService {
 			if (!CollectionUtils.isEmpty(registeredUUIDS))
 				assignes.addAll(registeredUUIDS);
 
-		} else if (wf != null && wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_ARCHITECT)) {
+		} else if (wf != null && (wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_ARCHITECT)
+				|| (bpa.getStatus().equalsIgnoreCase(BPAConstants.STATUS_CITIZEN_APPROVAL_INPROCESS)
+						&& wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_APPROVE)))) {
 			// Adding creator of BPA(Licensee)
 			if (bpa.getAccountId() != null)
 				assignes.add(bpa.getAccountId());
