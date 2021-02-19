@@ -1,5 +1,8 @@
 package org.egov.fsm.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -62,6 +65,8 @@ public class FSMConstants {
 	public static final String MDMS_FINANCIALYEAR = "FinancialYear";
 
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+	
+	public static final String MDMS_FSM_CONFIG_ALLOW_MODIFY = "$.MdmsRes.FSM.Config[?(@.code==\"ALLOW_MODIFY\" && @.WFState==\"%s\")].override";
 
 	public static final String MDMS_STARTDATE = "startingDate";
 
@@ -122,6 +127,10 @@ public class FSMConstants {
 	public static final String VEHICLETRIP_BUSINESSSERVICE_NAME = "FSM_VEHICLE_TRIP";
 
 	public static final String TRIP_READY_FOR_DISPOSAL = "READY_FOR_DISPOSAL";
+	
+	public static final String PIT_DETAIL = "pitDetail";
+	
+	public static final ArrayList<String> pitDetailList= new ArrayList<String>( Arrays.asList("height", "length", "width", "diameter", "distanceFromRoad") );
 
 
 

@@ -1,12 +1,16 @@
 package org.egov.fsm.validator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.service.BoundaryService;
@@ -20,10 +24,12 @@ import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.cedarsoftware.util.GraphComparator;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -227,10 +233,58 @@ public class FSMValidator {
 
 	}
 	
+	/**
+	 * @param collection the Collection to check
+	 * @param element the element to look for
+	 * @return {@code true} if found atleast partial content, {@code false} otherwise
+	 */
+	public boolean contains(@Nullable Collection<String> collection, String element) {
+		if (collection != null) {
+			for (String candidate : collection) {
+				if (candidate.contains(element)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public void validateUpdatableParams(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
+		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getWorkflow().getAction()));
+		FSM newFsm = fsmRequest.getFsm();
+		FSM oldFsm = searchResult.get(NumberUtils.INTEGER_ZERO);
+		List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);
+		if(listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
+			FSMConstants.pitDetailList.forEach(property -> {
+				listOfUpdatedParams.remove(property);
+			});
+		}
+		listOfUpdatedParams.forEach(updatedParam -> {
+			if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
+				throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
+			};
+		});
+		
+	}
+	
+	public List<String> getDelta(FSM source, FSM target) {
+		List<GraphComparator.Delta> deltas = GraphComparator.compare(source, target, new GraphComparator.ID() {
+			@Override
+			public Object getId(Object o) {
+				return "id";
+			}
+		});
+		List<String> updatedFields= new ArrayList<>();
+		deltas.forEach(delta -> {
+			updatedFields.add(delta.getFieldName());
+		});
+		return updatedFields;
+	}
+	
 	private void validateTripAmount(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 
-		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED);
+		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, String.format(FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED, fsmRequest.getWorkflow().getAction()));
 		
 		
 		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()

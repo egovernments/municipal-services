@@ -2,6 +2,7 @@ package org.egov.fsm.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,9 +37,12 @@ import org.egov.fsm.workflow.WorkflowIntegrator;
 import org.egov.fsm.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,6 +112,7 @@ public class FSMService {
 		return fsmRequest.getFsm();
 	}
 	
+	
 	/**
 	 * Updates the FSM
 	 * 
@@ -122,16 +127,25 @@ public class FSMService {
 		String tenantId = fsmRequest.getFsm().getTenantId().split("\\.")[0];
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		FSM fsm = fsmRequest.getFsm();
-
+		
+		List<String> listOfUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getWorkflow().getAction()));
+		
 		if (fsm.getId() == null) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		}
+		
+		if (fsmRequest.getWorkflow() == null || fsmRequest.getWorkflow().getAction() == null) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Workflow action cannot be null." + String.format("{Workflow:%s}", fsmRequest.getWorkflow())) ;
+		}
+		
+		
 
 		List<String> ids = new ArrayList<String>();
 		ids.add( fsm.getId());
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria, null);
 		
+		fsmValidator.validateUpdatableParams(fsmRequest, fsms, mdmsData);
 		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
