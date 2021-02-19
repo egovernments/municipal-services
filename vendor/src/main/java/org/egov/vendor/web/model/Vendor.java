@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 
 import org.egov.vendor.web.model.location.Address;
 import org.egov.vendor.web.model.user.User;
@@ -38,15 +39,18 @@ public class Vendor {
 	private String id = null;
 
 	@JsonProperty("tenantId")
+	@Size(max=64)
 	private String tenantId = null;
 
 	@JsonProperty("name")
+	@Size(max=128)
 	private String name = null;
 
 	@JsonProperty("address")
 	private Address address = null;
 
 	@JsonProperty("owner")
+	@Valid
 	private User owner = null;
 
 	@JsonProperty("vehicles")
@@ -67,6 +71,7 @@ public class Vendor {
 	private String description = null;
 	
 	@JsonProperty("ownerId")
+	@Size(max=64)
 	private String ownerId = null;
 
 	/**

@@ -2,6 +2,8 @@ package org.egov.vehicle.web.model;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.egov.common.contract.response.ResponseInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,5 +23,6 @@ public class VehicleResponse {
     private ResponseInfo responseInfo = null;
 
     @JsonProperty("vehicle")
+    @Valid
     private List<Vehicle> vehicle = null;
 }

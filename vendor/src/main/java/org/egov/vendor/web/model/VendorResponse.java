@@ -2,6 +2,8 @@ package org.egov.vendor.web.model;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
@@ -33,6 +35,7 @@ public class VendorResponse {
 	//private Vendor vendor = null;
 	
 	 @JsonProperty("vendor")
+	 @Valid
 	 private List<Vendor> vendor = null;
 	 
 	 

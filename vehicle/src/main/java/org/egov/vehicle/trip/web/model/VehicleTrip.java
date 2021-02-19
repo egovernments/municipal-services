@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.egov.common.contract.request.User;
 import org.egov.vehicle.web.model.AuditDetails;
@@ -40,24 +41,29 @@ public class VehicleTrip   {
 
   @NotNull
   @NotBlank
+  @Size(max=64)
   @JsonProperty("tenantId")
   private String tenantId = null;
   
   @JsonProperty("tripOwner")
+  @Valid
   private User tripOwner = null;
   
   @JsonProperty("tripOwnerId")
   private String tripOwnerId = null;
   
   @JsonProperty("driver")
+  @Valid
   private User driver = null;
   
   @JsonProperty("driverId")
+  @Size(max=64)
   private String driverId = null;
   
 
   @NotNull
   @JsonProperty("vehicle")
+  @Valid
   private Vehicle vehicle;
   
 

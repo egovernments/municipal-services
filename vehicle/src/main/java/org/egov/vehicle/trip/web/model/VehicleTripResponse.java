@@ -2,6 +2,8 @@ package org.egov.vehicle.trip.web.model;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,6 +32,7 @@ public class VehicleTripResponse {
 	private ResponseInfo responseInfo = null;
 	
 	 @JsonProperty("vehicleTrip")
+	 @Valid
 	 private List<VehicleTrip> vehicleTrip = null;
 	 
 	 
