@@ -82,6 +82,16 @@ public class EnrichmentService {
 	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION :  WCConstants.NEW_WATER_CONNECTION);
 		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+
+		WaterConnection connection = waterConnectionRequest.getWaterConnection();
+
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				roadCuttingInfo.setId(UUID.randomUUID().toString());
+				roadCuttingInfo.setStatus(Status.ACTIVE);
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 		
 	}
 	@SuppressWarnings("unchecked")
