@@ -332,59 +332,59 @@ public class TradeLicenseService {
 		
 		
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		String json;
-		if(roles.contains("TL_CEMP_FORLEGACY"))
-		{
+// 		ObjectMapper objectMapper = new ObjectMapper();
+// 		String json;
+// 		if(roles.contains("TL_CEMP_FORLEGACY"))
+// 		{
 			
-			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+// 			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+// 	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
 	    			
-		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-				}
-				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+// 		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+// 				}
+// 				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
 					
-					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-				}
-				else {
-			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+// 					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+// 				}
+// 				else {
+// 			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
 
-				}	
-	    	}else
-				json = "{ \"islegacy\" : \"true\"}";
+// 				}	
+// 	    	}else
+// 				json = "{ \"islegacy\" : \"true\"}";
 
-		}
+// 		}
 		
-    	else
-    	{
-    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+//     	else
+//     	{
+//     		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+//         		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
         			
-    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-    			}
-    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+//     	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+//     			}
+//     			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
     				
-    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-    			}
-    			else {
-    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+//     				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+//     			}
+//     			else {
+//     		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
 
-    			}	
-        	}else
-    			json = "{ \"islegacy\" : \"false\"}";
+//     			}	
+//         	}else
+//     			json = "{ \"islegacy\" : \"false\"}";
 
-    	}
-		JsonNode additionalDetail;
-		try {
-			additionalDetail = objectMapper.readTree(json);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
-		}
+//     	}
+// 		JsonNode additionalDetail;
+// 		try {
+// 			additionalDetail = objectMapper.readTree(json);
+// 		} catch (IOException e) {
+// 			// TODO Auto-generated catch block
+//             throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+// 		}
 	
-    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+//     	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
 
     	if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
         		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
