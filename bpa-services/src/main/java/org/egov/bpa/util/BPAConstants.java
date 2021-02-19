@@ -214,6 +214,8 @@ public class BPAConstants {
 	
 	public static final String FI_STATUS = "FIELDINSPECTION_INPROGRESS";
 	public static final String FI_ADDITIONALDETAILS = "fieldinspection_pending";
+	
+	public static final String  STATUS_CITIZEN_APPROVAL_INPROCESS = "CITIZEN_APPROVAL_INPROCESS";
 
 	// OCCUPANCY TYPE
 
