@@ -116,5 +116,7 @@ public class Address   {
         
         @JsonProperty("country")
         private String country = null;
-        
+
+        @JsonProperty("region")
+        private String region = null;
 }
