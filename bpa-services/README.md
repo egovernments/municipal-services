@@ -6,6 +6,7 @@ Module is used to apply for Building Plan Approval, Building Plan Occupancy Cert
 
 ### DB UML Diagram
 
+![DB UML](./images/bpa-services.png)
 
 
 ### Service Dependencies
