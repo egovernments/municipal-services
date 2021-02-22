@@ -1,5 +1,6 @@
 package org.egov.vehicle.trip.repository.rowmapper;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,13 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.trip.web.model.VehicleTripDetail;
 import org.egov.vehicle.web.model.AuditDetails;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class TripDetailRowMapper implements ResultSetExtractor<List<VehicleTripDetail>> {
@@ -33,7 +37,7 @@ public class TripDetailRowMapper implements ResultSetExtractor<List<VehicleTripD
 			String trip_id = rs.getString("trip_id");
 			String referenceno = rs.getString("referenceno");
 			String referencestatus = rs.getString("referencestatus");
-			String additionaldetails = rs.getString("additionaldetails");
+			Object additionaldetails = getAdditionalDetail("additionalDetails",rs);
 			String status = rs.getString("status");
 			Long itemstarttime = rs.getLong("itemstarttime");
 			Long itemendtime = rs.getLong("itemendtime");
@@ -54,4 +58,21 @@ public class TripDetailRowMapper implements ResultSetExtractor<List<VehicleTripD
 		}
 		return new ArrayList<>(tripDetailMap.values());
 	}
+	
+	  private JsonNode getAdditionalDetail(String columnName, ResultSet rs){
+
+	        JsonNode additionalDetail = null;
+	        try {
+	            PGobject pgObj = (PGobject) rs.getObject(columnName);
+	            if(pgObj!=null){
+	                 additionalDetail = mapper.readTree(pgObj.getValue());
+	            }
+	        }
+	        catch (IOException | SQLException e){
+	            e.printStackTrace();
+	            throw new CustomException("PARSING_ERROR","Failed to parse additionalDetail object");
+	        }
+	        return additionalDetail;
+	    }
+
 }

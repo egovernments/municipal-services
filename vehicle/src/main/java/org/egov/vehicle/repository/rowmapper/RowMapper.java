@@ -1,5 +1,6 @@
 package org.egov.vehicle.repository.rowmapper;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,13 +8,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.web.model.AuditDetails;
 import org.egov.vehicle.web.model.Vehicle;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
@@ -58,7 +62,7 @@ public class RowMapper  implements ResultSetExtractor<List<Vehicle>> {
 				currentVehicle = Vehicle.builder().tenantId(tenantId).registrationNumber(registrationNumber).model(model).type(type).tankCapacity(tankCapicity)
 						.suctionType(suctionType).pollutionCertiValidTill(pollutionCertiValidTill).InsuranceCertValidTill(InsuranceCertValidTill)
 						.fitnessValidTill(fitnessValidTill).roadTaxPaidTill(roadTaxPaidTill).gpsEnabled(gpsEnabled).source(source).ownerId(owner_id)
-						.status(Vehicle.StatusEnum.valueOf(status)).additionalDetails(additionalDetails).id(id).build();
+						.status(Vehicle.StatusEnum.valueOf(status)).additionalDetails(getAdditionalDetail("additionalDetails",rs)).id(id).build();
 				
 				vehicleMap.put(id, currentVehicle);
 			}
@@ -85,6 +89,25 @@ public class RowMapper  implements ResultSetExtractor<List<Vehicle>> {
 		vehicle.setAuditDetails(auditdetails);
 
 	}
+	
+
+
+
+    private JsonNode getAdditionalDetail(String columnName, ResultSet rs){
+
+        JsonNode additionalDetail = null;
+        try {
+            PGobject pgObj = (PGobject) rs.getObject(columnName);
+            if(pgObj!=null){
+                 additionalDetail = mapper.readTree(pgObj.getValue());
+            }
+        }
+        catch (IOException | SQLException e){
+            e.printStackTrace();
+            throw new CustomException("PARSING_ERROR","Failed to parse additionalDetail object");
+        }
+        return additionalDetail;
+    }
 	
 
 }

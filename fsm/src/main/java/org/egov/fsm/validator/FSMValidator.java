@@ -250,7 +250,7 @@ public class FSMValidator {
 	}
 	
 	public void validateUpdatableParams(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
-		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getWorkflow().getAction()));
+		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getFsm().getApplicationStatus()));
 		FSM newFsm = fsmRequest.getFsm();
 		FSM oldFsm = searchResult.get(NumberUtils.INTEGER_ZERO);
 		List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);

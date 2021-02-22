@@ -128,7 +128,6 @@ public class FSMService {
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		FSM fsm = fsmRequest.getFsm();
 		
-		List<String> listOfUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getWorkflow().getAction()));
 		
 		if (fsm.getId() == null) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);

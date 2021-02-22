@@ -1,5 +1,6 @@
 package org.egov.fsm.repository.rowmapper;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,11 +14,14 @@ import org.egov.fsm.web.model.PitDetail;
 import org.egov.fsm.web.model.location.Address;
 import org.egov.fsm.web.model.location.Boundary;
 import org.egov.fsm.web.model.location.GeoLocation;
+import org.egov.tracer.model.CustomException;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
@@ -59,7 +63,7 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 					lastModifiedTime = null;
 				}
 				currentfsm = FSM.builder().id(id).applicationNo(applicationNo).tenantId(tenantId)
-						.description(description).accountId(accountId).additionalDetails(additionalDetails)
+						.description(description).accountId(accountId).additionalDetails(getAdditionalDetail("additionalDetails",rs))
 						.source(source).sanitationtype(sanitationtype).propertyUsage(propertyUsage).noOfTrips(noOfTrips)
 						.vehicleId(vehicleId).applicationStatus(applicationStatus).dsoId(dsoid).possibleServiceDate(possiblesrvdate).vehicleType(vehicleType)
 						.build();
@@ -110,4 +114,20 @@ public class FSMRowMapper implements ResultSetExtractor<List<FSM>> {
 		
 	}
 
+
+    private JsonNode getAdditionalDetail(String columnName, ResultSet rs){
+
+        JsonNode additionalDetail = null;
+        try {
+            PGobject pgObj = (PGobject) rs.getObject(columnName);
+            if(pgObj!=null){
+                 additionalDetail = mapper.readTree(pgObj.getValue());
+            }
+        }
+        catch (IOException | SQLException e){
+            e.printStackTrace();
+            throw new CustomException("PARSING_ERROR","Failed to parse additionalDetail object");
+        }
+        return additionalDetail;
+    }
 }
