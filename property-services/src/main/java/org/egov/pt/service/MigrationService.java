@@ -156,14 +156,14 @@ public class MigrationService {
     public Map<String, String> initiateProcess(RequestInfoWrapper requestInfoWrapper,OldPropertyCriteria propertyCriteria,Map<String, String> errorMap){
 
         Map<String, String> resultMap = null;
-        Map<String, List<String>> masters = getMDMSData(requestInfoWrapper.getRequestInfo(),"pb");
+        Map<String, List<String>> masters = getMDMSData(requestInfoWrapper.getRequestInfo(),config.getStateLevelTenantId());
         List<String> tenantList = getTenantList();
 
         if(StringUtils.isEmpty(propertyCriteria.getLimit()))
             propertyCriteria.setLimit(Long.valueOf(batchSize));
 
         if(StringUtils.isEmpty(propertyCriteria.getOffset()))
-            propertyCriteria.setLimit(Long.valueOf(batchSize));
+            propertyCriteria.setLimit(Long.valueOf(batchOffset));
 
         for(int i= 0;i<tenantList.size();i++){
             MigrationCount migrationCount = getMigrationCountForTenant(tenantList.get(i));
@@ -862,7 +862,7 @@ public class MigrationService {
             assessment.setDocuments(null);
         else{
             List<Document> documentList = migrateDocument(propertyDetail.getDocuments());
-            Set<Document> documentSet = null;
+            Set<Document> documentSet = new HashSet<>();
             for(Document document : documentList)
                 documentSet.add(document);
             assessment.setDocuments(documentSet);

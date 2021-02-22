@@ -116,6 +116,8 @@ public class PTConstants {
 
     public static final List<String> FIELDS_FOR_PROPERTY_MUTATION = Collections.unmodifiableList(Arrays.asList("propertyType","usageCategory","ownershipCategory","noOfFloors","landArea"));
 
+    public static final String CITIZEN_SENDBACK_ACTION = "SENDBACKTOCITIZEN";
+    
     public static final String WORKFLOW_START_ACTION = "INITIATE";
 
     public static final String ASMT_WORKFLOW_CODE = "ASMT";
@@ -199,7 +201,9 @@ public class PTConstants {
 
 	public static final String BILL_AMOUNT_PATH = "/Bill/0/totalAmount";
 
-	public static final String BILL_NODEMAND_ERROR_CODE = "EG_BS_BILL_NO_DEMANDS_FOUND";
+	public static final String BILL_NO_DEMAND_ERROR_CODE = "EG_BS_BILL_NO_DEMANDS_FOUND";
+	
+	public static final String BILL_NO_PAYABLE_DEMAND_ERROR_CODE = "EG_BS_BILL_ZERO_TAX";
 
 
 
@@ -302,5 +306,10 @@ public class PTConstants {
 
     public static final String KEY_PDF_DOCUMENTTYPE = "documentType";
 
+    public static final String PT_CORRECTION_PENDING = "CORRECTIONPENDING";
+
+    public static final String ASMT_USER_EVENT_PAY = "pay";
+
+    public static final String VIEW_APPLICATION_CODE = "View Application";
 }
 
