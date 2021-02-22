@@ -284,7 +284,7 @@ public class FSMValidator {
 	private void validateTripAmount(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 
-		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, String.format(FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED, fsmRequest.getWorkflow().getAction()));
+		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED);
 		
 		
 		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()
