@@ -106,11 +106,12 @@ public class SWQueryBuilder {
 		}
 		
 		/*
-		 * to return empty result for mobile empty result
+		 * to return empty result for mobilenumber empty result
 		 */
-		if (CollectionUtils.isEmpty(criteria.getPropertyIds()) && CollectionUtils.isEmpty(criteria.getUserIds())
+		if (!StringUtils.isEmpty(criteria.getMobileNumber()) && 
+				CollectionUtils.isEmpty(criteria.getPropertyIds()) && CollectionUtils.isEmpty(criteria.getUserIds())
 				&& StringUtils.isEmpty(criteria.getApplicationNumber()) && StringUtils.isEmpty(criteria.getPropertyId())
-				&& StringUtils.isEmpty(criteria.getConnectionNumber())) {
+				&& StringUtils.isEmpty(criteria.getConnectionNumber()) && CollectionUtils.isEmpty(criteria.getIds())) {
 			return null;
 		}
 		
