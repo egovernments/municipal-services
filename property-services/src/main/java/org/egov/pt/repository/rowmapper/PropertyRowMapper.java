@@ -2,6 +2,7 @@ package org.egov.pt.repository.rowmapper;
 
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -156,18 +157,23 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 					return;
 			}
 		
+		Long constructionDate = 0 == rs.getLong("constructionDate") ? null : rs.getLong("constructionDate");
+
 		ConstructionDetail consDetail = ConstructionDetail.builder()
 				.constructionType(rs.getString("constructionType"))
 				.dimensions(getadditionalDetail(rs, "dimensions"))
-				.constructionDate(rs.getLong("constructionDate"))
+				.constructionDate(constructionDate)
 				.superBuiltUpArea(rs.getBigDecimal("unitspba"))
 				.builtUpArea(rs.getBigDecimal("builtUpArea"))
 				.carpetArea(rs.getBigDecimal("carpetArea"))
 				.plinthArea(rs.getBigDecimal("plinthArea"))
 				.build();
-				
-				
-				
+
+		
+		BigDecimal arv = rs.getBigDecimal("arv");
+		if (null != arv)
+			arv = arv.stripTrailingZeros();
+
 		Unit unit = Unit.builder()
 				.occupancyType(rs.getString("occupancyType"))
 				.usageCategory(rs.getString("unitusageCategory"))
@@ -176,7 +182,7 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 				.unitType(rs.getString("unitType"))
 				.constructionDetail(consDetail)
 				.floorNo(rs.getInt("floorno"))
-				.arv(rs.getBigDecimal("arv"))
+				.arv(arv)
 				.id(unitId)
 				.build();
 		
@@ -392,6 +398,9 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 			throw new CustomException("PARSING ERROR", "The propertyAdditionalDetail json cannot be parsed");
 		}
 
+		if(propertyAdditionalDetails.isEmpty())
+			propertyAdditionalDetails = null;
+		
 		return propertyAdditionalDetails;
 
 	}

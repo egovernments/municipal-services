@@ -161,3 +161,4 @@ config:
       - work-dir: "echallan-calculator"
         image-name: "echallan-calculator"
         dockerfile: "build/maven/Dockerfile"         
+

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -127,6 +128,13 @@ public class PropertyConfiguration {
     
     @Value("${egov.notif.view.mutation}")
     private String viewMutationLink;
+    
+
+    @Value("${egov.usr.events.view.history.link}")
+    private String userEventViewPropertyLink;
+    
+    @Value("${egov.usr.events.view.mutation.history.link}")
+    private String userEventViewMutationLink;    
     
     //Property Search Params
     @Value("${citizen.allowed.search.params}")
@@ -253,6 +261,8 @@ public class PropertyConfiguration {
     @Value("${property.unit.landarea}")
 	private String landAreaUnit;
     
+    @Value("${property.min.unit.builtuparea}")
+	private BigDecimal minUnitArea;
     
     @Value("${property.module.name}")
 	private String propertyModuleName;    
@@ -304,4 +314,6 @@ public class PropertyConfiguration {
     @Value("${egov.url.shortner.endpoint}")
     private String urlShortnerEndpoint;
 
+    @Value("${state.level.tenant.id}")
+    private String stateLevelTenantId;
 }
