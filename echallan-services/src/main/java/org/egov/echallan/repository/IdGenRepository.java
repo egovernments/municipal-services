@@ -45,9 +45,7 @@ public class IdGenRepository {
         } catch (HttpClientErrorException e) {
             throw new ServiceCallException(e.getResponseBodyAsString());
         } catch (Exception e) {
-            Map<String, String> map = new HashMap<>();
-            map.put(e.getCause().getClass().getName(),e.getMessage());
-            throw new CustomException(map);
+            throw new CustomException(e.getCause().getClass().getName(),e.getMessage());
         }
         return response;
     }

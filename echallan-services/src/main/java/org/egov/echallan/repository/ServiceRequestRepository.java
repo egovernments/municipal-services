@@ -34,7 +34,7 @@ public class ServiceRequestRepository {
 			log.error("External Service threw an Exception: ",e);
 			throw new ServiceCallException(e.getResponseBodyAsString());
 		}catch(Exception e) {
-			log.error("Exception while fetching from searcher: ",e);
+			log.error("Exception while fetching from service: ",e);
 		}
 
 		return response;

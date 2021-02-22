@@ -72,7 +72,7 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
                 }
                 challanMap.put(id,currentChallan);
             }
-            addChildrenToProperty(rs, currentChallan);
+            addAddressToChallan(rs, currentChallan);
 
         }
        
@@ -82,7 +82,7 @@ public class ChallanRowMapper  implements ResultSetExtractor<List<Challan>> {
 
 
 
-    private void addChildrenToProperty(ResultSet rs, Challan challan) throws SQLException {
+    private void addAddressToChallan(ResultSet rs, Challan challan) throws SQLException {
 
         String tenantId = challan.getTenantId();
 

@@ -12,319 +12,98 @@
 
 package org.egov.echallan.model;
 
-import java.util.List;
 import java.util.Objects;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
-
-import org.egov.common.contract.response.ResponseInfo;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
+import javax.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder;
 
 /**
  * Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. 
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-08-10T16:46:24.044+05:30[Asia/Calcutta]")
+@ApiModel(description = "Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. ")
+@Validated
+@javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Address {
+public class Address   {
 
-  @JsonProperty("tenantId")
+        @Size(max=64)
+        @JsonProperty("id")
+        private String id;
 
-  private String tenantId = null;
+        @Size(max=64)
+        @JsonProperty("tenantId")
+        private String tenantId = null;
 
-  @JsonProperty("doorNo")
+        @Size(max=64)
+        @JsonProperty("doorNo")
+        private String doorNo = null;
 
-  private String doorNo = null;
+        @JsonProperty("latitude")
+        private Double latitude = null;
 
-  @JsonProperty("plotNo")
+        @JsonProperty("longitude")
+        private Double longitude = null;
 
-  private String plotNo = null;
+        @Size(max=64)
+        @JsonProperty("addressId")
+        private String addressId = null;
 
-  @JsonProperty("id")
+        @Size(max=64)
+        @JsonProperty("addressNumber")
+        private String addressNumber = null;
 
-  private String id = null;
+        @Size(max=64)
+        @JsonProperty("type")
+        private String type = null;
 
-  @JsonProperty("landmark")
+        @JsonProperty("addressLine1")
+        private String addressLine1 = null;
 
-  private String landmark = null;
-  
-  @JsonProperty("latitude")
-  private Double latitude = null;
+        @Size(max=256)
+        @JsonProperty("addressLine2")
+        private String addressLine2 = null;
 
-  @JsonProperty("longitude")
-  private Double longitude = null;
+        @Size(max=64)
+        @JsonProperty("landmark")
+        private String landmark = null;
 
-  @JsonProperty("city")
+        @Size(max=64)
+        @JsonProperty("city")
+        private String city = null;
 
-  private String city = null;
+        @Size(max=64)
+        @JsonProperty("pincode")
+        private String pincode = null;
 
-  @JsonProperty("district")
+        @Size(max=64)
+        @JsonProperty("detail")
+        private String detail = null;
 
-  private String district = null;
+        @Size(max=64)
+        @JsonProperty("buildingName")
+        private String buildingName = null;
 
-  @JsonProperty("region")
+        @Size(max=64)
+        @JsonProperty("street")
+        private String street = null;
 
-  private String region = null;
+        @Valid
+        @JsonProperty("locality")
+        private Boundary locality = null;
 
-  @JsonProperty("state")
-
-  private String state = null;
-
-  @JsonProperty("country")
-
-  private String country = null;
-
-  @JsonProperty("pincode")
-
-  private String pincode = null;
-
-  @JsonProperty("additionDetails")
-
-  private String additionDetails = null;
-
-  @JsonProperty("buildingName")
-
-  private String buildingName = null;
-
-  @JsonProperty("street")
-
-  private String street = null;
-
-  @Valid
-  @JsonProperty("locality")
-  private Boundary locality = null;
-  
-  @Size(max=64)
-  @JsonProperty("detail")
-  private String detail = null;
-
-  public String getTenantId() {
-    return tenantId;
-  }
-  public void setTenantId(String tenantId) {
-    this.tenantId = tenantId;
-  }
-  public Address doorNo(String doorNo) {
-    this.doorNo = doorNo;
-    return this;
-  }
-
-  
-  public String getDoorNo() {
-    return doorNo;
-  }
-  public void setDoorNo(String doorNo) {
-    this.doorNo = doorNo;
-  }
-  public Address plotNo(String plotNo) {
-    this.plotNo = plotNo;
-    return this;
-  }
-
-  
-  public String getPlotNo() {
-    return plotNo;
-  }
-  public void setPlotNo(String plotNo) {
-    this.plotNo = plotNo;
-  }
-
-  public String getId() {
-    return id;
-  }
-  public Address landmark(String landmark) {
-    this.landmark = landmark;
-    return this;
-  }
-
-  public String getLandmark() {
-    return landmark;
-  }
-  public void setLandmark(String landmark) {
-    this.landmark = landmark;
-  }
-  public Address city(String city) {
-    this.city = city;
-    return this;
-  }
-
-  public String getCity() {
-    return city;
-  }
-  public void setCity(String city) {
-    this.city = city;
-  }
-  public Address district(String district) {
-    this.district = district;
-    return this;
-  }
-
-  public String getDistrict() {
-    return district;
-  }
-  public void setDistrict(String district) {
-    this.district = district;
-  }
-  public Address region(String region) {
-    this.region = region;
-    return this;
-  }
-
-  public String getRegion() {
-    return region;
-  }
-  public void setRegion(String region) {
-    this.region = region;
-  }
-  public Address state(String state) {
-    this.state = state;
-    return this;
-  }
-
-  public String getState() {
-    return state;
-  }
-  public void setState(String state) {
-    this.state = state;
-  }
-  public Address country(String country) {
-    this.country = country;
-    return this;
-  }
-
-  public String getCountry() {
-    return country;
-  }
-  public void setCountry(String country) {
-    this.country = country;
-  }
-  public Address pincode(String pincode) {
-    this.pincode = pincode;
-    return this;
-  }
-
-  public String getPincode() {
-    return pincode;
-  }
-  public void setPincode(String pincode) {
-    this.pincode = pincode;
-  }
-  public Address additionDetails(String additionDetails) {
-    this.additionDetails = additionDetails;
-    return this;
-  }
-
-  public String getAdditionDetails() {
-    return additionDetails;
-  }
-  public void setAdditionDetails(String additionDetails) {
-    this.additionDetails = additionDetails;
-  }
-  public Address buildingName(String buildingName) {
-    this.buildingName = buildingName;
-    return this;
-  }
-
-  
-  public String getBuildingName() {
-    return buildingName;
-  }
-  public void setBuildingName(String buildingName) {
-    this.buildingName = buildingName;
-  }
-  public Address street(String street) {
-    this.street = street;
-    return this;
-  }
-
-  public String getStreet() {
-    return street;
-  }
-  public void setStreet(String street) {
-    this.street = street;
-  }
-  
-
-  
-
-  
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    Address address = (Address) o;
-    return Objects.equals(this.tenantId, address.tenantId) &&
-        Objects.equals(this.doorNo, address.doorNo) &&
-        Objects.equals(this.plotNo, address.plotNo) &&
-        Objects.equals(this.id, address.id) &&
-        Objects.equals(this.landmark, address.landmark) &&
-        Objects.equals(this.city, address.city) &&
-        Objects.equals(this.district, address.district) &&
-        Objects.equals(this.region, address.region) &&
-        Objects.equals(this.state, address.state) &&
-        Objects.equals(this.country, address.country) &&
-        Objects.equals(this.pincode, address.pincode) &&
-        Objects.equals(this.additionDetails, address.additionDetails) &&
-        Objects.equals(this.buildingName, address.buildingName) &&
-        Objects.equals(this.street, address.street) ;
-       
-  }
-
-  @Override
-  public int hashCode() {
-    return java.util.Objects.hash(tenantId, doorNo, plotNo, id, landmark, city, district, region, state, country, pincode, additionDetails, buildingName, street);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Address {\n");
-    
-    sb.append("    tenantId: ").append(toIndentedString(tenantId)).append("\n");
-    sb.append("    doorNo: ").append(toIndentedString(doorNo)).append("\n");
-    sb.append("    plotNo: ").append(toIndentedString(plotNo)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    landmark: ").append(toIndentedString(landmark)).append("\n");
-    sb.append("    city: ").append(toIndentedString(city)).append("\n");
-    sb.append("    district: ").append(toIndentedString(district)).append("\n");
-    sb.append("    region: ").append(toIndentedString(region)).append("\n");
-    sb.append("    state: ").append(toIndentedString(state)).append("\n");
-    sb.append("    country: ").append(toIndentedString(country)).append("\n");
-    sb.append("    pincode: ").append(toIndentedString(pincode)).append("\n");
-    sb.append("    additionDetails: ").append(toIndentedString(additionDetails)).append("\n");
-    sb.append("    buildingName: ").append(toIndentedString(buildingName)).append("\n");
-    sb.append("    street: ").append(toIndentedString(street)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
 
 }

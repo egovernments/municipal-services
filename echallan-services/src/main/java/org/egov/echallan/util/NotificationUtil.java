@@ -54,20 +54,20 @@ public class NotificationUtil {
 	}
 
 
-	public HashMap<String, String> getCustomizedMsg(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+	public HashMap<String, String> getCustomizedMsg(RequestInfo requestInfo, Challan challan ) {
 		HashMap<String, String> msgDetail  = fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CREATE_CODE);
 		msgDetail.put(MSG_KEY, getCreateMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
 		return msgDetail;
 	}
 	
 	
-	public HashMap<String, String> getCustomizedMsgForUpdate(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+	public HashMap<String, String> getCustomizedMsgForUpdate(RequestInfo requestInfo, Challan challan ) {
 		HashMap<String, String> msgDetail  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,UPDATE_CODE);
 		msgDetail.put(MSG_KEY, getCreateMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
 		return msgDetail;
 	}
 	
-	public HashMap<String, String> getCustomizedMsgForCancel(RequestInfo requestInfo, Challan challan, String localizationMessage) {
+	public HashMap<String, String> getCustomizedMsgForCancel(RequestInfo requestInfo, Challan challan ) {
 		HashMap<String, String> msgDetail  =  fetchContentFromLocalization(requestInfo,challan.getTenantId(),MODULE,CANCEL_CODE);
 		msgDetail.put(MSG_KEY, getCancelMsg(requestInfo,challan,msgDetail.get(MSG_KEY)));
 		return msgDetail;
@@ -167,6 +167,7 @@ public class NotificationUtil {
 
 		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getBillUri(challan),
 				new RequestInfoWrapper(requestInfo));
+		
 		String jsonString = new JSONObject(responseMap).toString();
 
 		return jsonString;
@@ -244,23 +245,5 @@ public class NotificationUtil {
 		builder.append(challan.getBusinessService());
 		return builder;
 	}
-
-
-	/**
-	 * Fetches messages from localization service
-	 * 
-	 * @param tenantId
-	 *            tenantId of the challan
-	 * @param requestInfo
-	 *            The requestInfo of the request
-	 * @return Localization messages for the module
-	 */
-	public String getLocalizationMessages(String tenantId, RequestInfo requestInfo) {
-		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(getUri(tenantId, requestInfo),
-				requestInfo);
-		String jsonString = new JSONObject(responseMap).toString();
-		return jsonString;
-	}
-
 	
 }

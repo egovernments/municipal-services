@@ -86,13 +86,12 @@ public class NotificationService {
 						if (businessServiceAllowed.contains(challan.getBusinessService())) {
 							String mobilenumber = challan.getCitizen().getMobileNumber();
 							String[] users = new String[] {challan.getCitizen().getUuid()};
-							String localizationMessages = util.getLocalizationMessages(tenantId, challanRequest.getRequestInfo());
-							if(isSave)
-								msgDetail = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan, localizationMessages);
+ 							if(isSave)
+								msgDetail = util.getCustomizedMsg(challanRequest.getRequestInfo(), challan );
 							else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
-								msgDetail = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan, localizationMessages);
+								msgDetail = util.getCustomizedMsgForUpdate(challanRequest.getRequestInfo(), challan );
 							else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
-								msgDetail = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan, localizationMessages);
+								msgDetail = util.getCustomizedMsgForCancel(challanRequest.getRequestInfo(), challan );
 							if (msgDetail!=null && !StringUtils.isEmpty(msgDetail.get(NotificationUtil.MSG_KEY))) {
 								SMSRequest smsRequest = SMSRequest.builder().
 										mobileNumber(mobilenumber).
@@ -128,15 +127,14 @@ public class NotificationService {
 	private EventRequest getEventsForChallan(ChallanRequest request,boolean isSave) {
     	List<Event> events = new ArrayList<>();
         String tenantId = request.getChallan().getTenantId();
-		String localizationMessages = util.getLocalizationMessages(tenantId,request.getRequestInfo());
-		Challan challan = request.getChallan();
+ 		Challan challan = request.getChallan();
 		HashMap<String, String> msgDetail =null; 
 		if(isSave)
-			msgDetail = util.getCustomizedMsg(request.getRequestInfo(), challan, localizationMessages);
+			msgDetail = util.getCustomizedMsg(request.getRequestInfo(), challan );
 		else if(challan.getApplicationStatus()==StatusEnum.ACTIVE)
-			msgDetail = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan, localizationMessages);
+			msgDetail = util.getCustomizedMsgForUpdate(request.getRequestInfo(), challan );
 		else if(challan.getApplicationStatus()==StatusEnum.CANCELLED)
-			msgDetail = util.getCustomizedMsgForCancel(request.getRequestInfo(), challan, localizationMessages);
+			msgDetail = util.getCustomizedMsgForCancel(request.getRequestInfo(), challan );
 		else
 			return null;
         Map<String,String > mobileNumberToOwner = new HashMap<>();

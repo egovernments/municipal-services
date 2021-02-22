@@ -13,6 +13,7 @@ import org.egov.echallan.validator.ChallanValidator;
 import org.egov.echallan.web.models.user.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 
 @Service
@@ -71,13 +72,13 @@ public class ChallanService {
 	 public List<Challan> getChallansFromMobileNumber(SearchCriteria criteria, RequestInfo requestInfo){
 		 List<Challan> challans = new LinkedList<>();
 	        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
-	        if(userDetailResponse.getUser().size()==0){
+	        if(CollectionUtils.isEmpty(userDetailResponse.getUser())){
 	            return Collections.emptyList();
 	        }
 	        enrichmentService.enrichSearchCriteriaWithOwnerids(criteria,userDetailResponse);
 	        challans = repository.getChallans(criteria);
 
-	        if(challans.size()==0){
+	        if(CollectionUtils.isEmpty(challans)){
 	            return Collections.emptyList();
 	        }
 

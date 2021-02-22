@@ -198,12 +198,16 @@ public class EnrichmentService {
 		StringBuilder url = new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 
 		Object result = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
-		String jsonPath = GL_CODE_JSONPATH_CODE.replace("{}",challan.getBusinessService());
-		List<Map<String,Object>> jsonOutput =  JsonPath.read(result, jsonPath);
-		if(jsonOutput.size()!=0) {
-			Map<String,Object> glCodeObj = jsonOutput.get(0);
-			challan.setAdditionalDetail(glCodeObj);
+		if(result!=null) {
+			String jsonPath = GL_CODE_JSONPATH_CODE.replace("{}",challan.getBusinessService());
+			List<Map<String,Object>> jsonOutput =  JsonPath.read(result, jsonPath);
+			if(jsonOutput.size()!=0) {
+				Map<String,Object> glCodeObj = jsonOutput.get(0);
+				challan.setAdditionalDetail(glCodeObj);
+			}	
 		}
+		
+		
 	}
 
 	private ModuleDetail getGLCodeRequest() {
