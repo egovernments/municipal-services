@@ -145,7 +145,6 @@
             <class>org.egov.echallancalculation.web.models.calculation.CalculationRes</class>
             <class>org.egov.echallancalculation.web.models.calculation.CalulationCriteria</class>
             <class>org.egov.echallancalculation.web.models.calculation.FeeAndBillingSlabIds</class>
-            <class>org.egov.echallancalculation.web.models.calculation.TaxHeadEstimate</class>
             <class>org.egov.echallancalculation.model.Challan</class>
             <class>org.egov.echallancalculation.model.ChallanRequest</class>
             <class>org.egov.echallancalculation.model.ChallanResponse</class>
