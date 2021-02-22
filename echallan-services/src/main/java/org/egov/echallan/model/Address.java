@@ -105,5 +105,16 @@ public class Address   {
         @JsonProperty("locality")
         private Boundary locality = null;
 
-
+        @JsonProperty("plotNo")
+        private String plotNo = null;
+        
+        @JsonProperty("district")
+        private String district = null;
+        
+        @JsonProperty("state")
+        private String state = null;
+        
+        @JsonProperty("country")
+        private String country = null;
+        
 }
