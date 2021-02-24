@@ -28,5 +28,14 @@ mdms-service
 To run the fsm-calculator locally, update below listed properties in `application.properties` before running the project:
 
 ```ini
-If any host value of the server for any external service pointing to local port can be changed to https://egov-micro-dev.egovernments.org
+server.port
+spring.datasource.url=
+spring.datasource.username=
+spring.datasource.password=
+spring.datasource.platform=
+
+spring.flyway.url=
+spring.flyway.user=
+spring.flyway.password=
+spring.flyway.table=
 ```
