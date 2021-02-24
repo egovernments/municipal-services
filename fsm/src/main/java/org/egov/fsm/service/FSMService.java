@@ -144,7 +144,6 @@ public class FSMService {
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria, null);
 		
-		fsmValidator.validateUpdatableParams(fsmRequest, fsms, mdmsData);
 		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),

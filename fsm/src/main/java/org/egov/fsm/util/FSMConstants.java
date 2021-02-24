@@ -66,7 +66,7 @@ public class FSMConstants {
 
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
 	
-	public static final String MDMS_FSM_CONFIG_ALLOW_MODIFY = "$.MdmsRes.FSM.Config[?(@.code==\"ALLOW_MODIFY\" && @.WFState==\"%s\")].override";
+	public static final String MDMS_FSM_CONFIG_ALLOW_MODIFY = "$.MdmsRes.FSM.Config[?(@.code==\"ALLOW_MODIFY\" && @.WFState==\"%s\")].override.*";
 
 	public static final String MDMS_STARTDATE = "startingDate";
 

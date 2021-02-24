@@ -200,9 +200,9 @@ public class FSMValidator {
 	}
 
 	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
-
+		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
 		FSM fsm = fsmRequest.getFsm();
-		
+//		validateUpdatableParams(fsmRequest, searchResult, mdmsData);
 		if(searchResult.size() <= 0 ) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		} 
@@ -260,6 +260,9 @@ public class FSMValidator {
 					listOfUpdatedParams.remove(property);
 				});
 			}
+			listOfUpdatedParams.remove("children");
+			listOfUpdatedParams.remove("label");
+			listOfUpdatedParams.remove("name");
 			listOfUpdatedParams.forEach(updatedParam -> {
 				if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
 					throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
@@ -315,7 +318,7 @@ public class FSMValidator {
 	}
 	private void validateSlum(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
-		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
+		
 		String locality = fsm.getAddress().getLocality().getCode();
 		List<Map<String,Object>> slumNameAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_SLUM_OVERRIDE_ALLOWED);
 
