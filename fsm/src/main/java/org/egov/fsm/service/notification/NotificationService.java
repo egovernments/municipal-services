@@ -17,12 +17,14 @@ import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.NotificationUtil;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.notification.ActionItem;
 import org.egov.fsm.web.model.notification.Event;
 import org.egov.fsm.web.model.notification.EventRequest;
 import org.egov.fsm.web.model.notification.Recepient;
 import org.egov.fsm.web.model.notification.SMSRequest;
 import org.egov.fsm.web.model.notification.Source;
+import org.egov.fsm.web.model.user.UserDetailResponse;
 import org.egov.fsm.web.model.workflow.Action;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -194,8 +196,20 @@ public class NotificationService {
 	 */
 	private void enrichSMSRequest(FSMRequest fsmRequest, List<SMSRequest> smsRequests) {
 		String tenantId = fsmRequest.getFsm().getTenantId();
+		FSM fsm =fsmRequest.getFsm();
 		String localizationMessages = util.getLocalizationMessages(tenantId, fsmRequest.getRequestInfo());
-		String message = util.getCustomizedMsg(fsmRequest.getRequestInfo(), fsmRequest.getFsm(), localizationMessages);
+		String messageCode =  null;
+		
+		if(fsm.getApplicationStatus().equalsIgnoreCase(FSMConstants.WF_STATUS_PENDING_APPL_FEE_PAYMENT) && 
+				fsm.getSource().equalsIgnoreCase(FSMConstants.APPLICATION_CHANNEL_TELEPONE)) {
+			messageCode=FSMConstants.SMS_NOTIFICATION_PREFIX +fsm.getApplicationStatus()+"_"+FSMConstants.WF_ACTION_CREATE;
+			String message = util.getCustomizedMsg(fsmRequest, localizationMessages,messageCode);
+			Map<String, String> mobileNumberToOwner = getUserList(fsmRequest);
+			smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
+		}
+		messageCode = FSMConstants.SMS_NOTIFICATION_PREFIX +fsm.getApplicationStatus() +(fsmRequest.getWorkflow() ==null ?  "":"_" + fsmRequest.getWorkflow().getAction());
+
+		String message = util.getCustomizedMsg(fsmRequest, localizationMessages,messageCode);
 		Map<String, String> mobileNumberToOwner = getUserList(fsmRequest);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
 	}
@@ -209,7 +223,21 @@ public class NotificationService {
 	 */
 	private Map<String, String> getUserList(FSMRequest fsmRequest) {
 		Map<String, String> mobileNumberToOwner = new HashMap<>();
+		String tenantId = fsmRequest.getFsm().getTenantId().split("\\.")[0];
+		String stakeUUID = fsmRequest.getFsm().getAccountId();
+		List<String> ownerId = new ArrayList<String>();
+		ownerId.add(stakeUUID);
+		FSMSearchCriteria fsSearchCriteria = new FSMSearchCriteria();
+		fsSearchCriteria.setOwnerIds(ownerId);
+		fsSearchCriteria.setTenantId(tenantId);
+		UserDetailResponse userDetailResponse = userService.getUser(fsSearchCriteria, fsmRequest.getRequestInfo());
 		
+
+		
+		mobileNumberToOwner.put(userDetailResponse.getUser().get(0).getUserName(),
+				userDetailResponse.getUser().get(0).getName());
+		
+
 		return mobileNumberToOwner;
 	}
 }

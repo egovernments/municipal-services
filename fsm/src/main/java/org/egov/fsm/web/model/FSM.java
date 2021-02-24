@@ -1,6 +1,8 @@
 package org.egov.fsm.web.model;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.location.Address;
@@ -36,6 +38,8 @@ public class FSM   {
   @JsonProperty("id")
   private String id = null;
 
+  @NotNull
+  @Size(min=2,max=64)
   @JsonProperty("tenantId")
   private String tenantId = null;
 
