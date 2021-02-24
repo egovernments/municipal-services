@@ -657,11 +657,11 @@ public class DemandService {
 	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		Map<String, Object> billingPeriod = calculatorUtils.getSchedulerBillingMasterData(requestInfo, tenantId);
-		long taxPeriodFrom = billingPeriod.get("taxPeriodFrom") == null ? 0l
+//		Map<String, Object> billingPeriod = calculatorUtils.getSchedulerBillingMasterData(requestInfo, tenantId);
+		long taxPeriodFrom = billingMasterData.get("taxPeriodFrom") == null ? 0l
 				: (long) billingMasterData.get("taxPeriodFrom");
-		long taxPeriodTo = billingPeriod.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
-		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
+		long taxPeriodTo = billingMasterData.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
+//		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
 		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
 	}
 
@@ -753,7 +753,7 @@ public class DemandService {
 				&& (dayOfMonth == LocalDateTime.now().getDayOfMonth())) {
 			return true;
 		} else if (billingFrequency.equalsIgnoreCase(WSCalculationConstant.Quaterly_Billing_Period)) {
-			return false;
+			return true;
 		}
 		return true;
 	}
