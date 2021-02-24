@@ -61,10 +61,10 @@ public class FSMRepository {
 			fsmForStatusUpdate = fsm;
 		}
 		if (fsmForUpdate != null)
-			producer.push(config.getUpdateTopic(), new FSMRequest(requestInfo, fsmForUpdate, null));
+			producer.push(config.getUpdateTopic(), new FSMRequest(requestInfo, fsmForUpdate, fsmRequest.getWorkflow()));
 
 		if (fsmForStatusUpdate != null)
-			producer.push(config.getUpdateWorkflowTopic(), new FSMRequest(requestInfo, fsmForStatusUpdate, null));
+			producer.push(config.getUpdateWorkflowTopic(), new FSMRequest(requestInfo, fsmForStatusUpdate, fsmRequest.getWorkflow()));
 
 	}
 
