@@ -18,6 +18,8 @@ public class FSMAuditUtil {
 	private String applicationNo = null;
 
 	private String accountId = null;
+	
+	private String dsoId = null;
 
 	private String description = null;
 
@@ -34,6 +36,10 @@ public class FSMAuditUtil {
 	private String status = null;
 
 	private String vehicleId = null;
+	
+	private String vehicleType = null;
+	
+	private Long possibleServiceDate = null;
 
 	private String doorNo = null;
 
@@ -58,6 +64,8 @@ public class FSMAuditUtil {
 	private String buildingName = null;
 
 	private String street = null;
+	
+	private String slumName = null;
 
 	private Double latitude = null;
 

@@ -19,6 +19,7 @@ import org.egov.fsm.repository.FSMRepository;
 import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
+import org.egov.fsm.util.FSMToFSMAuditUtilConverter;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.validator.FSMValidator;
 import org.egov.fsm.web.model.FSM;
@@ -89,10 +90,11 @@ public class FSMService {
 	
 
 	@Autowired
-	VehicleService vehicleService;
+	private VehicleService vehicleService;
 	
 	@Autowired
 	private FSMRepository repository;
+	
 	public FSM create(FSMRequest fsmRequest) {
 		RequestInfo requestInfo = fsmRequest.getRequestInfo();
 		String tenantId = fsmRequest.getFsm().getTenantId().split("\\.")[0];
@@ -144,7 +146,6 @@ public class FSMService {
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		List<FSM> fsms = repository.getFSMData(criteria, null);
 		
-		fsmValidator.validateUpdatableParams(fsmRequest, fsms, mdmsData);
 		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
