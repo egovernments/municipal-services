@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static org.egov.tl.util.TLConstants.*;
 
@@ -114,58 +115,36 @@ public class TradeLicenseService {
 		
 		
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		String json;
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode json;
+		ObjectNode node;
 		if(roles.contains("TL_CEMP_FORLEGACY"))
 		{
 			
 			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-
-	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-	    			
-		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-				}
-				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-					
-					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-				}
-				else {
-			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-
-				}	
-	    	}else
-				json = "{ \"islegacy\" : \"true\"}";
+				
+				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+				node = (ObjectNode) json;
+				node.put("islegacy", "true");	
+			}
+			else
+			{
+				node = mapper.createObjectNode().put("islegacy", "true");			}
 		}
-		
     	else
     	{
     		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-
-        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-        			
-    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-    			}
-    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-    				
-    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-    			}
-    			else {
-    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-
-    			}	
-        	}else
-    			json = "{ \"islegacy\" : \"false\"}";
-	
+				
+				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+				node = (ObjectNode) json;
+				node.put("islegacy", "false");	
+			}
+			else
+			{
+				node = mapper.createObjectNode().put("islegacy", "false");			}
     	}
-		JsonNode additionalDetail;
-		try {
-			additionalDetail = objectMapper.readTree(json);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
-		}
-	
-    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+		
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail((JsonNode)node);
 
         Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
