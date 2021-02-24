@@ -209,14 +209,14 @@ public class CalculationService {
 			if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
 				amount = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
 			}else {
-				List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+				List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).propertyType(fsm.getPropertyUsage()).tenantId(fsm.getTenantId()).build());
 				if(billingSlabs.size() >0) {
 					amount = billingSlabs.get(0).getPrice();
 				}
 			}
 			
 		}else {
-			List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+			List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).propertyType(fsm.getPropertyUsage()).tenantId(fsm.getTenantId()).build());
 			if(billingSlabs.size() >0) {
 				amount = billingSlabs.get(0).getPrice();
 			}
