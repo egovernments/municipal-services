@@ -83,8 +83,6 @@ public class FSMValidator {
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 			validateTripAmount(fsmRequest, mdmsData);
-			validateSlum(fsmRequest, mdmsData);
-			validateNoOfTrips(fsmRequest, mdmsData);
 		}else {
 			// incase of anonymous user, citizen is mandatory
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
@@ -100,6 +98,8 @@ public class FSMValidator {
 			}
 		}
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
+		validateNoOfTrips(fsmRequest, mdmsData);
+		validateSlum(fsmRequest, mdmsData);
 	}
 
 	/**
@@ -253,17 +253,20 @@ public class FSMValidator {
 		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getFsm().getApplicationStatus()));
 		FSM newFsm = fsmRequest.getFsm();
 		FSM oldFsm = searchResult.get(NumberUtils.INTEGER_ZERO);
-		List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);
-		if(listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
-			FSMConstants.pitDetailList.forEach(property -> {
-				listOfUpdatedParams.remove(property);
+		if(!CollectionUtils.isEmpty(listOfAllowedUpdatableParams)) {
+			List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);
+			if(listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
+				FSMConstants.pitDetailList.forEach(property -> {
+					listOfUpdatedParams.remove(property);
+				});
+			}
+			listOfUpdatedParams.forEach(updatedParam -> {
+				if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
+					throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
+				};
 			});
 		}
-		listOfUpdatedParams.forEach(updatedParam -> {
-			if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
-				throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
-			};
-		});
+		
 		
 	}
 	
@@ -302,11 +305,11 @@ public class FSMValidator {
 	private void validateNoOfTrips(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 		Integer noOfTrips  = fsm.getNoOfTrips();
-		List<Map<String,Object>> noOftripsAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
+		List<Map<String,String>> noOftripsAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
 		
 		if(CollectionUtils.isEmpty(noOftripsAllowed) ) {
 			if(noOfTrips != 1) {
-				 throw new CustomException(FSMErrorConstants.INVALID_NO_OF_TRIPS, "Not allowed to modify No of Trips");
+				fsmRequest.getFsm().setNoOfTrips(1);
 			}
 		}
 	}

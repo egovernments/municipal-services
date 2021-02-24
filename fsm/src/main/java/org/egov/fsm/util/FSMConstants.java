@@ -118,8 +118,13 @@ public class FSMConstants {
 	public static final String WF_ACTION_SEND_BACK = "SENDBACK";
 
 	public static final String WF_ACTION_DSO_REJECT = "DSO_REJECT";
+	
 
 
+	public static final String WF_STATUS_CREATED = "CREATED";
+	public static final String APPLICATION_CHANNEL_TELEPONE="TELEPHONE";
+	public static final String SMS_NOTIFICATION_PREFIX="FSM_SMS_";
+	public static final String  WF_STATUS_PENDING_APPL_FEE_PAYMENT="PENDING_APPL_FEE_PAYMENT";
 
 	public static final String CHECK_LIST_SINGLE_SELECT = "SINGLE_SELECT";
 	public static final String CHECK_LIST_MULTI_SELECT = "MULTI_SELECT";
@@ -131,6 +136,8 @@ public class FSMConstants {
 	public static final String PIT_DETAIL = "pitDetail";
 	
 	public static final ArrayList<String> pitDetailList= new ArrayList<String>( Arrays.asList("height", "length", "width", "diameter", "distanceFromRoad") );
+
+	public static final String RECEIPT_KEY = "fsm-receipt";
 
 
 

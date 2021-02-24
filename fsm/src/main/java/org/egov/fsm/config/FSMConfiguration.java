@@ -202,6 +202,27 @@ public class FSMConfiguration {
 		private String collectionServiceSearchEndPoint;
 
 		
+		@Value("${egov.url.shortner.host}")
+		private String urlShortnerHost;
+		
+		@Value("${tl.url.shortner.endpoint}")
+		private String urlShortnerEndpoint;
+		
+		// PDF Config
+		@Value("${egov.pdf.host}")
+		private String pdfHost;
+
+		@Value("${egov.pdf.context.path}")
+		private String pdfContextPath;
+
+		@Value("${egov.pdf.createnosave.path}")
+		private String pdfCreateNoSaveEndpoint;
+		
+		@Value("${egov.ui.fsm.link}")
+		private String fsmAppLink;
+		
+		@Value("${egov.ui.fsm.new.link}")
+		private String newFsmLink;
 		
 		// DSO Config
 		@Value("${egov.vendor.host}")
