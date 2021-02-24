@@ -263,6 +263,7 @@ public class FSMValidator {
 			listOfUpdatedParams.remove("children");
 			listOfUpdatedParams.remove("label");
 			listOfUpdatedParams.remove("name");
+
 			listOfUpdatedParams.forEach(updatedParam -> {
 				if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
 					throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
