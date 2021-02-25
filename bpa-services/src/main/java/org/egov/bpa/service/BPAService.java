@@ -529,6 +529,7 @@ public class BPAService {
 			throw new CustomException(BPAErrorConstants.INVALID_REQUEST, "Approval Number is required.");
 		}
 
+		Exception exception = null;
 		try {
 			this.createTempReport(bpaRequest, fileName, document);
 			String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
@@ -540,6 +541,7 @@ public class BPAService {
 			this.addDataToPdf(document, bpaRequest, permitNo, generatedOn,fileName);
 
 		} catch (Exception ex) {
+			exception = ex;
 			log.debug("Exception occured while downloading pdf", ex.getMessage());
 			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		} finally {
@@ -547,8 +549,8 @@ public class BPAService {
 				if (document != null) {
 					document.close();
 				}
-			} catch (Exception ex) {
-				throw new CustomException(BPAErrorConstants.INVALID_FILE, "unable to close this file");
+			} catch (Throwable t) {
+				exception.addSuppressed(t);
 			}
 		}
 	}
