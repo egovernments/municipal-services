@@ -201,6 +201,8 @@ public class CalculationService {
 		SlumEnum slumName = null;
 		if(!CollectionUtils.isEmpty(slumNameAllowed)) {
 			 slumName = ((fsm.getAddress().getSlumName() == null ) ? SlumEnum.NO : SlumEnum.YES);
+		}else {
+			slumName = SlumEnum.NO;
 		}
 		 
 		if(!CollectionUtils.isEmpty(tripAountAllowed)) {

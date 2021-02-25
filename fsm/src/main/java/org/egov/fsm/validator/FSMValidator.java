@@ -71,9 +71,13 @@ public class FSMValidator {
 			if(!StringUtils.isEmpty(fsm.getSource())) {
 				mdmsValidator.validateApplicationChannel(fsm.getSource());
 				
+			}else {
+				fsm.setSource(FSMConstants.APPLICATION_CHANNEL_SOURCE);
 			}
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
 				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			}else {
+				fsm.setSanitationtype(FSMConstants.SANITATION_TYPE_SINGLE_PIT);
 			}
 			
 		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {

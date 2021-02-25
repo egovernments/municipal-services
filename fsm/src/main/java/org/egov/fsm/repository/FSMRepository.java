@@ -14,6 +14,7 @@ import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -68,11 +69,12 @@ public class FSMRepository {
 
 	}
 
-	public List<FSM> getFSMData(FSMSearchCriteria fsmSearchCriteria, String dsoId) {
+	public FSMResponse getFSMData(FSMSearchCriteria fsmSearchCriteria, String dsoId) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = fsmQueryBuilder.getFSMSearchQuery(fsmSearchCriteria, dsoId, preparedStmtList);
-		List<FSM> FSMData = jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
-		return FSMData;
+		List<FSM> fsms = jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
+		FSMResponse fsmResponse = FSMResponse.builder().fsm(fsms).totalCount(FSMrowMapper.full_count).build();
+		return fsmResponse;
 	}
 
 	public List<FSMAuditUtil> getFSMActualData(FSMAuditSearchCriteria criteria) {
