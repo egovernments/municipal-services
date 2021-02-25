@@ -93,7 +93,7 @@ public class NotificationService {
 			if(StringUtils.isEmpty(serviceType))
 				serviceType = PGRUtils.splitCamelCase(serviceTypes.get(0));
 		} catch (Exception e) {
-			log.error("SERVICE_TYPE_EXCEPTION",e);
+			log.error("SERVICE_TYPE_EXCEPTION", e);
 			return null;
 		}
 		Integer sla = slaHours.get(0) / 24; //converting hours to days.
@@ -185,7 +185,7 @@ public class NotificationService {
 		List<String> designations = null;
 		try {
 			Object result = serviceRequestRepository.fetchResult(uri, mdmsCriteriaReq);
-			log.info("Desg search: "+result);
+			log.info("Desgination search: " + result);
 			designations = JsonPath.read(result, PGRConstants.JSONPATH_DESIGNATIONS);
 			if (null == designations || designations.isEmpty())
 				return null;
@@ -255,7 +255,7 @@ public class NotificationService {
 					uuid = res.getUser().get(0).getUuid();
 				}
 			}catch(Exception e) {
-				log.error("Couldn't fetch user for id: "+userId+" error: " + e);
+				log.error("Couldn't fetch user for id: " + userId + " error: " + e);
 			}
 			return phoneNumber + "|" + uuid;
 		}else if(role.equals(PGRConstants.ROLE_EMPLOYEE)) {
@@ -292,7 +292,7 @@ public class NotificationService {
 	}
 	
 	public Long getSlaHours() {
-		log.info("Returning default sla: "+egovDefaultServiceSla);
+		log.info("Returning default sla: " + egovDefaultServiceSla);
 		return egovDefaultServiceSla;
 	}
 
