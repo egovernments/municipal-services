@@ -148,7 +148,7 @@ public class PaymentNotificationService {
             }
         }
         catch (Exception e){
-			log.error("NOTIFICATION_ERROR","Execption in notification creation:"+e);
+			log.error("NOTIFICATION_ERROR",e);
         }
     }
     /**
