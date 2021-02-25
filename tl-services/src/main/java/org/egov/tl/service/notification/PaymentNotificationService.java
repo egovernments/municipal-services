@@ -3,6 +3,7 @@ package org.egov.tl.service.notification;
 import com.jayway.jsonpath.DocumentContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.apache.commons.lang.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -30,6 +31,7 @@ import static org.egov.tl.util.TLConstants.*;
 
 
 @Service
+@Slf4j
 public class PaymentNotificationService {
 
 

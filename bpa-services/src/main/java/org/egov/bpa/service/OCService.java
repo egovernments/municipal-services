@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.jayway.jsonpath.JsonPath;
 
 @Service
+@Slf4j
 public class OCService {
 
 	@Autowired
