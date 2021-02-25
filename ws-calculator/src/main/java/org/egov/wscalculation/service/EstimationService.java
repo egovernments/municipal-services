@@ -273,6 +273,7 @@ public class EstimationService {
 		log.debug(" the slabs count : " + billingSlabs.size());
 		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0]
 				: "";
+		log.info("buildingType: "+buildingType );
 		// final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
 
@@ -286,7 +287,9 @@ public class EstimationService {
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
-			log.info("isBuildingTypeMatching"+isBuildingTypeMatching+" isConnectionTypeMatching: "
+			log.info("BuildingTypeMatching: " + slab.getBuildingType());
+
+			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
 					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
 
 			if (waterSubUsageType != null) {
