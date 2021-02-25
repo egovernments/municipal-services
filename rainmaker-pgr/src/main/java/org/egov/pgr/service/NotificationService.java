@@ -93,7 +93,7 @@ public class NotificationService {
 			if(StringUtils.isEmpty(serviceType))
 				serviceType = PGRUtils.splitCamelCase(serviceTypes.get(0));
 		} catch (Exception e) {
-			log.error("SERVICE_TYPE_EXCEPTION", "Execption in getting service type: "+e);
+			log.error("SERVICE_TYPE_EXCEPTION",e);
 			return null;
 		}
 		Integer sla = slaHours.get(0) / 24; //converting hours to days.
@@ -159,12 +159,12 @@ public class NotificationService {
 						department = departments.get(0); //Every serviceCode is mapped to always only one dept.
 					}
 				} catch (Exception e) {
-			log.error("DEPARTMENT_EXCEPTION", "Execption in getting department data: "+e);
+			log.error("DEPARTMENT_EXCEPTION", e);
 					 return department;
 				}
 			}
 		}catch (Exception e) {
-			log.error("DEPARTMENT_EXCEPTION", "Execption in getting department data: "+e);
+			log.error("DEPARTMENT_EXCEPTION", e);
 		    return department;
 		}
 		 return department;
@@ -190,7 +190,7 @@ public class NotificationService {
 			if (null == designations || designations.isEmpty())
 				return null;
 		} catch (Exception e) {
-			log.error("DESIGNATION_EXCEPTION", "Execption in getting designation data: "+e);
+			log.error("DESIGNATION_EXCEPTION", e);
 			return null;
 		}
 
@@ -285,7 +285,7 @@ public class NotificationService {
 				return null;
 			return actions.get(0).getAssignee();
 		}catch(Exception e) {
-			log.error("ASSIGNMENT_EXCEPTION", "Execption in getting assignment data: "+e);
+			log.error("ASSIGNMENT_EXCEPTION", e);
 			return null;
 		}
 
