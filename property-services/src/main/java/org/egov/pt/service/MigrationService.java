@@ -562,7 +562,7 @@ public class MigrationService {
                 try{
                     propertyMigrationValidator.validatePropertyCreateRequest(request,masters,errorMap);
                 } catch (Exception e) {
-                    log.error("Error while migrating prperty data of "+property.getPropertyId(), e);
+                    log.error("Error while migrating prperty data of " + property.getPropertyId(), e);
                 }
 
                 producer.push(config.getSavePropertyTopic(), request);
@@ -917,7 +917,7 @@ public class MigrationService {
         try{
             propertyMigrationValidator.ValidateAssessmentMigrationData(request,property,masters,errorMap);
         } catch (Exception e) {
-            log.error("Error while migrating assessment data of "+assessment.getAssessmentNumber(),e);
+            log.error("Error while migrating assessment data of " + assessment.getAssessmentNumber(), e);
             errorMap.put(assessment.getAssessmentNumber(), String.valueOf(e));
         }
         //assessmentRequestList.add(request);

@@ -67,7 +67,7 @@ public class DemandGenerationConsumer {
 					builder.append("Error while listening to value: ").append(mapper.writeValueAsString(record))
 							.append(" on topic: ").append(e);
 				} catch (JsonProcessingException e1) {
-					log.error("KAFKA_PROCESS_ERROR",e1);
+					log.error("KAFKA_PROCESS_ERROR", e1);
 				}
 				log.error(builder.toString());
 			}
@@ -108,7 +108,7 @@ public class DemandGenerationConsumer {
 							builder.append("Error while generating Demand for Criteria: ")
 									.append(mapper.writeValueAsString(calcCriteria));
 						} catch (JsonProcessingException e1) {
-							log.error("KAFKA_PROCESS_ERROR",e1);
+							log.error("KAFKA_PROCESS_ERROR", e1);
 						}
 						log.error(builder.toString(), e);
 					}

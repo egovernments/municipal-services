@@ -119,7 +119,7 @@ public class PaymentNotificationService {
 				}
 			}
 		} catch (Exception e) {
-			log.error("KAFKA_PROCESS_ERROR:",e);
+			log.error("KAFKA_PROCESS_ERROR:", e);
 		}
 	}
 

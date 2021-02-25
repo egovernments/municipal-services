@@ -58,7 +58,7 @@ public class OCService {
 				data.add(response);
 
 			} catch (Exception e) {
-				log.error("VALIDATION_ERROR:",e);
+				log.error("VALIDATION_ERROR:", e);
 			}
 		});
 		ArrayList<String> riskType = new ArrayList<String>();
