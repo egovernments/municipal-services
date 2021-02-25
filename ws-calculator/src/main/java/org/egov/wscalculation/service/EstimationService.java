@@ -271,7 +271,7 @@ public class EstimationService {
 		
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0]
+		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[1]
 				: "";
 		log.info("buildingType: "+buildingType );
 		// final String buildingType = "Domestic";
