@@ -12,6 +12,7 @@ import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.collection.PaymentDetail;
@@ -80,7 +81,8 @@ public class PaymentUpdateService {
 					searchCriteria.setTenantId(tenantId);
 					List<String> applNos = Arrays.asList(paymentDetail.getBill().getConsumerCode());
 					searchCriteria.setApplicationNos(applNos);
-					List<FSM> fsms = repository.getFSMData(searchCriteria, null);
+					FSMResponse fsmResponse = repository.getFSMData(searchCriteria, null);
+					List<FSM> fsms = fsmResponse.getFsm();
 					if (CollectionUtils.isEmpty(fsms)) {
 						throw new CustomException(FSMErrorConstants.INVALID_RECEIPT,
 								"No Building Plan Application found for the comsumerCode "

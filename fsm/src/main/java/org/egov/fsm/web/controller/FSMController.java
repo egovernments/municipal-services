@@ -74,11 +74,10 @@ public class FSMController {
 	public ResponseEntity<FSMResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 			@Valid @ModelAttribute FSMSearchCriteria criteria) {
 		
-		List<FSM> fsmList = fsmService.FSMsearch(criteria, requestInfoWrapper.getRequestInfo());
+		FSMResponse response= fsmService.FSMsearch(criteria, requestInfoWrapper.getRequestInfo());
 		
-		FSMResponse response = FSMResponse.builder().fsm(fsmList).responseInfo(
-				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
-				.build();
+		response.setResponseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true));
 		
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

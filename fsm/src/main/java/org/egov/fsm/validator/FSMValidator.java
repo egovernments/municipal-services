@@ -14,8 +14,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.service.BoundaryService;
+import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
+import org.egov.fsm.util.FSMToFSMAuditUtilConverter;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
@@ -46,6 +48,9 @@ public class FSMValidator {
 
 	@Autowired
 	private FSMConfiguration config;
+	
+	@Autowired
+	private FSMToFSMAuditUtilConverter converter;
 
 	public void validateCreate(FSMRequest fsmRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
@@ -66,9 +71,13 @@ public class FSMValidator {
 			if(!StringUtils.isEmpty(fsm.getSource())) {
 				mdmsValidator.validateApplicationChannel(fsm.getSource());
 				
+			}else {
+				fsm.setSource(FSMConstants.APPLICATION_CHANNEL_SOURCE);
 			}
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
 				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			}else {
+				fsm.setSanitationtype(FSMConstants.SANITATION_TYPE_SINGLE_PIT);
 			}
 			
 		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
@@ -202,7 +211,7 @@ public class FSMValidator {
 	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
 		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
 		FSM fsm = fsmRequest.getFsm();
-//		validateUpdatableParams(fsmRequest, searchResult, mdmsData);
+		
 		if(searchResult.size() <= 0 ) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		} 
@@ -214,6 +223,7 @@ public class FSMValidator {
 			throw new CustomException(FSMErrorConstants.INVALID_ACTION," Workflow Action is mandatory!");
 		}
 		
+		validateUpdatableParams(fsmRequest, searchResult, mdmsData);
 		validateAllIds(searchResult, fsm);
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
@@ -250,30 +260,32 @@ public class FSMValidator {
 	}
 	
 	public void validateUpdatableParams(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
-		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData, String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getFsm().getApplicationStatus()));
-		FSM newFsm = fsmRequest.getFsm();
-		FSM oldFsm = searchResult.get(NumberUtils.INTEGER_ZERO);
-		if(!CollectionUtils.isEmpty(listOfAllowedUpdatableParams)) {
+		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData,
+				String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getFsm().getApplicationStatus()));
+		
+		FSMAuditUtil newFsm = converter.convert(fsmRequest.getFsm());
+		FSMAuditUtil oldFsm = converter.convert(searchResult.get(NumberUtils.INTEGER_ZERO));
+		
+
+		if (!CollectionUtils.isEmpty(listOfAllowedUpdatableParams)) {
 			List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);
-			if(listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
+			if (listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
 				FSMConstants.pitDetailList.forEach(property -> {
 					listOfUpdatedParams.remove(property);
 				});
 			}
-			listOfUpdatedParams.remove("children");
-			listOfUpdatedParams.remove("label");
-			listOfUpdatedParams.remove("name");
-			listOfUpdatedParams.forEach(updatedParam -> {
-				if(!contains(listOfAllowedUpdatableParams, updatedParam)) {
-					throw new CustomException(FSMErrorConstants.UPDATE_ERROR, String.format("Cannot update the field:%s", updatedParam));
-				};
-			});
+			
+			for(String updatedParam : listOfUpdatedParams) {
+				if (!contains(listOfAllowedUpdatableParams, updatedParam)) {
+					throw new CustomException(FSMErrorConstants.UPDATE_ERROR,
+							String.format("Cannot update the field:%s", updatedParam));
+				}
+			}
 		}
-		
-		
+
 	}
 	
-	public List<String> getDelta(FSM source, FSM target) {
+	public List<String> getDelta(FSMAuditUtil source, FSMAuditUtil target) {
 		List<GraphComparator.Delta> deltas = GraphComparator.compare(source, target, new GraphComparator.ID() {
 			@Override
 			public Object getId(Object o) {

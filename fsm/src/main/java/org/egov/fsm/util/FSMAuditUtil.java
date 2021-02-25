@@ -14,7 +14,7 @@ import lombok.Setter;
 public class FSMAuditUtil {
 
 	private String id = null;
-	
+
 	private String applicationNo = null;
 
 	private String accountId = null;
@@ -72,6 +72,14 @@ public class FSMAuditUtil {
 	private Double diameter = null;
 
 	private Double distanceFromRoad = null;
+
+	private String vehicleType = null;
+
+	private Long possibleServiceDate = null;
+
+	private String dsoId = null;
+	
+	private String slumName = null;
 
 	private String modifiedBy = null;
 

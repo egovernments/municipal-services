@@ -30,6 +30,8 @@ public class FSMConstants {
 	public static final String FSM_PAY_BUSINESS_SERVICE="FSM.TRIP_CHARGES";
 	
 	public static final String DRAFT="DRAFT";
+	public static final String APPLICATION_CHANNEL_SOURCE="ONLINE";
+	public static final String SANITATION_TYPE_SINGLE_PIT="CONVENTIONAL_SINGLE_PIT";
 
 	// mdms path codes
 
