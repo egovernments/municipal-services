@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.BPARepository;
+import org.egov.bpa.repository.rowmapper.BPARowMapper;
 import org.egov.bpa.util.BPAErrorConstants;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.BPARequest;
@@ -18,6 +19,8 @@ import org.egov.bpa.workflow.WorkflowIntegrator;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -39,6 +42,8 @@ public class PaymentUpdateService {
 	private EnrichmentService enrichmentService;
 
 	private ObjectMapper mapper;
+
+	public static final Logger logger = LoggerFactory.getLogger(PaymentUpdateService.class);
 
 	@Autowired
 	public PaymentUpdateService(BPAConfiguration config, BPARepository repository,
@@ -116,7 +121,7 @@ public class PaymentUpdateService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Error while processing data");
 		}
 	}
 }

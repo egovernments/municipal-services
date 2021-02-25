@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -32,6 +34,7 @@ import static org.egov.tl.util.TLConstants.*;
 @Service
 public class PaymentNotificationService {
 
+    public static final Logger logger = LoggerFactory.getLogger(PaymentNotificationService.class);
 
     private TLConfiguration config;
 
@@ -148,7 +151,7 @@ public class PaymentNotificationService {
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            logger.error("Getting Error while processing Business service");
         }
     }
     /**

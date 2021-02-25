@@ -5,7 +5,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.tl.config.TLConfiguration;
@@ -53,6 +54,8 @@ public class PaymentUpdateService {
 	private WorkflowService workflowService;
 
 	private TradeUtil util;
+
+	public static final Logger logger = LoggerFactory.getLogger(PaymentUpdateService.class);
 
 	@Value("${workflow.bpa.businessServiceCode.fallback_enabled}")
 	private Boolean pickWFServiceNameFromTradeTypeOnly;
@@ -154,7 +157,7 @@ public class PaymentUpdateService {
 			}
 		 }
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("Error while processing");
 		}
 
 	}

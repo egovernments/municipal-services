@@ -3,6 +3,8 @@ package org.egov.pt.service;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.pt.config.PropertyConfiguration;
@@ -28,6 +30,8 @@ import com.google.common.collect.Sets;
 
 @Service
 public class PaymentUpdateService {
+
+	public static final Logger logger = LoggerFactory.getLogger(PaymentUpdateService.class);
 
 	@Autowired
 	private PropertyRepository propertyRepository;
@@ -75,7 +79,7 @@ public class PaymentUpdateService {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.info("Error while processing data");
 		}
 
 	}

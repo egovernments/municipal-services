@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.repository.ServiceRequestRepository;
 import org.egov.bpa.util.BPAConstants;
@@ -21,6 +23,8 @@ import com.jayway.jsonpath.JsonPath;
 
 @Service
 public class OCService {
+
+	public static final Logger logger = LoggerFactory.getLogger(OCService.class);
 
 	@Autowired
 	private BPAConfiguration config;
@@ -58,7 +62,7 @@ public class OCService {
 				data.add(response);
 
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error("Error occured ");
 			}
 		});
 		ArrayList<String> riskType = new ArrayList<String>();

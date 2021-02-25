@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.egov.bpa.web.model.AuditDetails;
 import org.egov.bpa.web.model.BPA;
 import org.egov.bpa.web.model.Document;
@@ -21,12 +23,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+
 @Component
 public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 
 	@Autowired
 	private ObjectMapper mapper;
-
+	public static final Logger logger = LoggerFactory.getLogger(BPARowMapper.class);
 	/**
 	 * extract the data from the resultset and prepare the BPA Object
 	 * @see org.springframework.jdbc.core.ResultSetExtractor#extractData(java.sql.ResultSet)
@@ -104,7 +107,7 @@ public class BPARowMapper implements ResultSetExtractor<List<BPA>> {
 			try {
 				additionalDetail = mapper.readTree(pgObj.getValue());
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Error occured on adding children to Property");
 			}
 			bpa.setAdditionalDetails(additionalDetail);
 		}

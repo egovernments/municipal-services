@@ -1,6 +1,8 @@
 package org.egov.tl.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.producer.Producer;
@@ -28,7 +30,7 @@ import static org.egov.tl.util.TLConstants.*;
 @Component
 public class TLBatchService {
 
-
+    public static final Logger logger = LoggerFactory.getLogger(TLBatchService.class);
 
     private NotificationUtil util;
 
@@ -134,7 +136,7 @@ public class TLBatchService {
                 smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
             }
             catch (Exception e){
-                e.printStackTrace();
+                logger.info("Error while sending SMS Reminder");
                 producer.push(config.getReminderErrorTopic(), license);
             }
         }
@@ -163,7 +165,7 @@ public class TLBatchService {
             producer.push(config.getUpdateWorkflowTopic(), new TradeLicenseRequest(requestInfo, licenses));
         }
         catch (Exception e){
-            e.printStackTrace();
+            logger.info("License Expiry Exception occured");
             producer.push(config.getExpiryErrorTopic(), licenses);
         }
 
