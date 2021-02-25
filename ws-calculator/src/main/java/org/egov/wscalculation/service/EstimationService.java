@@ -167,13 +167,18 @@ public class EstimationService {
 			} catch (IOException e) {
 				throw new CustomException("PARSING_ERROR", "Billing Slab can not be parsed!");
 			}
+			Property property = wSCalculationUtil.getProperty(
+					WaterConnectionRequest.builder().waterConnection(waterConnection).requestInfo(request.getRequestInfo()).build());
+			
 			JSONObject calculationAttributeMaster = new JSONObject();
 			calculationAttributeMaster.put(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST,
 					billingSlabMaster.get(WSCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
 			String calculationAttribute = getCalculationAttribute(calculationAttributeMaster,
 					waterConnection.getConnectionType());
-			List<BillingSlab> billingSlabs = getSlabsFiltered(waterConnection, mappingBillingSlab, calculationAttribute,
-					request.getRequestInfo());
+			log.info("billingSlabMaster: "+billingSlabMaster);
+			log.info("mappingBillingSlab:"+mappingBillingSlab+"calculationAttribute: "+calculationAttribute+" calculationAttributeMaster {}:",calculationAttributeMaster);
+			List<BillingSlab> billingSlabs = getSlabsFiltered(property, waterConnection, mappingBillingSlab, calculationAttribute);
+			
 			if (billingSlabs == null || billingSlabs.isEmpty())
 				throw new CustomException("BILLING_SLAB_NOT_FOUND", "Billing Slab are Empty");
 			/*
@@ -184,7 +189,7 @@ public class EstimationService {
 			log.debug(" Billing Slab Id For Water Charge Calculation --->  " + billingSlabIds.toString());
 
 			// WaterCharge Calculation
-			Double totalUOM = getUnitOfMeasurement(waterConnection, calculationAttribute, criteria);
+			Double totalUOM = getUnitOfMeasurement(property, waterConnection, calculationAttribute, criteria);
 			if (totalUOM == 0.0)
 				return waterCharge;
 			BillingSlab billSlab = billingSlabs.get(0);
@@ -260,11 +265,10 @@ public class EstimationService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<BillingSlab> getSlabsFiltered(WaterConnection waterConnection, List<BillingSlab> billingSlabs,
-			String calculationAttribute, RequestInfo requestInfo) {
+	private List<BillingSlab> getSlabsFiltered(Property property, WaterConnection waterConnection, List<BillingSlab> billingSlabs,
+			String calculationAttribute) {
 
-		Property property = wSCalculationUtil.getProperty(
-				WaterConnectionRequest.builder().waterConnection(waterConnection).requestInfo(requestInfo).build());
+		
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
 		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0]
@@ -282,6 +286,8 @@ public class EstimationService {
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
+			log.info("isBuildingTypeMatching"+isBuildingTypeMatching+" isConnectionTypeMatching: "
+					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
 
 			if (waterSubUsageType != null) {
 				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
@@ -328,7 +334,7 @@ public class EstimationService {
 		return assessmentYear;
 	}
 
-	private Double getUnitOfMeasurement(WaterConnection waterConnection, String calculationAttribute,
+	private Double getUnitOfMeasurement(Property property, WaterConnection waterConnection, String calculationAttribute,
 			CalculationCriteria criteria) {
 		Double totalUnit = 0.0;
 		if (waterConnection.getConnectionType().equals(WSCalculationConstant.meteredConnectionType)) {
@@ -344,6 +350,10 @@ public class EstimationService {
 			if (waterConnection.getPipeSize() == null)
 				return totalUnit;
 			return waterConnection.getPipeSize();
+		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
+				&& calculationAttribute.equalsIgnoreCase(WSCalculationConstant.plotBasedConst)) {
+			if (property.getLandArea() == null)
+				return totalUnit;
 		}
 		return 0.0;
 	}
