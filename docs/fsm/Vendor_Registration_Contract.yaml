@@ -30,6 +30,23 @@ paths:
           description: search with name of the business entity
           schema:
             type: string
+        - name: vehicleRegistrationNumber
+          in: query
+          description: search based on the vehicle assigned to DSO with the vehicle registration number
+          schema:
+            type: string
+        - name: vehicleType
+          in: query
+          description: search based on the vehicle assigned to DSO with the vehicleType
+          schema:
+            type: string
+        - name: vehicleIds
+          in: query
+          description: search by list of uuid(s) of the vehicle assigned to the SO
+          schema:
+            type: array
+            items:
+              type: string
         - name: ids
           in: query
           description: Search by list of UUID
@@ -37,7 +54,28 @@ paths:
             type: array
             items:
               type: string
-              maxItems: 10
+        - name : offset
+          in: query
+          description: offset for the pagination results
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: limit for the pagination results
+          schema:
+           type: integer
+        - name: ownerIds
+          in: query
+          description: search by list of uuid(s) of the owner of the DSo
+          schema:
+            type: array
+            items:
+              type: string
+        - name: mobileNumber
+          in: query
+          description: Search DSO by mobileNumber of the Owner of the DSO
+          schema:
+            type: string
       responses:
         '202':
           description: Successful response sorted by reverse chrnological order of creation
@@ -183,4 +221,7 @@ components:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ResponseInfo'
         vendor:
           $ref: '#/components/schemas/Vendor'
-      
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/WalkingTreeDev/eGov-DSO/1.0.0
