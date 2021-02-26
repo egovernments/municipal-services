@@ -1,5 +1,6 @@
 package org.egov.vendor.repository.rowmapper;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -7,15 +8,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.vendor.web.model.AuditDetails;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.location.Address;
 import org.egov.vendor.web.model.location.Boundary;
+import org.postgresql.util.PGobject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
@@ -35,7 +39,7 @@ public class VendorRowMapper implements ResultSetExtractor<List<Vendor>> {
 			String name = rs.getString("name");
 			currentvendor = vendorMap.get(id);
 			String tenantId = rs.getString("tenantid");
-			String additionalDetail = rs.getString("additionaldetails");
+			Object additionalDetail = getAdditionalDetail("additionaldetails",rs);
 			String owner_id = rs.getString("owner_id");
 			String description = rs.getString("description");
 			String source = rs.getString("source");
@@ -82,5 +86,22 @@ public class VendorRowMapper implements ResultSetExtractor<List<Vendor>> {
 		 vendor.setAuditDetails(auditdetails);
 		
 	}
+	
+	  private JsonNode getAdditionalDetail(String columnName, ResultSet rs){
+
+	        JsonNode additionalDetail = null;
+	        try {
+	            PGobject pgObj = (PGobject) rs.getObject(columnName);
+	            if(pgObj!=null){
+	                 additionalDetail = mapper.readTree(pgObj.getValue());
+	            }
+	        }
+	        catch (IOException | SQLException e){
+	            e.printStackTrace();
+	            throw new CustomException("PARSING_ERROR","Failed to parse additionalDetail object");
+	        }
+	        return additionalDetail;
+	    }
+
 
 }

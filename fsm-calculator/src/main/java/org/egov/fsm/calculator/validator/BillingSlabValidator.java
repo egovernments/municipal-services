@@ -11,6 +11,8 @@ import org.egov.fsm.calculator.repository.BillingSlabRepository;
 import org.egov.fsm.calculator.repository.querybuilder.BillingSlabQueryBuilder;
 import org.egov.fsm.calculator.utils.BillingSlabUtil;
 import org.egov.fsm.calculator.utils.CalculatorConstants;
+import org.egov.fsm.calculator.web.models.BillingSlab;
+import org.egov.fsm.calculator.web.models.BillingSlab.SlumEnum;
 import org.egov.fsm.calculator.web.models.BillingSlabRequest;
 import org.egov.fsm.calculator.web.models.BillingSlabSearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
@@ -50,10 +53,18 @@ public class BillingSlabValidator {
 				request.getBillingSlab().getCapacityTo(), request.getBillingSlab().getPropertyType(),
 				request.getBillingSlab().getSlum().toString(), preparedStmtList);
 		
-		int count = repository.getDataCount(query, preparedStmtList);
-		if (count >= 1) {
+		BillingSlabSearchCriteria searchCriteria = BillingSlabSearchCriteria.builder().propertyType( request.getBillingSlab().getPropertyType()).tenantId(request.getBillingSlab().getTenantId()).capacity(request.getBillingSlab().getCapacityFrom().doubleValue()).slum(SlumEnum.valueOf(request.getBillingSlab().getSlum().toString())).build();
+		List<BillingSlab> billingSlabs= repository.getBillingSlabData(searchCriteria);
+		if (!CollectionUtils.isEmpty(billingSlabs) ) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,
 					"Billing Slab already exits with the given combination of capacityType, capacityFrom, propertyType and slum");
+		}else {
+			searchCriteria.setCapacity(request.getBillingSlab().getCapacityTo().doubleValue());
+			billingSlabs= repository.getBillingSlabData(searchCriteria);
+			if (!CollectionUtils.isEmpty(billingSlabs) ) {
+				throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,
+						"Billing Slab already exits with the given combination of capacityType, capacityFrom, propertyType and slum");
+			}
 		}
 	}
 

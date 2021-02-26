@@ -20,6 +20,8 @@ To run the Vendor locally, you need to port forward below services locally
 ```bash
 boundary-service
 user-service
+vehicle
+mdms-service
 ```
 
 To run the Vendor locally, update below listed properties in `application.properties` prior to running the project:
@@ -35,9 +37,4 @@ spring.flyway.url=
 spring.flyway.user=
 spring.flyway.password=
 spring.flyway.table=
-
-egov.location.host=
-egov.location.host=
-egov.vehicle.host=
-egov.hrms.host=
 ```
