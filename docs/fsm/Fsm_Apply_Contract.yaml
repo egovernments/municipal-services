@@ -29,18 +29,86 @@ paths:
             items:
               type: string
               maxItems: 10
-        - name: mobileNo
+        - name: applicationStatus
           in: query
-          description: Search by mobile number of requester
+          description: search application by list of application Status(s)
+          schema:
+            type: array
+            items:
+              type: string
+        - name: locality
+          in: query
+          description: search application by list of Locality (s)
+          schema:
+            type: array
+            items:
+              type: string
+        - name: ownerIds
+          in: query
+          description: search by list of uuid(s) of the owner of the application
+          schema:
+            type: array
+            items:
+              type: string
+        - name: fromDate
+          in: query
+          description: search by the created date faling between the fromdate and today
+          schema:
+            type: integer
+        - name: toDate
+          in: query
+          description: search by the created date faling between the fromdate and today
+          schema:
+            type: integer
+        - name: applicationNos
+          in: query
+          description: search application by list of applicationNo(s)
+          schema: 
+            type: array
+            items:
+              type: string
+        - name: mobileNumber
+          in: query
+          description: Search applicationb by mobileNumber of the Owner of the application
           schema:
             type: string
+        - name : offset
+          in: query
+          description: offset for the pagination results
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: limit for the pagination results
+          schema:
+           type: integer
+        - name: sortOrder
+          in: query
+          description: sort the search results in Ascending or descending order
+          schema:
+           type: string
+           enum:
+            - ASC
+            - DESC
+        - name: sortBy
+          in: query
+          description: sort the search results by fields
+          schema:
+           type: string
+           enum: 
+            - applicationStatus
+            - applicationNumber
+            - propertyUsage
+            - vehicle
+            - locality
+            - createdTime
       responses:
         '202':
           description: Successful response sorted by reverse chrnological order of creation
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/FSMRequest'
+                $ref: '#/components/schemas/FSMResponse'
         '400':
           description: Invalid input.
           content:
@@ -49,6 +117,31 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
       tags:
         - FSM
+  /fsm/v1/_audit:
+    post:
+      summary: Get the application audit log for every change in the response. Provides a record for each set of change
+      parameters: 
+        - $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/parameters/tenantId'
+        - name: applicationNo
+          in: query
+          description: search for audit log based on the application no of FSM
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: search for audit log based on the unique id of the application
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Successful response sorted by reverse chrnological order of creation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FSMAuditResponse'
+      tags:
+        - FSM
+        
   /fsm/v1/_create:
     post:
       summary: Apply for desludging 
@@ -121,6 +214,9 @@ components:
           description: Unique Identifier scrutinized number
           minLength: 1
           maxLength: 64
+        rating:
+          type: integer
+          description: Rating for the application
         varificationDocuments:
           description: Attach the workflow varification documents.
           type: array
@@ -179,6 +275,11 @@ components:
           description: This is the master data defined in MDMS
           minLength: 2
           maxLength: 64
+        vehicleType:
+          type: string
+          description: This is the master data defined in MDMS
+          minLength: 2
+          maxLength: 64
         propertyUsage:
           type: string
           description: This is the master data defined in MDMS
@@ -187,8 +288,6 @@ components:
         noOfTrips:
           type: integer
           description: Total no of trips reqired for desludging the PIT
-          minLength: 2
-          maxLength: 64
         status:
           type: string
           enum:
@@ -199,14 +298,28 @@ components:
           description: Unique Id of the vehicle which got assigned to the perticular application
           minLength: 2
           maxLength: 64
+        dsoId:
+          type: string
+          description: Unique Id of the DSO assigned to the application
+          minLength: 2
+          maxLength: 64
+        possibleServiceDate:
+          type: integer
+          description: possible service date populated while assigning vehicle
+          format: date
+        wasteCollected:
+          type: number
+          format: double
+          description: waster collected at the application site
         pitDetail:
           $ref: '#/components/schemas/PitDetail'
         address:
-          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/Address'
+          $ref: '#/components/schemas/Address'
         auditDetails:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
       required:
         - tenantId
+        - propertyUsage
     
     PitDetail:
       type: object
@@ -221,7 +334,7 @@ components:
           description: The server generated unique ID(UUID).
           minLength: 2
           maxLength: 64
-        hight:
+        height:
           type: number
           format: double
           description: Hight of the PIT in meter
@@ -239,6 +352,12 @@ components:
           description: Width of the PIT in meter
           minLength: 2
           maxLength: 128
+        diameter:
+          type: number
+          format: double
+          description: diameter  of the PIT in meter
+          minLength: 2
+          maxLength: 128          
         distanceFromRoad:
           type: number
           format: double
@@ -247,7 +366,11 @@ components:
           maxLength: 128
         auditDetails:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
-        
+      required:
+        - height
+        - width
+        - length
+        - distanceFromRoad
     
     FSMRequest:
       type: object
@@ -267,11 +390,116 @@ components:
       description: Response of the FSM
       properties:
         responseInfo:
-          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ResponseInfo'
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ResponseInfo
         fsm:
           $ref: '#/components/schemas/FSM'
         workflow:
           $ref: '#/components/schemas/Workflow'
+        totalCount:
+          type: string
+          description: totalcount of records available in the system satifyig the search criteria
       required:
         - responseInfo
+        - totalCount
         - fsm
+    FSMAuditResponse:
+      type: object
+      description: Response of the FSM Audit search
+      properties:
+        responseInfo:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ResponseInfo
+        fsmAudit:
+          $ref: '#/components/schemas/FSMAudit'
+      required:
+        - responseInfo
+        - fsmAudit   
+        
+    FSMAudit:
+      type: object
+      description: >
+        Representation of FSM Audit
+      properties:
+        who:
+          type: string
+          description: uuid of the user who changed the data of FSM object 
+        when:
+          type: integer
+          format: date
+          description: timestamp of the time change occured
+        what:
+          type: object
+          description: key value pair of the changed key and the changed value
+    Address:
+      type: object
+      description: >
+        Representation of a address. Indiavidual APIs may choose to extend from
+        this using allOf if more details needed to be added in their case.
+      properties:
+        tenantId:
+          type: string
+          description: Unique Identifier of the tenant to which user primarily belongs
+        doorNo:
+          type: string
+          description: House number or door number.
+        plotNo:
+          type: string
+          description: Plot number of the house.
+        id:
+          type: string
+          description: System generated id for the address
+          readOnly: true
+        landmark:
+          description: additional landmark to help locate the address
+          type: string
+        city:
+          description: City of the address. Can be represented by the tenantid itself
+          type: string
+        district:
+          description: The district in which the property is located
+          type: string
+        region:
+          description: The Region in which the property is located
+          type: string
+        state:
+          description: The State in which the property is located
+          type: string
+        country:
+          description: The country in which the property is located
+          type: string
+        pincode:
+          type: string
+          description: PIN code of the address. Indian pincodes will usually be all numbers.
+        additionDetails:
+          type: string
+          description: more address detail as may be needed
+        buildingName:
+          type: string
+          description: Name of the building
+          maxLength: 64
+          minLength: 2
+        street:
+          type: string
+          description: Street Name
+          maxLength: 64
+          minLength: 2
+        slumName:
+          type: string
+          description: Street Name
+          maxLength: 64
+          minLength: 2
+        locality:
+          $ref: 'https://raw.githubusercontent.com/egovernments/egov-services/master/docs/egov-location/contracts/v11-0-0.yml#/definitions/Boundary'
+        geoLocation:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/GeoLocation'
+      required: 
+        - tenantId
+        - locality
+servers:
+  # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/phanikiran-wtt-egov/FSM/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/WalkingTreeDev/eGov-FSM/1.0.0
