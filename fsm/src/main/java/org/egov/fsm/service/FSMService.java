@@ -2,6 +2,7 @@ package org.egov.fsm.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAudit;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
+import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.dso.Vendor;
@@ -35,10 +37,14 @@ import org.egov.fsm.workflow.ActionValidator;
 import org.egov.fsm.workflow.WorkflowIntegrator;
 import org.egov.fsm.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
+import org.javers.common.collections.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,6 +114,7 @@ public class FSMService {
 		return fsmRequest.getFsm();
 	}
 	
+	
 	/**
 	 * Updates the FSM
 	 * 
@@ -122,17 +129,24 @@ public class FSMService {
 		String tenantId = fsmRequest.getFsm().getTenantId().split("\\.")[0];
 		Object mdmsData = util.mDMSCall(requestInfo, tenantId);
 		FSM fsm = fsmRequest.getFsm();
-
+		
+		
 		if (fsm.getId() == null) {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + fsm);
 		}
+		
+		if (fsmRequest.getWorkflow() == null || fsmRequest.getWorkflow().getAction() == null) {
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Workflow action cannot be null." + String.format("{Workflow:%s}", fsmRequest.getWorkflow())) ;
+		}
+		
+		
 
 		List<String> ids = new ArrayList<String>();
 		ids.add( fsm.getId());
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
-		List<FSM> fsms = repository.getFSMData(criteria, null);
-		
-		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData);
+		FSMResponse fsmResponse = repository.getFSMData(criteria, null);
+		List<FSM> fsms = fsmResponse.getFsm();
+		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData); 
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				FSMConstants.FSM_BusinessService,null);
@@ -201,7 +215,12 @@ public class FSMService {
 		if(fsm.getPossibleServiceDate() != null) {
 			Calendar psd = Calendar.getInstance();
 			psd.setTimeInMillis(fsm.getPossibleServiceDate());
-			if(Calendar.getInstance().compareTo(psd) >0) {
+			Calendar today = Calendar.getInstance();
+			today.clear(Calendar.HOUR);
+			today.clear(Calendar.MINUTE);
+			today.clear(Calendar.SECOND);
+			today.clear(Calendar.MILLISECOND);
+			if(today.compareTo(psd) >0) {
 				throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
 			}
 		}
@@ -254,7 +273,10 @@ public class FSMService {
 		if(fsm.getWasteCollected() == null  || fsm.getWasteCollected() <=0 ) {
 			throw new CustomException(FSMErrorConstants.INVALID_WASTER_COLLECTED," Wastecollected is invalid to complete the application !.");
 		}
-		org.egov.common.contract.request.User dsoUser = fsmRequest.getRequestInfo().getUserInfo();
+		
+		ArrayList assignes = new ArrayList<String>();
+		assignes.add(fsm.getAccountId());
+		fsmRequest.getWorkflow().setAssignes(assignes);
 		vehicleTripService.vehicleTripReadyForDisposal(fsmRequest);
 
 	}
@@ -300,9 +322,10 @@ public class FSMService {
 	 * @param requestInfo
 	 * @return
 	 */
-	public List<FSM> FSMsearch(FSMSearchCriteria criteria, RequestInfo requestInfo) {
+	public FSMResponse FSMsearch(FSMSearchCriteria criteria, RequestInfo requestInfo) {
 		
 		List<FSM> fsmList = new LinkedList<>();
+		FSMResponse fsmResponse =null;
 		List<String> uuids = new ArrayList<String>();
 		UserDetailResponse usersRespnse;
 		String dsoId = null;
@@ -338,15 +361,14 @@ public class FSMService {
 		
 
 		
-		fsmList = repository.getFSMData(criteria, dsoId);
+		fsmResponse = repository.getFSMData(criteria, dsoId);
+		fsmList = fsmResponse.getFsm();
 		if (!fsmList.isEmpty()) {
 			enrichmentService.enrichFSMSearch(fsmList, requestInfo, criteria.getTenantId());
 		}
 
-		if (fsmList.isEmpty()) {
-			return Collections.emptyList();
-		}
-		return fsmList;
+		
+		return fsmResponse;
 	}
 	
 	/**

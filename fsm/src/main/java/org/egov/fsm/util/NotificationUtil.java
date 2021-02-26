@@ -2,26 +2,36 @@ package org.egov.fsm.util;
 
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.producer.Producer;
 import org.egov.fsm.repository.ServiceRequestRepository;
+import org.egov.fsm.service.DSOService;
 import org.egov.fsm.web.model.FSM;
+import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.RequestInfoWrapper;
+import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.notification.EventRequest;
 import org.egov.fsm.web.model.notification.SMSRequest;
+import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import com.jayway.jsonpath.JsonPath;
 
@@ -36,13 +46,19 @@ public class NotificationUtil {
 	private ServiceRequestRepository serviceRequestRepository;
 
 	private Producer producer;
+	
+	private DSOService dsoSerevice;
+	
+	private RestTemplate restTemplate;
 
 	@Autowired
 	public NotificationUtil(FSMConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			Producer producer) {
+			Producer producer,DSOService dsoService, RestTemplate restTemplate) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.producer = producer;
+		this.dsoSerevice=dsoService;
+		this.restTemplate = restTemplate;
 	}
 
 	final String receiptNumberKey = "receiptNumber";
@@ -59,13 +75,112 @@ public class NotificationUtil {
 	 * @return customized message based on fsm
 	 */
 	@SuppressWarnings("unchecked")
-	public String getCustomizedMsg(RequestInfo requestInfo, FSM fsm, String localizationMessage) {
+	public String getCustomizedMsg(FSMRequest fsmRequest, String localizationMessage,String messageCode) {
 		String message = null, messageTemplate;
-		// TODO
-		// using this method messageTemplate = getMessageTemplate( get the temaplate fill the data and return
+
+			FSM fsm = fsmRequest.getFsm();
+			Vendor vendor = this.dsoSerevice.getVendor(fsm.getDsoId(), fsm.getTenantId(), null, null, fsmRequest.getRequestInfo());
+			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
+			if (!StringUtils.isEmpty(messageTemplate)) {
+				message = getInitiatedMsg(fsm, messageTemplate);
+
+				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
+					BigDecimal amount = getAmountToBePaid(fsmRequest.getRequestInfo(), fsmRequest.getFsm());
+					message = message.replace("<AMOUNT_TO_BE_PAID>", amount.toString());
+				}
+				if (message.contains("<DSO_MOBILE_NUMBER>") && vendor != null) {
+					
+					message = message.replace("<AMOUNT_TO_BE_PAID>", vendor.getOwner().getMobileNumber());
+				}
+				
+				if (message.contains("<VEHICLE_REG_NO>") && vendor != null && CollectionUtils.isEmpty(vendor.getVehicles())) {
+					Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
+					Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
+					if(vehicle != null) {
+						message = message.replace("<VEHICLE_REG_NO>", vehicle.getRegistrationNumber());
+					}
+					
+				}
+				
+				if (message.contains("<POSSIBLE_SERVICE_DATE>") && vendor != null) {
+					Calendar possibleSrvdt = Calendar.getInstance();
+					possibleSrvdt.setTimeInMillis(fsm.getPossibleServiceDate());
+					SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+					dateFormat.setTimeZone(possibleSrvdt.getTimeZone());
+					message = message.replace("<POSSIBLE_SERVICE_DATE>", dateFormat.format(possibleSrvdt.getTime()));
+				}
+				
+				if (message.contains("<FSM_DSO_REJECT_REASON>") ) {
+					
+					message = message.replace("<FSM_DSO_REJECT_REASON>", fsmRequest.getWorkflow().getComments());
+				}
+				if (message.contains("<FSM_CANCEL_REASON>") ) {
+					
+					message = message.replace("<FSM_CANCEL_REASON>", fsmRequest.getWorkflow().getComments());
+				}
+				
+				if (message.contains("<PAY_LINK>") ) {
+					String actionLink = config.getPayLink().replace("$mobile", fsm.getCitizen().getMobileNumber())
+    						.replace("$applicationNo", fsm.getApplicationNo())
+    						.replace("$tenantId", fsm.getTenantId())
+    						.replace("$businessService",FSMConstants.FSM_PAY_BUSINESS_SERVICE);
+					actionLink = config.getUiAppHost() + actionLink;
+    			
+					message = message.replace("<PAY_LINK>", getShortenedUrl(actionLink));
+				}
+				
+				if (message.contains("<RECEIPT_LINK>") ) {
+					StringBuilder builder = new StringBuilder(config.getPdfHost());
+					builder.append(config.getPdfContextPath()).append(config.getPdfCreateNoSaveEndpoint());
+					builder.append("?tenantId=").append(fsm.getTenantId()).append("&key=").append(FSMConstants.RECEIPT_KEY);
+					message = message.replace("<RECEIPT_LINK>", getShortenedUrl(builder.toString()));
+				}
+				
+				if (message.contains("<RECEIPT_NO>") ) {
+					message = message.replace("<RECEIPT_NO>", getPaymentData("receiptNumber",fsmRequest));
+				}
+				
+				if (message.contains("<FSM_APPL_LINK>") ) {
+					message = message.replace("<FSM_APPL_LINK>", getShortenedUrl(config.getUiAppHost()+config.getFsmAppLink()+fsm.getApplicationNo()));
+				}	
+				if (message.contains("<NEW_FSM_LINK>") ) {
+					message = message.replace("<NEW_FSM_LINK>", getShortenedUrl(config.getUiAppHost()+config.getNewFsmLink()));
+				}
+					
+			}
+		
 		return message;
 	}
 
+	private String getPaymentData(String properyName,FSMRequest fsmRequest) {
+			StringBuilder builder = new StringBuilder(config.getCollectionServiceHost());
+			builder.append(config.getCollectionServiceSearchEndPoint()).append(FSMConstants.FSM_PAY_BUSINESS_SERVICE);
+			builder.append("?tenantId=").append(fsmRequest.getFsm().getTenantId()).append("&consumerCodes=").append(fsmRequest.getFsm().getApplicationNo());
+			LinkedHashMap responseMap =  (LinkedHashMap) serviceRequestRepository.fetchResult(builder, new RequestInfoWrapper(fsmRequest.getRequestInfo()));
+			JSONObject jsonObject = new JSONObject(responseMap);
+			String proeprtyValue ="";
+			try {
+				JSONArray paymentsArray = (JSONArray) jsonObject.get("Payments");
+				if (paymentsArray != null) {
+					JSONObject firstElement = (JSONObject) paymentsArray.get(0);
+					if (firstElement != null) {
+						JSONArray paymentDetails = (JSONArray) firstElement.get("paymentDetails");
+						if (paymentDetails != null) {
+							for (int i = 0; i < paymentDetails.length(); i++) {
+								JSONObject object = (JSONObject) paymentDetails.get(i);
+								proeprtyValue = object.get(properyName).toString();
+							}
+						}
+					}
+				}
+				return proeprtyValue;
+			} catch (Exception e) {
+				throw new CustomException("PARSING ERROR",
+						"Failed to parse the response using jsonPath: "
+								);
+			}
+		}
+		
 	@SuppressWarnings("unchecked")
 	// As per OAP-304, keeping the same messages for Events and SMS, so removed
 	// "M_" prefix for the localization codes.
@@ -77,6 +192,21 @@ public class NotificationUtil {
 
 	}
 
+
+	/**
+	 * Creates customized message for initiate
+	 * 
+	 * @param bpa
+	 *            tenantId of the bpa
+	 * @param message
+	 *            Message from localization for initiate
+	 * @return customized message for initiate
+	 */
+	@SuppressWarnings("unchecked")
+	private String getInitiatedMsg(FSM fsm, String message) {
+		message = message.replace("<2>", fsm.getApplicationNo());
+		return message;
+	}
 	/**
 	 * Extracts message for the specific code
 	 * 
@@ -151,10 +281,14 @@ public class NotificationUtil {
 	 * @return The uri for the getBill
 	 */
 	private StringBuilder getBillUri(FSM fsm) {
-		String status = fsm.getStatus().toString();
-		String code = null;
 		StringBuilder builder = new StringBuilder(config.getBillingHost());
-		// TODO prepare the bill url based on the application status, for intial charge and the additional charges seperately
+		builder.append(config.getDemandSearchEndpoint());
+		builder.append("?tenantId=");
+		builder.append(fsm.getTenantId());
+		builder.append("&consumerCode=");
+		builder.append(fsm.getApplicationNo());
+		builder.append("&businessService=");
+		builder.append(FSMConstants.FSM_PAY_BUSINESS_SERVICE);
 		return builder;
 	}
 
@@ -250,5 +384,26 @@ public class NotificationUtil {
 		log.debug("STAKEHOLDER:: " + request.getEvents().get(0).getDescription());
 	}
 
+
+
+	/**
+	 * Method to shortent the url
+	 * returns the same url if shortening fails
+	 * @param url
+	 */
+	public String getShortenedUrl(String url){
+
+		HashMap<String,String> body = new HashMap<>();
+		body.put("url",url);
+		StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
+		builder.append(config.getUrlShortnerEndpoint());
+		String res = restTemplate.postForObject(builder.toString(), body, String.class);
+
+		if(StringUtils.isEmpty(res)){
+			log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
+			return url;
+		}
+		else return res;
+	}
 
 }

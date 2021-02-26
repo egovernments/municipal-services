@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.calculator.config.CalculatorConfig;
@@ -200,7 +201,9 @@ public class CalculationService {
 		
 		SlumEnum slumName = null;
 		if(!CollectionUtils.isEmpty(slumNameAllowed)) {
-			 slumName = ((fsm.getAddress().getSlumName() == null ) ? SlumEnum.NO : SlumEnum.YES);
+			 slumName = (( StringUtils.isEmpty(fsm.getAddress().getSlumName())) ? SlumEnum.NO : SlumEnum.YES); 
+		}else {
+			slumName = SlumEnum.NO;
 		}
 		 
 		if(!CollectionUtils.isEmpty(tripAountAllowed)) {
@@ -209,14 +212,14 @@ public class CalculationService {
 			if(  oldAdditionalDetails != null || oldAdditionalDetails.get("tripAmount") != null) {
 				amount = BigDecimal.valueOf(Double.valueOf((String)oldAdditionalDetails.get("tripAmount")));
 			}else {
-				List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+				List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).propertyType(fsm.getPropertyUsage()).tenantId(fsm.getTenantId()).build());
 				if(billingSlabs.size() >0) {
 					amount = billingSlabs.get(0).getPrice();
 				}
 			}
 			
 		}else {
-			List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).tenantId(fsm.getTenantId()).build());
+			List<BillingSlab> billingSlabs = billingSlabRepository.getBillingSlabData(BillingSlabSearchCriteria.builder().capacity(NumberUtils.toDouble(capacity)).slum(slumName).propertyType(fsm.getPropertyUsage()).tenantId(fsm.getTenantId()).build());
 			if(billingSlabs.size() >0) {
 				amount = billingSlabs.get(0).getPrice();
 			}

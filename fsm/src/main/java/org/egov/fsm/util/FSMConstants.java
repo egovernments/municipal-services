@@ -1,5 +1,8 @@
 package org.egov.fsm.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +30,8 @@ public class FSMConstants {
 	public static final String FSM_PAY_BUSINESS_SERVICE="FSM.TRIP_CHARGES";
 	
 	public static final String DRAFT="DRAFT";
+	public static final String APPLICATION_CHANNEL_SOURCE="ONLINE";
+	public static final String SANITATION_TYPE_SINGLE_PIT="CONVENTIONAL_SINGLE_PIT";
 
 	// mdms path codes
 
@@ -62,6 +67,8 @@ public class FSMConstants {
 	public static final String MDMS_FINANCIALYEAR = "FinancialYear";
 
 	public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.egf-master.FinancialYear[?(@.code==\"{}\")]";
+	
+	public static final String MDMS_FSM_CONFIG_ALLOW_MODIFY = "$.MdmsRes.FSM.Config[?(@.code==\"ALLOW_MODIFY\" && @.WFState==\"%s\")].override.*";
 
 	public static final String MDMS_STARTDATE = "startingDate";
 
@@ -113,8 +120,13 @@ public class FSMConstants {
 	public static final String WF_ACTION_SEND_BACK = "SENDBACK";
 
 	public static final String WF_ACTION_DSO_REJECT = "DSO_REJECT";
+	
 
 
+	public static final String WF_STATUS_CREATED = "CREATED";
+	public static final String APPLICATION_CHANNEL_TELEPONE="TELEPHONE";
+	public static final String SMS_NOTIFICATION_PREFIX="FSM_SMS_";
+	public static final String  WF_STATUS_PENDING_APPL_FEE_PAYMENT="PENDING_APPL_FEE_PAYMENT";
 
 	public static final String CHECK_LIST_SINGLE_SELECT = "SINGLE_SELECT";
 	public static final String CHECK_LIST_MULTI_SELECT = "MULTI_SELECT";
@@ -122,6 +134,12 @@ public class FSMConstants {
 	public static final String VEHICLETRIP_BUSINESSSERVICE_NAME = "FSM_VEHICLE_TRIP";
 
 	public static final String TRIP_READY_FOR_DISPOSAL = "READY_FOR_DISPOSAL";
+	
+	public static final String PIT_DETAIL = "pitDetail";
+	
+	public static final ArrayList<String> pitDetailList= new ArrayList<String>( Arrays.asList("height", "length", "width", "diameter", "distanceFromRoad") );
+
+	public static final String RECEIPT_KEY = "fsm-receipt";
 
 
 

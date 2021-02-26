@@ -82,6 +82,16 @@ public class EnrichmentService {
 				reqType == SWConstants.CREATE_APPLICATION ? SWConstants.NEW_SEWERAGE_CONNECTION : SWConstants.MODIFY_SEWERAGE_CONNECTION);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
+
+		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
+
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				roadCuttingInfo.setId(UUID.randomUUID().toString());
+				roadCuttingInfo.setStatus(Status.ACTIVE);
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 	}
 
 	@SuppressWarnings("unchecked")

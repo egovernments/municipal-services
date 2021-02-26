@@ -1,17 +1,23 @@
 package org.egov.fsm.validator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.service.BoundaryService;
+import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
+import org.egov.fsm.util.FSMToFSMAuditUtilConverter;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
@@ -20,10 +26,12 @@ import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.cedarsoftware.util.GraphComparator;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +48,9 @@ public class FSMValidator {
 
 	@Autowired
 	private FSMConfiguration config;
+	
+	@Autowired
+	private FSMToFSMAuditUtilConverter converter;
 
 	public void validateCreate(FSMRequest fsmRequest, Object mdmsData) {
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
@@ -60,9 +71,13 @@ public class FSMValidator {
 			if(!StringUtils.isEmpty(fsm.getSource())) {
 				mdmsValidator.validateApplicationChannel(fsm.getSource());
 				
+			}else {
+				fsm.setSource(FSMConstants.APPLICATION_CHANNEL_SOURCE);
 			}
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
 				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			}else {
+				fsm.setSanitationtype(FSMConstants.SANITATION_TYPE_SINGLE_PIT);
 			}
 			
 		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
@@ -77,8 +92,6 @@ public class FSMValidator {
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
 			validateTripAmount(fsmRequest, mdmsData);
-			validateSlum(fsmRequest, mdmsData);
-			validateNoOfTrips(fsmRequest, mdmsData);
 		}else {
 			// incase of anonymous user, citizen is mandatory
 			if(fsm.getCitizen() == null || StringUtils.isEmpty(fsm.getCitizen().getName()) || StringUtils.isEmpty(fsm.getCitizen().getMobileNumber() )) {
@@ -94,6 +107,8 @@ public class FSMValidator {
 			}
 		}
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
+		validateNoOfTrips(fsmRequest, mdmsData);
+		validateSlum(fsmRequest, mdmsData);
 	}
 
 	/**
@@ -194,7 +209,7 @@ public class FSMValidator {
 	}
 
 	public void validateUpdate(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
-
+		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
 		FSM fsm = fsmRequest.getFsm();
 		
 		if(searchResult.size() <= 0 ) {
@@ -208,6 +223,7 @@ public class FSMValidator {
 			throw new CustomException(FSMErrorConstants.INVALID_ACTION," Workflow Action is mandatory!");
 		}
 		
+		validateUpdatableParams(fsmRequest, searchResult, mdmsData);
 		validateAllIds(searchResult, fsm);
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
@@ -225,6 +241,62 @@ public class FSMValidator {
 		validateNoOfTrips(fsmRequest, mdmsData);
 		validateTripAmount(fsmRequest, mdmsData);
 
+	}
+	
+	/**
+	 * @param collection the Collection to check
+	 * @param element the element to look for
+	 * @return {@code true} if found atleast partial content, {@code false} otherwise
+	 */
+	public boolean contains(@Nullable Collection<String> collection, String element) {
+		if (collection != null) {
+			for (String candidate : collection) {
+				if (candidate.contains(element)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public void validateUpdatableParams(FSMRequest fsmRequest, List<FSM> searchResult, Object mdmsData) {
+		List<String> listOfAllowedUpdatableParams = JsonPath.read(mdmsData,
+				String.format(FSMConstants.MDMS_FSM_CONFIG_ALLOW_MODIFY, fsmRequest.getFsm().getApplicationStatus()));
+		
+		FSMAuditUtil newFsm = converter.convert(fsmRequest.getFsm());
+		FSMAuditUtil oldFsm = converter.convert(searchResult.get(NumberUtils.INTEGER_ZERO));
+		
+
+		if (!CollectionUtils.isEmpty(listOfAllowedUpdatableParams)) {
+			List<String> listOfUpdatedParams = getDelta(oldFsm, newFsm);
+			if (listOfAllowedUpdatableParams.contains(FSMConstants.PIT_DETAIL)) {
+				FSMConstants.pitDetailList.forEach(property -> {
+					listOfUpdatedParams.remove(property);
+				});
+			}
+			
+			for(String updatedParam : listOfUpdatedParams) {
+				if (!contains(listOfAllowedUpdatableParams, updatedParam)) {
+					throw new CustomException(FSMErrorConstants.UPDATE_ERROR,
+							String.format("Cannot update the field:%s", updatedParam));
+				}
+			}
+		}
+
+	}
+	
+	public List<String> getDelta(FSMAuditUtil source, FSMAuditUtil target) {
+		List<GraphComparator.Delta> deltas = GraphComparator.compare(source, target, new GraphComparator.ID() {
+			@Override
+			public Object getId(Object o) {
+				return "id";
+			}
+		});
+		List<String> updatedFields= new ArrayList<>();
+		deltas.forEach(delta -> {
+			updatedFields.add(delta.getFieldName());
+		});
+		return updatedFields;
 	}
 	
 	private void validateTripAmount(FSMRequest fsmRequest, Object mdmsData) {
@@ -248,26 +320,26 @@ public class FSMValidator {
 	private void validateNoOfTrips(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
 		Integer noOfTrips  = fsm.getNoOfTrips();
-		List<Map<String,Object>> noOftripsAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
+		List<Map<String,String>> noOftripsAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_NO_OF_TRIPS_AMOUNT_OVERRIDE_ALLOWED);
 		
 		if(CollectionUtils.isEmpty(noOftripsAllowed) ) {
-			if(noOfTrips != 1) {
-				 throw new CustomException(FSMErrorConstants.INVALID_NO_OF_TRIPS, "Not allowed to modify No of Trips");
+			if(noOfTrips == null || noOfTrips.intValue() !=1) {
+				fsmRequest.getFsm().setNoOfTrips(1);
 			}
 		}
 	}
 	private void validateSlum(FSMRequest fsmRequest, Object mdmsData) {
 		FSM fsm = fsmRequest.getFsm();
-		boundaryService.getAreaType(fsmRequest, config.getHierarchyTypeCode());
+		
 		String locality = fsm.getAddress().getLocality().getCode();
 		List<Map<String,Object>> slumNameAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_SLUM_OVERRIDE_ALLOWED);
 
 		
 		if(!CollectionUtils.isEmpty(slumNameAllowed) && !StringUtils.isEmpty(fsm.getAddress().getSlumName())) {
-			List<Map<String,Object>> slumNameMapping = JsonPath.read(mdmsData, FSMConstants.SLUM_CODE_PATH.replace("{1}", locality).replace("{2}", fsm.getAddress().getSlumName().trim()));
-			if(CollectionUtils.isEmpty(slumNameMapping)) {
-				 throw new CustomException(FSMErrorConstants.INVALID_SLUM, "Slum Name is Invalid!");
-			}
+//			List<Map<String,Object>> slumNameMapping = JsonPath.read(mdmsData, FSMConstants.SLUM_CODE_PATH.replace("{1}", locality).replace("{2}", fsm.getAddress().getSlumName().trim()));
+//			if(CollectionUtils.isEmpty(slumNameMapping)) {
+//				 throw new CustomException(FSMErrorConstants.INVALID_SLUM, "Slum Name is Invalid!");
+//			}
 		}
 		
 	}
