@@ -4,7 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## 1.1.3 - 2021-02-26
 
-- Fixed security issue for throwable statment
+- Updated domain name in application.properties
+- Fixed security issue for throwable statement
 
 ## 1.1.2 - 2021-01-12
 

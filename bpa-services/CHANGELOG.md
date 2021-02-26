@@ -3,7 +3,9 @@ All notable changes to this module will be documented in this file.
 
 ## 1.1.2
 
-- Fixed security issue for throwable statment.
+- Updated domain name in application.properties
+  
+- Fixed security issue for throwable statement.
 
 ## 1.1.1
 
