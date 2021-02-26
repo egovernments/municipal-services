@@ -190,8 +190,8 @@ public class EstimationService {
 
 			// WaterCharge Calculation
 			Double totalUOM = getUnitOfMeasurement(property, waterConnection, calculationAttribute, criteria);
-			if (totalUOM == 0.0)
-				return waterCharge;
+//			if (totalUOM == 0.0)
+//				return waterCharge;
 			BillingSlab billSlab = billingSlabs.get(0);
 
 			List<Slab> filteredSlabs = billSlab.getSlabs().stream()
@@ -235,22 +235,23 @@ public class EstimationService {
 					if (request.getTaxPeriodFrom() > 0 && request.getTaxPeriodTo() > 0) {
 						if (waterConnection.getConnectionExecutionDate() > request.getTaxPeriodFrom()) {
 							// Added pro rating
-							double daysFactor = ((request.getTaxPeriodTo()
-									- waterConnection.getConnectionExecutionDate())
-									/ (request.getTaxPeriodTo() - request.getTaxPeriodFrom()));
+//							double daysFactor = ((request.getTaxPeriodTo() - waterConnection.getConnectionExecutionDate())
+//									/ (request.getTaxPeriodTo() - request.getTaxPeriodFrom())); 
+//							waterCharge = waterCharge
+//									.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge() * daysFactor));
 							waterCharge = waterCharge
-									.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge() * daysFactor));
+									.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
 						} else {
 
 							waterCharge = waterCharge
-									.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
+									.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
 						}
 
 					} else {
-						waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
+						waterCharge = waterCharge.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
 
 					}
-					waterCharge = waterCharge.add(BigDecimal.valueOf(totalUOM * filteredSlabs.get(0).getCharge()));
+//					waterCharge = waterCharge.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
 
 					if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
 						waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
@@ -271,8 +272,7 @@ public class EstimationService {
 		
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[1]
-				: "";
+		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length-1]: "";
 		log.info("buildingType: "+buildingType );
 		// final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
@@ -355,8 +355,8 @@ public class EstimationService {
 			return waterConnection.getPipeSize();
 		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
 				&& calculationAttribute.equalsIgnoreCase(WSCalculationConstant.plotBasedConst)) {
-			if (property.getLandArea() == null)
-				return totalUnit;
+			if (property.getLandArea() != null)
+				return property.getLandArea();
 		}
 		return 0.0;
 	}
