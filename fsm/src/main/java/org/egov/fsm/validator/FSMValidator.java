@@ -336,10 +336,10 @@ public class FSMValidator {
 
 		
 		if(!CollectionUtils.isEmpty(slumNameAllowed) && !StringUtils.isEmpty(fsm.getAddress().getSlumName())) {
-			List<Map<String,Object>> slumNameMapping = JsonPath.read(mdmsData, FSMConstants.SLUM_CODE_PATH.replace("{1}", locality).replace("{2}", fsm.getAddress().getSlumName().trim()));
-			if(CollectionUtils.isEmpty(slumNameMapping)) {
-				 throw new CustomException(FSMErrorConstants.INVALID_SLUM, "Slum Name is Invalid!");
-			}
+//			List<Map<String,Object>> slumNameMapping = JsonPath.read(mdmsData, FSMConstants.SLUM_CODE_PATH.replace("{1}", locality).replace("{2}", fsm.getAddress().getSlumName().trim()));
+//			if(CollectionUtils.isEmpty(slumNameMapping)) {
+//				 throw new CustomException(FSMErrorConstants.INVALID_SLUM, "Slum Name is Invalid!");
+//			}
 		}
 		
 	}
