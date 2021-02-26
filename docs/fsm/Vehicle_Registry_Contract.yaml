@@ -46,17 +46,26 @@ paths:
           in: query
           description: Search by uuid  of service requester
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              maxItems: 10
         - name: type
           in: query
           description: Search by type of the vehicle
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              maxItems: 10
         - name: model
           in: query
           description: Search by model of the vehicle
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              maxItems: 10
         - name: tankCapacity
           in: query
           description: Search by tankCapacity of the vehicle
@@ -64,9 +73,19 @@ paths:
             type: string
         - name: sortBy
           in: query
-          description: sort the resust by 
+          description: sort the search results by fields
           schema:
-            type: string
+           type: string
+           enum:
+            - type
+            - model
+            - suctionType
+            - pollutionCertiValidTill
+            - InsuranceCertValidTill
+            - fitnessValidTill
+            - roadTaxPaidTill
+            - tankCapicity
+            - createdTime
         - name: sortOrder
           in: query
           description: sorting order of the search resulsts
@@ -179,11 +198,46 @@ paths:
             items:
               type: string
               maxItems: 10
-        - name: referenceNo
+        - name: tripOwnerIds
           in: query
-          description: Search by the referenceNo 
+          description: Search by list of UUID of of the trip owners
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: driverIds
+          in: query
+          description: Search by list of UUID of of the drivers
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: vehicleIds
+          in: query
+          description: Search by list of UUID of vehicle(s)
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: referenceNos
+          in: query
+          description: Search by the referenceNo(s)
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
+        - name: applicationNos
+          in: query
+          description: Search by the applicationNo(s)
+          schema:
+            type: array
+            items:
+              type: string
+              maxItems: 10
         - name: businessService
           in: query
           description: search by the businessService of the vehicleLog
@@ -197,6 +251,37 @@ paths:
             items:
               type: string
               maxItems: 10
+        - name : offset
+          in: query
+          description: offset for the pagination results
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: limit for the pagination results
+          schema:
+           type: integer
+        - name: sortOrder
+          in: query
+          description: sort the search results in Ascending or descending order
+          schema:
+           type: string
+           enum:
+            - ASC
+            - DESC
+        - name: sortBy
+          in: query
+          description: sort the search results by fields
+          schema:
+           type: string
+           enum: 
+            - applicationStatus
+            - applicationiNo
+            - referenceNo
+            - vehicle
+            - tripStartTime
+            - tripEndTime
+            - createdTime
       responses:
         '202':
           description: Successful response sorted by reverse chrnological order of creation
