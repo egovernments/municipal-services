@@ -193,4 +193,3 @@ config:
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "fsm-calculator/src/main/resources/db"
         image-name: "fsm-calculator-db"
-
