@@ -194,6 +194,126 @@ paths:
               $ref: '#/components/schemas/FSMRequest'
         description: Request schema.
         required: true
+        
+  /fsm-calculator/v1/billingSlab/_create:
+    post:
+      summary: Create Billing Slab record for the combination of propertyusage, slum ,tancapcity
+      tags: 
+        - FSM-Calculator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingSlabRequest'
+        description: Reuqest Schema for BillingSlab
+        required: true
+      responses:
+        '202':
+          description: BillingSlab created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BillingSlabResponse'
+        '400':
+          description: Failed to process the BillingSlab
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
+  
+  /fsm-calculator/v1/billingSlab/_update:
+    post:
+      summary: update Billing Slab record for the combination of propertyusage, slum ,tancapcity
+      tags: 
+        - FSM-Calculator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingSlabRequest'
+        description: Reuqest Schema for BillingSlab
+        required: true
+      responses:
+        '202':
+          description: BillingSlab updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BillingSlabResponse'
+        '400':
+          description: Failed to process the BillingSlab
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'  
+                
+  /fsm-calculator/v1/billingSlab/_search:
+    post:
+      summary: Get the BillingSlab based on the search criteria
+      tags: 
+        - FSM-Calculator
+      parameters: 
+        - $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/parameters/tenantId'
+        - name : offset
+          in: query
+          description: offset for the pagination results
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: limit for the pagination results
+          schema:
+           type: integer
+        - name: sortOrder
+          in: query
+          description: sort the search results in Ascending or descending order
+          schema:
+           type: string
+           enum:
+            - ASC
+            - DESC
+        - name: sortBy
+          in: query
+          description: sort the search results by fields
+          schema:
+           type: string
+           enum: 
+            - id
+            - propertyType
+            - capacity
+        - name : ids
+          in: query
+          description: serch by ids of the billingslab
+          schema:
+            type: array
+            items:
+              type: string
+        - name : propertyType
+          in: query
+          description: search by propertyType
+          schema:
+            type: string
+        - name : capacity
+          in: query
+          description: search by capacity
+          schema:
+            type: number
+            format: double
+        - name : slum
+          in: query
+          description: search by slum yes or no
+          schema:
+            type: string
+            enum:
+              - YES
+              - NO
+      responses:
+        '202':
+          description: Successful response sorted by reverse chrnological order of creation
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BillingSlabResponse'
 components:
   schemas:
     Workflow:
@@ -415,7 +535,6 @@ components:
       required:
         - responseInfo
         - fsmAudit   
-        
     FSMAudit:
       type: object
       description: >
@@ -496,6 +615,69 @@ components:
       required: 
         - tenantId
         - locality
+    BillingSlab:
+      type: object
+      description: Representation of billing slab
+      properties:
+        id:
+          type: string
+          description: unique identifier of the billing slab
+        tenantId:
+          type: string
+          description: id of the tenant i.e city
+        capacityFrom:
+          type: number
+          format: double
+          description: billing slab apply for the tankCapacity form 
+        capacityTo:
+          type: number
+          format: double
+          description: billing slab apply for the tankCapacity till
+        propertyType:
+          type: string
+          description: billing slab propertyType
+        slum:
+          type: string
+          description: billing slab applies for slum
+          enum: 
+            - YES
+            - NO
+        price:
+          type: number
+          format: double
+          description: price of the billing slab
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/AuditDetails'
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+    BillingSlabRequest:
+      type: object
+      description: Request object for BillingSlab
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
+        fsm:
+          $ref: '#/components/schemas/BillingSlab'
+      required:
+        - requestInfo
+        - billingSlab
+    BillingSlabResponse:
+      type: object
+      description: Response of the BillingSlab 
+      properties:
+        responseInfo:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ResponseInfo
+        billingSlab:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingSlab'
+      required:
+        - responseInfo
+        - billingSlab            
 servers:
   # Added by API Auto Mocking Plugin
   # Added by API Auto Mocking Plugin
