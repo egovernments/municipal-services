@@ -1,6 +1,10 @@
 # Change log
 All notable changes to this module will be documented in this file.
 
+## 1.3.0 - 2021-02-26
+- Added road cutting info deatils for calculating fees
+- Fixed security issue for throwable statment
+
 ## 1.2.0 - 2021-01-12
 - Added support for public domain search
 

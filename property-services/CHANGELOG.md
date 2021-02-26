@@ -1,6 +1,12 @@
 
 All notable changes to this module will be documented in this file.
 
+## 1.1.4 - 2021-02-26
+
+- Fixed security issue for throwable statment
+
+## 1.1.4
+
 ## 1.1.3 - 2021-01-22
 
 - MobileNuber based user validation for update

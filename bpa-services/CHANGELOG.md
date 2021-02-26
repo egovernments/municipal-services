@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this module will be documented in this file.
 
+## 1.1.2
+
+- Fixed security issue for throwable statment.
+
 ## 1.1.1
 
 - Updated the collection search end-point
