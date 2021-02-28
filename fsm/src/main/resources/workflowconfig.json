@@ -204,14 +204,6 @@
                 },
                 {
                     "tenantId": "pb.amritsar",
-                    "action": "ADDITIONAL_PAY_REQUEST",
-                    "nextState": "PENDING_ADDITIONAL_PAYMENT",
-                    "roles": [
-                        "FSM_DSO"
-                    ]
-                },
-                {
-                    "tenantId": "pb.amritsar",
                     "action": "CANCEL",
                     "nextState": "CANCELED",
                     "roles": [
@@ -273,42 +265,6 @@
             ]
         },
         {
-            "tenantId": "pb.amritsar",
-            "sla": null,
-            "state": "PENDING_ADDITIONAL_PAYMENT",
-            "applicationStatus": "PENDING_ADDITIONAL_PAYMENT",
-            "docUploadRequired": false,
-            "isStartState": false,
-            "isTerminateState": false,
-            "isStateUpdatable": true,
-            "actions": [
-                {
-                    "tenantId": "pb.amritsar",
-                    "action": "PAY",
-                    "nextState": "DSO_INPROGRESS",
-                    "roles": [
-                        "CITIZEN"
-                    ]
-                },
-                {
-                    "tenantId": "pb.amritsar",
-                    "action": "CANCEL",
-                    "nextState": "CANCELED",
-                    "roles": [
-                        "FSM_ADMIN"
-                    ]
-                },
-                {
-                    "tenantId": "pb.amritsar",
-                    "action": "SENDBACK",
-                    "nextState": "DSO_INPROGRESS",
-                    "roles": [
-                        "FSM_ADMIN"
-                    ]
-                }
-            ]
-        },
-        {
            
             "tenantId": "pb.amritsar",
             "sla": null,
@@ -347,7 +303,7 @@
                 "tenantId": "pb.amritsar",
                 "sla": null,
                 "state": "CITIZEN_FEEDBACK_PENDING",
-                "applicationStatus": "COMPLETED",
+                "applicationStatus": "CITIZEN_FEEDBACK_PENDING",
                 "docUploadRequired": false,
                 "isStartState": false,
                 "isTerminateState": false,

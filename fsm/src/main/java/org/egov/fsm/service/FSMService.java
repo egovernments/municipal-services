@@ -255,6 +255,9 @@ public class FSMService {
 				}
 			}
 		}
+		ArrayList uuids = new ArrayList<String>();
+		uuids.add(fsm.getDso().getOwner().getUuid());
+		fsmRequest.getWorkflow().setAssignes(uuids);
 		vehicleTripService.scheduleVehicleTrip(fsmRequest);
 	}
 	
