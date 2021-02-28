@@ -150,7 +150,7 @@ public class FSMService {
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				FSMConstants.FSM_BusinessService,null);
-//		actionValidator.validateUpdateRequest(fsmRequest, businessService);
+		actionValidator.validateUpdateRequest(fsmRequest, businessService);
 		FSM oldFSM = fsms.get(0);
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
