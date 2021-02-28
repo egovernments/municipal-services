@@ -112,11 +112,14 @@ public class NotificationUtil {
 				
 				if (message.contains("<FSM_DSO_REJECT_REASON>") ) {
 					
-					message = message.replace("<FSM_DSO_REJECT_REASON>", fsmRequest.getWorkflow().getComments());
+					String reasonComment = fsmRequest.getWorkflow().getComments();
+					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
+					message = message.replace("<FSM_DSO_REJECT_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
 				if (message.contains("<FSM_CANCEL_REASON>") ) {
-					
-					message = message.replace("<FSM_CANCEL_REASON>", fsmRequest.getWorkflow().getComments());
+					String reasonComment = fsmRequest.getWorkflow().getComments();
+					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
+					message = message.replace("<FSM_CANCEL_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
 				
 				if (message.contains("<PAY_LINK>") ) {
