@@ -155,7 +155,7 @@ public class NotificationUtil {
 	private String getPaymentData(String properyName,FSMRequest fsmRequest) {
 			StringBuilder builder = new StringBuilder(config.getCollectionServiceHost());
 			builder.append(config.getCollectionServiceSearchEndPoint()).append(FSMConstants.FSM_PAY_BUSINESS_SERVICE);
-			builder.append("?tenantId=").append(fsmRequest.getFsm().getTenantId()).append("&consumerCodes=").append(fsmRequest.getFsm().getApplicationNo());
+			builder.append("/_search?tenantId=").append(fsmRequest.getFsm().getTenantId()).append("&consumerCodes=").append(fsmRequest.getFsm().getApplicationNo());
 			LinkedHashMap responseMap =  (LinkedHashMap) serviceRequestRepository.fetchResult(builder, new RequestInfoWrapper(fsmRequest.getRequestInfo()));
 			JSONObject jsonObject = new JSONObject(responseMap);
 			String proeprtyValue ="";
@@ -305,7 +305,7 @@ public class NotificationUtil {
 			tenantId = tenantId.split("\\.")[0];
 
 		String locale = "en_IN";
-		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("|").length >= 2)
+		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("\\|").length >= 2)
 			locale = requestInfo.getMsgId().split("\\|")[1];
 
 		StringBuilder uri = new StringBuilder();

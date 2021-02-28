@@ -1,4 +1,4 @@
-# fsm
+# fsm-calculator
 
 TBD
 
