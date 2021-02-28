@@ -90,10 +90,10 @@ public class NotificationUtil {
 				}
 				if (message.contains("<DSO_MOBILE_NUMBER>") && vendor != null) {
 					
-					message = message.replace("<AMOUNT_TO_BE_PAID>", vendor.getOwner().getMobileNumber());
+					message = message.replace("<DSO_MOBILE_NUMBER>", vendor.getOwner().getMobileNumber());
 				}
 				
-				if (message.contains("<VEHICLE_REG_NO>") && vendor != null && CollectionUtils.isEmpty(vendor.getVehicles())) {
+				if (message.contains("<VEHICLE_REG_NO>") && vendor != null && !CollectionUtils.isEmpty(vendor.getVehicles())) {
 					Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
 					Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
 					if(vehicle != null) {
@@ -112,11 +112,14 @@ public class NotificationUtil {
 				
 				if (message.contains("<FSM_DSO_REJECT_REASON>") ) {
 					
-					message = message.replace("<FSM_DSO_REJECT_REASON>", fsmRequest.getWorkflow().getComments());
+					String reasonComment = fsmRequest.getWorkflow().getComments();
+					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
+					message = message.replace("<FSM_DSO_REJECT_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
 				if (message.contains("<FSM_CANCEL_REASON>") ) {
-					
-					message = message.replace("<FSM_CANCEL_REASON>", fsmRequest.getWorkflow().getComments());
+					String reasonComment = fsmRequest.getWorkflow().getComments();
+					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
+					message = message.replace("<FSM_CANCEL_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
 				
 				if (message.contains("<PAY_LINK>") ) {
