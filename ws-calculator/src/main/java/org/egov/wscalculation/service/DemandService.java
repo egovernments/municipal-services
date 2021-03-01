@@ -182,7 +182,11 @@ public class DemandService {
 			}
 			WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder().waterConnection(connection)
 					.requestInfo(requestInfo).build();
+			
+			log.info("waterConnectionRequest: {}",waterConnectionRequest);
 			Property property = wsCalculationUtil.getProperty(waterConnectionRequest);
+			log.info("Property: {}",property);
+			
 			String tenantId = calculation.getTenantId();
 			String consumerCode = isForConnectionNO ? calculation.getConnectionNo() : calculation.getApplicationNO();
 			User owner = property.getOwners().get(0).toCommonUser();
