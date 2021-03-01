@@ -108,11 +108,11 @@ public class DemandService {
 	 */
 	public List<Demand> generateDemand(CalculationReq request, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNo) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
-				.get(WSCalculationConstant.BILLING_PERIOD);
-		Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
-		Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+//		@SuppressWarnings("unchecked")
+//		Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
+//				.get(WSCalculationConstant.BILLING_PERIOD);
+//		Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+//		Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 
 		// List that will contain Calculation for new demands
 		List<Calculation> createCalculations = new LinkedList<>();
@@ -157,7 +157,7 @@ public class DemandService {
 					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, fromDate, toDate,
+			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
 					isForConnectionNo);
 		return createdDemands;
 	}
@@ -524,7 +524,7 @@ public class DemandService {
 
 				}
 
-				if (connection.getApplicationType().equalsIgnoreCase("MODIFY_WATER_CONNECTION")) {
+				if (("MODIFY_WATER_CONNECTION").equalsIgnoreCase(connection.getApplicationType())) {
 					WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
 							.waterConnection(connection).requestInfo(requestInfo).build();
 					Property property = wsCalculationUtil.getProperty(waterConnectionRequest);
