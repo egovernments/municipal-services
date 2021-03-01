@@ -223,8 +223,8 @@ public class DemandService {
 		}
 		log.info("Demand Object" + demands.toString());
 		List<Demand> demandRes = demandRepository.saveDemand(requestInfo, demands);
-		if (isForConnectionNO)
-			fetchBill(demandRes, requestInfo);
+//		if (isForConnectionNO)
+//			fetchBill(demandRes, requestInfo);
 		return demandRes;
 	}
 
