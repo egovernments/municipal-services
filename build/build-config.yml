@@ -163,11 +163,18 @@ config:
         dockerfile: "build/maven/Dockerfile"  
   - name: "builds/municipal-services/fsm"
     build:
-      - work-dir: "fsm"
-        image-name: "fsm"
+      - work-dir: "echallan-services"
+        image-name: "echallan-services"
         dockerfile: "build/maven/Dockerfile"
-      - work-dir: "fsm/src/main/resources/db"
-        image-name: "fsm-db"
+      - work-dir: "echallan-services/src/main/resources/db"
+        image-name: "echallan-services-db"         
+
+  - name: "builds/municipal-services/echallan-calculator"
+    build:
+      - work-dir: "echallan-calculator"
+        image-name: "echallan-calculator"
+        dockerfile: "build/maven/Dockerfile"  
+  - name: "builds/municipal-services/fsm"
 
 
   - name: "builds/municipal-services/vehicle"
@@ -188,8 +195,17 @@ config:
 
   - name: "builds/municipal-services/fsm-calculator"
     build:
-      - work-dir: "fsm-calculator"
-        image-name: "fsm-calculator"
+      - work-dir: "echallan-services"
+        image-name: "echallan-services"
         dockerfile: "build/maven/Dockerfile"
       - work-dir: "fsm-calculator/src/main/resources/db"
         image-name: "fsm-calculator-db"
+      - work-dir: "echallan-services/src/main/resources/db"
+        image-name: "echallan-services-db"         
+
+  - name: "builds/municipal-services/echallan-calculator"
+    build:
+      - work-dir: "echallan-calculator"
+        image-name: "echallan-calculator"
+        dockerfile: "build/maven/Dockerfile"          
+
