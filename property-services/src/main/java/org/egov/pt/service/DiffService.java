@@ -119,15 +119,11 @@ public class DiffService {
      * @return Name of the class of object removed
      */
     private String getObjectClassName(String affectedObject) {
-        String className = null;
-        try {
-            String firstSplit = affectedObject.substring(affectedObject.lastIndexOf('.') + 1);
-            className = firstSplit.split("@")[0];
-        } catch (Exception e) {
-            throw new CustomException("NOTIFICATION ERROR", "Failed to fetch notification");
-        }
-        return className;
-    }
+		String className = null;
+		String firstSplit = affectedObject.substring(affectedObject.lastIndexOf('.') + 1);
+		className = firstSplit.split("@")[0];
+		return className;
+	}
     
     
     /**

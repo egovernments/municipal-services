@@ -1,16 +1,13 @@
 package org.egov.bpa.repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.web.model.idgen.IdGenerationRequest;
 import org.egov.bpa.web.model.idgen.IdGenerationResponse;
 import org.egov.bpa.web.model.idgen.IdRequest;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -56,10 +53,6 @@ public class IdGenRepository {
 					IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		} catch (Exception e) {
-			Map<String, String> map = new HashMap<>();
-			map.put(e.getCause().getClass().getName(), e.getMessage());
-			throw new CustomException(map);
 		}
 		return response;
 	}

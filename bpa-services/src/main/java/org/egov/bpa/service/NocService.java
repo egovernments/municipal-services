@@ -87,15 +87,12 @@ public class NocService {
 		uri.append(config.getNocCreateEndpoint());
 
 		LinkedHashMap<String, Object> responseMap = null;
-		try {
-			log.debug("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
-			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
-			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
-			log.debug("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
-		} catch (Exception se) {
-			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
-					" Failed to create NOC of Type " + nocRequest.getNoc().getNocType());
-		}
+		log.debug("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
+		responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
+		NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
+		log.debug("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
+		throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
+				" Failed to create NOC of Type " + nocRequest.getNoc().getNocType());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -104,14 +101,9 @@ public class NocService {
 		uri.append(config.getNocUpdateEndpoint());
 
 		LinkedHashMap<String, Object> responseMap = null;
-		try {
-			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
-			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
-			log.debug("NOC updated with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
-		} catch (Exception se) {
-			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION,
-					" Failed to update NOC of Type " + nocRequest.getNoc().getNocType());
-		}
+		responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
+		NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
+		log.debug("NOC updated with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -122,13 +114,9 @@ public class NocService {
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(bpaRequest.getRequestInfo())
 				.build();
 		LinkedHashMap<String, Object> responseMap = null;
-		try {
-			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
-			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
-			return nocResponse.getNoc();
-		} catch (Exception e) {
-			throw new CustomException(BPAErrorConstants.NOC_SERVICE_EXCEPTION, " Unable to fetch the NOC records");
-		}
+		responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(url, requestInfoWrapper);
+		NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
+		return nocResponse.getNoc();
 	}
 
 	/**

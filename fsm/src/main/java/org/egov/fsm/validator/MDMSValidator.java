@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +50,7 @@ public class MDMSValidator {
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-			} catch (Exception e) {
+			} catch (PathNotFoundException e) {
 				log.error("Error while fetvhing MDMS data", e);
 				throw new CustomException(FSMErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
 						FSMErrorConstants.INVALID_TENANT_ID_MDMS_MSG);

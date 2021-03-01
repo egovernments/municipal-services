@@ -14,13 +14,17 @@ import org.egov.pt.calculator.service.BillingSlabService;
 import org.egov.pt.calculator.service.MutationBillingSlabService;
 import org.egov.pt.calculator.util.BillingSlabConstants;
 import org.egov.pt.calculator.util.BillingSlabUtils;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.MutationBillingSlab;
+import org.egov.pt.calculator.web.models.MutationBillingSlabReq;
+import org.egov.pt.calculator.web.models.MutationBillingSlabRes;
+import org.egov.pt.calculator.web.models.MutationBillingSlabSearchCriteria;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -140,19 +144,12 @@ public class MutationBillingSlabValidator {
         MdmsCriteriaReq request = billingSlabUtils.prepareRequest(uri,
                 billingSlabReq.getBillingSlab().get(0).getTenantId(), billingSlabReq.getRequestInfo());
         Object response = null;
-        try {
             response = repository.fetchResult(uri, request);
             if (null == response) {
                 log.info(BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
-                throw new CustomException();
+                throw new CustomException(BillingSlabConstants.MDMS_DATA_NOT_FOUND_KEY,BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
             }
             validateMDMSCodes(billingSlabReq, errorMap, response);
-        } catch (Exception e) {
-            log.error(BillingSlabConstants.MDMS_DATA_NOT_FOUND_KEY, e);
-            errorMap.put(BillingSlabConstants.MDMS_DATA_NOT_FOUND_KEY,
-                    BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
-            return;
-        }
     }
 
     public void validateMDMSCodes(MutationBillingSlabReq billingSlabReq, Map<String, String> errorMap, Object mdmsResponse) {
@@ -182,7 +179,7 @@ public class MutationBillingSlabValidator {
             subOwnerShipCategory = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_SUBOWNERSHIP_MASTER_NAME);
 
             occupancyType = JsonPath.read(mdmsResponse, BillingSlabConstants.MDMS_PROPERTYTAX_JSONPATH + BillingSlabConstants.MDMS_OCCUPANCYTYPE_MASTER_NAME);
-        } catch (Exception e) {
+        } catch (PathNotFoundException e) {
             if (CollectionUtils.isEmpty(propertySubtypes) && CollectionUtils.isEmpty(usageCategoryMinors)
                     && CollectionUtils.isEmpty(usageCategorySubMinor)
                     && CollectionUtils.isEmpty(subOwnerShipCategory)) {

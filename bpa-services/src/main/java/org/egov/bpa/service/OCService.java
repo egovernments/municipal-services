@@ -54,14 +54,10 @@ public class OCService {
 			uri.append(config.getGetPlanEndPoint());
 			uri.append("?").append("tenantId=").append(criteria.getTenantId());
 			uri.append("&").append("edcrNumber=").append(edcrNo);
-			try {
-				LinkedHashMap response = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
-						new org.egov.bpa.web.model.edcr.RequestInfoWrapper(edcrRequestInfo));
-				data.add(response);
+			LinkedHashMap response = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
+					new org.egov.bpa.web.model.edcr.RequestInfoWrapper(edcrRequestInfo));
+			data.add(response);
 
-			} catch (Exception e) {
-				log.error("VALIDATION_ERROR:", e);
-			}
 		});
 		ArrayList<String> riskType = new ArrayList<String>();
 		ArrayList<String> khathaNos = new ArrayList<String>();

@@ -1,7 +1,5 @@
 package org.egov.bpa.util;
 
-import static org.egov.bpa.util.BPAConstants.BILL_AMOUNT;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +21,6 @@ import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
-import org.egov.tracer.model.CustomException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,29 +216,26 @@ public class BPAUtil {
 				new RequestInfoWrapper(requestInfo));
 		JSONObject jsonObject = new JSONObject(responseMap);
 		double amount = 0.0;
-		try {
-			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
-			if (demandArray != null && demandArray.length() > 0) {
-				JSONObject firstElement = (JSONObject) demandArray.get(0);
-				if (firstElement != null) {
-					JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
-					if (demandDetails != null) {
-						for (int i = 0; i < demandDetails.length(); i++) {
-							JSONObject object = (JSONObject) demandDetails.get(i);
-							Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
-							amount = amount + taxAmt;
-						}
+
+		JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
+		if (demandArray != null && demandArray.length() > 0) {
+			JSONObject firstElement = (JSONObject) demandArray.get(0);
+			if (firstElement != null) {
+				JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+				if (demandDetails != null) {
+					for (int i = 0; i < demandDetails.length(); i++) {
+						JSONObject object = (JSONObject) demandDetails.get(i);
+						Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+						amount = amount + taxAmt;
 					}
 				}
 			}
-			return BigDecimal.valueOf(amount);
-		} catch (Exception e) {
-			throw new CustomException("PARSING ERROR", "Failed to parse the response using jsonPath: " + BILL_AMOUNT);
 		}
+		return BigDecimal.valueOf(amount);
 	}
 
 	/**
-	 * gererate bill url with the query params
+	 * generate bill url with the query params
 	 * @param bpa
 	 * @return
 	 */

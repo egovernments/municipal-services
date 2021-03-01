@@ -27,13 +27,16 @@ import org.egov.fsm.web.model.notification.SMSRequest;
 import org.egov.fsm.web.model.vehicle.Vehicle;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -177,7 +180,7 @@ public class NotificationUtil {
 					}
 				}
 				return proeprtyValue;
-			} catch (Exception e) {
+			} catch (PathNotFoundException e) {
 				throw new CustomException("PARSING ERROR",
 						"Failed to parse the response using jsonPath: "
 								);
@@ -230,7 +233,7 @@ public class NotificationUtil {
 				message = data.get(0).toString();
 			else
 				log.error("Fetching from localization failed with code " + notificationCode);
-		} catch (Exception e) {
+		} catch (InvalidJsonException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;
@@ -268,7 +271,7 @@ public class NotificationUtil {
 				}
 			}
 			amountToBePaid = BigDecimal.valueOf(amount);
-		} catch (Exception e) {
+		} catch (JSONException e) {
 			throw new CustomException("PARSING ERROR",
 					"Failed to parse the response using jsonPath: "
 							);

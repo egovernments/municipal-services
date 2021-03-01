@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.enums.CreationReason;
 import org.egov.pt.models.enums.Status;
@@ -176,7 +175,7 @@ public class WorkflowService {
 		try{
 			response = mapper.convertValue(res.get(), ProcessInstanceResponse.class);
 		}
-		catch (Exception e){
+		catch (IllegalArgumentException e){
 			throw new CustomException("PARSING_ERROR","Failed to parse workflow search response");
 		}
 

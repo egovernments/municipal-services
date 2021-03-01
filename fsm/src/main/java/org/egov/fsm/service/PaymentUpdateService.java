@@ -66,7 +66,6 @@ public class PaymentUpdateService {
 	 */
 	public void process(HashMap<String, Object> record) {
 
-		try {
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 			List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
@@ -119,8 +118,5 @@ public class PaymentUpdateService {
 
 				
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

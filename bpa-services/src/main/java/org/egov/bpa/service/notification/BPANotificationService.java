@@ -175,18 +175,13 @@ public class BPANotificationService {
 		userSearchRequest.put("userType", "CITIZEN");
 		for (String mobileNo : mobileNumbers) {
 			userSearchRequest.put("userName", mobileNo);
-			try {
-				Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
-				if (null != user) {
-					String uuid = JsonPath.read(user, "$.user[0].uuid");
-					mapOfPhnoAndUUIDs.put(mobileNo, uuid);
-				} else {
-					log.error("Service returned null while fetching user for username - " + mobileNo);
-				}
-			} catch (Exception e) {
-				log.error("Exception while fetching user for username - " + mobileNo);
-				log.error("Exception trace: ", e);
-				continue;
+
+			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+			if (null != user) {
+				String uuid = JsonPath.read(user, "$.user[0].uuid");
+				mapOfPhnoAndUUIDs.put(mobileNo, uuid);
+			} else {
+				log.error("Service returned null while fetching user for username - " + mobileNo);
 			}
 		}
 		return mapOfPhnoAndUUIDs;

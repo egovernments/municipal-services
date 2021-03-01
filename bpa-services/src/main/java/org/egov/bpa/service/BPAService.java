@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -539,19 +538,16 @@ public class BPAService {
 			generatedOn = generatedOn != null ? generatedOn : BPAConstants.GENERATEDON;
 			this.addDataToPdf(document, bpaRequest, permitNo, generatedOn,fileName);
 
-		} catch (Exception ex) {
-			log.debug("Exception occured while downloading pdf", ex.getMessage());
-			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		} finally {
-			try {
 				if (document != null) {
-					document.close();
+					try {
+						document.close();
+					} catch (IOException e) {
+						log.error("unable to close the file");
+					}
 				}
-			} catch (Exception ex) {
-				throw new CustomException(BPAErrorConstants.INVALID_FILE, "unable to close this file");
 			}
 		}
-	}
 	
 	/**
 	 * make edcr call and get the edcr report url to download the edcr report
@@ -559,30 +555,38 @@ public class BPAService {
 	 * @return
 	 * @throws Exception
 	 */
-	private URL getEdcrReportDownloaUrl(BPARequest bpaRequest) throws Exception {
-		String pdfUrl = edcrService.getEDCRPdfUrl(bpaRequest);
-		URL downloadUrl = new URL(pdfUrl);
-		
-		log.debug("Connecting to redirect url" + downloadUrl.toString() + " ... ");
-		URLConnection urlConnection = downloadUrl.openConnection();
+	private URL getEdcrReportDownloaUrl(BPARequest bpaRequest) {
 
-		// Checking whether the URL contains a PDF
-		if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
-			String downloadUrlString = urlConnection.getHeaderField("Location");
-			if (!StringUtils.isEmpty(downloadUrlString)) {
-				downloadUrl = new URL(downloadUrlString);
-				log.debug("Connecting to download url" + downloadUrl.toString() + " ... ");
-				urlConnection = downloadUrl.openConnection();
-				if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
-					log.error("Download url content type is not application/pdf.");
-					throw new CustomException(BPAErrorConstants.INVALID_EDCR_REPORT,"Download url content type is not application/pdf.");
+		try {
+
+			String pdfUrl = edcrService.getEDCRPdfUrl(bpaRequest);
+			URL downloadUrl = new URL(pdfUrl);
+
+			log.debug("Connecting to redirect url" + downloadUrl.toString() + " ... ");
+			URLConnection urlConnection = downloadUrl.openConnection();
+			
+			// Checking whether the URL contains a PDF
+			if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
+				String downloadUrlString = urlConnection.getHeaderField("Location");
+				if (!StringUtils.isEmpty(downloadUrlString)) {
+					downloadUrl = new URL(downloadUrlString);
+					log.debug("Connecting to download url" + downloadUrl.toString() + " ... ");
+					urlConnection = downloadUrl.openConnection();
+					if (!urlConnection.getContentType().equalsIgnoreCase("application/pdf")) {
+						log.error("Download url content type is not application/pdf.");
+						throw new CustomException(BPAErrorConstants.INVALID_EDCR_REPORT,"Download url content type is not application/pdf.");
+					}
+				} else {
+					log.error("Unable to fetch the location header URL");
+					throw new CustomException(BPAErrorConstants.INVALID_EDCR_REPORT,"Unable to fetch the location header URL");
 				}
-			} else {
-				log.error("Unable to fetch the location header URL");
-				throw new CustomException(BPAErrorConstants.INVALID_EDCR_REPORT,"Unable to fetch the location header URL");
 			}
+			
+			return downloadUrl;
+			
+		} catch (IOException e) {
+			throw new CustomException("error in getEdcrReportDownloaUrl", e.getMessage());
 		}
-		return downloadUrl;
 	}
 	/**
 	 * download the edcr report and create in tempfile
@@ -591,57 +595,73 @@ public class BPAService {
 	 * @param document
 	 * @throws Exception
 	 */
-	private void createTempReport(BPARequest bpaRequest,String fileName,PDDocument document) throws Exception {
+	private void createTempReport(BPARequest bpaRequest,String fileName,PDDocument document) {
+		
 		URL downloadUrl = this.getEdcrReportDownloaUrl(bpaRequest);
 		// Read the PDF from the URL and save to a local file
-		FileOutputStream writeStream = new FileOutputStream(fileName);
-		byte[] byteChunck = new byte[1024];
-		int baLength;
-		InputStream readStream = downloadUrl.openStream();
-		while ((baLength = readStream.read(byteChunck)) != -1) {
-			writeStream.write(byteChunck, 0, baLength);
-		}
-		writeStream.flush();
-		writeStream.close();
-		readStream.close();
+		FileOutputStream writeStream;
+		try {
+			writeStream = new FileOutputStream(fileName);
+			
+			byte[] byteChunck = new byte[1024];
+			int baLength;
+			InputStream readStream = downloadUrl.openStream();
+			while ((baLength = readStream.read(byteChunck)) != -1) {
+				writeStream.write(byteChunck, 0, baLength);
+			}
+			writeStream.flush();
+			writeStream.close();
+			readStream.close();
 
-		document = PDDocument.load(new File(fileName));
+			document = PDDocument.load(new File(fileName));
+		} catch (IOException e) {
+			throw new CustomException("Erro in createTempReport", e.getMessage());
+		}
+		
 	}
 	
-	private void addDataToPdf(PDDocument document,BPARequest bpaRequest, String permitNo, String generatedOn,String fileName) throws IOException {
-		PDPageTree allPages = document.getDocumentCatalog().getPages();
-		BPA bpa = bpaRequest.getBPA();
-		for (int i = 0; i < allPages.getCount(); i++) {
-			PDPage page = (PDPage) allPages.get(i);
-			@SuppressWarnings("deprecation")
-			PDPageContentStream contentStream = new PDPageContentStream(document, page, true, true, true);
-			PDFont font = PDType1Font.TIMES_ROMAN;
-			float fontSize = 10.0f;
-			contentStream.beginText();
-			// set font and font size
-			contentStream.setFont(font, fontSize);
+	private void addDataToPdf(PDDocument document,BPARequest bpaRequest, String permitNo, String generatedOn,String fileName) {
 
-			PDRectangle mediabox = page.getMediaBox();
-			float margin = 32;
-			float startX = mediabox.getLowerLeftX() + margin;
-			float startY = mediabox.getUpperRightY() - (margin/2);
-			contentStream.newLineAtOffset(startX, startY);
+		try {
 
-			contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getApprovalNo());
-			if (bpa.getApprovalDate() != null) {
-				Date date = new Date(bpa.getApprovalDate());
-				DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-				String formattedDate = format.format(date);
-				contentStream.newLineAtOffset(436, 0);
-				contentStream.showText(generatedOn + " : " + formattedDate);
-			} else {
-				contentStream.newLineAtOffset(436, 0);
-				contentStream.showText(generatedOn + " : " + "NA");
+			PDPageTree allPages = document.getDocumentCatalog().getPages();
+			BPA bpa = bpaRequest.getBPA();
+			for (int i = 0; i < allPages.getCount(); i++) {
+				PDPage page = (PDPage) allPages.get(i);
+				@SuppressWarnings("deprecation")
+				PDPageContentStream contentStream;
+				contentStream = new PDPageContentStream(document, page, true, true, true);
+
+				PDFont font = PDType1Font.TIMES_ROMAN;
+				float fontSize = 10.0f;
+				contentStream.beginText();
+				// set font and font size
+				contentStream.setFont(font, fontSize);
+
+				PDRectangle mediabox = page.getMediaBox();
+				float margin = 32;
+				float startX = mediabox.getLowerLeftX() + margin;
+				float startY = mediabox.getUpperRightY() - (margin / 2);
+				contentStream.newLineAtOffset(startX, startY);
+
+				contentStream.showText(permitNo + " : " + bpaRequest.getBPA().getApprovalNo());
+				if (bpa.getApprovalDate() != null) {
+					Date date = new Date(bpa.getApprovalDate());
+					DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+					String formattedDate = format.format(date);
+					contentStream.newLineAtOffset(436, 0);
+					contentStream.showText(generatedOn + " : " + formattedDate);
+				} else {
+					contentStream.newLineAtOffset(436, 0);
+					contentStream.showText(generatedOn + " : " + "NA");
+				}
+
+				contentStream.endText();
+				contentStream.close();
 			}
-
-			contentStream.endText();
-			contentStream.close();
+			document.save(fileName);
+		} catch (IOException e) {
+			throw new CustomException(e.getClass().getName(), e.getMessage());
 		}
-		document.save(fileName);
 	}
 }

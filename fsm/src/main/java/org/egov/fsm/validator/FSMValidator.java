@@ -309,12 +309,8 @@ public class FSMValidator {
 				: new HashMap<String, String>();
 		if(!CollectionUtils.isEmpty(tripAountAllowed) &&  additionalDetails.get("tripAmount") == null   ) {
 			throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-		}else if(!CollectionUtils.isEmpty(tripAountAllowed)){
-			try {
-				BigDecimal tripAmt = BigDecimal.valueOf(Double.valueOf((String)additionalDetails.get("tripAmount")));
-			}catch(Exception e) {
-				throw new CustomException(FSMErrorConstants.INVALID_TRIP_AMOUNT," tripAmount is invalid");
-			}
+		} else if (!CollectionUtils.isEmpty(tripAountAllowed)) {
+			BigDecimal tripAmt = BigDecimal.valueOf(Double.valueOf((String) additionalDetails.get("tripAmount")));
 		}
 	}
 	private void validateNoOfTrips(FSMRequest fsmRequest, Object mdmsData) {

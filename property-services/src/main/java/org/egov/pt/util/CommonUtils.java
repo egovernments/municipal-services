@@ -127,18 +127,13 @@ public class CommonUtils {
     	StringBuilder uri = new StringBuilder(configs.getMdmsHost()).append(configs.getMdmsEndpoint());
         MdmsCriteriaReq criteriaReq = prepareMdMsRequest(tenantId,moduleName,names,filter,requestInfo);
         Optional<Object> response = restRepo.fetchResult(uri, criteriaReq);
-        
-        try {
-        	if(response.isPresent()) {
-                return JsonPath.read(response.get(),jsonpath);
-        	}
-		} catch (Exception e) {
-			throw new CustomException(ErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
-					ErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
+
+		if (response.isPresent()) {
+			return JsonPath.read(response.get(), jsonpath);
 		}
-        
-        return null;
-    }
+
+		return null;
+	}
 	
     public MdmsCriteriaReq prepareMdMsRequest(String tenantId,String moduleName, List<String> names, String filter, RequestInfo requestInfo) {
 

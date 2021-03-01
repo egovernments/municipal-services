@@ -264,18 +264,14 @@ public class EnrichmentService {
 						.replace("{4}", edcrResponse.get(BPAConstants.APPLICATIONTYPE));
 				log.debug(condeitionsPath);
 
-				try {
-					List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
-					log.debug(conditions.toString());
-					if (bpa.getAdditionalDetails() == null) {
-						bpa.setAdditionalDetails(new HashMap());
-					}
-					Map additionalDetails = (Map) bpa.getAdditionalDetails();
-					additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
-
-				} catch (Exception e) {
-					log.warn("No approval conditions found for the application " + bpa.getApplicationNo());
+				List<String> conditions = (List<String>) JsonPath.read(mdmsData, condeitionsPath);
+				log.debug(conditions.toString());
+				if (bpa.getAdditionalDetails() == null) {
+					bpa.setAdditionalDetails(new HashMap());
 				}
+				Map additionalDetails = (Map) bpa.getAdditionalDetails();
+				additionalDetails.put(BPAConstants.PENDING_APPROVAL_STATE.toLowerCase(), conditions.get(0));
+
 			}
 		}
 	}

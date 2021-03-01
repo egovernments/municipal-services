@@ -59,8 +59,6 @@ public class PaymentUpdateService {
 	 */
 	public void process(HashMap<String, Object> record) {
 
-		try {
-
 			PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
 			RequestInfo requestInfo = paymentRequest.getRequestInfo();
 
@@ -76,9 +74,7 @@ public class PaymentUpdateService {
 					updateWorkflowForMutationPayment(requestInfo, tenantId, paymentDetail);
 				}
 			}
-		} catch (Exception e) {
-			log.error("KAFKA_PROCESS_ERROR:", e);
-		}
+	
 
 	}
 

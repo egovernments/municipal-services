@@ -125,9 +125,6 @@ public class WorkflowIntegrator {
 						" Unable to read the json path in error object : " + pnfe.getMessage());
 			}
 			throw new CustomException(FSMErrorConstants.EG_WF_ERROR, errros.toString());
-		} catch (Exception e) {
-			throw new CustomException(FSMErrorConstants.EG_WF_ERROR,
-					" Exception occured while integrating with workflow : " + e.getMessage());
 		}
 
 		/*

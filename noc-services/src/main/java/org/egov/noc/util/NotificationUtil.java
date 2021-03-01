@@ -21,6 +21,7 @@ import static org.egov.noc.util.NOCConstants.ACTION_STATUS_INITIATED;
 import static org.egov.noc.util.NOCConstants.ACTION_STATUS_REJECTED;
 import static org.egov.noc.util.NOCConstants.ACTION_STATUS_APPROVED;
 
+import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -169,7 +170,7 @@ public class NotificationUtil {
 				message = data.get(0).toString();
 			else
 				log.error("Fetching from localization failed with code " + notificationCode);
-		} catch (Exception e) {
+		} catch (InvalidJsonException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;

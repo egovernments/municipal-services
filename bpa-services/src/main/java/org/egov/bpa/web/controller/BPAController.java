@@ -1,5 +1,7 @@
 package org.egov.bpa.web.controller;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -88,9 +90,10 @@ public class BPAController {
 		bpaService.getEdcrPdf(bpaRequest);
 		try {
 			resource = new UrlResource(path.toUri());
-		} catch (Exception ex) {
+		} catch (IOException e) {
 			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		}
+	
 
 		return ResponseEntity.ok()
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + BPAConstants.EDCR_PDF + "\"")

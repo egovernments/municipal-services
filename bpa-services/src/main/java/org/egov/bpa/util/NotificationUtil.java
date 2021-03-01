@@ -141,15 +141,11 @@ public class NotificationUtil {
 		String path = "$..messages[?(@.code==\"{}\")].message";
 		path = path.replace("{}", notificationCode);
 		String message = null;
-		try {
-			List data = JsonPath.parse(localizationMessage).read(path);
-			if (!CollectionUtils.isEmpty(data))
-				message = data.get(0).toString();
-			else
-				log.error("Fetching from localization failed with code " + notificationCode);
-		} catch (Exception e) {
-			log.warn("Fetching from localization failed", e);
-		}
+		List data = JsonPath.parse(localizationMessage).read(path);
+		if (!CollectionUtils.isEmpty(data))
+			message = data.get(0).toString();
+		else
+			log.error("Fetching from localization failed with code " + notificationCode);
 		return message;
 	}
 
@@ -169,27 +165,22 @@ public class NotificationUtil {
 		JSONObject jsonObject = new JSONObject(responseMap);
 		BigDecimal amountToBePaid;
 		double amount = 0.0;
-		try {
-			JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
-			if (demandArray != null) {
-				JSONObject firstElement = (JSONObject) demandArray.get(0);
-				if (firstElement != null) {
-					JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
-					if (demandDetails != null) {
-						for (int i = 0; i < demandDetails.length(); i++) {
-							JSONObject object = (JSONObject) demandDetails.get(i);
-							Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
-							amount = amount + taxAmt;
-						}
+
+		JSONArray demandArray = (JSONArray) jsonObject.get("Demands");
+		if (demandArray != null) {
+			JSONObject firstElement = (JSONObject) demandArray.get(0);
+			if (firstElement != null) {
+				JSONArray demandDetails = (JSONArray) firstElement.get("demandDetails");
+				if (demandDetails != null) {
+					for (int i = 0; i < demandDetails.length(); i++) {
+						JSONObject object = (JSONObject) demandDetails.get(i);
+						Double taxAmt = Double.valueOf((object.get("taxAmount").toString()));
+						amount = amount + taxAmt;
 					}
 				}
 			}
-			amountToBePaid = BigDecimal.valueOf(amount);
-		} catch (Exception e) {
-			throw new CustomException("PARSING ERROR",
-					"Failed to parse the response using jsonPath: "
-							+ BILL_AMOUNT);
 		}
+		amountToBePaid = BigDecimal.valueOf(amount);
 		return amountToBePaid;
 	}
 

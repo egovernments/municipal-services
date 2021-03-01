@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.HttpException;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.web.model.idgen.IdGenerationRequest;
@@ -40,11 +41,7 @@ public class IdGenRepository {
 					IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		} catch (Exception e) {
-			Map<String, String> map = new HashMap<>();
-			map.put(e.getCause().getClass().getName(), e.getMessage());
-			throw new CustomException(map);
-		}
+		} 
 		return response;
 	}
 }

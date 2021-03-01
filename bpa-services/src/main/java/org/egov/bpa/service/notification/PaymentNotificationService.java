@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.egov.bpa.config.BPAConfiguration;
 import org.egov.bpa.service.BPAService;
@@ -27,7 +26,9 @@ import org.springframework.util.CollectionUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
 @Service
@@ -82,7 +83,7 @@ public class PaymentNotificationService {
 	 */
 	@SuppressWarnings("rawtypes")
 	public void process(HashMap<String, Object> record) {
-		try {
+
 			String jsonString = new JSONObject(record).toString();
 			DocumentContext documentContext = JsonPath.parse(jsonString);
 			Map<String, String> valMap = enrichValMap(documentContext);
@@ -120,9 +121,6 @@ public class PaymentNotificationService {
 					}
 				}
 			}
-		} catch (Exception e) {
-			log.error("KAFKA_PROCESS_ERROR:", e);
-		}
 	}
 
 	/**
@@ -157,7 +155,7 @@ public class PaymentNotificationService {
 							.read("$.Payment.paymentDetails[?(@.businessService=='BPA.NC_APP_FEE')].receiptNumber"))
 									.get(0));
 
-		} catch (Exception e) {
+		} catch (PathNotFoundException  e) {
 			throw new CustomException(BPAErrorConstants.RECEIPT_ERROR, "Unable to fetch values from receipt");
 		}
 		return valMap;

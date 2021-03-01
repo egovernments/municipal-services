@@ -56,12 +56,8 @@ public class MDMSValidator {
 				BPAConstants.COMMON_MASTER_JSONPATH_CODE);
 		final Map<String, List<String>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
-			try {
-				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-			} catch (Exception e) {
-				throw new CustomException(BPAErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
-						BPAErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
-			}
+			mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
+
 		});
 		return mdmsResMap;
 	}

@@ -2,16 +2,17 @@ package org.egov.bpa.calculator.repository;
 
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Repository
@@ -39,9 +40,9 @@ public class ServiceRequestRepository {
         }catch(HttpClientErrorException e) {
             log.error("External Service threw an Exception: ",e);
             throw new ServiceCallException(e.getResponseBodyAsString());
-        }catch(Exception e) {
-            log.error("Exception while fetching from searcher: ",e);
-        }
+        } catch (JsonProcessingException e) {
+        	log.error("Exception while fetching from searcher: ",e);
+		}
 
         return response;
     }

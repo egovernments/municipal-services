@@ -2,15 +2,12 @@ package org.egov.pt.repository;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.web.contracts.IdGenerationRequest;
 import org.egov.pt.web.contracts.IdGenerationResponse;
 import org.egov.pt.web.contracts.IdRequest;
-import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +15,10 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Repository
+@Slf4j
 public class IdGenRepository {
 
     @Value("${egov.idgen.host}")
@@ -45,17 +45,13 @@ public class IdGenRepository {
 
 			response = restTemplate.postForObject(idGenHost + idGenPath, req, IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
-
-			throw new ServiceCallException(e.getResponseBodyAsString());
-		} catch (Exception e) {
-
-			Map<String, String> map = new HashMap<>();
-			map.put(e.getCause().getClass().getName(), e.getMessage());
-			throw new CustomException(map);
+			if (null != e.getResponseBodyAsString())
+				throw new ServiceCallException(e.getResponseBodyAsString());
+			else
+				log.error(e.getMessage());
 		}
 
 		return response;
 	}
-
 
 }

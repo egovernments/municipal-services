@@ -6,12 +6,12 @@ import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
 
 @Repository
 @Slf4j
@@ -33,9 +33,8 @@ public class PTCalculatorRepository {
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		}catch(HttpClientErrorException e) {
 			log.error("External Service threw an Exception: ",e);
+			if(null != e.getResponseBodyAsString())
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch(Exception e) {
-			log.error("Exception while fetching from searcher: ",e);
 		}
 		
 		return response;

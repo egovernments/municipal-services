@@ -42,6 +42,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,7 @@ public class NotificationUtil {
         try {
             Object messageObj = JsonPath.parse(localizationMessage).read(path);
             message = ((ArrayList<String>) messageObj).get(0);
-        } catch (Exception e) {
+        } catch (InvalidJsonException e) {
             log.warn("Fetching from localization failed", e);
         }
         return message;
@@ -211,21 +212,16 @@ public class NotificationUtil {
         userSearchRequest.put("tenantId", tenantId);
         userSearchRequest.put("userType", "CITIZEN");
         for(String mobileNo: mobileNumbers) {
-            userSearchRequest.put("userName", mobileNo);
-            try {
-                Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest).get();
-                if(null != user) {
-                    String uuid = JsonPath.read(user, "$.user[0].uuid");
-                    mapOfPhnoAndUUIDs.put(mobileNo, uuid);
-                }else {
-                    log.error("Service returned null while fetching user for username - "+mobileNo);
-                }
-            }catch(Exception e) {
-                log.error("Exception while fetching user for username - "+mobileNo);
-                log.error("Exception trace: ",e);
-                continue;
-            }
-        }
+			userSearchRequest.put("userName", mobileNo);
+			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest).get();
+			if (null != user) {
+				String uuid = JsonPath.read(user, "$.user[0].uuid");
+				mapOfPhnoAndUUIDs.put(mobileNo, uuid);
+			} else {
+				log.error("Service returned null while fetching user for username - " + mobileNo);
+			}
+
+		}
         return mapOfPhnoAndUUIDs;
     }
 

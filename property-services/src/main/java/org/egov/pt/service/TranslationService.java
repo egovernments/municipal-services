@@ -1,5 +1,10 @@
 package org.egov.pt.service;
 
+import static org.egov.pt.util.PTConstants.ADHOC_PENALTY;
+import static org.egov.pt.util.PTConstants.ADHOC_PENALTY_REASON;
+import static org.egov.pt.util.PTConstants.ADHOC_REBATE;
+import static org.egov.pt.util.PTConstants.ADHOC_REBATE_REASON;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,15 +16,12 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.models.Assessment;
 import org.egov.pt.models.Property;
 import org.egov.pt.web.contracts.AssessmentRequest;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.egov.pt.util.PTConstants.*;
 
 @Service
 public class TranslationService {
@@ -101,7 +103,6 @@ public class TranslationService {
 
         if(assessment.getAdditionalDetails()!=null){
 
-            try{
                 if(assessment.getAdditionalDetails().get(ADHOC_REBATE)!=null && !assessment.getAdditionalDetails().get(ADHOC_REBATE).isNull()){
                     BigDecimal adhocExemption = new BigDecimal(assessment.getAdditionalDetails().get(ADHOC_REBATE).doubleValue());
                     propertyDetail.put("adhocExemption",adhocExemption);
@@ -118,9 +119,6 @@ public class TranslationService {
 
                 if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON)!=null)
                     propertyDetail.put("adhocPenaltyReason", assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON).asText());
-            } catch (Exception e){
-                throw new CustomException("PARSING_ERROR","Failed to parse additional details in translation");
-            }
 
         }
 

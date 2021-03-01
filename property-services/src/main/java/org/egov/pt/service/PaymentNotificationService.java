@@ -41,12 +41,12 @@ import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.util.NotificationUtil;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.web.contracts.SMSRequest;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -108,7 +108,7 @@ public class PaymentNotificationService {
             try {
                 Object messageObj = JsonPath.parse(localizationMessages).read(path);
                 messageTemplate = ((ArrayList<String>) messageObj).get(0);
-            } catch (Exception e) {
+            } catch (InvalidJsonException e) {
                 log.error("Fetching from localization failed", e);
             };
             Map<String, String> valMap = getValuesFromTransaction(transaction);
@@ -216,7 +216,7 @@ public class PaymentNotificationService {
             try {
                 Object messageObj = JsonPath.parse(localizationMessages).read(path);
                 messageTemplate = ((ArrayList<String>) messageObj).get(0);
-            } catch (Exception e) {
+            } catch (InvalidJsonException e) {
                 log.error("Fetching from localization failed", e);
             }
             Map<String, String> valMap = getValuesFromPayment(transactionNumber, paymentMode, paymentDetail);
@@ -275,9 +275,6 @@ public class PaymentNotificationService {
         BigDecimal totalAmount,amountPaid;
         Map<String,String> valMap = new HashMap<>();
 
-
-
-        try{
             totalAmount = paymentDetail.getTotalDue();
             valMap.put("totalAmount",totalAmount.toString());
 
@@ -299,11 +296,6 @@ public class PaymentNotificationService {
             valMap.put("module",paymentDetail.getBusinessService());
 
             valMap.put("receiptNumber",paymentDetail.getReceiptNumber());
-        }
-        catch (Exception e)
-        {
-            throw new CustomException("PARSING ERROR","Failed to fetch values from the Receipt Object");
-        }
 
         return valMap;
     }
@@ -315,7 +307,6 @@ public class PaymentNotificationService {
     private Map<String,String> getValuesFromTransaction(Transaction transaction){
         HashMap<String,String> valMap = new HashMap<>();
 
-        try{
             valMap.put("txnStatus",transaction.getTxnStatus().toString());
 
             valMap.put("txnAmount",transaction.getTxnAmount());
@@ -328,11 +319,6 @@ public class PaymentNotificationService {
             valMap.put("mobileNumber",transaction.getUser().getMobileNumber());
 
             valMap.put("module",transaction.getModule());
-        }
-        catch (Exception e)
-        {   log.error("Transaction Object Parsing: ",e);
-            throw new CustomException("PARSING ERROR","Failed to fetch values from the Transaction Object");
-        }
 
         return valMap;
     }
