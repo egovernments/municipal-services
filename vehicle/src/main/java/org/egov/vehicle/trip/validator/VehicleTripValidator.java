@@ -59,7 +59,7 @@ public class VehicleTripValidator {
 		if (request.getVehicleTrip().getVehicle() == null  || StringUtils.isEmpty(request.getVehicleTrip().getVehicle().getId())) {
 			throw new CustomException(VehicleTripConstants.INVALID_VEHICLELOG_ERROR, "vehicleId is mandatory");
 		}else {
-			List<Vehicle> vehicles = vehicleService.search(VehicleSearchCriteria.builder().ids(Arrays.asList(request.getVehicleTrip().getVehicle().getId())).tenantId(request.getVehicleTrip().getTenantId()).build(), request.getRequestInfo());
+			List<Vehicle> vehicles = vehicleService.search(VehicleSearchCriteria.builder().ids(Arrays.asList(request.getVehicleTrip().getVehicle().getId())).tenantId(request.getVehicleTrip().getTenantId()).build(), request.getRequestInfo()).getVehicle();
 			if(CollectionUtils.isEmpty(vehicles)) {
 				throw new CustomException(VehicleTripConstants.INVALID_VEHICLE, "vehicle does not exists with id "+ request.getVehicleTrip().getVehicle().getId());
 			}else {
