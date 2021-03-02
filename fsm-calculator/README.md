@@ -11,18 +11,10 @@ TBD
 - billing-service
 - mdms-service
 - workflow-v2
-- boundary-service
 - user-service
-- idgen-service
-- user-events
-- collection-service
-- notification-service
 - vendor
 - vehicle
-- fsm-calculator
-- egov-url-shortener
-- collection-service
-- pdf-service
+
 
 ### Swagger API Contract
 
@@ -35,46 +27,24 @@ Link to the postman collection [here](https://www.getpostman.com/collections/8b9
 
 ## Service Details
 
-**Faecal sludge management**
+**Faecal sludge management Calculator: fsm-calculator**
 
-fsm service helps to create/raise a Request for Septic Tank cleaning for ULB by citizen directly thrugh online portal or by approaching the ULB.
-
-*FSM Flow*
-
-- Citizen creates/raises a application for septic tank cleaning
-
-
-- ULB Employee reviews the request, updates the vehicleType based on the Application
-
-
-- System would generate a Demand for the Application 
-
-
-- Citizen would pay the Demand
-
-
-- ULB Employee identifies the DSO who can pickup the request and assign's DSO to the application
-
-
-- DSO can Accept or Reject the application, If rejected by DSO. ULB Employee would assign another DSO. While DSO Accepting the Application would assign a vehicle to the application. System would internally Schedule VehicleTrip
-
-
-- DSO would visit the site and after cleaning septic tank, would mark the application as complete, System would mark the respective VehicleTrip ready for disposal
-
-
-- Citizen can provide feedback in Rating as well as answer the Questions configure.
+- Contains the API's to create, update, search billing Slab with certain combination
+- Contains the API's to calculate and generate Demand for FSM Application and return the Estimate of the Charges for Given FSM.
 
 
 
 ### API Details
 
-`_create` : This API is used to create an application for the Desludging in the system. Whenever an application is created a application number is generated and assigned to the application for future reference.
+`_calculate` : This API calculates the TRIP Charge fees based on the billing slab identified for FSM Application.
 
-`_search` : This API is used to search the applications in the system based on various search parameters like mobile number, application number,status etc.
+`_estimate` : This API returns the estimate of the TRIP Charges for the given FSM Application.
 
-`_update` : The _update API is used to update the application information or to forward the application from one state to another.
+`billingSlab/_create` : The create api to create BillingSlab with the combination of tankCapacity, Slum and propertyType.
 
-`_audit`  : This API is used to search the Audit log of a particular applicaation in the system bsed on the appliationNo or id of the FSM and tenantId.
+`billingSlab/_update`  :The update api to update the existing billingSlab for the given combination of tankCapacity, Slum and PropertyType.
+
+`billingSlab/_search` : The search api search for the billngslab based on the search criteria.
 
 
 ### Reference Document
@@ -83,25 +53,9 @@ TBD
 
 ### Kafka Consumers
 
-- **egov.collection.payment-create** : service receives the data from this topic to update the status of the application on payment receipt creation
-
-
-- **save-fsm-application** : service receives data from this topic to send notification to the user 
-
-
-- **update-fsm-application** : service receives data from this topic to send notification to the user on application status change
-
-
-- **update-fsm-workflow-application** : service receives data from this topic to send notification to the user on application status change
 
 ### Kafka Producers
-- **save-fsm-application** : service sends data to this topic to create new FSM Application
+- **save-fsm-billing-slab** : service sends data to this topic to create new billing slab.
 
 
-- **update-fsm-application** : service sends data to this topic to update the FSM application with updatable state of workflow
-
-
-- **update-fsm-workflow-application** : service sends data to this topic to update the FSM application with not updatablestate of workflow
-
-
-- **egov.core.notification.sms** : service sends sms data to this topic to send sms notifications to the owner for every workflow state change
+- **update-fsm-billing-slab** : service sends data to this topic to update the billing slab
