@@ -314,6 +314,56 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/BillingSlabResponse'
+  /fsm-calculator/v1/_calculate:
+    post:
+      summary: Calcualte the FSM Charges and generate Demand for the same, based on the billingslab 
+      tags: 
+        - FSM-Calculator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculationReq'
+        description: Reuqest Schema calculate api
+        required: true
+      responses:
+        '202':
+          description: calculated  successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        '400':
+          description: Failed to process the calcuation
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes' 
+  /fsm-calculator/v1/_estimate:
+    post:
+      summary: Calcualte the FSM Charge, based on the billingslab . Does not create demand
+      tags: 
+        - FSM-Calculator
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculationReq'
+        description: Reuqest Schema estimate api
+        required: true
+      responses:
+        '202':
+          description: estimate calculated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        '400':
+          description: Failed to process the estimate
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/ErrorRes'
 components:
   schemas:
     Workflow:
@@ -678,6 +728,89 @@ components:
       required:
         - responseInfo
         - billingSlab            
+    CalculationReq:
+      type: object
+      description: Request object for Calcuation
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
+        CalulationCriteria:
+          $ref: '#/components/schemas/CalulationCriteria'
+      required:
+        - requestInfo
+        - CalulationCriteria
+    CalculationRes:
+      type: object
+      description: Response of the BillingSlab 
+      properties:
+        responseInfo:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/egov-services/master/docs/common/contracts/v1-1-1.yml#/definitions/ResponseInfo
+        Calculations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Calculation'
+      required:
+        - responseInfo
+        - Calculations   
+    CalulationCriteria:
+      type: object
+      description: Calculation Criteria to calcaulte and generate Demand
+      properties:
+        tenantId:
+          type: string
+          description: Unique Identifier of the tenant to which user primarily belongs
+        feeType:
+          type: string
+          description: type of fee to be calcaulted and generrate demand, As of now it is only one
+          enum: 
+            - APPLICATION_FEE
+        fsm:
+          $ref: '#/components/schemas/FSM'
+        applicationNo:
+          type: string
+          description: Application number of the FSM application
+    Calculation:
+      type: object
+      description: ist of calculations 
+      properties:
+        tenantId:
+          type: string
+          description: Unique Identifier of the tenant to which user primarily belongs
+        feeType:
+          type: string
+          description: type of fee to be calcaulted and generrate demand, As of now it is only one
+          enum: 
+            - APPLICATION_FEE
+        fsm:
+          $ref: '#/components/schemas/FSM'
+        applicationNumber:
+          type: string
+          description: Application number of the FSM application
+        taxHeadEstimates:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxHeadEstimate'
+    TaxHeadEstimate:
+      type: object
+      description: Estimate object for each taxHead
+      properties:
+        taxHeadCode:
+          type: string
+        estimateAmount:
+          type: number
+          format: bigdecimal
+        category:
+          type: string
+          enum:
+            - TAX
+            - FEE
+            - REBATE
+            - ADVANCE_COLLECTION
+            - PENALTY
+            - FINES
+            - CHARGES
+        
 servers:
   # Added by API Auto Mocking Plugin
   # Added by API Auto Mocking Plugin

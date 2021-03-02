@@ -220,6 +220,10 @@ public class FSMService {
 			today.clear(Calendar.MINUTE);
 			today.clear(Calendar.SECOND);
 			today.clear(Calendar.MILLISECOND);
+			psd.clear(Calendar.HOUR);
+			psd.clear(Calendar.MINUTE);
+			psd.clear(Calendar.SECOND);
+			psd.clear(Calendar.MILLISECOND);
 			if(today.compareTo(psd) >0) {
 				throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
 			}
