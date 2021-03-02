@@ -25,12 +25,15 @@ public class RowMapper  implements ResultSetExtractor<List<Vehicle>> {
 
 	@Autowired
 	private ObjectMapper mapper;
+	
+	public String fullCount=null;
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Vehicle> extractData(ResultSet rs) throws SQLException, DataAccessException {
 	
 		Map<String, Vehicle> vehicleMap = new LinkedHashMap<String, Vehicle>();
+		this.fullCount="0";
 
 		while (rs.next()) {
 			Vehicle currentVehicle = new Vehicle();
@@ -51,6 +54,7 @@ public class RowMapper  implements ResultSetExtractor<List<Vehicle>> {
 			String status = rs.getString("status");
 			String owner_id = rs.getString("owner_id");
 			String additionalDetails = rs.getString("additionalDetails");
+			this.fullCount = rs.getString("full_count");
 			
 			if(currentVehicle == null) {
 				Long lastModifiedTime = rs.getLong("lastmodifiedtime");
