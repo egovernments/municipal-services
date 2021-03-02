@@ -82,6 +82,7 @@ public class FSMConstants {
 	public static final String USREVENTS_EVENT_NAME = "FSM";
 	public static final String USREVENTS_EVENT_POSTEDBY = "SYSTEM-FSM";
 	public static final String SEARCH_MODULE = "rainmaker-common";
+	public static final String FSM_LOC_SEARCH_MODULE = "rainmaker-fsm";
 	
 	
 	
