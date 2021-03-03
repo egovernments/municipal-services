@@ -216,15 +216,15 @@ public class FSMService {
 			Calendar psd = Calendar.getInstance();
 			psd.setTimeInMillis(fsm.getPossibleServiceDate());
 			Calendar today = Calendar.getInstance();
-			today.clear(Calendar.HOUR);
-			today.clear(Calendar.MINUTE);
-			today.clear(Calendar.SECOND);
-			today.clear(Calendar.MILLISECOND);
-			psd.clear(Calendar.HOUR);
-			psd.clear(Calendar.MINUTE);
-			psd.clear(Calendar.SECOND);
-			psd.clear(Calendar.MILLISECOND);
-			if(today.compareTo(psd) >0) {
+			today.set(Calendar.HOUR_OF_DAY,0);
+			today.set(Calendar.MINUTE,0);
+			today.set(Calendar.SECOND,0);
+			today.set(Calendar.MILLISECOND,0);
+			psd.set(Calendar.HOUR_OF_DAY,0);
+			psd.set(Calendar.MINUTE,0);
+			psd.set(Calendar.SECOND,0);
+			psd.set(Calendar.MILLISECOND,0);
+			if(today.after(psd) ) {
 				throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
 			}
 		}
