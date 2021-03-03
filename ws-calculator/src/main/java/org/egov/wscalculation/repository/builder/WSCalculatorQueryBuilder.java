@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
 import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +33,8 @@ public class WSCalculatorQueryBuilder {
 	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno),ws.connectionexecutiondate FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id";
 
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_ws_connection ws";
-
+	
+	private static final String billGenerationSchedulerSearchQuery = "SELECT * from eg_ws_scheduler ";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -189,4 +191,35 @@ public class WSCalculatorQueryBuilder {
 		return query.toString();
 	}
 
+	public String getBillGenerationSchedulerQuery(BillGenerationSearchCriteria criteria,
+			List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(billGenerationSchedulerSearchQuery);
+		if (!StringUtils.isEmpty(criteria.getTenantId())) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" tenantid= ? ");
+			preparedStatement.add(criteria.getTenantId());
+		}
+		if (criteria.getLocality() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" locality = ? ");
+			preparedStatement.add(criteria.getLocality());
+		}
+		if (criteria.getStatus() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" status = ? ");
+			preparedStatement.add(criteria.getStatus());
+		}
+		if (criteria.getBillingcycleStartdate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" billingcyclestartdate >= ? ");
+			preparedStatement.add(criteria.getBillingcycleStartdate());
+		}
+		if (criteria.getBillingcycleEnddate() != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" billingcycleenddate <= ? ");
+			preparedStatement.add(criteria.getBillingcycleEnddate());
+		}
+
+		return query.toString();
+	}
 }
