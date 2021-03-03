@@ -157,7 +157,8 @@ public class FSMService {
 			handleApplicationSubmit(fsmRequest,oldFSM);
 		}
 		
-		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_ASSIGN_DSO) ) {
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_ASSIGN_DSO) || 
+				fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_REASSIGN_DSO) ) {
 			handleAssignDSO(fsmRequest);
 		}
 		
@@ -227,6 +228,8 @@ public class FSMService {
 			if(today.after(psd) ) {
 				throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
 			}
+		}else {
+			throw new CustomException(FSMErrorConstants.INVALID_POSSIBLE_DATE," Possible service Date  is invalid");
 		}
 		dsoService.validateDSO(fsmRequest);
 		
