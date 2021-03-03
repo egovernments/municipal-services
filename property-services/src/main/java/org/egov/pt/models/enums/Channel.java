@@ -15,7 +15,7 @@ public enum Channel {
   CITIZEN("CITIZEN"),
   
   DATA_ENTRY("DATA_ENTRY"),
-  
+  LEGACY_MIGRATION("LEGACY_MIGRATION");
   MIGRATION("MIGRATION");
 
   private String value;
