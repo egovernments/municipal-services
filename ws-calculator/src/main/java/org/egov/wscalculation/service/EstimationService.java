@@ -7,16 +7,20 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.util.CalculatorUtil;
+import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.util.WaterCessUtil;
 import org.egov.wscalculation.web.models.BillingSlab;
 import org.egov.wscalculation.web.models.CalculationCriteria;
 import org.egov.wscalculation.web.models.CalculationReq;
@@ -28,9 +32,6 @@ import org.egov.wscalculation.web.models.Slab;
 import org.egov.wscalculation.web.models.TaxHeadEstimate;
 import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionRequest;
-import org.egov.wscalculation.util.CalculatorUtil;
-import org.egov.wscalculation.util.WSCalculationUtil;
-import org.egov.wscalculation.util.WaterCessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -232,15 +233,20 @@ public class EstimationService {
 
 				} else if (waterConnection.getConnectionType()
 						.equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)) {
-					if (request.getTaxPeriodFrom() > 0 && request.getTaxPeriodTo() > 0) {
+						if (request.getTaxPeriodFrom() > 0 && request.getTaxPeriodTo() > 0) {
 						if (waterConnection.getConnectionExecutionDate() > request.getTaxPeriodFrom()) {
 							// Added pro rating
+							long milli_sec_btw_conn_date = Math.abs(request.getTaxPeriodTo() - waterConnection.getConnectionExecutionDate());
+							long milli_sec_btw_quarter = Math.abs(request.getTaxPeriodTo() - request.getTaxPeriodFrom());
+							//Converting milli seconds to days
+						    long days_conn_date = TimeUnit.MILLISECONDS.toDays(milli_sec_btw_conn_date) + 1;
+						    long days_quarter = TimeUnit.MILLISECONDS.toDays(milli_sec_btw_quarter) + 1;
+
+							waterCharge = waterCharge.add(BigDecimal.valueOf(days_conn_date * (filteredSlabs.get(0).getCharge() / days_quarter)).setScale(2, 2));
 //							double daysFactor = ((request.getTaxPeriodTo() - waterConnection.getConnectionExecutionDate())
 //									/ (request.getTaxPeriodTo() - request.getTaxPeriodFrom())); 
 //							waterCharge = waterCharge
 //									.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge() * daysFactor));
-							waterCharge = waterCharge
-									.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
 						} else {
 
 							waterCharge = waterCharge
@@ -252,7 +258,10 @@ public class EstimationService {
 
 					}
 //					waterCharge = waterCharge.add(BigDecimal.valueOf(filteredSlabs.get(0).getCharge()));
-
+					/**
+					 * Below 'if' statement is used to calculate the rate...
+					 * if water charge is less than minimum charge.
+					 */
 					if (billSlab.getMinimumCharge() > waterCharge.doubleValue()) {
 						waterCharge = BigDecimal.valueOf(billSlab.getMinimumCharge());
 					}
@@ -345,17 +354,15 @@ public class EstimationService {
 			return totalUnit;
 		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
 				&& calculationAttribute.equalsIgnoreCase(WSCalculationConstant.noOfTapsConst)) {
-			if (waterConnection.getNoOfTaps() == null)
-				return totalUnit;
+			if (waterConnection.getNoOfTaps() != null && waterConnection.getNoOfTaps() > 0) 
 			return new Double(waterConnection.getNoOfTaps());
 		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
 				&& calculationAttribute.equalsIgnoreCase(WSCalculationConstant.pipeSizeConst)) {
-			if (waterConnection.getPipeSize() == null)
-				return totalUnit;
+			if (waterConnection.getPipeSize() == null && waterConnection.getPipeSize() > 0)
 			return waterConnection.getPipeSize();
 		} else if (waterConnection.getConnectionType().equals(WSCalculationConstant.nonMeterdConnection)
 				&& calculationAttribute.equalsIgnoreCase(WSCalculationConstant.plotBasedConst)) {
-			if (property.getLandArea() != null)
+			if (property.getLandArea() != null && property.getLandArea() > 0)
 				return property.getLandArea();
 		}
 		return 0.0;
@@ -363,7 +370,7 @@ public class EstimationService {
 
 	public Map<String, Object> getQuarterStartAndEndDate(Map<String, Object> billingPeriod) {
 		Date date = new Date();
-		Calendar fromDateCalendar = Calendar.getInstance();
+		Calendar fromDateCalendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		fromDateCalendar.setTime(date);
 		fromDateCalendar.set(Calendar.MONTH, fromDateCalendar.get(Calendar.MONTH) / 3 * 3);
 		fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
