@@ -151,7 +151,7 @@
             "actions": [
                 {
                     "tenantId": "pb.amritsar",
-                    "action": "ASSIGN",
+                    "action": "REASSING",
                     "nextState": "PENDING_DSO_APPROVAL",
                     "roles": [
                         "FSM_EDITOR_EMP"
@@ -161,14 +161,6 @@
                     "tenantId": "pb.amritsar",
                     "action": "CANCEL",
                     "nextState": "CANCELED",
-                    "roles": [
-                        "FSM_ADMIN"
-                    ]
-                },
-                {
-                    "tenantId": "pb.amritsar",
-                    "action": "SENDBACK",
-                    "nextState": "PENDING_DSO_APPROVAL",
                     "roles": [
                         "FSM_ADMIN"
                     ]
