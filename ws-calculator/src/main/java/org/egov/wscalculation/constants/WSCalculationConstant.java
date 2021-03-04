@@ -290,7 +290,7 @@ public class WSCalculationConstant {
 
 	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
 	
-
+	public static final String WS_BILL_SCHEDULER_TRANSACTION = "Bill Generation";
 
 	
 }

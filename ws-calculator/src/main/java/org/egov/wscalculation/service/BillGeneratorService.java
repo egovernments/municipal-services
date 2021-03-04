@@ -12,6 +12,8 @@ import org.egov.wscalculation.web.models.BillScheduler;
 import org.egov.wscalculation.web.models.BillStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.egov.wscalculation.constants.WSCalculationConstant;
+
 
 @Service
 public class BillGeneratorService {
@@ -30,6 +32,7 @@ public class BillGeneratorService {
 		billRequest.getBillScheduler().setId(UUID.randomUUID().toString());
 		billRequest.getBillScheduler().setAuditDetails(auditDetails);
 		billRequest.getBillScheduler().setStatus(BillStatus.INITATED);
+		billRequest.getBillScheduler().setTransactionType(WSCalculationConstant.WS_BILL_SCHEDULER_TRANSACTION);
 		billGeneratorDao.saveBillGenertaionDetails(billRequest);
 		billSchedulers.add(billRequest.getBillScheduler());
 		return billSchedulers;
