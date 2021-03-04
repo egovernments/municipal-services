@@ -9,6 +9,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
+import org.egov.vehicle.repository.VehicleRepository;
 import org.egov.vehicle.service.UserService;
 import org.egov.vehicle.service.VehicleService;
 import org.egov.vehicle.trip.querybuilder.VehicleTripQueryBuilder;
@@ -42,6 +43,8 @@ public class VehicleTripValidator {
 	@Autowired
 	private VehicleTripQueryBuilder queryBuilder;
 	
+    @Autowired
+    private VehicleRepository repository;
 
 	@Autowired
 	private UserService userService;
@@ -137,9 +140,19 @@ public class VehicleTripValidator {
 				throw new CustomException(VehicleTripConstants.UPDATE_VEHICLELOG_ERROR, "VehicleLog Not found in the System" + request.getVehicleTrip());
 			}
 		} else if( request.getWorkflow().getAction().equalsIgnoreCase(VehicleTripConstants.DISPOSE)) {
+			ArrayList ids = new ArrayList<String>();
+			ids.add(request.getVehicleTrip().getVehicleId());
+			VehicleSearchCriteria criteria = VehicleSearchCriteria.builder().ids(ids).build();
+			Vehicle vehicle = repository.getVehicleData(criteria).getVehicle().get(0);
 			if(request.getVehicleTrip().getVolumeCarried() == null  || request.getVehicleTrip().getVolumeCarried() <= 0 ) {
 				throw new CustomException(VehicleTripConstants.INVALID_VOLUME, "Invalid volume carried");
-			}else if(request.getVehicleTrip().getTripEndTime() <= 0) {
+			}else if(request.getVehicleTrip().getVolumeCarried() > vehicle.getTankCapacity()) {
+				throw new CustomException(VehicleTripConstants.VOLUME_GRT_CAPACITY, "Waster collected is greater than vehicle Capcity");
+			}
+				
+				
+				
+				if(request.getVehicleTrip().getTripEndTime() <= 0) {
 				throw new CustomException(VehicleTripConstants.INVALID_TRIP_ENDTIME, "Invalid Trip end time");
 			}
 		}

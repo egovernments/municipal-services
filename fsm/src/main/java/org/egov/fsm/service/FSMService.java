@@ -280,7 +280,9 @@ public class FSMService {
 	}
 	private void handleFSMComplete(FSMRequest fsmRequest, FSM oldFSM) {
 		FSM fsm = fsmRequest.getFsm();
-		if(fsm.getWasteCollected() == null  || fsm.getWasteCollected() <=0 ) {
+		Vehicle vehicle = vehicleService.getVehicle(fsm.getVehicleId(), fsm.getTenantId(), fsmRequest.getRequestInfo());
+		if(fsm.getWasteCollected() == null  || fsm.getWasteCollected() <=0 ||
+				(vehicle != null && vehicle.getTankCapicity() != null && fsm.getWasteCollected() > vehicle.getTankCapicity()) ) {
 			throw new CustomException(FSMErrorConstants.INVALID_WASTER_COLLECTED," Wastecollected is invalid to complete the application !.");
 		}
 		
