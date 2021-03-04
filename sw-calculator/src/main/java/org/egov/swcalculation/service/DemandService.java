@@ -206,11 +206,11 @@ public class DemandService {
 			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(SWCalculationConstant.BILLING_PERIOD);
 			if (request.getTaxPeriodFrom() == 0 && request.getTaxPeriodTo() == 0) {
-				 Long fromDate = (Long)financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
-				 request.setTaxPeriodFrom(fromDate);
-				 Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
-				 request.setTaxPeriodFrom(fromDate);
-				 request.setTaxPeriodTo(toDate);
+				Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+				request.setTaxPeriodFrom(fromDate);
+				Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+				request.setTaxPeriodFrom(fromDate);
+				request.setTaxPeriodTo(toDate);
 			}
 			Long expiryDays = (Long) financialYearMaster.get(SWCalculationConstant.Demand_Expiry_Date_String);
 			Long expiryDate = System.currentTimeMillis() + expiryDays;
@@ -398,25 +398,27 @@ public class DemandService {
 			List<DemandDetail> updatedDemandDetails = getUpdatedDemandDetails(calculation, demandDetails);
 			demand.setDemandDetails(updatedDemandDetails);
 
-			if(isForConnectionNo){
+			if (isForConnectionNo) {
 				SewerageConnection connection = calculation.getSewerageConnection();
 				if (connection == null) {
 					List<SewerageConnection> sewerageConnectionList = calculatorUtils.getSewerageConnection(requestInfo,
-							calculation.getConnectionNo(),calculation.getTenantId());
+							calculation.getConnectionNo(), calculation.getTenantId());
 					int size = sewerageConnectionList.size();
-					connection = sewerageConnectionList.get(size-1);
+					connection = sewerageConnectionList.get(size - 1);
 
 				}
 
-				if(connection.getApplicationType().equalsIgnoreCase("MODIFY_SEWERAGE_CONNECTION")){
-					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder().sewerageConnection(connection)
-							.requestInfo(requestInfo).build();
+				if (connection.getApplicationType().equalsIgnoreCase("MODIFY_SEWERAGE_CONNECTION")) {
+					SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
+							.sewerageConnection(connection).requestInfo(requestInfo).build();
 					Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
 					User owner = property.getOwners().get(0).toCommonUser();
-					if (!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
-						owner = sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().get(0).toCommonUser();
+					if (!CollectionUtils
+							.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+						owner = sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().get(0)
+								.toCommonUser();
 					}
-					if(!(demand.getPayer().getUuid().equalsIgnoreCase(owner.getUuid())))
+					if (!(demand.getPayer().getUuid().equalsIgnoreCase(owner.getUuid())))
 						demand.setPayer(owner);
 				}
 			}
@@ -594,6 +596,11 @@ public class DemandService {
 			BigDecimal penalty = interestPenaltyEstimates.get(SWCalculationConstant.SW_TIME_PENALTY);
 			BigDecimal interest = interestPenaltyEstimates.get(SWCalculationConstant.SW_TIME_INTEREST);
 
+			if (penalty == null)
+				penalty = BigDecimal.ZERO;
+			if (interest == null)
+				interest = BigDecimal.ZERO;
+
 			DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
 
 			if (interest.compareTo(BigDecimal.ZERO) != 0) {
@@ -655,7 +662,8 @@ public class DemandService {
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (SewerageDetails detail : connectionNos) {
-				boolean isValidConnection = validateSewerageConnection(detail,taxperiodfrom,taxperiodto,tenantId,requestInfo);
+				boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
+						requestInfo);
 				if (isValidConnection) {
 					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 							.assessmentYear(estimationService.getAssessmentYear())
@@ -671,14 +679,15 @@ public class DemandService {
 		}
 	}
 
-	private boolean validateSewerageConnection(SewerageDetails detail,long taxPeriodFrom,long taxPeriodTo,String tenantId,RequestInfo requestInfo) {
+	private boolean validateSewerageConnection(SewerageDetails detail, long taxPeriodFrom, long taxPeriodTo,
+			String tenantId, RequestInfo requestInfo) {
 		boolean isValidSewerageConnection = true;
 
 		if (System.currentTimeMillis() < detail.getConnectionExecutionDate()) {
 
 			isValidSewerageConnection = false;
 		}
-		
+
 		if (detail.getConnectionExecutionDate() < taxPeriodFrom) {
 
 			isValidSewerageConnection = fetchBill(detail, taxPeriodFrom, taxPeriodTo, tenantId, requestInfo);
@@ -687,9 +696,7 @@ public class DemandService {
 
 		return isValidSewerageConnection;
 	}
-	
-	
-	
+
 	private boolean fetchBill(SewerageDetails sewerageDetails, long taxPeriodFrom, long taxPeriodTo, String tenantId,
 			RequestInfo requestInfo) {
 
