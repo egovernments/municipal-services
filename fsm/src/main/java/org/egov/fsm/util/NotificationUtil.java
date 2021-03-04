@@ -131,8 +131,8 @@ public class NotificationUtil {
 				
 				if (message.contains("<RECEIPT_LINK>") ) {
 					StringBuilder builder = new StringBuilder(config.getPdfHost());
-					builder.append(config.getPdfContextPath()).append(config.getPdfCreateNoSaveEndpoint());
-					builder.append("?tenantId=").append(fsm.getTenantId()).append("&key=").append(FSMConstants.RECEIPT_KEY);
+					builder.append(config.getUiAppHost()).append(config.getFsmAppLink());
+					builder.append(fsm.getApplicationNo());
 					message = message.replace("<RECEIPT_LINK>", getShortenedUrl(builder.toString()));
 				}
 				
