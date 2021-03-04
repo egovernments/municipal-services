@@ -401,7 +401,7 @@ public class NotificationUtil {
 			res = restTemplate.postForObject(builder.toString(), body, String.class);
 
 		}catch(Exception e) {
-			e.printStackTrace();
+			 log.error("Error while shortening the url: " + url,e);
 			
 		}
 		if(StringUtils.isEmpty(res)){
