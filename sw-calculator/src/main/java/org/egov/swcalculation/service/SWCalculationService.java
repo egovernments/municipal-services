@@ -10,7 +10,7 @@ public interface SWCalculationService {
 	
 	List<Calculation> getCalculation(CalculationReq request);
 	
-	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
+	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo, long taxperiodFrom, long taxperiodTo);
 	
 	List<Calculation> getEstimation(CalculationReq request);
 }

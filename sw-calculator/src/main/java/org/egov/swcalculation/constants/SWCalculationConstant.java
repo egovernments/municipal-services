@@ -240,7 +240,13 @@ public class SWCalculationConstant {
 
 	public static final String SW_METER_CHARGE = "SW_METER_CHARGE";
 
-	public static final String SW_SECURITY_CHARGE = "SW_SECURITY_CHARGE";
+	public static final String SW_SECURITY_DEPOSIT = "SW_SECURITY_DEPOSIT";
+	
+	public static final String SW_SECURITY_DEPOSIT_CONST = "securityDeposit";
+
+	public static final String SW_CONNECTION_FEE = "SW_CONNECTION_FEE";
+
+	public static final String SW_CONNECTION_FEE_CONST = "connectionFee";
 
 	public static final String SW_OTHER_CHARGE = "SW_OTHER_CHARGE";
 
@@ -252,7 +258,7 @@ public class SWCalculationConstant {
 
 	public static final String METER_COST_CONST = "meterCost";
 
-	public static final String OTHER_CHARGE_CONST = "other";
+	public static final String OTHER_FEE_CONST = "othersFee";
 
 	public static final String TAX_PERCENTAGE_CONST = "taxpercentage";
 	
@@ -287,5 +293,24 @@ public class SWCalculationConstant {
 	public static final String PROPERTY_JSONPATH_ROOT = "$.MdmsRes.PropertyTax";
 
 	public static final String PROPERTY_MASTER_MODULE = "PropertyTax";
+	public static final String COMPOSITION_FEE_CONST = "compositionFee";
+
+	public static final String COMPOSITION_FEE = "SW_COMPOSITION_FEE";
+
+	public static final String USER_CHARGES_CONST = "userCharges";
+
+	public static final String USER_CHARGES = "SW_USER_CHARGE";
+	
+	public static final String OTHER_FEE = "SW_OTHER_FEE";
+
+	public static final String BILLINGTYPE = "billingType";
+
+	public static final String CUSTOM = "CUSTOM";
+
+	public static final String CUSTOM_BILL_AMOUNT = "billingAmount";
+
+	public static final String ACTIVE = "Active";
+
+	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
 
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class SWCalculatorQueryBuilder {
 	
-	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
+	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno),sw.connectionexecutiondate FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
 	
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
@@ -15,12 +15,18 @@ public class SWCalculatorQueryBuilder {
 		return distinctTenantIdsCriteria;
 	}
 
-	public String getConnectionNumberList(String tenantId, String connectionType, List<Object> preparedStatement) {
+	public String getConnectionNumberList(String tenantId, String connectionType, String status, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" sw.connectiontype = ? ");
 		preparedStatement.add(connectionType);
+		
+		//Add status
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.status = ? ");
+		preparedStatement.add(status);
+		
 
 		// add tenantid
 		addClauseIfRequired(preparedStatement, query);
