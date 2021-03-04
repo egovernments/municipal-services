@@ -1,5 +1,7 @@
 package org.egov.wscalculation.web.models;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -18,9 +20,6 @@ import lombok.ToString;
 @ToString
 public class BillGenerationSearchCriteria {
 
-	@JsonProperty("billingCycle")
-	private String billingCycle;
-
 	@JsonProperty("locality")
 	private String locality;
 
@@ -33,6 +32,7 @@ public class BillGenerationSearchCriteria {
 	@JsonProperty("billingcycleenddate")
 	private Long billingcycleEnddate;
 
+	@NotNull
 	@JsonProperty("tenantId")
 	private String tenantId;
 
