@@ -79,7 +79,7 @@ public class VehicleTripRepository {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getVehicleLogSearchQuery(criteria, preparedStmtList);
 		vehicleTrips = jdbcTemplate.query(query,preparedStmtList.toArray(), mapper);
-		VehicleTripResponse response = VehicleTripResponse.builder().vehicleTrip(vehicleTrips).totalCount(mapper.fullCount).build();
+		VehicleTripResponse response = VehicleTripResponse.builder().vehicleTrip(vehicleTrips).totalCount(Integer.valueOf(mapper.getFullCount())).build();
 		return response;
 	}
 	

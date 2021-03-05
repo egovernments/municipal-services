@@ -43,7 +43,7 @@ public class VehicleRepository {
 			List<Object> preparedStmtList = new ArrayList<>();
 			String query = queryBuilder.getSearchQuery(criteria, preparedStmtList);
 			List<Vehicle> vehicles = jdbcTemplate.query(query, preparedStmtList.toArray(),rowMapper );
-			VehicleResponse response = VehicleResponse.builder().vehicle(vehicles).totalCount(rowMapper.fullCount).build();
+			VehicleResponse response = VehicleResponse.builder().vehicle(vehicles).totalCount(Integer.valueOf(rowMapper.getFullCount())).build();
 			return response;
 		}
 
