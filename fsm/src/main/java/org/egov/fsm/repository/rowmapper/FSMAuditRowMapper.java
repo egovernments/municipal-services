@@ -27,16 +27,16 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 	public List<FSMAuditUtil> extractData(ResultSet rs) throws SQLException, DataAccessException {
 
 		List<FSMAuditUtil> fsmAuditDataList = new ArrayList<FSMAuditUtil>();
-		Map<String, FSMAuditUtil> fsmAuditDataMap = new LinkedHashMap<String, FSMAuditUtil>();
+		Map<Long, FSMAuditUtil> fsmAuditDataMap = new LinkedHashMap<Long, FSMAuditUtil>();
 		while (rs.next()) {
 			FSMAuditUtil auditUtil = null;
 			
-			String id = rs.getString("fsm_id");			
-			auditUtil = fsmAuditDataMap.get(id);
+			Long lastmodifiedtime = rs.getLong("lastmodifiedtime");		
+			auditUtil = fsmAuditDataMap.get(lastmodifiedtime);
 			
 			if(auditUtil == null) {
 				auditUtil = new FSMAuditUtil();
-				auditUtil.setId(id);
+				auditUtil.setId(rs.getString("fsm_id"));
 				auditUtil.setApplicationNo(rs.getString("applicationno"));
 				auditUtil.setAccountId(rs.getString("accountId"));
 				auditUtil.setDescription(rs.getString("description"));
@@ -80,7 +80,7 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 				auditUtil.setCreatedBy(rs.getString("createdby"));
 				auditUtil.setCreatedTime(rs.getLong("createdtime"));
 				
-				fsmAuditDataMap.put(id, auditUtil);
+				fsmAuditDataMap.put(lastmodifiedtime, auditUtil);
 			}
 
 		}
