@@ -36,6 +36,6 @@ public class VehicleTripResponse {
 	private List<VehicleTrip> vehicleTrip = null;
 
 	@JsonProperty("totalCount")
-	private String totalCount = null;
+	private Integer totalCount = null;
 
 }
