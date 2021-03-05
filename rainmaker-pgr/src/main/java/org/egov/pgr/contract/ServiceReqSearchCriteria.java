@@ -38,7 +38,6 @@ public class ServiceReqSearchCriteria {
 	private String assignedTo;
 	
 	@JsonProperty("accountId")
-	@Pattern(regexp="^[a-zA-Z0-9]$")
 	private String accountId;
 	
 	@JsonProperty("status")
