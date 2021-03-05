@@ -127,7 +127,7 @@ consumerGroup.on("message", function(message) {
 /*case "INITIATED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.|1301157492438182299|1407161407309889909`;
           break;*/
 
         case "PENDINGPAYMENT":
@@ -137,25 +137,25 @@ consumerGroup.on("message", function(message) {
           Your application for ${firenocType} Fire NOC Certificate has been submitted, the application no. is ${applicationNumber}. 
           You can download your application form by clicking on the below link: 
            ${downLoadLink}.
-          Kindly pay your NOC Fees online or at your applicable fire office.`;
+          Kindly pay your NOC Fees online or at your applicable fire office.|1301157492438182299|1407161492659630233`;
           break;
         case "FIELDINSPECTION":
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} field inspection.`;
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} field inspection.|1301157492438182299|1407161492704744715`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} document verifier.`;
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} document verifier.|1301157492438182299|1407161407329037630`;
            break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} approver.`;
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} approver.|1301157492438182299|1407161407332754584`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
@@ -182,13 +182,13 @@ consumerGroup.on("message", function(message) {
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.`;
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.|1301157492438182299|1407161407355219072`;
           break;
         case "REJECTED":
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.|1301157492438182299|1407161407368404178
           `;
           break;
         // case "CANCELLED":
@@ -247,7 +247,7 @@ consumerGroup.on("message", function(message) {
     ] = `Dear ${applicantName}, 
     A Payment of ${paymentAmount} has been collected successfully for your Fire NOC Certificate.
     The payment receipt no. is  ${receiptNumber} and you can download your receipt by clicking on the below link:
-    ${downLoadLink}`;
+    ${downLoadLink}|1301157492438182299|1407161407392327147`;
 
     payloads.push({
       topic,
