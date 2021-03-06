@@ -1,12 +1,12 @@
 [
         {
-            "tenantId": "pb.amritsar",
+            "tenantId": "pb",
             "businessService": "FSM",
             "business": "fsm",
             "businessServiceSla": 172800000,
             "states": [
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": null,
                     "applicationStatus": null,
@@ -16,7 +16,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "APPLY",
                             "nextState": "PENDING_APPL_FEE_PAYMENT",
                             "roles": [
@@ -24,7 +24,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "CREATE",
                             "nextState": "CREATED",
                             "roles": [
@@ -34,7 +34,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "CREATED",
                     "applicationStatus": "CREATED",
@@ -44,7 +44,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "REJECT",
                             "nextState": "REJECTED",
                             "roles": [
@@ -52,7 +52,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "SUBMIT",
                             "nextState": "PENDING_APPL_FEE_PAYMENT",
                             "roles": [
@@ -62,7 +62,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "PENDING_APPL_FEE_PAYMENT",
                     "applicationStatus": "PENDING_APPL_FEE_PAYMENT",
@@ -72,7 +72,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "REJECT",
                             "nextState": "REJECTED",
                             "roles": [
@@ -80,7 +80,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "SENDBACK",
                             "nextState": "CREATED",
                             "roles": [
@@ -88,7 +88,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "PAY",
                             "nextState": "ASSING_DSO",
                             "roles": [
@@ -99,7 +99,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "ASSING_DSO",
                     "applicationStatus": "ASSING_DSO",
@@ -109,7 +109,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "SENDBACK",
                             "nextState": "PENDING_APPL_FEE_PAYMENT",
                             "roles": [
@@ -117,7 +117,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "CANCEL",
                             "nextState": "CANCELED",
                             "roles": [
@@ -125,7 +125,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "action": "ASSIGN",
                             "nextState": "PENDING_DSO_APPROVAL",
                             "roles": [
@@ -135,7 +135,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "DSO_REJECTED",
                     "applicationStatus": "DSO_REJECTED",
@@ -145,7 +145,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_REJECTED",
                             "action": "CANCEL",
                             "nextState": "CANCELED",
@@ -154,7 +154,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_REJECTED",
                             "action": "REASSING",
                             "nextState": "PENDING_DSO_APPROVAL",
@@ -163,7 +163,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_REJECTED",
                             "action": "SENDBACK",
                             "nextState": "PENDING_DSO_APPROVAL",
@@ -174,7 +174,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "DSO_INPROGRESS",
                     "applicationStatus": "DSO_INPROGRESS",
@@ -184,7 +184,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_INPROGRESS",
                             "action": "SENDBACK",
                             "nextState": "PENDING_DSO_APPROVAL",
@@ -193,7 +193,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_INPROGRESS",
                             "action": "DECLINE",
                             "nextState": "ASSING_DSO",
@@ -203,7 +203,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_INPROGRESS",
                             "action": "COMPLETED",
                             "nextState": "CITIZEN_FEEDBACK_PENDING",
@@ -213,7 +213,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "DSO_INPROGRESS",
                             "action": "CANCEL",
                             "nextState": "CANCELED",
@@ -224,7 +224,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "PENDING_DSO_APPROVAL",
                     "applicationStatus": "PENDING_DSO_APPROVAL",
@@ -234,7 +234,7 @@
                     "isStateUpdatable": true,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "PENDING_DSO_APPROVAL",
                             "action": "DSO_REJECT",
                             "nextState": "DSO_REJECTED",
@@ -243,7 +243,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "PENDING_DSO_APPROVAL",
                             "action": "DSO_ACCEPT",
                             "nextState": "DSO_INPROGRESS",
@@ -252,7 +252,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "PENDING_DSO_APPROVAL",
                             "action": "CANCEL",
                             "nextState": "CANCELED",
@@ -263,7 +263,7 @@
                     ]
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "COMPLETED",
                     "applicationStatus": "COMPLETED",
@@ -273,7 +273,7 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "COMPLETED",
                             "action": "SUBMIT_FEEDBACK",
                             "nextState": "COMPLETED",
@@ -282,7 +282,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "COMPLETED",
                             "action": "SUBMIT_FEEDBACK",
                             "nextState": "COMPLETED",
@@ -291,7 +291,7 @@
                             ]
                         },
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "COMPLETED",
                             "action": "SUBMIT_FEEDBACK",
                             "nextState": "COMPLETED",
@@ -312,7 +312,7 @@
                     "actions": null
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "CANCELED",
                     "applicationStatus": "CANCELED",
@@ -323,7 +323,7 @@
                     "actions": null
                 },
                 {
-                    "tenantId": "pb.amritsar",
+                    "tenantId": "pb",
                     "sla": null,
                     "state": "CITIZEN_FEEDBACK_PENDING",
                     "applicationStatus": "CITIZEN_FEEDBACK_PENDING",
@@ -333,7 +333,7 @@
                     "isStateUpdatable": false,
                     "actions": [
                         {
-                            "tenantId": "pb.amritsar",
+                            "tenantId": "pb",
                             "currentState": "CITIZEN_FEEDBACK_PENDING",
                             "action": "SUBMIT_FEEDBACK",
                             "nextState": "COMPLETED",
