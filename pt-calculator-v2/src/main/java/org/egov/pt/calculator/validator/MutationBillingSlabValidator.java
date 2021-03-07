@@ -147,7 +147,7 @@ public class MutationBillingSlabValidator {
             response = repository.fetchResult(uri, request);
             if (null == response) {
                 log.info(BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
-                throw new CustomException(BillingSlabConstants.MDMS_DATA_NOT_FOUND_KEY,BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
+                throw new CustomException(BillingSlabConstants.MDMS_DATA_NOT_FOUND_KEY, BillingSlabConstants.MDMS_DATA_NOT_FOUND_MESSAGE);
             }
             validateMDMSCodes(billingSlabReq, errorMap, response);
     }
@@ -241,7 +241,7 @@ public class MutationBillingSlabValidator {
                                     if (!CollectionUtils.isEmpty(allowedUsageCategorySubMinors) && !StringUtils.isEmpty(billingSlab.getUsageCategoryDetail()) && !billingSlab.getUsageCategoryDetail().equalsIgnoreCase(BillingSlabConstants.ALL_PLACEHOLDER_BILLING_SLAB)) {
                                         List<String> allowedUsageCategoryDetail = JsonPath.read(usageCategoryDetail ,"$.*.[?(@.usageCategorySubMinor=='" + billingSlab.getUsageCategorySubMinor() + "')].code");
                                         if (!allowedUsageCategoryDetail.contains(billingSlab.getUsageCategoryDetail())) {
-                                            errorMap.put("INVALID_USAGE_CATEGORY_DETAIL","Provided Usage category detail is invalid");
+                                            errorMap.put("INVALID_USAGE_CATEGORY_DETAIL", "Provided Usage category detail is invalid");
                                         }
                                     }
                                 }
