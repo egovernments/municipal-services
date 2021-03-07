@@ -186,7 +186,7 @@ public class TradeUtil {
             taxPeriods.put(TLConstants.MDMS_STARTDATE,(Long) startDate);
             taxPeriods.put(TLConstants.MDMS_ENDDATE,(Long) endDate);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("Error while fetching MDMS data", e);
             throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+license.getFinancialYear());
         }
@@ -209,7 +209,7 @@ public class TradeUtil {
 //            Object endDate = currentFYObject.get(TLConstants.MDMS_ENDDATE);
 //            taxPeriods.put(TLConstants.MDMS_STARTDATE,(Long) startDate);
 //            taxPeriods.put(TLConstants.MDMS_ENDDATE,(Long) endDate);
-//        } catch (Exception e) {
+//        } catch (CustomException e) {
 //            log.error("Error while fetching MDMS data", e);
 //            throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+license.getFinancialYear());
 //        }

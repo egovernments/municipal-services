@@ -136,7 +136,7 @@ public class PdfFileStoreService {
 			sewerageObject.put(service, "SEWERAGE");
 			return getFileStoreIdFromPDFService(sewerageObject, sewerageConnectionRequest.getRequestInfo(), tenantId,
 					applicationKey);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("SEWERAGE_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 		}
@@ -172,7 +172,7 @@ public class PdfFileStoreService {
 						"No file store id found from pdf service");
 			}
 			return fileStoreIds.get(0).toString();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("SEWERAGE_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}

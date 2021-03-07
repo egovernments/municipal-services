@@ -1,6 +1,16 @@
 package org.egov.tl.service;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.egov.tl.util.TLConstants.ACTION_EXPIRE;
+import static org.egov.tl.util.TLConstants.DEFAULT_WORKFLOW;
+import static org.egov.tl.util.TLConstants.JOB_EXPIRY;
+import static org.egov.tl.util.TLConstants.JOB_SMS_REMINDER;
+import static org.egov.tl.util.TLConstants.STATUS_APPROVED;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.producer.Producer;
@@ -11,17 +21,13 @@ import org.egov.tl.web.models.TradeLicense;
 import org.egov.tl.web.models.TradeLicenseRequest;
 import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.tl.workflow.WorkflowIntegrator;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import static org.egov.tl.util.TLConstants.*;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -133,7 +139,7 @@ public class TLBatchService {
                 });
                 smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
             }
-            catch (Exception e){
+            catch (CustomException e){
                 producer.push(config.getReminderErrorTopic(), license);
             }
         }
@@ -161,7 +167,7 @@ public class TLBatchService {
 
             producer.push(config.getUpdateWorkflowTopic(), new TradeLicenseRequest(requestInfo, licenses));
         }
-        catch (Exception e){
+        catch (CustomException e){
             producer.push(config.getExpiryErrorTopic(), licenses);
         }
 

@@ -14,6 +14,7 @@ import org.egov.pt.calculator.web.models.BillingSlab;
 import org.egov.pt.calculator.web.models.BillingSlabReq;
 import org.egov.pt.calculator.web.models.BillingSlabRes;
 import org.egov.pt.calculator.web.models.BillingSlabSearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -95,7 +96,7 @@ public class BillingSlabService {
 		List<BillingSlab> billingSlabs = null;
 		try {
 			billingSlabs = dbRepository.searchBillingSlab(billingSlabSearcCriteria);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while fetching billing slabs from db: " + e);
 			billingSlabs = new ArrayList<>();
 		}

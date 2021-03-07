@@ -51,7 +51,7 @@ public class HRMSUtil {
         try {
              departments = JsonPath.read(res, HRMS_DEPARTMENT_JSONPATH);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("PARSING_ERROR","Failed to parse HRMS response");
         }
 

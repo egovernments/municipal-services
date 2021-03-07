@@ -438,7 +438,7 @@ public class MasterDataService {
 		try {
 			Object result = repository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonPath);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException("Invalid Billing Period", "No data found for this Billing Period");
 		}

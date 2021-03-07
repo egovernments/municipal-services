@@ -18,6 +18,7 @@ import org.egov.pgr.utils.PGRConstants;
 import org.egov.pgr.utils.PGRUtils;
 import org.egov.pgr.utils.ReportConstants;
 import org.egov.pgr.utils.ReportUtils;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -200,7 +201,7 @@ public class ReportService {
 				}
 			}
 			log.debug("mapOfIdAndName: " + mapOfIdAndName);
-		}catch(Exception e) {
+		}catch(CustomException e) {
 			log.error("Exception while searching employee: ", e);
 		}
 		return mapOfIdAndName;

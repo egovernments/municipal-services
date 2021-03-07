@@ -130,7 +130,7 @@ public class PropertyValidator {
         try {
             Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
             return JsonPath.read(result,jsonpath);
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("Error while fetvhing MDMS data",e);
             throw new CustomException(ErrorConstants.INVALID_TENANT_ID_MDMS_KEY,
                     ErrorConstants.INVALID_TENANT_ID_MDMS_MSG);

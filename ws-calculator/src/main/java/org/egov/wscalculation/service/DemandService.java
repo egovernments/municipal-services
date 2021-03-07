@@ -725,7 +725,7 @@ public class DemandService {
 				billResponse.put("billResponse", result);
 				wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
 				notificationSent = true;
-			} catch (Exception ex) {
+			} catch (CustomException ex) {
 				log.error("Fetch Bill Error", ex);
 			}
 		}

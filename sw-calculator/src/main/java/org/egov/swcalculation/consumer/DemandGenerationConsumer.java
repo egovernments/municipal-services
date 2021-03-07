@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.swcalculation.config.SWCalculationConfiguration;
-import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
-import org.egov.swcalculation.web.models.CalculationCriteria;
-import org.egov.swcalculation.web.models.CalculationReq;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.service.MasterDataService;
 import org.egov.swcalculation.service.SWCalculationServiceImpl;
+import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
+import org.egov.swcalculation.web.models.CalculationCriteria;
+import org.egov.swcalculation.web.models.CalculationReq;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
@@ -132,7 +133,7 @@ public class DemandGenerationConsumer {
 			sWCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
 			StringBuilder str = new StringBuilder("Demand generated Successfully. For records : ").append(request.getCalculationCriteria());
 			log.info(str.toString());
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Demand generation error: ", ex);
 			log.info("From Topic: " + errorTopic);
 			producer.push(errorTopic, request);

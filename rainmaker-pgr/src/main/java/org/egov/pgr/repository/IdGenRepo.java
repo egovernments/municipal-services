@@ -51,7 +51,7 @@ public class IdGenRepo {
 			response = restTemplate.postForObject(idGenHost + idGenPath, req, IdGenerationResponse.class);
 		} catch (HttpClientErrorException e) {
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			Map<String, String> map = new HashMap<>();
 			map.put(e.getCause().getClass().getName(),e.getMessage());
 			throw new CustomException(map);

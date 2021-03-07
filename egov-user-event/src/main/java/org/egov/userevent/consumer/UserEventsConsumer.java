@@ -2,6 +2,7 @@ package org.egov.userevent.consumer;
 
 import java.util.HashMap;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.userevent.config.PropertiesManager;
 import org.egov.userevent.service.UserEventsService;
 import org.egov.userevent.web.contract.EventRequest;
@@ -36,18 +37,17 @@ public class UserEventsConsumer {
 	 * @param record
 	 * @param topic
 	 */
-    @KafkaListener(topics = { "${kafka.topics.save.events}", "${kafka.topics.update.events}" })
+	@KafkaListener(topics = { "${kafka.topics.save.events}", "${kafka.topics.update.events}" })
 	public void listen(HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		try {
 			EventRequest eventReq = objectMapper.convertValue(record, EventRequest.class);
-			if(topic.equals(props.getSaveEventsTopic())) {
+			if (topic.equals(props.getSaveEventsTopic())) {
 				service.createEvents(eventReq, false);
-			}else if(topic.equals(props.getUpdateEventsTopic())) {
+			} else if (topic.equals(props.getUpdateEventsTopic())) {
 				service.updateEvents(eventReq);
 			}
-		}catch(Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while reading from the queue: ", e);
 		}
 	}
-
 }

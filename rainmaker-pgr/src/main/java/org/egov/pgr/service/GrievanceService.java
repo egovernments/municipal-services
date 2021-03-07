@@ -172,7 +172,7 @@ public class GrievanceService {
 							.status(actionStatusMap.get(WorkFlowConfigs.ACTION_OPEN)).build();
 					actionInfos.add(newActionInfo);
 				}
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				ActionInfo newActionInfo = ActionInfo.builder().uuid(UUID.randomUUID().toString()).businessKey(currentId)
 						.action(WorkFlowConfigs.ACTION_OPEN).assignee(null).by(by).when(auditDetails.getCreatedTime()).tenantId(tenantId)
 						.status(actionStatusMap.get(WorkFlowConfigs.ACTION_OPEN)).build();
@@ -490,7 +490,7 @@ public class GrievanceService {
 						throw new CustomException(ErrorConstants.NO_DATA_KEY, ErrorConstants.NO_DATA_MSG);
 					log.info("serviceCodes: "+serviceCodes);
 					serviceReqSearchCriteria.setServiceCodes(serviceCodes);
-				} catch (Exception e) {
+				} catch (CustomException e) {
 					throw new CustomException(ErrorConstants.NO_DATA_KEY, ErrorConstants.NO_DATA_MSG);
 				}
 				serviceReqSearchCriteria.setTenantId(requestInfo.getUserInfo().getTenantId());
@@ -527,7 +527,7 @@ public class GrievanceService {
 				if(serviceCodes.isEmpty())
 					throw new CustomException(ErrorConstants.NO_DATA_KEY, ErrorConstants.NO_DATA_MSG);
 				serviceReqSearchCriteria.setServiceCodes(serviceCodes);
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				throw new CustomException(ErrorConstants.NO_DATA_KEY, ErrorConstants.NO_DATA_MSG);
 			}
 		}
@@ -556,7 +556,7 @@ public class GrievanceService {
 			}
 			log.debug("Employee: " + response);
 			departmenCodes = JsonPath.read(response, PGRConstants.EMPLOYEE_DEPTCODES_JSONPATH);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception: " + e);
 			throw new CustomException(ErrorConstants.UNAUTHORIZED_EMPLOYEE_TENANT_KEY,
 					ErrorConstants.UNAUTHORIZED_EMPLOYEE_TENANT_MSG);
@@ -580,7 +580,7 @@ public class GrievanceService {
 		Object response = null;
 		try {
 			response = serviceRequestRepository.fetchResult(uri, mdmsCriteriaReq);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while fetching serviceCodes: " + e);
 		}
 		return response;
@@ -607,7 +607,7 @@ public class GrievanceService {
 			if (null == response)
 				return serviceRequestIds;
 			serviceRequestIds = JsonPath.read(response, PGRConstants.SRID_ASSIGNEDTO_JSONPATH);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while parsing SRid search on AssignedTo result: " + e);
 			return serviceRequestIds;
 		}
@@ -702,7 +702,7 @@ public class GrievanceService {
 			Map<String, String> computeUriIdMap = new HashMap<>();
 			try {
 				computeUriIdMap = fileStoreRepo.getUrlMaps(tenantId.split("\\.")[0], fileStoreIds);
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				log.error(" exception while connecting to filestore : " + e);
 			}
 			final Map<String, String> urlIdMap = computeUriIdMap;
@@ -729,7 +729,7 @@ public class GrievanceService {
 					}
 				});
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while replacing s3 links: ", e);
 		}
 	}
@@ -744,7 +744,7 @@ public class GrievanceService {
 	 */
 	public ServiceResponse enrichResult(RequestInfo requestInfo, ServiceResponse response) {
 		List<Long> userIds = response.getServices().stream().map(a -> {
-					try {return Long.parseLong(a.getAccountId());}catch(Exception e) {return null;} }).collect(Collectors.toList());
+					try {return Long.parseLong(a.getAccountId());}catch(CustomException e) {return null;} }).collect(Collectors.toList());
 		List<Address> addresses = new ArrayList<>();
 		response.getServices().forEach(service -> {
 			if(null != service) {
@@ -814,7 +814,7 @@ public class GrievanceService {
 					Long id = null;
 					try {
 						id = Long.parseLong(service.getAccountId());
-					}catch(Exception e) {
+					}catch(CustomException e) {
 						log.error("Parse Error", e);
 					}
 					service.setCitizen(userResponseMap.get(id));
@@ -845,7 +845,7 @@ public class GrievanceService {
 			}else {
 				return res;
 			}
-		}catch(Exception e) {
+		}catch(CustomException e) {
 			return null;
 		}
 		
@@ -874,7 +874,7 @@ public class GrievanceService {
 					map.put(codes.get(i), names.get(i));
 				}
 			}
-		}catch(Exception e) {
+		}catch(CustomException e) {
 			log.error("Couldn't fetch mohalla names: "+e);
 		}
 		log.info("map: "+map);

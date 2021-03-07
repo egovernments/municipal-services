@@ -234,7 +234,7 @@ public class WSCalculationUtil {
 		try {
 			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
 			return propertyResponse.getProperties();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}

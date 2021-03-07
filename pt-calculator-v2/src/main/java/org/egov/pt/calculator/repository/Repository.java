@@ -1,7 +1,5 @@
 package org.egov.pt.calculator.repository;
 
-import java.io.IOException;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.RestTemplate;
 
 @org.springframework.stereotype.Repository
 @Slf4j
@@ -41,7 +39,6 @@ public class Repository {
 		Object response = null;
 		log.info("URI: " + uri.toString());
 		try {
-			log.info(mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (ResourceAccessException e) {
 			
@@ -52,7 +49,7 @@ public class Repository {
 
 			log.info("the error is : " + e.getResponseBodyAsString());
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch (Exception e) {
+		}catch (CustomException e) {
 
 			log.error("Exception while fetching from searcher: ", e);
 		}

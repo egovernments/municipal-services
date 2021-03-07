@@ -70,7 +70,7 @@
 //        PropertyRequest request = null;
 //        try{
 //            request = getPropertRequest("src/test/PropertyRequest.json");}
-//        catch(Exception e){
+//        catch(CustomException e){
 //            e.printStackTrace();
 //            fail();
 //        }
@@ -85,7 +85,7 @@
 //                    .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 //                    .andExpect(content().json(fileUtils.getFileContents("src/test/PropertyResponse.json")));
 //        }
-//        catch(Exception e){
+//        catch(CustomException e){
 //            e.printStackTrace();
 //            fail();
 //        }

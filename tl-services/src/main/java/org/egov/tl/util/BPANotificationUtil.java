@@ -148,7 +148,7 @@ public class BPANotificationUtil {
         try {
             Object messageObj = JsonPath.parse(localizationMessage).read(path);
             message = ((ArrayList<String>) messageObj).get(0);
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.warn("Fetching from localization failed", e);
         }
         return message;

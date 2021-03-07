@@ -45,7 +45,7 @@ public class ActionInfoRowMapper implements ResultSetExtractor<List<ActionInfo>>
                     media = media.stream().map(x -> x.replace("\"", "").trim()).collect(Collectors.toList());
                 }
             }
-            catch (Exception e){
+            catch (CustomException e){
                 e.printStackTrace();
                 log.error("MEDIA ERROR","Error parsing media");
             }

@@ -55,7 +55,7 @@ public class PropertyValidator {
                     String propertyIdFromSearch = documentContext.read(PROPERTY_JSONPATH);
                     if (propertyIdFromSearch == null)
                         throw new CustomException("INVALID PROPERTY", " The propertyId " + license.getPropertyId() + " does not exist");
-                } catch (Exception e) {
+                } catch (CustomException e) {
                     throw new CustomException("INVALID PROPERTY", " Failed to parse the response from property search on id " + license.getPropertyId());
                 }
             }

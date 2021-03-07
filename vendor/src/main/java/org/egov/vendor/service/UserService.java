@@ -283,7 +283,7 @@ public class UserService {
 		else if (uri.toString().contains(config.getUserCreateEndpoint()))
 			dobFormat = "dd/MM/yyyy";
 		try {
-//			System.out.println("user search url: " + uri + userRequest);
+//			log.info("user search url: " + uri + userRequest);
 			
 			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, userRequest);
 			parseResponse(responseMap, dobFormat);

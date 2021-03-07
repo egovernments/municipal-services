@@ -921,7 +921,7 @@ public class EstimationService {
 				.append(configs.getDemandUpdateEndPoint()).toString();
 		try {
 			restTemplate.postForObject(url, dmReq, Map.class);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Demand updation failed: ", e);
 			throw new CustomException(DEMAND_UPDATE_FAILED, DEMAND_UPDATE_FAILED_MSG);
 		}
@@ -972,7 +972,7 @@ public class EstimationService {
 				.append(configs.getDemandCreateEndPoint()).toString();
 		try {
 			restTemplate.postForObject(url, dmReq, Map.class);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Demand creation failed: ", e);
 			throw new CustomException(DEMAND_CREATE_FAILED, DEMAND_CREATE_FAILED_MSG);
 

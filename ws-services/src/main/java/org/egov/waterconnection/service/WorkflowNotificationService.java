@@ -112,7 +112,7 @@ public class WorkflowNotificationService {
 					}
 			}
 
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Error occured while processing the record from topic : " + topic, ex);
 		}
 	}
@@ -474,7 +474,7 @@ public class WorkflowNotificationService {
     			}else {
         			log.error("Service returned null while fetching user for username - "+mobileNo);
     			}
-    		}catch(Exception e) {
+    		}catch(CustomException e) {
     			log.error("Exception while fetching user for username - "+mobileNo);
     			log.error("Exception trace: ",e);
     		}
@@ -509,7 +509,7 @@ public class WorkflowNotificationService {
 			String tenantId = property.getTenantId().split("\\.")[0];
 			String fileStoreId = getFielStoreIdFromPDFService(waterObject, waterConnectionRequest.getRequestInfo(), tenantId);
 			return getApplicationDownloadLink(tenantId, fileStoreId);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 		}
@@ -541,7 +541,7 @@ public class WorkflowNotificationService {
 				throw new CustomException("EMPTY_FILESTORE_IDS_FROM_PDF_SERVICE", "File Store Id doesn't exist in pdf service");
 			}
 			return fileStoreIds.get(0).toString();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
@@ -567,7 +567,7 @@ public class WorkflowNotificationService {
 			}
 			JSONObject obje = mapper.convertValue(fileStoreIds.get(0), JSONObject.class);
 			return obje.get(urlReplacer).toString();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("PDF file store id response error!!", ex);
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}

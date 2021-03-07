@@ -274,7 +274,7 @@ public class EnrichmentService {
 							.equalsIgnoreCase(WCConstants.ACTION_PAY)) {
 				waterDao.enrichFileStoreIds(waterConnectionRequest);
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.debug(ex.toString());
 		}
 	}

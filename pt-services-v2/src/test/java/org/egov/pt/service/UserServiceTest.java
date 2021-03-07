@@ -1,18 +1,11 @@
 package org.egov.pt.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.SerializationUtils;
-import org.egov.pt.repository.ServiceRequestRepository;
-import org.egov.pt.util.FileUtils;
-import org.egov.pt.web.models.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.test.util.ReflectionTestUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,12 +17,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import org.apache.commons.lang.SerializationUtils;
+import org.egov.pt.repository.ServiceRequestRepository;
+import org.egov.pt.util.FileUtils;
+import org.egov.pt.web.models.CreateUserRequest;
+import org.egov.pt.web.models.PropertyRequest;
+import org.egov.pt.web.models.User;
+import org.egov.pt.web.models.UserDetailResponse;
+import org.egov.pt.web.models.UserSearchRequest;
+import org.egov.tracer.model.CustomException;
+import org.junit.Before;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UserServiceTest {
@@ -62,7 +68,7 @@ public class UserServiceTest {
             File file = new File("src/test/resources/UserDetailResponse.json");
             responseWithUser = mapper.readValue(file, new TypeReference<Map<String, Object>>(){});
         }
-        catch(Exception e){
+        catch(CustomException | IOException e){
             e.printStackTrace();
             fail();
         }
@@ -107,7 +113,7 @@ public class UserServiceTest {
                 }
             }).when(serviceRequestRepositoryMock).fetchResult(any(),anyObject());
         }
-        catch(Exception e){
+        catch(CustomException | IOException e){
             e.printStackTrace();
             fail();
         }
@@ -149,7 +155,7 @@ public class UserServiceTest {
                 }
             }).when(serviceRequestRepositoryMock).fetchResult(any(),anyObject());
         }
-        catch(Exception e){
+        catch(CustomException | IOException e){
             e.printStackTrace();
             fail();
         }
@@ -176,7 +182,7 @@ public class UserServiceTest {
             File file = new File("src/test/resources/UserDetailResponse.json");
             responseWithUser = mapper.readValue(file, new TypeReference<Map<String, Object>>(){});
         }
-        catch(Exception e){
+        catch(CustomException | IOException e){
             e.printStackTrace();
             fail();
         }

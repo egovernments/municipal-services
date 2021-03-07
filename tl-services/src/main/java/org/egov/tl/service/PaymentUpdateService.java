@@ -153,7 +153,7 @@ public class PaymentUpdateService {
 					repository.update(updateRequest,idToIsStateUpdatableMap);
 			}
 		 }
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("KAFKA_PROCESS_ERROR", e);
 		}
 
@@ -171,7 +171,7 @@ public class PaymentUpdateService {
 			valMap.put(businessService, context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].businessService"));
 			valMap.put(consumerCode, context.read("$.Payments.*.paymentDetails[?(@.businessService=='TL')].bill.consumerCode"));
 			valMap.put(tenantId, context.read("$.Payments[0].tenantId"));
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException("PAYMENT ERROR", "Unable to fetch values from payment");
 		}
 		return valMap;

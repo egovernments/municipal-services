@@ -96,7 +96,7 @@ public class MDMSService {
             taxPeriods.put(TLCalculatorConstants.MDMS_STARTDATE,(Long) startDate);
             taxPeriods.put(TLCalculatorConstants.MDMS_ENDDATE,(Long) endDate);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("Error while fetvhing MDMS data", e);
             throw new CustomException("INVALID FINANCIALYEAR", "No data found for the financialYear: "+license.getFinancialYear());
         }
@@ -137,7 +137,7 @@ public class MDMSService {
             List<HashMap> output = JsonPath.read(mdmsData,jsonPath);
             calculationType = output.get(0);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("MDMS ERROR","Failed to get calculationType");
         }
 

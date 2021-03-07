@@ -117,7 +117,7 @@ public class SewerageServicesUtil {
 	public List<Property> getPropertyDetails(Object result) {
 		try {
 			return mapper.convertValue(result, PropertyResponse.class).getProperties();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}

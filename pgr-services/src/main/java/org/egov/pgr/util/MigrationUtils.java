@@ -121,7 +121,7 @@ public class MigrationUtils {
         try{
             res = JsonPath.read(result,MDMS_DATA_JSONPATH);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response");
         }
 

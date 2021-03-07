@@ -6,15 +6,16 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
+import org.egov.wscalculation.producer.WSCalculationProducer;
+import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.web.models.DemandNotificationObj;
 import org.egov.wscalculation.web.models.EmailRequest;
 import org.egov.wscalculation.web.models.EventRequest;
 import org.egov.wscalculation.web.models.NotificationReceiver;
 import org.egov.wscalculation.web.models.SMSRequest;
-import org.egov.wscalculation.producer.WSCalculationProducer;
-import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -92,7 +93,7 @@ public class NotificationUtil {
 		try {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
 			message = ((ArrayList<String>) messageObj).get(0);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;

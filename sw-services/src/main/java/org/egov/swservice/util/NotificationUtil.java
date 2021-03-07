@@ -7,10 +7,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
-import org.egov.swservice.web.models.EventRequest;
-import org.egov.swservice.web.models.SMSRequest;
 import org.egov.swservice.producer.SewarageConnectionProducer;
 import org.egov.swservice.repository.ServiceRequestRepository;
+import org.egov.swservice.web.models.EventRequest;
+import org.egov.swservice.web.models.SMSRequest;
+import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -87,7 +88,7 @@ public class NotificationUtil {
 		try {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
 			return ((ArrayList<String>) messageObj).get(0);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return null;

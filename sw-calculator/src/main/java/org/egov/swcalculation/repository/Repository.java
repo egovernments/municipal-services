@@ -8,11 +8,11 @@ import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
-
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @org.springframework.stereotype.Repository
 @Slf4j
@@ -27,7 +27,7 @@ public class Repository {
 	/**
 	 * Fetches results from external services through rest call.
 	 *
-	 * @param uri - URI to send the request
+	 * @param uri     - URI to send the request
 	 * @param request - Request Object
 	 *
 	 * @return Object
@@ -37,7 +37,6 @@ public class Repository {
 		Object response = null;
 		log.debug("URI: " + uri.toString());
 		try {
-			log.debug(mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (ResourceAccessException e) {
 			Map<String, String> map = new HashMap<>();
@@ -46,7 +45,7 @@ public class Repository {
 		} catch (HttpClientErrorException e) {
 			log.info("the error is : " + e.getResponseBodyAsString());
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while fetching from searcher: ", e);
 		}
 		return response;

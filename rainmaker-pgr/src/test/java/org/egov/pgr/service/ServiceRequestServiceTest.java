@@ -181,7 +181,7 @@ public class ServiceRequestServiceTest {
 		Mockito.when(pGRUtils.prepareSearchRequest(Matchers.any(StringBuilder.class), 
 				Matchers.any(ServiceReqSearchCriteria.class), Matchers.any(RequestInfo.class))).thenReturn(searcherRequest);
 		Mockito.when(serviceRequestRepository.fetchResult(Matchers.any(StringBuilder.class), Matchers.any(SearcherRequest.class)))
-		.thenThrow(Exception.class);
+		.thenThrow(CustomException.class);
 		
 		service.getServiceRequests(requestInfo, serviceReqSearchCriteria);
 				
@@ -237,7 +237,7 @@ public class ServiceRequestServiceTest {
 		SearcherRequest searcherRequest = new SearcherRequest();
 		Mockito.when(pGRUtils.prepareSearchRequest(null, serviceReqSearchCriteria, requestInfo)).thenReturn(searcherRequest);
 		Mockito.when(serviceRequestRepository.fetchResult(Matchers.any(StringBuilder.class), Matchers.any(SearcherRequest.class)))
-		.thenReturn(Exception.class);
+		.thenReturn(CustomException.class);
 		
 		service.getCount(requestInfo, serviceReqSearchCriteria);
 		
@@ -299,7 +299,7 @@ public class ServiceRequestServiceTest {
 		Mockito.when(pGRUtils.prepareHistoryRequest(Matchers.any(StringBuilder.class), 
 				Matchers.any(ServiceReqSearchCriteria.class), Matchers.any(RequestInfo.class))).thenReturn(searcherRequest);
 		Mockito.when(serviceRequestRepository.fetchResult(Matchers.any(StringBuilder.class), Matchers.any(SearcherRequest.class)))
-		.thenThrow(Exception.class);
+		.thenThrow(CustomException.class);
 		
 		service.getServiceRequests(requestInfo, serviceReqSearchCriteria);
 				

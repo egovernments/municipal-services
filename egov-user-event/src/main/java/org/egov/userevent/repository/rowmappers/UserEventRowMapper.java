@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.userevent.model.AuditDetails;
 import org.egov.userevent.model.enums.Source;
 import org.egov.userevent.model.enums.Status;
@@ -73,7 +74,7 @@ public class UserEventRowMapper implements ResultSetExtractor <List<Event>> {
 					}
 				}
 				
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				log.error("Error while adding jsonb fields: ", e);
 				continue;
 			}

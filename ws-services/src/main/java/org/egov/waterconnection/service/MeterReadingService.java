@@ -7,14 +7,15 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
+import org.egov.waterconnection.repository.ServiceRequestRepository;
+import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.web.models.MeterConnectionRequest;
 import org.egov.waterconnection.web.models.MeterReading;
 import org.egov.waterconnection.web.models.MeterReading.MeterStatusEnum;
 import org.egov.waterconnection.web.models.MeterReadingResponse;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
-import org.egov.waterconnection.repository.ServiceRequestRepository;
-import org.egov.waterconnection.util.WaterServicesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -60,12 +61,11 @@ public class MeterReadingService {
 					Object response = serviceRequestRepository.fetchResult(waterServiceUtil.getMeterReadingCreateURL(),
 							req);
 					MeterReadingResponse readingResponse = mapper.convertValue(response, MeterReadingResponse.class);
-					log.info(mapper.writeValueAsString(readingResponse));
 				}
 			} else {
 				log.info("Intial Meter Reading Not Present!!");
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Error while creating meter reading!!!", ex);
 		}
 	}

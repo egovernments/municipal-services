@@ -115,7 +115,7 @@ public class WorkflowIntegrator {
 				throw new CustomException("EG_SW_WF_ERROR_KEY_NOT_FOUND", builder.toString());
 			}
 			throw new CustomException("EG_WF_ERROR", errorList.toString());
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException("EG_WF_ERROR",
 					" Exception occurred while integrating with workflow : " + e.getMessage());
 		}

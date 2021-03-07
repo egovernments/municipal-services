@@ -201,7 +201,7 @@ public class ReportUtils {
 			if(CollectionUtils.isEmpty(departments)) {
 				throw new CustomException(ErrorConstants.INVALID_DEPARTMENT_TENANT_KEY, ErrorConstants.INVALID_DEPARTMENT_TENANT_MSG);
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception: " + e);
 			throw new CustomException(ErrorConstants.INVALID_DEPARTMENT_TENANT_KEY,
 					ErrorConstants.INVALID_DEPARTMENT_TENANT_MSG);

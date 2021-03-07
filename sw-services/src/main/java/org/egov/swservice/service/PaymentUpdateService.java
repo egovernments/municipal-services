@@ -138,7 +138,7 @@ public class PaymentUpdateService {
 				}
 			}
 			sendNotificationForPayment(paymentRequest);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Failed to process Payment Update message.", ex);
 		}
 	}
@@ -214,7 +214,7 @@ public class PaymentUpdateService {
 					sendPaymentNotification(sewerageConnectionRequest, paymentDetail);
 				}
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
 	}

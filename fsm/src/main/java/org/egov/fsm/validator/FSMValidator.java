@@ -176,7 +176,7 @@ public class FSMValidator {
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on limit is not allowed");
 		
 		if (criteria.getApplicationNos() != null && !allowedParams.contains("applicationNos")) {
-			System.out.println("app..... "+criteria.getApplicationNos());
+			log.info("app..... "+criteria.getApplicationNos());
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on applicationNo is not allowed");
 			}
 		if (criteria.getFromDate() != null && !allowedParams.contains("fromDate") && 

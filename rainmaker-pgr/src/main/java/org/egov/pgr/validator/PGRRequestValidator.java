@@ -222,7 +222,7 @@ public class PGRRequestValidator {
 							List<Long> employeeIds = new ArrayList<>();
 							try {
 								employeeIds.add(Long.valueOf(info.getAssignee()));
-							}catch(Exception e) {
+							}catch(CustomException e) {
 								errorMsgForActionAssign.add(services.get(i).getServiceRequestId());
 							}
 							Map<Long, String> result = reportService.getEmployeeDetails(request, employeeIds);
@@ -355,7 +355,7 @@ public class PGRRequestValidator {
 				log.info("serviceCodes: "+serviceCodes);
 				if(CollectionUtils.isEmpty(serviceCodes))
 					errorMap.put(ErrorConstants.INVALID_ACTION_FOR_DGRO_CODE, ErrorConstants.INVALID_ACTION_FOR_DGRO_MSG);
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				errorMap.put(ErrorConstants.INVALID_ACTION_FOR_DGRO_CODE, ErrorConstants.INVALID_ACTION_FOR_DGRO_MSG);
 			}
 			for(Service service: serviceRequest.getServices()) {

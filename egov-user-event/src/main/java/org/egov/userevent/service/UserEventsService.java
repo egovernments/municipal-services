@@ -52,8 +52,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.request.Role;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.userevent.config.PropertiesManager;
 import org.egov.userevent.model.AuditDetails;
 import org.egov.userevent.model.LATWrapper;
@@ -346,7 +346,7 @@ public class UserEventsService {
 			try {
 				log.info("Updating events...");
 				updateEvents(request);
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				log.error("There was an error while lazy-updating the events: ", e);
 			}
 		}

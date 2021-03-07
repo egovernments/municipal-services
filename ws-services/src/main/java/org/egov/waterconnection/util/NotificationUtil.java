@@ -6,12 +6,13 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
-import org.egov.waterconnection.web.models.EventRequest;
-import org.egov.waterconnection.web.models.SMSRequest;
 import org.egov.waterconnection.producer.WaterConnectionProducer;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
+import org.egov.waterconnection.web.models.EventRequest;
+import org.egov.waterconnection.web.models.SMSRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -90,7 +91,7 @@ public class NotificationUtil {
 			if(messageObj != null && messageObj.size() > 0) {
 				message = messageObj.get(0);
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;

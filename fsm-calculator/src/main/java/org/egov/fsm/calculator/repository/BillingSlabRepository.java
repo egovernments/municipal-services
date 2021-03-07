@@ -48,7 +48,7 @@ public class BillingSlabRepository {
 		Integer count = null;
 		try {
 			count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab");
 		}
 		return count;
@@ -58,7 +58,7 @@ public class BillingSlabRepository {
 		BigDecimal billingSlabPrice = null;
 		try {
 			billingSlabPrice = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(),  BigDecimal.class);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			if(!e.getMessage().equalsIgnoreCase("Incorrect result size: expected 1, actual 0")) {
 				throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Price");
 			}
@@ -72,7 +72,7 @@ public class BillingSlabRepository {
 		String query = queryBuilder.getBillingSlabSearchQuery(criteria, preparedStmtList);
 		try {
 			billingSlabList = jdbcTemplate.query(query, preparedStmtList.toArray(), mapper);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException(CalculatorConstants.INVALID_BILLING_SLAB_ERROR,"Invalid Billing Slab Data");
 		}
 		return billingSlabList;

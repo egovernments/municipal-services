@@ -10,7 +10,11 @@ import org.egov.pt.calculator.repository.PTCalculatorDBRepository;
 import org.egov.pt.calculator.util.BillingSlabUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.util.ResponseInfoFactory;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.MutationBillingSlab;
+import org.egov.pt.calculator.web.models.MutationBillingSlabReq;
+import org.egov.pt.calculator.web.models.MutationBillingSlabRes;
+import org.egov.pt.calculator.web.models.MutationBillingSlabSearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -72,7 +76,7 @@ public class MutationBillingSlabService {
         List<MutationBillingSlab> billingSlabs = null;
         try {
             billingSlabs = dbRepository.searchMutationBillingSlab(billingSlabSearcCriteria);
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("Exception while fetching billing slabs from db: " + e);
             billingSlabs = new ArrayList<>();
         }

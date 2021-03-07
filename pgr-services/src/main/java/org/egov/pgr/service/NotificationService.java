@@ -89,7 +89,7 @@ public class NotificationService {
 
 
 
-        } catch (Exception ex) {
+        } catch (CustomException ex) {
             log.error("Error occured while processing the record from topic : " + topic, ex);
         }
     }
@@ -207,7 +207,7 @@ public class NotificationService {
         try{
             res = JsonPath.read(mdmsData,jsonPath);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response");
         }
 
@@ -240,7 +240,7 @@ public class NotificationService {
             mdmsDepartmentList = JsonPath.read(mdmsData,jsonPath);
             hrmsDepartmentList = JsonPath.read(response, HRMS_DEPARTMENT_JSONPATH);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response for department");
         }
 
@@ -259,7 +259,7 @@ public class NotificationService {
             designamtion = JsonPath.read(response, designationJsonPath);
             employeeName = JsonPath.read(response, HRMS_EMP_NAME_JSONPATH);
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response for department");
         }
 
@@ -328,7 +328,7 @@ public class NotificationService {
             }else {
                 log.error("Service returned null while fetching user for username - "+mobileNumber);
             }
-        }catch(Exception e) {
+        }catch(CustomException e) {
             log.error("Exception while fetching user for username - "+mobileNumber);
             log.error("Exception trace: ",e);
         }

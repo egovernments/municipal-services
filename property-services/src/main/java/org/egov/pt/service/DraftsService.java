@@ -78,7 +78,7 @@ public class DraftsService {
 //
 //		try {
 //			drafts = draftRepository.getDrafts(draftSearchCriteria);
-//		}catch(Exception e) {
+//		}catch(CustomException e) {
 //			log.info("Exception while fetching drafts: ",e);
 //			throw new CustomException("FETCH_DRAFTS_FAILED", "Unable to fetch drafts");
 //		}
@@ -92,7 +92,7 @@ public class DraftsService {
 //		List<Draft> drafts = new ArrayList<>();
 //		try {
 //			drafts = draftRepository.getDrafts(draftSearchCriteria);
-//		}catch(Exception e) {
+//		}catch(CustomException e) {
 //			log.info("Exception while fetching drafts: ",e);
 //			throw new CustomException("FETCH_DRAFTS_FAILED", "Unable to fetch drafts");
 //		}

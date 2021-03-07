@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
@@ -39,7 +40,7 @@ public class DiffService {
 						|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
 					editNotificationService.sendEditNotification(request);
 				}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Edit Notification Error!!", ex);
 		}
 	}

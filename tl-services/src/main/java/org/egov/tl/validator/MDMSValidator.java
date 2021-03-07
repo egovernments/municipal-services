@@ -177,7 +177,7 @@ public class MDMSValidator {
         modulepaths.forEach( modulepath -> {
             try {
                 mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-            } catch (Exception e) {
+            } catch (CustomException e) {
                 log.error("Error while fetvhing MDMS data", e);
                 throw new CustomException(TLConstants.INVALID_TENANT_ID_MDMS_KEY, TLConstants.INVALID_TENANT_ID_MDMS_MSG);
             }
@@ -201,7 +201,7 @@ public class MDMSValidator {
         modulepaths.forEach( modulepath -> {
             try {
                 mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-            } catch (Exception e) {
+            } catch (CustomException e) {
                 log.error("Error while fetvhing MDMS data", e);
                 throw new CustomException(TLConstants.INVALID_TENANT_ID_MDMS_KEY, TLConstants.INVALID_TENANT_ID_MDMS_MSG);
             }

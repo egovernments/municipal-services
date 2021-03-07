@@ -40,7 +40,7 @@ public class MeterReadingUtil {
 		try {
 			MeterReadingResponse meterReadingResponse = mapper.convertValue(result, MeterReadingResponse.class);
 			return meterReadingResponse.getMeterReadings();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}

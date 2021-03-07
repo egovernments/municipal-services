@@ -2,8 +2,9 @@ package org.egov.waterconnection.consumer;
 
 import java.util.HashMap;
 
-import org.egov.waterconnection.web.models.WaterConnectionRequest;
+import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.service.PdfFileStoreService;
+import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -35,7 +36,7 @@ public class FileStoreIdsConsumer {
 		try {
 			WaterConnectionRequest waterConnectionRequest = mapper.convertValue(record, WaterConnectionRequest.class);
 			pdfService.process(waterConnectionRequest, topic);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
 					.append("on topic: ").append(topic);
 			log.error(builder.toString(), ex);

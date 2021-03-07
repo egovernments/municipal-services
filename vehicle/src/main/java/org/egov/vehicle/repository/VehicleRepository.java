@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.vehicle.config.VehicleConfiguration;
 import org.egov.vehicle.producer.VehicleProducer;
 import org.egov.vehicle.repository.querybuilder.QueryBuilder;
@@ -28,7 +29,7 @@ public class VehicleRepository {
         private QueryBuilder queryBuilder;
         
         @Autowired
-    		private JdbcTemplate jdbcTemplate;
+    	private JdbcTemplate jdbcTemplate;
         
         @Autowired
         private RowMapper rowMapper;
@@ -52,7 +53,7 @@ public class VehicleRepository {
 			Integer count = null;
 			try {
 				count = jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				throw e;
 			}
 			return count;

@@ -167,7 +167,7 @@ public class TranslationService {
 
                 if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON_KEY)!=null)
                     propertyDetail.put("adhocPenaltyReason", assessment.getAdditionalDetails().get(ADHOC_PENALTY_REASON_KEY).asText());
-            } catch (Exception e){
+            } catch (CustomException e){
                 throw new CustomException("PARSING_ERROR","Failed to parse additional details in translation");
             }
 

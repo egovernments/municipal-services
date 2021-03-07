@@ -31,7 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AssessmentValidator {
 
 	@Autowired
@@ -263,8 +266,8 @@ public class AssessmentValidator {
 			});
 		}
 
-		System.out.println("activeUnitIdsInProperty--->"+activeUnitIdsInProperty);
-		System.out.println("activeUnitIdsInAssessment--->"+activeUnitIdsInAssessment);
+		log.info("activeUnitIdsInProperty--->"+activeUnitIdsInProperty);
+		log.info("activeUnitIdsInAssessment--->"+activeUnitIdsInAssessment);
 
 		if(!CollectionUtils.isEmpty(assessment.getUnitUsageList()) && !listEqualsIgnoreOrder(activeUnitIdsInAssessment, activeUnitIdsInProperty))
 			throw new CustomException("INVALID_UNITIDS","The unitIds are not matching in property and assessment");

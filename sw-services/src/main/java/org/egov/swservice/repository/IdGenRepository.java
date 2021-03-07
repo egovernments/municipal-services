@@ -62,7 +62,7 @@ public class IdGenRepository {
 		} catch (HttpClientErrorException e) {
 			log.error("Unable to generate sewerage connection ID", e);
 			throw new ServiceCallException("Id gen service threw an Exception");
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			Map<String, String> map = new HashMap<>();
 			map.put(e.getCause().getClass().getName(), e.getMessage());
 			throw new CustomException(map);

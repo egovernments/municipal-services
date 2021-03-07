@@ -131,7 +131,7 @@ public class PaymentUpdateService {
 							.build();
 					try {
 						log.info("WaterConnection Request " + mapper.writeValueAsString(waterConnectionRequest));
-					} catch (Exception ex) {
+					} catch (JsonProcessingException ex) {
 						log.error("Temp Catch Excption:", ex);
 					}
 
@@ -143,7 +143,7 @@ public class PaymentUpdateService {
 				}
 			}
 			sendNotificationForPayment(paymentRequest);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
 	}
@@ -221,7 +221,7 @@ public class PaymentUpdateService {
 					sendPaymentNotification(waterConnectionRequest, paymentDetail);
 				}
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Failed to process payment topic message. Exception: ", ex);
 		}
 	}

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.egov.pgr.contract.ReportRequest;
 import org.egov.pgr.utils.ReportConstants;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -39,7 +40,7 @@ public class ReportRepository {
 		}
 		try {
 			result = jdbcTemplate.queryForList(query);
-		}catch(Exception e) {
+		}catch(CustomException e) {
 			log.error("Exception while executing query: "+e);
 		}
 		log.info("dbResponse: "+result);
@@ -59,7 +60,7 @@ public class ReportRepository {
 		for(String query: queries) {
 			try {
 				   jdbcTemplate.execute(query);
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				log.error("Query: "+query);
 				log.error("Execution failed: "+e);
 			}

@@ -145,7 +145,7 @@ public class PaymentNotificationService {
 						}
 					}
 				}
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				log.error("Exception: ", e);
 				throw new CustomException("LOCALIZATION ERROR", "Unable to get message from localization");
 			}
@@ -256,7 +256,7 @@ public class PaymentNotificationService {
 
 			module = documentContext.read("$.Receipt[0].Bill[0].billDetails[0].businessService");
 			valMap.put("module", module);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException("PARSING ERROR", "Failed to fetch values from the Receipt Object");
 		}
 
@@ -346,7 +346,7 @@ public class PaymentNotificationService {
 			// module =
 			// documentContext.read("$.Transaction.taxAndPayments[0].businessService");
 			// valMap.put("module",module);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Transaction Object Parsing: ", e);
 			throw new CustomException("PARSING ERROR", "Failed to fetch values from the Transaction Object");
 		}
@@ -586,7 +586,7 @@ public class PaymentNotificationService {
 				log.info("Shortened URL generation failed.");
 				shortenedURL = longURL;
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Shortened URL generation failed: ", e);
 			shortenedURL = longURL;
 		}

@@ -263,7 +263,7 @@ public class EnrichmentService {
 							.equalsIgnoreCase(SWConstants.ACTION_PAY)) {
 				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.debug(ex.toString());
 		}
 	}

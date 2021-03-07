@@ -29,8 +29,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Controller
 @RequestMapping("/property")
+@Slf4j
 public class PropertyController {
 
     @Autowired
@@ -93,7 +96,7 @@ public class PropertyController {
 
         long endtime = System.nanoTime();
         long elapsetime = endtime - startTime;
-        System.out.println("Elapsed time--->"+elapsetime);
+        log.info("Elapsed time--->"+elapsetime);
 
         return new ResponseEntity<>(resultMap, HttpStatus.OK);
     }

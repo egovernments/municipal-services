@@ -30,6 +30,7 @@ import org.egov.pgr.service.NotificationService;
 import org.egov.pgr.utils.PGRConstants;
 import org.egov.pgr.utils.PGRUtils;
 import org.egov.pgr.utils.WorkFlowConfigs;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -193,7 +194,7 @@ public class PGRNotificationConsumer {
         if (StringUtils.isEmpty(actionInfo.getAssignee()) && !actionInfo.getAction().equals(WorkFlowConfigs.ACTION_OPEN)) {
             try {
                 actionInfo.setAssignee(notificationService.getCurrentAssigneeForTheServiceRequest(serviceReq, requestInfo));
-            } catch (Exception e) {
+            } catch (CustomException e) {
                 log.error("Exception while explicitly setting assignee!");
             }
         }
@@ -239,7 +240,7 @@ public class PGRNotificationConsumer {
         if (StringUtils.isEmpty(actionInfo.getAssignee()) && !actionInfo.getAction().equals(WorkFlowConfigs.ACTION_OPEN)) {
             try {
                 actionInfo.setAssignee(notificationService.getCurrentAssigneeForTheServiceRequest(serviceReq, requestInfo));
-            } catch (Exception e) {
+            } catch (CustomException e) {
                 log.error("Exception while explicitly setting assignee!");
             }
         }
@@ -264,7 +265,7 @@ public class PGRNotificationConsumer {
             locale = requestInfo.getMsgId().split("[|]")[1]; // Conventionally locale is sent in the first index of msgid split by |
             if (StringUtils.isEmpty(locale))
                 locale = fallbackLocale;
-        } catch (Exception e) {
+        } catch (CustomException e) {
             locale = fallbackLocale;
         }
         if (null == NotificationService.localizedMessageMap.get(locale + "|" + tenantId)) // static map that saves code-message pair against locale | tenantId.

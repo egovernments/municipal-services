@@ -2,8 +2,9 @@ package org.egov.swservice.consumer;
 
 import java.util.HashMap;
 
-import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.service.PdfFileStoreService;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -36,7 +37,7 @@ public class FileStoreIdsConsumer {
 			SewerageConnectionRequest sewerageConnectionRequest = mapper.convertValue(record,
 					SewerageConnectionRequest.class);
 			pdfService.process(sewerageConnectionRequest, topic);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
 					.append("on topic: ").append(topic);
 			log.error(builder.toString(), ex);

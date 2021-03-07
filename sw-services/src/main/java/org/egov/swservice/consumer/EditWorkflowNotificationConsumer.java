@@ -2,10 +2,11 @@ package org.egov.swservice.consumer;
 
 import java.util.HashMap;
 
-import org.egov.swservice.web.models.SewerageConnection;
-import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.service.DiffService;
 import org.egov.swservice.service.SewerageServiceImpl;
+import org.egov.swservice.web.models.SewerageConnection;
+import org.egov.swservice.web.models.SewerageConnectionRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -44,7 +45,7 @@ public class EditWorkflowNotificationConsumer {
 					sewerageConnectionRequest.getSewerageConnection().getId(),
 					sewerageConnectionRequest.getRequestInfo());
 			diffService.checkDifferenceAndSendEditNotification(sewerageConnectionRequest, searchResult);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			StringBuilder builder = new StringBuilder("Error while listening to value: ").append(record)
 					.append("on topic: ").append(topic);
 			log.error(builder.toString(), ex);

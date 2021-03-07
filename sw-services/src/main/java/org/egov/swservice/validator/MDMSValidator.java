@@ -65,7 +65,7 @@ public class MDMSValidator {
 		try {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonPath);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException("INVALID_CONNECTION_TYPE", SWConstants.INVALID_CONNECTION_TYPE);
 		}

@@ -149,7 +149,7 @@ public class PaymentNotificationService {
                 }
             }
         }
-        catch (Exception e){
+        catch (CustomException e){
 			log.error("NOTIFICATION_ERROR", e);
         }
     }
@@ -248,7 +248,7 @@ public class PaymentNotificationService {
             valMap.put(receiptNumberKey,receiptNumberList.isEmpty()?null:receiptNumberList.get(0));
             valMap.put(payerNameKey,context.read("$.Payment.payerName"));
         }
-        catch (Exception e){
+        catch (CustomException e){
             throw new CustomException("RECEIPT ERROR","Unable to fetch values from receipt");
         }
         return valMap;

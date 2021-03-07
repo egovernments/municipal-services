@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -120,14 +121,13 @@ public class PaymentNotificationService {
 					}
 					List<SMSRequest> smsRequests = getSmsRequest(mappedRecord, sewerageConnectionRequest, topic, property);
 					if (smsRequests != null && !CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
 						util.sendSMS(smsRequests);
 					}
 				}
 			}
 		}
 
-		catch (Exception ex) {
+		catch (CustomException ex) {
 			log.error("Exception while processing record: ", ex);
 		}
 	}
@@ -264,7 +264,7 @@ public class PaymentNotificationService {
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
 			mappedRecord.put(dueDate,
 					getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
-		} catch (Exception ex) {
+		} catch (CustomException | JsonProcessingException ex) {
 			log.error("Unable to fetch values from bill ",ex);
 			throw new CustomException("INVALID_BILL_DETAILS", "Unable to fetch values from bill");
 		}
@@ -330,7 +330,7 @@ public class PaymentNotificationService {
 				} else {
 					log.error("Service returned null while fetching user ");
 				}
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				log.error("Exception while fetching user");
 				log.error("Exception trace: ", e);
 			}

@@ -147,7 +147,7 @@ public class DiffService {
         try {
             String firstSplit = affectedObject.substring(affectedObject.lastIndexOf('.') + 1);
             className = firstSplit.split("@")[0];
-        } catch (Exception e) {
+        } catch (CustomException e) {
             throw new CustomException("NOTIFICATION ERROR", "Failed to fetch notification");
         }
         return className;

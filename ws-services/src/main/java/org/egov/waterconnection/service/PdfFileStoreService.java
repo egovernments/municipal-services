@@ -130,7 +130,7 @@ public class PdfFileStoreService {
 			waterObject.put(propertyKey, property);
 			waterObject.put(service, "WATER");
 			return getFileStoreIdFromPDFService(waterObject, waterConnectionRequest.getRequestInfo(), tenantId, applicationKey);
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Calculation response error!!", ex);
 			throw new CustomException("WATER_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 		}
@@ -166,7 +166,7 @@ public class PdfFileStoreService {
 						"NO file store id found from pdf service");
 			}
 			return fileStoreIds.get(0).toString();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			throw new CustomException("WATER_FILESTORE_PDF_EXCEPTION", "PDF response can not parsed!!!");
 		}
 	}

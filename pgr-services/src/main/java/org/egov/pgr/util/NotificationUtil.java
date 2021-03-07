@@ -1,7 +1,12 @@
 package org.egov.pgr.util;
 
-import com.jayway.jsonpath.JsonPath;
-import lombok.extern.slf4j.Slf4j;
+import static org.egov.pgr.util.PGRConstants.NOTIFICATION_LOCALE;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pgr.config.PGRConfiguration;
@@ -9,14 +14,16 @@ import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.ServiceRequestRepository;
 import org.egov.pgr.web.models.Notification.EventRequest;
 import org.egov.pgr.web.models.Notification.SMSRequest;
+import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
-import static org.egov.pgr.util.PGRConstants.*;
+import com.jayway.jsonpath.JsonPath;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -68,7 +75,7 @@ public class NotificationUtil {
             if(messageObj != null && messageObj.size() > 0) {
                 message = messageObj.get(0);
             }
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.warn("Fetching from localization failed", e);
         }
         return message;
@@ -123,7 +130,7 @@ public class NotificationUtil {
             if(messageObj != null && messageObj.size() > 0) {
                 message = messageObj.get(0);
             }
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.warn("Fetching from localization for placeholder failed", e);
         }
         return message;

@@ -47,21 +47,16 @@ public class MDMSService {
 		uri.append(props.getMdmsHost()).append(props.getMdmsSearchEndpoint());
 		Optional<Object> response = repository.fetchResult(uri, getRequestForEvents(requestInfo, tenantId));
 		List<String> codes = new ArrayList<>();
-		try {
-			if(response.isPresent()) {
-				codes = JsonPath.read(response.get(), UserEventsConstants.MEN_MDMS_EVENTMASTER_CODES_JSONPATH);
-				eventMasters.put(UserEventsConstants.MEN_MDMS_EVENTMASTER_CODE, codes);
-				codes = JsonPath.read(response.get(), UserEventsConstants.MEN_MDMS_EVENTCATEGORY_MASTER_CODES_JSONPATH);
-				eventMasters.put(UserEventsConstants.MEN_MDMS_EVENTCATEGORY_MASTER_CODE, codes);
-			}
-			else
-				throw new Exception();
-		}catch(Exception e) {
+		if (response.isPresent()) {
+			codes = JsonPath.read(response.get(), UserEventsConstants.MEN_MDMS_EVENTMASTER_CODES_JSONPATH);
+			eventMasters.put(UserEventsConstants.MEN_MDMS_EVENTMASTER_CODE, codes);
+			codes = JsonPath.read(response.get(), UserEventsConstants.MEN_MDMS_EVENTCATEGORY_MASTER_CODES_JSONPATH);
+			eventMasters.put(UserEventsConstants.MEN_MDMS_EVENTCATEGORY_MASTER_CODE, codes);
+		} else
 			throw new CustomException(ErrorConstants.MEN_ERROR_FROM_MDMS_CODE, ErrorConstants.MEN_ERROR_FROM_MDMS_MSG);
-		}
 		return eventMasters;
 	}
-	
+
 	/**
 	 * Method to build the body for MDMS request
 	 * 

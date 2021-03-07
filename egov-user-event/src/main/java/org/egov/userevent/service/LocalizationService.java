@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.egov.userevent.config.PropertiesManager;
 import org.egov.userevent.repository.RestCallRepository;
 import org.egov.userevent.utils.UserEventsConstants;
@@ -50,7 +51,7 @@ public class LocalizationService {
 				codes = JsonPath.read(response.get(), UserEventsConstants.LOCALIZATION_CODES_JSONPATH);
 				messages = JsonPath.read(response.get(), UserEventsConstants.LOCALIZATION_MSGS_JSONPATH);
 			}
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while fetching from localization: " + e);
 		}
 		if (!CollectionUtils.isEmpty(codes) && !CollectionUtils.isEmpty(messages)) {

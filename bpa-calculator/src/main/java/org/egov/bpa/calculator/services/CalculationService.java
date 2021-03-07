@@ -2,7 +2,6 @@ package org.egov.bpa.calculator.services;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -192,7 +191,7 @@ public class CalculationService {
 			DocumentContext calcContext = JsonPath.using(Configuration.defaultConfiguration()).parse(jsonData);
 			JSONArray parameterPaths = calcContext.read("calsiLogic.*.paramPath");
 			JSONArray tLimit = calcContext.read("calsiLogic.*.tolerancelimit");
-			System.out.println("tolerance limit in: " + tLimit.get(0));
+			log.info("tolerance limit in: " + tLimit.get(0));
 			DocumentContext edcrContext = null;
 			if (!CollectionUtils.isEmpty(permitNumber)) {
 				BPA permitBpa = bpaService.getBuildingPlan(requestInfo, bpa.getTenantId(), null,
@@ -208,11 +207,10 @@ public class CalculationService {
 				Double ocTotalBuitUpArea = context.read(parameterPaths.get(i).toString());
 				Double bpaTotalBuitUpArea = edcrContext.read(parameterPaths.get(i).toString());
 				Double diffInBuildArea = ocTotalBuitUpArea - bpaTotalBuitUpArea;
-				System.out.println("difference in area: " + diffInBuildArea);
+				log.info("difference in area: " + diffInBuildArea);
 				Double limit = Double.valueOf(tLimit.get(i).toString());
 				if (diffInBuildArea > limit) {
 					JSONArray data = calcContext.read("calsiLogic.*.deviation");
-					System.out.println(data.get(0));
 					JSONArray data1 = (JSONArray) data.get(0);
 					for (int j = 0; j < data1.size(); j++) {
 						LinkedHashMap diff = (LinkedHashMap) data1.get(j);

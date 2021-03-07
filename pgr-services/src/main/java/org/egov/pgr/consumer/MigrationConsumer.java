@@ -1,16 +1,19 @@
 package org.egov.pgr.consumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+
 import org.egov.pgr.service.MigrationService;
 import org.egov.pgr.web.models.pgrV1.ServiceResponse;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -32,7 +35,7 @@ public class MigrationConsumer {
             ServiceResponse serviceResponse = mapper.convertValue(record,ServiceResponse.class);
             migrationService.migrate(serviceResponse);
         }
-        catch (Exception e){
+        catch (CustomException e){
             log.error("Error occured while processing the record from topic : " + topic, e);
         }
 

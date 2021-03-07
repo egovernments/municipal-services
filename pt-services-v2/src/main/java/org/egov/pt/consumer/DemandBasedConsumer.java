@@ -1,21 +1,34 @@
 package org.egov.pt.consumer;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.service.CalculationService;
 import org.egov.pt.service.PropertyService;
-import org.egov.pt.web.models.*;
+import org.egov.pt.web.models.DemandBasedAssessment;
+import org.egov.pt.web.models.DemandBasedAssessmentRequest;
+import org.egov.pt.web.models.Property;
+import org.egov.pt.web.models.PropertyCriteria;
+import org.egov.pt.web.models.PropertyDetail;
+import org.egov.pt.web.models.PropertyRequest;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -127,7 +140,7 @@ public class DemandBasedConsumer {
 				consumercodes.add(property.getPropertyId());
 			calcService.getBills(consumercodes, demandBasedAssessments.get(0).getTenantId(), requestInfo);
 
-        } catch (Exception e) {
+        } catch (CustomException e) {
             DemandBasedAssessmentRequest request = DemandBasedAssessmentRequest.builder()
                     .requestInfo(requestInfo).build();
 

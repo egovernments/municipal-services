@@ -239,7 +239,7 @@ public class UserEventsValidator {
 				event.getRecepient().getToUsers().forEach(user -> {
 					try {
 						UUID.fromString(user);
-					} catch (Exception e) {
+					} catch (CustomException e) {
 						errorMap.put(ErrorConstants.MEN_INVALID_TOUSER_CODE, ErrorConstants.MEN_INVALID_TOUSER_MSG);
 					}
 				});

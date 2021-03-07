@@ -4,9 +4,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.egov.swservice.util.SWConstants;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
-import org.egov.swservice.util.SWConstants;
+import org.egov.tracer.model.CustomException;
 import org.javers.core.JaversBuilder;
 import org.javers.core.diff.Diff;
 import org.javers.core.diff.changetype.NewObject;
@@ -41,7 +42,7 @@ public class DiffService {
 					|| !CollectionUtils.isEmpty(getObjectsRemoved(updateConnection, searchResult))) {
 				editNotificationService.sendEditNotification(request);
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Edit Notification Error!!", ex);
 		}
 	}

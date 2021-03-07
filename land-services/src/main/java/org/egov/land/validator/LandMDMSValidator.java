@@ -55,7 +55,7 @@ public class LandMDMSValidator {
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
-			} catch (Exception e) {
+			} catch (CustomException e) {
 				throw new CustomException(LandConstants.INVALID_TENANT_ID_MDMS_KEY,
 						LandConstants.INVALID_TENANT_ID_MDMS_MSG);
 			}

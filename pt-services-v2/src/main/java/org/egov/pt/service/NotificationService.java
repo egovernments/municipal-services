@@ -53,7 +53,7 @@ public class NotificationService {
                 LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, request.getRequestInfo());
                 String jsonString = new JSONObject(responseMap).toString();
                 messageObj = JsonPath.parse(jsonString).read(path);
-            }catch(Exception e) {
+            }catch(CustomException e) {
             	throw new CustomException("LOCALIZATION ERROR","Unable to get message from localization");
             }
             String message = ((ArrayList<String>)messageObj).get(0);
@@ -80,7 +80,7 @@ public class NotificationService {
             }
 
         }
-        catch(Exception e){
+        catch(CustomException e){
         	log.error("There was an error while processing notifications: ",e);
         	throw new CustomException("ERROR_PROCESSING_NOTIFS","There was an error while processing notifications.");
         }
@@ -314,7 +314,7 @@ public class NotificationService {
     			}else {
         			log.error("Service returned null while fetching user for username - "+mobileNo);
     			}
-    		}catch(Exception e) {
+    		}catch(CustomException e) {
     			log.error("Exception while fetching user for username - "+mobileNo);
     			log.error("Exception trace: ",e);
     			continue;

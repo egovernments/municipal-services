@@ -1,8 +1,9 @@
 package org.egov.pt.repository.rowmapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import org.egov.pt.web.models.AuditDetails;
 import org.egov.pt.web.models.Draft;
 import org.egov.tracer.model.CustomException;
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -38,7 +41,7 @@ public class DraftsRowMapper implements RowMapper<Draft> {
 					.assessmentNumber(resultSet.getString("assessmentNumber"))
 					.draftRecord(pGDraft)
 					.auditDetails(auditDetails).build();
-		} catch (Exception e) {
+		} catch (CustomException | IOException e) {
 			throw new CustomException("SERVER_ERROR","Exception occured while parsing the draft json : "+ e.getMessage());
 		}
 	}
@@ -59,7 +62,7 @@ public class DraftsRowMapper implements RowMapper<Draft> {
 //                    currentDraft = Draft.builder().id(resultSet.getString("id")).userId(resultSet.getString("userId")).tenantId(resultSet.getString("tenantId"))
 //                            .draftRecord(pGDraft)
 //                            .auditDetails(auditDetails).build();
-//                } catch (Exception e) {
+//                } catch (CustomException e) {
 //                    throw new CustomException("SERVER_ERROR","Exception occured while parsing the draft json : "+ e.getMessage());
 //                }
 //

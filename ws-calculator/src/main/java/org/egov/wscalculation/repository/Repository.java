@@ -36,7 +36,6 @@ public class Repository {
 		Object response = null;
 		log.info("URI: " + uri.toString());
 		try {
-			log.info(mapper.writeValueAsString(request));
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
 		} catch (ResourceAccessException e) {
 			
@@ -47,7 +46,7 @@ public class Repository {
 
 			log.info("the error is : " + e.getResponseBodyAsString());
 			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch (Exception e) {
+		}catch (CustomException e) {
 
 			log.error("Exception while fetching from searcher: ", e);
 		}

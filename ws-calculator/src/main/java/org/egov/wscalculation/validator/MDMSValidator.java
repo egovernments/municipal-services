@@ -74,7 +74,7 @@ public class MDMSValidator {
 		try {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonPath);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
 		}
@@ -110,7 +110,7 @@ public class MDMSValidator {
 		try {
 			Object result = serviceRequestRepository.fetchResult(uri, criteriaReq);
 			return JsonPath.read(result, jsonpath);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching MDMS data", e);
 			throw new CustomException(MRConstants.INVALID_BILLING_PERIOD, MRConstants.INVALID_BILLING_PERIOD_MSG);
 		}

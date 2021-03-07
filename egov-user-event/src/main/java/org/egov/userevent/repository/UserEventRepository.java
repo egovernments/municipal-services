@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.tracer.model.CustomException;
 import org.egov.userevent.repository.querybuilder.UserEventsQueryBuilder;
 import org.egov.userevent.repository.rowmappers.UserEventRowMapper;
 import org.egov.userevent.repository.rowmappers.NotificationCountRowMapper;
@@ -42,11 +43,11 @@ public class UserEventRepository {
 	public List<Event> fetchEvents(EventSearchCriteria criteria){
 		Map<String, Object> preparedStatementValues = new HashMap<>();
 		String query = queryBuilder.getSearchQuery(criteria, preparedStatementValues);
-		log.info("Query: "+query);
+		log.debug("Query: " + query);
 		List<Event> events = new ArrayList<>();
 		try {
 			events = namedParameterJdbcTemplate.query(query, preparedStatementValues, rowMapper);
-		}catch(Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching results from db: ", e);
 		}
 		
@@ -63,12 +64,12 @@ public class UserEventRepository {
 		Map<String, Object> preparedStatementValues = new HashMap<>();
 		String insertQuery = queryBuilder.getInserIfNotExistsQuery(criteria, preparedStatementValues);
 		String query = queryBuilder.getCountQuery(criteria, preparedStatementValues);
-		log.info("Query: "+query);
+		log.debug("Query: "+query);
 		NotificationCountResponse response = null;
 		try {
 			namedParameterJdbcTemplate.update(insertQuery, preparedStatementValues);
 			response = namedParameterJdbcTemplate.query(query, preparedStatementValues, countRowMapper);
-		}catch(Exception e) {
+		} catch (CustomException e) {
 			log.error("Error while fetching count from db: ", e);
 		}
 		return response;

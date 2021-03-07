@@ -226,7 +226,7 @@ public class SWCalculationUtil {
 		try {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
 			message = ((ArrayList<String>) messageObj).get(0);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;
@@ -404,7 +404,7 @@ public class SWCalculationUtil {
 		try {
 			PropertyResponse propertyResponse = objectMapper.convertValue(result, PropertyResponse.class);
 			return propertyResponse.getProperties();
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			throw new CustomException("PARSING_ERROR", "The property json cannot be parsed");
 		}
 	}

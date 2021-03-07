@@ -21,12 +21,11 @@ import org.egov.swservice.web.models.Recepient;
 import org.egov.swservice.web.models.SMSRequest;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.web.models.Source;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,9 +38,6 @@ public class EditNotificationService {
 
 	@Autowired
 	private NotificationUtil notificationUtil;
-
-	@Autowired
-	private ObjectMapper mapper;
 
 	@Autowired
 	private WorkflowNotificationService workflowNotificationService;
@@ -69,7 +65,7 @@ public class EditNotificationService {
 					notificationUtil.sendSMS(smsRequests);
 				}
 			}
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Exception while trying to process edit notification.", ex);
 		}
 	}

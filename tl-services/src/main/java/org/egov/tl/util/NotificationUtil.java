@@ -128,7 +128,7 @@ public class NotificationUtil {
 		try {
 			Object messageObj = JsonPath.parse(localizationMessage).read(path);
 			message = ((ArrayList<String>) messageObj).get(0);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.warn("Fetching from localization failed", e);
 		}
 		return message;
@@ -418,7 +418,7 @@ public class NotificationUtil {
 		try {
 			Object obj = JsonPath.parse(jsonString).read(BILL_AMOUNT_JSONPATH);
 			amountToBePaid = new BigDecimal(obj.toString());
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			throw new CustomException("PARSING ERROR",
 					"Failed to parse the response using jsonPath: " + BILL_AMOUNT_JSONPATH);
 		}

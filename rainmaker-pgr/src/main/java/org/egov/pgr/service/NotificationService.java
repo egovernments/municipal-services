@@ -20,6 +20,7 @@ import org.egov.pgr.model.user.UserResponse;
 import org.egov.pgr.repository.ServiceRequestRepository;
 import org.egov.pgr.utils.PGRConstants;
 import org.egov.pgr.utils.PGRUtils;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -92,7 +93,7 @@ public class NotificationService {
 			serviceType = localizedMessageMap.get(locale + "|" + tenantId).get(PGRConstants.LOCALIZATION_COMP_CATEGORY_PREFIX + serviceTypes.get(0)); //result set is always of size one.
 			if(StringUtils.isEmpty(serviceType))
 				serviceType = PGRUtils.splitCamelCase(serviceTypes.get(0));
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("SERVICE_TYPE_EXCEPTION", e);
 			return null;
 		}
@@ -126,7 +127,7 @@ public class NotificationService {
 			employeeDetails.put("phone", JsonPath.read(response, PGRConstants.EMPLOYEE_PHNO_JSONPATH));
 			employeeDetails.put("department", ((List<String>) JsonPath.read(response, PGRConstants.EMPLOYEE_DEPTCODE_JSONPATH)).get(0));
 			employeeDetails.put("designation", ((List<String>)JsonPath.read(response, PGRConstants.EMPLOYEE_DESGCODE_JSONPATH)).get(0));
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception: ", e);
 		}
 		return employeeDetails;
@@ -158,12 +159,12 @@ public class NotificationService {
 					}else {
 						department = departments.get(0); //Every serviceCode is mapped to always only one dept.
 					}
-				} catch (Exception e) {
+				} catch (CustomException e) {
 			log.error("DEPARTMENT_EXCEPTION", e);
 					 return department;
 				}
 			}
-		}catch (Exception e) {
+		}catch (CustomException e) {
 			log.error("DEPARTMENT_EXCEPTION", e);
 		    return department;
 		}
@@ -189,7 +190,7 @@ public class NotificationService {
 			designations = JsonPath.read(result, PGRConstants.JSONPATH_DESIGNATIONS);
 			if (null == designations || designations.isEmpty())
 				return null;
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("DESIGNATION_EXCEPTION", e);
 			return null;
 		}
@@ -217,7 +218,7 @@ public class NotificationService {
 			result = serviceRequestRepository.fetchResult(uri, requestInfoWrapper);
 			codes = JsonPath.read(result, PGRConstants.LOCALIZATION_CODES_JSONPATH);
 			messages = JsonPath.read(result, PGRConstants.LOCALIZATION_MSGS_JSONPATH);
-		} catch (Exception e) {
+		} catch (CustomException e) {
 			log.error("Exception while fetching from localization: " + e);
 		}
 		if (null != result) {
@@ -254,7 +255,7 @@ public class NotificationService {
 					phoneNumber = res.getUser().get(0).getMobileNumber();
 					uuid = res.getUser().get(0).getUuid();
 				}
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				log.error("Couldn't fetch user for id: " + userId + " error: " + e);
 			}
 			return phoneNumber + "|" + uuid;
@@ -284,7 +285,7 @@ public class NotificationService {
 			if(CollectionUtils.isEmpty(actions))
 				return null;
 			return actions.get(0).getAssignee();
-		}catch(Exception e) {
+		}catch(CustomException e) {
 			log.error("ASSIGNMENT_EXCEPTION", e);
 			return null;
 		}

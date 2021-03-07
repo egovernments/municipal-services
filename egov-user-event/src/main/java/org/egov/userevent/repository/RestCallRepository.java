@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,11 +36,10 @@ public class RestCallRepository {
 		Object response = null;
 		try {
 			response = restTemplate.postForObject(uri.toString(), request, Map.class);
-		}catch(HttpClientErrorException e) {
-			log.error("External Service threw an Exception: ",e);
-			throw new ServiceCallException(e.getResponseBodyAsString());
-		}catch(Exception e) {
-			log.error("Exception while fetching data: ",e);
+		} catch (HttpClientErrorException e) {
+			log.error("External Service threw an Exception: ", e);
+			if (StringUtils.isEmpty(e.getResponseBodyAsString()))
+				throw new ServiceCallException(e.getResponseBodyAsString());
 		}
 		return Optional.ofNullable(response);
 		

@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -103,7 +104,6 @@ public class PaymentNotificationService {
 					}
 					EventRequest eventRequest = getEventRequest(mappedRecord, waterConnectionRequest, topic, property);
 					if (eventRequest != null) {
-						log.info("In App Notification :: -> " + mapper.writeValueAsString(eventRequest));
 						notificationUtil.sendEventNotification(eventRequest);
 					}
 				}
@@ -117,13 +117,12 @@ public class PaymentNotificationService {
 					}
 					List<SMSRequest> smsRequests = getSmsRequest(mappedRecord, waterConnectionRequest, topic, property);
 					if (!CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
 						notificationUtil.sendSMS(smsRequests);
 					}
 				}
 			}
 
-		} catch (Exception ex) {
+		} catch (CustomException ex) {
 			log.error("Error occurred while processing the record: ", ex);
 		}
 	}
@@ -278,8 +277,7 @@ public class PaymentNotificationService {
 			mappedRecord.put(totalBillAmount, context.read("$.Bill[0].totalAmount").toString());
 			mappedRecord.put(dueDate, getLatestBillDetails(mapper.writeValueAsString(context.read("$.Bill[0].billDetails"))));
 			return mappedRecord;
-		} catch (Exception ex) {
-			log.error("", ex);
+		} catch (CustomException | JsonProcessingException ex) {
 			throw new CustomException("BILLING_SERVER_ERROR","Unable to fetch values from billing service");
 		}
 	}
@@ -323,7 +321,7 @@ public class PaymentNotificationService {
     			}else {
         			log.error("Service returned null while fetching user");
     			}
-    		}catch(Exception e) {
+    		}catch(CustomException e) {
     			log.error("Exception trace: ",e);
     		}
     	}

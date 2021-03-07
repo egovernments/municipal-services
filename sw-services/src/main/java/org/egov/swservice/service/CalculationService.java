@@ -3,17 +3,18 @@ package org.egov.swservice.service;
 import java.util.Arrays;
 import java.util.List;
 
+import org.egov.swservice.repository.ServiceRequestRepository;
+import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.swservice.web.models.CalculationCriteria;
 import org.egov.swservice.web.models.CalculationReq;
 import org.egov.swservice.web.models.CalculationRes;
 import org.egov.swservice.web.models.Property;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
-import org.egov.swservice.repository.ServiceRequestRepository;
-import org.egov.swservice.util.SewerageServicesUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class CalculationService {
 				Object response = serviceRequestRepository.fetchResult(uri, calRequest);
 				CalculationRes calResponse = mapper.convertValue(response, CalculationRes.class);
 				log.info(mapper.writeValueAsString(calResponse));
-			} catch (Exception ex) {
+			} catch (CustomException | JsonProcessingException ex) {
 				log.error("Calculation response error!!", ex);
 				throw new CustomException("SEWERAGE_CALCULATION_EXCEPTION", "Calculation response can not parsed!!!");
 			}

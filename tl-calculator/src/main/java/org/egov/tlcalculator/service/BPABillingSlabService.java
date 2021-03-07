@@ -45,7 +45,7 @@ public class BPABillingSlabService {
             } else {
                 throw new CustomException("BILLINGSEARCH_NULLRESPONSE", " Found empty response on billingslab search for BPA");
             }
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("Couldn't fetch master: " + BillingslabConstants.BPA_MDMS_TRADETYPETOROLEMAPPING);
             log.error("Exception: " + e);
             throw new CustomException("BILLINGSEARCH_ERROR", " Error occured while searching billing slab for BPA");

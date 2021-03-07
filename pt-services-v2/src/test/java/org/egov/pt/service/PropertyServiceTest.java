@@ -69,7 +69,7 @@
 //        PropertyRequest request = null;
 //        try{
 //         request = getPropertRequest("src/test/PropertyRequest.json");}
-//        catch(Exception e){
+//        catch(CustomException e){
 //            e.printStackTrace();
 //            fail();
 //        }
@@ -103,7 +103,7 @@
 //        PropertyRequest request = null;
 //        try{
 //            request = getPropertRequest("src/test/PropertyRequestUpdate.json");}
-//        catch(Exception e){
+//        catch(CustomException e){
 //            e.printStackTrace();
 //            fail();
 //        }
@@ -157,7 +157,7 @@
 //        try{
 //            URL url = classLoader.getResource(path);
 //        String s= new String(Files.readAllBytes(new File(path).toPath()));}
-//        catch(Exception e){
+//        catch(CustomException e){
 //            e.printStackTrace();
 //            fail();
 //        }

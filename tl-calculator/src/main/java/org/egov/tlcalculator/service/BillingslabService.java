@@ -12,12 +12,17 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tlcalculator.config.BillingSlabConfigs;
 import org.egov.tlcalculator.kafka.broker.TLCalculatorProducer;
-import org.egov.tlcalculator.repository.builder.BillingslabQueryBuilder;
 import org.egov.tlcalculator.repository.BillingslabRepository;
+import org.egov.tlcalculator.repository.builder.BillingslabQueryBuilder;
 import org.egov.tlcalculator.utils.BillingslabConstants;
 import org.egov.tlcalculator.utils.BillingslabUtils;
 import org.egov.tlcalculator.utils.ResponseInfoFactory;
-import org.egov.tlcalculator.web.models.*;
+import org.egov.tlcalculator.web.models.AuditDetails;
+import org.egov.tlcalculator.web.models.BillingSlab;
+import org.egov.tlcalculator.web.models.BillingSlabReq;
+import org.egov.tlcalculator.web.models.BillingSlabRes;
+import org.egov.tlcalculator.web.models.BillingSlabSearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -146,7 +151,7 @@ public class BillingslabService {
 					List<String> data = JsonPath.read(response, jsonPath);
 					mdmsMap.put(master, data);
 				}
-			}catch(Exception e) {
+			}catch(CustomException e) {
 				log.error("Couldn't fetch master: "+master);
 				log.error("Exception: "+e);
 				mdmsMap.put(master, new ArrayList<>());
