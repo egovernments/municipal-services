@@ -466,6 +466,9 @@ components:
           $ref: 'https://raw.githubusercontent.com/egovernments/municipal-services/common-contract/docs/common-contract-v2-0-0.yml#/components/schemas/RequestHeader'
         vehicle:
           $ref: '#/components/schemas/Vehicle'
+        totalCount:
+          type: string
+          description: count of total records in the system meeting the search criteria
       required:
         - ResponseInfo
         - services
@@ -609,6 +612,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VehicleTrip'
+        totalCount:
+          type: string
+          description: count of total records in the system meeting the search criteria
       required:
         - responseInfo
         - VehicleTrip

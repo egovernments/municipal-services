@@ -22,7 +22,7 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<FSMAuditUtil> extractData(ResultSet rs) throws SQLException, DataAccessException {
-
+		
 		List<FSMAuditUtil> fsmAuditDataList = new ArrayList<FSMAuditUtil>();
 		while (rs.next()) {
 			FSMAuditUtil auditUtil = new FSMAuditUtil();
@@ -35,7 +35,7 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 			auditUtil.setSource(rs.getString("source"));
 			auditUtil.setSanitationtype(rs.getString("sanitationtype"));
 			auditUtil.setPropertyUsage(rs.getString("propertyUsage"));
-			auditUtil.setNoOfTrips(rs.getInt("noOfTrips"));
+			auditUtil.setNoOfTrips(rs.getInt("noOfTrips"));		
 			auditUtil.setStatus(rs.getString("status"));
 			auditUtil.setVehicleId(rs.getString("vehicle_id"));
 			auditUtil.setDoorNo(rs.getString("doorno"));
@@ -43,7 +43,7 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 			auditUtil.setVehicleType(rs.getString("vehicletype"));
 			auditUtil.setSlumName(rs.getString("slumname"));
 			auditUtil.setPossibleServiceDate(rs.getLong("possible_srv_date"));
-
+			
 			auditUtil.setPlotNo(rs.getString("plotno"));
 			auditUtil.setLandmark(rs.getString("landmark"));
 			auditUtil.setCity(rs.getString("city"));
@@ -52,25 +52,25 @@ public class FSMAuditRowMapper implements ResultSetExtractor<List<FSMAuditUtil>>
 			auditUtil.setState(rs.getString("state"));
 			auditUtil.setCountry(rs.getString("country"));
 			auditUtil.setLocality(rs.getString("locality"));
-			auditUtil.setPincode(rs.getString("pincode"));
+			auditUtil.setPincode(rs.getString("pincode"));			
 			auditUtil.setBuildingName(rs.getString("buildingName"));
 			auditUtil.setStreet(rs.getString("street"));
-
+            
 			auditUtil.setLatitude(rs.getDouble("latitude"));
 			auditUtil.setLongitude(rs.getDouble("longitude"));
-
+			
 			auditUtil.setHeight(rs.getDouble("height"));
 			auditUtil.setLength(rs.getDouble("length"));
 			auditUtil.setWidth(rs.getDouble("width"));
 			auditUtil.setDiameter(rs.getDouble("diameter"));
 			auditUtil.setDistanceFromRoad(rs.getDouble("distanceFromRoad"));
-
+			
 			auditUtil.setModifiedBy(rs.getString("lastmodifiedby"));
 			auditUtil.setModifiedTime(rs.getLong("lastmodifiedtime"));
-
+			
 			auditUtil.setCreatedBy(rs.getString("createdby"));
 			auditUtil.setCreatedTime(rs.getLong("createdtime"));
-
+			
 			fsmAuditDataList.add(auditUtil);
 
 		}
