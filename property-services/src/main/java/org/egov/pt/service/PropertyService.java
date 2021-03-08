@@ -19,6 +19,7 @@ import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.models.workflow.State;
 import org.egov.pt.producer.Producer;
 import org.egov.pt.repository.PropertyRepository;
+import org.egov.pt.util.CitizenFilterUtil;
 import org.egov.pt.util.PTConstants;
 import org.egov.pt.util.PropertyUtil;
 import org.egov.pt.validator.PropertyValidator;
@@ -64,6 +65,10 @@ public class PropertyService {
 
 	@Autowired
 	private CalculationService calculatorService;
+
+
+	@Autowired
+	private CitizenFilterUtil citizenFilterUtil;
 
 
 
@@ -299,6 +304,9 @@ public class PropertyService {
 		properties.forEach(property -> {
 			enrichmentService.enrichBoundary(property, requestInfo);
 		});
+
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
+			citizenFilterUtil.filterOwnerDocument(requestInfo, properties);
 
 		return properties;
 	}
