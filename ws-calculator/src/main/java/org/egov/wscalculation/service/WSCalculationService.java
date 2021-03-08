@@ -13,4 +13,6 @@ public interface WSCalculationService {
 	void jobScheduler();
 
 	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
+	
+	void generateBillBasedLocality(RequestInfo requestInfo);
 }

@@ -2,7 +2,9 @@ package org.egov.wscalculation.web.models;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,4 +39,39 @@ public class BillScheduler {
 
 	@NotNull
 	private String tenantId;
+	
+	
+	/**
+	 * status of the bill .
+	 */
+	public enum StatusEnum {
+		
+		INITATED("INITATED"),
+
+		INPROGRESS("INPROGRESS"),
+
+		COMPLETED("COMPLETED");
+		
+		private String value;
+
+		StatusEnum(String value) {
+			this.value = value;
+		}
+
+		@Override
+		@JsonValue
+		public String toString() {
+			return String.valueOf(value);
+		}
+
+		@JsonCreator
+		public static StatusEnum fromValue(String text) {
+			for (StatusEnum b : StatusEnum.values()) {
+				if (String.valueOf(b.value).equalsIgnoreCase(text)) {
+					return b;
+				}
+			}
+			return null;
+		}
+	}
 }

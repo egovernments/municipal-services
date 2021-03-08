@@ -52,6 +52,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 
 @Data
 @NoArgsConstructor
@@ -101,6 +102,9 @@ public class Demand {
 	@Builder.Default
 	@JsonProperty("minimumAmountPayable")
 	private BigDecimal minimumAmountPayable = BigDecimal.ZERO;
+	
+    @Default
+    private Boolean isPaymentCompleted = false;
 
 	/**
 	 * Gets or Sets status
