@@ -89,4 +89,11 @@ public class RequestsApiController{
 
     }
 
+    @RequestMapping(value="/request/_autoescalate", method = RequestMethod.POST)
+    public ResponseEntity<?> autoEscalateRequests(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+                                                           @Valid @ModelAttribute AutoEscalationCriteria criteria) {
+        pgrService.autoEscalate(requestInfoWrapper.getRequestInfo(), criteria);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

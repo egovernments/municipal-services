@@ -7,10 +7,13 @@ import org.egov.pgr.producer.Producer;
 import org.egov.pgr.repository.PGRRepository;
 import org.egov.pgr.util.MDMSUtils;
 import org.egov.pgr.validator.ServiceRequestValidator;
+import org.egov.pgr.web.models.AutoEscalationCriteria;
 import org.egov.pgr.web.models.ServiceWrapper;
 import org.egov.pgr.web.models.RequestSearchCriteria;
 import org.egov.pgr.web.models.ServiceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -37,6 +40,9 @@ public class PGRService {
     private PGRRepository repository;
 
     private MDMSUtils mdmsUtils;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
 
     @Autowired
@@ -179,5 +185,39 @@ public class PGRService {
             sortedServiceWrappers.addAll(sortedWrappers.get(createdTimeDesc));
         }
         return sortedServiceWrappers;
+    }
+
+    public void autoEscalate(RequestInfo requestInfo, AutoEscalationCriteria criteria) {
+
+        Set<String> tenantIds = !CollectionUtils.isEmpty(criteria.getTenantIds()) ? criteria.getTenantIds() : getListOfTenantIds();
+
+        Long noOfRecords = 0l;
+
+        String sqlCount="  SELECT count(*)"+
+                " FROM eg_pgr_service_v2 "+
+                " WHERE tenantid = ?";
+
+        String sqlFetch = " SELECT * FROM eg_pgr_service"+
+                " WHERE tenantid = ?";
+
+        for(String tenantId : tenantIds){
+            Long count = jdbcTemplate.queryForObject(sqlCount, new Object[] { tenantId }, Long.class);
+
+            Long offset = CollectionUtils.isEmpty(criteria.getProcessInstanceIds()) ? count : 0l;
+
+            while(true){
+                
+
+            }
+
+        }
+    }
+
+    private Set<String> getListOfTenantIds() {
+        Set<String> tenantIds = new HashSet<>();
+
+        // TODO
+
+        return tenantIds;
     }
 }
