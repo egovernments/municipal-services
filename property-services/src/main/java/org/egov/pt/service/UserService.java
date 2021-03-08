@@ -336,8 +336,8 @@ public class UserService {
         if(null != users) {
         	
             users.forEach( map -> {
-            	
-                        map.put("createdDate",dateTolong((String)map.get("createdDate"),format1));
+						if((String)map.get("createdDate")!=null)
+							map.put("createdDate",dateTolong((String)map.get("createdDate"),format1));
                         if((String)map.get("lastModifiedDate")!=null)
                             map.put("lastModifiedDate",dateTolong((String)map.get("lastModifiedDate"),format1));
                         if((String)map.get("dob")!=null)
