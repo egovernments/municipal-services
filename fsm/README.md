@@ -4,7 +4,7 @@ TBD
 
 ### DB UML Diagram
 
-- TBD
+![DB UML](./images/fsm.png)
 
 ### Service Dependencies
 

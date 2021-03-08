@@ -1,3 +1,6 @@
+***DB UML DIAGRAM***
+![DB UML](./images/rainmaker-pgr.png)
+
 ***PGR v1.1***
 
 This doc contains the changes done in the rainmaker-pgr service for the v1.1 release. It includes the details of refactoring and enhancements done as part of v1.1 release. Every section in the doc contains code changes done to accommodate the new requirements whilst cleaning the redundant code that was needed during v1. This doc doesn't contain the granular details of every task as to which loop was added, what variables were removed, which methods were broken into different methods and things like that. It gives a top-level idea of the changes done.
