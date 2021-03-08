@@ -302,6 +302,7 @@ public class WSCalculationConstant {
     
     public static final String EG_WS_CAL_JSON_EXCEPTION_MSG = "Exception occured while parsing additional details";
     
-	
+	public static final String WS_BILL_SCHEDULER_TRANSACTION = "Bill Generation";
+
 	
 }
