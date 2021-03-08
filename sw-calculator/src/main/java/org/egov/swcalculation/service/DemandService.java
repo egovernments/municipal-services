@@ -112,11 +112,14 @@ public class DemandService {
 	 */
 	public List<Demand> generateDemand(CalculationReq request, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNo) {
-		@SuppressWarnings("unchecked")
-		Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
-				.get(SWCalculationConstant.BILLING_PERIOD);
-		Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
-		Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+		/*
+		 * @SuppressWarnings("unchecked") Map<String, Object> financialYearMaster =
+		 * (Map<String, Object>) masterMap .get(SWCalculationConstant.BILLING_PERIOD);
+		 * Long fromDate = (Long)
+		 * financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+		 * Long toDate = (Long)
+		 * financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+		 */
 
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
@@ -128,8 +131,8 @@ public class DemandService {
 			Long toDateSearch = null;
 			Set<String> consumerCodes;
 			if (isForConnectionNo) {
-				fromDateSearch = fromDate;
-				toDateSearch = toDate;
+				fromDateSearch = request.getTaxPeriodFrom();
+				toDateSearch = request.getTaxPeriodTo();
 				consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 						.collect(Collectors.toSet());
 			} else {
@@ -156,10 +159,11 @@ public class DemandService {
 		}
 		List<Demand> createdDemands = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(createCalculations))
-			createdDemands = createDemand(request, createCalculations, masterMap, isForConnectionNo);
+			createdDemands = createDemand(request.getRequestInfo(), createCalculations, masterMap, isForConnectionNo,
+					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, fromDate, toDate,
+			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
 					isForConnectionNo);
 		return createdDemands;
 	}
@@ -171,8 +175,8 @@ public class DemandService {
 	 * @param calculations List of calculation object
 	 * @return Demands that are created
 	 */
-	private List<Demand> createDemand(CalculationReq request, List<Calculation> calculations,
-			Map<String, Object> masterMap, boolean isForConnectionNO) {
+	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
+			Map<String, Object> masterMap, boolean isForConnectionNO,long taxPeriodFrom, long taxPeriodTo) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 
@@ -185,7 +189,7 @@ public class DemandService {
 								+ " Water Connection with this number does not exist ");
 
 			SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
-					.sewerageConnection(connection).requestInfo(request.getRequestInfo()).build();
+					.sewerageConnection(connection).requestInfo(requestInfo).build();
 
 			Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
 
@@ -205,12 +209,9 @@ public class DemandService {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 					.get(SWCalculationConstant.BILLING_PERIOD);
-			if (request.getTaxPeriodFrom() == 0 && request.getTaxPeriodTo() == 0) {
-				Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
-				request.setTaxPeriodFrom(fromDate);
-				Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
-				request.setTaxPeriodFrom(fromDate);
-				request.setTaxPeriodTo(toDate);
+			if (taxPeriodFrom == 0 && taxPeriodTo == 0) {
+				taxPeriodFrom = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+				taxPeriodTo = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
 			}
 			Long expiryDays = (Long) financialYearMaster.get(SWCalculationConstant.Demand_Expiry_Date_String);
 			Long expiryDate = System.currentTimeMillis() + expiryDays;
@@ -222,14 +223,15 @@ public class DemandService {
 
 			demands.add(Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 					.minimumAmountPayable(minimumPayableAmount).tenantId(calculation.getTenantId())
-					.taxPeriodFrom(request.getTaxPeriodFrom()).taxPeriodTo(request.getTaxPeriodTo())
+					.taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
 					.consumerType("sewerageConnection").businessService(businessService)
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
 		}
 		log.info("Demand Object" + demands.toString());
-		List<Demand> demandRes = demandRepository.saveDemand(request.getRequestInfo(), demands);
-		if (isForConnectionNO)
-			fetchBill(demandRes, request.getRequestInfo());
+		List<Demand> demandRes = demandRepository.saveDemand(requestInfo, demands);
+		/*
+		 * if (isForConnectionNO) fetchBill(demandRes, request.getRequestInfo());
+		 */
 		return demandRes;
 	}
 
@@ -644,7 +646,10 @@ public class DemandService {
 			long taxperiodto) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxperiodfrom, taxperiodto);
+		long taxPeriodFrom = billingMasterData.get("taxPeriodFrom") == null ? 0l
+				: (long) billingMasterData.get("taxPeriodFrom");
+		long taxPeriodTo = billingMasterData.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
+		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
 	}
 
 	/**
@@ -657,8 +662,8 @@ public class DemandService {
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
 			long taxperiodfrom, long taxperiodto) {
 		log.info("Billing master data values for non metered connection:: {}", master);
-		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
+		//long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
+		//if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
 			for (SewerageDetails detail : connectionNos) {
@@ -676,7 +681,7 @@ public class DemandService {
 					kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 				}
 			}
-		}
+		//}
 	}
 
 	private boolean validateSewerageConnection(SewerageDetails detail, long taxPeriodFrom, long taxPeriodTo,
@@ -733,7 +738,7 @@ public class DemandService {
 				&& (dayOfMonth == LocalDateTime.now().getDayOfMonth())) {
 			return true;
 		} else if (billingFrequency.equalsIgnoreCase(SWCalculationConstant.Quaterly_Billing_Period)) {
-			return false;
+			return true;
 		}
 		return true;
 	}

@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -149,8 +151,11 @@ public class EstimationService {
 				billingSlabMaster.get(SWCalculationConstant.CALCULATION_ATTRIBUTE_CONST));
 		String calculationAttribute = getCalculationAttribute(calculationAttributeMaster,
 				sewerageConnection.getConnectionType());
-		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnection, mappingBillingSlab, calculationAttribute,
-				request.getRequestInfo());
+		SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
+				.sewerageConnection(sewerageConnection).requestInfo(request.getRequestInfo()).build();
+		Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
+		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnectionRequest, mappingBillingSlab, calculationAttribute,
+				request.getRequestInfo(),property);
 
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("INVALID_BILLING_SLAB", "Billing Slab are Empty");
@@ -169,9 +174,10 @@ public class EstimationService {
 		}
 
 		// Sewerage Charge Calculation
-		Double totalUnits = getCalculationUnit(sewerageConnection, calculationAttribute, criteria);
-		if (totalUnits == 0.0)
-			return sewerageCharge;
+		Double totalUnits = getCalculationUnit(sewerageConnection, calculationAttribute, criteria,property);
+		/*
+		 * if (totalUnits == 0.0) return sewerageCharge;
+		 */
 		BillingSlab billSlab = billingSlabs.get(0);
 		if (isRangeCalculation(calculationAttribute)) {
 
@@ -194,13 +200,17 @@ public class EstimationService {
 				}
 
 				if (slabCondition) {
-					sewerageCharge = BigDecimal.valueOf((totalUnits * slab.getCharge()));
+					sewerageCharge = BigDecimal.valueOf((slab.getCharge()));
 					if (request.getTaxPeriodFrom() > 0 && request.getTaxPeriodTo() > 0) {
 						if (sewerageConnection.getConnectionExecutionDate() > request.getTaxPeriodFrom()) {
-							long daysDifference = (request.getTaxPeriodTo()
-									- sewerageConnection.getConnectionExecutionDate())
-									/ (request.getTaxPeriodTo() - request.getTaxPeriodFrom());
-							sewerageCharge = BigDecimal.valueOf((totalUnits * slab.getCharge() * daysDifference));
+							long milli_sec_btw_conn_date = Math.abs(request.getTaxPeriodTo() - sewerageConnection.getConnectionExecutionDate());
+							long milli_sec_btw_quarter = Math.abs(request.getTaxPeriodTo() - request.getTaxPeriodFrom());
+							//Converting milli seconds to days
+						    long days_conn_date = TimeUnit.MILLISECONDS.toDays(milli_sec_btw_conn_date) + 1;
+						    long days_quarter = TimeUnit.MILLISECONDS.toDays(milli_sec_btw_quarter) + 1;
+	
+							//sewerageCharge = BigDecimal.valueOf((totalUnits * slab.getCharge() * daysDifference));
+							sewerageCharge = sewerageCharge.add(BigDecimal.valueOf(days_conn_date * (slab.getCharge() / days_quarter)).setScale(2, 2));
 						}
 
 					}
@@ -272,18 +282,17 @@ public class EstimationService {
 	 * @param requestInfo        - Request Info Object
 	 * @return List of billing slab based on matching criteria
 	 */
-	private List<BillingSlab> getSlabsFiltered(SewerageConnection sewerageConnection, List<BillingSlab> billingSlabs,
-			String calculationAttribute, RequestInfo requestInfo) {
+	private List<BillingSlab> getSlabsFiltered(SewerageConnectionRequest sewerageConnection, List<BillingSlab> billingSlabs,
+			String calculationAttribute, RequestInfo requestInfo, Property property) {
 
-		SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
-				.sewerageConnection(sewerageConnection).requestInfo(requestInfo).build();
-		Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
+		
+		
 
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[0]
-				: "";
-		final String connectionType = sewerageConnection.getConnectionType();
+		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length-1]: "";
+			
+		final String connectionType = sewerageConnection.getSewerageConnection().getConnectionType();
 
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
@@ -295,14 +304,14 @@ public class EstimationService {
 	}
 
 	private Double getCalculationUnit(SewerageConnection sewerageConnection, String calculationAttribute,
-			CalculationCriteria criteria) {
+			CalculationCriteria criteria,Property property) {
 		Double totalUnite = 0.0;
 		if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.meteredConnectionType)) {
 			return totalUnite;
 		} else if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.nonMeterdConnection)
-				&& calculationAttribute.equalsIgnoreCase(SWCalculationConstant.noOfToilets)) {
-			if (sewerageConnection.getNoOfToilets() == null)
-				return totalUnite;
+				&& calculationAttribute.equalsIgnoreCase(SWCalculationConstant.plotBasedConst)) {
+			if (property.getLandArea() != null && property.getLandArea() > 0)
+				return property.getLandArea();
 			return new Double(sewerageConnection.getNoOfToilets());
 		} else if (sewerageConnection.getConnectionType().equals(SWCalculationConstant.nonMeterdConnection)
 				&& calculationAttribute.equalsIgnoreCase(SWCalculationConstant.noOfWaterClosets)) {
@@ -584,7 +593,7 @@ public class EstimationService {
 
 	public Map<String, Object> getQuarterStartAndEndDate(Map<String, Object> billingPeriod) {
 		Date date = new Date();
-		Calendar fromDateCalendar = Calendar.getInstance();
+		Calendar fromDateCalendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		fromDateCalendar.setTime(date);
 		fromDateCalendar.set(Calendar.MONTH, fromDateCalendar.get(Calendar.MONTH) / 3 * 3);
 		fromDateCalendar.set(Calendar.DAY_OF_MONTH, 1);

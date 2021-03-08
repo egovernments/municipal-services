@@ -68,7 +68,7 @@ public class DemandGenerationConsumer {
 			}
 		});
 		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
+				.requestInfo(calculationReq.getRequestInfo()).taxPeriodFrom(calculationReq.getTaxPeriodFrom()).taxPeriodTo(calculationReq.getTaxPeriodTo()).isconnectionCalculation(true).build();
 		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
 		log.info("Number of batch records:  " + records.size());
 	}
