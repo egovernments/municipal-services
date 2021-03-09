@@ -159,8 +159,10 @@ public class EstimationService {
 
 		if (billingSlabs == null || billingSlabs.isEmpty())
 			throw new CustomException("INVALID_BILLING_SLAB", "Billing Slab are Empty");
-		if (billingSlabs.size() > 1)
-			throw new CustomException("INVALID_BILLING_SLAB", "More than one billing slab found");
+		/*
+		 * if (billingSlabs.size() > 1) throw new
+		 * CustomException("INVALID_BILLING_SLAB", "More than one billing slab found");
+		 */
 		// Add Billing Slab Ids
 		billingSlabIds.add(billingSlabs.get(0).getId());
 		HashMap<String, Object> additionalDetail = new HashMap<>();
