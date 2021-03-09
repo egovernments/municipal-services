@@ -713,11 +713,14 @@ public class DemandService {
 
 		if (waterConnection.getConnectionExecutionDate() > taxPeriodTo)
 			isConnectionValid = false;
-		if (waterConnection.getConnectionExecutionDate() < taxPeriodFrom) {
-
-			isConnectionValid = fetchBill(waterConnection, taxPeriodFrom, taxPeriodTo, tenantId, requestInfo);
-
-		}
+		/*
+		 * if (waterConnection.getConnectionExecutionDate() < taxPeriodFrom) {
+		 * 
+		 * isConnectionValid = fetchBill(waterConnection, taxPeriodFrom, taxPeriodTo,
+		 * tenantId, requestInfo);
+		 * 
+		 * }
+		 */
 
 		return isConnectionValid;
 
