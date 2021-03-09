@@ -692,11 +692,14 @@ public class DemandService {
 			isValidSewerageConnection = false;
 		}
 
-		if (detail.getConnectionExecutionDate() < taxPeriodFrom) {
-
-			isValidSewerageConnection = fetchBill(detail, taxPeriodFrom, taxPeriodTo, tenantId, requestInfo);
-
-		}
+		/*
+		 * if (detail.getConnectionExecutionDate() < taxPeriodFrom) {
+		 * 
+		 * isValidSewerageConnection = fetchBill(detail, taxPeriodFrom, taxPeriodTo,
+		 * tenantId, requestInfo);
+		 * 
+		 * }
+		 */
 
 		return isValidSewerageConnection;
 	}
