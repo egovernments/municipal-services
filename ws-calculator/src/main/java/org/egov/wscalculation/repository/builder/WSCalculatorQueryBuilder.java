@@ -36,6 +36,10 @@ public class WSCalculatorQueryBuilder {
 	
 	private static final String billGenerationSchedulerSearchQuery = "SELECT * from eg_ws_scheduler ";
 
+	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_ws_scheduler SET status=? where id=?";
+
+	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id";
+
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
@@ -221,5 +225,51 @@ public class WSCalculatorQueryBuilder {
 		}
 
 		return query.toString();
+	}
+	
+	/**
+	 * Bill expire query builder
+	 * 
+	 * @param billIds
+	 * @param preparedStmtList
+	 */
+	public String getBillSchedulerUpdateQuery(String schedulerId, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(BILL_SCHEDULER_STATUS_UPDATE_QUERY);
+
+		return builder.toString();
+	}
+	
+	public String getConnectionsNoByLocality(String tenantId, String connectionType,String status,String locality, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(connectionNoByLocality);
+		// Add connection type
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" ws.connectiontype = ? ");
+		preparedStatement.add(connectionType);
+		
+		//Active status	
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.status = ? ");
+		preparedStatement.add(status);
+		
+		// add tenantid
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.connectionno = ? ");
+		preparedStatement.add("107000137");
+		
+		if (locality != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" locality = ? ");
+			preparedStatement.add(locality);
+		}
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.connectionno is not null");
+		return query.toString();
+		
 	}
 }

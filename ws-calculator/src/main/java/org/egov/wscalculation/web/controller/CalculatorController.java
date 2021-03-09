@@ -87,6 +87,11 @@ public class CalculatorController {
 		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 	
+	@PostMapping("/_jobbillscheduler")
+	public void jobbillscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		wSCalculationService.generateBillBasedLocality(requestInfoWrapper.getRequestInfo());
+	}
+	
 	@PostMapping("/_applyAdhocTax")
 	public ResponseEntity<CalculationRes> applyAdhocTax(@Valid @RequestBody AdhocTaxReq adhocTaxReq) {
 		List<Calculation> calculations = wSCalculationServiceImpl.applyAdhocTax(adhocTaxReq);

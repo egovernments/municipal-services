@@ -13,24 +13,33 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.web.models.AdhocTaxReq;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationCriteria;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.TaxHeadCategory;
-import org.egov.wscalculation.web.models.Property;
-import org.egov.wscalculation.web.models.TaxHeadEstimate;
-import org.egov.wscalculation.web.models.TaxHeadMaster;
-import org.egov.wscalculation.web.models.WaterConnection;
-import org.egov.wscalculation.web.models.WaterConnectionRequest;
+import org.egov.wscalculation.producer.WSCalculationProducer;
+import org.egov.wscalculation.repository.BillGeneratorDao;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.web.models.AdhocTaxReq;
+import org.egov.wscalculation.web.models.BillGeneraterReq;
+import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
+import org.egov.wscalculation.web.models.BillScheduler;
+import org.egov.wscalculation.web.models.BillScheduler.StatusEnum;
+import org.egov.wscalculation.web.models.Calculation;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
+import org.egov.wscalculation.web.models.Property;
+import org.egov.wscalculation.web.models.RequestInfoWrapper;
+import org.egov.wscalculation.web.models.TaxHeadCategory;
+import org.egov.wscalculation.web.models.TaxHeadEstimate;
+import org.egov.wscalculation.web.models.TaxHeadMaster;
+import org.egov.wscalculation.web.models.WaterConnection;
+import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.ImmutableSet;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +71,18 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private WSCalculationUtil wSCalculationUtil;
+	
+	@Autowired
+	private BillGeneratorService billGeneratorService;
+	
+	@Autowired
+	private WSCalculationProducer producer;
+	
+	@Autowired
+	private WSCalculationConfiguration configs;
+	
+	@Autowired
+	private BillGeneratorDao billGeneratorDao;
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge And Estimation Charge
@@ -283,6 +304,48 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		tenantIds.forEach(tenantId -> {
 			demandService.generateDemandForTenantId(tenantId, requestInfo);
 		});
+	}
+	
+	/**
+	 * Generate bill Based on Time (Monthly, Quarterly, Yearly)
+	 */
+	public void generateBillBasedLocality(RequestInfo requestInfo) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for water bill generation on : " + date.format(dateTimeFormatter));
+
+		BillGenerationSearchCriteria criteria = new BillGenerationSearchCriteria();
+		criteria.setStatus(WSCalculationConstant.INITIATED_CONST);
+
+		List<BillScheduler> billSchedularList = billGeneratorService.getBillGenerationDetails(criteria);
+		if (billSchedularList.isEmpty())
+			return;
+		log.info("billSchedularList count : " + billSchedularList.size());
+		for (BillScheduler billSchedular : billSchedularList) {
+			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+			//Enable it once UI screen is done, for passing actual locality
+//			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, null);
+			if (connectionNos == null || connectionNos.isEmpty()) {
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+				return;
+			}
+
+			log.info("Producer ConsumerCodes size : {}", connectionNos.size());
+
+			BillGeneraterReq billGeneraterReq = BillGeneraterReq
+					.builder()
+					.requestInfoWrapper(requestInfoWrapper)
+					.tenantId(billSchedular.getTenantId())
+					.consumerCodes(ImmutableSet.copyOf(connectionNos))
+					.billSchedular(billSchedular)
+					.build();
+
+				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+
+		}
 	}
 	
 	/**

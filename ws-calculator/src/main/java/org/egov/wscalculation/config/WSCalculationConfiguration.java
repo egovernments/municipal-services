@@ -197,4 +197,7 @@ public class WSCalculationConfiguration {
 
 	@Value("${workflow.process.search.path}")
 	private String searchWorkflowProcessEndPoint;
+	
+	@Value("${egov.watercalculatorservice.billgenerate.topic}")
+	private String billGenerateSchedulerTopic;
 }

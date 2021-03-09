@@ -290,6 +290,18 @@ public class WSCalculationConstant {
 
 	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
 	
+	public static final String INITIATED_CONST = "INITIATED";
+	
+	public static final String INPROGRESS_CONST = "INPROGRESS";
+	
+	public static final String COMPLETED_CONST = "COMPLETED";
+	
+	public static final String ACTIVE = "ACTIVE";
+	
+    public static final String EG_WS_CAL_JSON_EXCEPTION_KEY = "EG_WS_CAL_JSON_EXCEPTION";
+    
+    public static final String EG_WS_CAL_JSON_EXCEPTION_MSG = "Exception occured while parsing additional details";
+    
 	public static final String WS_BILL_SCHEDULER_TRANSACTION = "Bill Generation";
 
 	

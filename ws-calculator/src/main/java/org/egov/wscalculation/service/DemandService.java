@@ -223,8 +223,8 @@ public class DemandService {
 		}
 		log.info("Demand Object" + demands.toString());
 		List<Demand> demandRes = demandRepository.saveDemand(requestInfo, demands);
-//		if (isForConnectionNO)
-//			fetchBill(demandRes, requestInfo);
+		if (isForConnectionNO)
+			fetchBill(demandRes, requestInfo);
 		return demandRes;
 	}
 
@@ -861,5 +861,22 @@ public class DemandService {
 		demandRepository.updateDemand(requestInfo, demands);
 		return calculations;
 	}
+	
+	public Boolean fetchBillScheduler(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+		for (String consumerCode : consumerCodes) {
+			try {
+				Object result = serviceRequestRepository.fetchResult(
+						calculatorUtils.getFetchBillURL(tenantId, consumerCode),
+						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+
+			} catch (Exception ex) {
+				log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
+			}
+		}
+		return Boolean.TRUE;
+	}
+	
+	
+
 
 }
