@@ -43,7 +43,7 @@ public class User   {
         private String uuid;
 
         @Size(max=64)
-        @JsonIgnore
+        @JsonProperty("userName")
         private String userName;
 
         @JsonIgnore
