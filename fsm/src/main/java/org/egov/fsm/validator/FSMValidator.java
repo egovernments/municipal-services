@@ -183,7 +183,7 @@ public class FSMValidator {
 		if (criteria.getFromDate() != null && !allowedParams.contains("fromDate") && criteria.getToDate() != null
 				&& !allowedParams.contains("toDate")) {
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "Search on fromDate and toDate is not allowed");
-		} else {
+		} else if( criteria.getFromDate() != null && criteria.getToDate() != null ){
 
 			if ((criteria.getFromDate() != null && criteria.getToDate() == null)
 					|| criteria.getFromDate() == null && criteria.getToDate() != null) {
