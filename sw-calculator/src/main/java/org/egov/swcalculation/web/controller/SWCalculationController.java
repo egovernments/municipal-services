@@ -77,8 +77,8 @@ public class SWCalculationController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,@RequestParam long taxperiodfrom, @RequestParam long taxPeriodto) {
-		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo(),taxperiodfrom,taxPeriodto);
+	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
 
 	@PostMapping("/_applyAdhocTax")

@@ -642,8 +642,7 @@ public class DemandService {
 	 * 
 	 * @param tenantId TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo, long taxperiodfrom,
-			long taxperiodto) {
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
 		long taxPeriodFrom = billingMasterData.get("taxPeriodFrom") == null ? 0l

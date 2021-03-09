@@ -169,7 +169,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
-	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo, long taxperiodfrom, long taxperiodto) {
+	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo) {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
@@ -177,7 +177,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
-		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo,taxperiodfrom,taxperiodto));
+		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo));
 	}
 
 	/**
