@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.egov.common.contract.request.Role;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.validation.annotation.Validated;
@@ -42,14 +43,14 @@ public class User   {
         private String uuid;
 
         @Size(max=64)
-        @JsonProperty("userName")
+        @JsonIgnore
         private String userName;
 
+        @JsonIgnore
         @Size(max=64)
-        @JsonProperty("password")
         private String password;
 
-        @JsonProperty("salutation")
+        @JsonIgnore
         private String salutation;
 
         @NotNull
@@ -75,11 +76,11 @@ public class User   {
         private String altContactNumber;
 
         @Size(max=10)
-        @JsonProperty("pan")
+        @JsonIgnore
         private String pan;
 
         @Pattern(regexp = "^[0-9]{12}$", message = "AdharNumber should be 12 digit number")
-        @JsonProperty("aadhaarNumber")
+        @JsonIgnore
         private String aadhaarNumber;
 
         @Size(max=300)
@@ -109,14 +110,14 @@ public class User   {
         @JsonProperty("active")
         private Boolean active;
 
-        @JsonProperty("dob")
+        @JsonIgnore
         private Long dob;
 
-        @JsonProperty("pwdExpiryDate")
+        @JsonIgnore
         private Long pwdExpiryDate;
 
         @Size(max=16)
-        @JsonProperty("locale")
+        @JsonIgnore
         private String locale;
 
         @Size(max=50)
@@ -124,10 +125,10 @@ public class User   {
         private String type;
 
         @Size(max=36)
-        @JsonProperty("signature")
+        @JsonIgnore
         private String signature;
 
-        @JsonProperty("accountLocked")
+        @JsonIgnore
         private Boolean accountLocked;
 
         @JsonProperty("roles")
@@ -139,15 +140,15 @@ public class User   {
         private String fatherOrHusbandName;
 
         @Size(max=32)
-        @JsonProperty("bloodGroup")
+        @JsonIgnore
         private String bloodGroup;
 
         @Size(max=300)
-        @JsonProperty("identificationMark")
+        @JsonIgnore
         private String identificationMark;
 
         @Size(max=36)
-        @JsonProperty("photo")
+        @JsonIgnore
         private String photo;
 
         @Size(max=64)
