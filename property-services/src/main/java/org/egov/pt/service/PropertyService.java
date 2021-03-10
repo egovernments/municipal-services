@@ -306,7 +306,7 @@ public class PropertyService {
 		});
 
 		if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-			citizenFilterUtil.filterOwnerDocument(requestInfo, properties);
+			citizenFilterUtil.filtersForCitizen(requestInfo, properties);
 
 		return properties;
 	}
