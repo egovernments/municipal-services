@@ -26,7 +26,7 @@ public class BillGenerationReq {
 	@NotNull
 	private RequestInfo requestInfo;
 
-	@JsonProperty("billScheduler")
+	@JsonProperty("BillScheduler")
 	@Valid
 	private BillScheduler billScheduler;
 
