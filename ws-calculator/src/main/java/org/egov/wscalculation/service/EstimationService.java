@@ -281,8 +281,8 @@ public class EstimationService {
 		
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length-1]: "";
-		log.info("buildingType: "+buildingType );
+		final String propertyType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length-1]: "";
+		log.info("propertyType: "+propertyType );
 		// final String buildingType = "Domestic";
 		final String connectionType = waterConnection.getConnectionType();
 
@@ -290,6 +290,10 @@ public class EstimationService {
 		additionalDetail = mapper.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
 		final String waterSubUsageType = (String) additionalDetail
 				.getOrDefault(WSCalculationConstant.WATER_SUBUSAGE_TYPE, null);
+
+		final String buildingType = WSCalculationConstant.PROPERTY_TYPE_MIXED.equalsIgnoreCase(propertyType)
+				? (String) additionalDetail.getOrDefault(WSCalculationConstant.UNIT_USAGE_TYPE_KEY, null)
+				: propertyType;
 
 		return billingSlabs.stream().filter(slab -> {
 			boolean isBuildingTypeMatching = slab.getBuildingType().equalsIgnoreCase(buildingType);
