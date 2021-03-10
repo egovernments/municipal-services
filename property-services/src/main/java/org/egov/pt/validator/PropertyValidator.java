@@ -25,6 +25,7 @@ import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.workflow.BusinessService;
 import org.egov.pt.models.workflow.ProcessInstance;
 import org.egov.pt.models.workflow.State;
+import org.egov.pt.repository.PropertyRepository;
 import org.egov.pt.service.DiffService;
 import org.egov.pt.service.PropertyService;
 import org.egov.pt.service.WorkflowService;
@@ -67,6 +68,9 @@ public class PropertyValidator {
     
     @Autowired
     private WorkflowService workflowService;
+    
+    @Autowired
+    private PropertyRepository propertyRepository;
 	
 
     /**
@@ -812,5 +816,4 @@ public class PropertyValidator {
 
 		return false;
 	}
-
 }

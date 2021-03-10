@@ -107,6 +107,17 @@ public class PropertyController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/demand/_rollover", method = RequestMethod.POST)
+	public ResponseEntity<PropertyResponse> rollOver(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+														@Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+		List<Property> properties = propertyService.searchPropertyPlainSearch(propertyCriteria, requestInfoWrapper.getRequestInfo());
+		propertyService.intiateRollOver(propertyCriteria.getTenantId(), properties, requestInfoWrapper.getRequestInfo());
+		PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
+				responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 //	@RequestMapping(value = "/_cancel", method = RequestMethod.POST)
 //	public ResponseEntity<PropertyResponse> cancel(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 //												   @Valid @ModelAttribute PropertyCancelCriteria propertyCancelCriteria) {

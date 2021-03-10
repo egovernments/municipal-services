@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.pt.models.Assessment;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
@@ -82,6 +84,11 @@ public class PropertyRepository {
 		StringBuilder builder = new StringBuilder(basequery);
 		if (!ObjectUtils.isEmpty(criteria.getTenantId())) {
 			builder.append(" where tenantid=?");
+			preparedStmtList.add(criteria.getTenantId());
+		}
+		if (!ObjectUtils.isEmpty(criteria.getLocality()) && !ObjectUtils.isEmpty(criteria.getTenantId())) {
+			builder.append(" where propertyid in (select propertyid from eg_pt_address where locality=? and tenantid=?)");
+			preparedStmtList.add(criteria.getLocality());
 			preparedStmtList.add(criteria.getTenantId());
 		}
 		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
@@ -195,5 +202,28 @@ public class PropertyRepository {
 
 		return false;
 	}
+
+	public void saveRollOver(Property property, String finYear, String status, String reason) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String basequery = "insert into eg_pt_rollover (propertyid, tenantid, financialyear, status, reason) values (?, ?, ?, ?, ?)";
+		StringBuilder builder = new StringBuilder(basequery);
+		preparedStmtList.add(property.getPropertyId());
+		preparedStmtList.add(property.getTenantId());
+		preparedStmtList.add(finYear);
+		preparedStmtList.add(status);
+		preparedStmtList.add(reason);
+		jdbcTemplate.update(builder.toString(), preparedStmtList.toArray());
+	
+	}
+
+	public List<Map<String, Object>> fetchPropertiesForRollOver(String tenantid) {
+		List<Object> preparedStmtList = new ArrayList<>();
+		String basequery = "select * from  eg_pt_rollover ";
+		StringBuilder builder = new StringBuilder(basequery);
+		builder.append("where tenantid = ?");
+		preparedStmtList.add(tenantid);
+		return jdbcTemplate.queryForList(builder.toString(), preparedStmtList.toArray());
+	}
+
 
 }

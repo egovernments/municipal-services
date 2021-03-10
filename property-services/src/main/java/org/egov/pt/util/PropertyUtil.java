@@ -3,6 +3,7 @@ package org.egov.pt.util;
 import static org.egov.pt.util.PTConstants.ASMT_MODULENAME;
 import static org.egov.pt.util.PTConstants.BILL_AMOUNT_PATH;
 import static org.egov.pt.util.PTConstants.BILL_NODEMAND_ERROR_CODE;
+import static org.egov.pt.util.PTConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
 import org.egov.pt.config.PropertyConfiguration;
+import org.egov.pt.models.DemandSearchCriteria;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.enums.CreationReason;
@@ -25,8 +27,6 @@ import org.egov.pt.repository.ServiceRequestRepository;
 import org.egov.pt.web.contracts.PropertyRequest;
 import org.egov.pt.web.contracts.RequestInfoWrapper;
 import org.egov.tracer.model.ServiceCallException;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -257,4 +257,15 @@ public class PropertyUtil extends CommonUtils {
 		});
 		return copyOwners;
 	}
+	
+	public StringBuilder getDemandSearchUrl(DemandSearchCriteria criteria) {
+
+        return new StringBuilder().append(configs.getEgbsHost())
+                .append(configs.getEgbsSearchDemand()).append(URL_PARAMS_SEPARATER)
+                .append(TENANT_ID_FIELD_FOR_SEARCH_URL).append(criteria.getTenantId())
+                .append(SEPARATER)
+                .append("consumerCode=").append(criteria.getPropertyId())
+                .append(SEPARATER)
+                .append("status=").append("ACTIVE");
+    }
 }

@@ -115,9 +115,11 @@ public class AssessmentService {
 		List<AssessmentRequest> legacyAssessments = new ArrayList<>();
 		Assessment actualAssessment = request.getAssessment();
 		DemandRequest demandRequest = mapper.convertValue(actualAssessment.getAdditionalDetails(), DemandRequest.class);
+		
 		List<Demand> demands = demandRequest.getDemands();
 		if (demands == null || demands.isEmpty())
 			throw new CustomException("No_DEMAND", "No demand added for the property");
+		if(!actualAssessment.getAdditionalDetails().get("isRollOver").asBoolean())
 		demandValidator.validateAndfilterDemands(demands, actualAssessment.getPropertyId(),
 				actualAssessment.getTenantId());
 
