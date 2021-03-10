@@ -37,7 +37,7 @@ public class SewerageFieldValidator implements SewerageActionValidator {
 				errorMap.put("INVALID_SEWERAGE_CONNECTION_TYPE", "Connection type should not be empty");
 			}
 			if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate()) &&
-					sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate() != SWConstants.INVALID_CONEECTION_EXECUTION_DATE) {
+					sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate().equals(SWConstants.INVALID_CONEECTION_EXECUTION_DATE)) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
 		}
@@ -68,7 +68,7 @@ public class SewerageFieldValidator implements SewerageActionValidator {
 				errorMap.put("INVALID_SEWERAGE_CONNECTION_TYPE", "Connection type should not be empty");
 			}
 			if (StringUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate()) &&
-					sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate() != SWConstants.INVALID_CONEECTION_EXECUTION_DATE) {
+					sewerageConnectionRequest.getSewerageConnection().getConnectionExecutionDate().equals(SWConstants.INVALID_CONEECTION_EXECUTION_DATE)) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 
 			}
