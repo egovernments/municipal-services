@@ -358,6 +358,10 @@ public class UserService {
     private Long dateTolong(String date,String format){
         SimpleDateFormat f = new SimpleDateFormat(format);
         Date d = null;
+
+        if(d==null)
+        	return null;
+
         try {
             d = f.parse(date);
         } catch (ParseException e) {
