@@ -82,6 +82,15 @@ public class PropertyController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/owner/_validate")
+    public ResponseEntity<Boolean> getOwnersOfProperties(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+                                                   @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+
+        Boolean isUserOwnerOfProperty = propertyService.isUserOwnerOfProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
+        return new ResponseEntity<>(isUserOwnerOfProperty, HttpStatus.OK);
+    }
+
+
     @PostMapping("/_migration")
     public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                @Valid @ModelAttribute OldPropertyCriteria propertyCriteria) {

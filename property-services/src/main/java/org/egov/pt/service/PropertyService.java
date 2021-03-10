@@ -1,10 +1,6 @@
 package org.egov.pt.service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -310,6 +306,38 @@ public class PropertyService {
 
 		return properties;
 	}
+
+
+	public Boolean isUserOwnerOfProperty(PropertyCriteria criteria, RequestInfo requestInfo){
+
+		List<Property>  properties = searchProperty(criteria, requestInfo);
+
+		String uuid = requestInfo.getUserInfo().getUuid();
+		String mobileNumber = requestInfo.getUserInfo().getUserName();
+
+		for(Property property : properties){
+
+			List<String> allowedUUIDs = new LinkedList<>();
+
+			List<String> allowedMobileNumbers = new LinkedList<>();
+
+			property.getOwners().forEach(ownerInfo -> {
+				allowedUUIDs.add(ownerInfo.getUuid());
+				allowedMobileNumbers.add(ownerInfo.getMobileNumber());
+			});
+
+			allowedUUIDs.add(property.getAccountId());
+
+			if(!allowedUUIDs.contains(uuid) && !allowedMobileNumbers.contains(mobileNumber)){
+				return false;
+			}
+
+		}
+
+		return true;
+	}
+
+
 
 	public List<Property> searchPropertyPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
 		List<Property> properties = getPropertiesPlainSearch(criteria, requestInfo);
