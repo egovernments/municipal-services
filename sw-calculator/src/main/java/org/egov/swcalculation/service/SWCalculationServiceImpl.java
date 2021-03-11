@@ -10,21 +10,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
+import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.web.models.AdhocTaxReq;
+import org.egov.swcalculation.web.models.BillGeneraterReq;
+import org.egov.swcalculation.web.models.BillGenerationSearchCriteria;
+import org.egov.swcalculation.web.models.BillScheduler;
+import org.egov.swcalculation.web.models.BillScheduler.StatusEnum;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
 import org.egov.swcalculation.web.models.TaxHeadCategory;
 import org.egov.swcalculation.web.models.Property;
+import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.SewerageConnection;
 import org.egov.swcalculation.web.models.SewerageConnectionRequest;
 import org.egov.swcalculation.web.models.TaxHeadEstimate;
 import org.egov.swcalculation.web.models.TaxHeadMaster;
+import org.egov.swcalculation.repository.BillGeneratorDao;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.ImmutableSet;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +59,18 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	
 	@Autowired
 	private SWCalculationUtil sWCalculationUtil;
+	
+	@Autowired
+	private BillGeneratorService billGeneratorService;
+
+	@Autowired
+	private SWCalculationProducer producer;
+
+	@Autowired
+	private SWCalculationConfiguration configs;
+
+	@Autowired
+	private BillGeneratorDao billGeneratorDao;
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Sewerage Charge
@@ -270,5 +292,46 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<Calculation> calculations = Collections.singletonList(calculation);
 		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
+	
+	/**
+	 * Generate bill Based on Time (Monthly, Quarterly, Yearly)
+	 */
+	public void generateBillBasedLocality(RequestInfo requestInfo) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for water bill generation on : " + date.format(dateTimeFormatter));
+
+		BillGenerationSearchCriteria criteria = new BillGenerationSearchCriteria();
+		criteria.setStatus(SWCalculationConstant.INITIATED_CONST);
+
+		List<BillScheduler> billSchedularList = billGeneratorService.getBillGenerationDetails(criteria);
+		if (billSchedularList.isEmpty())
+			return;
+		log.info("billSchedularList count : " + billSchedularList.size());
+		for (BillScheduler billSchedular : billSchedularList) {
+			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+			if (connectionNos == null || connectionNos.isEmpty()) {
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+				return;
+			}
+
+			log.info("Producer ConsumerCodes size : {}", connectionNos.size());
+
+			BillGeneraterReq billGeneraterReq = BillGeneraterReq
+					.builder()
+					.requestInfoWrapper(requestInfoWrapper)
+					.tenantId(billSchedular.getTenantId())
+					.consumerCodes(ImmutableSet.copyOf(connectionNos))
+					.billSchedular(billSchedular)
+					.build();
+
+				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+
+		}
+	}
+
 
 }

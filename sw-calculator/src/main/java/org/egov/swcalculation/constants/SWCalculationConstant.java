@@ -318,6 +318,18 @@ public class SWCalculationConstant {
 	public static final String plotBasedConst = "PLOT_BASED";
 	
 	public static final String PROPERTY_TYPE_MIXED = "MIXED";
+	
 	public static final String UNIT_USAGE_TYPE_KEY = "unitUsageType";
+	
+	public static final String INITIATED_CONST = "INITIATED";
+
+	public static final String INPROGRESS_CONST = "INPROGRESS";
+
+	public static final String COMPLETED_CONST = "COMPLETED";
+
+    public static final String EG_SW_CAL_JSON_EXCEPTION_KEY = "EG_SW_CAL_JSON_EXCEPTION";
+
+    public static final String EG_SW_CAL_JSON_EXCEPTION_MSG = "Exception occured while parsing additional details";
+
 
 }

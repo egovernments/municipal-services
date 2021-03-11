@@ -10,6 +10,7 @@ import org.egov.swcalculation.repository.rowMapper.BillGenerateSchedulerRowMappe
 import org.egov.swcalculation.web.models.BillGenerationRequest;
 import org.egov.swcalculation.web.models.BillGenerationSearchCriteria;
 import org.egov.swcalculation.web.models.BillScheduler;
+import org.egov.swcalculation.web.models.BillScheduler.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -48,5 +49,18 @@ public class BillGeneratorDao {
 			return Collections.emptyList();
 		log.debug("Prepared Statement" + preparedStatement.toString());
 		return jdbcTemplate.query(query, preparedStatement.toArray(), billGenerateSchedulerRowMapper);
+	}
+	
+	/**
+	 * executes query to update bill scheduler status 
+	 * @param billIds
+	 */
+	public void updateBillSchedularStatus(String schedulerId, StatusEnum status) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+		preparedStmtList.add(status.toString());
+		preparedStmtList.add(schedulerId.toString());
+		String queryStr = queryBuilder.getBillSchedulerUpdateQuery(schedulerId, preparedStmtList);
+		jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 	}
 }

@@ -180,4 +180,7 @@ public class SWCalculationConfiguration {
 
 	@Value("${workflow.process.search.path}")
 	private String searchWorkflowProcessEndPoint;
+	
+	@Value("${egov.swcalculatorservice.billgenerate.topic}")
+	private String billGenerateSchedulerTopic;
 }

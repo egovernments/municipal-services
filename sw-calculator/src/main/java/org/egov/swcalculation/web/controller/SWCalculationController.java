@@ -80,6 +80,11 @@ public class SWCalculationController {
 	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
 		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
 	}
+	
+	@PostMapping("/_jobbillscheduler")
+	public void jobbillscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+		sWCalculationService.generateBillBasedLocality(requestInfoWrapper.getRequestInfo());
+	}
 
 	@PostMapping("/_applyAdhocTax")
 	public ResponseEntity<CalculationRes> applyAdhocTax(@Valid @RequestBody AdhocTaxReq adhocTaxReq) {
