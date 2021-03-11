@@ -316,5 +316,8 @@ public class SWCalculationConstant {
 	public static final String SW_BILL_SCHEDULER_TRANSACTION = "Bill Generation";
 	
 	public static final String plotBasedConst = "PLOT_BASED";
+	
+	public static final String PROPERTY_TYPE_MIXED = "MIXED";
+	public static final String UNIT_USAGE_TYPE_KEY = "unitUsageType";
 
 }

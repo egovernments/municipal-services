@@ -292,8 +292,16 @@ public class EstimationService {
 
 		// get billing Slab
 		log.debug(" the slabs count : " + billingSlabs.size());
-		final String buildingType = (property.getUsageCategory() != null) ? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length-1]: "";
-			
+		final String propertyType = (property.getUsageCategory() != null)
+				? property.getUsageCategory().split("\\.")[property.getUsageCategory().split("\\.").length - 1] : "";
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		additionalDetail = mapper.convertValue(sewerageConnection.getSewerageConnection().getAdditionalDetails(),
+				HashMap.class);
+
+		final String buildingType = SWCalculationConstant.PROPERTY_TYPE_MIXED.equalsIgnoreCase(propertyType)
+				? (String) additionalDetail.getOrDefault(SWCalculationConstant.UNIT_USAGE_TYPE_KEY, null)
+				: propertyType;
+	
 		final String connectionType = sewerageConnection.getSewerageConnection().getConnectionType();
 
 		return billingSlabs.stream().filter(slab -> {
