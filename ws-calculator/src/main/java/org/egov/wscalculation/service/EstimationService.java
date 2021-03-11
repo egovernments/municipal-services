@@ -154,8 +154,8 @@ public class EstimationService {
 		String billingType = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE, null);
 		if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)
 				&& billingType.equalsIgnoreCase(WSCalculationConstant.CUSTOM)) {
-			BigDecimal customWaterCharges = (BigDecimal) additionalDetail
-					.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, BigDecimal.ZERO);
+			String billingAmtStr = (String)additionalDetail.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, "0");
+			BigDecimal customWaterCharges = new BigDecimal(billingAmtStr);
 			return customWaterCharges;
 		} else {
 			if (billingSlabMaster.get(WSCalculationConstant.WC_BILLING_SLAB_MASTER) == null)
@@ -296,10 +296,10 @@ public class EstimationService {
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
-			log.info("BuildingTypeMatching: " + slab.getBuildingType());
+//			log.info("BuildingTypeMatching: " + slab.getBuildingType());
 
-			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
-					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
+//			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
+//					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
 
 			if (waterSubUsageType != null) {
 				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
