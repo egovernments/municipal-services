@@ -38,7 +38,7 @@ public class WSCalculatorQueryBuilder {
 
 	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_ws_scheduler SET status=? where id=?";
 
-	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id";
+	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id INNER JOIN eg_pt_address address ON conn.property_id=address.propertyid ";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -257,13 +257,9 @@ public class WSCalculatorQueryBuilder {
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		
-		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.connectionno = ? ");
-		preparedStatement.add("107000137");
-		
 		if (locality != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" locality = ? ");
+			query.append(" address.locality = ? ");
 			preparedStatement.add(locality);
 		}
 		
