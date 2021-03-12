@@ -75,7 +75,7 @@ public class PropertyController {
                                                    @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
 
         propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-        List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
+        List<Property> properties = propertyService.searchPropertyWithCitizenFilters(propertyCriteria,requestInfoWrapper.getRequestInfo());
         PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
                 .build();
