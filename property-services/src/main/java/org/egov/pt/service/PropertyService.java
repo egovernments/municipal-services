@@ -301,6 +301,45 @@ public class PropertyService {
 			enrichmentService.enrichBoundary(property, requestInfo);
 		});
 
+		return properties;
+	}
+
+	/**
+	 * Search property with given PropertyCriteria
+	 *
+	 * @param criteria PropertyCriteria containing fields on which search is based
+	 * @return list of properties satisfying the containing fields in criteria
+	 */
+	public List<Property> searchPropertyWithCitizenFilters(PropertyCriteria criteria, RequestInfo requestInfo) {
+
+		List<Property> properties;
+
+		/*
+		 * throw error if audit request is with no proeprty id or multiple propertyids
+		 */
+		if (criteria.isAudit() && (CollectionUtils.isEmpty(criteria.getPropertyIds())
+				|| (!CollectionUtils.isEmpty(criteria.getPropertyIds()) && criteria.getPropertyIds().size() > 1))) {
+
+			throw new CustomException("EG_PT_PROPERTY_AUDIT_ERROR", "Audit can only be provided for a single propertyId");
+		}
+
+		if (criteria.getMobileNumber() != null || criteria.getName() != null || criteria.getOwnerIds() != null) {
+
+			/* converts owner information to associated property ids */
+			Boolean shouldReturnEmptyList = repository.enrichCriteriaFromUser(criteria, requestInfo);
+
+			if (shouldReturnEmptyList)
+				return Collections.emptyList();
+
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
+		} else {
+			properties = repository.getPropertiesWithOwnerInfo(criteria, requestInfo, false);
+		}
+
+		properties.forEach(property -> {
+			enrichmentService.enrichBoundary(property, requestInfo);
+		});
+
 		if(requestInfo.getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
 			citizenFilterUtil.filtersForCitizen(requestInfo, properties);
 
