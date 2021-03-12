@@ -171,8 +171,9 @@ public class DemandService {
 	 */
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNO, long taxPeriodFrom, long taxPeriodTo) {
-		List<Demand> demands = new LinkedList<>();
+		List<Demand> demandRes = new LinkedList<>();
 		for (Calculation calculation : calculations) {
+			List<Demand> demands = new LinkedList<>();
 			WaterConnection connection = calculation.getWaterConnection();
 			if (connection == null) {
 				throw new CustomException("INVALID_WATER_CONNECTION",
@@ -220,11 +221,14 @@ public class DemandService {
 					.minimumAmountPayable(minimumPayableAmount).tenantId(tenantId).taxPeriodFrom(taxPeriodFrom)
 					.taxPeriodTo(taxPeriodTo).consumerType("waterConnection").businessService(businessService)
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build());
+			
+			log.info("Demand Object" + demands.toString());
+			demandRes.addAll(demandRepository.saveDemand(requestInfo, demands));
+			if (WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType()))
+				fetchBill(demandRes, requestInfo);
+			
 		}
-		log.info("Demand Object" + demands.toString());
-		List<Demand> demandRes = demandRepository.saveDemand(requestInfo, demands);
-		if (isForConnectionNO)
-			fetchBill(demandRes, requestInfo);
+		
 		return demandRes;
 	}
 
