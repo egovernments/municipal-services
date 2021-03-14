@@ -695,7 +695,7 @@ public class DemandService {
 						taxPeriodFrom, taxPeriodTo);
 				if (isConnectionValid) {
 					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-							.assessmentYear(assessmentYear).connectionNo(waterConnection.getConnectionNo()).build();
+							.assessmentYear(assessmentYear).from(taxPeriodFrom).to(taxPeriodTo).connectionNo(waterConnection.getConnectionNo()).build();
 					List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 					calculationCriteriaList.add(calculationCriteria);
 					CalculationReq calculationReq = CalculationReq.builder()

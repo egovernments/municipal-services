@@ -209,8 +209,8 @@ public class MasterDataService {
 			}
 		}
 		Map<String, Object> billingPeriod = new HashMap<>();
-		if (master.get(WSCalculationConstant.ConnectionType).toString()
-				.equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+		if (WSCalculationConstant.meteredConnectionType
+				.equalsIgnoreCase(criteria.getWaterConnection().getConnectionType())) {
 			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
 			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 		} else {
