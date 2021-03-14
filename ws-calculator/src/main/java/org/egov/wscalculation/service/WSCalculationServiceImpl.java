@@ -223,7 +223,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			if(criteria.getFrom() <= 0 || criteria.getTo() <= 0){
+			if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
 				criteria.setFrom(request.getTaxPeriodFrom());
 				criteria.setTo(request.getTaxPeriodTo());
 			}
