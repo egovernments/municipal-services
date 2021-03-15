@@ -218,5 +218,7 @@ public class SWConstants {
 			.unmodifiableList(Arrays.asList(MODIFIED_FINAL_STATE, STATUS_APPROVED));
 
 	public static final String SEARCH_TYPE_CONNECTION = "CONNECTION";
+	
+	public static final long INVALID_CONEECTION_EXECUTION_DATE = 0L;
 
 }
