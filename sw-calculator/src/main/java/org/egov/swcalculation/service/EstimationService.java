@@ -170,11 +170,11 @@ public class EstimationService {
 		String billingType = (String) additionalDetail.getOrDefault(SWCalculationConstant.BILLINGTYPE, null);
 		if (sewerageConnection.getConnectionType().equalsIgnoreCase(SWCalculationConstant.nonMeterdConnection)
 				&& billingType.equalsIgnoreCase(SWCalculationConstant.CUSTOM)) {
-			String billingAmountStr = (String) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT, "0");
-			sewerageCharge = new BigDecimal(billingAmountStr);
+			Integer billingAmountInt = (Integer) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
+			sewerageCharge = BigDecimal.valueOf(Long.valueOf(billingAmountInt)).setScale(2, 2);
+			return sewerageCharge;
 //			sewerageCharge = (BigDecimal) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT,
 //					BigDecimal.ZERO);
-			return sewerageCharge;
 		}
 
 		// Sewerage Charge Calculation
