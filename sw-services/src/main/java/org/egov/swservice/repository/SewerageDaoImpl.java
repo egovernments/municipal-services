@@ -86,6 +86,7 @@ public class SewerageDaoImpl implements SewerageDao {
 
 	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,
 			boolean isStateUpdatable) {
+		log.info("SW application state updatable flag:"+isStateUpdatable);
 		if (isStateUpdatable) {
 			sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
 		} else {
