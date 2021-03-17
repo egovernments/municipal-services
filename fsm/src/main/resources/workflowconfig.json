@@ -316,7 +316,7 @@
                         {
                             "tenantId": "pb",
                             "currentState": "CITIZEN_FEEDBACK_PENDING",
-                            "action": "SUBMIT_FEEDBACK",
+                            "action": "RATE",
                             "nextState": "COMPLETED",
                             "roles": [
                                 "CITIZEN"
