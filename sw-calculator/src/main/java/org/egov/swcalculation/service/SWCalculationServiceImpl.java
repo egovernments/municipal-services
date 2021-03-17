@@ -199,7 +199,16 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
-		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo));
+		for (String tenantId : tenantIds) {
+			try {
+				demandService.generateDemandForTenantId(tenantId, requestInfo);
+			} catch (Exception e) {
+				log.error("Exception occurred while generating demand for tenant: {} : " , tenantId);
+				e.printStackTrace();
+				continue;
+
+			}
+		}
 	}
 
 	/**
