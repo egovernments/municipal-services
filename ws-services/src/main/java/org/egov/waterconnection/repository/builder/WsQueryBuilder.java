@@ -128,8 +128,14 @@ public class WsQueryBuilder {
 		
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.tenantid = ? ");
-			preparedStatement.add(criteria.getTenantId());
+			if(criteria.getTenantId().equalsIgnoreCase(config.getStateLevelTenantId())){
+				query.append(" conn.tenantid LIKE ");
+				preparedStatement.add(criteria.getTenantId() + '%');
+			}
+			else{
+				query.append(" conn.tenantid = ? ");
+				preparedStatement.add(criteria.getTenantId());
+			}
 		}
 		if (!StringUtils.isEmpty(criteria.getPropertyId()) && StringUtils.isEmpty(criteria.getMobileNumber())) {
 			if(propertyIdsPresent)

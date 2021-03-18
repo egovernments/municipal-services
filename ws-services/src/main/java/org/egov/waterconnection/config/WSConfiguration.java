@@ -196,4 +196,7 @@ public class WSConfiguration {
 
 	@Value("${egov.collection.host}")
 	private String collectionHost;
+
+	@Value("${egov.state.level.tenantid}")
+	private String stateLevelTenantId;
 }
