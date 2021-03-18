@@ -176,7 +176,7 @@ consumerGroup.on("message", function(message) {
           Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and  ${messageForcertificate}
           Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.
           You can download your Fire NOC Certificate by clicking on the below link:
-          ${downLoadLink}`;
+          ${downLoadLink}|1301157492438182299|1407161494277225601`;
           break;
         case "SENDBACKTOCITIZEN":
           smsRequest[
