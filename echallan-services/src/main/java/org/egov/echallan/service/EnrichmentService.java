@@ -66,7 +66,7 @@ public class EnrichmentService {
         }
         challan.setFilestoreid(null);
         setIdgenIds(challanRequest);
-        setGLCode(challanRequest);
+        // setGLCode(challanRequest);
     }
 
     private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey,
