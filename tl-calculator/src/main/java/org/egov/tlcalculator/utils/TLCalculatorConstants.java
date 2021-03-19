@@ -53,6 +53,8 @@ public class TLCalculatorConstants {
     public static final String REBATE_MASTER = "Rebate";
 
     public static final String PENANLTY_MASTER = "Penalty";
+    
+    public static final String TENANT_MASTER = "tenants";
 
     public static final String FROMFY_FIELD_NAME = "fromFY";
 

@@ -12,6 +12,7 @@ import org.egov.tlcalculator.utils.TLCalculatorConstants;
 import org.egov.tlcalculator.web.models.CalulationCriteria;
 import org.egov.tlcalculator.web.models.demand.Category;
 import org.egov.tlcalculator.web.models.demand.TaxHeadEstimate;
+import org.egov.tlcalculator.web.models.tradelicense.TradeLicense;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -43,18 +44,21 @@ public class TLRenewalCalculation {
 
     public List<TaxHeadEstimate> tlRenewalCalculation(RequestInfo requestInfo, CalulationCriteria calulationCriteria, Object mdmsData, BigDecimal taxAmt){
         Map<String, JSONArray> timeBasedExemptionMasterMap = new HashMap<>();
+        Map<String,JSONArray> tenantMasterMap=new HashMap<>();
         TaxHeadEstimate estimateRebate = new TaxHeadEstimate();
         TaxHeadEstimate estimatePenalty = new TaxHeadEstimate();
         List<TaxHeadEstimate> estimateList = new ArrayList<>();
         String tenantId = calulationCriteria.getTenantId();
         setPropertyMasterValues(requestInfo, tenantId,timeBasedExemptionMasterMap);
+        setTenantMasterValues(requestInfo, tenantId, tenantMasterMap);
+
         String financialyear = calulationCriteria.getTradelicense().getFinancialYear();
 
         BigDecimal rebate = getRebate(taxAmt, financialyear,timeBasedExemptionMasterMap.get(TLCalculatorConstants.REBATE_MASTER));
         BigDecimal penalty = BigDecimal.ZERO;
 
-        if (rebate.equals(BigDecimal.ZERO)) {
-            penalty = getPenalty(taxAmt, financialyear, timeBasedExemptionMasterMap.get(TLCalculatorConstants.PENANLTY_MASTER));
+        if (rebate.intValue()== 0) {
+            penalty = getPenalty(tenantId,taxAmt, financialyear, timeBasedExemptionMasterMap.get(TLCalculatorConstants.PENANLTY_MASTER),calulationCriteria.getTradelicense(),tenantMasterMap.get(TLCalculatorConstants.TENANT_MASTER));
         }
 
         estimateRebate.setCategory(Category.REBATE);
@@ -108,20 +112,48 @@ public class TLRenewalCalculation {
      * @param assessmentYear
      * @return
      */
-    public BigDecimal getPenalty(BigDecimal taxAmt, String assessmentYear, JSONArray penaltyMasterList) {
+    public BigDecimal getPenalty(String tenantId,BigDecimal taxAmt, String financialYear, JSONArray penaltyMasterList,TradeLicense tradeLicense,JSONArray tenantList) {
 
         BigDecimal penaltyAmt = BigDecimal.ZERO;
-        Map<String, Object> penalty = getApplicableMaster(assessmentYear, penaltyMasterList);
-        if (null == penalty) return penaltyAmt;
+        Map<String, Object> ulbGrade=getApplicableMasterForTenant(tenantId,financialYear,tenantList);
+        Map<String, Object> configMap = (Map<String, Object>) ulbGrade;
+        Map<String, Object> configMapp = (Map<String, Object>) configMap.get("city");
 
-        String[] time = getStartTime(assessmentYear,penalty);
+        String ulbGradeFromTenantMaster = configMapp.get("ulbGrade").toString();
+        Map<String, Object> penalty = getApplicableMasterForPenalty(financialYear, penaltyMasterList,ulbGradeFromTenantMaster);
+
+        if (null == penalty) return penaltyAmt;
+        Long commencementDate=tradeLicense.getCommencementDate();
+        Long applicationDate=tradeLicense.getApplicationDate();
+        String[] time = getStartTime(financialYear,penalty);
         Calendar cal = Calendar.getInstance();
         setDateToCalendar(time, cal);
+        long totalDays =0;
         Long currentIST = System.currentTimeMillis()+TLCalculatorConstants.TIMEZONE_OFFSET;
-
+        if(tradeLicense.getApplicationType().toString().equals("NEW")) {
+        if(commencementDate>cal.getTimeInMillis())
+        {
+        	totalDays=(currentIST - commencementDate) / (24 * 60 * 60 * 1000);
+        }
+        else {
+        	totalDays= (currentIST - cal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+        }}
+        else {
+        	 if(applicationDate>cal.getTimeInMillis())
+             {
+             	totalDays=(applicationDate - cal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
+             }
+        	 else
+        		 totalDays=0;
+   
+        }
+        BigDecimal applicableDays = new BigDecimal(totalDays);
         if (cal.getTimeInMillis() < currentIST)
-            penaltyAmt = calculateApplicables(taxAmt, penalty);
-
+            penaltyAmt = calculateApplicables(applicableDays, penalty);
+        
+        
+        
+        
         return penaltyAmt;
     }
 
@@ -139,13 +171,26 @@ public class TLRenewalCalculation {
         for (Map.Entry<String, JSONArray> entry : res.entrySet())
             timeBasedExemptionMasterMap.put(entry.getKey(), entry.getValue());
     }
+    
+    public void setTenantMasterValues(RequestInfo requestInfo, String tenantId, Map<String, JSONArray> tenantMasterMap) {
+
+        MdmsResponse response = mapper.convertValue(fetchTenantData(requestInfo, tenantId), MdmsResponse.class);
+        Map<String, JSONArray> res = response.getMdmsRes().get("tenant");
+        System.out.println("MDMS--->"+res.toString());
+        for (Map.Entry<String, JSONArray> entry : res.entrySet())
+        	tenantMasterMap.put(entry.getKey(), entry.getValue());
+    }
 
     @Cacheable(value = "mdmsData", sync = true, key = "tenantId")
     private Object fetchMdmsData(RequestInfo requestInfo, String tenantId) {
         return repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
                 getPropertyModuleRequest(requestInfo, tenantId));
     }
-
+    @Cacheable(value = "mdmsData", sync = true, key = "tenantId")
+    private Object fetchTenantData(RequestInfo requestInfo, String tenantId) {
+        return repository.fetchResult(calculatorUtils.getMdmsSearchUrl(),
+                getTenantModuleRequest(requestInfo, tenantId));
+    }
     /**
      * Methods provides all the usage category master for property tax module
      */
@@ -154,14 +199,23 @@ public class TLRenewalCalculation {
         List<MasterDetail> details = new ArrayList<>();
         details.add(MasterDetail.builder().name(TLCalculatorConstants.REBATE_MASTER).build());
         details.add(MasterDetail.builder().name(TLCalculatorConstants.PENANLTY_MASTER).build());
-
         ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
                 .moduleName("TradeLicense").build();
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
                 .build();
         return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
     }
+    public MdmsCriteriaReq getTenantModuleRequest(RequestInfo requestInfo, String tenantId) {
 
+        List<MasterDetail> details = new ArrayList<>();
+       details.add(MasterDetail.builder().name(TLCalculatorConstants.TENANT_MASTER).build());
+
+        ModuleDetail mdDtl = ModuleDetail.builder().masterDetails(details)
+                .moduleName("tenant").build();
+        MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(mdDtl)).tenantId(tenantId)
+                .build();
+        return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+    }
     /**
      * Returns the 'APPLICABLE' master object from the list of inputs
      *
@@ -208,6 +262,64 @@ public class TLRenewalCalculation {
                     }
                 }
             }
+        }
+        return objToBeReturned;
+    }
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getApplicableMasterForTenant(String tenantId,String assessmentYear, List<Object> masterList) {
+
+        Map<String, Object> objToBeReturned = null;
+      
+
+        for (Object object : masterList) {
+
+            Map<String, Object> objMap = (Map<String, Object>) object;
+           
+
+            String tenantCode = ((String) objMap.get("code"));
+            if(tenantCode.equalsIgnoreCase(tenantId))
+            	return objMap;
+            
+             }
+        return objToBeReturned;
+    }
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getApplicableMasterForPenalty(String assessmentYear, List<Object> masterList,String ulbGrade) {
+
+        Map<String, Object> objToBeReturned = null;
+        String maxYearFromTheList = "0";
+        Long maxStartTime = 0l;
+
+        for (Object object : masterList) {
+
+            Map<String, Object> objMap = (Map<String, Object>) object;
+            String objFinYear = ((String) objMap.get(TLCalculatorConstants.FROMFY_FIELD_NAME)).split("-")[0];
+            if(!objMap.containsKey(TLCalculatorConstants.STARTING_DATE_APPLICABLES)){
+                if (objFinYear.compareTo(assessmentYear.split("-")[0]) == 0)
+                	objToBeReturned = objMap;
+
+                else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+                    maxYearFromTheList = objFinYear;
+                    objToBeReturned = objMap;
+                }
+            }
+            else{
+                String objStartDay = ((String) objMap.get(TLCalculatorConstants.STARTING_DATE_APPLICABLES));
+                if (assessmentYear.split("-")[0].compareTo(objFinYear) >= 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+                    maxYearFromTheList = objFinYear;
+                    Long startTime = getStartDayInMillis(objStartDay);
+                    Long currentTime = System.currentTimeMillis();
+                    if(startTime < currentTime && maxStartTime < startTime && objMap.get("type").toString().contains(ulbGrade)){
+                        objToBeReturned = objMap;
+                        maxStartTime = startTime;
+                    }
+                }
+            }
+            
+//            if(((String) objMap.get("type")).contains(ulbGrade))
+//                objToBeReturned = objMap;
+//            else
+//            	objToBeReturned=null;
         }
         return objToBeReturned;
     }
@@ -284,17 +396,19 @@ public class TLRenewalCalculation {
         BigDecimal flatAmt = null != configMap.get(TLCalculatorConstants.FLAT_AMOUNT_FIELD_NAME)
                 ? BigDecimal.valueOf(((Number) configMap.get(TLCalculatorConstants.FLAT_AMOUNT_FIELD_NAME)).doubleValue())
                 : BigDecimal.ZERO;
-
+                
         if (null == rate)
-            currentApplicable = flatAmt.compareTo(applicableAmount) > 0 ? applicableAmount : flatAmt;
-        else {
-            currentApplicable = applicableAmount.multiply(rate.divide(TLCalculatorConstants.HUNDRED));
-
-            if (null != maxAmt && BigDecimal.ZERO.compareTo(maxAmt) < 0 && currentApplicable.compareTo(maxAmt) > 0)
-                currentApplicable = maxAmt;
-            else if (null != minAmt && currentApplicable.compareTo(minAmt) < 0)
-                currentApplicable = minAmt;
-        }
+              {
+               // currentApplicable = flatAmt.compareTo(applicableAmount) > 0 ? applicableAmount : flatAmt;
+               currentApplicable = flatAmt.add(minAmt.multiply(applicableAmount));
+              }
+              else {
+                  currentApplicable = flatAmt.add((applicableAmount.subtract(BigDecimal.ONE)).multiply(rate));
+                  if (null != maxAmt && BigDecimal.ZERO.compareTo(maxAmt) < 0 && currentApplicable.compareTo(maxAmt) > 0)
+                      currentApplicable = maxAmt;
+                  else if (null != minAmt && currentApplicable.compareTo(minAmt) < 0)
+                      currentApplicable = minAmt;
+              }
         return currentApplicable;
     }
 

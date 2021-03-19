@@ -186,6 +186,7 @@ public class CalculationService {
       }else{
           estimate.setTaxHeadCode(config.getBaseTaxHead());
           estimateList.add(estimate);
+          estimateList.addAll(tlRenewal.tlRenewalCalculation(requestInfo,calulationCriteria,mdmsData,totalTax));
       }
 
       estimatesAndSlabs.setEstimates(estimateList);
