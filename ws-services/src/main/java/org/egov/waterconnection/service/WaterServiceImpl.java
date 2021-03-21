@@ -85,7 +85,7 @@ public class WaterServiceImpl implements WaterService {
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
 		int reqType = WCConstants.CREATE_APPLICATION;
-		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest)) {
+		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest) && config.getIsExternalWorkFlowEnabled()) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
 
 			// Validate any process Instance exists with WF
