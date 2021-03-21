@@ -87,7 +87,7 @@ public class SewerageServiceImpl implements SewerageService {
 	@Override
 	public List<SewerageConnection> createSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest) {
 		int reqType = SWConstants.CREATE_APPLICATION;
-		if (sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest)) {
+		if (sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest) && config.getIsExternalWorkFlowEnabled()) {
 			List<SewerageConnection> sewerageConnectionList = getAllSewerageApplications(sewerageConnectionRequest);
 			if (!CollectionUtils.isEmpty(sewerageConnectionList)) {
 				workflowService.validateInProgressWF(sewerageConnectionList, sewerageConnectionRequest.getRequestInfo(),
