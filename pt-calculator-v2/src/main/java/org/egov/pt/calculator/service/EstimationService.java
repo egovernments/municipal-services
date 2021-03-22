@@ -254,7 +254,9 @@ public class EstimationService {
 			 * making call to get unbuilt area tax estimate
 			 */
 			taxAmt = taxAmt.add(unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
-
+			// for AssessmentYear FY 2021-22, 5% is to be added with PT Tax
+			if(assessmentYear.startsWith("2021-"))
+				taxAmt=taxAmt.multiply(new BigDecimal("1.05"));
 			/*
 			 * special case to handle property with one unit
 			 */
