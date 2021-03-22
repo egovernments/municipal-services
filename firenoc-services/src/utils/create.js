@@ -23,6 +23,7 @@ export const addUUIDAndAuditDetails = async (request, method = "_update") => {
         ? fireNOCApplication
         : await addIDGenId(RequestInfo, [
             {
+              idName: envVariables.EGOV_IDGEN_FN_CERTIFICATE_NO_NAME,
               tenantId: FireNOCs[i].tenantId,
               format: envVariables.EGOV_APPLICATION_FORMATE
             }
@@ -173,6 +174,7 @@ const checkApproveRecord = async (fireNoc = {}, RequestInfo) => {
       ? fireNOCNumber
       : await addIDGenId(RequestInfo, [
           {
+            idName: envVariables.EGOV_IDGEN_FN_CERTIFICATE_NO_NAME,
             tenantId: fireNoc.tenantId,
             format: envVariables.EGOV_CIRTIFICATE_FORMATE
           }
