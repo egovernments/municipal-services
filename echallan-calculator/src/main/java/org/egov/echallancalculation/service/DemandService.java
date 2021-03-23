@@ -75,6 +75,7 @@ public class DemandService {
         
         //Calling fetchbill service after demand creation/updation to handle duplicate bill generation issue
         for (Calculation calculation : calculations) {
+        	if(calculation.getChallan().getApplicationStatus()!=null && !calculation.getChallan().getApplicationStatus().equals(StatusEnum.CANCELLED.toString())) {
         	String tenantId = calculation.getTenantId();
         	String consumerCode = calculation.getChallan().getChallanNo();
         	GenerateBillCriteria billCriteria = GenerateBillCriteria.builder().
@@ -83,6 +84,7 @@ public class DemandService {
         			businessService(businessService)
         			.build();
         	generateBill(requestInfo,billCriteria);
+        	 }
         }
        
     }
