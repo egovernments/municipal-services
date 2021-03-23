@@ -3,11 +3,13 @@ package org.egov.waterconnection.web.controller;
 import java.util.List;
 import javax.validation.Valid;
 
+import org.egov.waterconnection.web.models.DocumentRequest;
 import org.egov.waterconnection.web.models.RequestInfoWrapper;
 import org.egov.waterconnection.web.models.SearchCriteria;
 import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.WaterConnectionResponse;
+import org.egov.waterconnection.service.DocumentService;
 import org.egov.waterconnection.service.WaterService;
 import org.egov.waterconnection.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class WaterController {
 	@Autowired
 	private WaterService waterService;
 
+	@Autowired
+	private DocumentService documentService;
+	
 	@Autowired
 	private final ResponseInfoFactory responseInfoFactory;
 
@@ -71,5 +76,11 @@ public class WaterController {
 
 	}
 
+	@RequestMapping(value = "/documents/_create", method = RequestMethod.POST)
+	public ResponseEntity<String> saveDocuments(@Valid @RequestBody DocumentRequest documentRequest) {
+
+		documentService.saveDocuments(documentRequest, documentRequest.getRequestInfo());
+		return new ResponseEntity<>("WS Connection FilestoreIds Saved", HttpStatus.CREATED);
+	}
 
 }
