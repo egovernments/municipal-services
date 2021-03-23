@@ -224,7 +224,7 @@ public class EstimationService {
             
 			for (Unit unit : activeUnits) {
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
-				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
+				BigDecimal currentUnitTax = getTaxForUnit(slab, unit,assessmentYear);
 				billingSlabIds.add(slab.getId()+"|"+i);
 				unitSlabMapping.put(unit, slab);
 
@@ -253,10 +253,14 @@ public class EstimationService {
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
-			taxAmt = taxAmt.add(unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
-			// for AssessmentYear FY 2021-22, 5% is to be added with PT Tax
-			if(assessmentYear.startsWith("2021-"))
-				taxAmt=taxAmt.multiply(new BigDecimal("1.05"));
+			
+			BigDecimal unBuiltTax=unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+			
+			if(assessmentYear.startsWith("2021-"))   // for 2021-22, 5% increase
+				unBuiltTax=unBuiltTax.multiply(new BigDecimal("1.05"));
+
+			taxAmt = taxAmt.add(unBuiltTax);
+			
 			/*
 			 * special case to handle property with one unit
 			 */
@@ -333,7 +337,7 @@ public class EstimationService {
 	 * @param unit the unit for which tax should be calculated.
 	 * @return calculated tax amount for the incoming unit
 	 */
-	private BigDecimal getTaxForUnit(BillingSlab slab, Unit unit) {
+	private BigDecimal getTaxForUnit(BillingSlab slab, Unit unit,String assessmentYear) {
 
 		boolean isUnitCommercial = unit.getUsageCategoryMajor().equalsIgnoreCase(configs.getUsageMajorNonResidential());
 		boolean isUnitRented = unit.getOccupancyType().equalsIgnoreCase(configs.getOccupancyTypeRented());
@@ -363,7 +367,10 @@ public class EstimationService {
 				multiplier = BigDecimal.valueOf(configs.getArvPercent() / 100);
 			currentUnitTax = unit.getArv().multiply(multiplier);
 		} else {
+	
 			currentUnitTax = BigDecimal.valueOf(unit.getUnitArea() * slab.getUnitRate());
+			if(assessmentYear.startsWith("2021-"))
+				currentUnitTax=currentUnitTax.multiply(new BigDecimal("1.05"));
 		}
 		return currentUnitTax;
 	}
@@ -1302,6 +1309,7 @@ public class EstimationService {
 			}
 
 		}
+      
         return unBuiltRateCalc;
     }
 
