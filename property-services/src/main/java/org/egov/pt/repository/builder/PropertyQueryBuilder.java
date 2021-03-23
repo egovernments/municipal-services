@@ -24,11 +24,9 @@ public class PropertyQueryBuilder {
 	
 	private static String PROEPRTY_AUDIT_QUERY = "select property from eg_pt_property_audit where propertyid=?";
 
-	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_property where tenantid= '{tenantid}' and id in (select propertyid from eg_pt_owner where userid IN {replace})";
+	private static String PROEPRTY_ID_QUERY = "select propertyid from eg_pt_property where id in (select propertyid from eg_pt_owner where userid IN {replace})";
 
 	private static String REPLACE_STRING = "{replace}";
-
-	private static String REPLACE_TENANTID_STRING = "{tenantid}";
 	
 	private static String WITH_CLAUSE_QUERY = " WITH propertyresult AS ({replace}) SELECT * FROM propertyresult "
 											+ "INNER JOIN (SELECT propertyid, min(statusorder) as minorder FROM propertyresult GROUP BY propertyid) as minresult "
@@ -311,7 +309,20 @@ public class PropertyQueryBuilder {
 		addToPreparedStatement(preparedStmtList, ownerIds);
 		query.append(")");
 
-		return PROEPRTY_ID_QUERY.replace(REPLACE_STRING, query).replace(REPLACE_TENANTID_STRING,tenantId).toString();
+		StringBuilder propertyIdQuery = new StringBuilder(PROEPRTY_ID_QUERY.replace(REPLACE_STRING, query));
+
+		if(tenantId.equalsIgnoreCase(config.getStateLevelTenantId())){
+			propertyIdQuery.append(AND_QUERY);
+			propertyIdQuery.append(" tenantId LIKE ? ");
+			preparedStmtList.add(tenantId + '%');
+		}
+		else{
+			propertyIdQuery.append(AND_QUERY);
+			propertyIdQuery.append(" tenantId= ? ");
+			preparedStmtList.add(tenantId);
+		}
+
+		return propertyIdQuery.toString();
 	}
 
 	private String createQuery(Set<String> ids) {
