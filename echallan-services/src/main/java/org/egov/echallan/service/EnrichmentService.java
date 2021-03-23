@@ -66,7 +66,6 @@ public class EnrichmentService {
         }
         challan.setFilestoreid(null);
         setIdgenIds(challanRequest);
-        setGLCode(challanRequest);
     }
 
     private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey,
@@ -181,41 +180,6 @@ public class EnrichmentService {
 	    	 challanRepository.setInactiveFileStoreId(challan.getTenantId().split("\\.")[0], Collections.singletonList(fileStoreId));
 	     }
 	     challan.setFilestoreid(null);
-	}
-	
-	private void setGLCode(ChallanRequest request) {
-		RequestInfo requestInfo = request.getRequestInfo();
-		Challan challan = request.getChallan();
-		String tenantId = challan.getTenantId();
-		ModuleDetail glCodeRequest = getGLCodeRequest(); 
-		List<ModuleDetail> moduleDetails = new LinkedList<>();
-		moduleDetails.add(glCodeRequest);
-		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
-				.build();
-		MdmsCriteriaReq mdmsCriteriaReq = MdmsCriteriaReq.builder().mdmsCriteria(mdmsCriteria)
-				.requestInfo(requestInfo).build();
-
-		StringBuilder url = new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
-
-		Object result = serviceRequestRepository.fetchResult(url, mdmsCriteriaReq);
-		if(result!=null) {
-			String jsonPath = GL_CODE_JSONPATH_CODE.replace("{}",challan.getBusinessService());
-			List<Map<String,Object>> jsonOutput =  JsonPath.read(result, jsonPath);
-			if(jsonOutput.size()!=0) {
-				Map<String,Object> glCodeObj = jsonOutput.get(0);
-				challan.setAdditionalDetail(glCodeObj);
-			}	
-		}
-		
-		
-	}
-
-	private ModuleDetail getGLCodeRequest() {
-		List<MasterDetail> masterDetails = new ArrayList<>();
-		masterDetails.add(MasterDetail.builder().name(GL_CODE_MASTER).build());
-		ModuleDetail moduleDtls = ModuleDetail.builder().masterDetails(masterDetails)
-				.moduleName(BILLING_SERVICE).build();
-		return moduleDtls;
 	}
 
 }
