@@ -3,11 +3,14 @@ package org.egov.swservice.web.controller;
 import java.util.List;
 
 import javax.validation.Valid;
+
+import org.egov.swservice.web.models.DocumentRequest;
 import org.egov.swservice.web.models.RequestInfoWrapper;
 import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.web.models.SewerageConnectionResponse;
+import org.egov.swservice.service.DocumentService;
 import org.egov.swservice.service.SewerageService;
 import org.egov.swservice.util.ResponseInfoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,9 @@ public class SewarageController {
 
 	@Autowired
 	private final ResponseInfoFactory responseInfoFactory;
+	
+	@Autowired
+	private DocumentService documentService;
 
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<SewerageConnectionResponse> createWaterConnection(
@@ -71,6 +77,13 @@ public class SewarageController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 
+	}
+	
+	@RequestMapping(value = "/documents/_create", method = RequestMethod.POST)
+	public ResponseEntity<String> saveDocuments(@Valid @RequestBody DocumentRequest documentRequest) {
+
+		documentService.saveDocuments(documentRequest, documentRequest.getRequestInfo());
+		return new ResponseEntity<>("SW Connection FilestoreIds Saved", HttpStatus.CREATED);
 	}
 
 }
