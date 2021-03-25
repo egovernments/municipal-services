@@ -1,46 +1,34 @@
 package org.egov.rb.contract;
 
 import java.util.LinkedList;
-
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
+import org.egov.rb.user.models.ActionInfo;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.rb.models.ActionInfo;
-import org.egov.rb.models.Service;
-import org.springframework.validation.annotation.Validated;
+import org.egov.rb.user.models.Services;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Request object to fetch the report data
- */
-@Validated
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ServiceRequest   {
-  @JsonProperty("RequestInfo")
-  private RequestInfo requestInfo = null;
-
-  @JsonProperty("services")
-  @Valid
-  @NotNull
-  private List<Service> services = new LinkedList<Service>();
-
-  @JsonProperty("actionInfo")
-  @Valid
-  private List<ActionInfo> actionInfo = new LinkedList<ActionInfo>();
+@Data
+public class ServiceRequest {
+	
+	@JsonProperty("RequestInfo")
+	private RequestInfo requestInfo=null;
+	
+	@JsonProperty("actionInfo")
+	private List<ActionInfo> actionInfo= new LinkedList<ActionInfo>();
+	
+	
+	 @JsonProperty("services")
+	private List<Services> services=new LinkedList<Services>();
+	 
+	
+	 
 
 }
-

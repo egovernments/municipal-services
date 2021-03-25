@@ -2,7 +2,7 @@ package org.egov.rb.service;
 
 
 
-
+import org.egov.rb.contract.ServiceRequest;
 import org.egov.rb.contract.ServiceResponse;
 import org.egov.rb.model.MessageRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TransformService {
 	
+	
+	
 	public ServiceResponse transform(MessageRequest messageRequest) {
 		log.info("Service layer for createss");
 		//enrichserviceRequestForcreate(request);
@@ -21,5 +23,16 @@ public class TransformService {
 		return null;
 		
 	}
+	
+	public ServiceResponse create(ServiceRequest serviceRequest) {
+		log.info("Service layer for createss");
+		/*
+		 * enrichserviceRequestForcreate(request); pGRProducer.push(saveTopic, request);
+		 * pGRProducer.push(saveIndexTopic, dataTranformationForIndexer(request, true));
+		 */
+		return null;
+	}
 
-}
+	
+	}
+
