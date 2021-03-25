@@ -27,7 +27,7 @@ public class DocumentRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	private static final String SW_APP_DOC_INSERT_QUERY = "Insert into eg_sw_applicationdocument(id, tenantid,documenttype ,filestoreid,swid,active ,documentuid ,createdby,lastmodifiedby,createdtime ,lastmodifiedtime) values(:id, :tenantid,:documenttype ,:filestoreid,:wsid,:active ,:documentuid ,:createdby,:lastmodifiedby,:createdtime ,:lastmodifiedtime);";
+	private static final String SW_APP_DOC_INSERT_QUERY = "Insert into eg_sw_applicationdocument(id, tenantid,documenttype ,filestoreid,swid,active ,documentuid ,createdby,lastmodifiedby,createdtime ,lastmodifiedtime) values(:id, :tenantid,:documenttype ,:filestoreid,:swid,:active ,:documentuid ,:createdby,:lastmodifiedby,:createdtime ,:lastmodifiedtime);";
 
 	private static final String SW_CONNECTION_UUID_QUERY = "select id,connectionno from eg_sw_connection where connectionno in(:connectionNo) and tenantid=:tenantId";
 
