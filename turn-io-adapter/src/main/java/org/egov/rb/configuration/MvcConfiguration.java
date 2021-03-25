@@ -9,7 +9,6 @@ public class MvcConfiguration {
 	
 	@Bean
 	public RestTemplate restTemplate() {
-		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&77  calling&&&&&&&&&&&&&&");
 		return new RestTemplate();
 	}
 

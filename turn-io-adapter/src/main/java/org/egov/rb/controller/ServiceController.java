@@ -116,13 +116,8 @@ public class ServiceController {
 		request.setRequestInfo(requestInfo);
 		request.setServices(serviceList);
 		request.setActionInfo(actionInfoList);
-		
-	
-		//ServiceRequestRepository serviceRequestRepository=new ServiceRequestRepository();
 		serviceRequestRepository.fetchResult(null, request);
 		
-		
-		//System.out.println(serviceRequestRepository);
 		System.out.println(messageRequest );
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
