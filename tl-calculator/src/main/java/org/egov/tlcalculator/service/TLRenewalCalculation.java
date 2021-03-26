@@ -134,19 +134,7 @@ public class TLRenewalCalculation {
         if(commencementDate>cal.getTimeInMillis())
         {
     
-   //convert seconds to milliseconds
-   Date date_curre = new Date(currentIST); 
-   Date date_comm=new Date(commencementDate);
-   // format of the date
-   SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd");
-   jdf.setTimeZone(TimeZone.getTimeZone("GMT-5"));
-   String comm_date = jdf.format(date_comm);
-   String curr_date=jdf.format(date_curre);
-            
-           if(comm_date.equals(curr_date)){
-               totalDays=0;}
-               else{
-        	totalDays=(currentIST - commencementDate) / (24 * 60 * 60 * 1000);}
+        	totalDays=(currentIST - commencementDate) / (24 * 60 * 60 * 1000);
         }
         else {
         	totalDays= (currentIST - cal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
@@ -416,11 +404,15 @@ public class TLRenewalCalculation {
                currentApplicable = flatAmt.add(minAmt.multiply(applicableAmount));
               }
               else {
+            	  if(!applicableAmount.equals(BigDecimal.ZERO)) {
                   currentApplicable = flatAmt.add((applicableAmount.subtract(BigDecimal.ONE)).multiply(rate));
                   if (null != maxAmt && BigDecimal.ZERO.compareTo(maxAmt) < 0 && currentApplicable.compareTo(maxAmt) > 0)
                       currentApplicable = maxAmt;
                   else if (null != minAmt && currentApplicable.compareTo(minAmt) < 0)
                       currentApplicable = minAmt;
+            	  }else
+            		  
+            		  currentApplicable=BigDecimal.ZERO;
               }
         return currentApplicable;
     }
