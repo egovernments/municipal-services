@@ -86,10 +86,10 @@ public class NotificationUtil {
 			FSM fsm = fsmRequest.getFsm();
 			Vendor vendor = this.dsoSerevice.getVendor(fsm.getDsoId(), fsm.getTenantId(), null, null, fsmRequest.getRequestInfo());
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
-			
+			System.out.println(" message__template"+messageCode+"_______"+messageTemplate);
 			if (!StringUtils.isEmpty(messageTemplate)) {
 				message = getInitiatedMsg(fsm, messageTemplate);
-
+				
 				if (message.contains("<SLA_HOURS>")) {
 					ProcessInstance processInstance = workflowService.getProcessInstance(fsm, fsmRequest.getRequestInfo());
 					Long slatime =null;

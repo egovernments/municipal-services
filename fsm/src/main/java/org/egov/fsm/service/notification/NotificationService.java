@@ -208,9 +208,11 @@ public class NotificationService {
 			smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
 		}
 		messageCode = FSMConstants.SMS_NOTIFICATION_PREFIX +fsm.getApplicationStatus() +(fsmRequest.getWorkflow() ==null ?  "":"_" + fsmRequest.getWorkflow().getAction());
-
+		System.out.println(" messagecode"+messageCode);
 		String message = util.getCustomizedMsg(fsmRequest, localizationMessages,messageCode);
 		Map<String, String> mobileNumberToOwner = getUserList(fsmRequest);
+		String mapAsString = mobileNumberToOwner.keySet().stream().map(key -> key + "=" + mobileNumberToOwner.get(key)).collect(Collectors.joining(", ", "{", "}"));
+		System.out.println("message__ownermap"+message+"_______"+mapAsString);
 		smsRequests.addAll(util.createSMSRequest(message, mobileNumberToOwner));
 	}
 
