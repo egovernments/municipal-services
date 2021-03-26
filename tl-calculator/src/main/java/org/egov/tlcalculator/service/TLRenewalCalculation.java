@@ -129,11 +129,24 @@ public class TLRenewalCalculation {
         Calendar cal = Calendar.getInstance();
         setDateToCalendar(time, cal);
         long totalDays =0;
-        Long currentIST = System.currentTimeMillis()+TLCalculatorConstants.TIMEZONE_OFFSET;
+        Long currentIST = System.currentTimeMillis();
         if(tradeLicense.getApplicationType().toString().equals("NEW")) {
         if(commencementDate>cal.getTimeInMillis())
         {
-        	totalDays=(currentIST - commencementDate) / (24 * 60 * 60 * 1000);
+    
+   //convert seconds to milliseconds
+   Date date_curre = new Date(currentIST); 
+   Date date_comm=new Date(commencementDate);
+   // format of the date
+   SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd");
+   jdf.setTimeZone(TimeZone.getTimeZone("GMT-5"));
+   String comm_date = jdf.format(date_comm);
+   String curr_date=jdf.format(date_curre);
+            
+           if(comm_date.equals(curr_date)){
+               totalDays=0;}
+               else{
+        	totalDays=(currentIST - commencementDate) / (24 * 60 * 60 * 1000);}
         }
         else {
         	totalDays= (currentIST - cal.getTimeInMillis()) / (24 * 60 * 60 * 1000);
