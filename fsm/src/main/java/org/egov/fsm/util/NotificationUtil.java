@@ -151,12 +151,15 @@ public class NotificationUtil {
 				}
 				
 				if (message.contains("<RECEIPT_LINK>") ) {
+					System.out.println(" RECEIPT_LINK__"+config.getDownloadLink());
 					String actionLink = config.getDownloadLink().replace("$mobile", fsm.getCitizen().getMobileNumber())
     						.replace("$consumerCode", fsm.getApplicationNo())
     						.replace("$tenantId", fsm.getTenantId())
     						.replace("$receiptNumber", getPaymentData("receiptNumber",fsmRequest))
     						.replace("$businessService",FSMConstants.FSM_PAY_BUSINESS_SERVICE);
+					System.out.println(" RECEIPT_LINK__VALUE"+config.getDownloadLink()+"____"+actionLink);
 					message = message.replace("<RECEIPT_LINK>", getShortenedUrl(actionLink));
+					System.out.println(" RECEIPT_LINK__MSG"+config.getDownloadLink()+"____"+message);
 				}
 				
 				if (message.contains("<RECEIPT_NO>") ) {
@@ -182,6 +185,7 @@ public class NotificationUtil {
 			LinkedHashMap responseMap =  (LinkedHashMap) serviceRequestRepository.fetchResult(builder, new RequestInfoWrapper(fsmRequest.getRequestInfo()));
 			JSONObject jsonObject = new JSONObject(responseMap);
 			String proeprtyValue ="";
+			
 			try {
 				JSONArray paymentsArray = (JSONArray) jsonObject.get("Payments");
 				if (paymentsArray != null) {
@@ -195,7 +199,7 @@ public class NotificationUtil {
 							}
 						}
 					}
-				}
+				}System.out.println(" RECEIPT_NO__VALUE"+properyName+"____"+proeprtyValue);
 				return proeprtyValue;
 			} catch (Exception e) {
 				throw new CustomException("PARSING ERROR",
