@@ -248,17 +248,13 @@ public class EstimationService {
 			 * making call to get unbuilt area tax estimate
 			 */
 			//taxAmt = taxAmt.add(getUnBuiltRate(detail, unBuiltRate, groundUnitsCount, groundUnitsArea));
-			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
+			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(assessmentYear,detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
 
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
 			
 			BigDecimal unBuiltTax=unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-			
-			if(assessmentYear.startsWith("2021-"))   // for 2021-22, 5% increase
-				unBuiltTax=unBuiltTax.multiply(new BigDecimal("1.05"));
-
 			taxAmt = taxAmt.add(unBuiltTax);
 			
 			/*
@@ -1278,7 +1274,7 @@ public class EstimationService {
 	 * @param groundUnitsArea Sum of ground floor units area
 	 * @return calculated tax for un-built area in the property detail.
 	 */
-	private HashMap<Unit, BigDecimal> getUnBuiltRate(PropertyDetail detail, HashMap<Unit, BillingSlab> unitSlabMapping, List<Unit> groundUnits, Double groundUnitsArea) {
+	private HashMap<Unit, BigDecimal> getUnBuiltRate(String assessmentYear,PropertyDetail detail, HashMap<Unit, BillingSlab> unitSlabMapping, List<Unit> groundUnits, Double groundUnitsArea) {
 
         BigDecimal unBuiltAmt = BigDecimal.ZERO;
 		HashMap<Unit, BigDecimal>  unBuiltRateCalc = new HashMap<>();
@@ -1301,8 +1297,16 @@ public class EstimationService {
 					unBuiltRateCalc.put(unit, BigDecimal.ZERO);
 				} else {
 					if (unBuiltAreaProrated) {
+						if(assessmentYear.startsWith("2021-")) {
+						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)*1.05));
+					} else
 						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)));
-					} else {
+					}
+						else {  
+						if(assessmentYear.startsWith("2021-")) {
+							unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)*1.05));
+						}  
+						else
 						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)));
 					}
 				}
