@@ -81,7 +81,7 @@ export const updateApiResponse = async ({ body }, isExternalCall, next = {}) => 
     return next({
       errorType: "custom",
       errorReponse: {
-        ResponseInfo: requestInfoToResponseInfo(RequestInfo, true),
+        ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, false),
         Errors: errorMap
       }
     });
