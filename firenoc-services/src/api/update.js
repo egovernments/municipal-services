@@ -78,14 +78,10 @@ export const updateApiResponse = async ({ body }, isExternalCall, next = {}) => 
   }
 
   if (errorMap.length > 0) {
-    return next({
-      errorType: "custom",
-      errorReponse: {
+    return {
         ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, false),
         Errors: errorMap
-      }
-    });
-    return;
+      };
   }
 
   //calculate call
