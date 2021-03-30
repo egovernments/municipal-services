@@ -23,13 +23,13 @@ export default ({ config }) => {
   api.post(
     "/_update",
     asyncHandler(async ({ body }, res, next) => {
-      let response = await updateApiResponse({ body }, next);
+      let response = await updateApiResponse({ body }, true, next);
       res.json(response);
     })
   );
   return api;
 };
-export const updateApiResponse = async ({ body }, next = {}) => {
+export const updateApiResponse = async ({ body }, isExternalCall, next = {}) => {
   //console.log("Update Body: "+JSON.stringify(body));
   let payloads = [];
   let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
@@ -68,8 +68,27 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   let workflowResponse = await createWorkFlow(body);
   //console.log("workflowResponse"+JSON.stringify(workflowResponse));
 
-  //calculate call
   let { FireNOCs = [], RequestInfo = {} } = body;
+
+  let errorMap = [];
+  for (var i = 0; i < FireNOCs.length; i++) {
+    if(isExternalCall && FireNOCs[i].fireNOCDetails.action === 'PAY'){
+      errorMap.push({"INVALID_ACTION":"PAY action cannot perform directly on application "+FireNOCs[i].fireNOCDetails.applicationNumber});
+    }
+  }
+
+  if (errorMap.length > 0) {
+    return next({
+      errorType: "custom",
+      errorReponse: {
+        ResponseInfo: requestInfoToResponseInfo(RequestInfo, true),
+        Errors: errorMap
+      }
+    });
+    return;
+  }
+
+  //calculate call
   for (var i = 0; i < FireNOCs.length; i++) {
     let firenocResponse = await calculate(FireNOCs[i], RequestInfo);
   }
