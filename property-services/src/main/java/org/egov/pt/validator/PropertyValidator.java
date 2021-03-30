@@ -653,10 +653,11 @@ public class PropertyValidator {
 //				.getCurrentState(request.getRequestInfo(), property.getTenantId(), property.getAcknowldgementNumber())
 //				.getIsStateUpdatable();
 
-		if (!CollectionUtils.isEmpty(fieldsUpdated))
+	/*	if (!CollectionUtils.isEmpty(fieldsUpdated))
 			throw new CustomException("EG_PT_MUTATION_ERROR",
 					"The property mutation doesnt allow change of these fields " + fieldsUpdated);
-
+     */
+		
 		@SuppressWarnings("unchecked")
 		Map<String, Object> additionalDetails = mapper.convertValue(property.getAdditionalDetails(), Map.class);
 		try {
