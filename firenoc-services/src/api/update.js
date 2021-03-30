@@ -24,6 +24,8 @@ export default ({ config }) => {
     "/_update",
     asyncHandler(async ({ body }, res, next) => {
       let response = await updateApiResponse({ body }, true, next);
+      if(response.Errors)
+        res.status(400);
       res.json(response);
     })
   );
@@ -81,7 +83,7 @@ export const updateApiResponse = async ({ body }, isExternalCall, next = {}) => 
     return next({
       errorType: "custom",
       errorReponse: {
-        ResponseInfo: requestInfoToResponseInfo(RequestInfo, true),
+        ResponseInfo: requestInfoToResponseInfo(RequestInfo, false),
         Errors: errorMap
       }
     });
