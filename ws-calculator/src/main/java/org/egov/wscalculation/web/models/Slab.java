@@ -50,5 +50,12 @@ public class Slab {
 	public void setEffectiveTo(long  effectiveTo) {
 		this.effectiveTo = effectiveTo;
 	}
+	@Override
+	public String toString() {
+		return "Slab [from=" + from + ", to=" + to + ", charge=" + charge + ", meterCharge=" + meterCharge
+				+ ", effectiveFrom=" + effectiveFrom + ", effectiveTo=" + effectiveTo + "]";
+	}
+	
+	
 	
 }

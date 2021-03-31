@@ -78,7 +78,7 @@ public class BillingSlab {
 	public String toString() {
 		return "BillingSlab [id=" + id + ", buildingType=" + buildingType + ", connectionType=" + connectionType
 				+ ", waterSubUsageType=" + waterSubUsageType + ", calculationAttribute=" + calculationAttribute
-				+ ", minimumCharge=" + minimumCharge + ", slabs=" + slabs + "]";
+				+ ", minimumCharge=" + minimumCharge + ", slabs=" + slabs.toString() + "]";
 	}
 	
 	
