@@ -180,7 +180,7 @@ public class WSCalculatorQueryBuilder {
 		preparedStatement.add(tenantId);
 		
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.connectionno is not null");
+		query.append(" conn.connectionno is not null limit 2");
 		return query.toString();
 		
 	}

@@ -194,12 +194,17 @@ public class EstimationService {
 //			if (totalUOM == 0.0)
 //				return waterCharge;
 			BillingSlab billSlab = billingSlabs.get(0);
+			
+			log.info("totalUOM: " + totalUOM);
+
+			log.info("Before billingslab  filter: " + billSlab.toString());
 
 			List<Slab> filteredSlabs = billSlab.getSlabs().stream()
 					.filter(slab -> slab.getFrom() <= totalUOM && slab.getTo() >= totalUOM
 							&& slab.getEffectiveFrom() <= System.currentTimeMillis()
 							&& slab.getEffectiveTo() >= System.currentTimeMillis())
 					.collect(Collectors.toList());
+			log.info("After billingslab  filter: " + filteredSlabs.size());
 			// IF calculation type is flat then take flat rate else take slab and calculate
 			// the charge
 			// For metered connection calculation on graded fee slab
@@ -300,10 +305,12 @@ public class EstimationService {
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
-//			log.info("BuildingTypeMatching: " + slab.getBuildingType());
+			log.info("BuildingTypeMatching: " + slab.getBuildingType() + "buildingType: " + buildingType +
+					"connectionType: " + connectionType + "calculationAttribute: " + calculationAttribute);
 
-//			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
-//					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
+			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
+					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching + 
+					" isWaterSubUsageType: "+waterSubUsageType);
 
 			if (waterSubUsageType != null) {
 				boolean isWaterSubUsageType = slab.getWaterSubUsageType().equalsIgnoreCase(waterSubUsageType);
