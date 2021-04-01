@@ -28,6 +28,7 @@ import static org.egov.pgr.util.PGRConstants.PGR_MODULENAME;
 
 @Component
 @Slf4j
+@org.springframework.stereotype.Service
 public class MigrationService {
 
 
@@ -74,8 +75,8 @@ public class MigrationService {
 
     @PostConstruct
     private void setStatusToUUIDMap(){
-        this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getTenantId());
-        this.serviceCodeToSLA = migrationUtils.getServiceCodeToSLAMap(config.getTenantId());
+        this.statusToUUIDMap = migrationUtils.getStatusToUUIDMap(config.getStateTenantId());
+        this.serviceCodeToSLA = migrationUtils.getServiceCodeToSLAMap(config.getStateTenantId());
     }
 
 

@@ -17,7 +17,6 @@ import java.util.Set;
 @Builder
 public class RequestSearchCriteria {
 
-    @SafeHtml
     @JsonProperty("tenantId")
     private String tenantId;
 
@@ -30,11 +29,9 @@ public class RequestSearchCriteria {
     @JsonProperty("applicationStatus")
     private Set<String> applicationStatus;
 
-    @SafeHtml
     @JsonProperty("mobileNumber")
     private String mobileNumber;
 
-    @SafeHtml
     @JsonProperty("serviceRequestId")
     private String serviceRequestId;
 
