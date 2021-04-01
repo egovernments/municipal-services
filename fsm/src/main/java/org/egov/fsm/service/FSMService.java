@@ -148,12 +148,19 @@ public class FSMService {
 		FSMSearchCriteria criteria = FSMSearchCriteria.builder().ids(ids).tenantId(fsm.getTenantId()).build();
 		FSMResponse fsmResponse = repository.getFSMData(criteria, null);
 		List<FSM> fsms = fsmResponse.getFsm();
-		fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData); 
+		
 		
 		BusinessService businessService = workflowService.getBusinessService(fsm, fsmRequest.getRequestInfo(),
 				FSMConstants.FSM_BusinessService,null);
 		actionValidator.validateUpdateRequest(fsmRequest, businessService);
 		FSM oldFSM = fsms.get(0);
+		
+		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_REJECT) || 
+				fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_CANCEL)) {
+			handleRejectCancel(fsmRequest,oldFSM);
+		}else {
+			fsmValidator.validateUpdate(fsmRequest, fsms, mdmsData); 
+		}
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SUBMIT) ) {
 			handleApplicationSubmit(fsmRequest,oldFSM);
@@ -184,10 +191,7 @@ public class FSMService {
 			handleAdditionalPayRequest(fsmRequest,oldFSM);
 		}
 		
-		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_REJECT) || 
-				fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_CANCEL)) {
-			handleRejectCancel(fsmRequest,oldFSM);
-		}
+		
 		
 		if( fsmRequest.getWorkflow().getAction().equalsIgnoreCase(FSMConstants.WF_ACTION_SEND_BACK) ) {
 			handleSendBack(fsmRequest,oldFSM);
@@ -382,15 +386,14 @@ public class FSMService {
 		
 		fsmValidator.validateSearch(requestInfo, criteria);
 		
-		if(criteria.tenantIdOnly() && 
-				requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
+		if(requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.CITIZEN) ) {
 			List<Role> roles = requestInfo.getUserInfo().getRoles();
 			if( roles.stream().anyMatch(role -> Objects.equals(role.getCode(), FSMConstants.ROLE_FSM_DSO))) {
 			  	Vendor dso = dsoService.getVendor(null, criteria.getTenantId(), null, requestInfo.getUserInfo().getMobileNumber(), requestInfo);
 			  	if(dso!=null && org.apache.commons.lang3.StringUtils.isNotEmpty(dso.getId())) {
 			  		dsoId = dso.getId();
 			  	}
-			}else {
+			}else if(criteria.tenantIdOnly() ){
 				criteria.setMobileNumber(requestInfo.getUserInfo().getMobileNumber());
 			}
 			
