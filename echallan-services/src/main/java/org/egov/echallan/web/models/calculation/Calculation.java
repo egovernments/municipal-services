@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import org.egov.echallan.model.Challan;
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
@@ -23,6 +24,7 @@ import java.util.List;
 @Builder
 public class Calculation {
 
+	@SafeHtml
 	@JsonProperty("challanNo")
 	private String challanNo = null;
 
@@ -30,6 +32,7 @@ public class Calculation {
 	private Challan challan = null;
 
 	@NotNull
+	@SafeHtml
 	@JsonProperty("tenantId")
 	@Size(min = 2, max = 256)
 	private String tenantId = null;
