@@ -8,6 +8,7 @@ import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.location.Address;
 import org.egov.fsm.web.model.user.User;
 import org.egov.fsm.web.model.vehicle.Vehicle;
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -35,38 +36,48 @@ public class FSM   {
   @JsonProperty("citizen")
   private User citizen = null;
 
+  @SafeHtml
   @JsonProperty("id")
   private String id = null;
 
   @NotNull
+  @SafeHtml
   @Size(min=2,max=64)
   @JsonProperty("tenantId")
   private String tenantId = null;
 
+  @SafeHtml
   @JsonProperty("applicationNo")
   private String applicationNo = null;
 
+  @SafeHtml
   @JsonProperty("description")
   private String description = null;
 
+  @SafeHtml
   @JsonProperty("accountId")
   private String accountId = null;
 
   @JsonProperty("additionalDetails")
   private Object additionalDetails = null;
 
+  @SafeHtml
   @JsonProperty("applicationStatus")
   private String applicationStatus = null;
 
+  @SafeHtml
   @JsonProperty("source")
   private String source = null;
 
+  @SafeHtml
   @JsonProperty("sanitationtype")
   private String sanitationtype = null;
 
+  @SafeHtml
   @JsonProperty("propertyUsage")
   private String propertyUsage = null;
   
+  @SafeHtml
   @JsonProperty("vehicleType")
   private String vehicleType = null;
 
@@ -106,12 +117,14 @@ public class FSM   {
   @JsonProperty("status")
   private StatusEnum status = null;
 
+  @SafeHtml
   @JsonProperty("vehicleId")
   private String vehicleId = null;
   
   @JsonProperty("vehicle")
   private Vehicle vehicle = null;
   
+  @SafeHtml
   @JsonProperty("dsoId")
   private String dsoId = null;
   
