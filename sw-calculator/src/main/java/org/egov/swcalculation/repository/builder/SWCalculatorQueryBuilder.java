@@ -2,6 +2,7 @@ package org.egov.swcalculation.repository.builder;
 
 import java.util.List;
 
+import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.web.models.BillGenerationSearchCriteria;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -34,6 +35,11 @@ public class SWCalculatorQueryBuilder {
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.status = ? ");
 		preparedStatement.add(status);
+		
+		//Get the activated connections status	
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.applicationstatus = ? ");
+		preparedStatement.add(SWCalculationConstant.CONNECTION_ACTIVATED);
 		
 
 		// add tenantid

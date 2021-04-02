@@ -331,5 +331,7 @@ public class SWCalculationConstant {
 
     public static final String EG_SW_CAL_JSON_EXCEPTION_MSG = "Exception occured while parsing additional details";
 
+	public static final String CONNECTION_ACTIVATED = "CONNECTION_ACTIVATED";
+
 
 }

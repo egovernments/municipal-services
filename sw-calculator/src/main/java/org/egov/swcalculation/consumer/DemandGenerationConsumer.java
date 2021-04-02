@@ -127,7 +127,8 @@ public class DemandGenerationConsumer {
 		try {
 			for(CalculationCriteria criteria : request.getCalculationCriteria()){
 				Boolean genratedemand = true;
-				swCalculationWorkflowValidator.nonMeterconnectionValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
+//				Application validation removing for migrated connection as of now 
+//				swCalculationWorkflowValidator.nonMeterconnectionValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
 			}
 			sWCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
 			StringBuilder str = new StringBuilder("Demand generated Successfully. For records : ").append(request.getCalculationCriteria());
