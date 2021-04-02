@@ -307,4 +307,8 @@ public class WSCalculationConstant {
 	public static final String PROPERTY_TYPE_MIXED = "MIXED";
 	
 	public static final String UNIT_USAGE_TYPE_KEY = "unitUsageType";
+	
+	public static final String CONNECTION_ACTIVATED = "CONNECTION_ACTIVATED";
+	
+	
 }

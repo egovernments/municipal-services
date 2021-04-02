@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wscalculation.constants.WSCalculationConstant;
 import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
 import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,13 +175,18 @@ public class WSCalculatorQueryBuilder {
 		query.append(" conn.status = ? ");
 		preparedStatement.add(status);
 		
+		//Get the activated connections status	
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.applicationstatus = ? ");
+		preparedStatement.add(WSCalculationConstant.CONNECTION_ACTIVATED);
+		
 		// add tenantid
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.connectionno is not null limit 2");
+		query.append(" conn.connectionno is not null");
 		return query.toString();
 		
 	}
