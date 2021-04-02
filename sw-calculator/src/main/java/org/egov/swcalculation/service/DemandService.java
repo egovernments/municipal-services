@@ -663,13 +663,13 @@ public class DemandService {
 		log.info("Billing master data values for non metered connection:: {}", master);
 		//long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		//if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
-			/*List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-					SWCalculationConstant.nonMeterdConnection);*/
-			SewerageDetails sewerage=new SewerageDetails();
-			sewerage.setConnectionNo("107000061");
-			sewerage.setConnectionExecutionDate(1);
-			List<SewerageDetails> connectionNos=new ArrayList<SewerageDetails>();
-			connectionNos.add(sewerage);
+			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
+					SWCalculationConstant.nonMeterdConnection);
+//			SewerageDetails sewerage=new SewerageDetails();
+//			sewerage.setConnectionNo("107000061");
+//			sewerage.setConnectionExecutionDate(1);
+//			List<SewerageDetails> connectionNos=new ArrayList<SewerageDetails>();
+//			connectionNos.add(sewerage);
 			for (SewerageDetails detail : connectionNos) {
 				boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
 						requestInfo);
