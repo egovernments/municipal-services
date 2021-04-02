@@ -195,7 +195,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for sewerage demand generation on : " + date.format(dateTimeFormatter));
-		List<String> tenantIds = sewerageCalculatorDao.getTenantId();
+//		List<String> tenantIds = sewerageCalculatorDao.getTenantId();
+		List<String> tenantIds = new ArrayList<>();
+		tenantIds.add("pb.fazilka");
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
