@@ -66,6 +66,16 @@
       <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-validator</artifactId>
+      <version>6.0.16.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.10.2</version>
+    </dependency>
+    <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>

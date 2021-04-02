@@ -400,13 +400,13 @@ public class EnrichmentService {
 			if (!StringUtils.isEmpty(criteria.getTenantId())) {
 				propertyCriteria.setTenantId(criteria.getTenantId());
 			}
-			propertyCriteria.setUuids(propertyIds);
+			propertyCriteria.setPropertyIds(propertyIds);
 			List<Property> propertyList = sewerageServicesUtil.getPropertyDetails(serviceRequestRepository.fetchResult(sewerageServicesUtil.getPropertyURL(propertyCriteria),
 					RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 
 			if(!CollectionUtils.isEmpty(propertyList)){
 				for(Property property: propertyList){
-					propertyToOwner.put(property.getId(),property.getOwners());
+					propertyToOwner.put(property.getPropertyId(),property.getOwners());
 				}
 			}
 

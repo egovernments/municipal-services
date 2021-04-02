@@ -140,6 +140,12 @@ consumerGroup.on("message", function(message) {
             "message"
           ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} is approved.And your fire NoC has been generated.Your Fire NoC No. is ${fireNOCNumber}. It is valid till ${dateString}`;
           break;
+        case "SENDBACKTOCITIZEN":
+          smsRequest[
+            "message"
+          ] = `Dear ${ownerName}, 
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.`;
+          break;
         case "REJECTED":
           smsRequest[
             "message"
@@ -219,7 +225,7 @@ consumerGroup.on("message", function(message) {
             const updateBody = { RequestInfo, FireNOCs };
             const updateRequest = { body: updateBody };
             //console.log("update Request: "+JSON.stringify(updateRequest));
-            const updateResponse = await updateApiResponse(updateRequest);
+            const updateResponse = await updateApiResponse(updateRequest, false);
             //console.log("update Response: "+JSON.stringify(updateResponse));
           }
         }

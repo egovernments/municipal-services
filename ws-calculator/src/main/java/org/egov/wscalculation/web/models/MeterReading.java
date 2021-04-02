@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -35,6 +36,7 @@ public class MeterReading {
 	@JsonProperty("id")
 	private String id = null;
 
+	@SafeHtml
 	@JsonProperty("billingPeriod")
 	private String billingPeriod = null;
 
@@ -92,6 +94,7 @@ public class MeterReading {
 	@JsonProperty("currentReadingDate")
 	private Long currentReadingDate = null;
 
+	@SafeHtml
 	@JsonProperty("connectionNo")
 	private String connectionNo = null;
 
@@ -104,6 +107,7 @@ public class MeterReading {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails = null;
 
+	@SafeHtml
 	@JsonProperty("tenantId")
 	private String tenantId = null;
 

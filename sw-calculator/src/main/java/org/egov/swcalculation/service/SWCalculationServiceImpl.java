@@ -259,10 +259,10 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	public List<Calculation> applyAdhocTax(AdhocTaxReq adhocTaxReq) {
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		if (!(adhocTaxReq.getAdhocpenalty().compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_ADHOC_PENALTY)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_TIME_ADHOC_PENALTY)
 					.estimateAmount(adhocTaxReq.getAdhocpenalty().setScale(2, 2)).build());
 		if (!(adhocTaxReq.getAdhocrebate().compareTo(BigDecimal.ZERO) == 0))
-			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_ADHOC_REBATE)
+			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_TIME_ADHOC_REBATE)
 					.estimateAmount(adhocTaxReq.getAdhocrebate().setScale(2, 2).negate()).build());
 		Calculation calculation = Calculation.builder()
 				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
