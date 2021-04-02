@@ -137,7 +137,8 @@ public class DemandGenerationConsumer {
 		try {
 			for(CalculationCriteria criteria : request.getCalculationCriteria()){
 				Boolean genratedemand = true;
-				wsCalulationWorkflowValidator.applicationValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
+//				Application validation removing for migrated connection as of now 
+//				wsCalulationWorkflowValidator.applicationValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
 			}
 			wSCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
 			String connectionNoStrings = request.getCalculationCriteria().stream()
