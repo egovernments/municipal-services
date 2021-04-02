@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.rb.contract.MessageRequest;
+import org.egov.rb.pgrmodels.Address;
 import org.egov.rb.pgrmodels.AddressDetail;
 import org.egov.rb.pgrmodels.Citizen;
 import org.egov.rb.pgrmodels.Service;
@@ -54,13 +55,13 @@ public class TransformService {
 		citizen.setName(messageRequest.getContacts().get(0).getProfile().getName());
 		service.setCitizen(citizen);
 		service.setServiceCode(messageRequest.getThreadContact().getContact().getIssueCategory());
-
-		AddressDetail addressDetail = new AddressDetail();
+		Address addressDetail = new Address();
 		addressDetail.setCity(messageRequest.getThreadContact().getContact().getCity());
 		addressDetail.setMohalla(messageRequest.getThreadContact().getContact().getWard());
 		service.setTenantId(messageRequest.getThreadContact().getContact().getCity());
 		service.setPhone(messageRequest.getContacts().get(0).getWa_id());
 		service.setSource(SourceEnum.IVR);
+		service.setAddressDetail(addressDetail);
 
 		List<Service> serviceList = new ArrayList<Service>();
 		serviceList.add(service);
