@@ -16,17 +16,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.mdms.model.*;
+import org.egov.mdms.model.MasterDetail;
+import org.egov.mdms.model.MdmsCriteria;
+import org.egov.mdms.model.MdmsCriteriaReq;
+import org.egov.mdms.model.MdmsResponse;
+import org.egov.mdms.model.ModuleDetail;
 import org.egov.swcalculation.constants.SWCalculationConstant;
+import org.egov.swcalculation.repository.Repository;
+import org.egov.swcalculation.util.CalculatorUtils;
+import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.TaxHeadMaster;
 import org.egov.swcalculation.web.models.TaxHeadMasterResponse;
 import org.egov.swcalculation.web.models.TaxPeriod;
 import org.egov.swcalculation.web.models.TaxPeriodResponse;
-import org.egov.swcalculation.repository.Repository;
-import org.egov.swcalculation.util.CalculatorUtils;
-import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -307,7 +311,9 @@ public class MasterDataService {
 			estimationService.getMonthStartAndEndDate(billingPeriod);
 		} else if (SWCalculationConstant.Quaterly_Billing_Period
 				.equalsIgnoreCase(master.get(SWCalculationConstant.BILLING_CYCLE_CONST).toString())) {
-			estimationService.getQuarterStartAndEndDate(billingPeriod);
+//			estimationService.getQuarterStartAndEndDate(billingPeriod);
+			billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
+			billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 		} else {
 			LocalDateTime demandEndDate = LocalDateTime.now();
 			demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);
