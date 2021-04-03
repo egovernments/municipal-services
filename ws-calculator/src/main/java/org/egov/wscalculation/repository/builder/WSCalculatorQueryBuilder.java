@@ -229,6 +229,8 @@ public class WSCalculatorQueryBuilder {
 			query.append(" billingcycleenddate <= ? ");
 			preparedStatement.add(criteria.getBillingcycleEnddate());
 		}
+		
+		query.append(" ORDER BY createdtime ");
 
 		return query.toString();
 	}
