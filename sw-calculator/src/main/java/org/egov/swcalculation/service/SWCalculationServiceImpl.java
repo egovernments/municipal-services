@@ -316,7 +316,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		criteria.setStatus(SWCalculationConstant.INITIATED_CONST);
 
 		List<BillScheduler> billSchedularList = billGeneratorService.getBillGenerationDetails(criteria);
-		if (billSchedularList.isEmpty())
+		if (billSchedularList != null && billSchedularList.isEmpty())
 			return;
 		log.info("billSchedularList count : " + billSchedularList.size());
 		for (BillScheduler billSchedular : billSchedularList) {
@@ -326,7 +326,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
 			if (connectionNos == null || connectionNos.isEmpty()) {
 				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
-				return;
+				continue;
 			}
 
 			log.info("Producer ConsumerCodes size : {}", connectionNos.size());

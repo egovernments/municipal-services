@@ -47,7 +47,7 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 	public List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality) {
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getConnectionsNoByLocality(tenantId, connectionType,SWCalculationConstant.ACTIVE, locality, preparedStatement);
-		log.info("water " + connectionType + " connection list : " + query);
+		log.info("Sewerage " + connectionType + " connection list : " + query);
 		return jdbcTemplate.queryForList(query, preparedStatement.toArray(), String.class);
 	}
 
