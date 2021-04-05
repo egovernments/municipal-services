@@ -16,7 +16,7 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String billGenerationSchedulerSearchQuery = "SELECT * from eg_sw_scheduler ";
 
-	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_ws_scheduler SET status=? where id=?";
+	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_sw_scheduler SET status=? where id=?";
 
 	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id INNER JOIN eg_pt_address address ON conn.property_id=address.propertyid ";
 
