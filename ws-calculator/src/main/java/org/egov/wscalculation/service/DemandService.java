@@ -673,6 +673,10 @@ public class DemandService {
 		long taxPeriodFrom = billingMasterData.get("taxPeriodFrom") == null ? 0l
 				: (long) billingMasterData.get("taxPeriodFrom");
 		long taxPeriodTo = billingMasterData.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
+		if(taxPeriodFrom == 0 || taxPeriodTo == 0) {
+			throw new CustomException("NO_BILLING_PERIODS","Billing Period does not available for tenant: "+ tenantId);
+		}
+		
 		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
 	}
 
