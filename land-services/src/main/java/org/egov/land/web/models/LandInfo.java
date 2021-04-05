@@ -44,7 +44,6 @@ public class LandInfo   {
   @JsonProperty("tenantId")
   private String tenantId = null;
 
-  @SafeHtml
   @JsonProperty("status")
   private Status status = null;
 
