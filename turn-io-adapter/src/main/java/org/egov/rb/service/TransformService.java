@@ -43,11 +43,7 @@ public class TransformService {
 	private ServiceRequest prepareServiceRequest(MessageRequest messageRequest) {
 
 		ServiceRequest serviceRequest = new ServiceRequest();
-		RequestInfo requestInfo = new RequestInfo();
-		requestInfo.setApiId("rainmaker");
-		requestInfo.setVer("1.0");
-		requestInfo.setAction("_create");
-		requestInfo.setTs(System.currentTimeMillis());
+		
 
 		Service service = new Service();
 		Citizen citizen = new Citizen();
@@ -65,7 +61,7 @@ public class TransformService {
 
 		List<Service> serviceList = new ArrayList<Service>();
 		serviceList.add(service);
-		serviceRequest.setRequestInfo(requestInfo);
+		serviceRequest.setRequestInfo(messageRequest.getRequestInfo());
 		serviceRequest.setServices(serviceList);
 		return serviceRequest;
 
