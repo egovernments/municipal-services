@@ -22,23 +22,26 @@ import org.egov.tl.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import static org.egov.tl.util.TLConstants.*;
-import static org.egov.tracer.http.HttpUtils.isInterServiceCall;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 public class TradeLicenseService {
-	
-	private WorkflowIntegrator wfIntegrator;
+
+    private WorkflowIntegrator wfIntegrator;
 
     private EnrichmentService enrichmentService;
 
@@ -62,7 +65,7 @@ public class TradeLicenseService {
 
     private WorkflowService workflowService;
 
-    private EditNotificationService  editNotificationService;
+    private EditNotificationService editNotificationService;
 
     private TradeUtil tradeUtil;
 
@@ -96,16 +99,14 @@ public class TradeLicenseService {
     }
 
 
-
-
-
     /**
      * creates the tradeLicense for the given request
+     *
      * @param tradeLicenseRequest The TradeLicense Create Request
      * @return The list of created traddeLicense
      */
-    public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest,String businessServicefromPath){
-       if(businessServicefromPath==null)
+    public List<TradeLicense> create(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath) {
+        if (businessServicefromPath == null)
             businessServicefromPath = businessService_TL;
         tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
 
@@ -114,58 +115,36 @@ public class TradeLicenseService {
 		
 		
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		String json;
+		ObjectMapper mapper = new ObjectMapper();
+		JsonNode json;
+		ObjectNode node;
 		if(roles.contains("TL_CEMP_FORLEGACY"))
 		{
 			
 			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-
-	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-	    			
-		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-				}
-				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-					
-					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-				}
-				else {
-			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-
-				}	
-	    	}else
-				json = "{ \"islegacy\" : \"true\"}";
+				
+				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+				node = (ObjectNode) json;
+				node.put("islegacy", "true");	
+			}
+			else
+			{
+				node = mapper.createObjectNode().put("islegacy", "true");			}
 		}
-		
     	else
     	{
     		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-
-        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-        			
-    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-    			}
-    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
-    				
-    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-    			}
-    			else {
-    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-
-    			}	
-        	}else
-    			json = "{ \"islegacy\" : \"false\"}";
-	
+				
+				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+				node = (ObjectNode) json;
+				node.put("islegacy", "false");	
+			}
+			else
+			{
+				node = mapper.createObjectNode().put("islegacy", "false");			}
     	}
-		JsonNode additionalDetail;
-		try {
-			additionalDetail = objectMapper.readTree(json);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
-		}
-	
-    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+		
+    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail((JsonNode)node);
 
         Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
@@ -182,18 +161,17 @@ public class TradeLicenseService {
         /*
          * call workflow service if it's enable else uses internal workflow process
          */
-       switch(businessServicefromPath)
-       {
-           case businessService_TL:
-               if (config.getIsExternalWorkFlowEnabled())
-                   wfIntegrator.callWorkFlow(tradeLicenseRequest);
-               break;
-       }
+        switch (businessServicefromPath) {
+            case businessService_TL:
+                if (config.getIsExternalWorkFlowEnabled())
+                    wfIntegrator.callWorkFlow(tradeLicenseRequest);
+                break;
+        }
         repository.save(tradeLicenseRequest);
-       
+
 
         return tradeLicenseRequest.getLicenses();
-	}
+    }
 
     public void validateMobileNumberUniqueness(TradeLicenseRequest request) {
         for (TradeLicense license : request.getLicenses()) {
@@ -205,38 +183,37 @@ public class TradeLicenseService {
                     List<TradeLicense> licensesFromSearch = getLicensesFromMobileNumber(tradeLicenseSearchCriteria, request.getRequestInfo());
                     List<String> tradeTypeResultforSameMobNo = new ArrayList<>();
                     for (TradeLicense result : licensesFromSearch) {
-                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber()) && !StringUtils.equals(result.getStatus(),STATUS_REJECTED)) {
+                        if (!StringUtils.equals(result.getApplicationNumber(), license.getApplicationNumber()) && !StringUtils.equals(result.getStatus(), STATUS_REJECTED)) {
                             tradeTypeResultforSameMobNo.add(result.getTradeLicenseDetail().getTradeUnits().get(0).getTradeType().split("\\.")[0]);
                         }
                     }
                     if (tradeTypeResultforSameMobNo.contains(tradetypeOfNewLicense)) {
-                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same license type: "+tradetypeOfNewLicense);
+                        throw new CustomException("DUPLICATE_TRADETYPEONMOBNO", " Same mobile number can not be used for more than one applications on same license type: " + tradetypeOfNewLicense);
                     }
                 }
             }
         }
     }
+
     /**
-     *  Searches the tradeLicense for the given criteria if search is on owner paramter then first user service
-     *  is called followed by query to db
-     * @param criteria The object containing the paramters on which to search
+     * Searches the tradeLicense for the given criteria if search is on owner paramter then first user service
+     * is called followed by query to db
+     *
+     * @param criteria    The object containing the paramters on which to search
      * @param requestInfo The search request's requestInfo
      * @return List of tradeLicense for the given criteria
      */
-    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath, HttpHeaders headers){
+    public List<TradeLicense> search(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo, String serviceFromPath) {
         List<TradeLicense> licenses;
-        // allow mobileNumber based search by citizen if interserviceCall
-        boolean isInterServiceCall = isInterServiceCall(headers);
-        tlValidator.validateSearch(requestInfo,criteria,serviceFromPath, isInterServiceCall);
+        tlValidator.validateSearch(requestInfo, criteria, serviceFromPath);
         criteria.setBusinessService(serviceFromPath);
-        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
-         if(criteria.getMobileNumber()!=null){
-             licenses = getLicensesFromMobileNumber(criteria,requestInfo);
-         }
-         else {
-             licenses = getLicensesWithOwnerInfo(criteria,requestInfo);
-         }
-       return licenses;
+        enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo, criteria);
+        if (criteria.getMobileNumber() != null) {
+            licenses = getLicensesFromMobileNumber(criteria, requestInfo);
+        } else {
+            licenses = getLicensesWithOwnerInfo(criteria, requestInfo);
+        }
+        return licenses;
     }
 
     public void checkEndStateAndAddBPARoles(TradeLicenseRequest tradeLicenseRequest) {
@@ -254,52 +231,56 @@ public class TradeLicenseService {
         }
     }
 
-    public List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
+    public List<TradeLicense> getLicensesFromMobileNumber(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo) {
         List<TradeLicense> licenses = new LinkedList<>();
-        UserDetailResponse userDetailResponse = userService.getUser(criteria,requestInfo);
+        UserDetailResponse userDetailResponse = userService.getUser(criteria, requestInfo);
         // If user not found with given user fields return empty list
-        if(userDetailResponse.getUser().size()==0){
+        if (userDetailResponse.getUser().size() == 0) {
             return Collections.emptyList();
         }
-        enrichmentService.enrichTLCriteriaWithOwnerids(criteria,userDetailResponse);
+        enrichmentService.enrichTLCriteriaWithOwnerids(criteria, userDetailResponse);
         licenses = repository.getLicenses(criteria);
 
-        if(licenses.size()==0){
+        if (licenses.size() == 0) {
             return Collections.emptyList();
         }
 
         // Add tradeLicenseId of all licenses owned by the user
-        criteria=enrichmentService.getTradeLicenseCriteriaFromIds(licenses);
+        criteria = enrichmentService.getTradeLicenseCriteriaFromIds(licenses);
         //Get all tradeLicenses with ownerInfo enriched from user service
-        licenses = getLicensesWithOwnerInfo(criteria,requestInfo);
+        licenses = getLicensesWithOwnerInfo(criteria, requestInfo);
         return licenses;
     }
 
 
     /**
      * Returns the tradeLicense with enrivhed owners from user servise
-     * @param criteria The object containing the paramters on which to search
+     *
+     * @param criteria    The object containing the paramters on which to search
      * @param requestInfo The search request's requestInfo
      * @return List of tradeLicense for the given criteria
      */
-    public List<TradeLicense> getLicensesWithOwnerInfo(TradeLicenseSearchCriteria criteria,RequestInfo requestInfo){
+    public List<TradeLicense> getLicensesWithOwnerInfo(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo) {
         List<TradeLicense> licenses = repository.getLicenses(criteria);
-        if(licenses.isEmpty())
+        if (licenses.isEmpty())
             return Collections.emptyList();
-        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria, requestInfo);
         return licenses;
     }
 
 
     /**
      * Returns tradeLicense from db for the update request
+     *
      * @param request The update request
      * @return List of tradeLicenses
      */
-    public List<TradeLicense> getLicensesWithOwnerInfo(TradeLicenseRequest request){
+    public List<TradeLicense> getLicensesWithOwnerInfo(TradeLicenseRequest request) {
         TradeLicenseSearchCriteria criteria = new TradeLicenseSearchCriteria();
         List<String> ids = new LinkedList<>();
-        request.getLicenses().forEach(license -> {ids.add(license.getId());});
+        request.getLicenses().forEach(license -> {
+            ids.add(license.getId());
+        });
 
         criteria.setTenantId(request.getLicenses().get(0).getTenantId());
         criteria.setIds(ids);
@@ -307,19 +288,20 @@ public class TradeLicenseService {
 
         List<TradeLicense> licenses = repository.getLicenses(criteria);
 
-        if(licenses.isEmpty())
+        if (licenses.isEmpty())
             return Collections.emptyList();
-        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,request.getRequestInfo());
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses, criteria, request.getRequestInfo());
         return licenses;
     }
 
 
     /**
      * Updates the tradeLicenses
+     *
      * @param tradeLicenseRequest The update Request
      * @return Updated TradeLcienses
      */
-    public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath){
+    public List<TradeLicense> update(TradeLicenseRequest tradeLicenseRequest, String businessServicefromPath) {
         TradeLicense licence = tradeLicenseRequest.getLicenses().get(0);
         TradeLicense.ApplicationTypeEnum applicationType = licence.getApplicationType();
         List<TradeLicense> licenceResponse = null;
@@ -329,65 +311,66 @@ public class TradeLicenseService {
 		
 		
 
-		ObjectMapper objectMapper = new ObjectMapper();
-		String json;
-		if(roles.contains("TL_CEMP_FORLEGACY"))
-		{
+// 		ObjectMapper objectMapper = new ObjectMapper();
+// 		String json;
+// 		if(roles.contains("TL_CEMP_FORLEGACY"))
+// 		{
 			
-			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+// 			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+// 	    		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
 	    			
-		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-				}
-				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+// 		    		json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+// 				}
+// 				else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
 					
-					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-				}
-				else {
-			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+// 					json = "{ \"islegacy\" : \"true\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+// 				}
+// 				else {
+// 			    	json = "{ \"islegacy\" : \"true\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
 
-				}	
-	    	}else
-				json = "{ \"islegacy\" : \"true\"}";
+// 				}	
+// 	    	}else
+// 				json = "{ \"islegacy\" : \"true\"}";
 
-		}
+// 		}
 		
-    	else
-    	{
-    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+//     	else
+//     	{
+//     		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
 
-        		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+//         		if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && !tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
         			
-    	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
-    			}
-    			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
+//     	    		json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+"} ";	
+//     			}
+//     			else if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("oldReceiptNumber") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("gstNo")) {
     				
-    				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
-    			}
-    			else {
-    		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+//     				json = "{ \"islegacy\" : \"false\",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
+//     			}
+//     			else {
+//     		    	json = "{ \"islegacy\" : \"false\",\"oldReceiptNumber\" :"+tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("oldReceiptNumber")+",\"gstNo\" :"+ tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().get("gstNo")+"} ";	
 
-    			}	
-        	}else
-    			json = "{ \"islegacy\" : \"false\"}";
+//     			}	
+//         	}else
+//     			json = "{ \"islegacy\" : \"false\"}";
 
-    	}
-		JsonNode additionalDetail;
-		try {
-			additionalDetail = objectMapper.readTree(json);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-            throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
-		}
+//     	}
+// 		JsonNode additionalDetail;
+// 		try {
+// 			additionalDetail = objectMapper.readTree(json);
+// 		} catch (IOException e) {
+// 			// TODO Auto-generated catch block
+//             throw new CustomException("ISLEGACY issue", " Failed to set the json for isLegacy");
+// 		}
 	
-    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
+//     	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail(additionalDetail);
 
-        if (applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL) && licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)) {
-            List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
-            licenceResponse =  createResponse;
-        }
-        else{
+    	if(applicationType != null && (applicationType).toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL ) 
+        		&& licence.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE) 
+                && licence.getStatus().equals(TLConstants.STATUS_APPROVED)){
+    		List<TradeLicense> createResponse = create(tradeLicenseRequest, businessServicefromPath);
+            licenceResponse = createResponse;
+        } else {
             if (businessServicefromPath == null)
                 businessServicefromPath = businessService_TL;
             tlValidator.validateBusinessService(tradeLicenseRequest, businessServicefromPath);
@@ -410,8 +393,7 @@ public class TradeLicenseService {
             actionValidator.validateUpdateRequest(tradeLicenseRequest, businessService);
             enrichmentService.enrichTLUpdateRequest(tradeLicenseRequest, businessService);
             tlValidator.validateUpdate(tradeLicenseRequest, searchResult, mdmsData);
-            switch(businessServicefromPath)
-            {
+            switch (businessServicefromPath) {
                 case businessService_BPA:
                     validateMobileNumberUniqueness(tradeLicenseRequest);
                     break;
@@ -422,12 +404,12 @@ public class TradeLicenseService {
             /*
              * call workflow service if it's enable else uses internal workflow process
              */
-            List<String> endStates = Collections.nCopies(tradeLicenseRequest.getLicenses().size(),STATUS_APPROVED);
+            List<String> endStates = Collections.nCopies(tradeLicenseRequest.getLicenses().size(), STATUS_APPROVED);
             switch (businessServicefromPath) {
                 case businessService_TL:
                     if (config.getIsExternalWorkFlowEnabled()) {
                         
-			if(tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()) 
+			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull() && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("islegacy") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()  && !tradeLicenseRequest.getLicenses().get(0).getAction().equalsIgnoreCase("INITIATE")) 
                        	tradeLicenseRequest.getLicenses().get(0).setAction("APPROVE");
                        	wfIntegrator.callWorkFlow(tradeLicenseRequest);
 			
@@ -441,7 +423,7 @@ public class TradeLicenseService {
                     wfIntegrator.callWorkFlow(tradeLicenseRequest);
                     break;
             }
-            enrichmentService.postStatusEnrichment(tradeLicenseRequest,endStates,mdmsData);
+            enrichmentService.postStatusEnrichment(tradeLicenseRequest, endStates, mdmsData);
             userService.createUser(tradeLicenseRequest, false);
             calculationService.addCalculation(tradeLicenseRequest);
             switch (businessServicefromPath) {
@@ -450,40 +432,36 @@ public class TradeLicenseService {
                     break;
             }
             repository.update(tradeLicenseRequest, idToIsStateUpdatableMap);
-            licenceResponse=  tradeLicenseRequest.getLicenses();
+            licenceResponse = tradeLicenseRequest.getLicenses();
         }
         return licenceResponse;
-        
+
     }
 
     public List<TradeLicense> plainSearch(TradeLicenseSearchCriteria criteria, RequestInfo requestInfo){
-        List<TradeLicense> licenses;
+
+        if(criteria.getLimit() == null)
+            criteria.setLimit(config.getDefaultLimit());
+
+        if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
+            criteria.setLimit(config.getMaxSearchLimit());
+
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
-        if(ids.isEmpty())
+        if (ids.isEmpty())
             return Collections.emptyList();
 
-        criteria.setIds(ids);
-
-        TradeLicenseSearchCriteria idsCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
-
-        licenses = repository.getPlainLicenseSearch(idsCriteria);
-
-        if(!CollectionUtils.isEmpty(licenses))
-            licenses = enrichmentService.enrichTradeLicenseSearch(licenses,criteria,requestInfo);
-
-        log.info("Total Records Returned: "+licenses.size());
-
+        TradeLicenseSearchCriteria newCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
+        List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
+        licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
         return licenses;
     }
 
-
     /**
-     *
      * @param serviceName
      */
-    public void runJob(String serviceName, String jobname, RequestInfo requestInfo){
+    public void runJob(String serviceName, String jobname, RequestInfo requestInfo) {
 
-        if(serviceName == null)
+        if (serviceName == null)
             serviceName = TRADE_LICENSE_MODULE_CODE;
 
         tlBatchService.getLicensesAndPerformAction(serviceName, jobname, requestInfo);
