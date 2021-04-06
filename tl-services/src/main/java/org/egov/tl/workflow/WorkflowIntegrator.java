@@ -179,7 +179,11 @@ public class WorkflowIntegrator {
 			// setting the status back to TL object from wf response
 
 			for ( TradeLicense tlObj: tradeLicenseRequest.getLicenses()) {
-				Boolean islegacy=tlObj.getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean();
+				Boolean islegacy=false;
+				if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull() && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().has("islegacy") && tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean()) 
+					islegacy=tlObj.getTradeLicenseDetail().getAdditionalDetail().findValue("islegacy").asBoolean();
+
+				
 				 if(islegacy && tlObj.getAction().equalsIgnoreCase(ACTION_APPROVE))
 					 {tlObj.setStatus("APPROVED");
 					 Long time = System.currentTimeMillis();
