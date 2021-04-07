@@ -69,7 +69,6 @@ public class Address   {
         @JsonProperty("pincode")
         private String pincode = null;
 
-        @SafeHtml
         @JsonProperty("additionDetails")
         private Object additionDetails = null;
 
