@@ -224,7 +224,7 @@ public class EstimationService {
             
 			for (Unit unit : activeUnits) {
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
-				BigDecimal currentUnitTax = getTaxForUnit(slab, unit);
+				BigDecimal currentUnitTax = getTaxForUnit(slab, unit,assessmentYear);
 				billingSlabIds.add(slab.getId()+"|"+i);
 				unitSlabMapping.put(unit, slab);
 
@@ -248,16 +248,15 @@ public class EstimationService {
 			 * making call to get unbuilt area tax estimate
 			 */
 			//taxAmt = taxAmt.add(getUnBuiltRate(detail, unBuiltRate, groundUnitsCount, groundUnitsArea));
-			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
-			
-			
+			HashMap<Unit, BigDecimal> unBuiltRateCalc = getUnBuiltRate(assessmentYear,detail, unitSlabMapping, groundFloorUnits, groundUnitsArea);
+
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
-			taxAmt = taxAmt.add(unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
-			// for AssessmentYear FY 2021-22, 5% is to be added with PT Tax
-			if(assessmentYear.startsWith("2021-"))
-							taxAmt=taxAmt.multiply(new BigDecimal("1.05"));
+			
+			BigDecimal unBuiltTax=unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+			taxAmt = taxAmt.add(unBuiltTax);
+			
 			/*
 			 * special case to handle property with one unit
 			 */
@@ -334,7 +333,7 @@ public class EstimationService {
 	 * @param unit the unit for which tax should be calculated.
 	 * @return calculated tax amount for the incoming unit
 	 */
-	private BigDecimal getTaxForUnit(BillingSlab slab, Unit unit) {
+	private BigDecimal getTaxForUnit(BillingSlab slab, Unit unit,String assessmentYear) {
 
 		boolean isUnitCommercial = unit.getUsageCategoryMajor().equalsIgnoreCase(configs.getUsageMajorNonResidential());
 		boolean isUnitRented = unit.getOccupancyType().equalsIgnoreCase(configs.getOccupancyTypeRented());
@@ -364,7 +363,10 @@ public class EstimationService {
 				multiplier = BigDecimal.valueOf(configs.getArvPercent() / 100);
 			currentUnitTax = unit.getArv().multiply(multiplier);
 		} else {
+	
 			currentUnitTax = BigDecimal.valueOf(unit.getUnitArea() * slab.getUnitRate());
+			if(assessmentYear.startsWith("2021-"))
+				currentUnitTax=currentUnitTax.multiply(new BigDecimal("1.05"));
 		}
 		return currentUnitTax;
 	}
@@ -1272,7 +1274,7 @@ public class EstimationService {
 	 * @param groundUnitsArea Sum of ground floor units area
 	 * @return calculated tax for un-built area in the property detail.
 	 */
-	private HashMap<Unit, BigDecimal> getUnBuiltRate(PropertyDetail detail, HashMap<Unit, BillingSlab> unitSlabMapping, List<Unit> groundUnits, Double groundUnitsArea) {
+	private HashMap<Unit, BigDecimal> getUnBuiltRate(String assessmentYear,PropertyDetail detail, HashMap<Unit, BillingSlab> unitSlabMapping, List<Unit> groundUnits, Double groundUnitsArea) {
 
         BigDecimal unBuiltAmt = BigDecimal.ZERO;
 		HashMap<Unit, BigDecimal>  unBuiltRateCalc = new HashMap<>();
@@ -1295,16 +1297,23 @@ public class EstimationService {
 					unBuiltRateCalc.put(unit, BigDecimal.ZERO);
 				} else {
 					if (unBuiltAreaProrated) {
+						if(assessmentYear.startsWith("2021-")) {
+						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)*1.05));
+					} else
 						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)));
-					} else {
+					}
+						else {  
+						if(assessmentYear.startsWith("2021-")) {
+							unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)*1.05));
+						}  
+						else
 						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)));
 					}
 				}
 			}
 
 		}
+      
         return unBuiltRateCalc;
     }
-
-
 }
