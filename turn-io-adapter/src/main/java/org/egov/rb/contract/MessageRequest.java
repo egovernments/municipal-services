@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class MessageRequest {
 	
-	@NotNull
+	
 	@JsonProperty("RequestInfo")
 	  private RequestInfo requestInfo = null;
  
@@ -29,7 +29,6 @@ public class MessageRequest {
 	@JsonProperty("messages")
 	private List<Messages> messages;
 	
-	@NotNull
 	@JsonProperty("thread")
 	private ThreadContact threadContact;
 	
