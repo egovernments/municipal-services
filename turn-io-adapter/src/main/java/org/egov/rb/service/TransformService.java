@@ -32,8 +32,8 @@ public class TransformService {
 	ServiceRequestRepository serviceRequestRepository;
 
 	/***
-	 * Method performs business logic if any transform the data and call the pgr data
-	 * persister queue on create topic
+	 * Method performs business logic to transform the data and call the pgr data
+	 * we are binding the pgr uri to transform
 	 * 
 	 * @param messagerequest
 	 * @return serviceResponse
