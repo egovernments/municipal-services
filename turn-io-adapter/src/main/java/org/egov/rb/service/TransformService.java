@@ -31,6 +31,13 @@ public class TransformService {
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
 
+	/***
+	 * Method performs business logic if any transform the data and call the pgr data
+	 * persister queue on create topic
+	 * 
+	 * @param messagerequest
+	 * @return serviceResponse
+	 */
 	
 	public ServiceResponse transform(MessageRequest messageRequest) {
 		ServiceRequest servicerequest = prepareServiceRequest(messageRequest);
@@ -39,6 +46,14 @@ public class TransformService {
 		return serviceResponse;
 
 	}
+	
+	/***
+	 *  method performs mapping the data messageRequest to serviceReguest fields and get the 
+	 *  data from the serviceRequest
+	 * 
+	 * @param messageRequest
+	 * @return serviceRequest
+	 */
 
 	private ServiceRequest prepareServiceRequest(MessageRequest messageRequest) {
 

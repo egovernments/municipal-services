@@ -2,6 +2,7 @@ package org.egov.rb.pgrmodels;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -26,6 +27,7 @@ public class Citizen {
 	@JsonProperty("permanentAddress")
 	private String address;
 	
+	@NotNull
 	private String mobileNumber;
 	
 	private String aadhaarNumber;

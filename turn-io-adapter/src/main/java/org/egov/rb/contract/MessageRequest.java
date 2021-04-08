@@ -2,6 +2,8 @@ package org.egov.rb.contract;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,16 +18,18 @@ import lombok.NoArgsConstructor;
 @Data
 public class MessageRequest {
 	
+	@NotNull
 	@JsonProperty("RequestInfo")
 	  private RequestInfo requestInfo = null;
  
 	@Autowired
 	@JsonProperty("contacts")
 	private List<Contacts> contacts;
-	//@Autowired
+	
 	@JsonProperty("messages")
 	private List<Messages> messages;
-	//@Autowired
+	
+	@NotNull
 	@JsonProperty("thread")
 	private ThreadContact threadContact;
 	
