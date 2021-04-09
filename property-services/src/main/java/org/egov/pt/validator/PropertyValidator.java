@@ -193,9 +193,9 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 				"ProcessInstance"));
 	        log.info("the following fields are updated "+fieldsUpdated);
 
-		if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
+		/*if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
 			throw new CustomException("EG_PT_WF_UPDATE_ERROR",
-					"The current state of workflow does not allow chnages to property");
+					"The current state of workflow does not allow chnages to property");*/
 		
 	    
         /*
