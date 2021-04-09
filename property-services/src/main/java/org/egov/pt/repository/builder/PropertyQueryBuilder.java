@@ -137,23 +137,22 @@ public class PropertyQueryBuilder {
 			Set<String> tenantIds = criteria.getTenantIds();
 			if(!CollectionUtils.isEmpty(tenantIds))
 			{
-				addClauseIfRequired(preparedStmtList,builder);
 				builder.append("property.tenantid IN (").append(createQuery(tenantIds)).append(")");
 				addToPreparedStatement(preparedStmtList,tenantIds);
+				appendAndQuery = true;
 			}
 		}
 		else
 		{
 			if(criteria.getTenantId()!=null)
 			{
-				addClauseIfRequired(preparedStmtList,builder);
 				builder.append("property.tenantid=?");
 				preparedStmtList.add(criteria.getTenantId());
+				appendAndQuery = true;
 			}
 		}
 		if (criteria.getFromDate() != null)
 		{
-			addClauseIfRequired(preparedStmtList,builder);
 			// If user does NOT specify toDate, take today's date as the toDate by default
 			if (criteria.getToDate() == null)
 			{
@@ -162,6 +161,7 @@ public class PropertyQueryBuilder {
 			builder.append("property.createdTime BETWEEN ? AND ?");
 			preparedStmtList.add(criteria.getFromDate());
 			preparedStmtList.add(criteria.getToDate());
+			appendAndQuery = true;
 		}
 		else
 		{
