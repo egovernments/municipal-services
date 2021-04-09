@@ -59,10 +59,9 @@ public class PropertyRepository {
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen) {
+	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen, Boolean isPlainSearch) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
-		Boolean isPlainSearch = true;
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch);
 		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
@@ -70,9 +69,8 @@ public class PropertyRepository {
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
-	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria) {
+	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria, Boolean isPlainSearch) {
 		List<Object> preparedStmtList = new ArrayList<>();
-		Boolean isPlainSearch = true;
 		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList, isPlainSearch);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
@@ -88,9 +86,9 @@ public class PropertyRepository {
 		return builder.toString();
 	}
 
-	public List<String> fetchIds(PropertyCriteria criteria) {
+	public List<String> fetchIds(PropertyCriteria criteria, Boolean isPlainSearch) {
+		
 		List<Object> preparedStmtList = new ArrayList<>();
-		Boolean isPlainSearch = false;
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
 		if(isPlainSearch)
@@ -134,7 +132,7 @@ public class PropertyRepository {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria, isOpenSearch);
+			properties = getProperties(criteria, isOpenSearch, false);
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
