@@ -48,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class PropertyValidator {
 
+public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class);
 
     @Autowired
     private PropertyUtil propertyUtil;
@@ -188,6 +189,7 @@ public class PropertyValidator {
 		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch, "");
 		objectsAdded.removeAll(Arrays.asList("TextNode", "Role", "NullNode", "LongNode", "JsonNodeFactory", "IntNode",
 				"ProcessInstance"));
+	        log.info("the following fields are updated "+fieldsUpdated);
 
 		if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
 			throw new CustomException("EG_PT_WF_UPDATE_ERROR",
