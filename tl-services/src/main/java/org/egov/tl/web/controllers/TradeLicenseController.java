@@ -57,9 +57,8 @@ import javax.servlet.http.HttpServletRequest;
     @RequestMapping(value = {"/{servicename}/_search", "/_search"}, method = RequestMethod.POST)
     public ResponseEntity<TradeLicenseResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                        @Valid @ModelAttribute TradeLicenseSearchCriteria criteria,
-                                                       @PathVariable(required = false) String servicename
-            , @RequestHeader HttpHeaders headers) {
-        List<TradeLicense> licenses = tradeLicenseService.search(criteria, requestInfoWrapper.getRequestInfo(), servicename, headers);
+                                                       @PathVariable(required = false) String servicename,@RequestHeader HttpHeaders headers) {
+        List<TradeLicense> licenses = tradeLicenseService.search(criteria, requestInfoWrapper.getRequestInfo(), servicename,headers);
 
         TradeLicenseResponse response = TradeLicenseResponse.builder().licenses(licenses).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
