@@ -680,6 +680,8 @@ public class DemandService {
 				if (isValidConnection) {
 					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 							.assessmentYear(estimationService.getAssessmentYear())
+							.from(taxperiodfrom)
+							.to(taxperiodto)
 							.connectionNo(detail.getConnectionNo()).build();
 					List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 					calculationCriteriaList.add(calculationCriteria);

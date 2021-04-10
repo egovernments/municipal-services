@@ -324,6 +324,8 @@ public class MasterDataService {
 			billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES,
 					Timestamp.valueOf(demandEndDate).getTime());
 		}
+		billingPeriod.put(SWCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
+		billingPeriod.put(SWCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 
 		log.info("Demand Expiry Date : " + master.get(SWCalculationConstant.Demand_Expiry_Date_String));
 		billingPeriod.put(SWCalculationConstant.Demand_Expiry_Date_String,
