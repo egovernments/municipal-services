@@ -179,4 +179,10 @@ public class ChallanConfiguration {
     
     @Value("${kafka.topics.receipt.cancel.name}")
     private String receiptCancelTopic;
+
+    @Value("${egov.localityservice.host}")
+    private String boundaryHost;
+
+    @Value("${egov.locality.search.endpoint}")
+    private String fetchBoundaryEndpoint;
 }

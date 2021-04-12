@@ -5,23 +5,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
+import org.egov.common.contract.request.RequestInfo;
+import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.Amount;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.Challan.StatusEnum;
 import org.egov.echallan.model.ChallanRequest;
+import org.egov.echallan.model.RequestInfoWrapper;
+import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import static org.egov.echallan.util.ChallanConstants.*;
 
 @Component
+@Slf4j
 public class ChallanValidator {
 
-	
-	public void validateFields(ChallanRequest request) {
-		 Challan challan = request.getChallan();
-         Map<String, String> errorMap = new HashMap<>();
+	@Autowired
+	private ChallanConfiguration config;
 
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
+
+	
+	public void validateFields(ChallanRequest request, Object mdmsData) {
+		 Challan challan = request.getChallan();
+		List<Map<String,Object>> taxPeriods = null;
+         Map<String, String> errorMap = new HashMap<>();
+         taxPeriods =  JsonPath.read(mdmsData, MDMS_FINACIALYEAR_PATH);
 		 List<Amount> entAmount = challan.getAmount();
 		 int totalAmt = 0;
 		for (Amount amount : entAmount) {
@@ -42,11 +57,49 @@ public class ChallanValidator {
             errorMap.put("NULL_Todate", " To date cannot be null");
          if(!challan.getTenantId().equalsIgnoreCase(request.getRequestInfo().getUserInfo().getTenantId()))
         	 errorMap.put("Invalid Tenant", "Invalid tenant id");
-         if (!errorMap.isEmpty())
+
+         Boolean validFinancialYear = false;
+         if(challan.getTaxPeriodTo() != null && challan.getTaxPeriodFrom() != null){
+			 for(Map<String,Object> financialYearProperties: taxPeriods){
+				 Long startDate = (Long) financialYearProperties.get(MDMS_STARTDATE);
+				 Long endDate = (Long) financialYearProperties.get(MDMS_ENDDATE);
+				 if( challan.getTaxPeriodFrom() < challan.getTaxPeriodTo() && challan.getTaxPeriodFrom() >= startDate && challan.getTaxPeriodTo() <= endDate )
+				 	validFinancialYear = true;
+			 }
+		 }
+
+         if(!validFinancialYear)
+			 errorMap.put("Invalid TaxPeriod", "Tax period details are invalid");
+
+         List<String> localityCodes = getLocalityCodes(challan.getTenantId(), request.getRequestInfo());
+
+         if(!localityCodes.contains(challan.getAddress().getLocality().getCode()))
+         	errorMap.put("Invalid Locality", "Locality details are invalid");
+
+
+		if (!errorMap.isEmpty())
         	 throw new CustomException(errorMap);
         
 		
 	}
+
+	public List<String> getLocalityCodes(String tenantId, RequestInfo requestInfo){
+		StringBuilder builder = new StringBuilder(config.getBoundaryHost());
+		builder.append(config.getFetchBoundaryEndpoint());
+		builder.append("?tenantId=");
+		builder.append(tenantId);
+		builder.append("&hierarchyTypeCode=");
+		builder.append(HIERARCHY_CODE);
+		builder.append("&boundaryType=");
+		builder.append(BOUNDARY_TYPE);
+
+		Object result = serviceRequestRepository.fetchResult(builder, new RequestInfoWrapper(requestInfo));
+
+		List<String> codes = JsonPath.read(result, LOCALITY_CODE_PATH);
+		return codes;
+	}
+
+
 
 	public void validateUpdateRequest(ChallanRequest request, List<Challan> searchResult) {
 		Challan challan = request.getChallan();

@@ -32,6 +32,21 @@ public class ChallanConstants {
 
 	public static final String BILLING_SERVICE = "BillingService";
 
+    public static final String TAXPERIOD_MODULE = "TaxPeriod";
+
+    public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.BillingService.TaxPeriod";
+
+    public static final String MDMS_STARTDATE  = "startingDate";
+
+    public static final String MDMS_ENDDATE  = "endingDate";
+
+    public static final String HIERARCHY_CODE  = "REVENUE";
+
+    public static final String BOUNDARY_TYPE  = "Locality";
+
+    public static final String LOCALITY_CODE_PATH = "$.TenantBoundary.[*].boundary[?(@.label==\"Locality\")].code";
+
+
     public ChallanConstants() {}
 
 }
