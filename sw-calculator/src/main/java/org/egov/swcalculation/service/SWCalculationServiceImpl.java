@@ -320,6 +320,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			return;
 		log.info("billSchedularList count : " + billSchedularList.size());
 		for (BillScheduler billSchedular : billSchedularList) {
+			try {
+				
 			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
@@ -340,6 +342,9 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 					.build();
 
 				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+			}catch (Exception e) {
+				log.error("Execptio occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
+			}
 
 		}
 	}

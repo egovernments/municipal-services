@@ -37,6 +37,8 @@ public class BillGenerationConsumer {
 	@KafkaListener(topics = {
 	"${egov.swcalculatorservice.billgenerate.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	public void listen(final List<Message<?>> records) {
+		try {
+			
 		log.info("bill generator consumer received records:  " + records.size());
 
 		BillGeneraterReq billGeneraterReq = mapper.convertValue(records.get(0).getPayload(), BillGeneraterReq.class);
@@ -45,11 +47,16 @@ public class BillGenerationConsumer {
 		if(billGeneraterReq.getConsumerCodes() != null && !billGeneraterReq.getConsumerCodes().isEmpty() && billGeneraterReq.getTenantId() != null) {
 			Boolean bill = demandService.fetchBillScheduler(billGeneraterReq.getConsumerCodes(),billGeneraterReq.getTenantId() ,billGeneraterReq.getRequestInfoWrapper().getRequestInfo());
 			log.info("Is Bill generator completed: {}", bill);
+			if(bill) {
+				billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.COMPLETED);
+				log.info("Number of batch records:  " + billGeneraterReq.getConsumerCodes().size());
+			}
+			
 		}
 		
-		billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.COMPLETED);
-
-		log.info("Number of batch records:  " + billGeneraterReq.getConsumerCodes().size());
+		}catch(Exception exception) {
+			log.error("Exception occurred while generating bills in the sw bill generator consumer");
+		}
 	}
 
 }
