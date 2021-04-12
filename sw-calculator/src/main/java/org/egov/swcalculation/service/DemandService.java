@@ -887,9 +887,12 @@ public class DemandService {
 				Object result = serviceRequestRepository.fetchResult(
 						calculatorUtils.getFetchBillURL(tenantId, consumerCode),
 						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				
+				log.info("Response fetchBillScheduler: {}",  result);
 
 			} catch (Exception ex) {
 				log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
+				ex.printStackTrace();
 				return Boolean.FALSE;
 			}
 		}
