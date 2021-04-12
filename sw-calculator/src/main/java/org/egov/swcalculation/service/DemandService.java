@@ -664,34 +664,42 @@ public class DemandService {
 	@SuppressWarnings("unchecked")
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
 			long taxperiodfrom, long taxperiodto) {
-		log.info("Billing master data values for non metered connection:: {}", master);
-		//long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-		//if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
+		try {
+			log.info("Billing master data values for non metered connection:: {}", master);
+			//long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
+			//if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
-//			SewerageDetails sewerage=new SewerageDetails();
-//			sewerage.setConnectionNo("107000061");
-//			sewerage.setConnectionExecutionDate(1);
-//			List<SewerageDetails> connectionNos=new ArrayList<SewerageDetails>();
-//			connectionNos.add(sewerage);
+			//			SewerageDetails sewerage=new SewerageDetails();
+			//			sewerage.setConnectionNo("107000061");
+			//			sewerage.setConnectionExecutionDate(1);
+			//			List<SewerageDetails> connectionNos=new ArrayList<SewerageDetails>();
+			//			connectionNos.add(sewerage);
 			for (SewerageDetails detail : connectionNos) {
-				boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
-						requestInfo);
-				if (isValidConnection) {
-					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-							.assessmentYear(estimationService.getAssessmentYear())
-							.from(taxperiodfrom)
-							.to(taxperiodto)
-							.connectionNo(detail.getConnectionNo()).build();
-					List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-					calculationCriteriaList.add(calculationCriteria);
-					CalculationReq calculationReq = CalculationReq.builder()
-							.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxperiodfrom)
-							.taxPeriodTo(taxperiodto).requestInfo(requestInfo).isconnectionCalculation(true).build();
-					kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+				try {
+					boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
+							requestInfo);
+					if (isValidConnection) {
+						CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+								.assessmentYear(estimationService.getAssessmentYear())
+								.from(taxperiodfrom)
+								.to(taxperiodto)
+								.connectionNo(detail.getConnectionNo()).build();
+						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+						calculationCriteriaList.add(calculationCriteria);
+						CalculationReq calculationReq = CalculationReq.builder()
+								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxperiodfrom)
+								.taxPeriodTo(taxperiodto).requestInfo(requestInfo).isconnectionCalculation(true).build();
+						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+
+					}
+				}catch (Exception e) {
+					log.error("Exception occurred while generating demand for sewerage connectionno: "+detail.getConnectionNo() + " tenantId: "+tenantId);
 				}
 			}
-		//}
+		}catch (Exception e) {
+			log.error("Exception occurred while processing the demand generation for tenantId: "+tenantId);
+		}
 	}
 
 	private boolean validateSewerageConnection(SewerageDetails detail, long taxPeriodFrom, long taxPeriodTo,
