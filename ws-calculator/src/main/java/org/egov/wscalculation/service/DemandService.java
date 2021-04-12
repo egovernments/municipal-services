@@ -688,6 +688,8 @@ public class DemandService {
 	 */
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
 			long taxPeriodFrom, long taxPeriodTo) {
+		try {
+			
 		log.info("Billing master data values for non metered connection:: {}", master);
 //		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 //		if (isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
@@ -695,21 +697,27 @@ public class DemandService {
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
 			for (WaterDetails waterConnection : connectionNos) {
-				boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
-						taxPeriodFrom, taxPeriodTo);
-				if (isConnectionValid) {
-					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-							.assessmentYear(assessmentYear).from(taxPeriodFrom).to(taxPeriodTo).connectionNo(waterConnection.getConnectionNo()).build();
-					List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-					calculationCriteriaList.add(calculationCriteria);
-					CalculationReq calculationReq = CalculationReq.builder()
-							.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxPeriodFrom)
-							.taxPeriodTo(taxPeriodTo).requestInfo(requestInfo).isconnectionCalculation(true).build();
-					wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-				}
-				// log.info("Prepared Statement" + calculationRes.toString());
+				try {
 
-//			}
+					boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
+							taxPeriodFrom, taxPeriodTo);
+					if (isConnectionValid) {
+						CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+								.assessmentYear(assessmentYear).from(taxPeriodFrom).to(taxPeriodTo).connectionNo(waterConnection.getConnectionNo()).build();
+						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+						calculationCriteriaList.add(calculationCriteria);
+						CalculationReq calculationReq = CalculationReq.builder()
+								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxPeriodFrom)
+								.taxPeriodTo(taxPeriodTo).requestInfo(requestInfo).isconnectionCalculation(true).build();
+						wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+					}
+				}catch (Exception e) {
+					log.error("Exception occurred while generating demand for water connectionno: "+waterConnection.getConnectionNo() + " tenantId: "+tenantId);
+				}
+
+			}
+		}catch (Exception e) {
+			log.error("Exception occurred while processing the demand generation for tenantId: "+tenantId);
 		}
 	}
 
