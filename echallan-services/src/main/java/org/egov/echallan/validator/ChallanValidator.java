@@ -1,5 +1,6 @@
 package org.egov.echallan.validator;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class ChallanValidator {
 		 int totalAmt = 0;
 		for (Amount amount : entAmount) {
 			totalAmt+=amount.getAmount().intValue();
+			if(amount.getAmount().compareTo(new BigDecimal(0)) == -1)
+				errorMap.put("Negative Amount","Amount cannot be negative");
 		}
 		if(totalAmt <= 0) {
 			errorMap.put("Zero amount","Challan cannot be generated for zero amount");
