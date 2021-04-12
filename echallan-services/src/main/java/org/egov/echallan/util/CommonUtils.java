@@ -90,7 +90,7 @@ public class CommonUtils {
         List<MasterDetail> masterDetails = new ArrayList<>();
 
         // filter to only get code field from master data
-        final String filterCodeForFY = "$.[?(@.active==true && @.module=='"+service+"')]";
+        final String filterCodeForFY = "$.[?(@.service=='"+service+"')]";
 
         masterDetails.add(MasterDetail.builder().name(constants.TAXPERIOD_MODULE).filter(filterCodeForFY).build());
 
