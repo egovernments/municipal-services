@@ -50,6 +50,9 @@ public class BillGenerationConsumer {
 					billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.COMPLETED);
 
 					log.info("Number of batch records:  " + billGeneraterReq.getConsumerCodes().size());
+				}else {
+					billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.INITIATED);
+					log.error("Bill scheduler fetch API failure for tenant: {}, locality: {} ", billGeneraterReq.getTenantId(), billGeneraterReq.getBillSchedular().getLocality());
 				}
 			}
 		}catch(Exception exception) {

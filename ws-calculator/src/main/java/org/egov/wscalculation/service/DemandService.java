@@ -689,10 +689,10 @@ public class DemandService {
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
 			long taxPeriodFrom, long taxPeriodTo) {
 		try {
-			
-		log.info("Billing master data values for non metered connection:: {}", master);
-//		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-//		if (isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
+
+			log.info("Billing master data values for non metered connection:: {}", master);
+			//		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
+			//		if (isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();

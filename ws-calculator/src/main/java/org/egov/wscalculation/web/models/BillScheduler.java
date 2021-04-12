@@ -46,7 +46,7 @@ public class BillScheduler {
 	 */
 	public enum StatusEnum {
 		
-		INITATED("INITATED"),
+		INITIATED("INITIATED"),
 
 		INPROGRESS("INPROGRESS"),
 
