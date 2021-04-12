@@ -28,7 +28,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 /**
  * Capture the challan amount details
@@ -46,7 +46,7 @@ public class Amount {
   private String taxHeadCode = null;
 
   @JsonProperty("amount")
-  @DecimalMin("0.00")
+  @Min(value = 0L, message = "The amount must be positive")
   private BigDecimal amount = null;
   public Amount taxHeadCode(String taxHeadCode) {
     this.taxHeadCode = taxHeadCode;
