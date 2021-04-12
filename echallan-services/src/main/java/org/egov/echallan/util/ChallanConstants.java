@@ -36,9 +36,9 @@ public class ChallanConstants {
 
     public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.BillingService.TaxPeriod";
 
-    public static final String MDMS_STARTDATE  = "startingDate";
+    public static final String MDMS_STARTDATE  = "fromDate";
 
-    public static final String MDMS_ENDDATE  = "endingDate";
+    public static final String MDMS_ENDDATE  = "toDate";
 
     public static final String HIERARCHY_CODE  = "REVENUE";
 
