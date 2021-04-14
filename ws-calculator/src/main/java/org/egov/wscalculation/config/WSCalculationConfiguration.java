@@ -200,4 +200,7 @@ public class WSCalculationConfiguration {
 	
 	@Value("${egov.watercalculatorservice.billgenerate.topic}")
 	private String billGenerateSchedulerTopic;
+	
+	@Value("${kafka.topics.save.demand}")
+	private String saveDemand;
 }

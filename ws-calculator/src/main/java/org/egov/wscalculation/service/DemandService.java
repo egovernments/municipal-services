@@ -223,9 +223,14 @@ public class DemandService {
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build());
 			
 			log.info("Demand Object" + demands.toString());
-			demandRes.addAll(demandRepository.saveDemand(requestInfo, demands));
-			if (WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType()))
+			
+			if (WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType())) {
+				demandRes.addAll(demandRepository.saveDemand(requestInfo, demands));
 				fetchBill(demandRes, requestInfo);
+				
+			}else {
+				saveDemand(requestInfo, demands);
+			}
 			
 		}
 		
@@ -892,6 +897,20 @@ public class DemandService {
 		return Boolean.TRUE;
 	}
 	
+    /**
+     * Creates demand
+     * @param requestInfo The RequestInfo of the calculation Request
+     * @param demands The demands to be created
+     * @return The list of demand created
+     */
+	public void saveDemand(RequestInfo requestInfo, List<Demand> demands){
+		try{
+			DemandRequest request = new DemandRequest(requestInfo,demands);
+			wsCalculationProducer.push(configs.getSaveDemand(), request);
+		}catch(Exception e){
+			throw new CustomException("PARSING_ERROR","Failed to push the save demand data to kafka topic");
+		}
+	}
 	
 
 
