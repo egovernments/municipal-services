@@ -66,6 +66,10 @@ public class WsQueryBuilder {
             "WHERE offset_ > ? AND offset_ <= ?";
 	
 	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.appCreatedDate DESC";
+	
+	
+	public static final String UPDATE_DISCONNECT_STATUS="update eg_ws_connection set status=? where id=?";
+	
 	/**
 	 * 
 	 * @param criteria

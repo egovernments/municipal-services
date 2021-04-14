@@ -196,4 +196,11 @@ public class WSConfiguration {
 
 	@Value("${egov.collection.host}")
 	private String collectionHost;
+	
+	@Value("${egov.billing.service.host}")
+	private String businesserviceHost;
+	
+	@Value("${egov.bill.fetchbillendpoint}")
+	private String fetchBillEndPoint;
+	
 }

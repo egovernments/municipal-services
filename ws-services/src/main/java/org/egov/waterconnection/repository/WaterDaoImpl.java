@@ -1,5 +1,6 @@
 package org.egov.waterconnection.repository;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -130,6 +131,16 @@ public class WaterDaoImpl implements WaterDao {
 
 		return userInfo.getType().equalsIgnoreCase("SYSTEM")
 				&& userInfo.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()).contains("ANONYMOUS");
+	}
+	
+	public void updateWaterApplicationStatus(String id, String status) {
+		
+		Object[] params = { status, id};
+		
+		int[] types = {Types.VARCHAR, Types.VARCHAR};
+		
+		jdbcTemplate.update(WsQueryBuilder.UPDATE_DISCONNECT_STATUS, params, types);
+		 
 	}
 
 }

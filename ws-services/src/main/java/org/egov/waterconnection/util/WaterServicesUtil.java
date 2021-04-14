@@ -10,6 +10,7 @@ import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.tracer.model.CustomException;
+import org.egov.tracer.model.ServiceCallException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.web.models.AuditDetails;
 import org.egov.waterconnection.web.models.Property;
@@ -17,6 +18,7 @@ import org.egov.waterconnection.web.models.PropertyCriteria;
 import org.egov.waterconnection.web.models.PropertyResponse;
 import org.egov.waterconnection.web.models.RequestInfoWrapper;
 import org.egov.waterconnection.web.models.SearchCriteria;
+import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.workflow.BusinessService;
 import org.egov.waterconnection.repository.ServiceRequestRepository;
@@ -27,9 +29,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONObject;
+import org.egov.waterconnection.constants.WCConstants;
 
 @Component
 public class WaterServicesUtil {
@@ -299,6 +303,32 @@ public class WaterServicesUtil {
 	public StringBuilder getcollectionURL() {
 		StringBuilder builder = new StringBuilder();
 		return builder.append(config.getCollectionHost()).append(config.getPaymentSearch());
+	}
+	
+	public Boolean isBillUnpaid(String connectionNo, String tenantId, RequestInfo request) {
+
+		Object res = null;
+
+		StringBuilder uri = new StringBuilder(config.getBusinesserviceHost())
+				.append(config.getFetchBillEndPoint())
+				.append("?tenantId=").append(tenantId)
+				.append("&consumerCode=").append(connectionNo)
+				.append("&businessService=").append(WCConstants.WATER_SERVICE_BUSINESS_ID);
+
+		try {
+			res = serviceRequestRepository.fetchResult(uri, new RequestInfoWrapper(request));
+		} catch (ServiceCallException e) {
+
+			if(!(e.getError().contains(WCConstants.BILL_NO_DEMAND_ERROR_CODE) || e.getError().contains(WCConstants.BILL_NO_PAYABLE_DEMAND_ERROR_CODE)))
+				throw e;
+		}
+
+		if (res != null) {
+			JsonNode node = objectMapper.convertValue(res, JsonNode.class);
+			Double amount = node.at(WCConstants.BILL_AMOUNT_PATH).asDouble();
+			return amount > 0;
+		}
+		return false;
 	}
 
 }

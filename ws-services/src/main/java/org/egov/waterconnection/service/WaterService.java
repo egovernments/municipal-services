@@ -15,4 +15,6 @@ public interface WaterService {
 	
 	List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest);
 
+	void disConnectWaterConnection(String connectionNo,RequestInfo requestInfo,String tenantId);
+
 }

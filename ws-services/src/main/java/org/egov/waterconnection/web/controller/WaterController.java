@@ -9,6 +9,7 @@ import org.egov.waterconnection.web.models.SearchCriteria;
 import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.WaterConnectionResponse;
+import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.service.DocumentService;
 import org.egov.waterconnection.service.WaterService;
 import org.egov.waterconnection.util.ResponseInfoFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Builder;
@@ -83,4 +85,12 @@ public class WaterController {
 		return new ResponseEntity<>("WS Connection FilestoreIds Saved", HttpStatus.CREATED);
 	}
 
+	@RequestMapping(value="/disconnect", method=RequestMethod.POST)
+	public ResponseEntity<String> disConnectWaterConnection(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,@RequestParam String connectionNo,@RequestParam String tenantId ){
+		
+		waterService.disConnectWaterConnection(connectionNo,requestInfoWrapper.getRequestInfo(),tenantId);
+		return new ResponseEntity<>(WCConstants.SUCCESS_DISCONNECT_MSG, HttpStatus.CREATED);
+	}
+	
+	
 }
