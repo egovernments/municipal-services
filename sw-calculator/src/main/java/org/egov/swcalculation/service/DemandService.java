@@ -893,7 +893,6 @@ public class DemandService {
 			} catch (Exception ex) {
 				log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
 				ex.printStackTrace();
-				return Boolean.FALSE;
 			}
 		}
 		return Boolean.TRUE;
