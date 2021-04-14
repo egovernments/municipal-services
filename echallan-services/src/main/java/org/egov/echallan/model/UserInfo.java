@@ -57,20 +57,11 @@ public class UserInfo extends User {
   @SafeHtml
   private String idToken;
 
-  @JsonProperty("mobileNumber")
-  @SafeHtml
-  private String mobileNumber;
-
   @JsonProperty("email")
   @SafeHtml
   private String email;
 
-  @JsonProperty("name")
-  @SafeHtml
-  private String name;
-
   @JsonProperty("primaryrole")
-
   private List<Role> primaryrole = new ArrayList<Role>();
 
   @JsonProperty("additionalroles")

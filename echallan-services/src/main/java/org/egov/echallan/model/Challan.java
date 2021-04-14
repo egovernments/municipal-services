@@ -28,6 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.SafeHtml;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ import java.util.List;
 public class Challan {
 
   @JsonProperty("citizen")
-
+  @Valid
   private UserInfo citizen = null;
 
   @JsonProperty("id")
