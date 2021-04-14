@@ -303,7 +303,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
 //		List<String> tenantIds = wSCalculationDao.getTenantId();
 		List<String> tenantIds = new ArrayList<>();
-		tenantIds.add("pb.fazilka");
+		tenantIds.add("pb.ahmedgarh");
 		if (tenantIds.isEmpty()) {
 			log.info("No tenants are found for generating demand");
 			return;
