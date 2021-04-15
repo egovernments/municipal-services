@@ -257,8 +257,10 @@ public class EnrichmentService {
 	 */
 	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {
-			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)
+			log.info("ACTION "+sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction());
+			log.info("ApplicationStatus "+sewerageConnectionRequest.getSewerageConnection().getApplicationStatus());
+			if (sewerageConnectionRequest.getSewerageConnection().getApplicationStatus()
+					.equalsIgnoreCase(SWConstants.PENDING_APPROVAL_FOR_CONNECTION_CODE)
 					|| sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 							.equalsIgnoreCase(SWConstants.ACTION_PAY)) {
 				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);

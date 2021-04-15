@@ -221,4 +221,6 @@ public class SWConstants {
 
 	public static final long INVALID_CONEECTION_EXECUTION_DATE = 0L;
 
+	public static final String PENDING_APPROVAL_FOR_CONNECTION_CODE ="PENDING_APPROVAL_FOR_CONNECTION";
+
 }
