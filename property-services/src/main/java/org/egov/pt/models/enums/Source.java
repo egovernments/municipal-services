@@ -9,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Source {
 	
   MUNICIPAL_RECORDS("MUNICIPAL_RECORDS"),
-    
+  
+  LEGACY_RECORD("LEGACY_RECORD"),
+
   FIELD_SURVEY("FIELD_SURVEY"),
 	
   WATER_CHARGES("WATER_CHARGES");
