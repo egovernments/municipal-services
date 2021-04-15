@@ -274,7 +274,7 @@ public class WaterServiceImpl implements WaterService {
 		connectionRequest.setWaterConnection(waterConnection);
 		List<WaterConnection> waterConnectionList = getAllWaterApplications(connectionRequest);
 		List<WaterConnection> activeWaterConnections = waterConnectionList.stream()
-				.filter(connection -> connection.getStatus().equals(WCConstants.ACTIVE_STATUS)
+				.filter(connection -> connection.getStatus().toString().equalsIgnoreCase(WCConstants.ACTIVE_STATUS)
 						&& !connection.getOldApplication())
 				.collect(Collectors.toList());
 		validateDisconnectWaterConnection(waterConnectionList, connectionNo, requestInfo, tenantId,

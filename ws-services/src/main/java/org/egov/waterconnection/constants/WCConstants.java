@@ -257,7 +257,7 @@ public class WCConstants {
 	
 	public static final String ACTIVE_ERROR_MESSAGE="Action can not be performed as the consumer is already inactive";
 
-	public static final String INACTIVE_STATUS = "INACTIVE";
+	public static final String INACTIVE_STATUS = "Inactive";
 
 	public static final String SUCCESS_DISCONNECT_MSG = "Successfully disconnected water connection";
 }
