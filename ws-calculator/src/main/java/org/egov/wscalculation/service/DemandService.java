@@ -701,7 +701,9 @@ public class DemandService {
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
+			Integer countForPause=0;
 			for (WaterDetails waterConnection : connectionNos) {
+				countForPause++;
 				try {
 
 					boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
@@ -715,6 +717,11 @@ public class DemandService {
 								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxPeriodFrom)
 								.taxPeriodTo(taxPeriodTo).requestInfo(requestInfo).isconnectionCalculation(true).build();
 						wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+						if(countForPause ==500) {
+							//Pausing the controller for every 3minutes.to remove the load on the service.
+							Thread.sleep(180000);
+							countForPause=0;
+						}
 					}
 				}catch (Exception e) {
 					log.error("Exception occurred while generating demand for water connectionno: "+waterConnection.getConnectionNo() + " tenantId: "+tenantId);
