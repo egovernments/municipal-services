@@ -13,6 +13,7 @@ import org.egov.swservice.web.models.SewerageConnectionResponse;
 import org.egov.swservice.service.DocumentService;
 import org.egov.swservice.service.SewerageService;
 import org.egov.swservice.util.ResponseInfoFactory;
+import org.egov.swservice.util.SWConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Builder;
@@ -84,6 +86,13 @@ public class SewarageController {
 
 		documentService.saveDocuments(documentRequest, documentRequest.getRequestInfo());
 		return new ResponseEntity<>("SW Connection FilestoreIds Saved", HttpStatus.CREATED);
+	}
+	
+	@RequestMapping(value="/disconnect", method=RequestMethod.POST)
+	public ResponseEntity<String> disConnectSwerageConnection(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,@RequestParam String connectionNo,@RequestParam String tenantId ){
+		
+		sewarageService.disConnectSewerageConnection(connectionNo,requestInfoWrapper.getRequestInfo(),tenantId);
+		return new ResponseEntity<>(SWConstants.SUCCESS_DISCONNECT_MSG, HttpStatus.CREATED);
 	}
 
 }

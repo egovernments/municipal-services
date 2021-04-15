@@ -1,5 +1,6 @@
 package org.egov.swservice.repository;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,12 +66,10 @@ public class SewerageDaoImpl implements SewerageDao {
 			return Collections.emptyList();
 		Boolean isOpenSearch = isSearchOpen(requestInfo.getUserInfo());
 		List<SewerageConnection> sewerageConnectionList = new ArrayList<>();
-		if(isOpenSearch)
-			sewerageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
-					openSewerageRowMapper);
+		if (isOpenSearch)
+			sewerageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), openSewerageRowMapper);
 		else
-			sewerageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(),
-					sewarageRowMapper);
+			sewerageConnectionList = jdbcTemplate.query(query, preparedStatement.toArray(), sewarageRowMapper);
 
 		if (sewerageConnectionList == null) {
 			return Collections.emptyList();
@@ -86,8 +85,8 @@ public class SewerageDaoImpl implements SewerageDao {
 
 	public void updateSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest,
 			boolean isStateUpdatable) {
-		log.info("SW application state updatable flag:"+isStateUpdatable);
-		log.info("SW application request before update:"+sewerageConnectionRequest);
+		log.info("SW application state updatable flag:" + isStateUpdatable);
+		log.info("SW application request before update:" + sewerageConnectionRequest);
 		if (isStateUpdatable) {
 			sewarageConnectionProducer.push(updateSewarageConnection, sewerageConnectionRequest);
 		} else {
@@ -123,6 +122,16 @@ public class SewerageDaoImpl implements SewerageDao {
 	 */
 	public void saveFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		sewarageConnectionProducer.push(swConfiguration.getSaveFileStoreIdsTopic(), sewerageConnectionRequest);
+	}
+
+	public void updateSewerageApplicationStatus(String id, String status) {
+
+		Object[] params = { status, id };
+
+		int[] types = { Types.VARCHAR, Types.VARCHAR };
+
+		jdbcTemplate.update(SWQueryBuilder.UPDATE_DISCONNECT_STATUS, params, types);
+
 	}
 
 }

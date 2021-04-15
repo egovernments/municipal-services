@@ -14,5 +14,8 @@ public interface SewerageService {
 	List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo);
 
 	List<SewerageConnection> updateSewerageConnection(SewerageConnectionRequest sewarageConnectionRequest);
+	
+	void disConnectSewerageConnection(String connectionNo,RequestInfo requestInfo,String tenantId);
+
 
 }

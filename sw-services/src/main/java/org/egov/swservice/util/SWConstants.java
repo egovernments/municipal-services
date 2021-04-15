@@ -220,5 +220,21 @@ public class SWConstants {
 	public static final String SEARCH_TYPE_CONNECTION = "CONNECTION";
 	
 	public static final long INVALID_CONEECTION_EXECUTION_DATE = 0L;
+	
+public static final String BILL_NO_DEMAND_ERROR_CODE = "EG_BS_BILL_NO_DEMANDS_FOUND";
+	
+	public static final String BILL_NO_PAYABLE_DEMAND_ERROR_CODE = "EG_BS_BILL_ZERO_TAX";
+	
+	public static final String BILL_AMOUNT_PATH = "/Bill/0/totalAmount";
+	
+	public static final String DUES_ERROR_MESSAGE="Please collect pending dues before proceeding to disconnect the connection";
+
+	public static final String ACTIVE_STATUS="Active";
+	
+	public static final String ACTIVE_ERROR_MESSAGE="Action can not be performed as the consumer is already inactive";
+
+	public static final String INACTIVE_STATUS = "Inactive";
+
+	public static final String SUCCESS_DISCONNECT_MSG = "Successfully disconnected sewerage connection";
 
 }

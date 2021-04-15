@@ -183,4 +183,10 @@ public class SWConfiguration {
 
 	@Value("${egov.usr.events.pay.link}")
 	private String userEventApplicationPayLink;
+	
+	@Value("${egov.billing.service.host}")
+	private String businesserviceHost;
+	
+	@Value("${egov.bill.fetchbillendpoint}")
+	private String fetchBillEndPoint;
 }

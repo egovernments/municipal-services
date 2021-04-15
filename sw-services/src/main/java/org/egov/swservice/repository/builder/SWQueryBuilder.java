@@ -61,6 +61,9 @@ public class SWQueryBuilder {
             "({})" +
             " result) result_offset " +
             "WHERE offset_ > ? AND offset_ <= ?";
+	
+	public static final String UPDATE_DISCONNECT_STATUS="update eg_sw_connection set status=? where id=?";
+	
 
 	/**
 	 *

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swservice.config.SWConfiguration;
@@ -262,5 +263,46 @@ public class SewerageServiceImpl implements SewerageService {
 				}
 			}
 		}
+	}
+
+
+	
+	@Override
+	public void disConnectSewerageConnection(String connectionNo, RequestInfo requestInfo, String tenantId) {
+		// TODO Auto-generated method stub
+		SewerageConnectionRequest connectionRequest = new SewerageConnectionRequest();
+		connectionRequest.setRequestInfo(requestInfo);
+		SewerageConnection sewerageConnection = new SewerageConnection();
+		sewerageConnection.setConnectionNo(connectionNo);
+		sewerageConnection.setTenantId(tenantId);
+		connectionRequest.setSewerageConnection(sewerageConnection);
+		List<SewerageConnection> waterConnectionList = getAllSewerageApplications(connectionRequest);
+		List<SewerageConnection> activeWaterConnections = waterConnectionList.stream()
+				.filter(connection -> connection.getStatus().toString().equalsIgnoreCase(SWConstants.ACTIVE_STATUS)
+						&& !connection.getOldApplication())
+				.collect(Collectors.toList());
+		validateDisconnectSewerageConnection(waterConnectionList, connectionNo, requestInfo, tenantId,
+				activeWaterConnections);
+		sewerageDaoImpl.updateSewerageApplicationStatus(activeWaterConnections.get(0).getId(), SWConstants.INACTIVE_STATUS);
+		
+
+	}
+
+	private void validateDisconnectSewerageConnection(List<SewerageConnection> waterConnectionList, String connectionNo,
+			RequestInfo requestInfo, String tenantId, List<SewerageConnection> activeWaterConnectionList) {
+
+		if (activeWaterConnectionList.size() != 1) {
+			throw new CustomException("EG_WS_DISCONNECTION_ERROR",SWConstants.ACTIVE_ERROR_MESSAGE);
+		}
+
+		if (!CollectionUtils.isEmpty(waterConnectionList)) {
+			workflowService.validateInProgressWF(waterConnectionList, requestInfo, connectionNo);
+		}
+
+		boolean isBillUnpaid = sewerageServicesUtil.isBillUnpaid(connectionNo, tenantId, requestInfo);
+
+		if (isBillUnpaid)
+			throw new CustomException("EG_WS_DISCONNECTION_ERROR", SWConstants.DUES_ERROR_MESSAGE);
+
 	}
 }
