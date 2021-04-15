@@ -94,7 +94,8 @@ public class DemandGenerationConsumer {
 				
 				calcReq.getCalculationCriteria().forEach(calcCriteria -> {
 					CalculationReq request = CalculationReq.builder().calculationCriteria(Arrays.asList(calcCriteria))
-							.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
+							.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true)
+							.taxPeriodFrom(calcCriteria.getFrom()).taxPeriodTo(calcCriteria.getTo()).build();
 					try {
 						log.info("Generating Demand for Criteria : " + calcCriteria);
 						// processing single

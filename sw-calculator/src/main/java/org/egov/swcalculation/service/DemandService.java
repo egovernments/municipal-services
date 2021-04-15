@@ -675,7 +675,9 @@ public class DemandService {
 			//			sewerage.setConnectionExecutionDate(1);
 			//			List<SewerageDetails> connectionNos=new ArrayList<SewerageDetails>();
 			//			connectionNos.add(sewerage);
+			Integer countForPause=0;
 			for (SewerageDetails detail : connectionNos) {
+				countForPause++;
 				try {
 					boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
 							requestInfo);
@@ -691,6 +693,11 @@ public class DemandService {
 								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxperiodfrom)
 								.taxPeriodTo(taxperiodto).requestInfo(requestInfo).isconnectionCalculation(true).build();
 						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+						if(countForPause ==500) {
+							//Pausing the controller for every 3minutes.to remove the load on the service.
+							Thread.sleep(180000);
+							countForPause=0;
+						}
 
 					}
 				}catch (Exception e) {
