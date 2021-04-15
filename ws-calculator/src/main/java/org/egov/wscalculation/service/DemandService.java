@@ -223,14 +223,14 @@ public class DemandService {
 					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build());
 			
 			log.info("Demand Object" + demands.toString());
+			demandRes.addAll(demandRepository.saveDemand(requestInfo, demands));
 			
 			if (WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType())) {
-				demandRes.addAll(demandRepository.saveDemand(requestInfo, demands));
 				fetchBill(demandRes, requestInfo);
 				
-			}else {
-				saveDemand(requestInfo, demands);
-			}
+			} /*
+				 * else { saveDemand(requestInfo, demands); }
+				 */
 			
 		}
 		
