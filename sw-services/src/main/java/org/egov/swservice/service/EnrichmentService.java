@@ -64,7 +64,8 @@ public class EnrichmentService {
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
-		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
+		if (config.getIsExternalWorkFlowEnabled())
+			sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
 			for (String constValue : SWConstants.ADDITIONAL_OBJECT) {
