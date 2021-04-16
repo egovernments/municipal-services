@@ -611,6 +611,7 @@ public class CalculatorUtils {
      * @return End of day epoch time for the given time
      */
     public static Long getEODEpoch(Long epoch) {
+        System.out.println("\n\ntimeZone"+timeZone+"\n\n");
         LocalDate date =
                 Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get(timeZone))).toLocalDate();
         LocalDateTime endOfDay = LocalDateTime.of(date, LocalTime.MAX);
