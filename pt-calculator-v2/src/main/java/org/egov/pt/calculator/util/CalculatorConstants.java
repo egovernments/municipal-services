@@ -336,4 +336,7 @@ public class CalculatorConstants {
 
 	public static final String TAX_PERIOD_SEARCH_FAILED = "EGPT_CALCULATOR_TAX_PERIOD_SEARCH_ERROR";
 	public static final String TAX_PERIOD_SEARCH_FAILED_MSG = "Tax period for current financial year is not present. Please add the tax period details";
+
+	public static final String TIMEZONE = "IST";
+
 }

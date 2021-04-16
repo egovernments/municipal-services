@@ -1,26 +1,5 @@
 package org.egov.pt.calculator.util;
 
-import static org.egov.pt.calculator.util.CalculatorConstants.ALLOWED_RECEIPT_STATUS;
-import static org.egov.pt.calculator.util.CalculatorConstants.ASSESSMENTNUMBER_FIELD_SEARCH;
-import static org.egov.pt.calculator.util.CalculatorConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL;
-import static org.egov.pt.calculator.util.CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME;
-import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_END_DATE_PARAM;
-import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_ID_SEARCH_FIELD_NAME;
-import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_START_DATE_PARAM;
-import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_STATUS_ACTIVE;
-import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_STATUS_PARAM;
-import static org.egov.pt.calculator.util.CalculatorConstants.PROPERTY_TAX_SERVICE_CODE;
-import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADVANCE_CARRYFORWARD;
-import static org.egov.pt.calculator.util.CalculatorConstants.RECEIPT_END_DATE_PARAM;
-import static org.egov.pt.calculator.util.CalculatorConstants.RECEIPT_START_DATE_PARAM;
-import static org.egov.pt.calculator.util.CalculatorConstants.SEPARATER;
-import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_FOR_SEARCH_URL;
-import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT;
-import static org.egov.pt.calculator.util.CalculatorConstants.STATUS_FIELD_FOR_SEARCH_URL;
-import static org.egov.pt.calculator.util.CalculatorConstants.TAXES_TO_BE_CONSIDERD;
-import static org.egov.pt.calculator.util.CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL;
-import static org.egov.pt.calculator.util.CalculatorConstants.URL_PARAMS_SEPARATER;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -73,6 +52,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
 
+import static org.egov.pt.calculator.util.CalculatorConstants.*;
+
 @Component
 @Getter
 public class CalculatorUtils {
@@ -92,8 +73,6 @@ public class CalculatorUtils {
     @Autowired
     private ObjectMapper mapper;
 
-    @Value("${id.timezone}")
-    static String timeZone;
 
     private Map<String, Integer> taxHeadApportionPriorityMap;
 
@@ -612,9 +591,9 @@ public class CalculatorUtils {
      */
     public static Long getEODEpoch(Long epoch) {
         LocalDate date =
-                Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get(timeZone))).toLocalDate();
+                Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get(TIMEZONE))).toLocalDate();
         LocalDateTime endOfDay = LocalDateTime.of(date, LocalTime.MAX);
-        Long eodEpoch = endOfDay.atZone(ZoneId.of(ZoneId.SHORT_IDS.get(timeZone))).toInstant().toEpochMilli();
+        Long eodEpoch = endOfDay.atZone(ZoneId.of(ZoneId.SHORT_IDS.get(TIMEZONE))).toInstant().toEpochMilli();
         return eodEpoch;
     }
 
