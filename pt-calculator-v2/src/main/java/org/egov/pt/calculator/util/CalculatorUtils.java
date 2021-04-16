@@ -92,8 +92,6 @@ public class CalculatorUtils {
     @Autowired
     private ObjectMapper mapper;
 
-    @Value("${id.timezone}")
-    private static String timeZone;
 
     private Map<String, Integer> taxHeadApportionPriorityMap;
 
@@ -608,9 +606,10 @@ public class CalculatorUtils {
      * Returns the current end of the day epoch time for the given epoch time
      *
      * @param epoch The epoch time for which end of day time is required
+     * @param timeZone
      * @return End of day epoch time for the given time
      */
-    public static Long getEODEpoch(Long epoch) {
+    public static Long getEODEpoch(Long epoch, String timeZone) {
         LocalDate date =
                 Instant.ofEpochMilli(epoch).atZone(ZoneId.of(ZoneId.SHORT_IDS.get(timeZone))).toLocalDate();
         LocalDateTime endOfDay = LocalDateTime.of(date, LocalTime.MAX);

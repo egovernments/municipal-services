@@ -12,6 +12,7 @@ import org.egov.pt.calculator.web.models.collections.Payment;
 import org.egov.pt.calculator.web.models.collections.PaymentDetail;
 import org.egov.pt.calculator.web.models.demand.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -38,6 +39,9 @@ public class PayService {
 
 	@Autowired
 	private MasterDataService mDService;
+ 
+	@Value("${id.timezone}")
+	private String timeZone;
 	
 	/**
 	 * Updates the incoming demand with latest rebate, penalty and interest values if applicable
@@ -158,7 +162,7 @@ public class PayService {
 
 			if (CollectionUtils.isEmpty(payments)) {
 
-				long numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
+				long numberOfDaysInMillies = getEODEpoch(currentUTC,timeZone) - interestStart;
 				return calculateInterest(numberOfDaysInMillies, taxAmt, interestMap);
 			} else {
 
@@ -198,7 +202,7 @@ public class PayService {
 
 				if (CollectionUtils.isEmpty(filteredPaymentsAfterIntersetDate)) {
 					applicableAmount = firstApplicableAmount;
-					numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
+					numberOfDaysInMillies = getEODEpoch(currentUTC, timeZone) - interestStart;
 					interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					interestAmt = interestAmt.add(interestCalculated);
 				} else {
@@ -234,7 +238,7 @@ public class PayService {
 
 							applicableAmount = firstApplicableAmount;
 
-							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
+							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate(), timeZone) - interestStart;
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else if (i == numberOfPeriods - 1) {
@@ -246,7 +250,7 @@ public class PayService {
 							// applicable amount.
 							applicableAmount = utils
 									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod);
-							numberOfDaysInMillies = getEODEpoch(currentUTC) - getEODEpoch(payment.getTransactionDate());
+							numberOfDaysInMillies = getEODEpoch(currentUTC, timeZone) - getEODEpoch(payment.getTransactionDate(), timeZone);
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else {
@@ -254,8 +258,8 @@ public class PayService {
 							Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
 							applicableAmount = utils
 									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod);
-							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate())
-									- getEODEpoch(paymentPrev.getTransactionDate());
+							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate(), timeZone)
+									- getEODEpoch(paymentPrev.getTransactionDate(), timeZone);
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						}
