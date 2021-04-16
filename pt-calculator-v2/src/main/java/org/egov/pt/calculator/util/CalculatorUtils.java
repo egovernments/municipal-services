@@ -93,7 +93,7 @@ public class CalculatorUtils {
     private ObjectMapper mapper;
 
     @Value("${id.timezone}")
-    static String timeZone;
+    private static String timeZone;
 
     private Map<String, Integer> taxHeadApportionPriorityMap;
 
