@@ -15,6 +15,7 @@ public class Contact {
 	private String campaign_name;
 	private String event_name;
 	private String language;
+	@NotNull
 	private String location;
 	private String name;
 	private boolean opted_in;
@@ -27,9 +28,12 @@ public class Contact {
 	private String report_subcategory;
 	private String school_code;
 	private String surname;
+	@NotNull
 	private int ward_number;
+	@NotNull
 	private String whatsapp_id;
 	private String whatsapp_profile_name;
+	@NotNull
 	private String city;
 	private String ward;
 	private String issueCategory;
