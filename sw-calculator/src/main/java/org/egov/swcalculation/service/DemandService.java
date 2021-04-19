@@ -213,8 +213,8 @@ public class DemandService {
 				taxPeriodFrom = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
 				taxPeriodTo = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
 			}
+			//pass the bill expiry days in millis
 			Long expiryDays = (Long) financialYearMaster.get(SWCalculationConstant.Demand_Expiry_Date_String);
-			Long expiryDate = System.currentTimeMillis() + expiryDays;
 			BigDecimal minimumPayableAmount = calculation.getTotalAmount();
 			String businessService = isForConnectionNO ? configs.getBusinessService()
 					: SWCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
@@ -225,7 +225,7 @@ public class DemandService {
 					.minimumAmountPayable(minimumPayableAmount).tenantId(calculation.getTenantId())
 					.taxPeriodFrom(taxPeriodFrom).taxPeriodTo(taxPeriodTo)
 					.consumerType("sewerageConnection").businessService(businessService)
-					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDate).build());
+					.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDays).build());
 		}
 		log.info("Demand Object" + demands.toString());
 		List<Demand> demandRes = demandRepository.saveDemand(requestInfo, demands);
