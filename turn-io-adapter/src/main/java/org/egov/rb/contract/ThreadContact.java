@@ -1,7 +1,7 @@
 package org.egov.rb.contract;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +16,7 @@ public class ThreadContact {
 	
 	@Autowired
 	@JsonProperty("contact")
+	@NotNull
 	private Contact contact;
 	
 
