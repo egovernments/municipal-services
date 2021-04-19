@@ -92,10 +92,14 @@ public class CalculatorUtils {
     @Autowired
     private ObjectMapper mapper;
 
-    @Value("${id.timezone}")
-    static String timeZone;
-
     private Map<String, Integer> taxHeadApportionPriorityMap;
+
+    private static String timeZone;
+
+    @Value("${id.timezone}")
+    public  void setTimeZone(String zone){
+        CalculatorUtils.timeZone = zone;
+    }
 
     public Map<String, Integer> getTaxHeadApportionPriorityMap() {
 
