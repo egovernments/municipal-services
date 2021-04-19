@@ -16,6 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 @Getter
 @Setter
@@ -24,6 +26,7 @@ import lombok.Setter;
 @Builder
 public class SearchCriteria {
 
+	@NotNull
 	@JsonProperty("tenantId")
 	private String tenantId;
 

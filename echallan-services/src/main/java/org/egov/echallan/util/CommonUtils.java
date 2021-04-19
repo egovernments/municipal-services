@@ -69,10 +69,9 @@ public class CommonUtils {
     }
 
     private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,String tenantId, String service){
-        ModuleDetail financialYearRequest = getFinancialYearRequest(service);
-
+        ModuleDetail moduleDeatilRequest = getModuleDeatilRequest(service);
         List<ModuleDetail> moduleDetails = new LinkedList<>();
-        moduleDetails.add(financialYearRequest);
+        moduleDetails.add(moduleDeatilRequest);
 
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
                 .build();
@@ -82,24 +81,20 @@ public class CommonUtils {
         return mdmsCriteriaReq;
     }
 
-    /**
-     * Creates request to search financialYear in mdms
-     * @return MDMS request for financialYear
-     */
-    private ModuleDetail getFinancialYearRequest(String service) {
+    private ModuleDetail getModuleDeatilRequest(String service) {
         List<MasterDetail> masterDetails = new ArrayList<>();
 
         // filter to only get code field from master data
-        final String filterCodeForFY = "$.[?(@.service=='"+service+"')]";
+        final String filterCode = "$.[?(@.service=='"+service+"')]";
 
-        masterDetails.add(MasterDetail.builder().name(constants.TAXPERIOD_MODULE).filter(filterCodeForFY).build());
+        masterDetails.add(MasterDetail.builder().name(constants.TAXPERIOD_MASTER).filter(filterCode).build());
+        masterDetails.add(MasterDetail.builder().name(constants.TAXPHEADCODE_MASTER).filter(filterCode).build());
 
         ModuleDetail moduleDtls = ModuleDetail.builder().masterDetails(masterDetails)
                 .moduleName(constants.BILLING_SERVICE).build();
 
         return moduleDtls;
     }
-
 
  
 }
