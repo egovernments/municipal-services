@@ -32,9 +32,13 @@ public class ChallanConstants {
 
 	public static final String BILLING_SERVICE = "BillingService";
 
-    public static final String TAXPERIOD_MODULE = "TaxPeriod";
+    public static final String TAXPERIOD_MASTER = "TaxPeriod";
+
+    public static final String TAXPHEADCODE_MASTER = "TaxHeadMaster";
 
     public static final String MDMS_FINACIALYEAR_PATH = "$.MdmsRes.BillingService.TaxPeriod";
+
+    public static final String MDMS_TAXHEADCODES_PATH = "$.MdmsRes.BillingService.TaxHeadMaster[?(@.service == '{}' && @.isRequired == true)].code";
 
     public static final String MDMS_STARTDATE  = "fromDate";
 
