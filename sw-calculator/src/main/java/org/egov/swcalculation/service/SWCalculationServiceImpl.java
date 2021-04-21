@@ -71,7 +71,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			Map<String, Object> masterData = mDataService.loadExemptionMaster(request.getRequestInfo(),
 					request.getCalculationCriteria().get(0).getTenantId());
 			calculations = getFeeCalculation(request, masterData);
-			System.out.println("\n\ncalculations---->"+calculations+"\n\n");
+			System.out.println("\n\ncalculations---->"+calculations.toString()+"\n\n");
 			demandService.generateDemand(request.getRequestInfo(), calculations, masterData,
 					request.getIsconnectionCalculation());
 			unsetSewerageConnection(calculations);

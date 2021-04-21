@@ -287,6 +287,7 @@ public class EstimationService {
 			throw new CustomException("SEWERAGE_CONNECTION_NOT_FOUND",
 					"Sewerage Connection are not present for " + criteria.getApplicationNo() + " Application no");
 		}
+		System.out.println("\n\ncriteria---->"+criteria.toString()+"\n\n");
 		ArrayList<String> billingSlabIds = new ArrayList<>();
 		billingSlabIds.add("");
 		List<TaxHeadEstimate> taxHeadEstimates = getTaxHeadForFeeEstimation(criteria, masterData, requestInfo);
