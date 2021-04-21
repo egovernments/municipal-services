@@ -294,6 +294,8 @@ public class EstimationService {
 		estimatesAndBillingSlabs.put("estimates", taxHeadEstimates);
 		// //Billing slab id
 		estimatesAndBillingSlabs.put("billingSlabIds", billingSlabIds);
+
+		System.out.println("\n\ntaxHeadEstimates---->"+taxHeadEstimates+"\n\n");
 		return estimatesAndBillingSlabs;
 	}
 
@@ -368,6 +370,15 @@ public class EstimationService {
 				.add(roadPlotCharge).add(usageTypeCharge);
 		BigDecimal tax = totalCharge.multiply(taxAndCessPercentage.divide(SWCalculationConstant.HUNDRED));
 		//
+
+		System.out.println("\n\nformFee---->"+formFee+"\n\n");
+		System.out.println("\n\nscrutinyFee---->"+scrutinyFee+"\n\n");
+		System.out.println("\n\notherCharges---->"+otherCharges+"\n\n");
+		System.out.println("\n\nroadCuttingCharge---->"+roadCuttingCharge+"\n\n");
+		System.out.println("\n\nusageTypeCharge---->"+usageTypeCharge+"\n\n");
+		System.out.println("\n\nroadPlotCharge---->"+roadPlotCharge+"\n\n");
+		System.out.println("\n\ntax---->"+tax+"\n\n");
+
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 		if (!(formFee.compareTo(BigDecimal.ZERO) == 0))
 			estimates.add(TaxHeadEstimate.builder().taxHeadCode(SWCalculationConstant.SW_FORM_FEE)
