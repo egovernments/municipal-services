@@ -393,15 +393,15 @@ public class DemandService {
 	/**
 	 * 
 	 * @param tenantId    TenantId
-	 * @param consumerCode    Consumer Code
+	 * @param consumerCode    Connection Number
 	 * @param requestInfo - RequestInfo
 	 * @return List of Demand
 	 */
-	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCode, RequestInfo requestInfo) {
+	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, String consumerCode, RequestInfo requestInfo) {
 		String uri = getDemandSearchURLForDemandId().toString();
 		uri = uri.replace("{1}", tenantId);
 		uri = uri.replace("{2}", configs.getBusinessService());
-		uri = uri.replace("{3}", StringUtils.join(consumerCode, ','));
+		uri = uri.replace("{3}", consumerCode);
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		try {
@@ -877,12 +877,12 @@ public class DemandService {
 	public List<Calculation> updateDemandForAdhocTax(RequestInfo requestInfo, List<Calculation> calculations) {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
-			Set<String> consumerCodes = Collections.singleton(calculation.getApplicationNO());
-			List<Demand> searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(), consumerCodes,
+			String consumerCode = calculation.getConnectionNo();
+			List<Demand> searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(), consumerCode,
 					requestInfo);
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID_DEMAND_UPDATE",
-						"No demand exists for Number: " + consumerCodes.toString());
+						"No demand exists for Number: " + consumerCode);
 			
 			Collections.sort(searchResult, new Comparator<Demand>() {
 				@Override
