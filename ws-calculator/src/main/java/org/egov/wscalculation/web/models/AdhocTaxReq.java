@@ -39,4 +39,6 @@ public class AdhocTaxReq {
 	@JsonProperty("adhocpenalty")
 	private BigDecimal adhocpenalty = null;
 
+	@JsonProperty("consumerCode")
+	private String consumerCode;
 }

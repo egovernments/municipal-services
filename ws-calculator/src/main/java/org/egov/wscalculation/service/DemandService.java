@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -382,23 +383,25 @@ public class DemandService {
 		url.append("businessService=");
 		url.append("{2}");
 		url.append("&");
-		url.append("demandId=");
+		url.append("consumerCode=");
 		url.append("{3}");
+		url.append("&");
+		url.append("isPaymentCompleted=false");
 		return url;
 	}
 
 	/**
 	 * 
 	 * @param tenantId    TenantId
-	 * @param demandId    Set of Demand Ids
+	 * @param consumerCode    Consumer Code
 	 * @param requestInfo - RequestInfo
 	 * @return List of Demand
 	 */
-	private List<Demand> searchDemandBasedOnDemandId(String tenantId, Set<String> demandId, RequestInfo requestInfo) {
+	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, Set<String> consumerCode, RequestInfo requestInfo) {
 		String uri = getDemandSearchURLForDemandId().toString();
 		uri = uri.replace("{1}", tenantId);
 		uri = uri.replace("{2}", configs.getBusinessService());
-		uri = uri.replace("{3}", StringUtils.join(demandId, ','));
+		uri = uri.replace("{3}", StringUtils.join(consumerCode, ','));
 		Object result = serviceRequestRepository.fetchResult(new StringBuilder(uri),
 				RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 		try {
@@ -875,11 +878,19 @@ public class DemandService {
 		List<Demand> demands = new LinkedList<>();
 		for (Calculation calculation : calculations) {
 			Set<String> consumerCodes = Collections.singleton(calculation.getApplicationNO());
-			List<Demand> searchResult = searchDemandBasedOnDemandId(calculation.getTenantId(), consumerCodes,
+			List<Demand> searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(), consumerCodes,
 					requestInfo);
 			if (CollectionUtils.isEmpty(searchResult))
 				throw new CustomException("INVALID_DEMAND_UPDATE",
 						"No demand exists for Number: " + consumerCodes.toString());
+			
+			Collections.sort(searchResult, new Comparator<Demand>() {
+				@Override
+				public int compare(Demand d1, Demand d2) {
+					return d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom());
+				}
+			});
+			
 			Demand demand = searchResult.get(0);
 			demand.setDemandDetails(getUpdatedAdhocTax(calculation, demand.getDemandDetails()));
 			demands.add(demand);
