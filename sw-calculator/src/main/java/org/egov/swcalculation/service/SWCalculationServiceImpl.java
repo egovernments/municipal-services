@@ -299,7 +299,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 					.estimateAmount(adhocTaxReq.getAdhocrebate().setScale(2, 2).negate()).build());
 		Calculation calculation = Calculation.builder()
 				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
-				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
+				.connectionNo(adhocTaxReq.getConsumerCode()).taxHeadEstimates(estimates).build();
 		List<Calculation> calculations = Collections.singletonList(calculation);
 		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
