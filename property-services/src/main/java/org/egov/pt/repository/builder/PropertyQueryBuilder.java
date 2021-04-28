@@ -334,7 +334,7 @@ public class PropertyQueryBuilder {
 		if (values.isEmpty())
 			queryString.append(" WHERE ");
 		else {
-			queryString.append(" AND");
+			queryString.append(" AND ");
 		}
 	}
 
