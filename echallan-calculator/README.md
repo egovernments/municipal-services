@@ -16,7 +16,7 @@ This service is used to calculate the echallan amount based on the details prese
 
 Link to the swagger API contract yaml and editor link like below
 
-https://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/municipal-services/7692192050a69c213127f8bd44a80a08cc63f4f4/docs/e-Challan-v1.0.0.yaml#!/
+https://editor.swagger.io/?url=https://raw.githubusercontent.com/egovernments/municipal-services/develop/docs/e-Challan-v1.0.0.yaml#!/
 
 
 ## Service Details
