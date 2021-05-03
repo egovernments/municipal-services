@@ -92,20 +92,17 @@ export const addUUIDAndAuditDetails = async (request, method = "_update") => {
         userSearchReqCriteria.name = owners[owneriter].name;
         userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
 
-        console.log("User search criteria: "+JSON.stringify(userSearchReqCriteria));        
         userSearchResponse = await userService.searchUser(
           RequestInfo,
           userSearchReqCriteria
         );
         if (get(userSearchResponse, "user", []).length > 0) {
-          console.log("user");
         userResponse = await userService.updateUser(RequestInfo, {
         ...userSearchResponse.user[0],
         ...owners[owneriter]
         });
         }
         else{
-          console.log("create");
           userResponse = await createUser(
             RequestInfo,
             owners[owneriter],
