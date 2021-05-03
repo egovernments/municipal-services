@@ -18,7 +18,7 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_sw_scheduler SET status=? where id=?";
 
-	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id INNER JOIN eg_pt_address address ON conn.property_id=address.propertyid ";
+	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -112,9 +112,9 @@ public class SWCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(connectionNoByLocality);
 		// Add connection type
 		if(connectionType != null) {
-		addClauseIfRequired(preparedStatement, query);
-		query.append(" ws.connectiontype = ? ");
-		preparedStatement.add(connectionType);
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" ws.connectiontype = ? ");
+			preparedStatement.add(connectionType);
 		}
 
 		//Active status	
@@ -126,9 +126,9 @@ public class SWCalculatorQueryBuilder {
 
 		// add tenantid
 		if(tenantId != null) {
-		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.tenantid = ? ");
-		preparedStatement.add(tenantId);
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.tenantid = ? ");
+			preparedStatement.add(tenantId);
 		}
 
 //		addClauseIfRequired(preparedStatement, query);
@@ -137,7 +137,7 @@ public class SWCalculatorQueryBuilder {
 
 		if (locality != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" address.locality = ? ");
+			query.append(" locality = ? ");
 			preparedStatement.add(locality);
 		}
 
