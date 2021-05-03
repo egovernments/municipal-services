@@ -16,7 +16,7 @@ export const searchUser = async (requestInfo, userSearchReqCriteria) => {
   var dobFormat = "yyyy-MM-dd";
   userSearchResponse = parseResponse(userSearchResponse, dobFormat);
   // console.log(userSearchResponse);
-  //console.log("User search response: "+JSON.stringify(userSearchResponse));
+  console.log("User search response: "+JSON.stringify(userSearchResponse));
   return userSearchResponse;
 };
 
