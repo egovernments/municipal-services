@@ -84,15 +84,36 @@ export const addUUIDAndAuditDetails = async (request, method = "_update") => {
     ) {
       let owners = FireNOCs[i].fireNOCDetails.applicantDetails.owners;
       for (var owneriter = 0; owneriter < owners.length; owneriter++) {
-        let userCreateResponse = await createUser(
+        let userResponse = {};
+        let userSearchReqCriteria = {};
+        let userSearchResponse = {};
+
+        userSearchReqCriteria.mobileNumber = owners[owneriter].mobileNumber;
+        userSearchReqCriteria.name = owners[owneriter].name;
+        userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
+
+        userSearchResponse = await userService.searchUser(
           RequestInfo,
-          owners[owneriter],
-          envVariables.EGOV_DEFAULT_STATE_ID
+          userSearchReqCriteria
         );
+        if (get(userSearchResponse, "user", []).length > 0) {
+        userResponse = await userService.updateUser(RequestInfo, {
+        ...userSearchResponse.user[0],
+        ...owners[owneriter]
+        });
+        }
+        else{
+          userResponse = await createUser(
+            RequestInfo,
+            owners[owneriter],
+            envVariables.EGOV_DEFAULT_STATE_ID
+          );
+        }
+
         let ownerUUID = get(owners[owneriter], "ownerUUID");
         owners[owneriter] = {
           ...owners[owneriter],
-          ...get(userCreateResponse, "user.0", []),
+          ...get(userResponse, "user.0", []),
           ownerUUID: ownerUUID && method != "_create" ? ownerUUID : uuidv1()
         };
       }
