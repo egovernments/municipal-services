@@ -33,6 +33,8 @@ import lombok.Setter;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2019-11-12T10:46:14.653+05:30[Asia/Kolkata]")
 public class MeterReading {
+
+	@SafeHtml
 	@JsonProperty("id")
 	private String id = null;
 
