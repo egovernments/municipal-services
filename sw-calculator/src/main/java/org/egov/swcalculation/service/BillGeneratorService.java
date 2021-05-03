@@ -30,7 +30,7 @@ public class BillGeneratorService {
 
 		billRequest.getBillScheduler().setId(UUID.randomUUID().toString());
 		billRequest.getBillScheduler().setAuditDetails(auditDetails);
-		billRequest.getBillScheduler().setStatus(BillStatus.INITATED);
+		billRequest.getBillScheduler().setStatus(BillStatus.INITIATED);
 		billRequest.getBillScheduler().setTransactionType(SWCalculationConstant.SW_BILL_SCHEDULER_TRANSACTION);
 		billGeneratorDao.saveBillGenertaionDetails(billRequest);
 		billSchedulers.add(billRequest.getBillScheduler());
