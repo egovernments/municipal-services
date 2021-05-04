@@ -314,7 +314,7 @@ public class WSCalculationConstant {
 	
 	public static final String WS_NO_BILLING_PERIOD_MSG = "No billin period is active or not defined";
 	
-    public static final String WS_DUPLICATE_BILL_SCHEDULER = "WS_NO_BILLING_PERIOD";
+    public static final String WS_DUPLICATE_BILL_SCHEDULER = "WS_DUPLICATE_BILL_SCHEDULER";
 	
 	public static final String WS_DUPLICATE_BILL_SCHEDULER_MSG = "Bills are already scheduled for the locality ";
 	
