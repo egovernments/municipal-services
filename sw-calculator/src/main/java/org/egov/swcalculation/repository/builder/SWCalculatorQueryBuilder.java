@@ -20,6 +20,8 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id";
 
+	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_ws_scheduler ";
+
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
@@ -145,5 +147,34 @@ public class SWCalculatorQueryBuilder {
 		query.append(" conn.connectionno is not null");
 		return query.toString();
 
+	}
+	
+	public String getBillSchedulerSearchQuery(String locality, Long billFromDate, Long billToDate, String tenantId,
+			List<Object> preparedStmtList) {
+
+		StringBuilder query = new StringBuilder(BILL_SCHEDULER_STATUS_SEARCH_QUERY);
+
+		addClauseIfRequired(preparedStmtList, query);
+		query.append(" tenantid = ? ");
+		preparedStmtList.add(tenantId);
+
+		if (locality != null) {
+			addClauseIfRequired(preparedStmtList, query);
+			query.append(" locality = ? ");
+			preparedStmtList.add(locality);
+		}
+		if (billFromDate != null) {
+			addClauseIfRequired(preparedStmtList, query);
+			query.append(" billingcyclestartdate = ? ");
+			preparedStmtList.add(billFromDate);
+		}
+		if (billToDate != null) {
+			addClauseIfRequired(preparedStmtList, query);
+			query.append(" billingcycleenddate = ? ");
+			preparedStmtList.add(billToDate);
+		}
+		
+
+		return query.toString();
 	}
 }
