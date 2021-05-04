@@ -215,7 +215,7 @@ public class WSCalculatorQueryBuilder {
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" d.taxPeriodTo = ? ");
-		preparedStatement.add(taxPeriodFrom);
+		preparedStatement.add(taxPeriodTo);
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" d.businessservice = ? ) ");
