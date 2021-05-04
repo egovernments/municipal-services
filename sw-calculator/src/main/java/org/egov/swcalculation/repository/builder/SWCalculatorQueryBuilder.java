@@ -20,11 +20,13 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id";
 
+	private static final String fiterConnectionBasedOnTaxPeriod =" AND conn.connectionno not in (select distinct consumercode from egbs_demand_v1 d ";
+
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
 
-	public String getConnectionNumberList(String tenantId, String connectionType, String status, List<Object> preparedStatement) {
+	public String getConnectionNumberList(String tenantId, String connectionType, String status, Long taxPeriodFrom, Long taxPeriodTo, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
@@ -50,6 +52,31 @@ public class SWCalculatorQueryBuilder {
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
+		
+		query.append(fetchConnectionsToBeGenerate(tenantId, taxPeriodFrom, taxPeriodTo, preparedStatement));
+
+		return query.toString();
+	}
+	
+	public String fetchConnectionsToBeGenerate(String tenantId, Long taxPeriodFrom, Long taxPeriodTo, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(fiterConnectionBasedOnTaxPeriod);
+
+		query.append(" WHERE d.tenantid = ? ");
+		preparedStatement.add(tenantId);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodFrom = ? ");
+		preparedStatement.add(taxPeriodFrom);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodTo = ? ");
+		preparedStatement.add(taxPeriodTo);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ) ");
+		preparedStatement.add(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+
+
 		return query.toString();
 	}
 

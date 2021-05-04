@@ -136,6 +136,18 @@ public class EstimationService {
 	public BigDecimal getSewerageEstimationCharge(SewerageConnection sewerageConnection, CalculationCriteria criteria,
 			Map<String, JSONArray> billingSlabMaster, ArrayList<String> billingSlabIds, CalculationReq request) {
 		BigDecimal sewerageCharge = BigDecimal.ZERO;
+		HashMap<String, Object> additionalDetail = new HashMap<>();
+		additionalDetail = mapper.convertValue(sewerageConnection.getAdditionalDetails(), HashMap.class);
+		String billingType = (String) additionalDetail.getOrDefault(SWCalculationConstant.BILLINGTYPE, null);
+		if (sewerageConnection.getConnectionType().equalsIgnoreCase(SWCalculationConstant.nonMeterdConnection)
+				&& billingType.equalsIgnoreCase(SWCalculationConstant.CUSTOM)) {
+			Integer billingAmountInt = (Integer) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
+			sewerageCharge = BigDecimal.valueOf(Long.valueOf(billingAmountInt)).setScale(2, 2);
+			return sewerageCharge;
+//			sewerageCharge = (BigDecimal) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT,
+//					BigDecimal.ZERO);
+		}
+		
 		if (billingSlabMaster.get(SWCalculationConstant.SW_BILLING_SLAB_MASTER) == null)
 			throw new CustomException("INVALID_BILLING_SLAB", "Billing Slab are Empty");
 		List<BillingSlab> mappingBillingSlab;
@@ -165,17 +177,6 @@ public class EstimationService {
 		 */
 		// Add Billing Slab Ids
 		billingSlabIds.add(billingSlabs.get(0).getId());
-		HashMap<String, Object> additionalDetail = new HashMap<>();
-		additionalDetail = mapper.convertValue(sewerageConnection.getAdditionalDetails(), HashMap.class);
-		String billingType = (String) additionalDetail.getOrDefault(SWCalculationConstant.BILLINGTYPE, null);
-		if (sewerageConnection.getConnectionType().equalsIgnoreCase(SWCalculationConstant.nonMeterdConnection)
-				&& billingType.equalsIgnoreCase(SWCalculationConstant.CUSTOM)) {
-			Integer billingAmountInt = (Integer) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
-			sewerageCharge = BigDecimal.valueOf(Long.valueOf(billingAmountInt)).setScale(2, 2);
-			return sewerageCharge;
-//			sewerageCharge = (BigDecimal) additionalDetail.getOrDefault(SWCalculationConstant.CUSTOM_BILL_AMOUNT,
-//					BigDecimal.ZERO);
-		}
 
 		// Sewerage Charge Calculation
 		Double totalUnits = getCalculationUnit(sewerageConnection, calculationAttribute, criteria,property);

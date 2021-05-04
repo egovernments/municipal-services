@@ -34,11 +34,11 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 	}
 
 	@Override
-	public List<SewerageDetails> getConnectionsNoList(String tenantId, String connectionType) {
+	public List<SewerageDetails> getConnectionsNoList(String tenantId, String connectionType, Long taxPeriodFrom, Long taxPeriodTo ) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,SWCalculationConstant.ACTIVE, preparedStatement);
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,SWCalculationConstant.ACTIVE, taxPeriodFrom, taxPeriodTo,  preparedStatement);
 		StringBuilder builder = new StringBuilder();
-		builder.append("sewerage ").append(connectionType).append(" connection list : ").append(query);
+		builder.append("preparedStatement:").append(preparedStatement).append("sewerage: ").append(connectionType).append(" connection list : ").append(query);
 		log.info(builder.toString());
 		return jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 	}
