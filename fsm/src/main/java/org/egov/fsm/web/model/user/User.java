@@ -155,6 +155,7 @@ public class User {
     private String photo;
 
     @Size(max=64)
+    @SafeHtml
     @JsonProperty("createdBy")
     private String createdBy;
 
@@ -162,12 +163,14 @@ public class User {
     private Long createdDate;
 
     @Size(max=64)
+    @SafeHtml
     @JsonProperty("lastModifiedBy")
     private String lastModifiedBy;
 
     @JsonProperty("lastModifiedDate")
     private Long lastModifiedDate;
 
+    @SafeHtml
     @JsonProperty("otpReference")
     private String otpReference;
 
