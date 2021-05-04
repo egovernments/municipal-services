@@ -160,9 +160,8 @@ public class DemandService {
 					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations)) {
-			return demands;
-//			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
-//					isForConnectionNo);
+			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
+					isForConnectionNo);
 		}
 		return createdDemands;
 	}
@@ -706,7 +705,7 @@ public class DemandService {
 			//		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 			//		if (isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
-					WSCalculationConstant.nonMeterdConnection);
+					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
 			String assessmentYear = estimationService.getAssessmentYear();
 			Integer countForPause=0;
 			for (WaterDetails waterConnection : connectionNos) {
@@ -736,6 +735,7 @@ public class DemandService {
 
 			}
 		}catch (Exception e) {
+			e.printStackTrace();
 			log.error("Exception occurred while processing the demand generation for tenantId: "+tenantId);
 		}
 	}

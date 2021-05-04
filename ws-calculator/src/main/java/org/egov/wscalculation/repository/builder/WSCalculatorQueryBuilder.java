@@ -43,6 +43,8 @@ public class WSCalculatorQueryBuilder {
 
 	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_ws_scheduler ";
 	
+	private static final String fiterConnectionBasedOnTaxPeriod =" AND conn.connectionno not in (select distinct consumercode from egbs_demand_v1 d ";
+	
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
@@ -165,8 +167,9 @@ public class WSCalculatorQueryBuilder {
 	}
 	
 	
-	public String getConnectionNumberList(String tenantId, String connectionType,String status, List<Object> preparedStatement) {
+	public String getConnectionNumberList(String tenantId, String connectionType,String status, Long taxPeriodFrom, Long taxPeriodTo, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
+		
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" ws.connectiontype = ? ");
@@ -193,8 +196,33 @@ public class WSCalculatorQueryBuilder {
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
+		
+		query.append(fetchConnectionsToBeGenerate(tenantId, taxPeriodFrom, taxPeriodTo, preparedStatement));
+
 		return query.toString();
 		
+	}
+	
+	public String fetchConnectionsToBeGenerate(String tenantId, Long taxPeriodFrom, Long taxPeriodTo, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(fiterConnectionBasedOnTaxPeriod);
+
+		query.append(" WHERE d.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodFrom = ? ");
+		preparedStatement.add(taxPeriodFrom);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodTo = ? ");
+		preparedStatement.add(taxPeriodFrom);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ) ");
+		preparedStatement.add(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
+
+		
+		return query.toString();
 	}
 	
 	public String isBillingPeriodExists(String connectionNo, String billingPeriod, List<Object> preparedStatement) {

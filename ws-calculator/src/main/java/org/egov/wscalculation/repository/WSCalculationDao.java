@@ -22,7 +22,7 @@ public interface WSCalculationDao {
 	
 	int isMeterReadingConnectionExist(List<String> ids);
 	
-	List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType);
+	List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType, Long taxPeriodFrom, Long taxPeriodTo);
 	
 	List<String> getTenantId();
 	
