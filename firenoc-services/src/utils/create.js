@@ -248,7 +248,7 @@ export const enrichAssignees = async (FireNOCs, RequestInfo) => {
   for (var i = 0; i < FireNOCs.length; i++) {
     if(FireNOCs[i].fireNOCDetails.action === 'SENDBACKTOCITIZEN'){
       let assignes = []; 
-      let owners = FireNOCs[i].fireNOCDetails.applicantDetails.applicantDetails.owners;
+      let owners = FireNOCs[i].fireNOCDetails.applicantDetails.owners;
       for (let owner of owners)
         assignes.push(owner.uuid);
 
