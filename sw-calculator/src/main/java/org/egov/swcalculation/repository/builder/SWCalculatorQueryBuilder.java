@@ -20,7 +20,7 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id";
 
-	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_ws_scheduler ";
+	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_sw_scheduler ";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
