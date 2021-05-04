@@ -63,4 +63,24 @@ public class BillGeneratorDao {
 		String queryStr = queryBuilder.getBillSchedulerUpdateQuery(schedulerId, preparedStmtList);
 		jdbcTemplate.update(queryStr, preparedStmtList.toArray());
 	}
+	
+	/**
+	 * fetch existing scheduled bill status for the locality  
+	 * @param locality,billFromDate,billToDate and tenantId
+	 */
+	public List<String> fetchExistingBillSchedularStatusForLocality(String locality, Long billFromDate, Long billToDate,
+			String tenantId) {
+
+		List<Object> preparedStmtList = new ArrayList<>();
+		List<String> res = new ArrayList<>();
+		String queryString = queryBuilder.getBillSchedulerSearchQuery(locality, billFromDate, billToDate, tenantId,
+				preparedStmtList);
+		try {
+			res = jdbcTemplate.queryForList(queryString, preparedStmtList.toArray(), String.class);
+		} catch (Exception ex) {
+			log.error("Exception while reading bill scheduler status" + ex.getMessage());
+		}
+		return res;
+	}
+
 }
