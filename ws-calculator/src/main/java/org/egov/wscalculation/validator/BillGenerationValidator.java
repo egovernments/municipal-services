@@ -25,7 +25,7 @@ public class BillGenerationValidator {
 	public void validateBillingCycleDates(BillGenerationReq billGenerationReq, RequestInfo requestInfo) {
 
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo,
-				"pb.fazilka");
+				billGenerationReq.getBillScheduler().getTenantId());
 
 		if (billingMasterData.get("taxPeriodFrom") == null || billingMasterData.get("taxPeriodTo") == null) {
 			throw new CustomException(WSCalculationConstant.WS_NO_BILLING_PERIOD_MSG,
