@@ -6,12 +6,12 @@ import javax.validation.Valid;
 
 import org.egov.swcalculation.service.BillGeneratorService;
 import org.egov.swcalculation.util.ResponseInfoFactory;
+import org.egov.swcalculation.validator.BillGenerationValidator;
 import org.egov.swcalculation.web.models.BillGenerationRequest;
 import org.egov.swcalculation.web.models.BillGenerationSearchCriteria;
 import org.egov.swcalculation.web.models.BillScheduler;
 import org.egov.swcalculation.web.models.BillSchedulerResponse;
 import org.egov.swcalculation.web.models.RequestInfoWrapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +38,13 @@ public class BillGeneratorController {
 	@Autowired
 	private BillGeneratorService billGeneratorService;
 
+	@Autowired
+	private BillGenerationValidator billGenerationValidator;
+	
 	@PostMapping("/scheduler/_create")
 	public ResponseEntity<BillSchedulerResponse> billSchedulerCreate(
 			@Valid @RequestBody BillGenerationRequest billGenerationReq) {
+		billGenerationValidator.validateBillingCycleDates(billGenerationReq, billGenerationReq.getRequestInfo());
 		List<BillScheduler> billDetails = billGeneratorService.saveBillGenerationDetails(billGenerationReq);
 		BillSchedulerResponse response = BillSchedulerResponse.builder().billSchedulers(billDetails)
 				.responseInfo(
