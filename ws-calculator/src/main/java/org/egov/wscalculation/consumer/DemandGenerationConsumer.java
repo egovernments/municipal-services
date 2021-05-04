@@ -136,11 +136,11 @@ public class DemandGenerationConsumer {
 	 */
 	private void generateDemandInBatch(CalculationReq request, Map<String, Object> masterMap, String errorTopic) {
 		try {
-			for(CalculationCriteria criteria : request.getCalculationCriteria()){
-				Boolean genratedemand = true;
-//				Application validation removing for migrated connection as of now 
-//				wsCalulationWorkflowValidator.applicationValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
-			}
+//			for(CalculationCriteria criteria : request.getCalculationCriteria()){
+//				Boolean genratedemand = true;
+////				Application validation removing for migrated connection as of now 
+////				wsCalulationWorkflowValidator.applicationValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
+//			}
 			wSCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
 			String connectionNoStrings = request.getCalculationCriteria().stream()
 					.map(criteria -> criteria.getConnectionNo()).collect(Collectors.toSet()).toString();
