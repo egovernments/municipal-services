@@ -119,6 +119,8 @@ public class DemandService {
 		List<Calculation> createCalculations = new LinkedList<>();
 		// List that will contain Calculation for old demands
 		List<Calculation> updateCalculations = new LinkedList<>();
+		List<Demand> demands = null;
+		
 		if (!CollectionUtils.isEmpty(calculations)) {
 			// Collect required parameters for demand search
 			String tenantId = calculations.get(0).getTenantId();
@@ -135,7 +137,7 @@ public class DemandService {
 						.collect(Collectors.toSet());
 			}
 
-			List<Demand> demands = searchDemand(tenantId, consumerCodes, fromDateSearch, toDateSearch,
+			demands = searchDemand(tenantId, consumerCodes, fromDateSearch, toDateSearch,
 					request.getRequestInfo());
 			Set<String> connectionNumbersFromDemands = new HashSet<>();
 			if (!CollectionUtils.isEmpty(demands))
@@ -157,9 +159,11 @@ public class DemandService {
 			createdDemands = createDemand(request.getRequestInfo(), createCalculations, masterMap, isForConnectionNo,
 					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
-		if (!CollectionUtils.isEmpty(updateCalculations))
-			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
-					isForConnectionNo);
+		if (!CollectionUtils.isEmpty(updateCalculations)) {
+			return demands;
+//			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
+//					isForConnectionNo);
+		}
 		return createdDemands;
 	}
 
