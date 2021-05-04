@@ -337,7 +337,7 @@ public class SWCalculationConstant {
 	
 	public static final String SW_NO_BILLING_PERIOD_MSG = "No billin period is active or not defined";
 	
-    public static final String SW_DUPLICATE_BILL_SCHEDULER = "SW_NO_BILLING_PERIOD";
+    public static final String SW_DUPLICATE_BILL_SCHEDULER = "SW_DUPLICATE_BILL_SCHEDULER";
 	
 	public static final String SW_DUPLICATE_BILL_SCHEDULER_MSG = "Bills are already scheduled for the locality ";
 	
