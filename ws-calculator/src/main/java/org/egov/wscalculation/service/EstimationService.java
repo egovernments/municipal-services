@@ -154,7 +154,14 @@ public class EstimationService {
 		String billingType = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE, null);
 		if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)
 				&& billingType.equalsIgnoreCase(WSCalculationConstant.CUSTOM)) {
-			Integer billingAmountInt = (Integer) additionalDetail.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
+			Integer billingAmountInt  = 0;
+			Object customAmountObj = additionalDetail.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
+			if ( customAmountObj instanceof String) {
+				billingAmountInt = Integer.parseInt((String)customAmountObj);
+			}else {
+				billingAmountInt = (Integer) customAmountObj;
+			}
+//			Integer billingAmountInt = (Integer) additionalDetail.getOrDefault(WSCalculationConstant.CUSTOM_BILL_AMOUNT, 0);
 			BigDecimal customWaterCharges = BigDecimal.valueOf(Long.valueOf(billingAmountInt)).setScale(2, 2);
 			return customWaterCharges;
 		} else {
