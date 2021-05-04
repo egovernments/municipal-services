@@ -242,3 +242,53 @@ export const updateStatus = (FireNOCs, workflowResponse) => {
   });
   return FireNOCs;
 };
+
+export const enrichAssignees = async (FireNOCs, RequestInfo) => {
+
+  for (var i = 0; i < FireNOCs.length; i++) {
+    if(FireNOCs[i].fireNOCDetails.action === 'SENDBACKTOCITIZEN'){
+      let assignes = []; 
+      let owners = FireNOCs[i].fireNOCDetails.applicantDetails.applicantDetails.owners;
+      for (let owner of owners)
+        assignes.push(owner.uuid);
+
+      let uuids = await getUUidFromUserName(owners, RequestInfo);
+      if(uuids.length > 0)
+        assignes = [...new Set([...assignes, ...uuids])];
+
+      FireNOCs[i].fireNOCDetails.additionalDetail.assignee = assignes;
+    }
+  }
+  return FireNOCs;
+};
+
+const getUUidFromUserName = async (owners, RequestInfo) => {
+  let uuids = [];
+  let mobileNumbers = [];
+
+  for(let owner of owners)
+    mobileNumbers.push(owner.mobileNumber);
+
+  var mobileNumberSet = [...new Set(mobileNumbers)];
+
+  for(let mobileNumber of mobileNumberSet){
+    let userSearchReqCriteria = {};
+    let userSearchResponse = {};
+
+    userSearchReqCriteria.userName = mobileNumber;
+    userSearchReqCriteria.tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
+
+    userSearchResponse = await userService.searchUser(
+      RequestInfo,
+      userSearchReqCriteria
+    );
+
+    if (get(userSearchResponse, "user", []).length > 0) {
+      uuids.push(userSearchResponse.user[0].uuid);
+    }
+
+  }
+  let uuidsSet = [...new Set(uuids)];
+
+  return uuidsSet;
+};
