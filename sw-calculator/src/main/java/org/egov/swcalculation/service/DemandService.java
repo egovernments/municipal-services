@@ -515,6 +515,7 @@ public class DemandService {
 		List<TaxPeriod> taxPeriods = masterDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(),
 				getBillCriteria.getTenantId(), SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 		consumerCodeToDemandMap.forEach((id, demand) -> {
+			if(demand.getIsPaymentCompleted()==false) {
 			if (demand.getStatus() != null
 					&& SWCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(SWCalculationConstant.EG_SW_INVALID_DEMAND_ERROR,
@@ -522,6 +523,7 @@ public class DemandService {
 			applyTimeBasedApplicables(demand, requestInfoWrapper, timeBasedExemptionMasterMap, taxPeriods);
 			addRoundOffTaxHead(getBillCriteria.getTenantId(), demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
+			}
 		});
 		// Call demand update in bulk to update the interest or penalty
 		repository.fetchResult(utils.getUpdateDemandUrl(), DemandRequest.builder().demands(demandsToBeUpdated)
