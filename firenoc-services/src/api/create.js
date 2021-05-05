@@ -30,6 +30,7 @@ export default ({ config }) => {
 };
 export const createApiResponse = async ({ body }, res, next) => {
   var jxx = xss(body);
+  console.log("\n"+await jxx.json()+"\n");
   console.log("\n"+JSON.stringify(jxx)+"\n");
   let payloads = [];
   //getting mdms data
