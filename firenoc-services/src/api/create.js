@@ -13,6 +13,7 @@ import { validateFireNOCModel } from "../utils/modelValidation";
 import set from "lodash/set";
 import get from "lodash/get";
 const asyncHandler = require("express-async-handler");
+var xss = require('xss');
 
 export default ({ config }) => {
   let api = Router();
@@ -28,6 +29,8 @@ export default ({ config }) => {
   return api;
 };
 export const createApiResponse = async ({ body }, res, next) => {
+  var jxx = xss(body);
+  console.log(jxx);
   let payloads = [];
   //getting mdms data
   let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
