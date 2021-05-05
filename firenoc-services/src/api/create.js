@@ -14,6 +14,7 @@ import set from "lodash/set";
 import get from "lodash/get";
 const asyncHandler = require("express-async-handler");
 var xss = require('xss');
+var xssFilters = require('xss-filters');
 
 export default ({ config }) => {
   let api = Router();
@@ -29,7 +30,7 @@ export default ({ config }) => {
   return api;
 };
 export const createApiResponse = async ({ body }, res, next) => {
-  var jxx = xss(body.FireNOCs[0].fireNOCDetails.additionalDetail.comment);
+  var jxx = xssFilters.inHTMLData(body.FireNOCs[0].fireNOCDetails.additionalDetail.comment);
   console.log("\n"+jxx+"\n");
   let payloads = [];
   //getting mdms data
