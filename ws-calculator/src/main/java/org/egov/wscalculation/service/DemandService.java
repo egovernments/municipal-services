@@ -488,6 +488,7 @@ public class DemandService {
 				WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 
 		consumerCodeToDemandMap.forEach((id, demand) -> {
+			if(demand.getIsPaymentCompleted()==false) {
 			if (demand.getStatus() != null
 					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
@@ -495,6 +496,7 @@ public class DemandService {
 			applyTimeBasedApplicables(demand, requestInfoWrapper, timeBasedExemptionMasterMap, taxPeriods);
 			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
+			}
 		});
 
 		// Call demand update in bulk to update the interest or penalty
