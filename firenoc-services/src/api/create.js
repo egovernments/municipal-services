@@ -29,8 +29,8 @@ export default ({ config }) => {
   return api;
 };
 export const createApiResponse = async ({ body }, res, next) => {
-  var jxx = xss(body);
-  console.log("\n"+JSON.stringify(jxx)+"\n");
+  var jxx = xss(body.FireNOCs[0].fireNOCDetails.additionalDetail.comment);
+  console.log("\n"+jxx+"\n");
   let payloads = [];
   //getting mdms data
   let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
