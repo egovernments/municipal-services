@@ -520,8 +520,12 @@ public class DemandService {
 			
 			BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			
+			List<String> taxHeadMasterCodes = demand.getDemandDetails().stream().map(DemandDetail::getTaxHeadMasterCode).collect(Collectors.toList());;
 
-			if(demand.getIsPaymentCompleted()==false && totalTax.compareTo(totalCollection) > 0) {
+			if(demand.getIsPaymentCompleted()==false && 
+					totalTax.compareTo(totalCollection) > 0 && 
+					!taxHeadMasterCodes.contains(SWCalculationConstant.SW_TIME_PENALTY)) {
 			if (demand.getStatus() != null
 					&& SWCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(SWCalculationConstant.EG_SW_INVALID_DEMAND_ERROR,
