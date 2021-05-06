@@ -515,7 +515,13 @@ public class DemandService {
 		List<TaxPeriod> taxPeriods = masterDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(),
 				getBillCriteria.getTenantId(), SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 		consumerCodeToDemandMap.forEach((id, demand) -> {
-			if(demand.getIsPaymentCompleted()==false) {
+			BigDecimal totalTax = demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			
+			BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+			if(demand.getIsPaymentCompleted()==false && totalTax.compareTo(totalCollection) > 0) {
 			if (demand.getStatus() != null
 					&& SWCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(SWCalculationConstant.EG_SW_INVALID_DEMAND_ERROR,
