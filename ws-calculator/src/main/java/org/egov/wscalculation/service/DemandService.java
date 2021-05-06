@@ -488,7 +488,13 @@ public class DemandService {
 				WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
 
 		consumerCodeToDemandMap.forEach((id, demand) -> {
-			if(demand.getIsPaymentCompleted()==false) {
+			BigDecimal totalTax = demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+			
+			BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
+					.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+			if(demand.getIsPaymentCompleted()==false && totalTax.compareTo(totalCollection) > 0) {
 			if (demand.getStatus() != null
 					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
