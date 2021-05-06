@@ -210,6 +210,9 @@ public class WSCalculatorQueryBuilder {
 		preparedStatement.add(tenantId);
 		
 		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.status = 'ACTIVE' ");
+		
+		addClauseIfRequired(preparedStatement, query);
 		query.append(" d.taxPeriodFrom = ? ");
 		preparedStatement.add(taxPeriodFrom);
 		
