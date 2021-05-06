@@ -65,19 +65,21 @@ public class SWCalculatorQueryBuilder {
 
 		query.append(" WHERE d.tenantid = ? ");
 		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.status = 'ACTIVE' ");
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ");
+		preparedStatement.add(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
 
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" d.taxPeriodFrom = ? ");
 		preparedStatement.add(taxPeriodFrom);
-
+		
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" d.taxPeriodTo = ? ");
+		query.append(" d.taxPeriodTo = ? ) ");
 		preparedStatement.add(taxPeriodTo);
-
-		addClauseIfRequired(preparedStatement, query);
-		query.append(" d.businessservice = ? ) ");
-		preparedStatement.add(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
-
 
 		return query.toString();
 	}
