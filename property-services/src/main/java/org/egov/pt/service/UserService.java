@@ -457,8 +457,7 @@ public class UserService {
 		userSearchRequest.setUserType("CITIZEN");
 		userSearchRequest.setUserName(userName);
 		userSearchRequest.setTenantId(tenantId);
-		StringBuilder uri = new StringBuilder(userHost).append(userContextPath).append(userUpdateEndpoint);
-		return userCall(userSearchRequest,uri);
+		return getUser(userSearchRequest);
 	}
 
 	private String getStateLevelTenant(String tenantId){
