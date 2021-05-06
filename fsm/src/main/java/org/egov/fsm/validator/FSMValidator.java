@@ -15,6 +15,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.service.BoundaryService;
+import org.egov.fsm.service.DSOService;
 import org.egov.fsm.util.FSMAuditUtil;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
@@ -23,6 +24,7 @@ import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.user.User;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.BeanUtils;
@@ -51,6 +53,9 @@ public class FSMValidator {
 	private FSMConfiguration config;
 	
 	@Autowired
+	private DSOService dsoService;
+	
+	@Autowired
 	private FSMToFSMAuditUtilConverter converter;
 
 	public void validateCreate(FSMRequest fsmRequest, Object mdmsData) {
@@ -76,7 +81,8 @@ public class FSMValidator {
 				fsm.setSource(FSMConstants.APPLICATION_CHANNEL_SOURCE);
 			}
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
-				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype(),fsm.getPitDetail());
+
 			}
 			
 		}else if( fsmRequest.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
@@ -87,10 +93,11 @@ public class FSMValidator {
 			
 			
 			
-			mdmsValidator.validateVehicleType(fsm.getVehicleType());
+			validateVehicleType(fsmRequest);
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
-				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype(),fsm.getPitDetail());
+
 			}
 			validateTripAmount(fsmRequest, mdmsData);
 		}else {
@@ -104,12 +111,24 @@ public class FSMValidator {
 				
 			}
 			if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
-				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+				mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype() ,fsm.getPitDetail());
 			}
 		}
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());
 		validateNoOfTrips(fsmRequest, mdmsData);
 		validateSlum(fsmRequest, mdmsData);
+	}
+	/**
+	 * validate the vehicleMakemodel in MDMS as well as existance of vehicle with given vehicleType in given tenant
+	 */
+	private void validateVehicleType(FSMRequest fsmRequest) {
+		FSM fsm = fsmRequest.getFsm();
+		
+		mdmsValidator.validateVehicleType(fsm.getVehicleType());
+		Vendor vendor = dsoService.getVendor(null, fsm.getTenantId(), null, null, fsm.getVehicleType(), fsmRequest.getRequestInfo());
+		if(vendor == null) {
+			throw new CustomException(FSMErrorConstants.NO_VEHICLE_VEHICLE_TYPE,"DSO Does not exists in the ULB with vehicle of vehicleType "+fsm.getVehicleType());
+		}
 	}
 
 	/**
@@ -244,13 +263,13 @@ public class FSMValidator {
 		validateAllIds(searchResult, fsm);
 		
 		mdmsValidator.validateMdmsData(fsmRequest, mdmsData);
-		mdmsValidator.validateVehicleType(fsm.getVehicleType());
+		validateVehicleType(fsmRequest);
 		if(!StringUtils.isEmpty(fsm.getSource())) {
 			mdmsValidator.validateApplicationChannel(fsm.getSource());
 			
 		}
 		if(!StringUtils.isEmpty(fsm.getSanitationtype())) {
-			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype());
+			mdmsValidator.validateOnSiteSanitationType(fsm.getSanitationtype(),fsm.getPitDetail());
 		}
 		
 		mdmsValidator.validatePropertyType(fsmRequest.getFsm().getPropertyUsage());

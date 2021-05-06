@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -84,90 +85,97 @@ public class NotificationUtil {
 		String message = null, messageTemplate;
 
 			FSM fsm = fsmRequest.getFsm();
-			Vendor vendor = this.dsoSerevice.getVendor(fsm.getDsoId(), fsm.getTenantId(), null, null, fsmRequest.getRequestInfo());
+			Vendor vendor = this.dsoSerevice.getVendor(fsm.getDsoId(), fsm.getTenantId(), null, null,null, fsmRequest.getRequestInfo());
 			messageTemplate = getMessageTemplate(messageCode, localizationMessage);
 			
 			if (!StringUtils.isEmpty(messageTemplate)) {
 				message = getInitiatedMsg(fsm, messageTemplate);
 
-				if (message.contains("<SLA_HOURS>")) {
+				if (message.contains("{SLA_HOURS}")) {
 					ProcessInstance processInstance = workflowService.getProcessInstance(fsm, fsmRequest.getRequestInfo());
 					Long slatime =null;
 					slatime = ( ( processInstance.getStateSla() != null ) ? processInstance.getStateSla() : processInstance.getBusinesssServiceSla() );
-					int slaValue = 0;
+					Double slaValue = 0.0;
 					if(slatime != null) {
-						slaValue= (int) Math.ceil(slatime/(1000*60*60));
+						slaValue= Math.ceil(slatime.doubleValue()/(60*60*1000)) ;
 						
 					}
-					message = message.replace("<SLA_HOURS>", String.valueOf(slaValue));
+					message = message.replace("{SLA_HOURS}", String.valueOf(slaValue.intValue()));
 				}
 				
-				if (message.contains("<AMOUNT_TO_BE_PAID>")) {
+				if (message.contains("{AMOUNT_TO_BE_PAID}")) {
 					BigDecimal amount = getAmountToBePaid(fsmRequest.getRequestInfo(), fsmRequest.getFsm());
-					message = message.replace("<AMOUNT_TO_BE_PAID>", amount.toString());
+					message = message.replace("{AMOUNT_TO_BE_PAID}", amount.toString());
 				}
-				if (message.contains("<DSO_MOBILE_NUMBER>") && vendor != null) {
+				if (message.contains("{DSO_MOBILE_NUMBER}") && vendor != null) {
 					
-					message = message.replace("<DSO_MOBILE_NUMBER>", vendor.getOwner().getMobileNumber());
+					message = message.replace("{DSO_MOBILE_NUMBER}", vendor.getOwner().getMobileNumber());
 				}
 				
-				if (message.contains("<VEHICLE_REG_NO>") && vendor != null && !CollectionUtils.isEmpty(vendor.getVehicles())) {
+				if (message.contains("{VEHICLE_REG_NO}") && vendor != null && !CollectionUtils.isEmpty(vendor.getVehicles())) {
 					Map<String, Vehicle> vehilceIdMap = vendor.getVehicles().stream().collect(Collectors.toMap(Vehicle::getId,Function.identity()));
 					Vehicle vehicle = vehilceIdMap.get(fsm.getVehicleId());
 					if(vehicle != null) {
-						message = message.replace("<VEHICLE_REG_NO>", vehicle.getRegistrationNumber());
+						message = message.replace("{VEHICLE_REG_NO}", vehicle.getRegistrationNumber());
 					}
 					
 				}
 				
-				if (message.contains("<POSSIBLE_SERVICE_DATE>") && vendor != null) {
+				if (message.contains("{POSSIBLE_SERVICE_DATE}") && vendor != null) {
 					Calendar possibleSrvdt = Calendar.getInstance();
 					possibleSrvdt.setTimeInMillis(fsm.getPossibleServiceDate());
 					SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 					dateFormat.setTimeZone(possibleSrvdt.getTimeZone());
-					message = message.replace("<POSSIBLE_SERVICE_DATE>", dateFormat.format(possibleSrvdt.getTime()));
+					message = message.replace("{POSSIBLE_SERVICE_DATE}", dateFormat.format(possibleSrvdt.getTime()));
 				}
 				
-				if (message.contains("<FSM_DSO_REJECT_REASON>") ) {
+				if (message.contains("{FSM_DSO_REJECT_REASON}") ) {
 					
 					String reasonComment = fsmRequest.getWorkflow().getComments();
+					reasonComment = reasonComment.split("~")[0];
 					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
-					message = message.replace("<FSM_DSO_REJECT_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
+					message = message.replace("{FSM_DSO_REJECT_REASON}", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
-				if (message.contains("<FSM_CANCEL_REASON>") ) {
+				if (message.contains("{FSM_CANCEL_REASON}") ) {
 					String reasonComment = fsmRequest.getWorkflow().getComments();
+					reasonComment = reasonComment.split("~")[0];
 					String localizedCmt = getMessageTemplate(reasonComment, localizationMessage);
-					message = message.replace("<FSM_CANCEL_REASON>", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
+					message = message.replace("{FSM_CANCEL_REASON}", org.springframework.util.StringUtils.isEmpty(localizedCmt)? reasonComment : localizedCmt);
 				}
 				
-				if (message.contains("<PAY_LINK>") ) {
+				if (message.contains("{PAY_LINK}") ) {
 					String actionLink = config.getPayLink().replace("$mobile", fsm.getCitizen().getMobileNumber())
     						.replace("$applicationNo", fsm.getApplicationNo())
     						.replace("$tenantId", fsm.getTenantId())
     						.replace("$businessService",FSMConstants.FSM_PAY_BUSINESS_SERVICE);
 					actionLink = config.getUiAppHost() + actionLink;
     			
-					message = message.replace("<PAY_LINK>", getShortenedUrl(actionLink));
+					message = message.replace("{PAY_LINK}", getShortenedUrl(actionLink));
 				}
-				
-				if (message.contains("<RECEIPT_LINK>") ) {
+
+				if (message.contains("{RECEIPT_LINK}") ) {
+
 					String actionLink = config.getDownloadLink().replace("$mobile", fsm.getCitizen().getMobileNumber())
     						.replace("$consumerCode", fsm.getApplicationNo())
     						.replace("$tenantId", fsm.getTenantId())
     						.replace("$receiptNumber", getPaymentData("receiptNumber",fsmRequest))
     						.replace("$businessService",FSMConstants.FSM_PAY_BUSINESS_SERVICE);
-					message = message.replace("<RECEIPT_LINK>", getShortenedUrl(config.getUiAppHost()+actionLink));
+
+					message = message.replace("{RECEIPT_LINK}", getShortenedUrl(config.getUiAppHost()+actionLink));
+
 				}
 				
-				if (message.contains("<RECEIPT_NO>") ) {
-					message = message.replace("<RECEIPT_NO>", getPaymentData("receiptNumber",fsmRequest));
+				if (message.contains("{RECEIPT_NO}") ) {
+					message = message.replace("{RECEIPT_NO}", getPaymentData("receiptNumber",fsmRequest));
 				}
 				
-				if (message.contains("<FSM_APPL_LINK>") ) {
-					message = message.replace("<FSM_APPL_LINK>", getShortenedUrl(config.getUiAppHost()+config.getFsmAppLink()+fsm.getApplicationNo()));
+				if (message.contains("{FSM_APPL_LINK}") ) {
+					message = message.replace("{FSM_APPL_LINK}", getShortenedUrl(config.getUiAppHost()+config.getFsmAppLink()+fsm.getApplicationNo()));
 				}	
-				if (message.contains("<NEW_FSM_LINK>") ) {
-					message = message.replace("<NEW_FSM_LINK>", getShortenedUrl(config.getUiAppHost()+config.getNewFsmLink())); 
+
+				if (message.contains("{NEW_FSM_LINK}") ) {
+					message = message.replace("{NEW_FSM_LINK}", getShortenedUrl(config.getUiAppHost()+config.getNewFsmLink())); 
+
 				}
 					
 			}
@@ -187,6 +195,10 @@ public class NotificationUtil {
 				if (paymentsArray != null) {
 					JSONObject firstElement = (JSONObject) paymentsArray.get(0);
 					if (firstElement != null) {
+						String payerMobileNumber = firstElement.get("mobileNumber").toString();
+						String payerName = firstElement.get("paidBy").toString();
+						((Map)fsmRequest.getFsm().getAdditionalDetails()).put("payerMobileNumber", payerMobileNumber);
+						((Map)fsmRequest.getFsm().getAdditionalDetails()).put("payerName", payerName);
 						JSONArray paymentDetails = (JSONArray) firstElement.get("paymentDetails");
 						if (paymentDetails != null) {
 							for (int i = 0; i < paymentDetails.length(); i++) {
@@ -227,7 +239,7 @@ public class NotificationUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	private String getInitiatedMsg(FSM fsm, String message) {
-		message = message.replace("<2>", fsm.getApplicationNo());
+		message = message.replace("{2}", fsm.getApplicationNo());
 		return message;
 	}
 	/**
@@ -389,7 +401,7 @@ public class NotificationUtil {
 		List<SMSRequest> smsRequest = new LinkedList<>();
 
 		for (Map.Entry<String, String> entryset : mobileNumberToOwner.entrySet()) {
-			String customizedMsg = message.replace("<1>", entryset.getValue());
+			String customizedMsg = message.replace("{1}", entryset.getValue());
 			smsRequest.add(new SMSRequest(entryset.getKey(), customizedMsg));
 		}
 		return smsRequest;
