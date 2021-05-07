@@ -24,6 +24,7 @@ import org.egov.wscalculation.producer.WSCalculationProducer;
 import org.egov.wscalculation.repository.DemandRepository;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
+import org.egov.wscalculation.repository.WaterConnectionRepository;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.validator.WSCalculationWorkflowValidator;
@@ -100,6 +101,8 @@ public class DemandService {
 	@Autowired
 	private WSCalculationWorkflowValidator wsCalulationWorkflowValidator;
 
+	@Autowired
+	private WaterConnectionRepository waterConnectionRepository;
 	/**
 	 * Creates or updates Demand
 	 * 
@@ -481,7 +484,11 @@ public class DemandService {
 		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
+		boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConnectionNumber(),getBillCriteria.getTenantId());
 
+		List<Demand> demands = res.getDemands();
+		demands.sort( (d1,d2)-> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
+		Demand oldDemand = demands.get(0);
 		String tenantId = getBillCriteria.getTenantId();
 
 		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId,
@@ -495,7 +502,9 @@ public class DemandService {
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			List<String> taxHeadMasterCodes = demand.getDemandDetails().stream().map(DemandDetail::getTaxHeadMasterCode).collect(Collectors.toList());;
 
-			if(demand.getIsPaymentCompleted()==false && totalTax.compareTo(totalCollection) > 0 && !taxHeadMasterCodes.contains(WSCalculationConstant.WS_TIME_PENALTY)) {
+			if (!isMigratedCon && !oldDemand.getId().equalsIgnoreCase(demand.getId())) {
+			  if (!demand.getIsPaymentCompleted() && totalTax.compareTo(totalCollection) > 0
+					&& !taxHeadMasterCodes.contains(WSCalculationConstant.WS_TIME_PENALTY)) {
 			if (demand.getStatus() != null
 					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
 				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
@@ -504,12 +513,31 @@ public class DemandService {
 			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 			}
+		}
 		});
 
 		// Call demand update in bulk to update the interest or penalty
 		DemandRequest request = DemandRequest.builder().demands(demandsToBeUpdated).requestInfo(requestInfo).build();
 		repository.fetchResult(utils.getUpdateDemandUrl(), request);
 		return res.getDemands();
+
+	}
+	
+	private boolean isMigratedConnection(final String connectionNumber, final String tenantId) {
+
+		String b = waterConnectionRepository.fetchConnectionAdditonalDetails(connectionNumber, tenantId);
+		Map<String, Object> result = null;
+		try {
+			result = mapper.readValue(b, HashMap.class);
+		} catch (Exception e) {
+			log.error("Exception while reading connection migration falg");
+		}
+		if (result == null)
+			return false;
+		else if ((boolean) result.get("isMigrated")) {
+			return true;
+		}
+		return false;
 
 	}
 
