@@ -763,6 +763,8 @@ public class DemandService {
 					generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
 						     .filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
 						     .findFirst().getAsInt();
+					//Increased one index to generate the next quarter demand
+					generateDemandFromIndex++;
 					}
 					
 					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
