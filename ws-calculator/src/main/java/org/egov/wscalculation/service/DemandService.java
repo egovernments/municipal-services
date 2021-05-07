@@ -501,18 +501,18 @@ public class DemandService {
 			BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			List<String> taxHeadMasterCodes = demand.getDemandDetails().stream().map(DemandDetail::getTaxHeadMasterCode).collect(Collectors.toList());;
-
-			if (!isMigratedCon && !oldDemand.getId().equalsIgnoreCase(demand.getId())) {
-			  if (!demand.getIsPaymentCompleted() && totalTax.compareTo(totalCollection) > 0
-					&& !taxHeadMasterCodes.contains(WSCalculationConstant.WS_TIME_PENALTY)) {
-			if (demand.getStatus() != null
-					&& WSCalculationConstant.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
-				throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
-						WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
-			applyTimeBasedApplicables(demand, requestInfoWrapper, timeBasedExemptionMasterMap, taxPeriods);
-			addRoundOffTaxHead(tenantId, demand.getDemandDetails());
-			demandsToBeUpdated.add(demand);
-			}
+			log.info("isMigratedCon-->"+isMigratedCon);
+			if (!(isMigratedCon && oldDemand.getId().equalsIgnoreCase(demand.getId()))) {
+				if (!demand.getIsPaymentCompleted() && totalTax.compareTo(totalCollection) > 0
+						&& !taxHeadMasterCodes.contains(WSCalculationConstant.WS_TIME_PENALTY)) {
+					if (demand.getStatus() != null && WSCalculationConstant.DEMAND_CANCELLED_STATUS
+							.equalsIgnoreCase(demand.getStatus().toString()))
+						throw new CustomException(WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR,
+								WSCalculationConstant.EG_WS_INVALID_DEMAND_ERROR_MSG);
+					applyTimeBasedApplicables(demand, requestInfoWrapper, timeBasedExemptionMasterMap, taxPeriods);
+					addRoundOffTaxHead(tenantId, demand.getDemandDetails());
+					demandsToBeUpdated.add(demand);
+				}
 		}
 		});
 
