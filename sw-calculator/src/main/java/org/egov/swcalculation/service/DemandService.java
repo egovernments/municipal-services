@@ -23,6 +23,7 @@ import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.DemandRepository;
 import org.egov.swcalculation.repository.ServiceRequestRepository;
 import org.egov.swcalculation.repository.SewerageCalculatorDao;
+import org.egov.swcalculation.repository.SewerageConnectionRepository;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
@@ -104,6 +105,8 @@ public class DemandService {
 	@Autowired
 	private SWCalculationWorkflowValidator swCalulationWorkflowValidator;
 
+	@Autowired
+	private SewerageConnectionRepository sewerageConnectionRepository;
 	/**
 	 * Creates or updates Demand
 	 * 
@@ -522,8 +525,15 @@ public class DemandService {
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			
 			List<String> taxHeadMasterCodes = demand.getDemandDetails().stream().map(DemandDetail::getTaxHeadMasterCode).collect(Collectors.toList());;
+			
+			boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConsumerCodes().get(0),
+					getBillCriteria.getTenantId());
 
-			if(demand.getIsPaymentCompleted()==false && 
+			List<Demand> demands = res.getDemands();
+			demands.sort((d1, d2) -> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
+			Demand oldDemand = demands.get(0);
+			if (!(isMigratedCon && oldDemand.getId().equalsIgnoreCase(demand.getId()))) {
+			if(!demand.getIsPaymentCompleted() && 
 					totalTax.compareTo(totalCollection) > 0 && 
 					!taxHeadMasterCodes.contains(SWCalculationConstant.SW_TIME_PENALTY)) {
 			if (demand.getStatus() != null
@@ -534,6 +544,7 @@ public class DemandService {
 			addRoundOffTaxHead(getBillCriteria.getTenantId(), demand.getDemandDetails());
 			demandsToBeUpdated.add(demand);
 			}
+			}
 		});
 		// Call demand update in bulk to update the interest or penalty
 		repository.fetchResult(utils.getUpdateDemandUrl(), DemandRequest.builder().demands(demandsToBeUpdated)
@@ -541,6 +552,26 @@ public class DemandService {
 		return res;
 	}
 
+	private boolean isMigratedConnection(final String connectionNumber, final String tenantId) {
+
+		String connectionAddlDetail = sewerageConnectionRepository.fetchConnectionAdditonalDetails(connectionNumber,
+				tenantId);
+		log.info("SW connectionAddlDetail-->" + connectionAddlDetail);
+		Map<String, Object> result = null;
+		try {
+			result = mapper.readValue(connectionAddlDetail, HashMap.class);
+		} catch (Exception e) {
+			log.error("Exception while reading connection migration flag");
+		}
+		if (result == null)
+			return false;
+		else if ((boolean) result.getOrDefault("isMigrated", false)) {
+			return true;
+		}
+		return false;
+
+	}
+	
 	/**
 	 * Updates the amount in the latest demandDetail by adding the diff between new
 	 * and old amounts to it
