@@ -35,7 +35,7 @@ export const validateFireNOCModel = (data, mdmsData) => {
   const ajv = getAjvInstance();
   // console.log(financialYear);
 
-  ajv.addKeyword("valid_oldFireNOCNumber", {
+  ajv.addKeyword("valid_htmlData", {
     validate: function(schema, data) {
       return (xss(data)==data) ? true : false;
     },

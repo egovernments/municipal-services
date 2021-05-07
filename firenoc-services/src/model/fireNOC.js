@@ -558,13 +558,15 @@ const FireNOC = {
       minLength: 2,
       maxLength: 64,
       description: "Unique Identifier of the Fire NOC (UUID)",
-      readOnly: true
+      readOnly: true,
+      valid_htmlData: true
     },
     tenantId: {
       type: "string",
       description: "Unique Identifier of ULB",
       maxLength: 128,
-      minLength: 2
+      minLength: 2,
+      valid_htmlData: true
     },
     fireNOCNumber: {
       type: "string",
@@ -572,6 +574,7 @@ const FireNOC = {
         "Unique Fire NOC Number of the Fire NOC. This is  unique in system for a tenant. This is mandatory but always be generated on the final approval.",
       maxLength: 64,
       minLength: 2,
+      valid_htmlData: true,
       readOnly: true
     },
     provisionFireNOCNumber: {
@@ -579,6 +582,7 @@ const FireNOC = {
       description:
         "Unique Fire NOC Number of the Provision Fire NOC number that will be used for linking provision fire NOC number with new fire NOC number. This is  unique in system for a tenant. This is mandatory but always be generated on the final approval.",
       maxLength: 64,
+      valid_htmlData: true,
       minLength: 2
     },
     oldFireNOCNumber: {
@@ -587,7 +591,7 @@ const FireNOC = {
         "Unique Old License Number of the Fire NOC. This is  unique in system for a tenant. This is mandatory  for legacy license(DataEntry).",
       maxLength: 64,
       minLength: 2,
-      valid_oldFireNOCNumber: true
+      valid_htmlData: true
     },
     dateOfApplied: {
       type: "integer",
