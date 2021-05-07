@@ -44,7 +44,9 @@ public class WSCalculatorQueryBuilder {
 	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_ws_scheduler ";
 	
 	private static final String fiterConnectionBasedOnTaxPeriod =" AND conn.connectionno not in (select distinct consumercode from egbs_demand_v1 d ";
-	
+
+	private static final String LAST_DEMAND_GEN_FOR_CONN =" SELECT d.taxperiodfrom FROM egbs_demand_v1 d ";
+
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
@@ -190,9 +192,9 @@ public class WSCalculatorQueryBuilder {
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		
-		// Test with connection number
+//		 Test with connection number
 //		addClauseIfRequired(preparedStatement, query);
-//		query.append(" conn.connectionno = '0603009108' ");
+//		query.append(" conn.connectionno = '0603005299' ");
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
@@ -339,6 +341,29 @@ public class WSCalculatorQueryBuilder {
 		}
 		
 
+		return query.toString();
+	}
+	
+	public String searchLastDemandGenFromDate(String consumerCode, String tenantId, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(LAST_DEMAND_GEN_FOR_CONN);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ");
+		preparedStatement.add(WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.consumercode = ? ");
+		preparedStatement.add(consumerCode);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.status = 'ACTIVE' ");
+		
+		query.append(" ORDER BY d.taxperiodfrom desc limit 1 ");
+		
 		return query.toString();
 	}
 }

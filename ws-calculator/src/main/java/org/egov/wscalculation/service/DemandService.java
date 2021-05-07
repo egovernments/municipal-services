@@ -10,9 +10,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -737,38 +739,65 @@ public class DemandService {
 	 * @param tenantId    Tenant Id
 	 */
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
-			long taxPeriodFrom, long taxPeriodTo) {
+			Long taxPeriodFrom, Long taxPeriodTo) {
 		try {
+			List<TaxPeriod> taxPeriods = calculatorUtils.getTaxPeriodsFromMDMS(requestInfo, tenantId);
 
+//			java.util.Optional<TaxPeriod> matchingObject = taxPeriods.stream().
+//				    filter(p -> p.getFromDate().equals(taxPeriodFrom)).findFirst();
+			
+			int generateDemandToIndex = IntStream.range(0, taxPeriods.size())
+				     .filter(p -> taxPeriodFrom.equals(taxPeriods.get(p).getFromDate()))
+				     .findFirst().getAsInt();
+			
 			log.info("Billing master data values for non metered connection:: {}", master);
-			//		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
-			//		if (isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
-			String assessmentYear = estimationService.getAssessmentYear();
+//			String assessmentYear = estimationService.getAssessmentYear();
 			Integer countForPause=0;
 			for (WaterDetails waterConnection : connectionNos) {
-				countForPause++;
 				try {
+					int generateDemandFromIndex = 0;
+					Long lastDemandFromDate = waterCalculatorDao.searchLastDemandGenFromDate(waterConnection.getConnectionNo(), tenantId);
+					if(lastDemandFromDate != null) {
+					generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
+						     .filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
+						     .findFirst().getAsInt();
+					}
+					
+					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
+						countForPause++;
+						generateDemandFromIndex++;
+						TaxPeriod taxPeriod = taxPeriods.get(taxPeriodIndex);
 
-					boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
-							taxPeriodFrom, taxPeriodTo);
-					if (isConnectionValid) {
-						CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-								.assessmentYear(assessmentYear).from(taxPeriodFrom).to(taxPeriodTo).connectionNo(waterConnection.getConnectionNo()).build();
-						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-						calculationCriteriaList.add(calculationCriteria);
-						CalculationReq calculationReq = CalculationReq.builder()
-								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxPeriodFrom)
-								.taxPeriodTo(taxPeriodTo).requestInfo(requestInfo).isconnectionCalculation(true).build();
-						wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-						if(countForPause ==500) {
-							//Pausing the controller for every 3minutes.to remove the load on the service.
-							Thread.sleep(180000);
-							countForPause=0;
+						boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
+								taxPeriod.getFromDate(), taxPeriod.getToDate());
+						if (isConnectionValid) {
+							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+									.assessmentYear(taxPeriod.getFinancialYear())
+									.from(taxPeriod.getFromDate())
+									.to(taxPeriod.getToDate())
+									.connectionNo(waterConnection.getConnectionNo())
+									.build();
+							List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+							calculationCriteriaList.add(calculationCriteria);
+							CalculationReq calculationReq = CalculationReq.builder()
+									.calculationCriteria(calculationCriteriaList)
+									.taxPeriodFrom(taxPeriod.getFromDate())
+									.taxPeriodTo(taxPeriod.getToDate())
+									.requestInfo(requestInfo)
+									.isconnectionCalculation(true)
+									.build();
+							wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+							if(countForPause ==500) {
+								//To remove the load on the billing service pausing the controller for every 3 Minutes.
+								Thread.sleep(180000);
+								countForPause=0;
+							}
 						}
 					}
 				}catch (Exception e) {
+					e.printStackTrace();
 					log.error("Exception occurred while generating demand for water connectionno: "+waterConnection.getConnectionNo() + " tenantId: "+tenantId);
 				}
 

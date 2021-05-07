@@ -29,6 +29,8 @@ public interface WSCalculationDao {
 	int isBillingPeriodExists(String connectionNo, String billingPeriod);
 	
 	List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality);
+	
+	Long searchLastDemandGenFromDate(String consumerCode, String tenantId);
 
 
 }

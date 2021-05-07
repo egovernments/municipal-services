@@ -318,5 +318,13 @@ public class WSCalculationConstant {
 	
 	public static final String WS_DUPLICATE_BILL_SCHEDULER_MSG = "Bills are already scheduled for the locality ";
 	
+	public static final String MODULE_NAME_BILLINGSERVICE = "BillingService";
+	
+	public static final String TAXPERIOD_MASTERNAME = "TaxPeriod";
+
+	public static final String MDMS_NO_FILTER_TAXPERIOD = "$.MdmsRes.BillingService.TaxPeriod.*";
+
+
+	
 	
 }

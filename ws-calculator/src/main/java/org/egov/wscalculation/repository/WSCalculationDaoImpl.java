@@ -157,4 +157,15 @@ List<WaterDetails> waterDetails=jdbcTemplate.query(query,preparedStatement.toArr
 		log.info("water " + connectionType + " connection list : " + query);
 		return jdbcTemplate.queryForList(query, preparedStatement.toArray(), String.class);
 	}
+	@Override
+	public Long searchLastDemandGenFromDate(String consumerCode, String tenantId) {
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.searchLastDemandGenFromDate(consumerCode, tenantId, preparedStatement);
+		log.info("preparedStatement: "+ preparedStatement + " searchLastDemandGenFromDate Query : " + query);
+		List<Long> fromDate = jdbcTemplate.queryForList(query, preparedStatement.toArray(), Long.class);
+		if(fromDate != null && !fromDate.isEmpty())
+			return  fromDate.get(0);
+		
+		return null;
+	}
 }
