@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -707,38 +708,65 @@ public class DemandService {
 	 */
 	@SuppressWarnings("unchecked")
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
-			long taxperiodfrom, long taxperiodto) {
+			Long taxPeriodFrom, Long taxPeriodTo) {
 		try {
+			
+			List<TaxPeriod> taxPeriods = calculatorUtils.getTaxPeriodsFromMDMS(requestInfo, tenantId);
+			
+			int generateDemandToIndex = IntStream.range(0, taxPeriods.size())
+				     .filter(p -> taxPeriodFrom.equals(taxPeriods.get(p).getFromDate()))
+				     .findFirst().getAsInt();
+			
 			log.info("Billing master data values for non metered connection:: {}", master);
 			List<SewerageDetails> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-					SWCalculationConstant.nonMeterdConnection, taxperiodfrom, taxperiodto);
+					SWCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
+//			String assessmentYear = estimationService.getAssessmentYear();
 			Integer countForPause=0;
-			for (SewerageDetails detail : connectionNos) {
+			for (SewerageDetails sewConnDetails : connectionNos) {
 				countForPause++;
 				try {
-					boolean isValidConnection = validateSewerageConnection(detail, taxperiodfrom, taxperiodto, tenantId,
-							requestInfo);
-					if (isValidConnection) {
-						CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-								.assessmentYear(estimationService.getAssessmentYear())
-								.from(taxperiodfrom)
-								.to(taxperiodto)
-								.connectionNo(detail.getConnectionNo()).build();
-						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-						calculationCriteriaList.add(calculationCriteria);
-						CalculationReq calculationReq = CalculationReq.builder()
-								.calculationCriteria(calculationCriteriaList).taxPeriodFrom(taxperiodfrom)
-								.taxPeriodTo(taxperiodto).requestInfo(requestInfo).isconnectionCalculation(true).build();
-						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
-						if(countForPause ==500) {
-							//Pausing the controller for every 3minutes.to remove the load on the service.
-							Thread.sleep(180000);
-							countForPause=0;
+					int generateDemandFromIndex = 0;
+					Long lastDemandFromDate = sewerageCalculatorDao.searchLastDemandGenFromDate(sewConnDetails.getConnectionNo(), tenantId);
+					if(lastDemandFromDate != null) {
+						generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
+								.filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
+								.findFirst().getAsInt();
+						//Increased one index to generate the next quarter demand
+						generateDemandFromIndex++;
+					}
+
+					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
+						countForPause++;
+						generateDemandFromIndex++;
+						TaxPeriod taxPeriod = taxPeriods.get(taxPeriodIndex);
+
+						boolean isValidConnection = validateSewerageConnection(sewConnDetails, taxPeriod.getFromDate(), taxPeriod.getToDate(), tenantId,
+								requestInfo);
+						if (isValidConnection) {
+							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+									.assessmentYear(taxPeriod.getFinancialYear())
+									.from(taxPeriod.getFromDate())
+									.to(taxPeriod.getToDate())
+									.connectionNo(sewConnDetails.getConnectionNo()).build();
+							List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+							calculationCriteriaList.add(calculationCriteria);
+							CalculationReq calculationReq = CalculationReq.builder()
+									.calculationCriteria(calculationCriteriaList)
+									.taxPeriodFrom(taxPeriod.getFromDate())
+									.taxPeriodTo(taxPeriod.getToDate())
+									.requestInfo(requestInfo)
+									.isconnectionCalculation(true).build();
+							kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+							if(countForPause ==500) {
+								//To remove the load on the billing service pausing the controller for every 3 Minutes.
+								Thread.sleep(180000);
+								countForPause=0;
+							}
 						}
 
 					}
 				}catch (Exception e) {
-					log.error("Exception occurred while generating demand for sewerage connectionno: "+detail.getConnectionNo() + " tenantId: "+tenantId);
+					log.error("Exception occurred while generating demand for sewerage connectionno: "+sewConnDetails.getConnectionNo() + " tenantId: "+tenantId);
 				}
 			}
 		}catch (Exception e) {
@@ -750,7 +778,7 @@ public class DemandService {
 			String tenantId, RequestInfo requestInfo) {
 		boolean isValidSewerageConnection = true;
 
-		if (System.currentTimeMillis() < detail.getConnectionExecutionDate()) {
+		if (detail.getConnectionExecutionDate() > taxPeriodTo) {
 
 			isValidSewerageConnection = false;
 		}

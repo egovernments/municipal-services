@@ -11,4 +11,7 @@ public interface SewerageCalculatorDao {
 	List<SewerageDetails> getConnectionsNoList(String tenantId, String connectionType, Long taxPeriodFrom, Long taxPeriodTo );
 	
 	List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality);
+	
+	Long searchLastDemandGenFromDate(String consumerCode, String tenantId);
+
 }
