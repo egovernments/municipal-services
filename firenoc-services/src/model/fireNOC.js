@@ -586,7 +586,8 @@ const FireNOC = {
       description:
         "Unique Old License Number of the Fire NOC. This is  unique in system for a tenant. This is mandatory  for legacy license(DataEntry).",
       maxLength: 64,
-      minLength: 2
+      minLength: 2,
+      valid_oldFireNOCNumber: true
     },
     dateOfApplied: {
       type: "integer",
