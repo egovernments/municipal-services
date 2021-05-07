@@ -484,7 +484,7 @@ public class DemandService {
 		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
-		boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConnectionNumber(),getBillCriteria.getTenantId());
+		boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConsumerCodes().get(0),getBillCriteria.getTenantId());
 
 		List<Demand> demands = res.getDemands();
 		demands.sort( (d1,d2)-> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
@@ -525,16 +525,18 @@ public class DemandService {
 	
 	private boolean isMigratedConnection(final String connectionNumber, final String tenantId) {
 
-		String b = waterConnectionRepository.fetchConnectionAdditonalDetails(connectionNumber, tenantId);
+		String connectionAddlDetail = waterConnectionRepository.fetchConnectionAdditonalDetails(connectionNumber,
+				tenantId);
+		log.info("connectionAddlDetail-->" + connectionAddlDetail);
 		Map<String, Object> result = null;
 		try {
-			result = mapper.readValue(b, HashMap.class);
+			result = mapper.readValue(connectionAddlDetail, HashMap.class);
 		} catch (Exception e) {
-			log.error("Exception while reading connection migration falg");
+			log.error("Exception while reading connection migration flag");
 		}
 		if (result == null)
 			return false;
-		else if ((boolean) result.get("isMigrated")) {
+		else if ((boolean) result.getOrDefault("isMigrated", false)) {
 			return true;
 		}
 		return false;
