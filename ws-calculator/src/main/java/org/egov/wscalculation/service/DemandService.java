@@ -487,10 +487,12 @@ public class DemandService {
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
 		boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConsumerCodes().get(0),getBillCriteria.getTenantId());
-
+		log.info("-------updateDemands------------isMigratedCon--------"+isMigratedCon);
 		List<Demand> demands = res.getDemands();
 		demands.sort( (d1,d2)-> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
+		log.info("-------updateDemands------------demands--------"+demands);
 		Demand oldDemand = demands.get(0);
+		log.info("-------updateDemands------------oldDemand--------"+oldDemand);
 		String tenantId = getBillCriteria.getTenantId();
 
 		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId,
@@ -503,8 +505,8 @@ public class DemandService {
 			BigDecimal totalCollection = demand.getDemandDetails().stream().map(DemandDetail::getCollectionAmount)
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
 			List<String> taxHeadMasterCodes = demand.getDemandDetails().stream().map(DemandDetail::getTaxHeadMasterCode).collect(Collectors.toList());;
-			log.info("isMigratedCon-->"+isMigratedCon);
 			if (!(isMigratedCon && oldDemand.getId().equalsIgnoreCase(demand.getId()))) {
+				log.info("-------updateDemands-----inside if-------demand.getId()--------"+demand.getId()+"-------oldDemand.getId()---------"+oldDemand.getId());
 				if (!demand.getIsPaymentCompleted() && totalTax.compareTo(totalCollection) > 0
 						&& !taxHeadMasterCodes.contains(WSCalculationConstant.WS_TIME_PENALTY)) {
 					if (demand.getStatus() != null && WSCalculationConstant.DEMAND_CANCELLED_STATUS
@@ -526,22 +528,19 @@ public class DemandService {
 	}
 	
 	private boolean isMigratedConnection(final String connectionNumber, final String tenantId) {
-
+		Boolean isMigrated = false;
 		String connectionAddlDetail = waterConnectionRepository.fetchConnectionAdditonalDetails(connectionNumber,
 				tenantId);
-		log.info("connectionAddlDetail-->" + connectionAddlDetail);
+		log.info("isMigratedConnection-----connectionAddlDetail-->" + connectionAddlDetail);
 		Map<String, Object> result = null;
 		try {
 			result = mapper.readValue(connectionAddlDetail, HashMap.class);
+			isMigrated = (Boolean) result.getOrDefault("isMigrated", false);
 		} catch (Exception e) {
 			log.error("Exception while reading connection migration flag");
 		}
-		if (result == null)
-			return false;
-		else if ((boolean) result.getOrDefault("isMigrated", false)) {
-			return true;
-		}
-		return false;
+		log.info("isMigratedConnection-----isMigrated-->" + isMigrated);
+		return isMigrated;
 
 	}
 
