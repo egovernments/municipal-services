@@ -39,7 +39,7 @@ public class WSCalculatorQueryBuilder {
 
 	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_ws_scheduler SET status=? where id=?";
 
-	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id INNER JOIN eg_pt_address address ON conn.property_id=address.propertyid ";
+	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_ws_connection conn INNER JOIN eg_ws_service ws ON conn.id = ws.connection_id  ";
 
 	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_ws_scheduler ";
 	
@@ -289,6 +289,12 @@ public class WSCalculatorQueryBuilder {
 	
 	public String getConnectionsNoByLocality(String tenantId, String connectionType,String status,String locality, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoByLocality);
+		
+		// add tenantid
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" ws.connectiontype = ? ");
@@ -299,16 +305,15 @@ public class WSCalculatorQueryBuilder {
 		query.append(" conn.status = ? ");
 		preparedStatement.add(status);
 		
-		// add tenantid
-		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.tenantid = ? ");
-		preparedStatement.add(tenantId);
-		
 		if (locality != null) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" address.locality = ? ");
+			query.append(" conn.locality = ? ");
 			preparedStatement.add(locality);
 		}
+		
+		//Getting only non exempted connection to generate bill
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" (conn.additionaldetails->>'isexempted')::boolean is false ");
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
