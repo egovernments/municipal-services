@@ -18,7 +18,7 @@ public class SWCalculatorQueryBuilder {
 
 	private static final String BILL_SCHEDULER_STATUS_UPDATE_QUERY = "UPDATE eg_sw_scheduler SET status=? where id=?";
 
-	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id";
+	private static final String connectionNoByLocality = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service ws ON conn.id = ws.connection_id ";
 
 	private static final String fiterConnectionBasedOnTaxPeriod =" AND conn.connectionno not in (select distinct consumercode from egbs_demand_v1 d ";
 
@@ -143,6 +143,13 @@ public class SWCalculatorQueryBuilder {
 
 	public String getConnectionsNoByLocality(String tenantId, String connectionType,String status,String locality, List<Object> preparedStatement) {
 		StringBuilder query = new StringBuilder(connectionNoByLocality);
+		// add tenantid
+		if(tenantId != null) {
+			addClauseIfRequired(preparedStatement, query);
+			query.append(" conn.tenantid = ? ");
+			preparedStatement.add(tenantId);
+		}
+		
 		// Add connection type
 		if(connectionType != null) {
 			addClauseIfRequired(preparedStatement, query);
@@ -157,13 +164,6 @@ public class SWCalculatorQueryBuilder {
 			preparedStatement.add(status);			
 		}
 
-		// add tenantid
-		if(tenantId != null) {
-			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.tenantid = ? ");
-			preparedStatement.add(tenantId);
-		}
-
 //		addClauseIfRequired(preparedStatement, query);
 //		query.append(" conn.connectionno = ? ");
 //		preparedStatement.add("SW/107/2020-21/000018");
@@ -173,6 +173,10 @@ public class SWCalculatorQueryBuilder {
 			query.append(" locality = ? ");
 			preparedStatement.add(locality);
 		}
+		
+		//Getting only non exempted connection to generate bill
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" (conn.additionaldetails->>'isexempted')::boolean is false ");
 
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
