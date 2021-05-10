@@ -27,18 +27,9 @@ vehicle
 fsm
 ```
 
-To run the fms locally, update below listed properties in `application.properties` prior to running the project:
+To run the inbox locally, update below listed properties in `application.properties` prior to running the project:
 
 ```ini
-server.port
-spring.datasource.url=
-spring.datasource.username=
-spring.datasource.password=
-spring.datasource.platform=
-
-spring.flyway.url=
-spring.flyway.user=
-spring.flyway.password=
-spring.flyway.table=
+service.search.mapping=
 ```
 
