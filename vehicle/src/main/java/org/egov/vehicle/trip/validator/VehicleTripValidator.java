@@ -155,6 +155,12 @@ public class VehicleTripValidator {
 				if(request.getVehicleTrip().getTripEndTime() <= 0) {
 				throw new CustomException(VehicleTripConstants.INVALID_TRIP_ENDTIME, "Invalid Trip end time");
 			}
+			if (request.getVehicleTrip().getFstpEntryTime() <= 0 || request.getVehicleTrip().getFstpExitTime() <= 0
+					|| request.getVehicleTrip().getFstpEntryTime() >= request.getVehicleTrip().getFstpExitTime()) {
+				throw new CustomException(VehicleTripConstants.INVALID_FSTP_ENTRYEXIT_TIME,
+						"FSTP vehicle entry and exist time are invalid.");
+
+			}
 		}
 		
 		
