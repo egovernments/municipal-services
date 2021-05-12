@@ -153,6 +153,7 @@ public class NotificationUtil {
 					message = message.replace("{PAY_LINK}", getShortenedUrl(actionLink));
 				}
 
+				
 				if (message.contains("{RECEIPT_LINK}") ) {
 
 					String actionLink = config.getDownloadLink().replace("$mobile", fsm.getCitizen().getMobileNumber())
@@ -160,7 +161,6 @@ public class NotificationUtil {
     						.replace("$tenantId", fsm.getTenantId())
     						.replace("$receiptNumber", getPaymentData("receiptNumber",fsmRequest))
     						.replace("$businessService",FSMConstants.FSM_PAY_BUSINESS_SERVICE);
-
 					message = message.replace("{RECEIPT_LINK}", getShortenedUrl(config.getUiAppHost()+actionLink));
 
 				}

@@ -11,6 +11,7 @@
 	<groupId>org.egov</groupId>
 	<artifactId>fsm</artifactId>
 	<version>1.0.2-SNAPSHOT</version>
+
 	<name>fsm-services</name>
 	<description>fsm services</description>
 

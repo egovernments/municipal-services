@@ -12,6 +12,3 @@ All notable changes to this module will be documented in this file.
 - Payment link correction sent in sms
 - workflow modification to allow re-assign DSO at multiple stages
 
-## 1.0.0
-
-- base version

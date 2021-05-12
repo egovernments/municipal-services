@@ -211,15 +211,6 @@
                             "roles": [
                                 "FSM_EDITOR_EMP"
                             ]
-                        },
-                        {
-                            "tenantId": "pb",
-                            "currentState": "DSO_INPROGRESS",
-                            "action": "REASSING",
-                            "nextState": "PENDING_DSO_APPROVAL",
-                            "roles": [
-                                "FSM_EDITOR_EMP"
-                            ]
                         }
                     ]
                 },
