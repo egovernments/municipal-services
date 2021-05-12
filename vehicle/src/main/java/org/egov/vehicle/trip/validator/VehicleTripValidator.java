@@ -1,8 +1,12 @@
 package org.egov.vehicle.trip.validator;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -155,11 +159,27 @@ public class VehicleTripValidator {
 				if(request.getVehicleTrip().getTripEndTime() <= 0) {
 				throw new CustomException(VehicleTripConstants.INVALID_TRIP_ENDTIME, "Invalid Trip end time");
 			}
+			else {
+				request.getVehicleTrip().setFstpExitTime(request.getVehicleTrip().getTripEndTime());
+			}
+
 			if (request.getVehicleTrip().getFstpEntryTime() <= 0 || request.getVehicleTrip().getFstpExitTime() <= 0
 					|| request.getVehicleTrip().getFstpEntryTime() >= request.getVehicleTrip().getFstpExitTime()) {
 				throw new CustomException(VehicleTripConstants.INVALID_FSTP_ENTRYEXIT_TIME,
 						"FSTP vehicle entry and exist time are invalid.");
+			} else {
+				LocalDate entryDate = LocalDateTime
+						.ofInstant(Instant.ofEpochSecond(request.getVehicleTrip().getFstpEntryTime()),
+								TimeZone.getDefault().toZoneId())
+						.toLocalDate();
+				LocalDate exitDate = LocalDateTime
+						.ofInstant(Instant.ofEpochSecond(request.getVehicleTrip().getFstpExitTime()),
+								TimeZone.getDefault().toZoneId())
+						.toLocalDate();
 
+				if (!(entryDate.isEqual(exitDate)))
+					throw new CustomException(VehicleTripConstants.INVALID_FSTP_ENTRYEXIT_DAY,
+							"FSTP vehicle entry and exist time should be the same day.");
 			}
 		}
 		

@@ -136,7 +136,7 @@ public class VehicleTrip   {
   private Long fstpEntryTime = null;
   
   @JsonProperty("fstpExitTime")
-  private Double fstpExitTime = null;
+  private Long fstpExitTime = null;
 
 
 }
