@@ -31,4 +31,6 @@ public class VehicleTripConstants {
 	public static final String INVALID_TRIP_ENDTIME = "INVALID_TRIP_ENDTIME";
 	public static final String ACTION_SCHEDULE = "SCHEDULE";
 	public static final String VOLUME_GRT_CAPACITY ="VOLUME_GRT_CAPACITY";
+	public static final String INVALID_FSTP_ENTRYEXIT_TIME = "INVALID_FSTP_ENTRYEXIT_TIME";
+	public static final String INVALID_FSTP_ENTRYEXIT_DAY = "INVALID_FSTP_ENTRYEXIT_DAY";
 }

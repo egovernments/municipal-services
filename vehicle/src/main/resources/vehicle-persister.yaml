@@ -118,7 +118,7 @@ serviceMaps:
       fromTopic: update-vehicle-trip
       isTransaction: true
       queryMaps:
-        - query: UPDATE eg_vehicle_trip SET  driver_id=?,  applicationno=?, additionaldetails=?, status=?, applicationstatus=?, tripstarttime=?, tripendtime=?, volumecarried=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
+        - query: UPDATE eg_vehicle_trip SET  driver_id=?,  applicationno=?, additionaldetails=?, status=?, applicationstatus=?, tripstarttime=?, tripendtime=?, volumecarried=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?, fstpEntryTime=?, fstpExitTime=?  WHERE id=?
           basePath: vehicleTrip
           jsonMaps:
               
@@ -148,6 +148,10 @@ serviceMaps:
             - jsonPath: $.vehicleTrip.auditDetails.createdTime
   
             - jsonPath: $.vehicleTrip.auditDetails.lastModifiedTime
+            
+            - jsonPath: $.vehicleTrip.fstpEntryTime
+            
+            - jsonPath: $.vehicleTrip.fstpExitTime
             
             - jsonPath: $.vehicleTrip.id
             
@@ -185,7 +189,7 @@ serviceMaps:
       fromTopic: update-workflow-vehicle-trip
       isTransaction: true
       queryMaps:
-        - query: UPDATE eg_vehicle_trip SET  driver_id=?,  applicationno=?, additionaldetails=?, status=?, applicationstatus=?, tripstarttime=?, tripendtime=?, volumecarried=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=? WHERE id=?
+        - query: UPDATE eg_vehicle_trip SET  driver_id=?,  applicationno=?, additionaldetails=?, status=?, applicationstatus=?, tripstarttime=?, tripendtime=?, volumecarried=?, createdby=?, lastmodifiedby=?, createdtime=?, lastmodifiedtime=?, fstpEntryTime=?, fstpExitTime=? WHERE id=?
           basePath: vehicleTrip
           jsonMaps:
               
@@ -215,6 +219,10 @@ serviceMaps:
             - jsonPath: $.vehicleTrip.auditDetails.createdTime
   
             - jsonPath: $.vehicleTrip.auditDetails.lastModifiedTime
+            
+            - jsonPath: $.vehicleTrip.fstpEntryTime
+            
+            - jsonPath: $.vehicleTrip.fstpExitTime
             
             - jsonPath: $.vehicleTrip.id
             

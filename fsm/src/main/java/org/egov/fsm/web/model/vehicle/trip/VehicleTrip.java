@@ -132,7 +132,11 @@ public class VehicleTrip   {
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
   
+  @JsonProperty("fstpEntryTime")
+  private Long fstpEntryTime = null;
+  
+  @JsonProperty("fstpExitTime")
+  private Long fstpExitTime = null;
 
 
 }
-
