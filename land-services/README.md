@@ -4,7 +4,7 @@
 This service is the major service supporting bpa-services which handles the data of the land like land details, owner information, unit ,address and documents which has the complete information of the land.
 
 ### DB UML Diagram
-
+![DB UML](./images/land-services.png)
 
 
 ### Service Dependencies
