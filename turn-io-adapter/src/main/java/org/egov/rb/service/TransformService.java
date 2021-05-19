@@ -54,9 +54,8 @@ public class TransformService {
 	@Value("${turn.io.profile.api}")
 	private String turnIoProfileUpdateAPI;
 
-	private String successMessage = "Thank you\uD83D\uDE4F\uD83D\uDE4F for lodging your complaint in *Public Grievance Complaint portal*.\n\n" +
-			"Your Complaint No is : *{{complaintNumber}}*\n\nYou can view and track your complaint  through the link below:\n{{complaintLink}}\n\n" +
-			"To lodge another complaint. Please type and send *PGR-PUNJAB*";
+	private String successMessage = "Your Complaint No is : *{{complaintNumber}}*\n\nYou can view and track your complaint through the "+
+									"link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR-PUNJAB*";
 
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
