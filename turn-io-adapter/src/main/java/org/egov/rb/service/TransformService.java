@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -185,6 +186,11 @@ public class TransformService {
 		headers.add("Accept","application/vnd.v1+json");
 
 		HttpEntity requestEntity = new HttpEntity<>(request, headers);
+
+
+		RestTemplate restTemplate = new RestTemplate();
+		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+		restTemplate.setRequestFactory(httpRequestFactory);
 
 		url = url.replace("{phoneNumber}",mobileNumber);
 		try {
