@@ -22,7 +22,7 @@ public class TransformController {
 	/**Dharamshala0
 	 * contoller endpoint to transform the messageRequest
 	 * 
-	 * @param MessageRequest
+	 * @param messageRequest
 	 * @return ResponseEntity<?>
 	 * 
 	 */	

@@ -35,8 +35,8 @@ public class Contact {
 	private String whatsapp_profile_name;
 	@NotNull
 	private String city;
-	private String ward;
-	private String issueCategory;
+	private String locality;
+	private String complaint_sub_category;
 	
 	
 	

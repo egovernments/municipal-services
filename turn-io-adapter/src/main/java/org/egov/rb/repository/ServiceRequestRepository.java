@@ -9,6 +9,7 @@ import java.util.Map;
 import org.egov.rb.pgrmodels.RequestInfo;
 import org.egov.rb.pgrmodels.ServiceRequest;
 import org.egov.rb.pgrmodels.ServiceResponse;
+import org.egov.rb.service.TurnIoService;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,23 +37,39 @@ public class ServiceRequestRepository {
 
 	@Autowired
 	private RestTemplate restTemplate;
-	
 
-	  public ServiceResponse fetchResult(StringBuilder uri, ServiceRequest serviceRequest) {
-	  
-		  ServiceResponse serviceResponse=null;
-	  try {
+	@Autowired
+	private ObjectMapper mapper;
+
+	public ServiceResponse fetchResult(StringBuilder uri, ServiceRequest serviceRequest) {
+		ServiceResponse serviceResponse=null;
+	  	try {
 		  serviceResponse = restTemplate.postForObject(uri.toString(), serviceRequest, ServiceResponse.class);
 		  
-	  }catch(HttpClientErrorException e) {
+	  	}catch(HttpClientErrorException e) {
           log.error("External Service threw an Exception: ",e);
           throw new ServiceCallException(e.getResponseBodyAsString());
-      }catch(Exception e) {
+      	}catch(Exception e) {
           log.error("Exception while fetching from searcher: ",e);
-      }
+      	}
 
-      return serviceResponse;
-	  }
+      	return serviceResponse;
+	}
+
+	public Object getMdmsData(StringBuilder uri, Object request) {
+		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		Object response = null;
+		try {
+			response = restTemplate.postForObject(uri.toString(), request, Map.class);
+		}catch(HttpClientErrorException e) {
+			log.error("External Service threw an Exception: ",e);
+			throw new ServiceCallException(e.getResponseBodyAsString());
+		}catch(Exception e) {
+			log.error("Exception while fetching from searcher: ",e);
+		}
+
+		return response;
+	}
 
 	
 	  
