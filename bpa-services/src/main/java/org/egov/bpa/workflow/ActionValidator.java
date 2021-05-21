@@ -18,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Component
+@Slf4j
 public class ActionValidator {
 
 
@@ -71,15 +74,21 @@ public class ActionValidator {
 			List<Action> actions = state.getActions();
 			List<Role> roles = requestInfo.getUserInfo().getRoles();
 			List<String> validActions = new LinkedList<>();
-			
+			log.info("---State--->>>>"+state.toString());
+			for(Action a : actions) {
+				log.info("---State Actions--->>>>"+a.toString());
+				log.info("State Action Roles---->>>>"+String.join(", ", a.getRoles()));
+			}
 			roles.forEach(role -> {
+				log.info("---BPA User Role Code--->>>>"+role.getCode());
 				actions.forEach(action -> {
 					if (action.getRoles().contains(role.getCode())) {
 						validActions.add(action.getAction());
 					}
 				});
 			});
-
+			log.info("Workflow action---->>>>"+bpa.getWorkflow().getAction());
+			log.info("Valid actions---->>>>"+String.join(", ", validActions));
 			if (!validActions.contains(bpa.getWorkflow().getAction())) {
 				errorMap.put("UNAUTHORIZED UPDATE", "The action cannot be performed by this user");
 			}

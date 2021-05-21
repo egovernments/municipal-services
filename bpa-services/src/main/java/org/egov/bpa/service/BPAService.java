@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DateFormat;
@@ -595,6 +594,7 @@ public class BPAService {
 	 */
 	private void createTempReport(BPARequest bpaRequest,String fileName,PDDocument document) throws Exception {
 		URL downloadUrl = this.getEdcrReportDownloaUrl(bpaRequest);
+		log.info("EDCR Download URL--->>>"+downloadUrl.toString());
 		// Read the PDF from the URL and save to a local file
 		FileOutputStream writeStream = null;
 		InputStream readStream = null;
@@ -603,6 +603,7 @@ public class BPAService {
 			byte[] byteChunck = new byte[1024];
 			int baLength;
 			readStream = downloadUrl.openStream();
+			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck)));
 			while ((baLength = readStream.read(byteChunck)) != -1) {
 				writeStream.write(byteChunck, 0, baLength);
 			}
