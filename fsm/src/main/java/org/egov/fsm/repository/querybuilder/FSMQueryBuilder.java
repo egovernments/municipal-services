@@ -235,7 +235,7 @@ public class FSMQueryBuilder {
 			FSMSearchCriteria criteria) {
 
 		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
-			builder.append("and fsm.id in (select id from eg_fsm_application where tenantid= ? order by propertyid offset ? limit ?)");
+			builder.append("and fsm.id in (select id from eg_fsm_application where tenantid= ? order by id offset ? limit ?)");
 			preparedStmtList.add(criteria.getTenantId());
 			preparedStmtList.add(criteria.getOffset());
 			preparedStmtList.add(criteria.getLimit());
