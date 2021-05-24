@@ -471,7 +471,7 @@ public class FSMService {
         if(criteria.getIds() != null && !criteria.getIds().isEmpty())
             ids = criteria.getIds();
         else
-            ids = repository.fetchPropertyIds(criteria);
+            ids = repository.fetchFSMIds(criteria);
 
         if(ids.isEmpty())
             return Collections.emptyList();
