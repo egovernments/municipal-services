@@ -97,7 +97,7 @@ public class FSMRepository {
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), auditRowMapper);
 	}
 
-	public List<String> fetchPropertyIds(@Valid FSMSearchCriteria criteria) {
+	public List<String> fetchFSMIds(@Valid FSMSearchCriteria criteria) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(criteria.getOffset());
