@@ -5,13 +5,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -449,5 +453,32 @@ public class FSMService {
 		}
 		return auditList;
 
+	}
+
+
+	public List<FSM> searchFSMPlainSearch(@Valid FSMSearchCriteria criteria, RequestInfo requestInfo) {
+		List<FSM> fsmList = getFsmPlainSearch(criteria, requestInfo);
+		return fsmList;
+	}
+
+
+	private List<FSM> getFsmPlainSearch(@Valid FSMSearchCriteria criteria, RequestInfo requestInfo) {
+		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
+            criteria.setLimit(config.getMaxSearchLimit());
+
+        List<String> ids = null;
+
+        if(criteria.getIds() != null && !criteria.getIds().isEmpty())
+            ids = criteria.getIds();
+        else
+            ids = repository.fetchPropertyIds(criteria);
+
+        if(ids.isEmpty())
+            return Collections.emptyList();
+
+        FSMSearchCriteria FSMcriteria = FSMSearchCriteria.builder().ids(ids).build();
+
+        List<FSM> listFSM = repository.getFsmPlainSearch(FSMcriteria);
+        return listFSM;
 	}
 }
