@@ -1,6 +1,7 @@
 package org.egov.waterconnection.service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -8,12 +9,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+//import org.egov.tl.web.models.TradeLicenseSearchCriteria;
+//import org.egov.pt.models.OwnerInfo;
+//import org.egov.pt.models.PropertyCriteria;
+//import org.egov.pt.models.user.UserDetailResponse;
+//import org.egov.pt.models.user.UserSearchRequest;
+import org.egov.waterconnection.web.models.PropertyCriteria;
+import org.egov.waterconnection.web.models.users.UserSearchRequest;
+import org.egov.waterconnection.web.models.users.UserDetailResponse;
+import org.egov.waterconnection.util.WaterServicesUtil;
+
 import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.WaterDao;
 import org.egov.waterconnection.repository.WaterDaoImpl;
-import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.validator.ActionValidator;
 import org.egov.waterconnection.validator.MDMSValidator;
 import org.egov.waterconnection.validator.ValidateProperty;
@@ -144,6 +154,78 @@ public class WaterServiceImpl implements WaterService {
 	public List<WaterConnection> getWaterConnectionsList(SearchCriteria criteria, RequestInfo requestInfo) {
 		return waterDao.getWaterConnectionList(criteria, requestInfo);
 	}
+	
+	/*
+	 * 
+	 * 
+	 * 
+	 * 
+	 */
+	
+	
+	@Override
+	public List<WaterConnection> searchWaterConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo) {
+		List<WaterConnection> waterConnectionList = getWaterConnectionPlainSearch(criteria, requestInfo);
+//		for(WaterConnection connection:waterConnectionList)
+//			enrichmentService.enrichBoundary(connection,requestInfo);
+		return waterConnectionList;
+	}
+
+
+	List<WaterConnection> getWaterConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo) {
+		
+		if(criteria.getLimit()==null)
+			criteria.setLimit(config.getDefaultLimit());
+		
+		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxLimit())
+			criteria.setLimit(config.getMaxLimit());				
+		
+		if(criteria.getOffset()==null)
+			criteria.setOffset(config.getDefaultOffset());
+		
+//		SearchCriteria waterConnectionCriteria = new SearchCriteria();
+//		if (criteria.getUuids() != null || criteria.getIds() != null) {
+//			if (criteria.getUuids() != null)
+//				waterConnectionCriteria.setUuids(criteria.getUuids());
+//			if (criteria.getIds() != null)
+//				waterConnectionCriteria.setIds(criteria.getIds());
+//
+//		} else {
+//			List<String> uuids = repository.fetchIds(criteria,true);
+//			if (uuids.isEmpty())
+//				return Collections.emptyList();
+//			propertyCriteria.setUuids(new HashSet<>(uuids));
+//		}
+//		waterConnectionCriteria.setLimit(criteria.getLimit());
+//		
+//		List<WaterConnection> waterConnectionList = repository.getPropertiesForBulkSearch(waterConnectionCriteria,true);
+//		if(waterConnectionList.isEmpty())
+//			return Collections.emptyList();
+//		Set<String> ownerIds = waterConnectionList.stream().map(WaterConnection::getOwners).flatMap(List::stream)
+//				.map(OwnerInfo::getUuid).collect(Collectors.toSet());
+//
+//		UserSearchRequest userSearchRequest = userService.getBaseUserSearchRequest(criteria.getTenantId(), requestInfo);
+//		userSearchRequest.setUuid(ownerIds);
+//		UserDetailResponse userDetailResponse = userService.getUser(userSearchRequest);
+//		wsUtil.enrichOwner(userDetailResponse,  waterConnectionList, false);
+//		return  waterConnectionList;
+		
+		
+		List<String> ids = waterDao.fetchWaterConnectionIds(criteria);
+        if (ids.isEmpty())
+            return Collections.emptyList();
+        
+        SearchCriteria newCriteria = new SearchCriteria();
+		newCriteria.setIds(new HashSet<>(ids));
+        //SearchCriteria newCriteria = SearchCriteria.builder().ids(ids).build();
+        List<WaterConnection> waterConnectionList = waterDao.getPlainWaterConnectionSearch(newCriteria);
+        //waterConnectionList = enrichmentService.enrichTradeLicenseSearch(waterConnectionList,newCriteria,requestInfo);
+        return waterConnectionList;
+	}
+	
+	
+	
+	
 
 	/**
 	 * 

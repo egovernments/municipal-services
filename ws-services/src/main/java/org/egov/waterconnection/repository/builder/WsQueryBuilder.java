@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
+//import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.service.UserService;
 import org.egov.waterconnection.util.WaterServicesUtil;
@@ -208,11 +209,26 @@ public class WsQueryBuilder {
 		}
 		return builder.toString();
 	}
+	
+	private String createQuery(List<String> ids) {
+        StringBuilder builder = new StringBuilder();
+        int length = ids.size();
+        for( int i = 0; i< length; i++){
+            builder.append(" LOWER(?)");
+            if(i != length -1) builder.append(",");
+        }
+        return builder.toString();
+    }
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		preparedStatement.addAll(ids);
 	}
-
+	
+	
+	private void addToPreparedStatement(List<Object> preparedStmtList,List<String> ids)
+    {
+        ids.forEach(id ->{ preparedStmtList.add(id);});
+    }
 
 	/**
 	 * 
@@ -250,4 +266,18 @@ public class WsQueryBuilder {
 			queryString.append(" OR");
 		}
 	}
+	
+	public String getWCPlainSearchQuery(SearchCriteria criteria, List<Object> preparedStmtList) {
+        StringBuilder builder = new StringBuilder(WATER_SEARCH_QUERY);
+
+        Set<String> ids = criteria.getIds();
+        if (!CollectionUtils.isEmpty(ids)) {
+            addClauseIfRequired(preparedStmtList,builder);
+            builder.append(" conn.id IN (").append(createQuery(ids)).append(")");
+            addToPreparedStatement(preparedStmtList, ids);
+        }
+
+        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+
+    }
 }

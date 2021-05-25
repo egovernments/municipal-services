@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
+//import org.egov.tl.web.models.TradeLicense;
+//import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.rowmapper.OpenWaterRowMapper;
@@ -21,6 +23,7 @@ import org.egov.waterconnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -142,5 +145,30 @@ public class WaterDaoImpl implements WaterDao {
 		jdbcTemplate.update(WsQueryBuilder.UPDATE_DISCONNECT_STATUS, params, types);
 		 
 	}
+	
+	@Override
+	public List<String> fetchWaterConnectionIds(SearchCriteria criteria){
+
+        List<Object> preparedStmtList = new ArrayList<>();
+        preparedStmtList.add(criteria.getOffset());
+        preparedStmtList.add(criteria.getLimit());
+
+        return jdbcTemplate.query("SELECT id from eg_ws_connection ORDER BY createdtime offset " +
+                        " ? " +
+                        "limit ? ",
+                preparedStmtList.toArray(),
+                new SingleColumnRowMapper<>(String.class));
+    }
+	
+	@Override
+	public List<WaterConnection> getPlainWaterConnectionSearch(SearchCriteria criteria) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = wsQueryBuilder.getWCPlainSearchQuery(criteria, preparedStmtList);
+        log.info("Query: " + query +  "\n preparedStmtList:"+ preparedStmtList);
+      
+        List<WaterConnection> waterconnection =  jdbcTemplate.query(query, preparedStmtList.toArray(), waterRowMapper);
+       // sortChildObjectsById(waterconnection);
+        return waterconnection;
+    }
 
 }

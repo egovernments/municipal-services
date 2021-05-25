@@ -9,6 +9,9 @@ import org.egov.waterconnection.web.models.SearchCriteria;
 import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.waterconnection.web.models.WaterConnectionRequest;
 import org.egov.waterconnection.web.models.WaterConnectionResponse;
+//import org.egov.pt.models.Property;
+//import org.egov.pt.models.PropertyCriteria;
+//import org.egov.pt.web.contracts.PropertyResponse;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.service.DocumentService;
 import org.egov.waterconnection.service.WaterService;
@@ -65,6 +68,16 @@ public class WaterController {
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/_plainsearch", method = RequestMethod.POST)
+    public ResponseEntity<WaterConnectionResponse> plainsearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
+                                                        @Valid @ModelAttribute SearchCriteria criteria) {
+        List<WaterConnection> waterConnectionList = waterService.searchWaterConnectionPlainSearch(criteria, requestInfoWrapper.getRequestInfo());
+        WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnectionList).responseInfo(
+                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 	@RequestMapping(value = "/_update", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<WaterConnectionResponse> updateWaterConnection(

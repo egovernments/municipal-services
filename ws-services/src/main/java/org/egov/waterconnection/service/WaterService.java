@@ -13,6 +13,8 @@ public interface WaterService {
 
 	List<WaterConnection> search(SearchCriteria criteria, RequestInfo requestInfo);
 	
+	List<WaterConnection> searchWaterConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo);
+	
 	List<WaterConnection> updateWaterConnection(WaterConnectionRequest waterConnectionRequest);
 
 	void disConnectWaterConnection(String connectionNo,RequestInfo requestInfo,String tenantId);
