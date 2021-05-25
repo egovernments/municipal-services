@@ -546,6 +546,7 @@ public class BPAService {
 
 		} catch (Exception ex) {
 			exception = ex;
+			ex.printStackTrace();
 			log.error("Exception occured while downloading pdf", ex.getMessage());
 			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		} finally {
@@ -611,10 +612,16 @@ public class BPAService {
 			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck)));
 			log.info("EDCR Filename--->>>"+fileName);
 			while ((baLength = readStream.read(byteChunck)) != -1) {
+				log.info("baLength--->>>"+baLength);
+				log.info("byteChunck before write--->>>"+byteChunck.length);
 				writeStream.write(byteChunck, 0, baLength);
+				log.info("byteChunck after write--->>>"+byteChunck.length);
 			}
+			log.info("File Descriptor--->>>"+writeStream.getFD().toString());
+			log.info("byteChunck--->>>"+byteChunck.length);
 		}catch (Exception e){
-			log.error("Error while creating temp report.", e);
+			e.printStackTrace();
+			log.error("Error while creating temp report.");
 		}finally {
 			writeStream.flush();
 			writeStream.close();
