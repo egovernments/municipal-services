@@ -222,11 +222,10 @@ public class QueryBuilder {
 
 	public String getVehicleLikeQuery(VehicleSearchCriteria criteria, List<Object> preparedStmtList) {
 
-		StringBuilder builder = new StringBuilder(VEH_EXISTS_QUERY);
+		StringBuilder builder = new StringBuilder(Query);
 
 		List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
-			preparedStmtList.add(criteria.getTenantId());
 			addClauseIfRequired(preparedStmtList, builder);
 			builder.append(" id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
