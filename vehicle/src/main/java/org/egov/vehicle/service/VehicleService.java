@@ -111,7 +111,7 @@ public class VehicleService {
         if(ids.isEmpty())
             return Collections.emptyList();
 
-        VehicleSearchCriteria Vehiclecriteria = VehicleSearchCriteria.builder().ids(ids).build();
+        VehicleSearchCriteria Vehiclecriteria = VehicleSearchCriteria.builder().tenantId(criteria.getTenantId()).ids(ids).build();
 
         List<Vehicle> vehicleList = repository.getVehiclePlainSearch(Vehiclecriteria);
         return vehicleList;
