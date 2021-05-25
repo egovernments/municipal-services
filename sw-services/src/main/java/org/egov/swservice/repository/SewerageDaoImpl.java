@@ -14,7 +14,6 @@ import org.egov.swservice.repository.rowmapper.OpenSewerageRowMapper;
 import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
-//import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.swservice.producer.SewarageConnectionProducer;
 import org.egov.swservice.repository.builder.SWQueryBuilder;
 import org.egov.swservice.repository.rowmapper.SewerageRowMapper;
@@ -156,7 +155,6 @@ public class SewerageDaoImpl implements SewerageDao {
         String query = swQueryBuilder.getSCPlainSearchQuery(criteria, preparedStmtList);
         log.info("Query: " + query);
         List<SewerageConnection> sewerageconnection =  jdbcTemplate.query(query, preparedStmtList.toArray(), sewarageRowMapper);
-       // sortChildObjectsById(sewerageconnection);
         return sewerageconnection;
     }
 

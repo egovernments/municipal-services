@@ -25,8 +25,6 @@ import org.egov.swservice.web.models.workflow.BusinessService;
 import org.egov.swservice.workflow.WorkflowIntegrator;
 import org.egov.swservice.workflow.WorkflowService;
 import org.egov.tracer.model.CustomException;
-//import org.egov.waterconnection.web.models.WaterConnection;
-//import org.egov.waterconnection.web.models.WaterConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,8 +149,6 @@ public class SewerageServiceImpl implements SewerageService {
 	@Override
 	public List<SewerageConnection> searchSewerageConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<SewerageConnection> sewerageConnectionList = getSewerageConnectionPlainSearch(criteria, requestInfo);
-//		for(SewerageConnection connection:sewerageConnectionList)
-//			enrichmentService.enrichBoundary(connection,requestInfo);
 		return sewerageConnectionList;
 	}
 
@@ -175,9 +171,7 @@ public class SewerageServiceImpl implements SewerageService {
         
         SearchCriteria newCriteria = new SearchCriteria();
 		newCriteria.setIds(new HashSet<>(ids));
-        //SearchCriteria newCriteria = SearchCriteria.builder().ids(ids).build();
         List<SewerageConnection> sewerageConnectionList = sewerageDao.getPlainSewerageConnectionSearch(newCriteria);
-        //sewerageConnectionList = enrichmentService.enrichTradeLicenseSearch(sewerageConnectionList,newCriteria,requestInfo);
         return sewerageConnectionList;
 		
 		

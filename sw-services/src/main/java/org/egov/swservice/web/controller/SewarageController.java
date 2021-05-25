@@ -10,8 +10,6 @@ import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
 import org.egov.swservice.web.models.SewerageConnectionResponse;
-//import org.egov.waterconnection.web.models.WaterConnection;
-//import org.egov.waterconnection.web.models.WaterConnectionResponse;
 import org.egov.swservice.service.DocumentService;
 import org.egov.swservice.service.SewerageService;
 import org.egov.swservice.util.ResponseInfoFactory;
