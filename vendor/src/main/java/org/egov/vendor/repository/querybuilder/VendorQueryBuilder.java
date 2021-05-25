@@ -144,4 +144,41 @@ public class VendorQueryBuilder {
 		return builder.toString();
 	}
 
+	public String getVendorLikeQuery(VendorSearchCriteria criteria, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(Query);
+
+		List<String> ids = criteria.getIds();
+		if (!CollectionUtils.isEmpty(ids)) {
+
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" vendor.id IN (").append(createQuery(ids)).append(")");
+			addToPreparedStatement(preparedStmtList, ids);
+		}
+
+		return addPaginationClause(builder, preparedStmtList, criteria);
+
+	}
+
+	private String addPaginationClause(StringBuilder builder, List<Object> preparedStmtList,
+			VendorSearchCriteria criteria) {
+
+		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
+			builder.append("and vendor.id in (select id from eg_vendor where tenantid= ? order by id offset ? limit ?)");
+			preparedStmtList.add(criteria.getTenantId());
+			preparedStmtList.add(criteria.getOffset());
+			preparedStmtList.add(criteria.getLimit());
+
+			 addOrderByClause(builder, criteria);
+
+		} else {
+			 addOrderByClause(builder, criteria);
+		}
+		return builder.toString();
+	}
+
+	private void addOrderByClause(StringBuilder builder, VendorSearchCriteria criteria) {
+		builder.append(" ORDER BY vendor.id DESC ").toString();
+	}
+
 }

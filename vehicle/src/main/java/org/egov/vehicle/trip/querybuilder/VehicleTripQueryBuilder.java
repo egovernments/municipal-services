@@ -168,4 +168,50 @@ public class VehicleTripQueryBuilder {
 		return QUERY_TRIP_DTL;
 	}
 
+
+
+	public String getvehicleTripLikeQuery(VehicleTripSearchCriteria criteria, List<Object> preparedStmtList) {
+
+		StringBuilder builder = new StringBuilder(Query_SEARCH_VEHICLE_LOG);
+
+		List<String> ids = criteria.getIds();
+		if (!CollectionUtils.isEmpty(ids)) {
+
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
+			addToPreparedStatement(preparedStmtList, ids);
+		}
+
+		return addPaginationClause(builder, preparedStmtList, criteria);
+	}
+
+
+
+	private String addPaginationClause(StringBuilder builder, List<Object> preparedStmtList,
+			VehicleTripSearchCriteria criteria) {
+
+		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
+			builder.append("and vehicletrip.id in (select id from eg_vehicle_trip where tenantid= ? order by id offset ? limit ?)");
+			preparedStmtList.add(criteria.getTenantId());
+			preparedStmtList.add(criteria.getOffset());
+			preparedStmtList.add(criteria.getLimit());
+
+			 addOrderByClause(builder, criteria);
+
+		} else {
+			 addOrderByClause(builder, criteria);
+		}
+		return builder.toString();
+	}
+
+
+
+	private void addClauseIfRequired(List<Object> values, StringBuilder queryString) {
+		if (values.isEmpty())
+			queryString.append(" WHERE ");
+		else {
+			queryString.append(" AND");
+		}
+	}
+
 }
