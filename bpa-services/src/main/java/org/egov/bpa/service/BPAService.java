@@ -530,7 +530,9 @@ public class BPAService {
 
 		Exception exception = null;
 		try {
+			log.info("Before creating temp Report");
 			this.createTempReport(bpaRequest, fileName, document);
+			log.info("After creating temp Report");
 			String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
 					bpaRequest.getRequestInfo());
 			String permitNo = notificationUtil.getMessageTemplate(BPAConstants.PERMIT_ORDER_NO, localizationMessages);
@@ -541,7 +543,7 @@ public class BPAService {
 
 		} catch (Exception ex) {
 			exception = ex;
-			log.debug("Exception occured while downloading pdf", ex.getMessage());
+			log.error("Exception occured while downloading pdf", ex.getMessage());
 			throw new CustomException(BPAErrorConstants.UNABLE_TO_DOWNLOAD, "Unable to download the file");
 		} finally {
 			try {
