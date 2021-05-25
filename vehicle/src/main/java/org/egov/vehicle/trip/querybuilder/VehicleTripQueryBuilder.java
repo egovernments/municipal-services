@@ -176,9 +176,9 @@ public class VehicleTripQueryBuilder {
 
 		List<String> ids = criteria.getIds();
 		if (!CollectionUtils.isEmpty(ids)) {
-
+			preparedStmtList.add(criteria.getTenantId());
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" fsm.id IN (").append(createQuery(ids)).append(")");
+			builder.append(" id IN (").append(createQuery(ids)).append(")");
 			addToPreparedStatement(preparedStmtList, ids);
 		}
 
