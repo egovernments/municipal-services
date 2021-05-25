@@ -14,6 +14,7 @@ import org.egov.swservice.repository.rowmapper.OpenSewerageRowMapper;
 import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
+//import org.egov.waterconnection.web.models.WaterConnection;
 import org.egov.swservice.producer.SewarageConnectionProducer;
 import org.egov.swservice.repository.builder.SWQueryBuilder;
 import org.egov.swservice.repository.rowmapper.SewerageRowMapper;
@@ -21,6 +22,7 @@ import org.egov.swservice.util.SWConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -133,5 +135,29 @@ public class SewerageDaoImpl implements SewerageDao {
 		jdbcTemplate.update(SWQueryBuilder.UPDATE_DISCONNECT_STATUS, params, types);
 
 	}
+	
+	@Override
+	public List<String> fetchSewerageConnectionIds(SearchCriteria criteria){
+
+        List<Object> preparedStmtList = new ArrayList<>();
+        preparedStmtList.add(criteria.getOffset());
+        preparedStmtList.add(criteria.getLimit());
+
+        return jdbcTemplate.query("SELECT id from eg_sw_connection ORDER BY createdtime offset " +
+                        " ? " +
+                        "limit ? ",
+                preparedStmtList.toArray(),
+                new SingleColumnRowMapper<>(String.class));
+    }
+	
+	@Override
+	public List<SewerageConnection> getPlainSewerageConnectionSearch(SearchCriteria criteria) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = swQueryBuilder.getSCPlainSearchQuery(criteria, preparedStmtList);
+        log.info("Query: " + query);
+        List<SewerageConnection> sewerageconnection =  jdbcTemplate.query(query, preparedStmtList.toArray(), sewarageRowMapper);
+       // sortChildObjectsById(sewerageconnection);
+        return sewerageconnection;
+    }
 
 }

@@ -204,10 +204,25 @@ public class SWQueryBuilder {
 		}
 		return builder.toString();
 	}
+	
+	private String createQuery(List<String> ids) {
+        StringBuilder builder = new StringBuilder();
+        int length = ids.size();
+        for( int i = 0; i< length; i++){
+            builder.append(" LOWER(?)");
+            if(i != length -1) builder.append(",");
+        }
+        return builder.toString();
+    }
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		preparedStatement.addAll(ids);
 	}
+	
+	private void addToPreparedStatement(List<Object> preparedStmtList,List<String> ids)
+    {
+        ids.forEach(id ->{ preparedStmtList.add(id);});
+    }
 
 
 	/**
@@ -244,4 +259,18 @@ public class SWQueryBuilder {
 			queryString.append(" OR");
 		}
 	}
+	
+	public String getSCPlainSearchQuery(SearchCriteria criteria, List<Object> preparedStmtList) {
+        StringBuilder builder = new StringBuilder(SEWERAGE_SEARCH_QUERY);
+
+        Set<String> ids = criteria.getIds();
+        if (!CollectionUtils.isEmpty(ids)) {
+            addClauseIfRequired(preparedStmtList,builder);
+            builder.append(" conn.id IN (").append(createQuery(ids)).append(")");
+            addToPreparedStatement(preparedStmtList, ids);
+        }
+
+        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+
+    }
 }

@@ -24,6 +24,9 @@ public class SWConfiguration {
 	@Value("${egov.sewerageservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
+	@Value("${egov.sewerageservice.pagination.max.limit}")
+	private Integer maxLimit;
+	
 
     	@Value("${egov.idgen.scid.name}")
     	private String sewerageIdGenName;
