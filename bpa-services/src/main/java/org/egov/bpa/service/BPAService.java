@@ -530,16 +530,19 @@ public class BPAService {
 
 		Exception exception = null;
 		try {
-			log.info("Before creating temp Report");
+			log.info("********Before creating temp Report");
 			this.createTempReport(bpaRequest, fileName, document);
-			log.info("After creating temp Report");
+			log.info("******After creating temp Report");
 			String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
 					bpaRequest.getRequestInfo());
+			log.info("******Localization Messages---"+localizationMessages);
 			String permitNo = notificationUtil.getMessageTemplate(BPAConstants.PERMIT_ORDER_NO, localizationMessages);
 			permitNo = permitNo != null ? permitNo : BPAConstants.PERMIT_ORDER_NO;
 			String generatedOn = notificationUtil.getMessageTemplate(BPAConstants.GENERATEDON, localizationMessages);
 			generatedOn = generatedOn != null ? generatedOn : BPAConstants.GENERATEDON;
+			log.info("******Before adding into PDF---");
 			this.addDataToPdf(document, bpaRequest, permitNo, generatedOn,fileName);
+			log.info("******After adding into PDF---");
 
 		} catch (Exception ex) {
 			exception = ex;
@@ -606,22 +609,24 @@ public class BPAService {
 			int baLength;
 			readStream = downloadUrl.openStream();
 			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck)));
+			log.info("EDCR Filename--->>>"+fileName);
 			while ((baLength = readStream.read(byteChunck)) != -1) {
 				writeStream.write(byteChunck, 0, baLength);
 			}
 		}catch (Exception e){
-			log.error("Error while creating temp report.");
+			log.error("Error while creating temp report.", e);
 		}finally {
 			writeStream.flush();
 			writeStream.close();
 			readStream.close();
 		}
-
 		document = PDDocument.load(new File(fileName));
+		log.info("EDCR File Pages Size--->>>"+document.getNumberOfPages());
 	}
 	
 	private void addDataToPdf(PDDocument document,BPARequest bpaRequest, String permitNo, String generatedOn,String fileName) throws IOException {
 		PDPageTree allPages = document.getDocumentCatalog().getPages();
+		log.info("PDF TREE Pages Count--->>>"+allPages.getCount());
 		BPA bpa = bpaRequest.getBPA();
 		for (int i = 0; i < allPages.getCount(); i++) {
 			PDPage page = (PDPage) allPages.get(i);
