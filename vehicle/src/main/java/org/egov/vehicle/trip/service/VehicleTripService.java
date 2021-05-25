@@ -134,7 +134,7 @@ public class VehicleTripService {
         if(ids.isEmpty())
             return Collections.emptyList();
 
-        VehicleTripSearchCriteria VehicleTripcriteria = VehicleTripSearchCriteria.builder().ids(ids).build();
+        VehicleTripSearchCriteria VehicleTripcriteria = VehicleTripSearchCriteria.builder().tenantId(criteria.getTenantId()).ids(ids).build();;
 
         List<VehicleTrip> vehicleTripLogs = vehicleLogRepository.getVehicleTripPlainSearch(VehicleTripcriteria);
         return vehicleTripLogs;
