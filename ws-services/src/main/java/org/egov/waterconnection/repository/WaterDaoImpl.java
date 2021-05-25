@@ -9,8 +9,6 @@ import java.util.stream.Collectors;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.Role;
 import org.egov.common.contract.request.User;
-//import org.egov.tl.web.models.TradeLicense;
-//import org.egov.tl.web.models.TradeLicenseSearchCriteria;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.rowmapper.OpenWaterRowMapper;
@@ -167,7 +165,6 @@ public class WaterDaoImpl implements WaterDao {
         log.info("Query: " + query +  "\n preparedStmtList:"+ preparedStmtList);
       
         List<WaterConnection> waterconnection =  jdbcTemplate.query(query, preparedStmtList.toArray(), waterRowMapper);
-       // sortChildObjectsById(waterconnection);
         return waterconnection;
     }
 
