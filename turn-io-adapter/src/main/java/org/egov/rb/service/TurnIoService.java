@@ -45,7 +45,7 @@ public class TurnIoService {
     private String stateLevelTenantId;
 
     private String successMessage = "Your Complaint No is : *{{complaintNumber}}*\n\nYou can view and track your complaint through the "+
-            "link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR-PUNJAB*";
+            "link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR PUNJAB*";
 
 
     @Autowired
