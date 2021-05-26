@@ -417,6 +417,7 @@ public class GrievanceService {
 				throw e;
 		}
 		searcherRequest = pGRUtils.prepareSearchRequestWithDetails(uri, serviceReqSearchCriteria, requestInfo);
+		System.out.println("\n\nRequest-->"+searcherRequest.toString()+"\n\n");
 		Object response = serviceRequestRepository.fetchResult(uri, searcherRequest);
 		log.debug(PGRConstants.SEARCHER_RESPONSE_TEXT + response);
 		if (null == response)
