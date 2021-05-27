@@ -148,10 +148,12 @@ public class WaterDaoImpl implements WaterDao {
 	public List<String> fetchWaterConnectionIds(SearchCriteria criteria){
 
         List<Object> preparedStmtList = new ArrayList<>();
+        preparedStmtList.add(criteria.getTenantId());
         preparedStmtList.add(criteria.getOffset());
         preparedStmtList.add(criteria.getLimit());
+        
 
-        return jdbcTemplate.query("SELECT id from eg_ws_connection ORDER BY createdtime offset " +
+        return jdbcTemplate.query("SELECT id from eg_ws_connection where tenantid=? ORDER BY createdtime offset " +
                         " ? " +
                         "limit ? ",
                 preparedStmtList.toArray(),
