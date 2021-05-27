@@ -63,9 +63,9 @@ public class VehicleService {
 		UserDetailResponse usersRespnse;
 		List<String> uuids = new ArrayList<String>();
 		
-		if(criteria.tenantIdOnly() ) {
+		/*if(criteria.tenantIdOnly() ) {
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH, " Atlest one parameter is mandatory!");
-		}
+		}*/
 		
 		if( criteria.getMobileNumber() !=null) {
 			usersRespnse = userService.getOwner(criteria,requestInfo);
