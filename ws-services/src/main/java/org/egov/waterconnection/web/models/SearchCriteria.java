@@ -26,16 +26,13 @@ public class SearchCriteria {
 
 	@JsonProperty("tenantId")
 	private String tenantId;
-
+	
 	@JsonProperty("status")
 	private String status;
 
 	@JsonProperty("ids")
 	private Set<String> ids;
 	
-//	@JsonProperty("ids")
-//    private List<String> ids;
-
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 		

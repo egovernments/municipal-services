@@ -4,6 +4,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -144,20 +146,47 @@ public class WaterDaoImpl implements WaterDao {
 		 
 	}
 	
+	private String createQuery(Set<String> ids) {
+		StringBuilder builder = new StringBuilder();
+		int length = ids.size();
+		for (int i = 0; i < length; i++) {
+			builder.append(" ?");
+			if (i != length - 1)
+				builder.append(",");
+		}
+		return builder.toString();
+	}
+	
 	@Override
 	public List<String> fetchWaterConnectionIds(SearchCriteria criteria){
 
-        List<Object> preparedStmtList = new ArrayList<>();
-        preparedStmtList.add(criteria.getTenantId());
-        preparedStmtList.add(criteria.getOffset());
-        preparedStmtList.add(criteria.getLimit());
+//        List<Object> preparedStmtList = new ArrayList<>();
+//        preparedStmtList.add(criteria.getTenantId());
+//        preparedStmtList.add(criteria.getOffset());
+//        preparedStmtList.add(criteria.getLimit());
+//        
+//
+//        return jdbcTemplate.query("SELECT id from eg_ws_connection where tenantid=? ORDER BY createdtime offset " +
+//                        " ? " +
+//                        "limit ? ",
+//                preparedStmtList.toArray(),
+//                new SingleColumnRowMapper<>(String.class));
         
+        
+        List<Object> preparedStmtList = new ArrayList<>();
+		String basequery = "select id from eg_ws_connection";
+		StringBuilder builder = new StringBuilder(basequery);
 
-        return jdbcTemplate.query("SELECT id from eg_ws_connection where tenantid=? ORDER BY createdtime offset " +
-                        " ? " +
-                        "limit ? ",
-                preparedStmtList.toArray(),
-                new SingleColumnRowMapper<>(String.class));
+		if(!ObjectUtils.isEmpty(criteria.getTenantId())){
+				builder.append(" where tenantid=?");
+				preparedStmtList.add(criteria.getTenantId());
+			}
+
+		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
+		builder.append(orderbyClause);
+		preparedStmtList.add(criteria.getOffset());
+		preparedStmtList.add(criteria.getLimit());
+		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
     }
 	
 	@Override
