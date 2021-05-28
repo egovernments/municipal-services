@@ -146,16 +146,6 @@ public class WaterDaoImpl implements WaterDao {
 		 
 	}
 	
-	private String createQuery(Set<String> ids) {
-		StringBuilder builder = new StringBuilder();
-		int length = ids.size();
-		for (int i = 0; i < length; i++) {
-			builder.append(" ?");
-			if (i != length - 1)
-				builder.append(",");
-		}
-		return builder.toString();
-	}
 	
 	@Override
 	public List<String> fetchWaterConnectionIds(SearchCriteria criteria){
