@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -138,16 +139,32 @@ public class SewerageDaoImpl implements SewerageDao {
 	@Override
 	public List<String> fetchSewerageConnectionIds(SearchCriteria criteria){
 
-        List<Object> preparedStmtList = new ArrayList<>();
-        preparedStmtList.add(criteria.getTenantId());
-        preparedStmtList.add(criteria.getOffset());
-        preparedStmtList.add(criteria.getLimit());
+//        List<Object> preparedStmtList = new ArrayList<>();
+//        preparedStmtList.add(criteria.getTenantId());
+//        preparedStmtList.add(criteria.getOffset());
+//        preparedStmtList.add(criteria.getLimit());
+//
+//        return jdbcTemplate.query("SELECT id from eg_sw_connection where tenantid=? ORDER BY createdtime offset " +
+//                        " ? " +
+//                        "limit ? ",
+//                preparedStmtList.toArray(),
+//                new SingleColumnRowMapper<>(String.class));
+		
+		 	List<Object> preparedStmtList = new ArrayList<>();
+			String basequery = "select id from eg_sw_connection";
+			StringBuilder builder = new StringBuilder(basequery);
 
-        return jdbcTemplate.query("SELECT id from eg_sw_connection where tenantid=? ORDER BY createdtime offset " +
-                        " ? " +
-                        "limit ? ",
-                preparedStmtList.toArray(),
-                new SingleColumnRowMapper<>(String.class));
+			if(!ObjectUtils.isEmpty(criteria.getTenantId())){
+					builder.append(" where tenantid=?");
+					preparedStmtList.add(criteria.getTenantId());
+				}
+
+			String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
+			builder.append(orderbyClause);
+			preparedStmtList.add(criteria.getOffset());
+			preparedStmtList.add(criteria.getLimit());
+			return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
+		
     }
 	
 	@Override
