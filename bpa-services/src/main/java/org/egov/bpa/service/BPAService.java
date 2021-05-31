@@ -609,15 +609,12 @@ public class BPAService {
 			byte[] byteChunck = new byte[1024];
 			int baLength;
 			readStream = downloadUrl.openStream();
-			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck)));
+			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck, 0 , byteChunck.length)));
 			log.info("EDCR Filename--->>>"+fileName);
-			while ((baLength = readStream.read(byteChunck)) != -1) {
+			while ((baLength = readStream.read(byteChunck, 0 , byteChunck.length)) != -1) {
 				log.info("baLength--->>>"+baLength);
-				log.info("byteChunck before write--->>>"+byteChunck.length);
 				writeStream.write(byteChunck, 0, baLength);
-				log.info("byteChunck after write--->>>"+byteChunck.length);
 			}
-			log.info("File Descriptor--->>>"+writeStream.getFD().toString());
 			log.info("byteChunck--->>>"+byteChunck.length);
 		}catch (Exception e){
 			e.printStackTrace();
