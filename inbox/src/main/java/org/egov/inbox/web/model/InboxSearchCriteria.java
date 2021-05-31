@@ -3,6 +3,7 @@ package org.egov.inbox.web.model;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 import org.egov.inbox.web.model.workflow.ProcessInstanceSearchCriteria;
@@ -30,5 +31,6 @@ public class InboxSearchCriteria {
     private Integer offset;
 
     @JsonProperty("limit")
+    @Max(value = 300)
     private Integer limit;
 }
