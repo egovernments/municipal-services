@@ -13,4 +13,5 @@ public class Constants {
 
     public static final String MDMS_SERVICECODE_SEARCH = "$.MdmsRes.RAINMAKER-PGR.ServiceDefs[?(@.name=='{COMPLAINT_NAME}')].serviceCode";
 	
+    public static final String MDMS_SERVICENAME_SEARCH ="$.MdmsRes.RAINMAKER-PGR.ServiceDefs[?(@.name=='{COMPLAINT_CODE}')].name";
 }

@@ -3,6 +3,8 @@ package org.egov.rb.service;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.rb.config.PropertyConfiguration;
+import org.egov.rb.pgrmodels.ServiceRequest;
 import org.egov.rb.repository.ServiceRequestRepository;
 import org.egov.rb.util.MDMSUtils;
 import org.egov.tracer.model.CustomException;
@@ -24,135 +26,168 @@ import java.util.List;
 import java.util.Map;
 
 import static org.egov.rb.util.Constants.MDMS_SERVICECODE_SEARCH;
+import static org.egov.rb.util.Constants.MDMS_SERVICENAME_SEARCH;
 
 @Service
 @Slf4j
 public class TurnIoService {
 
-    @Value("${egov.external.host}")
-    private String egovExternalHost;
+	@Autowired
+	PropertyConfiguration propertyConfiguration;
 
-    @Value("${authorization.token}")
-    private String authorizationToken;
+	private String successMessage = "Your Complaint No is : *{{complaintNumber}}*\n\nYou can view and track your complaint through the "
+			+ "link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR PUNJAB*";
 
-    @Value("${turn.io.message.api}")
-    private String turnIoMessageAPI;
+	private String statusUpdateMessage = "Hi,\r\n" + "We have an update on your complaint about {{complaintType}} -\r\n"
+			+ "Complaint no. - {{complaintNumber}}\r\n" + "Complaint Status - {{status}}";
 
-    @Value("${turn.io.profile.api}")
-    private String turnIoProfileUpdateAPI;
+	@Autowired
+	ServiceRequestRepository serviceRequestRepository;
 
-    @Value("${state.level.tenant.id}")
-    private String stateLevelTenantId;
+	@Autowired
+	private RestTemplate restTemplate;
 
-    private String successMessage = "Your Complaint No is : *{{complaintNumber}}*\n\nYou can view and track your complaint through the "+
-            "link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR PUNJAB*";
+	@Autowired
+	URLShorteningSevice urlShorteningSevice;
 
+	@Autowired
+	MDMSUtils mdmsUtils;
 
-    @Autowired
-    ServiceRequestRepository serviceRequestRepository;
+	public String getServiceCode(RequestInfo requestInfo, String complaintName) {
+		String jsonPath = MDMS_SERVICECODE_SEARCH.replace("{COMPLAINT_NAME}", complaintName);
+		Object mdmsData = mdmsUtils.mDMSCall(requestInfo, propertyConfiguration.getStateLevelTenantId());
 
-    @Autowired
-    private RestTemplate restTemplate;
+		List<String> res = null;
+		try {
+			res = JsonPath.read(mdmsData, jsonPath);
+		} catch (Exception e) {
+			throw new CustomException("JSONPATH_ERROR", "Failed to parse mdms response for department");
+		}
 
-    @Autowired
-    URLShorteningSevice urlShorteningSevice;
+		if (CollectionUtils.isEmpty(res))
+			throw new CustomException("PARSING_ERROR",
+					"Failed to fetch service code from mdms data for complaint type: " + complaintName);
 
-    @Autowired
-    MDMSUtils mdmsUtils;
+		return res.get(0);
+	}
 
-    public String getServiceCode(RequestInfo requestInfo, String complaintName){
-        String jsonPath = MDMS_SERVICECODE_SEARCH.replace("{COMPLAINT_NAME}",complaintName);
-        Object mdmsData = mdmsUtils.mDMSCall(requestInfo, stateLevelTenantId);
+	public void sendTurnMessage(String message, String mobileNumber) {
+		Map<String, Object> request = new HashMap<>();
+		Map<String, String> textBody = new HashMap<>();
+		Object response = null;
 
-        List<String> res = null;
-        try{
-            res = JsonPath.read(mdmsData,jsonPath);
-        }
-        catch (Exception e){
-            throw new CustomException("JSONPATH_ERROR","Failed to parse mdms response for department");
-        }
+		textBody.put("body", message);
+		request.put("preview_url", true);
+		request.put("recipient_type", "individual");
+		request.put("to", mobileNumber);
+		request.put("type", "text");
+		request.put("text", textBody);
 
-        if(CollectionUtils.isEmpty(res))
-            throw new CustomException("PARSING_ERROR","Failed to fetch service code from mdms data for complaint type: "+complaintName);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + propertyConfiguration.getAuthorizationToken());
+		headers.add("Content-Type", "application/json");
 
-        return res.get(0);
-    }
+		HttpEntity requestEntity = new HttpEntity<>(request, headers);
 
-    public void sendTurnMessage(String message, String mobileNumber){
-        Map<String, Object> request = new HashMap<>();
-        Map<String,String> textBody = new HashMap<>();
-        Object response = null;
+		try {
+			response = restTemplate.exchange(propertyConfiguration.getTurnIoMessageAPI(), HttpMethod.POST,
+					requestEntity, Map.class);
+		} catch (HttpClientErrorException e) {
+			log.error("External Service threw an Exception: ", e);
+			throw new ServiceCallException(e.getResponseBodyAsString());
+		} catch (Exception e) {
+			log.error("Exception while fetching from searcher: ", e);
+		}
+	}
 
-        textBody.put("body",message);
-        request.put("preview_url", true);
-        request.put("recipient_type", "individual");
-        request.put("to", mobileNumber);
-        request.put("type", "text");
-        request.put("text", textBody);
+	public void setProfileField(String mobileNumber) {
+		String url = propertyConfiguration.getTurnIoProfileUpdateAPI();
+		Map<String, Object> request = new HashMap<>();
+		Object response = null;
 
+		request.put("city", null);
+		request.put("cityset", false);
+		request.put("locality", null);
+		request.put("localityset", false);
+		request.put("complaint_category", null);
+		request.put("complaint_image", null);
+		request.put("complaint_sub_category", null);
+		request.put("complaintsetvalue", null);
+		request.put("complaintset", false);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization" , "Bearer "+ authorizationToken);
-        headers.add("Content-Type","application/json");
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + propertyConfiguration.getAuthorizationToken());
+		headers.add("Content-Type", "application/json");
+		headers.add("Accept", "application/vnd.v1+json");
 
-        HttpEntity requestEntity = new HttpEntity<>(request, headers);
+		HttpEntity requestEntity = new HttpEntity<>(request, headers);
 
-        try {
-            response = restTemplate.exchange(turnIoMessageAPI, HttpMethod.POST, requestEntity, Map.class);
-        }catch(HttpClientErrorException e) {
-            log.error("External Service threw an Exception: ",e);
-            throw new ServiceCallException(e.getResponseBodyAsString());
-        }catch(Exception e) {
-            log.error("Exception while fetching from searcher: ",e);
-        }
-    }
+		RestTemplate restTemplate = new RestTemplate();
+		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+		restTemplate.setRequestFactory(httpRequestFactory);
 
-    public void setProfileField(String mobileNumber){
-        String url = turnIoProfileUpdateAPI;
-        Map<String, Object> request = new HashMap<>();
-        Object response = null;
+		url = url.replace("{phoneNumber}", mobileNumber);
+		try {
+			response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Map.class);
+		} catch (HttpClientErrorException e) {
+			log.error("External Service threw an Exception: ", e);
+			throw new ServiceCallException(e.getResponseBodyAsString());
+		} catch (Exception e) {
+			log.error("Exception while fetching from searcher: ", e);
+		}
 
-        request.put("city", null);
-        request.put("cityset", false);
-        request.put("locality", null);
-        request.put("localityset", false);
-        request.put("complaint_category", null);
-        request.put("complaint_image", null);
-        request.put("complaint_sub_category", null);
-        request.put("complaintsetvalue", null);
-        request.put("complaintset", false);
+	}
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization" , "Bearer "+ authorizationToken);
-        headers.add("Content-Type","application/json");
-        headers.add("Accept","application/vnd.v1+json");
+	public String prepareMessage(org.egov.rb.pgrmodels.Service service, String mobileNumber) throws Exception {
+		String message = successMessage;
+		String complaintNumber = service.getServiceRequestId();
+		String encodedPath = URLEncoder.encode(complaintNumber, "UTF-8");
+		String url = propertyConfiguration.getEgovExternalHost() + "citizen/otpLogin?mobileNo=" + mobileNumber
+				+ "&redirectTo=complaint-details/" + encodedPath;
+		String shortenedURL = urlShorteningSevice.shortenURL(url);
+		message = message.replace("{{complaintNumber}}", complaintNumber).replace("{{complaintLink}}", shortenedURL);
+		return message;
+	}
+	
+	/**
+	 * This method will prepare message for application status tracking
+	 * @param serviceRequest
+	 * @return string 
+	 */
 
-        HttpEntity requestEntity = new HttpEntity<>(request, headers);
+	public String prepareServiceRequestStatusMessage(ServiceRequest serviceRequest) {
+		String message = statusUpdateMessage;
+		org.egov.rb.pgrmodels.Service service = serviceRequest.getServices().get(0);
+		String serviceName = getServiceName(serviceRequest.getRequestInfo(), service.getServiceCode());
+		message.replace("{{{{complaintType}}}", serviceName)
+				.replace("{{complaintNumber}}", service.getServiceRequestId())
+				.replace("{{status}}", service.getStatus().toString());
 
+		return message;
+	}
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        restTemplate.setRequestFactory(httpRequestFactory);
+	/***
+	 * This method will get the complaint name based on the complaint code
+	 * 
+	 * @param requestInfo
+	 * @param complaintCode
+	 * @return
+	 */
+	public String getServiceName(RequestInfo requestInfo, String complaintCode) {
+		String jsonPath = MDMS_SERVICENAME_SEARCH.replace("{COMPLAINT_CODE}", complaintCode);
+		Object mdmsData = mdmsUtils.mDMSCall(requestInfo, propertyConfiguration.getStateLevelTenantId());
 
-        url = url.replace("{phoneNumber}",mobileNumber);
-        try {
-            response = restTemplate.exchange(url, HttpMethod.PATCH, requestEntity, Map.class);
-        }catch(HttpClientErrorException e) {
-            log.error("External Service threw an Exception: ",e);
-            throw new ServiceCallException(e.getResponseBodyAsString());
-        }catch(Exception e) {
-            log.error("Exception while fetching from searcher: ",e);
-        }
+		List<String> res = null;
+		try {
+			res = JsonPath.read(mdmsData, jsonPath);
+		} catch (Exception e) {
+			throw new CustomException("JSONPATH_ERROR", "Failed to parse mdms response for department");
+		}
 
-    }
+		if (CollectionUtils.isEmpty(res))
+			throw new CustomException("PARSING_ERROR",
+					"Failed to fetch service code from mdms data for complaint type: " + complaintCode);
 
-    public String prepareMessage(org.egov.rb.pgrmodels.Service service, String mobileNumber) throws Exception {
-        String message = successMessage;
-        String complaintNumber = service.getServiceRequestId();
-        String encodedPath = URLEncoder.encode(complaintNumber, "UTF-8");
-        String url = egovExternalHost + "citizen/otpLogin?mobileNo=" + mobileNumber + "&redirectTo=complaint-details/" + encodedPath;
-        String shortenedURL = urlShorteningSevice.shortenURL(url);
-        message = message.replace("{{complaintNumber}}",complaintNumber).replace("{{complaintLink}}",shortenedURL);
-        return message;
-    }
+		return res.get(0);
+	}
 }
