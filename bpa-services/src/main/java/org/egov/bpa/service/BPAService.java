@@ -1,7 +1,9 @@
 package org.egov.bpa.service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -16,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -623,8 +626,23 @@ public class BPAService {
 			writeStream.close();
 			readStream.close();
 		}
-		document = PDDocument.load(new File(fileName));
+		File file = new File(fileName);
+		isPDF(file);
+		document = PDDocument.load(file);
 		log.info("EDCR File Pages Size--->>>"+document.getNumberOfPages());
+	}
+	
+	public boolean isPDF(File file) throws FileNotFoundException{
+	    Scanner input = new Scanner(new FileReader(file));
+	    while (input.hasNextLine()) {
+	        final String checkline = input.nextLine();
+	        log.info("Checkline--->>>"+checkline);
+	        if(checkline.contains("%PDF-")) { 
+	            // a match!
+	            return true;
+	        }  
+	    }
+	    return false;
 	}
 	
 	private void addDataToPdf(PDDocument document,BPARequest bpaRequest, String permitNo, String generatedOn,String fileName) throws IOException {
