@@ -611,19 +611,10 @@ public class BPAService {
 			readStream = downloadUrl.openStream();
 			log.info("Size of eDCR File--->>"+String.valueOf(readStream.read(byteChunck, 0 , byteChunck.length)));
 			log.info("EDCR Filename--->>>"+fileName);
-			/*
-			 * while ((baLength = readStream.read(byteChunck, 0 , byteChunck.length)) != -1)
-			 * { log.info("baLength--->>>"+baLength); writeStream.write(byteChunck, 0,
-			 * baLength); }
-			 */
-			if(readStream != null && readStream.available() > 0) {
-				document = PDDocument.load(readStream);
-				document.save(new File(fileName));
-				log.info("Inputstream Length--->>>"+readStream.available());
-			} else {
-				log.error("The Edcr scrutiny report file is not available");
-				throw new CustomException(BPAErrorConstants.INVALID_EDCR_REPORT,"The Edcr scrutiny report file is not available.");
+			while ((baLength = readStream.read(byteChunck, 0 , byteChunck.length)) != -1) {
+				writeStream.write(byteChunck, 0, baLength);
 			}
+			log.info("byteChunck--->>>"+byteChunck.length);
 		}catch (Exception e){
 			e.printStackTrace();
 			log.error("Error while creating temp report.");
@@ -632,7 +623,7 @@ public class BPAService {
 			writeStream.close();
 			readStream.close();
 		}
-		//document = PDDocument.load(new File(fileName));
+		document = PDDocument.load(new File(fileName));
 		log.info("EDCR File Pages Size--->>>"+document.getNumberOfPages());
 	}
 	
