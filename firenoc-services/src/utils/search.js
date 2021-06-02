@@ -95,7 +95,6 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
     tenantId: row.tenantId,
     fatherOrHusbandName: ""
   };
-  console.info("\n\nownerObject-->"+JSON.stringify(ownerObject)+"\n\n");
 
   if (ownerIndex != -1) {
     mapper[ownerIndex] = {
@@ -103,7 +102,6 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
       ...mapper[ownerIndex]
     };
     mapper[ownerIndex].ownerType = row.applicantcategory;
-    console.info("\n\mapper-->"+JSON.stringify(mapper)+"\n\n");
   } else {
     let user = {};
     if (row.useruuid) {
