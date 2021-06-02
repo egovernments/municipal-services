@@ -102,6 +102,7 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
       ...ownerObject,
       ...mapper[ownerIndex]
     };
+    mapper[ownerIndex].ownerType = row.applicantcategory;
     console.info("\n\mapper-->"+JSON.stringify(mapper)+"\n\n");
   } else {
     let user = {};
