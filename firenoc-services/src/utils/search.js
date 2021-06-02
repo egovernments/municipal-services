@@ -31,6 +31,7 @@ const fireNOCRowMapper = async (row, mapper = {}) => {
     row,
     get(fireNoc, "fireNOCDetails.applicantDetails.owners", [])
   );
+  console.info("\n\owners-->"+JSON.stringify(owners)+"\n\n");
   let fireNOCDetails = {
     id: row.firenocdetailsid,
     applicationNumber: row.applicationnumber,
@@ -95,6 +96,8 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
     tenantId: row.tenantId,
     fatherOrHusbandName: ""
   };
+  console.info("\n\nownerObject-->"+JSON.stringify(ownerObject)+"\n\n");
+
   if (ownerIndex != -1) {
     mapper[ownerIndex] = {
       ...ownerObject,
@@ -105,7 +108,7 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
     if (row.useruuid) {
       user = await searchUser(requestInfo, row.useruuid);
     }
-    // console.info("user",user);
+    console.info("\n\nuser-->"+JSON.stringify(user)+"\n\n");
     user = {
       ...ownerObject,
       ...user
