@@ -90,7 +90,7 @@ const fireNocOwnersRowMapper = async (row, mapper = []) => {
     userName: row.username,
     useruuid: row.useruuid,
     active: row.active,
-    ownerType: row.ownertype,
+    ownerType: row.applicantcategory,
     relationship: row.relationship,
     tenantId: row.tenantId,
     fatherOrHusbandName: ""
