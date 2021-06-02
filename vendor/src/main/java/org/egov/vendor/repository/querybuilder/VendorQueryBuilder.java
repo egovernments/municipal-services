@@ -164,8 +164,16 @@ public class VendorQueryBuilder {
 			VendorSearchCriteria criteria) {
 
 		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
-			builder.append("and vendor.id in (select id from eg_vendor where tenantid= ? order by id offset ? limit ?)");
-			preparedStmtList.add(criteria.getTenantId());
+			builder.append("and vendor.id in (select id from eg_vendor where tenantid like ? order by id offset ? limit ?)");
+			if (criteria.getTenantId() != null) {
+				if (criteria.getTenantId().split("\\.").length == 1) {
+					
+					preparedStmtList.add('%' + criteria.getTenantId() + '%');
+				} else {
+					
+					preparedStmtList.add(criteria.getTenantId());
+				}
+			}
 			preparedStmtList.add(criteria.getOffset());
 			preparedStmtList.add(criteria.getLimit());
 
