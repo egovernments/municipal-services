@@ -137,6 +137,10 @@ public class VehicleTripService {
         VehicleTripSearchCriteria VehicleTripcriteria = VehicleTripSearchCriteria.builder().tenantId(criteria.getTenantId()).ids(ids).build();;
 
         List<VehicleTrip> vehicleTripLogs = vehicleLogRepository.getVehicleTripPlainSearch(VehicleTripcriteria);
+        vehicleTripLogs.forEach(trip->{
+			trip.setTripDetails(vehicleLogRepository.getTrpiDetails(trip.getId()));
+		});
+        vehicleLogEnrichmentService.enrichSearch(vehicleTripLogs, requestInfo);
         return vehicleTripLogs;
 	}
 }

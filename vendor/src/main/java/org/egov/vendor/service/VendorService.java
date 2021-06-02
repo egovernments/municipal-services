@@ -142,15 +142,19 @@ public class VendorService {
         if(criteria.getIds() != null && !criteria.getIds().isEmpty())
             ids = criteria.getIds();
         else
-            ids = repository.fetchendorIds(criteria);
+            ids = repository.fetchVendorIds(criteria);
 
         if(ids.isEmpty())
             return Collections.emptyList();
 
         VendorSearchCriteria vendorCriteria = VendorSearchCriteria.builder().ids(ids).build();
 
-        List<Vendor> listFSM = repository.getVendorPlainSearch(vendorCriteria);
-        return listFSM;
+        List<Vendor> vendorList = repository.getVendorPlainSearch(vendorCriteria);
+        if (!vendorList.isEmpty()) {
+			enrichmentService.enrichVendorSearch(vendorList, requestInfo, criteria.getTenantId());
+		}
+        
+        return vendorList;
 	}
 
 }

@@ -74,7 +74,7 @@ public class VendorRepository {
 		return vendorIds;		
 	}
 
-	public List<String> fetchendorIds(@Valid VendorSearchCriteria criteria) {
+	public List<String> fetchVendorIds(@Valid VendorSearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
