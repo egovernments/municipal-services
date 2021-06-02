@@ -1,11 +1,11 @@
 package org.egov.rb.consumer;
 
 import java.util.HashMap;
+
 import org.egov.rb.config.PropertyConfiguration;
 import org.egov.rb.pgrmodels.Service.SourceEnum;
 import org.egov.rb.pgrmodels.ServiceRequest;
 import org.egov.rb.service.TransformService;
-import org.egov.rb.service.TurnIoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -26,7 +26,7 @@ public class PGRConsumer {
 	@Autowired
 	TransformService transformService;
 	
-	@KafkaListener(topics = { "${propertyConfiguration.getPGRUpdateTopic()}"})
+	@KafkaListener(topics = { "${kafka.topics.update.pgr}"})
 	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 		ObjectMapper mapper = new ObjectMapper();
 		ServiceRequest serviceRequest=null;

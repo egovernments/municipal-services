@@ -108,7 +108,7 @@ public class TransformService {
 		String mobileNumber=serviceRequest.getServices().get(0).getCitizen().getMobileNumber();
 		
 		try {
-			turnIoService.sendTurnMessage(message, mobileNumber);
+			turnIoService.sendTurnMessage(message, "91"+mobileNumber);
 		} catch (Exception e) {
 			throw new CustomException("PGR_UPDATE_NOTIFICATION_ERROR", "Exception while notifying  PGR complaint status ");
 		}

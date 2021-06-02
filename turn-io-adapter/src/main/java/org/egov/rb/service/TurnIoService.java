@@ -159,7 +159,7 @@ public class TurnIoService {
 		String message = statusUpdateMessage;
 		org.egov.rb.pgrmodels.Service service = serviceRequest.getServices().get(0);
 		String serviceName = getServiceName(serviceRequest.getRequestInfo(), service.getServiceCode());
-		message.replace("{{{{complaintType}}}", serviceName)
+	message =	message.replace("{{complaintType}}", serviceName)
 				.replace("{{complaintNumber}}", service.getServiceRequestId())
 				.replace("{{status}}", service.getStatus().toString());
 
