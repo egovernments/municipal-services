@@ -455,6 +455,9 @@ public class FSMService {
 	
 	public List<FSM> searchFSMPlainSearch(@Valid FSMSearchCriteria criteria, RequestInfo requestInfo) {
 		List<FSM> fsmList = getFsmPlainSearch(criteria, requestInfo);
+		if (!fsmList.isEmpty()) {
+			enrichmentService.enrichFSMSearch(fsmList, requestInfo, criteria.getTenantId());
+		}
 		return fsmList;
 	}
 
