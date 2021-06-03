@@ -42,6 +42,7 @@ public class Vehicle {
     private String registrationNumber  = null;
 
     @NonNull
+    @SafeHtml
 	@Size(max=64)
     @JsonProperty("model")
     private String model = null;
