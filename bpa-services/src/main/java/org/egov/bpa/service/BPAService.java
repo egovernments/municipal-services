@@ -524,7 +524,7 @@ public class BPAService {
 	public void getEdcrPdf(BPARequest bpaRequest) {
 		
 		String fileName = BPAConstants.EDCR_PDF;
-		PDDocument document = null;
+		PDDocument document = new PDDocument();
 		BPA bpa = bpaRequest.getBPA();
 
 		if (StringUtils.isEmpty(bpa.getApprovalNo())) {
@@ -534,6 +534,7 @@ public class BPAService {
 		Exception exception = null;
 		try {
 			log.info("********Before creating temp Report");
+			document.setVersion(1.4f);
 			this.createTempReport(bpaRequest, fileName, document);
 			log.info("******After creating temp Report");
 			String localizationMessages = notificationUtil.getLocalizationMessages(bpa.getTenantId(),
