@@ -27,7 +27,7 @@ public class PGRConsumer {
 	TransformService transformService;
 	
 	@KafkaListener(topics = { "${kafka.topics.update.pgr}"})
-	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+	public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		ServiceRequest serviceRequest=null;
 		try {

@@ -101,7 +101,7 @@ public class TransformService {
 
 	}
 
-	public void sendServiceRequestStatusMessage(ServiceRequest serviceRequest) {
+	public void sendServiceRequestStatusMessage(ServiceRequest serviceRequest) throws Exception  {
 		
 		String message=turnIoService.prepareServiceRequestStatusMessage(serviceRequest);
 		

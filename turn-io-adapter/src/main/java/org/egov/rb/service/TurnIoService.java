@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,8 @@ public class TurnIoService {
 			+ "link given below:\n{{complaintLink}}\n\n To lodge another complaint. Please type and send *PGR PUNJAB*";
 
 	private String statusUpdateMessage = "Hi,\r\n" + "We have an update on your complaint about {{complaintType}} -\r\n"
-			+ "Complaint no. - {{complaintNumber}}\r\n" + "Complaint Status - {{status}}";
+			+ "Complaint no. - {{complaintNumber}}\r\n" + "Complaint Status - {{status}}, \r\n"
+			+ "Please click on the following link to know more about the complaint status - {{link}}";
 
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
@@ -148,20 +150,27 @@ public class TurnIoService {
 		message = message.replace("{{complaintNumber}}", complaintNumber).replace("{{complaintLink}}", shortenedURL);
 		return message;
 	}
-	
+
 	/**
 	 * This method will prepare message for application status tracking
+	 * 
 	 * @param serviceRequest
-	 * @return string 
+	 * @return string
+	 * @throws UnsupportedEncodingException
 	 */
 
-	public String prepareServiceRequestStatusMessage(ServiceRequest serviceRequest) {
+	public String prepareServiceRequestStatusMessage(ServiceRequest serviceRequest) throws Exception
+			 {
 		String message = statusUpdateMessage;
 		org.egov.rb.pgrmodels.Service service = serviceRequest.getServices().get(0);
 		String serviceName = getServiceName(serviceRequest.getRequestInfo(), service.getServiceCode());
-	message =	message.replace("{{complaintType}}", serviceName)
+		String encodedPath = URLEncoder.encode(service.getServiceRequestId(), "UTF-8");
+		String url = propertyConfiguration.getEgovExternalHost() + "citizen/otpLogin?mobileNo="
+				+ service.getCitizen().getMobileNumber() + "&redirectTo=complaint-details/" + encodedPath;
+		String shortenedURL = urlShorteningSevice.shortenURL(url);
+		message = message.replace("{{complaintType}}", serviceName)
 				.replace("{{complaintNumber}}", service.getServiceRequestId())
-				.replace("{{status}}", service.getStatus().toString());
+				.replace("{{status}}", service.getStatus().toString()).replace("{{link}}", shortenedURL);
 
 		return message;
 	}
