@@ -767,7 +767,7 @@ public class DemandService {
 					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
 
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
-			
+			log.info("connectionNos: {} and bulkSaveDemandCount: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				WaterDetails waterConnection = connectionNos.get(connectionNosIndex);
@@ -775,6 +775,7 @@ public class DemandService {
 				try {
 					int generateDemandFromIndex = 0;
 					Long lastDemandFromDate = waterCalculatorDao.searchLastDemandGenFromDate(waterConnection.getConnectionNo(), tenantId);
+					
 					if(lastDemandFromDate != null) {
 					generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
 						     .filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
@@ -782,10 +783,13 @@ public class DemandService {
 					//Increased one index to generate the next quarter demand
 					generateDemandFromIndex++;
 					}
+					log.info("lastDemandFromDate: {} and generateDemandFromIndex: {}",lastDemandFromDate, generateDemandFromIndex);
 					
 					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
 						generateDemandFromIndex++;
 						TaxPeriod taxPeriod = taxPeriods.get(taxPeriodIndex);
+						log.info("FromPeriod: {} and ToPeriod: {}",taxPeriod.getFromDate(),taxPeriod.getToDate());
+						log.info("taxPeriodIndex: {} and generateDemandFromIndex: {} and generateDemandToIndex: {}",taxPeriodIndex, generateDemandFromIndex, generateDemandToIndex);
 
 						boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
 								taxPeriod.getFromDate(), taxPeriod.getToDate());
@@ -798,11 +802,12 @@ public class DemandService {
 									.connectionNo(waterConnection.getConnectionNo())
 									.build();
 							calculationCriteriaList.add(calculationCriteria);
+							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-							if((calculationCriteriaList.size() == bulkSaveDemandCount) 
-									|| 
+							if(calculationCriteriaList.size() == bulkSaveDemandCount || 
 									(connectionNosIndex == connectionNos.size() && generateDemandFromIndex == generateDemandToIndex)) {
-								
+								log.info("Controller entered into producer logic: ",connectionNosIndex, connectionNos.size());
+
 								CalculationReq calculationReq = CalculationReq.builder()
 										.calculationCriteria(calculationCriteriaList)
 										.taxPeriodFrom(taxPeriod.getFromDate())
