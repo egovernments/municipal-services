@@ -203,4 +203,8 @@ public class WSCalculationConfiguration {
 	
 	@Value("${kafka.topics.save.demand}")
 	private String saveDemand;
+	
+	@Value("${egov.bulk.save.demand.count}")
+	private Integer bulkSaveDemandCount;
+	
 }
