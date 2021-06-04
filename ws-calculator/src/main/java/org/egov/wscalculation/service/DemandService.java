@@ -805,7 +805,7 @@ public class DemandService {
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
 							if(calculationCriteriaList.size() == bulkSaveDemandCount || 
-									(connectionNosIndex == connectionNos.size() && generateDemandFromIndex == generateDemandToIndex)) {
+									(connectionNosIndex == connectionNos.size() && taxPeriodIndex == generateDemandToIndex)) {
 								log.info("Controller entered into producer logic: ",connectionNosIndex, connectionNos.size());
 
 								CalculationReq calculationReq = CalculationReq.builder()
