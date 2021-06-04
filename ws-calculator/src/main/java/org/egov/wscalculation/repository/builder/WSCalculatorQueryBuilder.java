@@ -193,8 +193,8 @@ public class WSCalculatorQueryBuilder {
 		preparedStatement.add(tenantId);
 		
 //		 Test with connection number
-//		addClauseIfRequired(preparedStatement, query);
-//		query.append(" conn.connectionno = '0603005299' ");
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.connectionno = '0603007664' ");
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");

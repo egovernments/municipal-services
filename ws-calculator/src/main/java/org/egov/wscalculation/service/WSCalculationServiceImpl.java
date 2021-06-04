@@ -223,17 +223,21 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
-				criteria.setFrom(request.getTaxPeriodFrom());
-				criteria.setTo(request.getTaxPeriodTo());
+			try {
+				if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
+					criteria.setFrom(request.getTaxPeriodFrom());
+					criteria.setTo(request.getTaxPeriodTo());
+				}
+				Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
+						masterMap);
+				ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+						.get(WSCalculationConstant.Billing_Period_Master);
+				masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+				Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
+				calculations.add(calculation);
+			}catch (Exception e) {
+				e.printStackTrace();
 			}
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
-					masterMap);
-			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-					.get(WSCalculationConstant.Billing_Period_Master);
-			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
-			Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
-			calculations.add(calculation);
 		}
 		return calculations;
 	}
