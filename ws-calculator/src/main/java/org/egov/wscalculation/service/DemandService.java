@@ -204,13 +204,14 @@ public class DemandService {
 
 				isDemandAvailable = waterCalculatorDao.isConnectionDemandAvailableForBillingCycle(tenantId, fromDateSearch, toDateSearch, consumerCodes);
 
+				log.info("isDemandAvailable: {} for consumercode: {}, taxperiod from: {} and To: {}", isDemandAvailable, consumerCodes, fromDateSearch, toDateSearch);
 				// If demand already exists add it updateCalculations else
 				if (!isDemandAvailable)
 					createDemands.add(createDemandForNonMeteredInBulk(request.getRequestInfo(), calculation, masterMap, isForConnectionNo,
-							request.getTaxPeriodFrom(), request.getTaxPeriodTo()));
+							fromDateSearch, toDateSearch));
 				else
 					updateDemands.add(createDemandForNonMeteredInBulk(request.getRequestInfo(), calculation, masterMap, isForConnectionNo,
-							request.getTaxPeriodFrom(), request.getTaxPeriodTo()));
+							toDateSearch, toDateSearch));
 			}
 		}
 
