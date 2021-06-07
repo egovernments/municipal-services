@@ -226,7 +226,7 @@ public class DemandService {
 			demandRes.addAll(demandRepository.updateDemand(request.getRequestInfo(), updateDemands));
 
 		}
-		catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 
