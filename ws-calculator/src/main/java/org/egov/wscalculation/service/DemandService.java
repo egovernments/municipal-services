@@ -894,8 +894,10 @@ public class DemandService {
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
 			log.info("connectionNos: {} and bulkSaveDemandCount: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+			int connectionNosCount = 0;
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				WaterDetails waterConnection = connectionNos.get(connectionNosIndex);
+				connectionNosCount++;
 				
 				try {
 					int generateDemandFromIndex = 0;
@@ -929,9 +931,9 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-							if(connectionNosIndex == bulkSaveDemandCount || 
+							if(connectionNosCount == bulkSaveDemandCount || 
 									(connectionNosIndex == connectionNos.size()-1 && taxPeriodIndex == generateDemandToIndex)) {
-								log.info("Controller entered into producer logic: ",connectionNosIndex, connectionNos.size());
+								log.info("Controller entered into producer logic connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
 
 								CalculationReq calculationReq = CalculationReq.builder()
 										.calculationCriteria(calculationCriteriaList)
@@ -943,6 +945,7 @@ public class DemandService {
 								log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 								calculationCriteriaList.clear();
+								connectionNosCount=0;
 							} 
 						}
 					}
