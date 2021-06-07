@@ -251,7 +251,7 @@ public class DemandService {
 		}
 		//Save the bulk demands for non metered connections
 		if(!demandReq.isEmpty()) {
-		log.info("Non metered Demands list size: {} and Demand Object" + demandReq.toString(), demandsForMetered.size());
+		log.info("Non metered Demands list size: {} and Demand Object" + demandReq.toString(), demandReq.size());
 		demandRes.addAll(demandRepository.saveDemand(requestInfo, demandReq));
 		
 		}
@@ -815,7 +815,7 @@ public class DemandService {
 										.requestInfo(requestInfo)
 										.isconnectionCalculation(true)
 										.build();
-								
+								log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 								calculationCriteriaList.clear();
 							} 
