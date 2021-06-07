@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/v1/bpa")
 public class BPAController {
@@ -57,6 +60,7 @@ public class BPAController {
 
 	@PostMapping(value = "/_update")
 	public ResponseEntity<BPAResponse> update(@Valid @RequestBody BPARequest bpaRequest) {
+		log.info("BPA Workflow Request Payload at Controller--->>"+bpaRequest.getBPA().getWorkflow().toString());
 		BPA bpa = bpaService.update(bpaRequest);
 		List<BPA> bpas = new ArrayList<BPA>();
 		bpas.add(bpa);

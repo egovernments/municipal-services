@@ -89,7 +89,7 @@ public class WorkflowIntegrator {
 		obj.put(ACTIONKEY, bpa.getWorkflow().getAction());
 		obj.put(COMMENTKEY, bpa.getWorkflow().getComments());
 		if(bpaRequest.getBPA().getWorkflow() != null)
-			log.info("Workflow toString--->>"+bpaRequest.getBPA().getWorkflow().toString());
+			log.info("BPA Workflow request payload before calling workflow API--->>"+bpaRequest.getBPA().getWorkflow().toString());
 		if (!CollectionUtils.isEmpty(bpa.getWorkflow().getAssignes())) {
 			List<Map<String, String>> uuidmaps = new LinkedList<>();
 			bpa.getWorkflow().getAssignes().forEach(assignee -> {
