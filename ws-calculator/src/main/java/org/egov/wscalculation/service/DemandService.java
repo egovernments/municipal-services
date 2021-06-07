@@ -172,6 +172,68 @@ public class DemandService {
 	}
 
 	/**
+	 * Creates or updates Demand
+	 * 
+	 * @param requestInfo  The RequestInfo of the calculation request
+	 * @param calculations The Calculation Objects for which demand has to be
+	 *                     generated or updated
+	 */
+	public List<Demand> generateDemandForBillingCycleInBulk(CalculationReq request, List<Calculation> calculations,
+			Map<String, Object> masterMap, boolean isForConnectionNo) {
+
+		boolean isDemandAvailable = false;
+		List<Demand> createDemands = new ArrayList<>();
+		List<Demand> updateDemands = new ArrayList<>();
+		List<Demand> demandRes = new ArrayList<>();
+
+		try {
+		if (!CollectionUtils.isEmpty(calculations)) {
+			for (Calculation calculation : calculations) {		
+				// Collect required parameters for demand search
+				String tenantId = calculation.getTenantId();
+				Long fromDateSearch = null;
+				Long toDateSearch = null;
+				String consumerCodes;
+				if (isForConnectionNo) {
+					fromDateSearch = calculation.getFrom();
+					toDateSearch = calculation.getTo();
+					consumerCodes = calculation.getConnectionNo();
+				} else {
+					consumerCodes = calculation.getApplicationNO();
+				}
+
+				isDemandAvailable = waterCalculatorDao.isConnectionDemandAvailableForBillingCycle(tenantId, fromDateSearch, toDateSearch, consumerCodes);
+
+				// If demand already exists add it updateCalculations else
+				if (!isDemandAvailable)
+					createDemands.add(createDemandForNonMeteredInBulk(request.getRequestInfo(), calculation, masterMap, isForConnectionNo,
+							request.getTaxPeriodFrom(), request.getTaxPeriodTo()));
+				else
+					updateDemands.add(createDemandForNonMeteredInBulk(request.getRequestInfo(), calculation, masterMap, isForConnectionNo,
+							request.getTaxPeriodFrom(), request.getTaxPeriodTo()));
+			}
+		}
+
+		//Save the bulk demands for metered connections
+		if (!createDemands.isEmpty()) {
+			log.info("Creating Non metered Demands list size: {} and Demand Object" + createDemands.size(), createDemands.toString());
+			demandRes.addAll(demandRepository.saveDemand(request.getRequestInfo(), createDemands));
+
+		}
+		//Save the bulk demands for non metered connections
+		if(!updateDemands.isEmpty()) {
+			log.info("Updating Non metered Demands list size: {} and Demand Object" + updateDemands.size(), updateDemands.toString());
+			demandRes.addAll(demandRepository.updateDemand(request.getRequestInfo(), updateDemands));
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return createDemands;
+	}
+
+	/**
 	 * 
 	 * @param requestInfo  RequestInfo
 	 * @param calculations List of Calculation
@@ -258,6 +320,67 @@ public class DemandService {
 		
 		return demandRes;
 	}
+	
+	/**
+	 * 
+	 * @param requestInfo  RequestInfo
+	 * @param calculations List of Calculation
+	 * @param masterMap    Master MDMS Data
+	 * @return Returns list of demands
+	 */
+	private Demand createDemandForNonMeteredInBulk(RequestInfo requestInfo, Calculation calculation,
+			Map<String, Object> masterMap, boolean isForConnectionNO, long taxPeriodFrom, long taxPeriodTo) {
+
+			WaterConnection connection = calculation.getWaterConnection();
+			if (connection == null) {
+				throw new CustomException("INVALID_WATER_CONNECTION",
+						"Demand cannot be generated for "
+								+ (isForConnectionNO ? calculation.getConnectionNo() : calculation.getApplicationNO())
+								+ " Water Connection with this number does not exist ");
+			}
+			WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder().waterConnection(connection)
+					.requestInfo(requestInfo).build();
+			
+			log.info("waterConnectionRequest: {}",waterConnectionRequest);
+			Property property = wsCalculationUtil.getProperty(waterConnectionRequest);
+			log.info("Property: {}",property);
+			
+			String tenantId = calculation.getTenantId();
+			String consumerCode = isForConnectionNO ? calculation.getConnectionNo() : calculation.getApplicationNO();
+			User owner = property.getOwners().get(0).toCommonUser();
+			if (!CollectionUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionHolders())) {
+				owner = waterConnectionRequest.getWaterConnection().getConnectionHolders().get(0).toCommonUser();
+			}
+			List<DemandDetail> demandDetails = new LinkedList<>();
+			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
+				demandDetails.add(DemandDetail.builder().taxAmount(taxHeadEstimate.getEstimateAmount())
+						.taxHeadMasterCode(taxHeadEstimate.getTaxHeadCode()).collectionAmount(BigDecimal.ZERO)
+						.tenantId(tenantId).build());
+			});
+			@SuppressWarnings("unchecked")
+			Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
+					.get(WSCalculationConstant.BILLING_PERIOD);
+
+			if (taxPeriodFrom == 0 && taxPeriodTo == 0) {
+				taxPeriodFrom = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+				taxPeriodTo = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
+			}
+			Long expiryDaysInmillies = (Long) financialYearMaster.get(WSCalculationConstant.Demand_Expiry_Date_String);
+			//Long expiryDate = System.currentTimeMillis() + expiryDaysInmillies;
+
+			BigDecimal minimumPayableAmount = calculation.getTotalAmount();
+			String businessService = isForConnectionNO ? configs.getBusinessService()
+					: WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
+
+			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
+			Demand demand = Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
+						.minimumAmountPayable(minimumPayableAmount).tenantId(tenantId).taxPeriodFrom(taxPeriodFrom)
+						.taxPeriodTo(taxPeriodTo).consumerType("waterConnection").businessService(businessService)
+						.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build();
+						
+		return demand;
+	}
+
 
 	/**
 	 * Returns the list of new DemandDetail to be added for updating the demand
@@ -766,6 +889,7 @@ public class DemandService {
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
 
+			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
 			log.info("connectionNos: {} and bulkSaveDemandCount: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
@@ -791,7 +915,7 @@ public class DemandService {
 						log.info("FromPeriod: {} and ToPeriod: {}",taxPeriod.getFromDate(),taxPeriod.getToDate());
 						log.info("taxPeriodIndex: {} and generateDemandFromIndex: {} and generateDemandToIndex: {}",taxPeriodIndex, generateDemandFromIndex, generateDemandToIndex);
 
-						boolean isConnectionValid = validateWaterConnection(waterConnection, requestInfo, tenantId,
+						boolean isConnectionValid = isValidBillingCycle(waterConnection, requestInfo, tenantId,
 								taxPeriod.getFromDate(), taxPeriod.getToDate());
 						if (isConnectionValid) {
 							
@@ -804,14 +928,14 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-							if(calculationCriteriaList.size() == bulkSaveDemandCount || 
+							if(connectionNosIndex == bulkSaveDemandCount || 
 									(connectionNosIndex == connectionNos.size()-1 && taxPeriodIndex == generateDemandToIndex)) {
 								log.info("Controller entered into producer logic: ",connectionNosIndex, connectionNos.size());
 
 								CalculationReq calculationReq = CalculationReq.builder()
 										.calculationCriteria(calculationCriteriaList)
-										.taxPeriodFrom(taxPeriod.getFromDate())
-										.taxPeriodTo(taxPeriod.getToDate())
+//										.taxPeriodFrom(taxPeriod.getFromDate())
+//										.taxPeriodTo(taxPeriod.getToDate())
 										.requestInfo(requestInfo)
 										.isconnectionCalculation(true)
 										.build();
@@ -833,7 +957,7 @@ public class DemandService {
 		}
 	}
 
-	private boolean validateWaterConnection(WaterDetails waterConnection, RequestInfo requestInfo, String tenantId,
+	private boolean isValidBillingCycle(WaterDetails waterConnection, RequestInfo requestInfo, String tenantId,
 			long taxPeriodFrom, long taxPeriodTo) {
 		// TODO Auto-generated method stub
 

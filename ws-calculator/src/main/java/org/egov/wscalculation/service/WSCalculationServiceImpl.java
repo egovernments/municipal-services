@@ -116,7 +116,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request, calculations, masterMap, true);
+		demandService.generateDemandForBillingCycleInBulk(request, calculations, masterMap, true);
 		return calculations;
 	}
 
@@ -234,6 +234,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 						.get(WSCalculationConstant.Billing_Period_Master);
 				masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
 				Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
+				calculation.setFrom(criteria.getFrom());
+				calculation.setTo(criteria.getTo());
 				calculations.add(calculation);
 			}catch (Exception e) {
 				e.printStackTrace();
