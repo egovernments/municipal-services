@@ -289,7 +289,7 @@ public class EnrichmentService {
 		BPA bpa = bpaRequest.getBPA();
 		BigDecimal demandAmount = bpaUtil.getDemandAmount(bpaRequest);
 		if (!(demandAmount.compareTo(BigDecimal.ZERO) > 0)) {
-			Workflow workflow = Workflow.builder().action(BPAConstants.ACTION_SKIP_PAY).build();
+			Workflow workflow = Workflow.builder().action(BPAConstants.ACTION_SKIP_PAY).assignes(bpa.getWorkflow().getAssignes()).build();
 			bpa.setWorkflow(workflow);
 			wfIntegrator.callWorkFlow(bpaRequest);
 		}
@@ -304,6 +304,8 @@ public class EnrichmentService {
 	public void enrichAssignes(BPA bpa) {
 		Workflow wf = bpa.getWorkflow();
 		Set<String> assignes = new HashSet<>();
+		if(bpa.getWorkflow() != null && bpa.getWorkflow().getAssignes() != null)
+			assignes.addAll(bpa.getWorkflow().getAssignes());
 		if (wf != null && wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SENDBACKTOCITIZEN)
 				|| wf.getAction().equalsIgnoreCase(BPAConstants.ACTION_SEND_TO_CITIZEN)) {
 
