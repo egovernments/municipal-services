@@ -83,6 +83,7 @@ public class InboxService {
 			bussinessSrvs.add(businessService);
 			HashMap<String,String> StatusIdNameMap = workflowService.getActionableStatusesForRole(requestInfo, bussinessSrvs, processCriteria);
 			String applicationStatusParam = srvMap.get("applsStatusParam");
+			String businessIdParam = srvMap.get("businessIdProperty");
 			if(StringUtils.isEmpty(applicationStatusParam)) {
 				applicationStatusParam ="applicationStatus";
 			}
@@ -107,7 +108,7 @@ public class InboxService {
 //			}
 			
 			businessObjects = fetchModuleObjects(moduleSearchCriteria,businessServiceName,criteria.getTenantId(),requestInfo,srvMap);
-			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get("applicationNo").toString(),
+			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
                     s1 -> s1));
 			ArrayList businessIds = new ArrayList();
 			businessIds.addAll( businessMap.keySet());
@@ -139,12 +140,13 @@ public class InboxService {
 			if(CollectionUtils.isEmpty(srvMap) ) {
 				throw new CustomException(ErrorConstants.INVALID_MODULE,"config not found for the businessService : " + businessServiceName );
 			}
+			String businessIdParam = srvMap.get("businessIdProperty");
 			moduleSearchCriteria.put(srvMap.get("applNosParam"),StringUtils.arrayToDelimitedString( processInstanceMap.keySet().toArray(),","));
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
 			moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", -1);
 			businessObjects = fetchModuleObjects(moduleSearchCriteria,businessServiceName,criteria.getTenantId(),requestInfo,srvMap);
-			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get("applicationNo").toString(),
+			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
                     s1 -> s1));
 			
 			if(businessObjects.length() >0 && processInstances.size() > 0) {
