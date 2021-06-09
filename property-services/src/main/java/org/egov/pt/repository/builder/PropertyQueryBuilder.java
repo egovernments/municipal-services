@@ -171,7 +171,7 @@ public class PropertyQueryBuilder {
 
 			addClauseIfRequired(preparedStmtList,builder);
 			builder.append("property.status = ?");
-			preparedStmtList.add(criteria.getStatus());
+			preparedStmtList.add(criteria.getStatus().toString());
 		}
 		
 		if (null != criteria.getLocality()) {
