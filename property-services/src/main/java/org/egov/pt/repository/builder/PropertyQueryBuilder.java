@@ -176,7 +176,9 @@ public class PropertyQueryBuilder {
 		if (!CollectionUtils.isEmpty(statuses)) {
 
 			addClauseIfRequired(preparedStmtList,builder);
-			builder.append("property.status IN ( ").append(createQuery(statuses)).append(" )");
+			builder.append(" property.status IN ( ")
+				.append(createQuery(statuses))
+				.append(" )");
 			addToPreparedStatement(preparedStmtList, statuses);
 		}
 		
