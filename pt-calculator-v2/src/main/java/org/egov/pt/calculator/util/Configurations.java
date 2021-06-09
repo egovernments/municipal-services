@@ -47,6 +47,9 @@ public class Configurations {
 	@Value("${egov.assessmentservice.search.endpoint}")
 	private String	assessmentSearchEndpoint;
 	
+	@Value("${egov.assessmentservice.create.endpoint}")
+	private String	assessmentCreateEndpoint;
+	
 	// billing service
 	@Value("${egov.billingservice.host}")
 	private String billingServiceHost;
@@ -143,6 +146,7 @@ public class Configurations {
 	@Value("${pt.mutation.minpayable.amount}")
 	private BigDecimal ptMutationMinPayable;
 	
-
-
+	@Value("${state.level.tenant.id}")
+	private String stateLevelTenantId;
+	
 }

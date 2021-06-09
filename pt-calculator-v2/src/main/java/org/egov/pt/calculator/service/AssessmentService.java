@@ -1,23 +1,41 @@
 package org.egov.pt.calculator.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pt.calculator.repository.AssessmentRepository;
 import org.egov.pt.calculator.repository.PTCalculatorRepository;
+import org.egov.pt.calculator.repository.Repository;
 import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
+import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.web.models.Assessment;
+import org.egov.pt.calculator.web.models.Assessment.Channel;
+import org.egov.pt.calculator.web.models.AssessmentRequest;
+import org.egov.pt.calculator.web.models.AssessmentResponse;
 import org.egov.pt.calculator.web.models.CalculationReq;
+import org.egov.pt.calculator.web.models.GenerateAssessmentRequest;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyResponse;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
+import org.egov.pt.calculator.web.models.propertyV2.AssessmentV2.Source;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 /**
  * AssesmentService
@@ -41,6 +59,17 @@ public class AssessmentService {
 	@Autowired
 	private ObjectMapper mapper;
 
+	
+	@Autowired
+	private Configurations configs;
+	
+	@Autowired
+	private Repository mdmsRepository;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+
+	
 	/**
 	 * persists the assessments
 	 * <p>
@@ -147,6 +176,62 @@ public class AssessmentService {
 		});
 
 		return propertyMap;
+	}
+	
+	public void createAssessmentsForFY(GenerateAssessmentRequest assessmentRequest) {
+		Map<String, Object> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
+		for (Entry<String, Object> tenantConfig : scheduledTenants.entrySet()) {
+			assessmentRequest.setTenantId(tenantConfig.getKey());
+			assessmentRequest.setAssessmentYear(tenantConfig.getValue().toString());
+			List<Property> properties = repository.fetchAllActiveProperties(assessmentRequest);
+			for (Property property : properties) {
+				boolean isExists = repository.isAssessmentExists(property.getPropertyId(),
+						assessmentRequest.getAssessmentYear(), property.getTenantId());
+				if (!isExists) {
+
+					Assessment assessment = Assessment.builder().financialYear(tenantConfig.getValue().toString())
+							.propertyId(property.getPropertyId()).source(Source.MUNICIPAL_RECORDS)
+							.channel(Channel.CFC_COUNTER).assessmentDate(System.currentTimeMillis())
+							.tenantId(tenantConfig.getKey()).build();
+					AssessmentRequest assessmentReq = AssessmentRequest.builder().assessment(assessment)
+							.requestInfo(assessmentRequest.getRequestInfo()).build();
+					String url = new StringBuilder().append(configs.getAssessmentServiceHost())
+							.append(configs.getAssessmentCreateEndpoint()).toString();
+					AssessmentResponse response = null;
+					try {
+						response = restTemplate.postForObject(url, assessmentReq, AssessmentResponse.class);
+						Assessment createdAsessment = response.getAssessments().get(0);
+						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS", null);
+					} catch (HttpClientErrorException e) {
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.getMessage());
+					} catch (Exception e) {
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.getMessage());
+					}
+
+				}
+
+			}
+		}
+
+	}
+
+	private Map<String, Object> fetchScheduledTenants(RequestInfo request) {
+
+		StringBuilder mdmsURL = utils.getMdmsSearchUrl();
+
+		MdmsCriteriaReq mdmsConfig = utils.getAssessmentConfigRequest(request, configs.getStateLevelTenantId());
+		try {
+			Object response = mdmsRepository.fetchResult(mdmsURL, mdmsConfig);
+			List<Map<String,Object>> jsonOutput =  JsonPath.read(response, CalculatorConstants.MDMS_ASSESSMENT_JOB_CONFIG_PATH);
+			Map<String,Object> scheduledTenants = new HashMap<>();
+			for(Map<String,Object> config : jsonOutput){
+				scheduledTenants.put(config.get("tenant").toString(),config.get("financialyear"));
+			}
+			return scheduledTenants;
+		} catch (Exception e) {
+			throw new CustomException(CalculatorConstants.NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB,
+					CalculatorConstants.NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB);
+		}
 	}
 
 }

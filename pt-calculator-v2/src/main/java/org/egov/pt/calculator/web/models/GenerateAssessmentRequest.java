@@ -1,31 +1,27 @@
 package org.egov.pt.calculator.web.models;
 
-import java.util.List;
-
 import org.egov.common.contract.request.RequestInfo;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Request object for Assessment
- * 
- * 
- * @author kavi elrey
- *
- */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AssessmentRequest {
+public class GenerateAssessmentRequest {
 
-	private RequestInfo requestInfo;
+	@JsonProperty("RequestInfo")
+	private RequestInfo  requestInfo;
 	
-	private List<Assessment> assessments;
+	private String assessmentYear;
 	
-	private Assessment assessment;
+	private String locality;
+
+	private String tenantId;
+	
 }

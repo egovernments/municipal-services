@@ -796,4 +796,15 @@ public class CalculatorUtils {
 		return isTaxPeriodPresent;
 	}
 
+	public MdmsCriteriaReq getAssessmentConfigRequest(RequestInfo requestInfo, String tenantId) {
+
+		MasterDetail mstrDetail = MasterDetail.builder().name(CalculatorConstants.ASSESSMENT_CONFIG_MASTER)
+				.filter("[?(@.enabled==true)]")
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("tenant")
+				.masterDetails(Arrays.asList(mstrDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
 }
