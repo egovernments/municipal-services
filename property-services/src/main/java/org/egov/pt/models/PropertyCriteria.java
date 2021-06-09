@@ -31,7 +31,7 @@ public class PropertyCriteria {
 
 	private Set<String> oldpropertyids;
 	
-	private Status status;
+	private Set<Status> status;
 
 	private String mobileNumber;
 
