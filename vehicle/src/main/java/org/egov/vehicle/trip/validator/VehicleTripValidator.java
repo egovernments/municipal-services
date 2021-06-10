@@ -14,7 +14,9 @@ import org.egov.vehicle.service.UserService;
 import org.egov.vehicle.service.VehicleService;
 import org.egov.vehicle.trip.querybuilder.VehicleTripQueryBuilder;
 import org.egov.vehicle.trip.repository.VehicleTripRepository;
+import org.egov.vehicle.trip.service.VehicleTripFSMService;
 import org.egov.vehicle.trip.util.VehicleTripConstants;
+import org.egov.vehicle.trip.web.model.PlantMapping;
 import org.egov.vehicle.trip.web.model.VehicleTripRequest;
 import org.egov.vehicle.trip.web.model.VehicleTripSearchCriteria;
 import org.egov.vehicle.web.model.Vehicle;
@@ -24,6 +26,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,6 +57,9 @@ public class VehicleTripValidator {
 	
 	@Autowired
 	private VehicleConfiguration config;
+	
+	@Autowired
+	private VehicleTripFSMService vehicleTripFSMService;
 
 	public void validateCreateOrUpdateRequest(VehicleTripRequest request) {
 		if (StringUtils.isEmpty(request.getVehicleTrip().getTenantId())) {
@@ -154,6 +163,20 @@ public class VehicleTripValidator {
 				
 				if(request.getVehicleTrip().getTripEndTime() <= 0) {
 				throw new CustomException(VehicleTripConstants.INVALID_TRIP_ENDTIME, "Invalid Trip end time");
+			}
+				
+			//set the plant code based on the logged in user uuid
+			
+			PlantMapping plantMapping = vehicleTripFSMService.getPlantMapping(request.getRequestInfo(),
+					request.getVehicleTrip().getTenantId(), request.getRequestInfo().getUserInfo().getUuid());
+			if (null != plantMapping && StringUtils.isNotEmpty(plantMapping.getPlantCode())) {
+				ObjectNode additionalDtlObjectNode = (ObjectNode) request.getVehicleTrip().getAdditionalDetails();
+				if (null == additionalDtlObjectNode) {
+					ObjectMapper mapper = new ObjectMapper();
+					additionalDtlObjectNode = mapper.createObjectNode();
+				}
+				additionalDtlObjectNode.set("plantCode", TextNode.valueOf(plantMapping.getPlantCode()));
+				request.getVehicleTrip().setAdditionalDetails(additionalDtlObjectNode);
 			}
 		}
 		

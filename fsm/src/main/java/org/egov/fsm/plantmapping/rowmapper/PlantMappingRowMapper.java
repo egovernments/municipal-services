@@ -40,7 +40,7 @@ public class PlantMappingRowMapper implements ResultSetExtractor<List<PlantMappi
 		while (rs.next()) {
 			PlantMapping plantMap = new PlantMapping();
 			// TODO fill the FSM object with data in the result set record
-			String id = rs.getString("fsm_id");
+			String id = rs.getString("id");
 			plantMap = plant.get(id);
 			String tenantId = rs.getString("tenantid");
 			String plantCode = rs.getString("plantcode");

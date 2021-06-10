@@ -15,7 +15,7 @@ public class PlantMappingQueryBuilder {
 	@Autowired
 	private FSMConfiguration config;
 	
-	private static final String Query = "select count(*) OVER() AS full_count, * from eg_fsm_plantmapping";
+	private static final String Query = "select count(*) OVER() AS full_count, * from eg_fsm_plantmapping plantmapping ";
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 
@@ -26,11 +26,11 @@ public class PlantMappingQueryBuilder {
 		if (criteria.getTenantId() != null) {
 			if (criteria.getTenantId().split("\\.").length == 1) {
 				addClauseIfRequired(preparedStmtList, builder);
-				builder.append(" fsm.tenantid like ?");
+				builder.append(" plantmapping.tenantid like ?");
 				preparedStmtList.add('%' + criteria.getTenantId() + '%');
 			} else {
 				addClauseIfRequired(preparedStmtList, builder);
-				builder.append(" fsm.tenantid=? ");
+				builder.append(" plantmapping.tenantid=? ");
 				preparedStmtList.add(criteria.getTenantId());
 			}
 		}
@@ -46,7 +46,7 @@ public class PlantMappingQueryBuilder {
 
 		if( criteria.getPlantCode() !=null) {
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append(" plantcode = ?");
+			builder.append(" plantmapping.plantcode = ?");
 			preparedStmtList.add(criteria.getPlantCode());
 		}
 		
