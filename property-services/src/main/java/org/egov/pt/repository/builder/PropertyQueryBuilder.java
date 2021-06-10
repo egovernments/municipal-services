@@ -170,9 +170,11 @@ public class PropertyQueryBuilder {
 		}
 
 		Set<String> statuses = new HashSet<>();
-		criteria.getStatus().forEach(status -> {
-			statuses.add(status.toString());
-		});
+		if(!CollectionUtils.isEmpty(criteria.getStatus())) {
+			criteria.getStatus().forEach(status -> {
+				statuses.add(status.toString());
+			});
+		}
 		if (!CollectionUtils.isEmpty(statuses)) {
 
 			addClauseIfRequired(preparedStmtList,builder);
