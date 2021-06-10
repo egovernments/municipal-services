@@ -45,6 +45,7 @@ public class PlantMappingService {
 		}
 		validaor.validateCreateOrUpdate(request, mdmsData);
 		enrichmentService.enrichCreateRequest(request, mdmsData);
+		repository.save(request);
 		return request.getPlantMapping();
 	}
 
