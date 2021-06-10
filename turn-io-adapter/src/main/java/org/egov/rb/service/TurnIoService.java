@@ -108,14 +108,14 @@ public class TurnIoService {
 		Object response = null;
 
 		request.put("city", null);
-		request.put("cityset", false);
+		request.put("cityseteg", false);
 		request.put("locality", null);
-		request.put("localityset", false);
+		request.put("localityseteg", false);
 		request.put("complaint_category", null);
 		request.put("complaint_image", null);
 		request.put("complaint_sub_category", null);
 		request.put("complaintsetvalue", null);
-		request.put("complaintset", false);
+		//request.put("complaintset", false);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", "Bearer " + propertyConfiguration.getAuthorizationToken());
