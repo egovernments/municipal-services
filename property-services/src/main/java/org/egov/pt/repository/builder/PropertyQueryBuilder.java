@@ -169,19 +169,16 @@ public class PropertyQueryBuilder {
 			}
 		}
 
-		Set<String> statuses = new HashSet<>();
-		if(!CollectionUtils.isEmpty(criteria.getStatus())) {
+		Set<String> statusStringList = new HashSet<>();
+		if (!CollectionUtils.isEmpty(criteria.getStatus())) {
 			criteria.getStatus().forEach(status -> {
-				statuses.add(status.toString());
+				statusStringList.add(status.toString());
 			});
-		}
-		if (!CollectionUtils.isEmpty(statuses)) {
-
 			addClauseIfRequired(preparedStmtList,builder);
 			builder.append(" property.status IN ( ")
-				.append(createQuery(statuses))
+				.append(createQuery(statusStringList))
 				.append(" )");
-			addToPreparedStatement(preparedStmtList, statuses);
+			addToPreparedStatement(preparedStmtList, statusStringList);
 		}
 		
 		if (null != criteria.getLocality()) {
