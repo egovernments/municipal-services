@@ -231,7 +231,7 @@ public class DemandService {
 			e.printStackTrace();
 		}
 
-		return createDemands;
+		return demandRes;
 	}
 
 	/**
@@ -895,6 +895,7 @@ public class DemandService {
 			log.info("connectionNos: {} and bulkSaveDemandCount: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			int connectionNosCount = 0;
+			int totalRecordsPushedToKafka = 0;
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				WaterDetails waterConnection = connectionNos.get(connectionNosIndex);
 				connectionNosCount++;
@@ -921,7 +922,7 @@ public class DemandService {
 						boolean isConnectionValid = isValidBillingCycle(waterConnection, requestInfo, tenantId,
 								taxPeriod.getFromDate(), taxPeriod.getToDate());
 						if (isConnectionValid) {
-							
+
 							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 									.assessmentYear(taxPeriod.getFinancialYear())
 									.from(taxPeriod.getFromDate())
@@ -931,22 +932,39 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-							if(connectionNosCount == bulkSaveDemandCount || 
-									(connectionNosIndex == connectionNos.size()-1 && taxPeriodIndex == generateDemandToIndex)) {
-								log.info("Controller entered into producer logic connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
+							if(connectionNosCount == bulkSaveDemandCount && taxPeriodIndex == generateDemandToIndex) {
+								log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
 
 								CalculationReq calculationReq = CalculationReq.builder()
 										.calculationCriteria(calculationCriteriaList)
-//										.taxPeriodFrom(taxPeriod.getFromDate())
-//										.taxPeriodTo(taxPeriod.getToDate())
+										//										.taxPeriodFrom(taxPeriod.getFromDate())
+										//										.taxPeriodTo(taxPeriod.getToDate())
 										.requestInfo(requestInfo)
 										.isconnectionCalculation(true)
 										.build();
 								log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+								totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
 								calculationCriteriaList.clear();
 								connectionNosCount=0;
-							} 
+							}else if(connectionNosIndex == connectionNos.size()-1 && taxPeriodIndex == generateDemandToIndex) {
+								log.info("Last connection entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
+
+								CalculationReq calculationReq = CalculationReq.builder()
+										.calculationCriteria(calculationCriteriaList)
+										//									.taxPeriodFrom(taxPeriod.getFromDate())
+										//									.taxPeriodTo(taxPeriod.getToDate())
+										.requestInfo(requestInfo)
+										.isconnectionCalculation(true)
+										.build();
+								log.info("Pushing calculation last req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
+								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+								totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
+								calculationCriteriaList.clear();
+								connectionNosCount=0;
+
+
+							}
 						}
 					}
 				}catch (Exception e) {
@@ -955,6 +973,7 @@ public class DemandService {
 				}
 
 			}
+			log.info("totalRecordsPushedToKafka: {}", totalRecordsPushedToKafka);
 		}catch (Exception e) {
 			e.printStackTrace();
 			log.error("Exception occurred while processing the demand generation for tenantId: "+tenantId);
