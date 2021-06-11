@@ -879,13 +879,13 @@ public class DemandService {
 		try {
 			List<TaxPeriod> taxPeriods = calculatorUtils.getTaxPeriodsFromMDMS(requestInfo, tenantId);
 
-//			java.util.Optional<TaxPeriod> matchingObject = taxPeriods.stream().
-//				    filter(p -> p.getFromDate().equals(taxPeriodFrom)).findFirst();
-			
+			//			java.util.Optional<TaxPeriod> matchingObject = taxPeriods.stream().
+			//				    filter(p -> p.getFromDate().equals(taxPeriodFrom)).findFirst();
+
 			int generateDemandToIndex = IntStream.range(0, taxPeriods.size())
-				     .filter(p -> taxPeriodFrom.equals(taxPeriods.get(p).getFromDate()))
-				     .findFirst().getAsInt();
-			
+					.filter(p -> taxPeriodFrom.equals(taxPeriods.get(p).getFromDate()))
+					.findFirst().getAsInt();
+
 			log.info("Billing master data values for non metered connection:: {}", master);
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
@@ -899,20 +899,20 @@ public class DemandService {
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				WaterDetails waterConnection = connectionNos.get(connectionNosIndex);
 				connectionNosCount++;
-				
+
 				try {
 					int generateDemandFromIndex = 0;
 					Long lastDemandFromDate = waterCalculatorDao.searchLastDemandGenFromDate(waterConnection.getConnectionNo(), tenantId);
-					
+
 					if(lastDemandFromDate != null) {
-					generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
-						     .filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
-						     .findFirst().getAsInt();
-					//Increased one index to generate the next quarter demand
-					generateDemandFromIndex++;
+						generateDemandFromIndex = IntStream.range(0, taxPeriods.size())
+								.filter(p -> lastDemandFromDate.equals(taxPeriods.get(p).getFromDate()))
+								.findFirst().getAsInt();
+						//Increased one index to generate the next quarter demand
+						generateDemandFromIndex++;
 					}
 					log.info("lastDemandFromDate: {} and generateDemandFromIndex: {}",lastDemandFromDate, generateDemandFromIndex);
-					
+
 					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
 						generateDemandFromIndex++;
 						TaxPeriod taxPeriod = taxPeriods.get(taxPeriodIndex);
@@ -932,44 +932,45 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-							if(connectionNosCount == bulkSaveDemandCount && taxPeriodIndex == generateDemandToIndex) {
-								log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
-
-								CalculationReq calculationReq = CalculationReq.builder()
-										.calculationCriteria(calculationCriteriaList)
-										//										.taxPeriodFrom(taxPeriod.getFromDate())
-										//										.taxPeriodTo(taxPeriod.getToDate())
-										.requestInfo(requestInfo)
-										.isconnectionCalculation(true)
-										.build();
-								log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
-								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-								totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
-								calculationCriteriaList.clear();
-								connectionNosCount=0;
-							}else if(connectionNosIndex == connectionNos.size()-1 && taxPeriodIndex == generateDemandToIndex) {
-								log.info("Last connection entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
-
-								CalculationReq calculationReq = CalculationReq.builder()
-										.calculationCriteria(calculationCriteriaList)
-										//									.taxPeriodFrom(taxPeriod.getFromDate())
-										//									.taxPeriodTo(taxPeriod.getToDate())
-										.requestInfo(requestInfo)
-										.isconnectionCalculation(true)
-										.build();
-								log.info("Pushing calculation last req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
-								wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-								totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
-								calculationCriteriaList.clear();
-								connectionNosCount=0;
-
-
-							}
 						}
 					}
-				}catch (Exception e) {
+					if(connectionNosCount == bulkSaveDemandCount) {
+						log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
+
+						CalculationReq calculationReq = CalculationReq.builder()
+								.calculationCriteria(calculationCriteriaList)
+								//										.taxPeriodFrom(taxPeriod.getFromDate())
+								//										.taxPeriodTo(taxPeriod.getToDate())
+								.requestInfo(requestInfo)
+								.isconnectionCalculation(true)
+								.build();
+						log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
+						wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+						totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
+						calculationCriteriaList.clear();
+						connectionNosCount=0;
+					} else if(connectionNosIndex == connectionNos.size()-1) {
+						log.info("Last connection entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
+
+						CalculationReq calculationReq = CalculationReq.builder()
+								.calculationCriteria(calculationCriteriaList)
+								//									.taxPeriodFrom(taxPeriod.getFromDate())
+								//									.taxPeriodTo(taxPeriod.getToDate())
+								.requestInfo(requestInfo)
+								.isconnectionCalculation(true)
+								.build();
+						log.info("Pushing calculation last req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
+						wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+						totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
+						calculationCriteriaList.clear();
+						connectionNosCount=0;
+
+
+					}
+
+				} catch (Exception e) {
 					e.printStackTrace();
-					log.error("Exception occurred while generating demand for water connectionno: "+waterConnection.getConnectionNo() + " tenantId: "+tenantId);
+					log.error("Exception occurred while generating demand for water connectionno: "+waterConnection.getConnectionNo() + " tenantId: "+tenantId+" Exception msg:"+e.getMessage());
 				}
 
 			}
