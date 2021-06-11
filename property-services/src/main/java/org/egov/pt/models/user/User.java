@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.egov.common.contract.request.Role;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -53,7 +54,7 @@ public class User   {
         @JsonProperty("password")
         private String password;
 
-        @JsonProperty("salutation")
+        @JsonIgnore
         @SafeHtml
         private String salutation;
 
@@ -84,14 +85,14 @@ public class User   {
         @JsonProperty("altContactNumber")
         private String altContactNumber;
 
+        @JsonIgnore
         @Size(max=10)
         @SafeHtml
-        @JsonProperty("pan")
         private String pan;
 
+        @JsonIgnore
         @SafeHtml
         @Pattern(regexp = "^[0-9]{12}$", message = "AdharNumber should be 12 digit number")
-        @JsonProperty("aadhaarNumber")
         private String aadhaarNumber;
 
         @Size(max=300)
@@ -160,19 +161,19 @@ public class User   {
         @JsonProperty("fatherOrHusbandName")
         private String fatherOrHusbandName;
 
+        @JsonIgnore
         @Size(max=32)
         @SafeHtml
-        @JsonProperty("bloodGroup")
         private String bloodGroup;
 
+        @JsonIgnore
         @Size(max=300)
         @SafeHtml
-        @JsonProperty("identificationMark")
         private String identificationMark;
 
+        @JsonIgnore
         @Size(max=36)
         @SafeHtml
-        @JsonProperty("photo")
         private String photo;
 
         @Size(max=64)
