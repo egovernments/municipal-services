@@ -9,6 +9,7 @@ import org.egov.fsm.service.FSMService;
 import org.egov.fsm.service.UserService;
 import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.util.ResponseInfoFactory;
+import org.egov.fsm.web.model.DataMartModel;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAudit;
 import org.egov.fsm.web.model.FSMAuditResponse;
@@ -105,4 +106,13 @@ public class FSMController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	public ResponseEntity<List<DataMartModel>> getDataMart(){
+		
+		List<DataMartModel> dataMartModel=new ArrayList<DataMartModel>();
+		
+		
+		
+		return new ResponseEntity<>(dataMartModel,HttpStatus.OK);
+		
+	}
 }

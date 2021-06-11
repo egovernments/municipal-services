@@ -24,6 +24,8 @@ public class FSMQueryBuilder {
 			+ "	 INNER JOIN   eg_fsm_address fsm_address on fsm_address.fsm_id = fsm.id"
 			+ "	 LEFT OUTER JOIN  eg_fsm_geolocation fsm_geo on fsm_geo.address_id = fsm_address.id"
 			+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
+	
+	
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 
