@@ -48,7 +48,8 @@ public class PitDetail   {
 
   @JsonProperty("width")
   private Double width = null;
-  
+ 
+  @Max(value=99.9)
   @JsonProperty("diameter")
   private Double diameter = null;
 
