@@ -892,7 +892,7 @@ public class DemandService {
 
 			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
-			log.info("connectionNos: {} and bulkSaveDemandCount: {}", connectionNos.size(), bulkSaveDemandCount);
+			log.info("Toatal Connections: {} and batch count: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			int connectionNosCount = 0;
 			int totalRecordsPushedToKafka = 0;
@@ -900,6 +900,7 @@ public class DemandService {
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				WaterDetails waterConnection = connectionNos.get(connectionNosIndex);
 				connectionNosCount++;
+				log.info("Connection Number: {} ",waterConnection.getConnectionNo());		
 
 				try {
 					int generateDemandFromIndex = 0;
@@ -933,7 +934,12 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
+						}else
+						{
+							log.info("Invalid Connection");
+							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 						}
+						
 					}
 					if(connectionNosCount == bulkSaveDemandCount) {
 						log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
