@@ -7,15 +7,18 @@ import org.egov.pgr.contract.ServiceReqSearchCriteria;
 import org.egov.pgr.contract.ServiceRequest;
 import org.egov.pgr.contract.ServiceResponse;
 import org.egov.pgr.service.GrievanceService;
+import org.egov.pgr.utils.DGRApi;
 import org.egov.pgr.validator.PGRRequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -108,6 +111,14 @@ public class ServiceController {
 		pgrRequestValidator.validateSearch(serviceReqSearchCriteria, requestInfoWrapper.getRequestInfo());
 		Object countResponse = service.getCount(requestInfoWrapper.getRequestInfo(), serviceReqSearchCriteria);
 		return new ResponseEntity<>(countResponse, HttpStatus.OK);
+	}
+	
+	
+	@GetMapping("_apicall")
+	@ResponseBody
+	private ResponseEntity<?> callApi(@RequestParam String complaintId) {
+		String responce = new DGRApi().apiCalling(complaintId);
+		return new ResponseEntity<>(responce, HttpStatus.OK);
 	}
 
 }
