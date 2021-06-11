@@ -1,1 +1,1 @@
-ALTER TABLE eg_pt_unit ADD COLUMN additionaldetails character varying;
+ALTER TABLE eg_pt_unit ADD COLUMN additionaldetails jsonb;
