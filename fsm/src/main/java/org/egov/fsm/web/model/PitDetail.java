@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Max;
 
 /**
@@ -38,15 +40,18 @@ public class PitDetail   {
   private String tenantId = null;
   
   @JsonProperty("height")
+  @DecimalMax(value="99.9")
   private Double height = null;
 
   @JsonProperty("length")
+  @DecimalMax(value="99.9",message="Length value sholud be less than 100")
   private Double length = null;
 
   @JsonProperty("width")
+  @DecimalMax(value="99.9",message="Width value sholud be less than 100")
   private Double width = null;
  
-  @Max(value=99.9)
+  @DecimalMax(value="99.9", message="Diameter value sholud be less than 100")
   @JsonProperty("diameter")
   private Double diameter = null;
 
