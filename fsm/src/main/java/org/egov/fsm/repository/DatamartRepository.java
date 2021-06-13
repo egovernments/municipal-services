@@ -17,11 +17,13 @@ import org.egov.common.contract.request.RequestInfo.RequestInfoBuilder;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.querybuilder.DataMartQueryBuilder;
 import org.egov.fsm.repository.rowmapper.DataMartRowMapper;
+import org.egov.fsm.repository.rowmapper.DataMartTenantRowMapper;
 import org.egov.fsm.service.FSMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.egov.fsm.web.model.DataMartModel;
+import org.egov.fsm.web.model.DataMartTenantModel;
 import org.egov.fsm.web.model.workflow.ProcessInstance;
 import org.egov.fsm.web.model.workflow.ProcessInstanceResponse;
 import org.egov.fsm.web.model.workflow.State;
@@ -44,20 +46,23 @@ public class DatamartRepository {
 
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
+	
+	@Autowired
+	DataMartTenantRowMapper dataMartTenantRowMapper;
 
 	public List<DataMartModel> getData(RequestInfo requestInfo) {
 
 		String countQuery = DataMartQueryBuilder.countQuery;
-		Integer totalcount = jdbcTemplate.queryForObject(countQuery, Integer.class);
+		List<DataMartTenantModel> totalrowsWithTenantId = jdbcTemplate.query(countQuery, dataMartTenantRowMapper);
 
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
-		for (int i = 0; i < totalcount - 500; i += 500) {
+		for (int i = 0; i < totalrowsWithTenantId.size() - 500; i += 500) {
 			query.append(" offset " + i + " limit 500 ;");
 			List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
 			for (DataMartModel dataMartModel : dataMartList) {
 				Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
-						dataMartModel.getApplicationId(), requestInfo);
+						dataMartModel.getApplicationId(), requestInfo,totalrowsWithTenantId.get(i).getTenantId());
 				dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
 				datamartList.add(dataMartModel);
 			}
@@ -188,12 +193,12 @@ public class DatamartRepository {
 		return dataMartModel;
 	}
 
-	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo) {
+	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo, String tenantId) {
 		// TODO Auto-generated method stub
 
 		
 		ProcessInstanceResponse processInstanceResponse = (ProcessInstanceResponse) serviceRequestRepository
-				.fetchResult(new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()+"?businessService=FSM && businessIds="+applicationId),
+				.fetchResult(new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()+"?businessService=FSM&&businessIds="+applicationId+"&&tenantId="+tenantId),
 						requestInfo);
 		Map<State, List<ProcessInstance>> processInstanceListMap = processInstanceResponse.getProcessInstances()
 				.stream().collect(Collectors.groupingBy(ProcessInstance::getState));
