@@ -10,8 +10,10 @@ import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import org.egov.fsm.web.model.*;
 
+@Component
 public class DataMartRowMapper implements ResultSetExtractor<List<DataMartModel>> {
 
 	@Override
