@@ -48,7 +48,7 @@ public class DatamartRepository {
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (int i = 0; i < totalcount - 500; i += 500) {
-			query.append(" offset " + i + " limit 500");
+			query.append(" offset " + i + " limit 500 ;");
 			List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
 			for (DataMartModel dataMartModel : dataMartList) {
 				Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
