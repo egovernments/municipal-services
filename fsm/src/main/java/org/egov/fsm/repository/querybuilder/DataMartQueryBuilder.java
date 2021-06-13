@@ -10,7 +10,7 @@ public class DataMartQueryBuilder {
 	
 	
 	
-	public static final String dataMartQuery="public static final String query=\"SELECT\\r\\n\"\r\n"
+	public static final String dataMartQuery="SELECT\\r\\n\"\r\n"
 			+ "			+ \"fsm.id as applicationId,\\r\\n\"\r\n"
 			+ "			+ \"fsm.applicationStatus as fsmapplicationstatus,\\r\\n\"\r\n"
 			+ "			+ \"split_part(propertyusage::TEXT,'.', 1) as propertyType,\\r\\n\"\r\n"
