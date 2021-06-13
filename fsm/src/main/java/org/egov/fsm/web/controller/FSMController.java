@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.fsm.service.DataMartService;
 import org.egov.fsm.service.FSMService;
 import org.egov.fsm.service.UserService;
 import org.egov.fsm.util.FSMUtil;
@@ -45,6 +46,9 @@ public class FSMController {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private DataMartService dataMartService;
 
 	@PostMapping(value = "/_create")
 	public ResponseEntity<FSMResponse> create(@Valid @RequestBody FSMRequest fsmRequest) {
@@ -106,11 +110,13 @@ public class FSMController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	public ResponseEntity<List<DataMartModel>> getDataMart(){
+	
+	@RequestMapping(value="/_datamart")
+	public ResponseEntity<List<DataMartModel>> getDataMart(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper){
 		
-		List<DataMartModel> dataMartModel=new ArrayList<DataMartModel>();
 		
 		
+		List<DataMartModel> dataMartModel=dataMartService.getFsmDataMartData(requestInfoWrapper.getRequestInfo());
 		
 		return new ResponseEntity<>(dataMartModel,HttpStatus.OK);
 		
