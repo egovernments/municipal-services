@@ -7,6 +7,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -19,15 +20,25 @@ import org.egov.fsm.repository.querybuilder.DataMartQueryBuilder;
 import org.egov.fsm.repository.rowmapper.DataMartRowMapper;
 import org.egov.fsm.repository.rowmapper.DataMartTenantRowMapper;
 import org.egov.fsm.service.FSMService;
+import org.egov.fsm.util.FSMErrorConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
+
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
 import org.egov.fsm.web.model.DataMartModel;
 import org.egov.fsm.web.model.DataMartTenantModel;
+import org.egov.fsm.web.model.RequestInfoWrapper;
+import org.egov.fsm.web.model.location.Boundary;
 import org.egov.fsm.web.model.workflow.ProcessInstance;
 import org.egov.fsm.web.model.workflow.ProcessInstanceResponse;
 import org.egov.fsm.web.model.workflow.State;
 import org.egov.fsm.workflow.WorkflowService;
+import org.egov.tracer.model.CustomException;
+import org.json.JSONObject;
 
 @Repository
 public class DatamartRepository {
@@ -40,13 +51,13 @@ public class DatamartRepository {
 
 	@Autowired
 	FSMConfiguration fsmConfiguration;
-	
+
 	@Autowired
 	WorkflowService workflowService;
 
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
-	
+
 	@Autowired
 	DataMartTenantRowMapper dataMartTenantRowMapper;
 
@@ -57,14 +68,27 @@ public class DatamartRepository {
 
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
-		for (int i = 0; i < totalrowsWithTenantId.size() - 500; i += 500) {
-			query.append(" offset " + i + " limit 500 ;");
-			List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
-			for (DataMartModel dataMartModel : dataMartList) {
-				Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
-						dataMartModel.getApplicationId(), requestInfo,totalrowsWithTenantId.get(i).getTenantId());
-				dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
-				datamartList.add(dataMartModel);
+		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
+			List<Boundary> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
+			for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
+				query.append(" offset " + i + " limit 500 ;");
+				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
+				for (DataMartModel dataMartModel : dataMartList) {
+					Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
+							dataMartModel.getApplicationId(), requestInfo, totalrowsWithTenantId.get(i).getTenantId());
+					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
+					String jsonString = new JSONObject(boundaryData).toString();
+
+					DocumentContext context = JsonPath.parse(jsonString);
+
+					if (dataMartModel.getLocality() != null) {
+						List<Boundary> boundaryResponse = context
+								.read("$.[?(@.code==\"{}\")]".replace("{}", dataMartModel.getLocality()));
+						dataMartModel.setLocality(boundaryResponse.get(0).getName());
+					}
+
+					datamartList.add(dataMartModel);
+				}
 			}
 		}
 		return datamartList;
@@ -77,7 +101,7 @@ public class DatamartRepository {
 		for (Map.Entry<String, ProcessInstance> data : processInstanceData.entrySet()) {
 
 			LocalDateTime createdTime = null;
-			
+
 			switch (data.getKey()) {
 
 			case "CREATED": {
@@ -86,7 +110,7 @@ public class DatamartRepository {
 				LocalDateTime dateTime = Instant.ofEpochMilli(processInstance.getAuditDetails().getCreatedTime())
 						.atZone(ZoneId.systemDefault()).toLocalDateTime();
 				dataMartModel.setCreatedAssignedDateTime(dateTime);
-				createdTime=dateTime;
+				createdTime = dateTime;
 				break;
 			}
 
@@ -145,7 +169,7 @@ public class DatamartRepository {
 				LocalDateTime dateTime = Instant.ofEpochMilli(processInstance.getAuditDetails().getCreatedTime())
 						.atZone(ZoneId.systemDefault()).toLocalDateTime();
 				dataMartModel.setApplicationCompletedTime(dateTime);
-				 Duration duration = Duration.between(dateTime, createdTime);
+				Duration duration = Duration.between(dateTime, createdTime);
 				dataMartModel.setSlaDays(duration.toDays());
 				break;
 
@@ -162,7 +186,6 @@ public class DatamartRepository {
 				if (commentArray != null && commentArray.length > 0) {
 					dataMartModel.setReasonForRejection(commentArray[0]);
 				}
-				
 
 				break;
 
@@ -193,21 +216,41 @@ public class DatamartRepository {
 		return dataMartModel;
 	}
 
-	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo, String tenantId) {
+	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo,
+			String tenantId) {
 		// TODO Auto-generated method stub
 
-		
-		ProcessInstanceResponse processInstanceResponse = (ProcessInstanceResponse) serviceRequestRepository
-				.fetchResult(new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()+"?businessService=FSM&&businessIds="+applicationId+"&&tenantId="+tenantId),
-						requestInfo);
-		Map<State, List<ProcessInstance>> processInstanceListMap = processInstanceResponse.getProcessInstances()
-				.stream().collect(Collectors.groupingBy(ProcessInstance::getState));
+		LinkedHashMap processInstanceResponse = (LinkedHashMap) serviceRequestRepository.fetchResult(
+				new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()
+						+ "?businessService=FSM&&businessIds=" + applicationId + "&&tenantId=" + tenantId),
+				requestInfo);
+		List<ProcessInstance> processInstances = (List<ProcessInstance>) processInstanceResponse
+				.get("ProcessInstances");
+		Map<State, List<ProcessInstance>> processInstanceListMap = processInstances.stream()
+				.collect(Collectors.groupingBy(ProcessInstance::getState));
 		Map<String, ProcessInstance> processInstanceMap = new HashMap<String, ProcessInstance>();
 		for (Map.Entry<State, List<ProcessInstance>> entry : processInstanceListMap.entrySet()) {
 			processInstanceMap.put(entry.getKey().getState(), entry.getValue().get(0));
 		}
 
 		return processInstanceMap;
+
+	}
+
+	private List<Boundary> getBoundaryData(String tenantId, RequestInfo requestInfo) {
+		StringBuilder uri = new StringBuilder(fsmConfiguration.getLocationHost());
+		uri.append(fsmConfiguration.getLocationContextPath()).append(fsmConfiguration.getLocationEndpoint());
+		uri.append("?").append("tenantId=").append(tenantId);
+		uri.append("&").append("boundaryType=").append("Locality");
+		RequestInfoWrapper wrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+		LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, wrapper);
+
+		if (CollectionUtils.isEmpty(responseMap)) {
+			throw new CustomException(FSMErrorConstants.BOUNDARY_ERROR,
+					"The response from location service is empty or null");
+		}
+
+		return (List<Boundary>) responseMap.get("Boundary");
 
 	}
 

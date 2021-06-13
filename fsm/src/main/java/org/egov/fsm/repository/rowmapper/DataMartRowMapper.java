@@ -34,10 +34,14 @@ public class DataMartRowMapper implements ResultSetExtractor<List<DataMartModel>
 			dataMartModel.setDistrict(rs.getString("district"));
 			dataMartModel.setState(rs.getString("state"));
 			dataMartModel.setSlumName(rs.getString("slumname"));
-			if (rs.getString("longitude") != null) {
+			if (rs.getString("longitude") != null ) {
 				dataMartModel.setLongtitude(rs.getString("longitude"));
 				dataMartModel.setLatitude(rs.getString("latitude"));
-				dataMartModel.setGeoLocationProvided(true);
+				if(Float.valueOf(rs.getString("longitude"))>0) {
+					
+					dataMartModel.setGeoLocationProvided(true);
+				}
+				
 			}
 			dataMartModel.setApplicationSource(rs.getString("applicationchannel"));
 			dataMartModel.setDesludgingEntity(rs.getString("dsoname"));
