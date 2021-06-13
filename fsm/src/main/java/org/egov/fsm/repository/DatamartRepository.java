@@ -17,6 +17,7 @@ import org.egov.common.contract.request.RequestInfo.RequestInfoBuilder;
 import org.egov.fsm.config.FSMConfiguration;
 import org.egov.fsm.repository.querybuilder.DataMartQueryBuilder;
 import org.egov.fsm.repository.rowmapper.DataMartRowMapper;
+import org.egov.fsm.service.FSMService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,7 @@ import org.egov.fsm.web.model.DataMartModel;
 import org.egov.fsm.web.model.workflow.ProcessInstance;
 import org.egov.fsm.web.model.workflow.ProcessInstanceResponse;
 import org.egov.fsm.web.model.workflow.State;
+import org.egov.fsm.workflow.WorkflowService;
 
 @Repository
 public class DatamartRepository {
@@ -36,6 +38,9 @@ public class DatamartRepository {
 
 	@Autowired
 	FSMConfiguration fsmConfiguration;
+	
+	@Autowired
+	WorkflowService workflowService;
 
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
@@ -186,8 +191,9 @@ public class DatamartRepository {
 	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo) {
 		// TODO Auto-generated method stub
 
+		
 		ProcessInstanceResponse processInstanceResponse = (ProcessInstanceResponse) serviceRequestRepository
-				.fetchResult(new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()),
+				.fetchResult(new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()+"?businessService=FSM && businessIds="+applicationId),
 						requestInfo);
 		Map<State, List<ProcessInstance>> processInstanceListMap = processInstanceResponse.getProcessInstances()
 				.stream().collect(Collectors.groupingBy(ProcessInstance::getState));
