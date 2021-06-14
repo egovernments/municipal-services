@@ -1097,18 +1097,18 @@ public class DemandService {
 								+ (isForConnectionNO ? calculation.getConnectionNo() : calculation.getApplicationNO())
 								+ " Water Connection with this number does not exist ");
 			}
-			SewerageConnectionRequest waterConnectionRequest = SewerageConnectionRequest.builder().sewerageConnection(connection)
+			SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder().sewerageConnection(connection)
 					.requestInfo(requestInfo).build();
 			
-			log.info("waterConnectionRequest: {}",waterConnectionRequest);
-			Property property = utils.getProperty(waterConnectionRequest);
+			log.info("SewerageConnectionRequest: {}",sewerageConnectionRequest);
+			Property property = utils.getProperty(sewerageConnectionRequest);
 			log.info("Property: {}",property);
 			
 			String tenantId = calculation.getTenantId();
 			String consumerCode = isForConnectionNO ? calculation.getConnectionNo() : calculation.getApplicationNO();
 			User owner = property.getOwners().get(0).toCommonUser();
-			if (!CollectionUtils.isEmpty(waterConnectionRequest.getSewerageConnection().getConnectionHolders())) {
-				owner = waterConnectionRequest.getSewerageConnection().getConnectionHolders().get(0).toCommonUser();
+			if (!CollectionUtils.isEmpty(sewerageConnectionRequest.getSewerageConnection().getConnectionHolders())) {
+				owner = sewerageConnectionRequest.getSewerageConnection().getConnectionHolders().get(0).toCommonUser();
 			}
 			List<DemandDetail> demandDetails = new LinkedList<>();
 			calculation.getTaxHeadEstimates().forEach(taxHeadEstimate -> {
