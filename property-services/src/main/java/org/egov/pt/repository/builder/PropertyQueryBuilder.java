@@ -1,10 +1,12 @@
 package org.egov.pt.repository.builder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.time.Instant;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.PropertyCriteria;
+import org.egov.pt.models.enums.Status;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -167,11 +169,16 @@ public class PropertyQueryBuilder {
 			}
 		}
 
-		if (null != criteria.getStatus()) {
-
+		Set<String> statusStringList = new HashSet<>();
+		if (!CollectionUtils.isEmpty(criteria.getStatus())) {
+			criteria.getStatus().forEach(status -> {
+				statusStringList.add(status.toString());
+			});
 			addClauseIfRequired(preparedStmtList,builder);
-			builder.append("property.status = ?");
-			preparedStmtList.add(criteria.getStatus());
+			builder.append(" property.status IN ( ")
+				.append(createQuery(statusStringList))
+				.append(" )");
+			addToPreparedStatement(preparedStmtList, statusStringList);
 		}
 		
 		if (null != criteria.getLocality()) {
