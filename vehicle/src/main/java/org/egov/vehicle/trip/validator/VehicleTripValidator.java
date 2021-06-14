@@ -165,18 +165,22 @@ public class VehicleTripValidator {
 				throw new CustomException(VehicleTripConstants.INVALID_TRIP_ENDTIME, "Invalid Trip end time");
 			}
 				
-			//set the plant code based on the logged in user uuid
-			
-			PlantMapping plantMapping = vehicleTripFSMService.getPlantMapping(request.getRequestInfo(),
-					request.getVehicleTrip().getTenantId(), request.getRequestInfo().getUserInfo().getUuid());
-			if (null != plantMapping && StringUtils.isNotEmpty(plantMapping.getPlantCode())) {
-				ObjectNode additionalDtlObjectNode = (ObjectNode) request.getVehicleTrip().getAdditionalDetails();
-				if (null == additionalDtlObjectNode) {
-					ObjectMapper mapper = new ObjectMapper();
-					additionalDtlObjectNode = mapper.createObjectNode();
+			// For FSM_VEHICLE_TRIP service, set the plant code based on the logged in user uuid
+
+			if (VehicleTripConstants.FSM_VEHICLE_TRIP_BusinessService
+					.equalsIgnoreCase(request.getVehicleTrip().getBusinessService())) {
+				PlantMapping plantMapping = vehicleTripFSMService.getPlantMapping(request.getRequestInfo(),
+						request.getVehicleTrip().getTenantId(), request.getRequestInfo().getUserInfo().getUuid());
+				if (null != plantMapping && StringUtils.isNotEmpty(plantMapping.getPlantCode())) {
+					ObjectNode additionalDtlObjectNode = (ObjectNode) request.getVehicleTrip().getAdditionalDetails();
+					if (null == additionalDtlObjectNode) {
+						ObjectMapper mapper = new ObjectMapper();
+						additionalDtlObjectNode = mapper.createObjectNode();
+					}
+					log.info("FSTP Plant code"+ plantMapping.getPlantCode());
+					additionalDtlObjectNode.set("plantCode", TextNode.valueOf(plantMapping.getPlantCode()));
+					request.getVehicleTrip().setAdditionalDetails(additionalDtlObjectNode);
 				}
-				additionalDtlObjectNode.set("plantCode", TextNode.valueOf(plantMapping.getPlantCode()));
-				request.getVehicleTrip().setAdditionalDetails(additionalDtlObjectNode);
 			}
 		}
 		
