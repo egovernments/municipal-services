@@ -231,6 +231,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap,
 					true);
+			calculation.setTaxPeriodFrom(criteria.getFrom());
+			calculation.setTaxPeriodTo(criteria.getTo());
 			calculations.add(calculation);
 		}
 		return calculations;
@@ -244,7 +246,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request, calculations, masterMap, true);
+		demandService.generateDemandForBillingCycleInBulk(request, calculations, masterMap, true);
 		return calculations;
 	}
 

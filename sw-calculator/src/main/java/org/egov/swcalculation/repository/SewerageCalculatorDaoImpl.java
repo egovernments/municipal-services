@@ -62,5 +62,15 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 		
 		return null;
 	}
+	
+	@Override
+	public Boolean isConnectionDemandAvailableForBillingCycle(String tenantId, Long taxPeriodFrom, Long taxPeriodTo,
+			String consumerCode) {
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.isConnectionDemandAvailableForBillingCycle(tenantId, taxPeriodFrom, taxPeriodTo, consumerCode, preparedStatement);
+		log.info("isConnectionDemandAvailableForBillingCycle Query: " + query + " preparedStatement: "+ preparedStatement);
+		
+		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Boolean.class);
+	}
 
 }

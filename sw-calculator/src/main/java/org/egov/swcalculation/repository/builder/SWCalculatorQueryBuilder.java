@@ -25,6 +25,8 @@ public class SWCalculatorQueryBuilder {
 	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_sw_scheduler ";
 	
 	private static final String LAST_DEMAND_GEN_FOR_CONN =" SELECT d.taxperiodfrom FROM egbs_demand_v1 d ";
+	
+	private static final String isConnectionDemandAvailableForBillingCycle ="select EXISTS (select 1 from egbs_demand_v1 d ";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -232,6 +234,36 @@ public class SWCalculatorQueryBuilder {
 		query.append(" d.status = 'ACTIVE' ");
 		
 		query.append(" ORDER BY d.taxperiodfrom desc limit 1 ");
+		
+		return query.toString();
+	}
+	
+	public String isConnectionDemandAvailableForBillingCycle(String tenantId, Long taxPeriodFrom, Long taxPeriodTo, String consumerCode, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(isConnectionDemandAvailableForBillingCycle);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.consumercode = ? ");
+		preparedStatement.add(consumerCode);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.status = 'ACTIVE' ");
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodFrom = ? ");
+		preparedStatement.add(taxPeriodFrom);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodTo = ? ");
+		preparedStatement.add(taxPeriodTo);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ) ");
+		preparedStatement.add(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+
 		
 		return query.toString();
 	}
