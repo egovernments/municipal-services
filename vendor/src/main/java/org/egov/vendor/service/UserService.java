@@ -82,7 +82,9 @@ public class UserService {
 
 					if (isRoleAvailale(userDetailResponse.getUser().get(i), VendorConstants.DSO_ROLE,
 							vendor.getTenantId()) == Boolean.TRUE) {
-						foundOwner = userDetailResponse.getUser().get(i);
+// 						foundOwner = userDetailResponse.getUser().get(i);
+						throw new CustomException(VendorErrorConstants.INVALID_OWNER_ERROR, "Vendor already exists with this mobile No");
+
 					}
 				}
 
@@ -459,7 +461,8 @@ public class UserService {
 	public Boolean isRoleAvailale(User user, String role, String tenantId) {
 		Boolean flag = false;
 		Map<String, List<String>> tenantIdToOwnerRoles = getTenantIdToOwnerRolesMap(user);
-		flag = isRoleAvailable(tenantIdToOwnerRoles.get(tenantId), role);
+		log.info("Data available tenant Id" + tenantIdToOwnerRoles.get(tenantId.split("\\.")[0]));
+		flag = isRoleAvailable(tenantIdToOwnerRoles.get(tenantId.split("\\.")[0]), role);
 		return flag;
 	}
 
