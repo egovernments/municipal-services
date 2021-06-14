@@ -52,4 +52,7 @@ public class PlantMappingConfiguration {
 
 			@Value("${plant.mapping.allowed.search.params}")
 			private String allowedPlantMappingSearchParameters;
+			
+			@Value("${persister.update.plantmap.topic}")
+			private String updateTopic;
 }

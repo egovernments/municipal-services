@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.egov.fsm.plantmapping.web.model.PlantMapping;
+import org.egov.fsm.web.model.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -44,16 +45,24 @@ public class PlantMappingRowMapper implements ResultSetExtractor<List<PlantMappi
 			plantMap = plant.get(id);
 			String tenantId = rs.getString("tenantid");
 			String plantCode = rs.getString("plantcode");
+			
+			AuditDetails auditdetails = AuditDetails.builder().createdBy(rs.getString("createdBy"))
+					.createdTime(rs.getLong("createdTime")).lastModifiedBy(rs.getString("lastModifiedBy"))
+					.lastModifiedTime(rs.getLong("lastModifiedTime")).build();
+			
+			
 			if (plantMap == null) {
 				Long lastModifiedTime = rs.getLong("lastmodifiedtime");
 
 				if (rs.wasNull()) {
 					lastModifiedTime = null;
 				}
-				plantMap = PlantMapping.builder().id(id).tenantId(tenantId).plantCode(plantCode).build();
+				plantMap = PlantMapping.builder().id(id).tenantId(tenantId).plantCode(plantCode).auditDetails(auditdetails).build();
 
 				plant.put(id, plantMap);
 			}
+			
+			
 		}
 		return new ArrayList<>(plant.values());
 	}

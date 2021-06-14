@@ -47,4 +47,8 @@ public class PlantMappingRepository {
 		PlantMappingResponse PlantMapResponse = PlantMappingResponse.builder().plantMapping(plantmaps).build();
 		return PlantMapResponse;
 	}
+
+	public void update(PlantMappingRequest request) {
+		producer.push(config.getUpdateTopic(), request);
+	}
 }

@@ -50,6 +50,13 @@ public class PlantMappingQueryBuilder {
 			preparedStmtList.add(criteria.getPlantCode());
 		}
 		
+		List<String> ids = criteria.getIds();
+		if (!CollectionUtils.isEmpty(ids)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" plantmapping.id IN (").append(createQuery(ids)).append(")");
+			addToPreparedStatement(preparedStmtList, ids);
+		}
+		
 		return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 	}
 

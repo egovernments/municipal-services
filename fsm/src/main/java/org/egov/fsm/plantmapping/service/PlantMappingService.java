@@ -14,9 +14,7 @@ import org.egov.fsm.plantmapping.web.model.PlantMappingRequest;
 import org.egov.fsm.plantmapping.web.model.PlantMappingResponse;
 import org.egov.fsm.plantmapping.web.model.PlantMappingSearchCriteria;
 import org.egov.fsm.util.FSMErrorConstants;
-import org.egov.fsm.web.model.FSM;
-import org.egov.fsm.web.model.FSMResponse;
-import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.AuditDetails;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,17 +58,19 @@ public class PlantMappingService {
 			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + plantMap);
 		}
 		
+		validaor.validateCreateOrUpdate(request, mdmsData);
 		List<String> ids = new ArrayList<String>();
 		ids.add( plantMap.getId());
-		PlantMappingSearchCriteria criteria = PlantMappingSearchCriteria.builder().tenantId(plantMap.getTenantId()).build();
-		
+		PlantMappingSearchCriteria criteria = PlantMappingSearchCriteria.builder().tenantId(plantMap.getTenantId()).ids(ids).build();		
 		PlantMappingResponse response = repository.getPlantMappingData(criteria);
-		List<PlantMapping> plantMaps = response.getPlantMapping();
+		PlantMapping existingPlantMap = response.getPlantMapping().get(0);
 		
-		
-		validaor.validateCreateOrUpdate(request, mdmsData);
-		enrichmentService.enrichCreateRequest(request, mdmsData);
-		return request.getPlantMapping();
+		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);
+		auditDetails.setCreatedBy(existingPlantMap.getAuditDetails().getCreatedBy());
+		auditDetails.setCreatedTime(existingPlantMap.getAuditDetails().getCreatedTime());
+		request.getPlantMapping().setAuditDetails(auditDetails);
+		repository.update(request);
+		return request.getPlantMapping(); 
 	}
 
 	public PlantMappingResponse search(@Valid PlantMappingSearchCriteria criteria, RequestInfo requestInfo) {

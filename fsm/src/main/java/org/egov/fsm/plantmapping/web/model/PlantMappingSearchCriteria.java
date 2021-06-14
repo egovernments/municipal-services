@@ -2,9 +2,6 @@ package org.egov.fsm.plantmapping.web.model;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +27,9 @@ public class PlantMappingSearchCriteria {
     
     @JsonProperty("employeeUuid")
     private List<String> employeeUuid;
+    
+    @JsonProperty("ids")
+    private List <String> ids;
     
     
     public boolean isEmpty() {
