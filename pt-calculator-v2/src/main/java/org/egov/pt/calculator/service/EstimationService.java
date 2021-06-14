@@ -1,13 +1,74 @@
 package org.egov.pt.calculator.service;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import static org.egov.pt.calculator.util.CalculatorConstants.ADHOC_PENALTY;
+import static org.egov.pt.calculator.util.CalculatorConstants.ADHOC_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_AREA;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_ERROR_CODE;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_ERROR_MESSAGE;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_FLOOR;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_MATCH_USAGE_DETAIL;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_SEARCH_FAILED;
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLING_SLAB_SEARCH_FAILED_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_CREATE_FAILED;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_CREATE_FAILED_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_UPDATE_FAILED;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_UPDATE_FAILED_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.DOCUMENT_DATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG_ESTIMATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_ESTIMATE_ARV_NULL;
+import static org.egov.pt.calculator.util.CalculatorConstants.EG_PT_ESTIMATE_ARV_NULL_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.EXEMPTION_FIELD_NAME;
+import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIALYEAR_MASTER_KEY;
+import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.MARKET_VALUE;
+import static org.egov.pt.calculator.util.CalculatorConstants.MUTATION_PAYMENT_PERIOD_IN_MONTH;
+import static org.egov.pt.calculator.util.CalculatorConstants.OWNER_STATUS_ACTIVE;
+import static org.egov.pt.calculator.util.CalculatorConstants.OWNER_TYPE_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADHOC_PENALTY;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADHOC_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADHOC_REBATE_INVALID_AMOUNT;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADHOC_REBATE_INVALID_AMOUNT_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADVANCE_CARRYFORWARD;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_CANCER_CESS;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ESTIMATE_BILLINGSLABS_UNMATCH_replace_id;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_FIRE_CESS;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_OWNER_EXEMPTION;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TAX;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_INTEREST;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_PENALTY;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TYPE_VACANT_LAND;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_UNIT_USAGE_EXEMPTION;
+import static org.egov.pt.calculator.util.CalculatorConstants.SEPARATER;
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT_MUTATION;
+import static org.egov.pt.calculator.util.CalculatorConstants.TAXHEADMASTER_MASTER_KEY;
+import static org.egov.pt.calculator.util.CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.URL_PARAMS_SEPARATER;
+import static org.egov.pt.calculator.util.CalculatorConstants.USAGE_DETAIL_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.USAGE_MAJOR_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.USAGE_MINOR_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.USAGE_SUB_MINOR_MASTER;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -19,20 +80,31 @@ import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.util.PBFirecessUtils;
 import org.egov.pt.calculator.validator.CalculationValidator;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.BillingSlab;
 import org.egov.pt.calculator.web.models.BillingSlabSearchCriteria;
-import org.egov.pt.calculator.web.models.collections.Payment;
-import org.egov.pt.calculator.web.models.demand.*;
 import org.egov.pt.calculator.web.models.Calculation;
 import org.egov.pt.calculator.web.models.CalculationCriteria;
 import org.egov.pt.calculator.web.models.CalculationReq;
 import org.egov.pt.calculator.web.models.CalculationRes;
+import org.egov.pt.calculator.web.models.MutationBillingSlab;
+import org.egov.pt.calculator.web.models.MutationBillingSlabRes;
+import org.egov.pt.calculator.web.models.MutationBillingSlabSearchCriteria;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
+import org.egov.pt.calculator.web.models.collections.Payment;
 import org.egov.pt.calculator.web.models.demand.Category;
+import org.egov.pt.calculator.web.models.demand.Demand;
+import org.egov.pt.calculator.web.models.demand.DemandDetail;
+import org.egov.pt.calculator.web.models.demand.DemandRequest;
+import org.egov.pt.calculator.web.models.demand.DemandResponse;
 import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
-import org.egov.pt.calculator.web.models.property.*;
+import org.egov.pt.calculator.web.models.demand.TaxPeriod;
+import org.egov.pt.calculator.web.models.demand.TaxPeriodResponse;
+import org.egov.pt.calculator.web.models.property.OwnerInfo;
+import org.egov.pt.calculator.web.models.property.Property;
+import org.egov.pt.calculator.web.models.property.PropertyDetail;
+import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
+import org.egov.pt.calculator.web.models.property.Unit;
 import org.egov.pt.calculator.web.models.propertyV2.AssessmentRequestV2;
-import org.egov.pt.calculator.web.models.propertyV2.AssessmentResponseV2;
 import org.egov.pt.calculator.web.models.propertyV2.PropertyV2;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +113,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-
-import static org.egov.pt.calculator.util.CalculatorConstants.*;
 
 @Service
 @Slf4j
@@ -227,9 +299,22 @@ public class EstimationService {
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit,assessmentYear);
 				billingSlabIds.add(slab.getId()+"|"+i);
 				unitSlabMapping.put(unit, slab);
-
-				/*
-				 * counting the number of units & total area in ground floor for unbuilt area
+				if(unit.getOccupancyType().equalsIgnoreCase("RENTED") || unit.getOccupancyType().equalsIgnoreCase("PG"))
+				{ 	
+					BigDecimal  noofmonths=BigDecimal.valueOf(Double.parseDouble(unit.getAdditionalDetails().get("rentedformonths").toString()));
+					if(noofmonths.compareTo(BigDecimal.valueOf(12)) < 0 )
+					{
+					unit.setOccupancyType("UNOCCUPIED");
+					BigDecimal restMonths=	BigDecimal.valueOf(12).subtract(noofmonths);
+					slab = getSlabForCalc(filteredBillingSlabs, unit);
+					BigDecimal tax=BigDecimal.valueOf(Math.round(getTaxForUnit(slab, unit,assessmentYear).doubleValue()));
+					BigDecimal addTax=tax.multiply(restMonths).divide(BigDecimal.valueOf(12),2, RoundingMode.HALF_UP);
+					currentUnitTax =currentUnitTax.add(addTax);
+					billingSlabIds.add(slab.getId()+"|"+i);
+					unitSlabMapping.put(unit, slab);
+					}	
+				}	/*
+								 * counting the number of units & total area in ground floor for unbuilt area
 				 * tax calculation
 				 */
 				if (unit.getFloorNo().equalsIgnoreCase("0")) {
@@ -243,7 +328,7 @@ public class EstimationService {
 				usageExemption = usageExemption
 						.add(getExemption(unit, currentUnitTax, assessmentYear, propertyBasedExemptionMasterMap));
 				i++;
-			}
+			}	
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
@@ -361,7 +446,10 @@ public class EstimationService {
 				multiplier = BigDecimal.valueOf(slab.getArvPercent() / 100);
 			else
 				multiplier = BigDecimal.valueOf(configs.getArvPercent() / 100);
-			currentUnitTax = unit.getArv().multiply(multiplier);
+			if(unit.getAdditionalDetails() !=null && unit.getAdditionalDetails().has("rentedformonths")) {
+			currentUnitTax = unit.getArv().multiply(multiplier).multiply(BigDecimal.valueOf(unit.getAdditionalDetails().get("rentedformonths").asDouble())).divide(BigDecimal.valueOf(12));}
+			else {
+				currentUnitTax = unit.getArv().multiply(multiplier); }
 		} else {
 	
 			currentUnitTax = BigDecimal.valueOf(unit.getUnitArea() * slab.getUnitRate());
