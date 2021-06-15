@@ -6,10 +6,10 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.plantmapping.repository.PlantMappingRepository;
-import org.egov.fsm.plantmapping.util.PlantMappingUtil;
 import org.egov.fsm.plantmapping.web.model.PlantMapping;
 import org.egov.fsm.plantmapping.web.model.PlantMappingRequest;
 import org.egov.fsm.service.UserService;
+import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class PlantMappingEnrichmentService {
 	private UserService userService;
 	
 	@Autowired
-	private PlantMappingUtil util;
+	private FSMUtil util;
 
 	public void enrichCreateRequest(@Valid PlantMappingRequest request, Object mdmsData) {
 		// TODO Auto-generated method stub

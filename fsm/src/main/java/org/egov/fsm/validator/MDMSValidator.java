@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.fsm.plantmapping.util.PlantMappingConstants;
+import org.egov.fsm.plantmapping.web.model.PlantMappingRequest;
 import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.web.model.FSMRequest;
@@ -131,6 +133,26 @@ public class MDMSValidator {
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 		
+	}
+	public void validateMdmsData(PlantMappingRequest request, Object mdmsData) {
+
+		this.mdmsResMap = getAttributeValues(mdmsData);
+		String[] masterArray = { PlantMappingConstants.MDMS_FSTP_PLANT_INFO };
+
+		validateIfMasterPresent(masterArray, this.mdmsResMap);
+
+	}
+
+	public void validateFSTPPlantInfo(String plantCode) throws CustomException {
+
+		Map<String, String> errorMap = new HashMap<>();
+
+		if (!((List<String>) this.mdmsResMap.get(PlantMappingConstants.MDMS_FSTP_PLANT_INFO)).contains(plantCode)) {
+			errorMap.put(FSMErrorConstants.INVALID_APPLICATION_CHANNEL, " Application Channel is invalid");
+		}
+
+		if (!errorMap.isEmpty())
+			throw new CustomException(errorMap);
 	}
 
 }
