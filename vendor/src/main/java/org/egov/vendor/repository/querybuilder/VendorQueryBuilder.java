@@ -36,6 +36,8 @@ public class VendorQueryBuilder {
 	private static final String VENDOR_ID = "vendor_id";
 	private static final String VENDOR_DRIVER = "eg_vendor_driver";
 	private static final String VENDOR_VEHICLE = "eg_vendor_vehicle";
+	
+	public static final String VENDOR_COUNT="select count(*) from eg_vendor where owner_id IN ";
 
 	public String getDriverSearchQuery() {
 		return String.format(DRIVER_VEHICLE_QUERY, DRIVER_ID, VENDOR_DRIVER, VENDOR_ID);
@@ -52,6 +54,13 @@ public class VendorQueryBuilder {
 		return builder.toString();
 	}
 
+	public String getvendorCount(List<String> ownerList,List<Object> preparedStmtList) {
+		StringBuilder builder = new StringBuilder(VEHICLE_EXISTS);		
+		builder.append("(").append(createQuery(ownerList)).append(")");
+		addToPreparedStatement(preparedStmtList, ownerList);
+		return builder.toString();
+
+	}
 
 
 	public String getVendorSearchQuery(VendorSearchCriteria criteria, List<Object> preparedStmtList) {
