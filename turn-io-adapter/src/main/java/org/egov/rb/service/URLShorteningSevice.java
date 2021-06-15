@@ -20,7 +20,7 @@ public class URLShorteningSevice {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${egov.urlshortner.host}")
+    @Value("${egov.url.shortner.host}")
     private String urlShortnerServiceHost;
 
     @Value("${egov.urlshortner.endpoint}")
