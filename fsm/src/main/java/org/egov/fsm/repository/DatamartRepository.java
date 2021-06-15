@@ -74,17 +74,17 @@ public class DatamartRepository {
 				query.append(" offset " + i + " limit 500 ;");
 				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
 				for (DataMartModel dataMartModel : dataMartList) {
+					String locality = dataMartModel.getLocality();
 					Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
 							dataMartModel.getApplicationId(), requestInfo, totalrowsWithTenantId.get(i).getTenantId());
 					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
-					String jsonString = new JSONObject(boundaryData).toString();
 
-					DocumentContext context = JsonPath.parse(jsonString);
+					if (dataMartModel.getLocality() != null && boundaryData != null) {
 
-					if (dataMartModel.getLocality() != null) {
-						List<Boundary> boundaryResponse = context
-								.read("$.[?(@.code==\"{}\")]".replace("{}", dataMartModel.getLocality()));
+						List<Boundary> boundaryResponse = boundaryData.stream()
+								.filter(boundary -> boundary.getCode() == locality).collect(Collectors.toList());
 						dataMartModel.setLocality(boundaryResponse.get(0).getName());
+						
 					}
 
 					datamartList.add(dataMartModel);
@@ -250,7 +250,13 @@ public class DatamartRepository {
 					"The response from location service is empty or null");
 		}
 
-		return (List<Boundary>) responseMap.get("Boundary");
+		String jsonString = new JSONObject(responseMap).toString();
+
+		DocumentContext context = JsonPath.parse(jsonString);
+
+		List<Boundary> boundaryResponse = context.read("$..boundary");
+
+		return boundaryResponse;
 
 	}
 
