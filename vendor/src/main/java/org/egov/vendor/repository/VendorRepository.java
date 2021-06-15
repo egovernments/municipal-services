@@ -55,7 +55,8 @@ public class VendorRepository {
 		List<String> ids = null;
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(id);
-		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getDriverSearchQuery(), preparedStmtList.toArray(), String.class);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getDriverSearchQuery(), preparedStmtList.toArray(),
+				String.class);
 		return ids;
 	}
 
@@ -63,15 +64,17 @@ public class VendorRepository {
 		List<String> ids = null;
 		List<Object> preparedStmtList = new ArrayList<>();
 		preparedStmtList.add(id);
-		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getVehicleSearchQuery(), preparedStmtList.toArray(), String.class);
+		ids = jdbcTemplate.queryForList(vendorQueryBuilder.getVehicleSearchQuery(), preparedStmtList.toArray(),
+				String.class);
 		return ids;
 	}
-	
-	public List<String> getVendorWithVehicles(List<String> vehicleIds){
+
+	public List<String> getVendorWithVehicles(List<String> vehicleIds) {
 		List<String> vendorIds = null;
 		List<Object> preparedStmtList = new ArrayList<>();
-		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(vehicleIds, preparedStmtList), preparedStmtList.toArray(), String.class);		
-		return vendorIds;		
+		vendorIds = jdbcTemplate.queryForList(vendorQueryBuilder.vendorsForVehicles(vehicleIds, preparedStmtList),
+				preparedStmtList.toArray(), String.class);
+		return vendorIds;
 	}
 
 	public List<String> fetchVendorIds(@Valid VendorSearchCriteria criteria) {
@@ -79,24 +82,31 @@ public class VendorRepository {
 		preparedStmtList.add(criteria.getOffset());
 		preparedStmtList.add(criteria.getLimit());
 
-		List<String> ids = jdbcTemplate.query("SELECT id from eg_vendor ORDER BY createdtime offset " +
-						" ? " +
-						"limit ? ",
-				preparedStmtList.toArray(),
-				new SingleColumnRowMapper<>(String.class));
+		List<String> ids = jdbcTemplate.query(
+				"SELECT id from eg_vendor ORDER BY createdtime offset " + " ? " + "limit ? ",
+				preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
 		return ids;
 	}
 
 	public List<Vendor> getVendorPlainSearch(VendorSearchCriteria criteria) {
 
-		if(criteria.getIds() == null || criteria.getIds().isEmpty())
+		if (criteria.getIds() == null || criteria.getIds().isEmpty())
 			throw new CustomException("PLAIN_SEARCH_ERROR", "Search only allowed by ids!");
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = vendorQueryBuilder.getVendorLikeQuery(criteria, preparedStmtList);
-		log.info("Query: "+query);
-		log.info("PS: "+preparedStmtList);
+		log.info("Query: " + query);
+		log.info("PS: " + preparedStmtList);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), vendorrowMapper);
+	}
+
+	public int getExistingVenodrsCount(List<String> ownerIdList) {
+		List<Object> preparedStmtList = new ArrayList<>();
+
+		String query = vendorQueryBuilder.getvendorCount(ownerIdList, preparedStmtList);
+
+		return jdbcTemplate.queryForObject(query, preparedStmtList.toArray(), Integer.class);
+
 	}
 
 }
