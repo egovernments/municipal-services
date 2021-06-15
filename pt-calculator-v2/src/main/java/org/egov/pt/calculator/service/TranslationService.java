@@ -147,7 +147,11 @@ public class TranslationService {
                 if(masterData.length >= 4)
                     unitMap.put("usageCategoryDetail",masterData[3]);
 
-                unitMap.put("additionalDetails", unit.getAdditionalDetails());
+                if(!unit.getAdditionalDetails().isNull())
+                	unitMap.put("additionalDetails", unit.getAdditionalDetails());
+                else
+                	unitMap.put("additionalDetails", null);
+
                 units.add(unitMap);
 
             });
