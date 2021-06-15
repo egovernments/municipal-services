@@ -67,7 +67,7 @@ public class PlantMappingValidator {
 		if (!request.getRequestInfo().getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE)) {
 			throw new CustomException(FSMErrorConstants.INVALID_APPLICANT_ERROR, "Applicant must be an Employee");
 		}
-		mdmsValidator.validateFSTPPlantInfo(plantMap.getPlantCode());
+		mdmsValidator.validateFSTPPlantInfo(plantMap.getPlantCode(),request.getPlantMapping().getTenantId());
 
 		UserDetailResponse userDetailResponse = userExists(request);
 
@@ -86,18 +86,19 @@ public class PlantMappingValidator {
 
 		}
 
-		PlantMappingResponse plantMapResponse = plantMappingExists(request);
-		if (null != plantMapResponse && null != plantMapResponse.getPlantMapping()
-				&& Strings.isNullOrEmpty(plantMapResponse.getPlantMapping().get(0).getId()))
-			throw new CustomException(FSMErrorConstants.FSTP_EMPLOYEE_MAP_EXISTS_ERROR,
-					"FSTP and employee mapping already exist.");
+	
 	}
 
-	private PlantMappingResponse plantMappingExists(PlantMappingRequest request) {
+	public void validatePlantMappingExists(PlantMappingRequest request) {
 		PlantMappingSearchCriteria plantMappingSearchCriteria = new PlantMappingSearchCriteria();
 		plantMappingSearchCriteria.setEmployeeUuid(Arrays.asList(request.getPlantMapping().getEmployeeUuid()));
 		plantMappingSearchCriteria.setPlantCode(request.getPlantMapping().getPlantCode());
-		return plantMappingService.search(plantMappingSearchCriteria, request.getRequestInfo());
+		plantMappingSearchCriteria.setTenantId(request.getPlantMapping().getTenantId());
+		PlantMappingResponse plantMapResponse = plantMappingService.search(plantMappingSearchCriteria, request.getRequestInfo());
+		if (null != plantMapResponse && null != plantMapResponse.getPlantMapping()
+				&& StringUtils.isNotBlank(plantMapResponse.getPlantMapping().get(0).getId()))
+			throw new CustomException(FSMErrorConstants.FSTP_EMPLOYEE_MAP_EXISTS_ERROR,
+					"FSTP and employee mapping already exist.");
 	}
 
 	private UserDetailResponse userExists(PlantMappingRequest request) {

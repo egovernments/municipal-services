@@ -41,7 +41,9 @@ public class PlantMappingService {
 		if (request.getPlantMapping().getTenantId().split("\\.").length == 1) {
 			throw new CustomException(FSMErrorConstants.INVALID_TENANT, "Application Request cannot be create at StateLevel");
 		}
+		
 		validaor.validateCreateOrUpdate(request, mdmsData);
+		validaor.validatePlantMappingExists(request);
 		enrichmentService.enrichCreateRequest(request, mdmsData);
 		repository.save(request);
 		return request.getPlantMapping();
@@ -55,7 +57,7 @@ public class PlantMappingService {
 		
 		
 		if (plantMap.getId() == null) {
-			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "Application Not found in the System" + plantMap);
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "FSTP employee map not found in the System" + plantMap.getId());
 		}
 		
 		validaor.validateCreateOrUpdate(request, mdmsData);
@@ -63,6 +65,10 @@ public class PlantMappingService {
 		ids.add( plantMap.getId());
 		PlantMappingSearchCriteria criteria = PlantMappingSearchCriteria.builder().tenantId(plantMap.getTenantId()).ids(ids).build();		
 		PlantMappingResponse response = repository.getPlantMappingData(criteria);
+		if(!(null != response && response.getPlantMapping().size()>0)){
+			throw new CustomException(FSMErrorConstants.UPDATE_ERROR, "FSTP employee map not found in the System");
+		}
+		
 		PlantMapping existingPlantMap = response.getPlantMapping().get(0);
 		
 		AuditDetails auditDetails = util.getAuditDetails(requestInfo.getUserInfo().getUuid(), true);

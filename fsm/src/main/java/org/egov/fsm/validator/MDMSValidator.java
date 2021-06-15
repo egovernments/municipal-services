@@ -143,14 +143,20 @@ public class MDMSValidator {
 
 	}
 
-	public void validateFSTPPlantInfo(String plantCode) throws CustomException {
-
+	public void validateFSTPPlantInfo(String plantCode, String tenantId) throws CustomException {
 		Map<String, String> errorMap = new HashMap<>();
-
-		if (!((List<String>) this.mdmsResMap.get(PlantMappingConstants.MDMS_FSTP_PLANT_INFO)).contains(plantCode)) {
-			errorMap.put(FSMErrorConstants.INVALID_APPLICATION_CHANNEL, " Application Channel is invalid");
+		List<Map<String, String>> plantMap = (List<Map<String, String>>) this.mdmsResMap
+				.get(PlantMappingConstants.MDMS_FSTP_PLANT_INFO);
+		List<Map<String, String>> fstpmap = (List<Map<String, String>>) JsonPath.parse(plantMap)
+				.read("$.[?(@.PlantCode=='" + plantCode + "')]");
+		if (fstpmap != null && fstpmap.size() > 0) {
+			Map<String, String> planMapData = fstpmap.get(0);
+			if (!(planMapData.get("PlantCode").equals(plantCode)) || !(planMapData.get("ULBS").contains(tenantId))) {
+				errorMap.put(FSMErrorConstants.INVALID_FSTP_CODE, "Invalid FSTP code");
+			}
+		} else {
+			errorMap.put(FSMErrorConstants.INVALID_FSTP_CODE, "Invalid FSTP code");
 		}
-
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 	}
