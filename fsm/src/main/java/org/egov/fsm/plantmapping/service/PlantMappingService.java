@@ -7,13 +7,13 @@ import javax.validation.Valid;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.fsm.plantmapping.repository.PlantMappingRepository;
-import org.egov.fsm.plantmapping.util.PlantMappingUtil;
 import org.egov.fsm.plantmapping.validator.PlantMappingValidator;
 import org.egov.fsm.plantmapping.web.model.PlantMapping;
 import org.egov.fsm.plantmapping.web.model.PlantMappingRequest;
 import org.egov.fsm.plantmapping.web.model.PlantMappingResponse;
 import org.egov.fsm.plantmapping.web.model.PlantMappingSearchCriteria;
 import org.egov.fsm.util.FSMErrorConstants;
+import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.AuditDetails;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 public class PlantMappingService {
 
 	@Autowired
-	private PlantMappingUtil util;
+	private FSMUtil util;
 	
 	@Autowired
 	private PlantMappingValidator validaor;

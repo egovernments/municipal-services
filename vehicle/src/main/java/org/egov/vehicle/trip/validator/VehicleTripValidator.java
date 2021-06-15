@@ -180,6 +180,10 @@ public class VehicleTripValidator {
 					log.info("FSTP Plant code"+ plantMapping.getPlantCode());
 					additionalDtlObjectNode.set("plantCode", TextNode.valueOf(plantMapping.getPlantCode()));
 					request.getVehicleTrip().setAdditionalDetails(additionalDtlObjectNode);
+				} else {
+					log.error("Logged user to FSTP mapping doesn't exists. ");
+					throw new CustomException(VehicleTripConstants.EMPLOYEE_FSTP_MAP_NOT_EXISTS,
+							"Logged user to FSTP mapping doesn't exists.");
 				}
 			}
 		}

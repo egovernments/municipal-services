@@ -6,11 +6,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.egov.fsm.plantmapping.service.PlantMappingService;
-import org.egov.fsm.plantmapping.util.PlantMappingUtil;
 import org.egov.fsm.plantmapping.web.model.PlantMapping;
 import org.egov.fsm.plantmapping.web.model.PlantMappingRequest;
 import org.egov.fsm.plantmapping.web.model.PlantMappingResponse;
 import org.egov.fsm.plantmapping.web.model.PlantMappingSearchCriteria;
+import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.util.ResponseInfoFactory;
 import org.egov.fsm.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class PlantMappingController {
 	private ResponseInfoFactory responseInfoFactory; 
 	
 	@Autowired
-	private PlantMappingUtil util;
+	private FSMUtil util;
 
 	@PostMapping(value = "/_create")
 	public ResponseEntity<PlantMappingResponse> create(@Valid @RequestBody PlantMappingRequest request) {
