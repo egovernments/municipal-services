@@ -737,6 +737,7 @@ public class DemandService {
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				SewerageDetails sewConnDetails = connectionNos.get(connectionNosIndex);
+				connectionNosCount++;
 				countForPause++;
 				try {
 					int generateDemandFromIndex = 0;
