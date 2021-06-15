@@ -203,7 +203,7 @@ const calculateNOCFee = async (
       let fullrate = Number(billingslabs[0].rate);
           if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "PROVISIONAL")
             buidingnocfee= Math.round((fullrate * billingslabs[0].provisional_percentage) / 100.0);
-          else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEW")
+          else if (calculateCriteria.fireNOC.fireNOCDetails.fireNOCType === "RENEWAL")
             buidingnocfee= Math.round((fullrate * billingslabs[0].renew_percentage) / 100.0);
           else
             buidingnocfee= Math.round((fullrate * billingslabs[0].new_percentage) / 100.0);
