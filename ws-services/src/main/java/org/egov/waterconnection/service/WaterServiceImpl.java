@@ -167,11 +167,12 @@ public class WaterServiceImpl implements WaterService {
 
 	List<WaterConnection> getWaterConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo) {
 		
-		if(criteria.getLimit()==null)
+		if(criteria.getLimit()==null) {
 			criteria.setLimit(config.getDefaultLimit());
-		
-		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxLimit())
+		}
+		else if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxLimit()) {
 			criteria.setLimit(config.getMaxLimit());				
+		}
 		
 		if(criteria.getOffset()==null)
 			criteria.setOffset(config.getDefaultOffset());
