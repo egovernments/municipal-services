@@ -55,6 +55,10 @@ public class SWCalculatorQueryBuilder {
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
 		
+		//Added connection number for testing Anonymous User issue
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" conn.connectionno ='0603000581' ");
+		
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");

@@ -711,10 +711,12 @@ public class DemandService {
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId,
 			Long taxPeriodFrom, Long taxPeriodTo) {
 		try {
-			List<Role> roles = requestInfo.getUserInfo().getRoles()	!= null ? requestInfo.getUserInfo().getRoles() : null;
+			List<Role> roles = requestInfo.getUserInfo().getRoles()	!= null ? requestInfo.getUserInfo().getRoles() : new ArrayList<Role>();
+			log.info("requestInfo Before removing Anonymous User: {}", mapper.writeValueAsString(requestInfo));
 			//Removing the ANONYMOUS role.
 			roles.removeIf(role -> role.getCode().equalsIgnoreCase("ANONYMOUS"));
-			
+			log.info("requestInfo After removing Anonymous User: {}", mapper.writeValueAsString(requestInfo));
+
 			List<TaxPeriod> taxPeriods = calculatorUtils.getTaxPeriodsFromMDMS(requestInfo, tenantId);
 			
 			int generateDemandToIndex = IntStream.range(0, taxPeriods.size())
@@ -782,7 +784,7 @@ public class DemandService {
 								.build();
 						log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
-						totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
+						totalRecordsPushedToKafka++;
 						calculationCriteriaList.clear();
 						connectionNosCount=0;
 						if(threadSleepCount == 3) {
@@ -801,7 +803,7 @@ public class DemandService {
 								.build();
 						log.info("Pushing calculation last req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
-						totalRecordsPushedToKafka=totalRecordsPushedToKafka+calculationCriteriaList.size();
+						totalRecordsPushedToKafka++;
 						calculationCriteriaList.clear();
 						connectionNosCount=0;
 
@@ -812,7 +814,7 @@ public class DemandService {
 					log.error("Exception occurred while generating demand for sewerage connectionno: "+sewConnDetails.getConnectionNo() + " tenantId: "+tenantId);
 				}
 			}
-			log.info("totalRecordsPushedToKafka: {}", totalRecordsPushedToKafka);
+			log.info("totalConnRecordsPushedToKafka: {}", totalRecordsPushedToKafka);
 		}catch (Exception e) {
 			log.error("Exception occurred while processing the demand generation for tenantId: "+tenantId);
 		}
