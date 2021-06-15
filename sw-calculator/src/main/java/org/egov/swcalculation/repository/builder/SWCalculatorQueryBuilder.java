@@ -57,7 +57,7 @@ public class SWCalculatorQueryBuilder {
 		
 		//Added connection number for testing Anonymous User issue
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" conn.connectionno ='0603000581' ");
+		query.append(" conn.connectionno ='0603001817' ");
 		
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
