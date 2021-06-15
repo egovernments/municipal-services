@@ -729,8 +729,9 @@ public class DemandService {
 
 			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
-		
-			Integer countForPause=0;
+			
+			log.info("Total Connections: {} and batch count: {}", connectionNos.size(), bulkSaveDemandCount);
+
 			int connectionNosCount = 0;
 			int totalRecordsPushedToKafka = 0;
 			int threadSleepCount = 0;
@@ -738,7 +739,8 @@ public class DemandService {
 			for (int connectionNosIndex = 0; connectionNosIndex < connectionNos.size(); connectionNosIndex++) {
 				SewerageDetails sewConnDetails = connectionNos.get(connectionNosIndex);
 				connectionNosCount++;
-				countForPause++;
+				int billingCycleCount = 0;
+
 				try {
 					int generateDemandFromIndex = 0;
 					Long lastDemandFromDate = sewerageCalculatorDao.searchLastDemandGenFromDate(sewConnDetails.getConnectionNo(), tenantId);
@@ -752,8 +754,9 @@ public class DemandService {
 
 					for (int taxPeriodIndex = generateDemandFromIndex; generateDemandFromIndex <= generateDemandToIndex; taxPeriodIndex++) {
 						generateDemandFromIndex++;
+						billingCycleCount++;
 						TaxPeriod taxPeriod = taxPeriods.get(taxPeriodIndex);
-						log.info("FromPeriod: {} and ToPeriod: {}",taxPeriod.getFromDate(),taxPeriod.getToDate());
+//						log.info("FromPeriod: {} and ToPeriod: {}",taxPeriod.getFromDate(),taxPeriod.getToDate());
 						log.info("taxPeriodIndex: {} and generateDemandFromIndex: {} and generateDemandToIndex: {}",taxPeriodIndex, generateDemandFromIndex, generateDemandToIndex);
 
 						boolean isValidBillingCycle = isValidBillingCycle(sewConnDetails, taxPeriod.getFromDate(), taxPeriod.getToDate(), tenantId,
@@ -769,13 +772,10 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 							log.info("connectionNosIndex: {} and connectionNos.size(): {}",connectionNosIndex, connectionNos.size());
 
-						} else {
-							log.info("Invalid Connection");
-							log.info("connectionNo: {}, connectionNosIndex: {} and connectionNos.size(): {}",sewConnDetails.getConnectionNo(),connectionNosIndex, connectionNos.size());
 						}
 						
 					}
-					if(connectionNosCount == bulkSaveDemandCount) {
+					if(billingCycleCount > 10 || connectionNosCount == bulkSaveDemandCount) {
 						log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
 
 						CalculationReq calculationReq = CalculationReq.builder()
@@ -786,6 +786,7 @@ public class DemandService {
 						log.info("Pushing calculation req to the kafka topic with bulk data of calculationCriteriaList size: {}", calculationCriteriaList.size());
 						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 						totalRecordsPushedToKafka++;
+						billingCycleCount=0;
 						calculationCriteriaList.clear();
 						connectionNosCount=0;
 						if(threadSleepCount == 3) {
@@ -807,7 +808,6 @@ public class DemandService {
 						totalRecordsPushedToKafka++;
 						calculationCriteriaList.clear();
 						connectionNosCount=0;
-
 
 					}
 
