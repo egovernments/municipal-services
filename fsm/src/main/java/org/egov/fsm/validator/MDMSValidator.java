@@ -73,6 +73,11 @@ public class MDMSValidator {
 		if( !((List<String>) this.mdmsResMap.get(FSMConstants.MDMS_PROPERTY_TYPE)).contains(propertyType) ) {
 			errorMap.put(FSMErrorConstants.INVALID_PROPERTY_TYPE," Property Type is invalid");
 		}
+		
+		if (propertyType.split("\\.").length <= 1) {
+			errorMap.put(FSMErrorConstants.INVALID_PROPERTY_TYPE,
+					" Property Type And Sub property type Both are mandetory.");
+		}
 
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
