@@ -13,6 +13,7 @@ import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.oldProperty.OldPropertyCriteria;
 import org.egov.pt.repository.ElasticSearchRepository;
+import org.egov.pt.service.FuzzySearchService;
 import org.egov.pt.service.MigrationService;
 import org.egov.pt.service.PropertyService;
 import org.egov.pt.util.ResponseInfoFactory;
@@ -48,7 +49,7 @@ public class PropertyController {
     private PropertyValidator propertyValidator;
 
     @Autowired
-    ElasticSearchRepository elasticSearchRepository;
+    FuzzySearchService fuzzySearchService;
 
     @PostMapping("/_create")
     public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
@@ -126,10 +127,10 @@ public class PropertyController {
 
 
     @PostMapping("/fuzzy/_search")
-    public ResponseEntity<Map> fuzzySearch(@Valid @ModelAttribute FuzzySearchCriteria fuzzySearchCriteria) {
+    public ResponseEntity<List<Property>> fuzzySearch(@Valid @ModelAttribute FuzzySearchCriteria fuzzySearchCriteria) {
 
-        Map output = elasticSearchRepository.fuzzySearchProperties(fuzzySearchCriteria);
-        return new ResponseEntity<>(output, HttpStatus.OK);
+        List<Property> properties = fuzzySearchService.getProperties(fuzzySearchCriteria);
+        return new ResponseEntity<>(properties, HttpStatus.OK);
     }
 
 }

@@ -4,16 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.repository.builder.FuzzySearchQueryBuilder;
 import org.egov.pt.web.contracts.FuzzySearchCriteria;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Component
 public class ElasticSearchRepository {
@@ -36,13 +34,13 @@ public class ElasticSearchRepository {
     }
 
 
-
     /**
      * Searches records from elasticsearch based on the fuzzy search criteria
+     *
      * @param criteria
      * @return
      */
-    public Map fuzzySearchProperties(FuzzySearchCriteria criteria){
+    public Object fuzzySearchProperties(FuzzySearchCriteria criteria) {
 
 
         String url = getESURL();
@@ -52,22 +50,26 @@ public class ElasticSearchRepository {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(searchQuery, headers);
+        ResponseEntity response = null;
+        try {
+             response = restTemplate.postForEntity(url, requestEntity, Object.class);
 
+        } catch (Exception e) {
 
-        Object response = restTemplate.postForEntity(url, requestEntity, Object.class);
+            throw new CustomException("ES_ERROR","Failed to fetch data from ES");
+        }
 
-        Map<String, Object> output = mapper.convertValue(response, Map.class);
-
-        return output;
+        return response.getBody();
 
     }
 
 
     /**
      * Generates elasticsearch search url from application properties
+     *
      * @return
      */
-    private String getESURL(){
+    private String getESURL() {
 
         StringBuilder builder = new StringBuilder(config.getEsHost());
         builder.append(config.getEsPTIndex());
@@ -75,8 +77,6 @@ public class ElasticSearchRepository {
 
         return builder.toString();
     }
-
-
 
 
 }

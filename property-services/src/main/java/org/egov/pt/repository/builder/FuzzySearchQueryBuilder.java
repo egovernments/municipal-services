@@ -21,7 +21,7 @@ public class FuzzySearchQueryBuilder {
     }
 
     private static final String BASE_QUERY = "{\n" +
-            "  \"_source\": \"Data.propertyId\",\n" +
+            "  \"_source\": [\"Data.propertyId\",\"Data.tenantData.code\"],\n" +
             "  \"query\": {\n" +
             "    \"match\": {\n" +
             "    }\n" +
