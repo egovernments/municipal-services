@@ -2,6 +2,7 @@ package org.egov.land.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.egov.land.config.LandConfiguration;
 import org.egov.land.producer.Producer;
@@ -60,7 +61,13 @@ public class LandRepository {
 	public List<LandInfo> getLandInfoData(LandSearchCriteria criteria) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getLandInfoSearchQuery(criteria, preparedStmtList);
+		log.info("Query--->>>"+query);
+		for(Object o : preparedStmtList) {
+			log.info("Query Params--->>>"+o.toString());
+		}
+		
 		List<LandInfo> landInfoData = jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+		log.info("Size Of Landinfo"+landInfoData.size());
 		if(!CollectionUtils.isEmpty(landInfoData)) {
 			log.debug("Received data from Query..");
 		}

@@ -114,13 +114,14 @@ public class LandService {
 			System.out.println(ids);
 			criteria.setUserIds(ids);
 		}
-
+		log.info("LandSearchCriteria [tenantId=" + criteria.getTenantId() + ", ids=" + criteria.getIds() + ", landUId=" + criteria.getLandUId() + ", mobileNumber="
+				+ criteria.getMobileNumber() + ", offset=" + criteria.getOffset() + ", limit=" + criteria.getLimit() + ", userIds=" + criteria.getUserIds() + "]");
 		landInfo = repository.getLandInfoData(criteria);
-
 		if (landInfo.size() == 0) {
 			return Collections.emptyList();
 		}
 		enrichmentService.enrichLandInfoSearch(landInfo, criteria, requestInfo);
+		log.info("landInfo after enrich Size--->>>"+landInfo.size());
 		return landInfo;
 	}
 	
@@ -142,8 +143,9 @@ public class LandService {
 		if(!CollectionUtils.isEmpty(landInfos)){
 			log.debug("Received final landInfo response..");
 		}
-		
+		log.info("fetchLandInfoData before enrich"+landInfos.size());
 		landInfos = enrichmentService.enrichLandInfoSearch(landInfos, criteria, requestInfo);
+		log.info("fetchLandInfoData after enrich"+landInfos.size());
 		if(!CollectionUtils.isEmpty(landInfos)){
 			log.debug("Received final landInfo response after enrichment..");
 		}

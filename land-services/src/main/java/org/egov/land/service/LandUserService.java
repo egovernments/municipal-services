@@ -9,7 +9,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
+import java.util.UUID;import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -178,6 +179,7 @@ public class LandUserService {
 			ids.add(uuid);
 		}
 		userSearchRequest.setUuid(ids);
+		log.info("User ids"+ids.stream().collect(Collectors.joining(",")));
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		return userCall(userSearchRequest, uri);
 	}
