@@ -1,14 +1,12 @@
 package org.egov.pgr.utils;
 
-import org.json.JSONObject;
-
 import okhttp3.*;
 
-public class DGRApi {
+public class DGRApi {	
 
 	public String apiCalling(String complaintId)
 	{
-		String status="";
+		String jsonData = null;
 	OkHttpClient client = new OkHttpClient().newBuilder()
 			  .followRedirects(false)
 			  .build();
@@ -22,18 +20,15 @@ public class DGRApi {
 			Response responses = null;
 			try {
 				responses = client.newCall(request).execute();
-				String jsonData = responses.body().string();
-				JSONObject Jobject = new JSONObject(jsonData);	
-				if(Jobject.get("response").equals(1))
-					status= "Successfully updated.";
-				else
-					status= "Something went be wrong!";
+				jsonData = responses.body().string();
+				
+				
 	}
 	catch(Exception e)
 	{
 		e.printStackTrace();
 	}
-			return status;
+			return jsonData;
 	}
 
 }
