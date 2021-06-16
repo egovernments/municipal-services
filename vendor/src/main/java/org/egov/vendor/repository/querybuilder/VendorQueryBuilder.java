@@ -55,7 +55,7 @@ public class VendorQueryBuilder {
 	}
 
 	public String getvendorCount(List<String> ownerList,List<Object> preparedStmtList) {
-		StringBuilder builder = new StringBuilder(VEHICLE_EXISTS);		
+		StringBuilder builder = new StringBuilder(VENDOR_COUNT);		
 		builder.append("(").append(createQuery(ownerList)).append(")");
 		addToPreparedStatement(preparedStmtList, ownerList);
 		return builder.toString();
