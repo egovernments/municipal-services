@@ -17,13 +17,13 @@ import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.web.models.Assessment;
-import org.egov.pt.calculator.web.models.Assessment.Channel;
 import org.egov.pt.calculator.web.models.AssessmentRequest;
 import org.egov.pt.calculator.web.models.AssessmentResponse;
 import org.egov.pt.calculator.web.models.CalculationReq;
-import org.egov.pt.calculator.web.models.GenerateAssessmentRequest;
+import org.egov.pt.calculator.web.models.CreateAssessmentRequest;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
+import org.egov.pt.calculator.web.models.property.Channel;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyResponse;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
@@ -178,7 +178,7 @@ public class AssessmentService {
 		return propertyMap;
 	}
 	
-	public void createAssessmentsForFY(GenerateAssessmentRequest assessmentRequest) {
+	public void createAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
 		Map<String, Object> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
 		for (Entry<String, Object> tenantConfig : scheduledTenants.entrySet()) {
 			assessmentRequest.setTenantId(tenantConfig.getKey());
@@ -189,10 +189,10 @@ public class AssessmentService {
 						assessmentRequest.getAssessmentYear(), property.getTenantId());
 				if (!isExists) {
 
-					Assessment assessment = Assessment.builder().financialYear(tenantConfig.getValue().toString())
+					Assessment assessment = Assessment.builder().financialYear(assessmentRequest.getAssessmentYear())
 							.propertyId(property.getPropertyId()).source(Source.MUNICIPAL_RECORDS)
 							.channel(Channel.CFC_COUNTER).assessmentDate(System.currentTimeMillis())
-							.tenantId(tenantConfig.getKey()).build();
+							.tenantId(assessmentRequest.getTenantId()).build();
 					AssessmentRequest assessmentReq = AssessmentRequest.builder().assessment(assessment)
 							.requestInfo(assessmentRequest.getRequestInfo()).build();
 					String url = new StringBuilder().append(configs.getAssessmentServiceHost())

@@ -3,7 +3,9 @@ package org.egov.pt.calculator.repository;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -11,12 +13,13 @@ import org.egov.pt.calculator.repository.rowmapper.AssessmentRowMapper;
 import org.egov.pt.calculator.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.Assessment;
-import org.egov.pt.calculator.web.models.GenerateAssessmentRequest;
+import org.egov.pt.calculator.web.models.CreateAssessmentRequest;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.egov.pt.calculator.web.models.property.Property;
 
@@ -28,9 +31,18 @@ import org.egov.pt.calculator.web.models.property.Property;
  */
 @Repository
 public class AssessmentRepository {
+	
+	private static final String PROPERTY_SEARCH_QUERY = "select prop.* from eg_pt_property prop ,eg_pt_address addr where addr.propertyid=prop.id and addr.tenantid=prop.tenantid and prop.status='ACTIVE' ";
+
+	private static final String ASSESSMENT_SEARCH_QUERY = "select id from eg_pt_asmt_assessment where status='ACTIVE' and propertyid=:propertyid and financialyear=:financialyear and tenantid=:tenantid";
+
+	private static final String ASSESSMENT_JOB_DATA_INSERT_QUERY = "Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,tenantid) values(:id,:assessmentnumber,:propertyid,:financialyear,:createdtime,:status,:error,:tenantid)";;
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
 	@Autowired
 	private AssessmentRowMapper rowMapper;
@@ -92,31 +104,27 @@ public class AssessmentRepository {
 		return assessments;
 	}
 	
-	public List<Property> fetchAllActiveProperties(GenerateAssessmentRequest request){
-		List<Object> preparedStmtList = new ArrayList<>();
-		StringBuilder query = new StringBuilder("select prop.* from eg_pt_property prop ,eg_pt_address addr where addr.propertyid=prop.id and addr.tenantid=prop.tenantid and prop.status='ACTIVE' ");
-		
-		if(request.getLocality()!=null){
-			query.append(" and addr.locality=?");
-			preparedStmtList.add(request.getLocality());
+	public List<Property> fetchAllActiveProperties(CreateAssessmentRequest request) {
+		StringBuilder query = new StringBuilder(PROPERTY_SEARCH_QUERY);
+		final Map<String, Object> params = new HashMap<>();
+		if (request.getLocality() != null) {
+			query.append(" and addr.locality=:locality");
+			params.put("locality", request.getLocality());
 		}
-		query.append(" and prop.tenantid=?");
-		preparedStmtList.add(request.getTenantId());
-		return jdbcTemplate.query(query.toString(), preparedStmtList.toArray(), propertyRowMapper);
-		
-		//return null;
+		query.append(" and prop.tenantid=:tenantid");
+		params.put("tenantid", request.getTenantId());
+		return namedParameterJdbcTemplate.query(query.toString(), params, propertyRowMapper);
 	}
 	
 	public boolean isAssessmentExists(String propertyId, String assessmentYear, String tenantId) {
-		List<Object> preparedStmtList = new ArrayList<>();
-		StringBuilder query = new StringBuilder("select id from eg_pt_asmt_assessment where status='ACTIVE' ");
-		query.append(" and tenantid=?");
-		preparedStmtList.add(propertyId);
-		preparedStmtList.add(assessmentYear);
-		preparedStmtList.add(tenantId);
+		StringBuilder query = new StringBuilder(ASSESSMENT_SEARCH_QUERY);
+		final Map<String, Object> params = new HashMap<>();
+		params.put("propertyid", propertyId);
+		params.put("financialyear", assessmentYear);
+		params.put("tenantId", tenantId);
 		List<String> assessmentIds = new ArrayList<>();
 		try {
-			assessmentIds = jdbcTemplate.queryForList(query.toString(), preparedStmtList.toArray(), String.class);
+			assessmentIds = namedParameterJdbcTemplate.queryForList(query.toString(), params, String.class);
 		} catch (final DataAccessException e) {
 
 		}
@@ -128,19 +136,18 @@ public class AssessmentRepository {
 	}
 	
 	public void saveAssessmentGenerationDetails(Assessment assessment, String status, String error) {
-		List<Object> preparedStmtList = new ArrayList<>();
-		StringBuilder query = new StringBuilder(
-				"Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,tenantid) values(?,?,?,?,?,?,?,?) ");
-		preparedStmtList.add(UUID.randomUUID());
-		preparedStmtList.add(assessment.getAssessmentNumber());
-		preparedStmtList.add(assessment.getPropertyId());
-		preparedStmtList.add(assessment.getFinancialYear());
-		preparedStmtList.add(System.currentTimeMillis());
-		preparedStmtList.add(status);
-		preparedStmtList.add(error);
-		preparedStmtList.add(assessment.getTenantId());
+		StringBuilder query = new StringBuilder(ASSESSMENT_JOB_DATA_INSERT_QUERY);
+		final Map<String, Object> params = new HashMap<>();
+		params.put("id", UUID.randomUUID());
+		params.put("assessmentnumber", assessment.getAssessmentNumber());
+		params.put("propertyid", assessment.getPropertyId());
+		params.put("financialyear", assessment.getFinancialYear());
+		params.put("createdtime", System.currentTimeMillis());
+		params.put("status", status);
+		params.put("error", error);
+		params.put("tenantid", assessment.getTenantId());
 		try {
-			jdbcTemplate.update(query.toString(), preparedStmtList.toArray());
+			namedParameterJdbcTemplate.update(query.toString(), params);
 		} catch (final DataAccessException e) {
 
 		}
