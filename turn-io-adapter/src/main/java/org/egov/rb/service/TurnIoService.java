@@ -166,7 +166,7 @@ public class TurnIoService {
 		String serviceName = getServiceName(serviceRequest.getRequestInfo(), service.getServiceCode());
 		String encodedPath = URLEncoder.encode(service.getServiceRequestId(), "UTF-8");
 		String url = propertyConfiguration.getEgovExternalHost() + "citizen/otpLogin?mobileNo="
-				+ service.getCitizen().getMobileNumber() + "&redirectTo=complaint-details/" + encodedPath;
+				+ service.getPhone() + "&redirectTo=complaint-details/" + encodedPath;
 		String shortenedURL = urlShorteningSevice.shortenURL(url);
 		message = message.replace("{{complaintType}}", serviceName)
 				.replace("{{complaintNumber}}", service.getServiceRequestId())
