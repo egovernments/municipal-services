@@ -46,6 +46,8 @@ public class BillGenerationConsumer {
 			billGeneratorDao.updateBillSchedularStatus(billGeneratorReq.getBillSchedular().getId(), StatusEnum.INPROGRESS);
 
 			if(billGeneratorReq.getConsumerCodes() != null && !billGeneratorReq.getConsumerCodes().isEmpty() && billGeneratorReq.getTenantId() != null) {
+				log.info("Fetch Bill generator initiated for Consumers: {}", billGeneratorReq.getConsumerCodes());
+				
 				List<String> fetchBillSuccessConsumercodes = demandService.fetchBillSchedulerSingle(billGeneratorReq.getConsumerCodes(),billGeneratorReq.getTenantId() ,billGeneratorReq.getRequestInfoWrapper().getRequestInfo());
 				log.info("Fetch Bill generator completed fetchBillConsumers: {}", fetchBillSuccessConsumercodes);
 				if(fetchBillSuccessConsumercodes != null && !fetchBillSuccessConsumercodes.isEmpty()) {

@@ -50,7 +50,8 @@ public class WSCalculatorQueryBuilder {
 	private static final String isConnectionDemandAvailableForBillingCycle ="select EXISTS (select 1 from egbs_demand_v1 d ";
 
 	public static final String EG_WS_BILL_SCHEDULER_CONNECTION_STATUS_INSERT = "INSERT INTO eg_ws_bill_scheduler_connection_status "
-			+ "(id, eg_ws_scheduler_id, locality, module, createdtime, lastupdatedtime, status, tenantid, reason, consumercode) VALUES (?,?,?,?,?,?,?,?,?);";
+							+ "(id, eg_ws_scheduler_id, locality, module, createdtime, lastupdatedtime, status, tenantid, reason, consumercode) "
+							+ "VALUES (?,?,?,?,?,?,?,?,?,?);";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
