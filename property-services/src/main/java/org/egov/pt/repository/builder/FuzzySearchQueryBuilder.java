@@ -49,7 +49,7 @@ public class FuzzySearchQueryBuilder {
             if(criteria.getName() != null){
                 String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getName());
                 JsonNode innerNode = mapper.readTree(innerQuery);
-                insideMatch.put("name",innerNode);
+                insideMatch.put("Data.ownerNames",innerNode);
             }
 
             if(criteria.getDoorNo() != null){
