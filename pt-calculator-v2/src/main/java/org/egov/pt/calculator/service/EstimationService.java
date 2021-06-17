@@ -299,7 +299,7 @@ public class EstimationService {
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit,assessmentYear);
 				billingSlabIds.add(slab.getId()+"|"+i);
 				unitSlabMapping.put(unit, slab);
-				if(unit.getOccupancyType().equalsIgnoreCase("RENTED") || unit.getOccupancyType().equalsIgnoreCase("PG") && unit.getAdditionalDetails() != null && unit.getAdditionalDetails().has("rentedformonths"))
+				if((unit.getOccupancyType().equalsIgnoreCase("RENTED") || unit.getOccupancyType().equalsIgnoreCase("PG")) && unit.getAdditionalDetails() != null && unit.getAdditionalDetails().has("rentedformonths"))
 				{ 	
 					BigDecimal  noofmonths=BigDecimal.valueOf(Double.parseDouble(unit.getAdditionalDetails().get("rentedformonths").toString()));
 					if(noofmonths.compareTo(BigDecimal.valueOf(12)) < 0 )
