@@ -32,7 +32,8 @@ public class PropertyRowMapper implements ResultSetExtractor<List<Property>> {
 						.status(StatusEnum.fromValue(rs.getString("status")))
 						.ownershipCategory(rs.getString("ownershipcategory"))
 						.oldPropertyId(rs.getString("oldPropertyId")).propertyType(rs.getString("propertytype"))
-						.propertyId(rs.getString("propertyid")).auditDetails(auditDetails).build();
+						.propertyId(rs.getString("propertyid")).auditDetails(auditDetails)
+						.tenantId(rs.getString("tenantid")).build();
 				;
 
 				propertyMap.put(propertyId, property);
