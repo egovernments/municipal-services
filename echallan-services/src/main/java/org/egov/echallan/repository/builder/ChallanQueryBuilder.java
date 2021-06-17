@@ -90,9 +90,10 @@ public class ChallanQueryBuilder {
                 preparedStmtList.add(criteria.getChallanNo());
             }
             if (criteria.getStatus() != null) {
+                List<String> status = Arrays.asList(criteria.getStatus().split(","));
                 addClauseIfRequired(preparedStmtList, builder);
-                builder.append("  challan.applicationstatus = ? ");
-                preparedStmtList.add(criteria.getStatus());
+                builder.append(" challan.applicationstatus IN (").append(createQuery(status)).append(")");
+                addToPreparedStatement(preparedStmtList, status);
             }
 
 
