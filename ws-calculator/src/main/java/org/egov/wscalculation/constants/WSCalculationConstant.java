@@ -324,7 +324,13 @@ public class WSCalculationConstant {
 
 	public static final String MDMS_NO_FILTER_TAXPERIOD = "$.MdmsRes.BillingService.TaxPeriod.*";
 
+	public static final String SUCCESS = "Success";
 
+	public static final String FAILURE = "Failure";
+	
+	public static final String SUCCESS_MESSAGE = "Bill is generated successfully for consumer number: ";
+	
+	public static final String FAILURE_MESSAGE = "Bill already paid or Error in bill generation";
 	
 	
 }

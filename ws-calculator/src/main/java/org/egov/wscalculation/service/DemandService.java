@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,6 +30,7 @@ import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.validator.WSCalculationWorkflowValidator;
 import org.egov.wscalculation.web.models.BillResponseV2;
+import org.egov.wscalculation.web.models.BillV2;
 import org.egov.wscalculation.web.models.Calculation;
 import org.egov.wscalculation.web.models.CalculationCriteria;
 import org.egov.wscalculation.web.models.CalculationReq;
@@ -862,7 +862,7 @@ public class DemandService {
 				: (long) billingMasterData.get("taxPeriodFrom");
 		long taxPeriodTo = billingMasterData.get("taxPeriodTo") == null ? 0l : (long) billingMasterData.get("taxPeriodTo");
 		if(taxPeriodFrom == 0 || taxPeriodTo == 0) {
-			throw new CustomException("NO_BILLING_PERIODS","Billing Period does not available for tenant: "+ tenantId);
+			throw new CustomException("NO_BILLING_PERIODS","MDMS Billing Period does not available for tenant: "+ tenantId);
 		}
 		
 		generateDemandForULB(billingMasterData, requestInfo, tenantId, taxPeriodFrom, taxPeriodTo);
@@ -892,7 +892,7 @@ public class DemandService {
 
 			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
-			log.info("Toatal Connections: {} and batch count: {}", connectionNos.size(), bulkSaveDemandCount);
+			log.info("Total Connections: {} and batch count: {}", connectionNos.size(), bulkSaveDemandCount);
 			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			int connectionNosCount = 0;
 			int totalRecordsPushedToKafka = 0;
@@ -946,8 +946,6 @@ public class DemandService {
 
 						CalculationReq calculationReq = CalculationReq.builder()
 								.calculationCriteria(calculationCriteriaList)
-								//										.taxPeriodFrom(taxPeriod.getFromDate())
-								//										.taxPeriodTo(taxPeriod.getToDate())
 								.requestInfo(requestInfo)
 								.isconnectionCalculation(true)
 								.build();
@@ -967,8 +965,6 @@ public class DemandService {
 
 						CalculationReq calculationReq = CalculationReq.builder()
 								.calculationCriteria(calculationCriteriaList)
-								//									.taxPeriodFrom(taxPeriod.getFromDate())
-								//									.taxPeriodTo(taxPeriod.getToDate())
 								.requestInfo(requestInfo)
 								.isconnectionCalculation(true)
 								.build();
@@ -1159,18 +1155,49 @@ public class DemandService {
 		return calculations;
 	}
 	
-	public Boolean fetchBillScheduler(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+	public List<String> fetchBillSchedulerBatch(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+		List<String> consumercodesFromRes = null ;
+		try {
+
+			StringBuilder fetchBillURL = calculatorUtils.getFetchBillURL(tenantId, getCommaSeparateStrings(consumerCodes));
+
+			Object result = serviceRequestRepository.fetchResult(fetchBillURL, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+			log.info("Bills generated for the consumercodes: {}", fetchBillURL);
+			BillResponseV2 billResponse = mapper.convertValue(result, BillResponseV2.class);
+			List<BillV2> bills = billResponse.getBill();
+			if(bills != null && !bills.isEmpty()) {
+				consumercodesFromRes = bills.stream().map(BillV2::getConsumerCode).collect(Collectors.toList());
+			}
+
+		} catch (Exception ex) {
+			log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
+			return consumercodesFromRes;
+		}
+		return consumercodesFromRes;
+	}
+	
+	public List<String> fetchBillSchedulerSingle(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+		List<String> consumercodesFromRes = new ArrayList<>() ;
 		for (String consumerCode : consumerCodes) {
+
 			try {
-				Object result = serviceRequestRepository.fetchResult(
-						calculatorUtils.getFetchBillURL(tenantId, consumerCode),
-						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				
+				StringBuilder fetchBillURL = calculatorUtils.getFetchBillURL(tenantId, consumerCode);
+
+				Object result = serviceRequestRepository.fetchResult(fetchBillURL, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				log.info("Bills generated for the consumercodes: {}", fetchBillURL);
+				BillResponseV2 billResponse = mapper.convertValue(result, BillResponseV2.class);
+				List<BillV2> bills = billResponse.getBill();
+				if(bills != null && !bills.isEmpty()) {
+					consumercodesFromRes.addAll(bills.stream().map(BillV2::getConsumerCode).collect(Collectors.toList()));
+					log.info("Bill generated successfully for consumercode: {}, TenantId: {}" ,consumerCode, tenantId);
+				}
 
 			} catch (Exception ex) {
 				log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
 			}
 		}
-		return Boolean.TRUE;
+		return consumercodesFromRes;
 	}
 	
     /**
@@ -1186,6 +1213,20 @@ public class DemandService {
 		}catch(Exception e){
 			throw new CustomException("PARSING_ERROR","Failed to push the save demand data to kafka topic");
 		}
+	}
+	
+	private static String getCommaSeparateStrings(Set<String> idList) {
+
+		StringBuilder query = new StringBuilder();
+		if (!idList.isEmpty()) {
+
+			String[] list = idList.toArray(new String[idList.size()]);
+			query.append(list[0]);
+			for (int i = 1; i < idList.size(); i++) {
+				query.append("," + list[i]);
+			}
+		}
+		return query.toString();
 	}
 	
 
