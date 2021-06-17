@@ -328,9 +328,9 @@ public class WSCalculationConstant {
 
 	public static final String FAILURE = "Failure";
 	
-	public static final String SUCCESS_MESSAGE = "Bill is generated successfully for consumer number: ";
+	public static final String SUCCESS_MESSAGE = "Bill is generated successfully for consumercode: ";
 	
-	public static final String FAILURE_MESSAGE = "Bill already paid or Error in bill generation";
+	public static final String FAILURE_MESSAGE = "Bill already paid or Error in bill generation for consumercode: ";
 	
 	
 }

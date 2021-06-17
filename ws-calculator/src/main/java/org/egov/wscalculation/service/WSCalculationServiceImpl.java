@@ -351,9 +351,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
 			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
-			connectionNos.add("0603000002");
-			connectionNos.add("0603009718");
-			connectionNos.add("0603000001");
+//			connectionNos.add("0603000002");
+//			connectionNos.add("0603009718");
+//			connectionNos.add("0603000001");
 			if (connectionNos == null || connectionNos.isEmpty()) {
 				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
 				continue;
