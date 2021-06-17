@@ -105,7 +105,7 @@ public class TransformService {
 		
 		String message=turnIoService.prepareServiceRequestStatusMessage(serviceRequest);
 		
-		String mobileNumber=serviceRequest.getServices().get(0).getCitizen().getMobileNumber();
+		String mobileNumber=serviceRequest.getServices().get(0).getPhone();
 		
 		try {
 			turnIoService.sendTurnMessage(message, "91"+mobileNumber);
