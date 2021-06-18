@@ -941,6 +941,9 @@ public class DemandService {
 						}
 						
 					}
+					if(calculationCriteriaList == null || calculationCriteriaList.isEmpty())
+						continue;
+					
 					if(connectionNosCount == bulkSaveDemandCount) {
 						log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
 

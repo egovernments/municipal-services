@@ -89,15 +89,13 @@ public class BillGeneratorDao {
 	}
 	
 	public void insertBillSchedulerConnectionStatus(List<String> consumerCodes, String scheduler_id, 
-			String locality, String Status, String tenantid, String reason) {
+			String locality, String Status, String tenantid, String reason, long createdTime) {
 		try {
 
 			log.info("Entered into insertBillSchedulerConnectionStatus");
 			if(consumerCodes ==null || consumerCodes.isEmpty())
 				return;
 			
-			long milliseconds = System.currentTimeMillis();
-
 			consumerCodes.forEach(consumercode -> {
 				String id = UUID.randomUUID().toString();
 
@@ -110,8 +108,8 @@ public class BillGeneratorDao {
 						ps.setString(2, scheduler_id);
 						ps.setString(3, locality);
 						ps.setString(4, WSCalculationConstant.SERVICE_FIELD_VALUE_WS);
-						ps.setObject(5, milliseconds);
-						ps.setObject(6, milliseconds);
+						ps.setObject(5, createdTime);
+						ps.setObject(6, createdTime);
 						ps.setString(7, Status);
 						ps.setString(8, tenantid);
 						ps.setString(9, reason+consumercode);

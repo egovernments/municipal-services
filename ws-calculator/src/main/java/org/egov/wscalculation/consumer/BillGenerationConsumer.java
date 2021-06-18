@@ -50,6 +50,8 @@ public class BillGenerationConsumer {
 				
 				List<String> fetchBillSuccessConsumercodes = demandService.fetchBillSchedulerSingle(billGeneratorReq.getConsumerCodes(),billGeneratorReq.getTenantId() ,billGeneratorReq.getRequestInfoWrapper().getRequestInfo());
 				log.info("Fetch Bill generator completed fetchBillConsumers: {}", fetchBillSuccessConsumercodes);
+				long milliseconds = System.currentTimeMillis();
+				
 				if(fetchBillSuccessConsumercodes != null && !fetchBillSuccessConsumercodes.isEmpty()) {
 					
 					billGeneratorDao.insertBillSchedulerConnectionStatus(
@@ -58,7 +60,7 @@ public class BillGenerationConsumer {
 							billGeneratorReq.getBillSchedular().getLocality(), 
 							WSCalculationConstant.SUCCESS, 
 							billGeneratorReq.getBillSchedular().getTenantId(), 
-							WSCalculationConstant.SUCCESS_MESSAGE);
+							WSCalculationConstant.SUCCESS_MESSAGE, milliseconds);
 					
 				} /*
 					 * else {
@@ -79,7 +81,7 @@ public class BillGenerationConsumer {
 							billGeneratorReq.getBillSchedular().getLocality(), 
 							WSCalculationConstant.FAILURE, 
 							billGeneratorReq.getBillSchedular().getTenantId(), 
-							WSCalculationConstant.FAILURE_MESSAGE);
+							WSCalculationConstant.FAILURE_MESSAGE, milliseconds);
 					
 				}
 				
