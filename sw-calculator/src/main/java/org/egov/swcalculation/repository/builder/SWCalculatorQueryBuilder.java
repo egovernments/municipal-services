@@ -29,7 +29,7 @@ public class SWCalculatorQueryBuilder {
 	private static final String isConnectionDemandAvailableForBillingCycle ="select EXISTS (select 1 from egbs_demand_v1 d ";
 
 	public static final String EG_SW_BILL_SCHEDULER_CONNECTION_STATUS_INSERT = "INSERT INTO eg_sw_bill_scheduler_connection_status "
-			+ "(id, eg_sw_scheduler_id, locality, module, createdtime, lastupdatedtime, status, tenantid, reason, consumercode) VALUES (?,?,?,?,?,?,?,?,?);";
+			+ "(id, eg_sw_scheduler_id, locality, module, createdtime, lastupdatedtime, status, tenantid, reason, consumercode) VALUES (?,?,?,?,?,?,?,?,?,?);";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
