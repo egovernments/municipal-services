@@ -79,7 +79,7 @@ public class DatamartRepository {
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
 			List<Boundary> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
-			Map<String, Object> masterData=	mdmsValidator.getAttributeValues(mdmsData);
+			Map<String, Object> masterData=	dataMartUtil.groupMdmsDataByMater(mdmsData);
 			for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
 				query.append(" offset " + i + " limit 500 ;");
 				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
