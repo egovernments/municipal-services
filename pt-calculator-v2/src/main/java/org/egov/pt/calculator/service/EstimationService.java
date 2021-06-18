@@ -446,11 +446,9 @@ public class EstimationService {
 				multiplier = BigDecimal.valueOf(slab.getArvPercent() / 100);
 			else
 				multiplier = BigDecimal.valueOf(configs.getArvPercent() / 100);
-			if(unit.getAdditionalDetails() !=null && unit.getAdditionalDetails().has("rentedformonths")) {
-			currentUnitTax = unit.getArv().multiply(multiplier).multiply(BigDecimal.valueOf(unit.getAdditionalDetails().get("rentedformonths").asDouble())).divide(BigDecimal.valueOf(12));}
-			else {
+			
 				currentUnitTax = unit.getArv().multiply(multiplier); }
-		} else {
+		 else {
 	
 			currentUnitTax = BigDecimal.valueOf(unit.getUnitArea() * slab.getUnitRate());
 			if(assessmentYear.startsWith("2021-"))
