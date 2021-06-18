@@ -4,33 +4,35 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.producer.SWCalculationProducer;
+import org.egov.swcalculation.repository.BillGeneratorDao;
+import org.egov.swcalculation.repository.SewerageCalculatorDao;
+import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.web.models.AdhocTaxReq;
-import org.egov.swcalculation.web.models.BillGeneraterReq;
 import org.egov.swcalculation.web.models.BillGenerationSearchCriteria;
+import org.egov.swcalculation.web.models.BillGeneratorReq;
 import org.egov.swcalculation.web.models.BillScheduler;
 import org.egov.swcalculation.web.models.BillScheduler.StatusEnum;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
-import org.egov.swcalculation.web.models.TaxHeadCategory;
 import org.egov.swcalculation.web.models.Property;
 import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.SewerageConnection;
 import org.egov.swcalculation.web.models.SewerageConnectionRequest;
+import org.egov.swcalculation.web.models.TaxHeadCategory;
 import org.egov.swcalculation.web.models.TaxHeadEstimate;
 import org.egov.swcalculation.web.models.TaxHeadMaster;
-import org.egov.swcalculation.repository.BillGeneratorDao;
-import org.egov.swcalculation.repository.SewerageCalculatorDao;
-import org.egov.swcalculation.util.SWCalculationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -323,32 +325,47 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		log.info("billSchedularList count : " + billSchedularList.size());
 		for (BillScheduler billSchedular : billSchedularList) {
 			try {
-				
-			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
-			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
-			if (connectionNos == null || connectionNos.isEmpty()) {
-				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
-				continue;
-			}
+				requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-			log.info("Producer ConsumerCodes size : {}", connectionNos.size());
+				List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+				if (connectionNos == null || connectionNos.isEmpty()) {
+					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+					continue;
+				}
+				//testing purpose added three consumercodes
+				connectionNos.add("0603000001");
+				connectionNos.add("0603000002");
+				connectionNos.add("0603009718");
 
-			BillGeneraterReq billGeneraterReq = BillGeneraterReq
-					.builder()
-					.requestInfoWrapper(requestInfoWrapper)
-					.tenantId(billSchedular.getTenantId())
-					.consumerCodes(ImmutableSet.copyOf(connectionNos))
-					.billSchedular(billSchedular)
-					.build();
+				log.info("Producer ConsumerCodes size : {}", connectionNos.size());
+				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
+				for (List<String>  conectionNoList : partitionConectionNoList) {
 
-				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+					BillGeneratorReq billGeneraterReq = BillGeneratorReq
+							.builder()
+							.requestInfoWrapper(requestInfoWrapper)
+							.tenantId(billSchedular.getTenantId())
+							.consumerCodes(ImmutableSet.copyOf(conectionNoList))
+							.billSchedular(billSchedular)
+							.build();
+
+					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+				}
 			}catch (Exception e) {
+				e.printStackTrace();
 				log.error("Execptio occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
 			}
 
 		}
+	}
+	
+	static <T> Collection<List<T>> partitionBasedOnSize(List<T> inputList, int size) {
+        final AtomicInteger counter = new AtomicInteger(0);
+        return inputList.stream()
+                    .collect(Collectors.groupingBy(s -> counter.getAndIncrement()/size))
+                    .values();
 	}
 
 

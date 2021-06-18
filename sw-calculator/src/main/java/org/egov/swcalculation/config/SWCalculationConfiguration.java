@@ -186,4 +186,8 @@ public class SWCalculationConfiguration {
 	
 	@Value("${egov.bulk.save.demand.count}")
 	private Integer bulkSaveDemandCount;
+	
+	@Value("${egov.bulk.bill.generate.count}")
+	private Integer bulkBillGenerateCount;
+
 }

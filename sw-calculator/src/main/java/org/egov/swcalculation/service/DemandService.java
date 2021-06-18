@@ -29,6 +29,7 @@ import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 import org.egov.swcalculation.web.models.BillResponseV2;
+import org.egov.swcalculation.web.models.BillV2;
 import org.egov.swcalculation.web.models.Calculation;
 import org.egov.swcalculation.web.models.CalculationCriteria;
 import org.egov.swcalculation.web.models.CalculationReq;
@@ -763,7 +764,8 @@ public class DemandService {
 								requestInfo);
 						if (isValidBillingCycle) {
 
-							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+							CalculationCriteria calculationCriteria = CalculationCriteria.builder()
+									.tenantId(tenantId)
 									.assessmentYear(taxPeriod.getFinancialYear())
 									.from(taxPeriod.getFromDate())
 									.to(taxPeriod.getToDate())
@@ -775,6 +777,9 @@ public class DemandService {
 						}
 						
 					}
+					if(calculationCriteriaList == null || calculationCriteriaList.isEmpty())
+						continue;
+					
 					if(billingCycleCount > 10 || connectionNosCount == bulkSaveDemandCount) {
 						log.info("Controller entered into producer logic, connectionNosCount: {} and connectionNos.size(): {}",connectionNosCount, connectionNos.size());
 
@@ -830,6 +835,7 @@ public class DemandService {
 			isValidSewerageConnection = false;
 		}
 
+		
 		/*
 		 * if (detail.getConnectionExecutionDate() < taxPeriodFrom) {
 		 * 
@@ -1007,22 +1013,52 @@ public class DemandService {
 		return calculations;
 	}
 	
-	public Boolean fetchBillScheduler(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+	public List<String> fetchBillSchedulerBatch(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+		List<String> consumercodesFromRes = null ;
+		try {
+
+			StringBuilder fetchBillURL = calculatorUtils.getFetchBillURL(tenantId, getCommaSeparateStrings(consumerCodes));
+
+			Object result = serviceRequestRepository.fetchResult(fetchBillURL, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+			log.info("Bills generated for the consumercodes: {}", fetchBillURL);
+			BillResponseV2 billResponse = mapper.convertValue(result, BillResponseV2.class);
+			List<BillV2> bills = billResponse.getBill();
+			if(bills != null && !bills.isEmpty()) {
+				consumercodesFromRes = bills.stream().map(BillV2::getConsumerCode).collect(Collectors.toList());
+			}
+
+		} catch (Exception ex) {
+			log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
+			return consumercodesFromRes;
+		}
+		return consumercodesFromRes;
+	}
+	
+	public List<String> fetchBillSchedulerSingle(Set<String> consumerCodes,String tenantId, RequestInfo requestInfo) {
+		List<String> consumercodesFromRes = new ArrayList<>() ;
 		for (String consumerCode : consumerCodes) {
+
 			try {
-				Object result = serviceRequestRepository.fetchResult(
-						calculatorUtils.getFetchBillURL(tenantId, consumerCode),
-						RequestInfoWrapper.builder().requestInfo(requestInfo).build());
 				
-				log.info("Response fetchBillScheduler: {}",  result);
+				StringBuilder fetchBillURL = calculatorUtils.getFetchBillURL(tenantId, consumerCode);
+
+				Object result = serviceRequestRepository.fetchResult(fetchBillURL, RequestInfoWrapper.builder().requestInfo(requestInfo).build());
+				log.info("Bills generated for the consumercodes: {}", fetchBillURL);
+				BillResponseV2 billResponse = mapper.convertValue(result, BillResponseV2.class);
+				List<BillV2> bills = billResponse.getBill();
+				if(bills != null && !bills.isEmpty()) {
+					consumercodesFromRes.addAll(bills.stream().map(BillV2::getConsumerCode).collect(Collectors.toList()));
+					log.info("Bill generated successfully for consumercode: {}, TenantId: {}" ,consumerCode, tenantId);
+				}
 
 			} catch (Exception ex) {
 				log.error("Fetch Bill Error For tenantId:{} consumercode: {} and Exception is: {}",tenantId,consumerCodes, ex);
-				ex.printStackTrace();
 			}
 		}
-		return Boolean.TRUE;
+		return consumercodesFromRes;
 	}
+	
+	
 	
 	/**
 	 * Creates or updates Demand
@@ -1145,6 +1181,20 @@ public class DemandService {
 						.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build();
 						
 		return demand;
+	}
+	
+	private static String getCommaSeparateStrings(Set<String> idList) {
+
+		StringBuilder query = new StringBuilder();
+		if (!idList.isEmpty()) {
+
+			String[] list = idList.toArray(new String[idList.size()]);
+			query.append(list[0]);
+			for (int i = 1; i < idList.size(); i++) {
+				query.append("," + list[i]);
+			}
+		}
+		return query.toString();
 	}
 
 
