@@ -94,8 +94,10 @@ public class PlantMappingValidator {
 		plantMappingSearchCriteria.setEmployeeUuid(Arrays.asList(request.getPlantMapping().getEmployeeUuid()));
 		plantMappingSearchCriteria.setPlantCode(request.getPlantMapping().getPlantCode());
 		plantMappingSearchCriteria.setTenantId(request.getPlantMapping().getTenantId());
-		PlantMappingResponse plantMapResponse = plantMappingService.search(plantMappingSearchCriteria, request.getRequestInfo());
+		PlantMappingResponse plantMapResponse = plantMappingService.search(plantMappingSearchCriteria,
+				request.getRequestInfo());
 		if (null != plantMapResponse && null != plantMapResponse.getPlantMapping()
+				&& plantMapResponse.getPlantMapping().size() > 0
 				&& StringUtils.isNotBlank(plantMapResponse.getPlantMapping().get(0).getId()))
 			throw new CustomException(FSMErrorConstants.FSTP_EMPLOYEE_MAP_EXISTS_ERROR,
 					"FSTP and employee mapping already exist.");
