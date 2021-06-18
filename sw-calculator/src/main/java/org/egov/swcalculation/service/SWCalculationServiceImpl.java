@@ -330,14 +330,16 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
 				List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
-				if (connectionNos == null || connectionNos.isEmpty()) {
-					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
-					continue;
-				}
+
 				//testing purpose added three consumercodes
 				connectionNos.add("0603000001");
 				connectionNos.add("0603000002");
 				connectionNos.add("0603009718");
+				
+				if (connectionNos == null || connectionNos.isEmpty()) {
+					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+					continue;
+				}
 
 				log.info("Producer ConsumerCodes size : {}", connectionNos.size());
 				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
