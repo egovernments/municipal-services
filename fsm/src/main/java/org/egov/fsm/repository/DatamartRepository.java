@@ -20,7 +20,9 @@ import org.egov.fsm.repository.querybuilder.DataMartQueryBuilder;
 import org.egov.fsm.repository.rowmapper.DataMartRowMapper;
 import org.egov.fsm.repository.rowmapper.DataMartTenantRowMapper;
 import org.egov.fsm.service.FSMService;
+import org.egov.fsm.util.DataMartUtil;
 import org.egov.fsm.util.FSMErrorConstants;
+import org.egov.fsm.validator.MDMSValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -60,7 +62,13 @@ public class DatamartRepository {
 
 	@Autowired
 	DataMartTenantRowMapper dataMartTenantRowMapper;
-
+	
+	@Autowired
+    DataMartUtil dataMartUtil; 
+	
+	@Autowired
+	MDMSValidator mdmsValidator;
+	
 	public List<DataMartModel> getData(RequestInfo requestInfo) {
 
 		String countQuery = DataMartQueryBuilder.countQuery;
@@ -70,6 +78,8 @@ public class DatamartRepository {
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
 			List<Boundary> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
+			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
+			Map<String, Object> masterData=	mdmsValidator.getAttributeValues(mdmsData);
 			for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
 				query.append(" offset " + i + " limit 500 ;");
 				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
