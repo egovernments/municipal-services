@@ -81,11 +81,10 @@ public class DatamartRepository {
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
-			List<List<Boundary>> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
+			List<List<LinkedHashMap>> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
 			ObjectMapper objectMapper = new ObjectMapper();
 			String jsonString = new JSONObject(boundaryData.get(0)).toString();
-			List<Boundary> boundaryObject = objectMapper.convertValue(jsonString, new TypeReference<List<Boundary>>() {
-			});
+			List<LinkedHashMap> boundaryObject = boundaryData.get(0);
 
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
 			Map<String, JsonNode> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
@@ -99,10 +98,15 @@ public class DatamartRepository {
 					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
 
 					if (dataMartModel.getLocality() != null && boundaryData != null) {
-						System.out.println(boundaryData.get(0).get(0));
-						List<Boundary> boundaryResponse = boundaryObject.stream()
-								.filter(boundary -> boundary.getCode() == locality).collect(Collectors.toList());
-						dataMartModel.setLocality(boundaryResponse.get(0).getName());
+
+						for (LinkedHashMap map : boundaryObject) {
+							if (map.get("code").toString() == locality) {
+								dataMartModel.setLocality(map.get("name").toString());
+								break;
+							}
+						}
+
+						// dataMartModel.setLocality(boundaryResponse.get(0).getName());
 
 					}
 
@@ -261,7 +265,7 @@ public class DatamartRepository {
 
 	}
 
-	private List<List<Boundary>> getBoundaryData(String tenantId, RequestInfo requestInfo) {
+	private List<List<LinkedHashMap>> getBoundaryData(String tenantId, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(fsmConfiguration.getLocationHost());
 		uri.append(fsmConfiguration.getLocationContextPath()).append(fsmConfiguration.getLocationEndpoint());
 		uri.append("?").append("tenantId=").append(tenantId);
@@ -278,7 +282,7 @@ public class DatamartRepository {
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		List<List<Boundary>> boundaryResponse = context.read("$..boundary");
+		List<List<LinkedHashMap>> boundaryResponse = context.read("$..boundary");
 
 		return boundaryResponse;
 
