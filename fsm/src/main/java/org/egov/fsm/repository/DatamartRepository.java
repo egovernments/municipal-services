@@ -81,12 +81,10 @@ public class DatamartRepository {
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
-			List<Boundary> boundaryList = new ArrayList<Boundary>();
 			List<List<Boundary>> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
 			ObjectMapper objectMapper = new ObjectMapper();
-			boundaryData.get(0).forEach(boundary -> {
-				Boundary boundaryObject = objectMapper.convertValue(boundary, Boundary.class);
-				boundaryList.add(boundaryObject);
+			String jsonString = new JSONObject(boundaryData.get(0)).toString();
+			List<Boundary> boundaryObject = objectMapper.convertValue(jsonString, new TypeReference<List<Boundary>>() {
 			});
 
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
@@ -102,7 +100,7 @@ public class DatamartRepository {
 
 					if (dataMartModel.getLocality() != null && boundaryData != null) {
 						System.out.println(boundaryData.get(0).get(0));
-						List<Boundary> boundaryResponse = boundaryList.stream()
+						List<Boundary> boundaryResponse = boundaryObject.stream()
 								.filter(boundary -> boundary.getCode() == locality).collect(Collectors.toList());
 						dataMartModel.setLocality(boundaryResponse.get(0).getName());
 
