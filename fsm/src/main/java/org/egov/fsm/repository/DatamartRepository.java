@@ -21,6 +21,7 @@ import org.egov.fsm.repository.rowmapper.DataMartRowMapper;
 import org.egov.fsm.repository.rowmapper.DataMartTenantRowMapper;
 import org.egov.fsm.service.FSMService;
 import org.egov.fsm.util.DataMartUtil;
+import org.egov.fsm.util.FSMConstants;
 import org.egov.fsm.util.FSMErrorConstants;
 import org.egov.fsm.validator.MDMSValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
@@ -62,13 +66,13 @@ public class DatamartRepository {
 
 	@Autowired
 	DataMartTenantRowMapper dataMartTenantRowMapper;
-	
+
 	@Autowired
-    DataMartUtil dataMartUtil; 
-	
+	DataMartUtil dataMartUtil;
+
 	@Autowired
 	MDMSValidator mdmsValidator;
-	
+
 	public List<DataMartModel> getData(RequestInfo requestInfo) {
 
 		String countQuery = DataMartQueryBuilder.countQuery;
@@ -77,9 +81,16 @@ public class DatamartRepository {
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
-			List<Boundary> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
+			List<Boundary> boundaryList = new ArrayList<Boundary>();
+			List<List<Boundary>> boundaryData = getBoundaryData(tenantModel.getTenantId(), requestInfo);
+			ObjectMapper objectMapper = new ObjectMapper();
+			boundaryData.get(0).forEach(boundary -> {
+				Boundary boundaryObject = objectMapper.convertValue(boundary, Boundary.class);
+				boundaryList.add(boundaryObject);
+			});
+
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
-			Map<String, Object> masterData=	dataMartUtil.groupMdmsDataByMater(mdmsData);
+			Map<String, JsonNode> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
 			for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
 				query.append(" offset " + i + " limit 500 ;");
 				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
@@ -90,12 +101,17 @@ public class DatamartRepository {
 					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
 
 					if (dataMartModel.getLocality() != null && boundaryData != null) {
-
-						List<Boundary> boundaryResponse = boundaryData.stream()
+						System.out.println(boundaryData.get(0).get(0));
+						List<Boundary> boundaryResponse = boundaryList.stream()
 								.filter(boundary -> boundary.getCode() == locality).collect(Collectors.toList());
 						dataMartModel.setLocality(boundaryResponse.get(0).getName());
-						
+
 					}
+
+					// if(dataMartModel.getSlumName()!=null) {
+					JsonNode slumMasterData = masterData.get(FSMConstants.MDMS_SLUM_NAME);
+
+					// }
 
 					datamartList.add(dataMartModel);
 				}
@@ -247,7 +263,7 @@ public class DatamartRepository {
 
 	}
 
-	private List<Boundary> getBoundaryData(String tenantId, RequestInfo requestInfo) {
+	private List<List<Boundary>> getBoundaryData(String tenantId, RequestInfo requestInfo) {
 		StringBuilder uri = new StringBuilder(fsmConfiguration.getLocationHost());
 		uri.append(fsmConfiguration.getLocationContextPath()).append(fsmConfiguration.getLocationEndpoint());
 		uri.append("?").append("tenantId=").append(tenantId);
@@ -264,7 +280,7 @@ public class DatamartRepository {
 
 		DocumentContext context = JsonPath.parse(jsonString);
 
-		List<Boundary> boundaryResponse = context.read("$..boundary");
+		List<List<Boundary>> boundaryResponse = context.read("$..boundary");
 
 		return boundaryResponse;
 

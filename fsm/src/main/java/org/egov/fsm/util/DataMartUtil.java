@@ -18,6 +18,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,16 +50,16 @@ public class DataMartUtil {
 	public List<ModuleDetail> getFSMModuleRequest() {
 
 		// filter to only get code field from master data
-		final String filterCode = "$.[?(@.active==true)].code";
+		//final String filterCode = "$.[?(@.active==true)].code";
 		final String activeFilter = "$.[?(@.active==true)]";
 		// master details for FSM module
 		List<MasterDetail> fsmMasterDtls = new ArrayList<>();
 
 		fsmMasterDtls
-				.add(MasterDetail.builder().name(FSMConstants.MDMS_APPLICATION_CHANNEL).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SANITATION_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_PROPERTY_TYPE).filter(filterCode).build());
-		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SLUM_NAME).filter(activeFilter).build());
+				.add(MasterDetail.builder().name(FSMConstants.MDMS_APPLICATION_CHANNEL).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SANITATION_TYPE).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_PROPERTY_TYPE).build());
+		fsmMasterDtls.add(MasterDetail.builder().name(FSMConstants.MDMS_SLUM_NAME).build());
 		ModuleDetail fsmMasterMDtl = ModuleDetail.builder().masterDetails(fsmMasterDtls)
 				.moduleName(FSMConstants.FSM_MODULE_CODE).build();
 
@@ -76,10 +77,10 @@ public class DataMartUtil {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
 	
-	public Map<String, Object> groupMdmsDataByMater(Object mdmsData) {
+	public Map<String, JsonNode> groupMdmsDataByMater(Object mdmsData) {
 
 		List<String> modulepaths = Arrays.asList(FSMConstants.FSM_JSONPATH_CODE);
-		final Map<String, Object> mdmsResMap = new HashMap<>();
+		final Map<String, JsonNode> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
