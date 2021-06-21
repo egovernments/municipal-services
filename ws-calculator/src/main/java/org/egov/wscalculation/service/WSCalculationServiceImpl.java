@@ -346,46 +346,52 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		log.info("billSchedularList count : " + billSchedularList.size());
 		for (BillScheduler billSchedular : billSchedularList) {
 			try {
-				
-			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
-			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
-//			connectionNos.add("0603000002");
-//			connectionNos.add("0603009718");
-//			connectionNos.add("0603000001");
-			if (connectionNos == null || connectionNos.isEmpty()) {
-				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
-				continue;
-			}
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.INPROGRESS);
+				log.info("Updated Bill Schedular Status To INPROGRESS");
 
-			Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
-			log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
-			int threadSleepCount = 1;
-			int count = 1;
-			for (List<String>  conectionNoList : partitionConectionNoList) {
+				requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-				BillGeneratorReq billGeneraterReq = BillGeneratorReq
-						.builder()
-						.requestInfoWrapper(requestInfoWrapper)
-						.tenantId(billSchedular.getTenantId())
-						.consumerCodes(ImmutableSet.copyOf(conectionNoList))
-						.billSchedular(billSchedular)
-						.build();
-
-				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
-				log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
-
-				if(threadSleepCount == 2) {
-					//Pausing the controller for 15 seconds after every two batches pushed to Kafka topic
-					Thread.sleep(15000);
-					threadSleepCount=1;
+				List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+				//			connectionNos.add("0603000002");
+				//			connectionNos.add("0603009718");
+				//			connectionNos.add("0603000001");
+				if (connectionNos == null || connectionNos.isEmpty()) {
+					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+					continue;
 				}
-				threadSleepCount++;
 
-			}
+				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
+				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+				int threadSleepCount = 1;
+				int count = 1;
+				for (List<String>  conectionNoList : partitionConectionNoList) {
+
+					BillGeneratorReq billGeneraterReq = BillGeneratorReq
+							.builder()
+							.requestInfoWrapper(requestInfoWrapper)
+							.tenantId(billSchedular.getTenantId())
+							.consumerCodes(ImmutableSet.copyOf(conectionNoList))
+							.billSchedular(billSchedular)
+							.build();
+
+					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+					log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
+
+					if(threadSleepCount == 2) {
+						//Pausing the controller for 10 seconds after every two batches pushed to Kafka topic
+						Thread.sleep(10000);
+						threadSleepCount=1;
+					}
+					threadSleepCount++;
+
+				}
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+				log.info("Updated Bill Schedular Status To COMPLETED");
+
 			}catch (Exception e) {
-				 log.error("Execption occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
+				log.error("Execption occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
 			}
 
 		}
