@@ -87,7 +87,7 @@ public class DatamartRepository {
 			List<LinkedHashMap> boundaryObject = boundaryData.get(0);
 
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
-			Map<String, JsonNode> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
+			Map<String, List<LinkedHashMap>> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
 			for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
 				query.append(" offset " + i + " limit 500 ;");
 				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
@@ -96,24 +96,7 @@ public class DatamartRepository {
 					Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
 							dataMartModel.getApplicationId(), requestInfo, totalrowsWithTenantId.get(i).getTenantId());
 					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
-
-					if (dataMartModel.getLocality() != null && boundaryData != null) {
-
-						for (LinkedHashMap map : boundaryObject) {
-							if (map.get("code").toString() == locality) {
-								dataMartModel.setLocality(map.get("name").toString());
-								break;
-							}
-						}
-
-						// dataMartModel.setLocality(boundaryResponse.get(0).getName());
-
-					}
-
-					// if(dataMartModel.getSlumName()!=null) {
-					JsonNode slumMasterData = masterData.get(FSMConstants.MDMS_SLUM_NAME);
-
-					// }
+					dataMartModel = enrichMasterData(boundaryObject, masterData, dataMartModel);
 
 					datamartList.add(dataMartModel);
 				}
@@ -121,6 +104,58 @@ public class DatamartRepository {
 		}
 		return datamartList;
 
+	}
+
+	private DataMartModel enrichMasterData(List<LinkedHashMap> boundaryObject,
+			Map<String, List<LinkedHashMap>> masterData, DataMartModel dataMartModel,) {
+		if (dataMartModel.getLocality() != null && boundaryObject != null) {
+
+			for (LinkedHashMap map : boundaryObject) {
+				if (map.get("code").toString() == dataMartModel.getLocality()) {
+					dataMartModel.setLocality(map.get("name").toString());
+					break;
+				}
+			}
+
+		}
+
+		if (dataMartModel.getSlumName() != null) {
+			List<LinkedHashMap> slumMasterData = masterData.get(FSMConstants.MDMS_SLUM_NAME);
+			String slumName = dataMartModel.getSlumName();
+			List<LinkedHashMap> slumCodeList = slumMasterData.stream()
+					.filter(map -> ((String) map.get("code")) == slumName).collect(Collectors.toList());
+			dataMartModel.setSlumName(slumCodeList.get(0).get("name").toString());
+		}
+		
+		if (dataMartModel.getSanitationType() != null) {
+			List<LinkedHashMap> sanitationMasterData = masterData.get(FSMConstants.MDMS_SANITATION_TYPE);
+			String sanitationType = dataMartModel.getSanitationType();
+			List<LinkedHashMap> sanitationCodeList = sanitationMasterData.stream()
+					.filter(map -> ((String) map.get("code")) ==sanitationType ).collect(Collectors.toList());
+			dataMartModel.setSanitationType(sanitationCodeList.get(0).get("name").toString());
+		}
+		
+		if (dataMartModel.getApplicationSource() != null) {
+			List<LinkedHashMap> applicationMasterData = masterData.get(FSMConstants.MDMS_APPLICATION_CHANNEL);
+			String applicationType = dataMartModel.getApplicationSource();
+			List<LinkedHashMap> applicationList = applicationMasterData.stream()
+					.filter(map -> ((String) map.get("code")) ==applicationType ).collect(Collectors.toList());
+			dataMartModel.setApplicationSource(applicationList.get(0).get("name").toString());
+		}
+		
+		if (dataMartModel.getPropertyType() != null) {
+			List<LinkedHashMap> propertyTypeMasterData = masterData.get(FSMConstants.MDMS_PROPERTY_TYPE);
+			String propertyType = dataMartModel.getPropertyType();
+			List<LinkedHashMap> propertyTypeList = propertyTypeMasterData.stream()
+					.filter(map -> ((String) map.get("code"))==propertyType ).collect(Collectors.toList());
+			dataMartModel.setPropertySubType(propertyTypeList.get(0).get("name").toString());
+			if(dataMartModel.getPropertySubType()!=null) {
+				String propertySubType=dataMartModel.getPropertyType()+"."+dataMartModel.getPropertySubType();
+				List<LinkedHashMap> propertySubTypeList = propertyTypeMasterData.stream()
+						.filter(map -> ((String) map.get("code"))==propertySubType ).collect(Collectors.toList());
+				dataMartModel.setPropertySubType(propertySubTypeList.get(0).get("name").toString());
+			}
+		}
 	}
 
 	private DataMartModel enrichWorkFlowData(Map<String, ProcessInstance> processInstanceData,

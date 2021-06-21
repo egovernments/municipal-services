@@ -3,6 +3,7 @@ package org.egov.fsm.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +78,10 @@ public class DataMartUtil {
 		return new StringBuilder().append(config.getMdmsHost()).append(config.getMdmsEndPoint());
 	}
 	
-	public Map<String, JsonNode> groupMdmsDataByMater(Object mdmsData) {
+	public Map<String, List<LinkedHashMap>> groupMdmsDataByMater(Object mdmsData) {
 
 		List<String> modulepaths = Arrays.asList(FSMConstants.FSM_JSONPATH_CODE);
-		final Map<String, JsonNode> mdmsResMap = new HashMap<>();
+		final Map<String, List<LinkedHashMap>> mdmsResMap = new HashMap<>();
 		modulepaths.forEach(modulepath -> {
 			try {
 				mdmsResMap.putAll(JsonPath.read(mdmsData, modulepath));
