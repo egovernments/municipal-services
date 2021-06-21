@@ -154,7 +154,7 @@ List<WaterDetails> waterDetails=jdbcTemplate.query(query,preparedStatement.toArr
 	public List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality) {
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getConnectionsNoByLocality(tenantId, connectionType,WSCalculationConstant.ACTIVE_CONNECTION, locality, preparedStatement);
-		log.info("water " + connectionType + " connection list : " + query);
+		log.info("preparedStatement: " + preparedStatement + " query : " + query);
 		return jdbcTemplate.queryForList(query, preparedStatement.toArray(), String.class);
 	}
 	@Override

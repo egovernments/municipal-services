@@ -319,7 +319,7 @@ public class WSCalculatorQueryBuilder {
 		
 		//Getting only non exempted connection to generate bill
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" (conn.additionaldetails->>'isexempted')::boolean is false ");
+		query.append(" (conn.additionaldetails->>'isexempted')::boolean is not true ");
 		
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");

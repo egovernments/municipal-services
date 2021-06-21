@@ -941,7 +941,7 @@ public class DemandService {
 						}
 						
 					}
-					if(calculationCriteriaList == null || calculationCriteriaList.isEmpty())
+					if(calculationCriteriaList.isEmpty())
 						continue;
 					
 					if(connectionNosCount == bulkSaveDemandCount) {
