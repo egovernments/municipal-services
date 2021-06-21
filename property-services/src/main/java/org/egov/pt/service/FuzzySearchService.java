@@ -34,11 +34,14 @@ public class FuzzySearchService {
     }
 
 
-    public List<Property> getProperties(RequestInfo requestInfo, FuzzySearchCriteria criteria) {
+    public List<Property> getProperties(RequestInfo requestInfo, PropertyCriteria criteria) {
+
+
+        List<String> idsFromDB = propertyRepository.getPropertyIds(criteria);
 
         validateFuzzySearchCriteria(criteria);
 
-        Object esResponse = elasticSearchRepository.fuzzySearchProperties(criteria);
+        Object esResponse = elasticSearchRepository.fuzzySearchProperties(criteria, idsFromDB);
 
         Map<String, Set<String>> tenantIdToPropertyId = getTenantIdToPropertyIdMap(esResponse);
 
@@ -107,7 +110,7 @@ public class FuzzySearchService {
      * Validates the search params
      * @param criteria
      */
-    private void validateFuzzySearchCriteria(FuzzySearchCriteria criteria){
+    private void validateFuzzySearchCriteria(PropertyCriteria criteria){
 
         if(criteria.getOldPropertyId() == null && criteria.getName() == null && criteria.getDoorNo() == null)
             throw new CustomException("INVALID_SEARCH_CRITERIA","The search criteria is invalid");

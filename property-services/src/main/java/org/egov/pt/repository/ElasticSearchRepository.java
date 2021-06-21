@@ -2,6 +2,7 @@ package org.egov.pt.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.pt.config.PropertyConfiguration;
+import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.repository.builder.FuzzySearchQueryBuilder;
 import org.egov.pt.web.contracts.FuzzySearchCriteria;
 import org.egov.tracer.model.CustomException;
@@ -12,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 @Component
 public class ElasticSearchRepository {
@@ -40,12 +43,14 @@ public class ElasticSearchRepository {
      * @param criteria
      * @return
      */
-    public Object fuzzySearchProperties(FuzzySearchCriteria criteria) {
+    public Object fuzzySearchProperties(PropertyCriteria criteria, List<String> uuids) {
 
 
         String url = getESURL();
 
-        String searchQuery = queryBuilder.getFuzzySearchQuery(criteria);
+        String searchQuery = queryBuilder.getFuzzySearchQuery(criteria, uuids);
+
+        System.out.println(searchQuery);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

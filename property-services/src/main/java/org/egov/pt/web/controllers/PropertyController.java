@@ -128,7 +128,7 @@ public class PropertyController {
 
     @PostMapping("/fuzzy/_search")
     public ResponseEntity<PropertyResponse> fuzzySearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                      @Valid @ModelAttribute FuzzySearchCriteria fuzzySearchCriteria) {
+                                                      @Valid @ModelAttribute PropertyCriteria fuzzySearchCriteria) {
 
         List<Property> properties = fuzzySearchService.getProperties(requestInfoWrapper.getRequestInfo(), fuzzySearchCriteria);
         PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
