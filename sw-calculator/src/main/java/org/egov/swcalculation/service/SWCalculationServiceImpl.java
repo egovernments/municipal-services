@@ -342,7 +342,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				}
 
 				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
-				int threadSleepCount = 0;
+				int threadSleepCount = 1;
+				
 				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
 
 				for (List<String>  conectionNoList : partitionConectionNoList) {
@@ -356,10 +357,12 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 							.build();
 
 					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
-					if(threadSleepCount == 3) {
+					log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
+
+					if(threadSleepCount == 2) {
 						//Pausing controller for every three batches.
 						Thread.sleep(15000);
-						threadSleepCount=0;
+						threadSleepCount=1;
 					}
 					threadSleepCount++;
 				}
