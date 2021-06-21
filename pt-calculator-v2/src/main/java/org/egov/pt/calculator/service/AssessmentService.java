@@ -203,9 +203,9 @@ public class AssessmentService {
 						Assessment createdAsessment = response.getAssessments().get(0);
 						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS", null);
 					} catch (HttpClientErrorException e) {
-						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.getMessage());
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.toString());
 					} catch (Exception e) {
-						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.getMessage());
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.toString());
 					}
 
 				}
