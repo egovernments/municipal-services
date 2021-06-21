@@ -195,7 +195,7 @@ public class GrievanceService {
 	private void overRideCitizenAccountId(ServiceRequest serviceRequest) {
 		User user = serviceRequest.getRequestInfo().getUserInfo();
 		List<String> codes = user.getRoles().stream().map(Role::getCode).collect(Collectors.toList());
-		if (codes.contains(PGRConstants.ROLE_CITIZEN) || codes.contains(PGRConstants.ROLE_NAME_CITIZEN))
+		if (codes.contains(PGRConstants.ROLE_CITIZEN) || codes.contains(PGRConstants.ROLE_NAME_CITIZEN) || codes.contains(PGRConstants.ROLE_NAME_ANONYMOUS))
 			serviceRequest.getServices().forEach(service -> service.setAccountId(String.valueOf(user.getId())));
 	}
 	
