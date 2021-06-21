@@ -109,7 +109,7 @@ public class FuzzySearchService {
      */
     private void validateFuzzySearchCriteria(FuzzySearchCriteria criteria){
 
-        if(criteria.getStreet() == null && criteria.getName() == null && criteria.getDoorNo() == null)
+        if(criteria.getOldPropertyId() == null && criteria.getName() == null && criteria.getDoorNo() == null)
             throw new CustomException("INVALID_SEARCH_CRITERIA","The search criteria is invalid");
 
     }

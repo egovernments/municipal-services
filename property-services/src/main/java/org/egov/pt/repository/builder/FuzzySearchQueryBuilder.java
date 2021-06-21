@@ -58,10 +58,10 @@ public class FuzzySearchQueryBuilder {
                 insideMatch.put("Data.doorNo",innerNode);
             }
 
-            if(criteria.getStreet() != null){
-                String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getStreet());
+            if(criteria.getOldPropertyId() != null){
+                String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getOldPropertyId());
                 JsonNode innerNode = mapper.readTree(innerQuery);
-                insideMatch.put("Data.street",innerNode);
+                insideMatch.put("Data.oldPropertyId",innerNode);
             }
 
             finalQuery = mapper.writeValueAsString(node);

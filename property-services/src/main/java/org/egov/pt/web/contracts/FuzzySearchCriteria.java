@@ -18,7 +18,7 @@ public class FuzzySearchCriteria {
     @JsonProperty("doorNo")
     private String doorNo;
 
-    @JsonProperty("street")
-    private String street;
+    @JsonProperty("oldPropertyId")
+    private String oldPropertyId;
 
 }
