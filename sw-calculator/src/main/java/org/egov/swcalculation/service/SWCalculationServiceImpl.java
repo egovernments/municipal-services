@@ -345,6 +345,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				int threadSleepCount = 1;
 				
 				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+				int count = 1;
 
 				for (List<String>  conectionNoList : partitionConectionNoList) {
 
@@ -361,7 +362,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 					if(threadSleepCount == 2) {
 						//Pausing controller for every three batches.
-						Thread.sleep(15000);
+						Thread.sleep(10000);
 						threadSleepCount=1;
 					}
 					threadSleepCount++;
