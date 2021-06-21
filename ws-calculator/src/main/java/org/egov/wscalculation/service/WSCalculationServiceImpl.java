@@ -359,10 +359,9 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				continue;
 			}
 
-			log.info("Producer ConsumerCodes size : {}", connectionNos.size());
 			Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
-			
-
+			log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+			int threadSleepCount = 0;
 			for (List<String>  conectionNoList : partitionConectionNoList) {
 
 				BillGeneratorReq billGeneraterReq = BillGeneratorReq
@@ -374,6 +373,12 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 						.build();
 
 				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+				if(threadSleepCount == 3) {
+					Thread.sleep(15000);
+					threadSleepCount=0;
+				}
+				threadSleepCount++;
+
 			}
 			}catch (Exception e) {
 				 log.error("Execptio occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
