@@ -43,7 +43,7 @@ public class BillGenerationConsumer {
 			log.info("bill generator consumer received records:  " + records.size());
 
 			BillGeneratorReq billGeneratorReq = mapper.convertValue(records.get(0).getPayload(), BillGeneratorReq.class);
-			billGeneratorDao.updateBillSchedularStatus(billGeneratorReq.getBillSchedular().getId(), StatusEnum.INPROGRESS);
+			log.info("Number of batch records:  " + billGeneratorReq.getConsumerCodes().size());
 
 			if(billGeneratorReq.getConsumerCodes() != null && !billGeneratorReq.getConsumerCodes().isEmpty() && billGeneratorReq.getTenantId() != null) {
 				log.info("Fetch Bill generator initiated for Consumers: {}", billGeneratorReq.getConsumerCodes());
@@ -62,14 +62,7 @@ public class BillGenerationConsumer {
 							billGeneratorReq.getBillSchedular().getTenantId(), 
 							SWCalculationConstant.SUCCESS_MESSAGE, milliseconds);
 					
-				} /*
-					 * else {
-					 * billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular(
-					 * ).getId(), StatusEnum.INITIATED);
-					 * log.error("Bill scheduler fetch API failure for tenant: {}, locality: {} ",
-					 * billGeneraterReq.getTenantId(),
-					 * billGeneraterReq.getBillSchedular().getLocality()); }
-					 */
+				} 
 				//Removing the fetch bill success consumercodes from billGenerate
 				billGeneratorReq.getConsumerCodes().removeAll(fetchBillSuccessConsumercodes);
 				if(!billGeneratorReq.getConsumerCodes().isEmpty()) {
@@ -84,10 +77,6 @@ public class BillGenerationConsumer {
 							SWCalculationConstant.FAILURE_MESSAGE, milliseconds);
 					
 				}
-				
-				billGeneratorDao.updateBillSchedularStatus(billGeneratorReq.getBillSchedular().getId(), StatusEnum.COMPLETED);
-
-				log.info("Number of batch records:  " + billGeneratorReq.getConsumerCodes().size());
 				
 			}
 		}catch(Exception exception) {
