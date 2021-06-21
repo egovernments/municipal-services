@@ -304,7 +304,7 @@ public class EstimationService {
 					BigDecimal  noofmonths=BigDecimal.valueOf(Double.parseDouble(unit.getAdditionalDetails().get("rentedformonths").toString()));
 					if(noofmonths.compareTo(BigDecimal.valueOf(12)) < 0 )
 					{
-					unit.setOccupancyType("UNOCCUPIED");
+					unit.setOccupancyType("SELFOCCUPIED");
 					BigDecimal restMonths=	BigDecimal.valueOf(12).subtract(noofmonths);
 					slab = getSlabForCalc(filteredBillingSlabs, unit);
 					BigDecimal tax=BigDecimal.valueOf(Math.round(getTaxForUnit(slab, unit,assessmentYear).doubleValue()));
