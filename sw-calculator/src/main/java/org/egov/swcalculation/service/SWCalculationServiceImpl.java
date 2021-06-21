@@ -332,17 +332,19 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoByLocality( billSchedular.getTenantId(), SWCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
 
 				//testing purpose added three consumercodes
-				connectionNos.add("0603000001");
-				connectionNos.add("0603000002");
-				connectionNos.add("0603009718");
+//				connectionNos.add("0603000001");
+//				connectionNos.add("0603000002");
+//				connectionNos.add("0603009718");
 				
 				if (connectionNos == null || connectionNos.isEmpty()) {
 					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
 					continue;
 				}
 
-				log.info("Producer ConsumerCodes size : {}", connectionNos.size());
 				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
+				int threadSleepCount = 0;
+				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+
 				for (List<String>  conectionNoList : partitionConectionNoList) {
 
 					BillGeneratorReq billGeneraterReq = BillGeneratorReq
@@ -354,6 +356,12 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 							.build();
 
 					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+					if(threadSleepCount == 3) {
+						//Pausing controller for every three batches.
+						Thread.sleep(15000);
+						threadSleepCount=0;
+					}
+					threadSleepCount++;
 				}
 			}catch (Exception e) {
 				e.printStackTrace();
