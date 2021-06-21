@@ -362,6 +362,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 			Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
 			log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
 			int threadSleepCount = 0;
+			int count = 1;
 			for (List<String>  conectionNoList : partitionConectionNoList) {
 
 				BillGeneratorReq billGeneraterReq = BillGeneratorReq
@@ -373,6 +374,8 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 						.build();
 
 				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+				log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
+
 				if(threadSleepCount == 3) {
 					Thread.sleep(15000);
 					threadSleepCount=0;
@@ -381,7 +384,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 			}
 			}catch (Exception e) {
-				 log.error("Execptio occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
+				 log.error("Execption occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
 			}
 
 		}
