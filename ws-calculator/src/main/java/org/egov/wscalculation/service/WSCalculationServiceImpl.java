@@ -361,7 +361,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 			Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
 			log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
-			int threadSleepCount = 0;
+			int threadSleepCount = 1;
 			int count = 1;
 			for (List<String>  conectionNoList : partitionConectionNoList) {
 
@@ -376,9 +376,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 				producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
 				log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
 
-				if(threadSleepCount == 3) {
+				if(threadSleepCount == 2) {
+					//Pausing the controller for 15 seconds after every two batches pushed to Kafka topic
 					Thread.sleep(15000);
-					threadSleepCount=0;
+					threadSleepCount=1;
 				}
 				threadSleepCount++;
 
