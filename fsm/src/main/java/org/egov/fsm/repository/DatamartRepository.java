@@ -72,12 +72,18 @@ public class DatamartRepository {
 
 	@Autowired
 	MDMSValidator mdmsValidator;
+	
+	@Autowired
+	WorkflowService workflowService;
 
 	public List<DataMartModel> getData(RequestInfo requestInfo) {
 
 		String countQuery = DataMartQueryBuilder.countQuery;
 		List<DataMartTenantModel> totalrowsWithTenantId = jdbcTemplate.query(countQuery, dataMartTenantRowMapper);
 
+		BusinessService businessService = workflowService.getBusinessService(null, requestInfo,
+				FSMConstants.FSM_BusinessService,null);
+		
 		StringBuilder query = new StringBuilder(DataMartQueryBuilder.dataMartQuery);
 		List<DataMartModel> datamartList = new ArrayList<DataMartModel>();
 		for (DataMartTenantModel tenantModel : totalrowsWithTenantId) {
