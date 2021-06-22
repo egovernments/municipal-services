@@ -66,7 +66,7 @@ public class Address   {
         @JsonProperty("addressLine2")
         private String addressLine2 = null;
 
-        @Size(max=64)
+        @Size(max=255)
         @JsonProperty("landmark")
         private String landmark = null;
 
@@ -82,11 +82,11 @@ public class Address   {
         @JsonProperty("detail")
         private String detail = null;
 
-        @Size(max=64)
+        @Size(max=255)
         @JsonProperty("buildingName")
         private String buildingName = null;
 
-        @Size(max=64)
+        @Size(max=255)
         @JsonProperty("street")
         private String street = null;
 

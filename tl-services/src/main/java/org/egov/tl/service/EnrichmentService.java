@@ -77,12 +77,23 @@ public class EnrichmentService {
                             tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                             tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
                     }
-                    if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
+                    if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories())) {
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                             accessory.setTenantId(tradeLicense.getTenantId());
                             accessory.setId(UUID.randomUUID().toString());
                             accessory.setActive(true);
-                        });
+                        });}
+                    else {
+                    	Accessory accessory=new Accessory();
+                    	List<Accessory> list=new ArrayList<>();
+                    	 accessory.setTenantId(tradeLicense.getTenantId());
+                         accessory.setId(UUID.randomUUID().toString());
+                         accessory.setCount(null);
+                         accessory.setAccessoryCategory("ACC-NULL");
+                         accessory.setActive(true);
+                         list.add(accessory);
+                         tradeLicense.getTradeLicenseDetail().setAccessories(list);
+                    }
                     break;
             }
             tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
@@ -102,22 +113,38 @@ public class EnrichmentService {
             
             if(tradeLicense.getApplicationType() !=null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                 if(tradeLicense.getAction().equalsIgnoreCase(ACTION_APPLY) || tradeLicense.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)){
+                	if(tradeLicense.getTradeLicenseDetail().getApplicationDocuments()!=null){
                     tradeLicense.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
                         document.setId(UUID.randomUUID().toString());
                         document.setActive(true);
                     });
+                	}
                 }
                                
             }
 
+           if(tradeLicense.getApplicationType().toString().equalsIgnoreCase("RENEWAL") && tradeLicense.getWorkflowCode().toString().equalsIgnoreCase("EDITRENEWAL")) {
             tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner -> {
-                owner.setUserActive(true);
+                //owner.setUserActive(true);
                 if (!CollectionUtils.isEmpty(owner.getDocuments()))
                     owner.getDocuments().forEach(document -> {
                         document.setId(UUID.randomUUID().toString());
                         document.setActive(true);
                     });
-            });
+            });}
+
+            else 
+            { 
+                tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                owner.setUserActive(true);
+                    if (!CollectionUtils.isEmpty(owner.getDocuments()))
+                         owner.getDocuments().forEach(document -> {
+                         document.setId(UUID.randomUUID().toString());
+                         document.setActive(true);
+                        });
+                });
+            }
+
 
             if (tradeLicense.getTradeLicenseDetail().getSubOwnerShipCategory().contains(config.getInstitutional())) {
                 tradeLicense.getTradeLicenseDetail().getInstitution().setId(UUID.randomUUID().toString());
