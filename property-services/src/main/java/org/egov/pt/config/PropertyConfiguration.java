@@ -316,4 +316,17 @@ public class PropertyConfiguration {
 
     @Value("${state.level.tenant.id}")
     private String stateLevelTenantId;
+
+
+    // ES Config
+
+    @Value("${elasticsearch.host}")
+    private String esHost;
+
+    @Value("${property.es.index}")
+    private String esPTIndex;
+
+    @Value("${elasticsearch.search.endpoint}")
+    private String esSearchEndpoint;
+
 }
