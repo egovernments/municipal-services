@@ -74,6 +74,24 @@ public class TLConstants {
     public static final String NOTIFICATION_FORWARD_CITIZEN = "tl.en.forward.citizen";
 
     public static final String NOTIFICATION_TL_REMINDER = "tl.en.reminder";
+    
+    public static final String NOTIFICATION_SENDBACK_TO_INSPECTION= "tl.en.sendback.to.inspection";
+    
+    public static final String NOTIFICATION_PENDINGAPPROVAL= "tl.en.send.to.approver";
+    
+    public static final String RENEWAL_NOTIFICATION_SENDBACK_TO_INSPECTION  = "tl.renew.en.sendback.to.inspection";
+    
+    public static final String RENEWAL_NOTIFICATION_STATUS_FORWARD_APPLIED ="tl.renew.en.counter.resubmit";
+    
+    public static final String NOTIFICATION_STATUS_FORWARD_APPLIED = "tl.en.counter.resubmit";
+
+    public static final List<String> NOTIFICATION_CODES = Collections.unmodifiableList(Arrays.asList(
+            RENEWAL_NOTIFICATION_INITIATED, RENEWAL_NOTIFICATION_APPLIED, RENEWAL_NOTIFICATION_FIELD_INSPECTION, RENEWAL_NOTIFICATION_PENDINGAPPROVAL,
+            RENEWAL_NOTIFICATION_REJECTED,RENEWAL_NOTIFICATION_APPROVED,NOTIFICATION_INITIATED,NOTIFICATION_APPLIED,NOTIFICATION_FIELD_INSPECTION,
+            NOTIFICATION_PAYMENT_OWNER,NOTIFICATION_RENEWAL_PAYMENT_OWNER,NOTIFICATION_PAYMENT_PAYER,NOTIFICATION_RENEWAL_PAYMENT_PAYER,
+            NOTIFICATION_PAID,NOTIFICATION_APPROVED,NOTIFICATION_REJECTED,NOTIFICATION_CANCELLED,NOTIFICATION_FIELD_CHANGED,NOTIFICATION_OBJECT_ADDED,
+            NOTIFICATION_OBJECT_REMOVED,NOTIFICATION_OBJECT_MODIFIED,NOTIFICATION_OBJECT_RENEW_MODIFIED,NOTIFICATION_SENDBACK_CITIZEN,
+            NOTIFICATION_FORWARD_CITIZEN,NOTIFICATION_TL_REMINDER));
 
 
     public static final String DEFAULT_OBJECT_MODIFIED_MSG = "Dear <1>,Your Trade License with application number <APPLICATION_NUMBER> was modified.";
@@ -208,7 +226,10 @@ public class TLConstants {
     public static final String ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION  = "SENDBACKTOCITIZEN_CITIZENACTIONREQUIRED";
 
     public static final String ACTION_FORWARD_CITIZENACTIONREQUIRED  = "FORWARDTOEMPLOYEE_FIELDINSPECTION";
+    
+    public static final String ACTION_STATUS_SENDBACK  = "SENDBACK_APPLIED";
 
+    public static final String ACTION_STATUS_FORWARD_APPLIED  = "FORWARD_APPLIED";
 
     public static final String ACTION_STATUS_PAID  = "PAID";
 
@@ -270,7 +291,11 @@ public class TLConstants {
 
     public static final String DEFAULT_WORKFLOW = "NewTL";
 
+    public static final String PAYMENT_LINK_PLACEHOLDER="{PAYMENT_LINK}";
+
     public TLConstants() {}
+    
+    public static final String TL_BUSINESS_SERVICE= "NewTL";
 
 
 

@@ -3,6 +3,7 @@ package org.egov.tl.util;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.utils.URIBuilder;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
 import org.egov.tl.producer.Producer;
@@ -11,8 +12,10 @@ import org.egov.tl.web.models.*;
 import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -30,13 +33,22 @@ public class NotificationUtil {
 
 	private Producer producer;
 
+	private RestTemplate restTemplate;
+	
 	@Autowired
-	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository,
-			Producer producer) {
+	private ShortUrlUtil shortUrlUtil;
+	
+	@Value("${egov.tl.citizen.search}")
+	private String tlCitizenSearchUrl;
+    
+	@Autowired
+	public NotificationUtil(TLConfiguration config, ServiceRequestRepository serviceRequestRepository, Producer producer, RestTemplate restTemplate) {
 		this.config = config;
 		this.serviceRequestRepository = serviceRequestRepository;
 		this.producer = producer;
+		this.restTemplate = restTemplate;
 	}
+
 
 	final String receiptNumberKey = "receiptNumber";
 
@@ -83,10 +95,12 @@ public class NotificationUtil {
 			message = getRejectedMsg(license, messageTemplate);
 			break;
 
-		case ACTION_STATUS_FIELDINSPECTION:
-			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION, localizationMessage);
-			message = getFieldInspectionMsg(license, messageTemplate);
-			break;
+		/*
+		 * case ACTION_STATUS_FIELDINSPECTION: messageTemplate =
+		 * getMessageTemplate(TLConstants.NOTIFICATION_FIELD_INSPECTION,
+		 * localizationMessage); message = getFieldInspectionMsg(license,
+		 * messageTemplate); break;
+		 */
 
 		case ACTION_SENDBACKTOCITIZEN_FIELDINSPECTION:
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_SENDBACK_CITIZEN, localizationMessage);
@@ -102,8 +116,24 @@ public class NotificationUtil {
 			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_CANCELLED, localizationMessage);
 			message = getCancelledMsg(license, messageTemplate);
 			break;
+			
+		case ACTION_STATUS_SENDBACK:
+			messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_SENDBACK_TO_INSPECTION, localizationMessage);
+			message = getSendBackToInspcetionMsg(license, messageTemplate);
+			break;
+			
+		/*
+		 * case ACTION_STATUS_PENDINGAPPROVAL: messageTemplate =
+		 * getMessageTemplate(NOTIFICATION_PENDINGAPPROVAL, localizationMessage);
+		 * message = getPendingApprovalMsg(license, messageTemplate); break;
+		 */
+	          
+		  case ACTION_STATUS_FORWARD_APPLIED:
+              messageTemplate = getMessageTemplate(TLConstants.NOTIFICATION_STATUS_FORWARD_APPLIED, localizationMessage);
+  			message = getResubmitAppMsg(license, messageTemplate);
+  			break; 
 		}
-
+	
 		return message;
 	}
 
@@ -142,13 +172,11 @@ public class NotificationUtil {
 			tenantId = tenantId.split("\\.")[0];
 
 		String locale = NOTIFICATION_LOCALE;
-		if (!StringUtils.isEmpty(requestInfo.getMsgId()) && requestInfo.getMsgId().split("|").length >= 2)
-			locale = requestInfo.getMsgId().split("\\|")[1];
-
 		StringBuilder uri = new StringBuilder();
 		uri.append(config.getLocalizationHost()).append(config.getLocalizationContextPath())
 				.append(config.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
-				.append("&tenantId=").append(tenantId).append("&module=").append(TLConstants.MODULE);
+				.append("&tenantId=").append(tenantId).append("&module=").append(TLConstants.MODULE)
+				.append("&codes=").append(StringUtils.join(NOTIFICATION_CODES,','));
 
 		return uri;
 	}
@@ -231,6 +259,18 @@ public class NotificationUtil {
 	private String getApprovedMsg(TradeLicense license, BigDecimal amountToBePaid, String message) {
 		message = message.replace("<2>", license.getTradeName());
 		message = message.replace("<3>", amountToBePaid.toString());
+		
+
+		String UIHost = config.getUiAppHost();
+
+		String paymentPath = config.getPayLinkSMS();
+		paymentPath = paymentPath.replace("$consumercode",license.getApplicationNumber());
+		paymentPath = paymentPath.replace("$tenantId",license.getTenantId());
+		paymentPath = paymentPath.replace("$businessservice",businessService_TL);
+
+		String finalPath = UIHost + paymentPath;
+
+		message = message.replace(PAYMENT_LINK_PLACEHOLDER,getShortenedUrl(finalPath));
 		return message;
 	}
 
@@ -326,6 +366,13 @@ public class NotificationUtil {
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", license.getTradeName());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
+		String applicationNumber = license.getApplicationNumber();
+		messageTemplate= messageTemplate.replace("<applicationNumber>", applicationNumber);
+		String shortUrl = shortUrlUtil.getShortUrl(tlCitizenSearchUrl, applicationNumber,
+				license.getTenantId());
+
+		messageTemplate = messageTemplate.replace("<5>", shortUrl);
+
 		return messageTemplate;
 	}
 
@@ -343,6 +390,12 @@ public class NotificationUtil {
 		messageTemplate = messageTemplate.replace("<2>", valMap.get(amountPaidKey));
 		messageTemplate = messageTemplate.replace("<3>", license.getTradeName());
 		messageTemplate = messageTemplate.replace("<4>", valMap.get(receiptNumberKey));
+		String applicationNumber = license.getApplicationNumber();
+		messageTemplate= messageTemplate.replace("<applicationNumber>", applicationNumber);
+		String shortUrl = shortUrlUtil.getShortUrl(tlCitizenSearchUrl, applicationNumber,
+				license.getTenantId());
+
+		messageTemplate = messageTemplate.replace("<5>", shortUrl);
 		return messageTemplate;
 	}
 
@@ -371,7 +424,7 @@ public class NotificationUtil {
 	 *            The list of SMSRequest to be sent
 	 */
 	public void sendSMS(List<SMSRequest> smsRequestList, boolean isSMSEnabled) {
-		if (isSMSEnabled) {
+		
 			if (CollectionUtils.isEmpty(smsRequestList))
 				log.info("Messages from localization couldn't be fetched!");
 			for (SMSRequest smsRequest : smsRequestList) {
@@ -379,7 +432,7 @@ public class NotificationUtil {
 				log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			}
 		}
-	}
+	
 
 	/**
 	 * Fetches the amount to be paid from getBill API
@@ -517,6 +570,45 @@ public class NotificationUtil {
 	 */
 	public void sendEventNotification(EventRequest request) {
 		producer.push(config.getSaveUserEventsTopic(), request);
+	}
+
+	private String getSendBackToInspcetionMsg(TradeLicense license, String message) {
+		message = message.replace("<2>", license.getTradeName());
+		message = message.replace("<3>", license.getApplicationNumber());
+
+		return message;
+	}
+	
+	 private String getPendingApprovalMsg(TradeLicense license, String message) {
+	        message = message.replace("<APPLICATION_NUMBER>", license.getApplicationNumber());
+	        return message;
+	    }
+	 
+	  private String getResubmitAppMsg(TradeLicense license, String message) {
+			message = message.replace("<2>", license.getTradeName());
+			message = message.replace("<3>", license.getApplicationNumber());
+
+			return message;
+		}
+
+	/**
+	 * Method to shortent the url
+	 * returns the same url if shortening fails
+	 * @param url
+	 */
+	public String getShortenedUrl(String url){
+
+		HashMap<String,String> body = new HashMap<>();
+		body.put("url",url);
+		StringBuilder builder = new StringBuilder(config.getUrlShortnerHost());
+		builder.append(config.getUrlShortnerEndpoint());
+		String res = restTemplate.postForObject(builder.toString(), body, String.class);
+
+		if(StringUtils.isEmpty(res)){
+			log.error("URL_SHORTENING_ERROR","Unable to shorten url: "+url); ;
+			return url;
+		}
+		else return res;
 	}
 
 }
