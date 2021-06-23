@@ -204,6 +204,12 @@ public class PropertyQueryBuilder {
 				.append(" )");
 			addToPreparedStatement(preparedStmtList, statusStringList);
 		}
+
+		if(!ObjectUtils.isEmpty(criteria.getCreationReason())){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("property.creationreason = ?");
+			preparedStmtList.add(criteria.getCreationReason());
+		}
 		
 		if (null != criteria.getLocality()) {
 
