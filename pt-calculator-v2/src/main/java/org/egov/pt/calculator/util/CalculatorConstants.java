@@ -342,4 +342,16 @@ public class CalculatorConstants {
 
 	public static final String MDMS_ASSESSMENT_JOB_CONFIG_PATH = "$.MdmsRes.tenant.assessmentconfig[?(@.enabled==true)]";
 
+	public static final String FINANCIALYEAR_KEY = "financialyear";
+
+	public static final String LOCALITY_KEY = "locality";
+
+	public static final String PROPERTYTYPE_KEY = "propertytype";
+
+	public static final String TENANT_KEY = "tenant";
+
+	public static final String ASSESSMENT_JOB_MDMS_ERROR = "ASSESSMENT_JOB_MDMS_ERROR";
+
+	public static final String ASSESSMENT_JOB_MDMS_ERROR_MSG = "Exception while fetching aseesment configuration tenants.";
+
 }

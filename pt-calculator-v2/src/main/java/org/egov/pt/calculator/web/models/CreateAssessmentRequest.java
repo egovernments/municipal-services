@@ -1,5 +1,7 @@
 package org.egov.pt.calculator.web.models;
 
+import java.util.List;
+
 import org.egov.common.contract.request.RequestInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,7 +26,9 @@ public class CreateAssessmentRequest {
 	
 	private String assessmentYear;
 	
-	private String locality;
+	private List<String> locality;
+	
+	private List<String> propertyType;
 
 	private String tenantId;
 	

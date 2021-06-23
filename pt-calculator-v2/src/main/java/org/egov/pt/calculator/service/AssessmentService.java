@@ -178,11 +178,17 @@ public class AssessmentService {
 		return propertyMap;
 	}
 	
+	 @SuppressWarnings("unchecked")
 	public void createAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
-		Map<String, Object> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
-		for (Entry<String, Object> tenantConfig : scheduledTenants.entrySet()) {
+		Map<String, Map<String, Object>> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
+		for (Entry<String, Map<String, Object>> tenantConfig : scheduledTenants.entrySet()) {
+			Map<String, Object> configData = tenantConfig.getValue();
+			List<String> locality = (List<String>) configData.get(CalculatorConstants.LOCALITY_KEY);
+			List<String> propertyType = (List<String>) configData.get(CalculatorConstants.PROPERTYTYPE_KEY);
 			assessmentRequest.setTenantId(tenantConfig.getKey());
 			assessmentRequest.setAssessmentYear(tenantConfig.getValue().toString());
+			assessmentRequest.setLocality(locality);
+			assessmentRequest.setPropertyType(propertyType);
 			List<Property> properties = repository.fetchAllActiveProperties(assessmentRequest);
 			for (Property property : properties) {
 				boolean isExists = repository.isAssessmentExists(property.getPropertyId(),
@@ -215,22 +221,30 @@ public class AssessmentService {
 
 	}
 
-	private Map<String, Object> fetchScheduledTenants(RequestInfo request) {
+	private Map<String, Map<String,Object>> fetchScheduledTenants(RequestInfo request) {
 
 		StringBuilder mdmsURL = utils.getMdmsSearchUrl();
 
 		MdmsCriteriaReq mdmsConfig = utils.getAssessmentConfigRequest(request, configs.getStateLevelTenantId());
 		try {
 			Object response = mdmsRepository.fetchResult(mdmsURL, mdmsConfig);
-			List<Map<String,Object>> jsonOutput =  JsonPath.read(response, CalculatorConstants.MDMS_ASSESSMENT_JOB_CONFIG_PATH);
-			Map<String,Object> scheduledTenants = new HashMap<>();
-			for(Map<String,Object> config : jsonOutput){
-				scheduledTenants.put(config.get("tenant").toString(),config.get("financialyear"));
+			List<Map<String, Object>> jsonOutput = JsonPath.read(response,
+					CalculatorConstants.MDMS_ASSESSMENT_JOB_CONFIG_PATH);
+			Map<String,Map<String,Object>> scheduledTenants = new HashMap<>();
+
+			for (Map<String, Object> config : jsonOutput) {
+				Map<String, Object> tenantConfig = new HashMap<>();
+				tenantConfig.put(CalculatorConstants.LOCALITY_KEY, config.get(CalculatorConstants.LOCALITY_KEY));
+				tenantConfig.put(CalculatorConstants.PROPERTYTYPE_KEY,
+						config.get(CalculatorConstants.PROPERTYTYPE_KEY));
+				tenantConfig.put(CalculatorConstants.FINANCIALYEAR_KEY,
+						config.get(CalculatorConstants.FINANCIALYEAR_KEY));
+				scheduledTenants.put(config.get(CalculatorConstants.TENANT_KEY).toString(), tenantConfig);
 			}
 			return scheduledTenants;
 		} catch (Exception e) {
-			throw new CustomException(CalculatorConstants.NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB,
-					CalculatorConstants.NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB);
+			throw new CustomException(CalculatorConstants.ASSESSMENT_JOB_MDMS_ERROR,
+					CalculatorConstants.ASSESSMENT_JOB_MDMS_ERROR_MSG);
 		}
 	}
 

@@ -108,8 +108,12 @@ public class AssessmentRepository {
 		StringBuilder query = new StringBuilder(PROPERTY_SEARCH_QUERY);
 		final Map<String, Object> params = new HashMap<>();
 		if (request.getLocality() != null) {
-			query.append(" and addr.locality=:locality");
+			query.append(" and addr.locality in (:locality) ");
 			params.put("locality", request.getLocality());
+		}
+		if (request.getPropertyType() != null) {
+			query.append(" and prop.usagecategory in (:propertytype) ");
+			params.put("propertytype", request.getPropertyType());
 		}
 		query.append(" and prop.tenantid=:tenantid");
 		params.put("tenantid", request.getTenantId());
