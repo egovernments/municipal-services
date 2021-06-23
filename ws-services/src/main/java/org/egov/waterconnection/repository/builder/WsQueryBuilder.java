@@ -39,13 +39,13 @@ public class WsQueryBuilder {
 	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.connectionType, wc.waterSource,"
 			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading, wc.appCreatedDate,"
 			+ " wc.detailsprovidedby, wc.estimationfileStoreId , wc.sanctionfileStoreId , wc.estimationLetterDate,"
-			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea,"
+			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo,conn.isoldapplication, conn.property_id, conn.roadcuttingarea,"
 			+ " conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.applicationType, conn.dateEffectiveFrom,"
 			+ " conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment, conn.createdBy as ws_createdBy, conn.lastModifiedBy as ws_lastModifiedBy,"
-			+ " conn.createdTime as ws_createdTime, conn.lastModifiedTime as ws_lastModifiedTime, "
+			+ " conn.createdTime as ws_createdTime, conn.lastModifiedTime as ws_lastModifiedTime,conn.additionaldetails, "
 			+ " conn.locality, conn.isoldapplication, conn.roadtype, document.id as doc_Id, document.documenttype, document.filestoreid, document.active as doc_active, plumber.id as plumber_id,"
-			+ " plumber.name as plumber_name, plumber.licenseno,"
-			+ " plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress,"
+			+ " plumber.name as plumber_name, plumber.licenseno, roadcuttingInfo.id as roadcutting_id, roadcuttingInfo.roadtype as roadcutting_roadtype, roadcuttingInfo.roadcuttingarea as roadcutting_roadcuttingarea, roadcuttingInfo.roadcuttingarea as roadcutting_roadcuttingarea,"
+			+ " roadcuttingInfo.active as roadcutting_active, plumber.mobilenumber as plumber_mobileNumber, plumber.gender as plumber_gender, plumber.fatherorhusbandname, plumber.correspondenceaddress,"
 			+ " plumber.relationship, " + holderSelectValues
 			+ " FROM eg_ws_connection conn "
 			+  INNER_JOIN_STRING 
@@ -55,7 +55,9 @@ public class WsQueryBuilder {
 			+  LEFT_OUTER_JOIN_STRING
 			+ "eg_ws_plumberinfo plumber ON plumber.wsid = conn.id"
 		    +  LEFT_OUTER_JOIN_STRING
-		    + "eg_ws_connectionholder connectionholder ON connectionholder.connectionid = conn.id";
+		    + "eg_ws_connectionholder connectionholder ON connectionholder.connectionid = conn.id"
+			+  LEFT_OUTER_JOIN_STRING
+			+ "eg_ws_roadcuttinginfo roadcuttingInfo ON roadcuttingInfo.wsid = conn.id" ;
 
 	private static final String PAGINATION_WRAPPER = "SELECT * FROM " +
             "(SELECT *, DENSE_RANK() OVER (ORDER BY conn_id) offset_ FROM " +
@@ -64,6 +66,10 @@ public class WsQueryBuilder {
             "WHERE offset_ > ? AND offset_ <= ?";
 	
 	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.appCreatedDate DESC";
+	
+	
+	public static final String UPDATE_DISCONNECT_STATUS="update eg_ws_connection set status=? where id=?";
+	
 	/**
 	 * 
 	 * @param criteria
@@ -86,7 +92,7 @@ public class WsQueryBuilder {
 		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
 			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
-			propertyList.forEach(property -> propertyIds.add(property.getId()));
+			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(propertyIdQuery).append(createQuery(propertyIds)).append(" )");
@@ -202,11 +208,26 @@ public class WsQueryBuilder {
 		}
 		return builder.toString();
 	}
+	
+	private String createQuery(List<String> ids) {
+        StringBuilder builder = new StringBuilder();
+        int length = ids.size();
+        for( int i = 0; i< length; i++){
+            builder.append(" LOWER(?)");
+            if(i != length -1) builder.append(",");
+        }
+        return builder.toString();
+    }
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		preparedStatement.addAll(ids);
 	}
-
+	
+	
+	private void addToPreparedStatement(List<Object> preparedStmtList,List<String> ids)
+    {
+        ids.forEach(id ->{ preparedStmtList.add(id);});
+    }
 
 	/**
 	 * 
@@ -244,4 +265,18 @@ public class WsQueryBuilder {
 			queryString.append(" OR");
 		}
 	}
+	
+	public String getWCPlainSearchQuery(SearchCriteria criteria, List<Object> preparedStmtList) {
+        StringBuilder builder = new StringBuilder(WATER_SEARCH_QUERY);
+
+        Set<String> ids = criteria.getIds();
+        if (!CollectionUtils.isEmpty(ids)) {
+            addClauseIfRequired(preparedStmtList,builder);
+            builder.append(" conn.id IN (").append(createQuery(ids)).append(")");
+            addToPreparedStatement(preparedStmtList, ids);
+        }
+
+        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
+
+    }
 }

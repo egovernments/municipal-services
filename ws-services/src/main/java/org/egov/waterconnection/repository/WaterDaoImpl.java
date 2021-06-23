@@ -1,8 +1,10 @@
 package org.egov.waterconnection.repository;
 
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -20,7 +22,9 @@ import org.egov.waterconnection.repository.rowmapper.WaterRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.ObjectUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -131,5 +135,58 @@ public class WaterDaoImpl implements WaterDao {
 		return userInfo.getType().equalsIgnoreCase("SYSTEM")
 				&& userInfo.getRoles().stream().map(Role::getCode).collect(Collectors.toSet()).contains("ANONYMOUS");
 	}
+	
+	public void updateWaterApplicationStatus(String id, String status) {
+		
+		Object[] params = { status, id};
+		
+		int[] types = {Types.VARCHAR, Types.VARCHAR};
+		
+		jdbcTemplate.update(WsQueryBuilder.UPDATE_DISCONNECT_STATUS, params, types);
+		 
+	}
+	
+	
+	@Override
+	public List<String> fetchWaterConnectionIds(SearchCriteria criteria){
+
+//        List<Object> preparedStmtList = new ArrayList<>();
+//        preparedStmtList.add(criteria.getTenantId());
+//        preparedStmtList.add(criteria.getOffset());
+//        preparedStmtList.add(criteria.getLimit());
+//        
+//
+//        return jdbcTemplate.query("SELECT id from eg_ws_connection where tenantid=? ORDER BY createdtime offset " +
+//                        " ? " +
+//                        "limit ? ",
+//                preparedStmtList.toArray(),
+//                new SingleColumnRowMapper<>(String.class));
+        
+        
+        List<Object> preparedStmtList = new ArrayList<>();
+		String basequery = "select id from eg_ws_connection";
+		StringBuilder builder = new StringBuilder(basequery);
+
+		if(!ObjectUtils.isEmpty(criteria.getTenantId())){
+				builder.append(" where tenantid=?");
+				preparedStmtList.add(criteria.getTenantId());
+			}
+
+		String orderbyClause = " order by lastmodifiedtime,id offset ? limit ?";
+		builder.append(orderbyClause);
+		preparedStmtList.add(criteria.getOffset());
+		preparedStmtList.add(criteria.getLimit());
+		return jdbcTemplate.query(builder.toString(), preparedStmtList.toArray(), new SingleColumnRowMapper<>(String.class));
+    }
+	
+	@Override
+	public List<WaterConnection> getPlainWaterConnectionSearch(SearchCriteria criteria) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = wsQueryBuilder.getWCPlainSearchQuery(criteria, preparedStmtList);
+        log.info("Query: " + query +  "\n preparedStmtList:"+ preparedStmtList);
+      
+        List<WaterConnection> waterconnection =  jdbcTemplate.query(query, preparedStmtList.toArray(), waterRowMapper);
+        return waterconnection;
+    }
 
 }
