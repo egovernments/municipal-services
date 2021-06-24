@@ -237,12 +237,20 @@ public class SWQueryBuilder {
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
-
-		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
+		
+		if (criteria.getLimit() != null && criteria.getLimit() <= config.getMaxLimit())
 			limit = criteria.getLimit();
 
-		if (criteria.getLimit() != null && criteria.getLimit() > config.getDefaultOffset())
-			limit = config.getDefaultLimit();
+		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxLimit())
+			limit = config.getMaxLimit();
+		
+		
+		
+//		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
+//			limit = criteria.getLimit();
+//
+//		if (criteria.getLimit() != null && criteria.getLimit() > config.getDefaultOffset())
+//			limit = config.getDefaultLimit();
 
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
