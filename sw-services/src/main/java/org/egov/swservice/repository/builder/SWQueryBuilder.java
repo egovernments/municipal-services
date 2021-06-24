@@ -238,6 +238,9 @@ public class SWQueryBuilder {
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
 		
+		if (criteria.getLimit() == null && criteria.getOffset() == null)
+			limit = config.getMaxLimit();
+		
 		if (criteria.getLimit() != null && criteria.getLimit() <= config.getMaxLimit())
 			limit = criteria.getLimit();
 
