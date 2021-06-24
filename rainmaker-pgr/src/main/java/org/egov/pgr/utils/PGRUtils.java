@@ -11,9 +11,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -265,8 +267,15 @@ public class PGRUtils {
 	public SearcherRequest prepareSearchRequestWithDetails(StringBuilder uri,
 			ServiceReqSearchCriteria serviceReqSearchCriteria, RequestInfo requestInfo){
 		uri.append(searcherHost);
-		String endPoint = searcherEndpoint.replace(MODULE_NAME, PGRConstants.SEARCHER_PGR_MOD_NAME).replace(SEARCH_NAME,
-				PGRConstants.SEARCHER_SRSEARCH_DEF_NAME);
+		String precedentRole = getPrecedentRole(requestInfo.getUserInfo().getRoles().stream().map(Role::getCode)
+				.collect(Collectors.toList()));
+		String endPoint=null;
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(PGRConstants.ROLE_CITIZEN)) {
+			endPoint= searcherEndpoint.replace(MODULE_NAME, PGRConstants.SEARCHER_PGR_MOD_NAME).replace(SEARCH_NAME,
+					PGRConstants.SEARCHER_SRSEARCHCITIZEN_DEF_NAME);}
+			else {
+			endPoint= searcherEndpoint.replace(MODULE_NAME, PGRConstants.SEARCHER_PGR_MOD_NAME).replace(SEARCH_NAME,
+				PGRConstants.SEARCHER_SRSEARCH_DEF_NAME);}
 		uri.append(endPoint);
 		serviceReqSearchCriteria.setNoOfRecords(null == serviceReqSearchCriteria.getNoOfRecords() ? 200L : serviceReqSearchCriteria.getNoOfRecords()); //be default we retrieve 200 records.
 		serviceReqSearchCriteria.setOffset(null == serviceReqSearchCriteria.getOffset() ? 0L : serviceReqSearchCriteria.getOffset());

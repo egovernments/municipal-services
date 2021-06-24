@@ -9,7 +9,6 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pgr.contract.SearcherRequest;
 import org.egov.pgr.contract.ServiceReqSearchCriteria;
 import org.egov.tracer.model.ServiceCallException;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,7 +32,6 @@ public class ServiceRequestRepositoryTest {
 	private ServiceRequestRepository serviceRequestRepository;
 
 
-	@Ignore
 	@Test
 	public void testGetServiceRequestsFailure() {
 		Object response = new Object();
@@ -54,9 +52,8 @@ public class ServiceRequestRepositoryTest {
 		
 		
 	}
-
+	
 	@SuppressWarnings("unchecked")
-	@Ignore
 	@Test
 	public void testGetServiceRequestsSuccess() {
 /*		ReflectionTestUtils.setField(
@@ -82,7 +79,6 @@ public class ServiceRequestRepositoryTest {
 	}
 	
 	@SuppressWarnings("unchecked")
-	@Ignore
 	@Test(expected = ServiceCallException.class)
 	public void testGetServiceRequestsException() {
 		StringBuilder uri = new StringBuilder();

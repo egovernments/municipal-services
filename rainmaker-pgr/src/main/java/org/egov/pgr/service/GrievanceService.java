@@ -85,9 +85,6 @@ public class GrievanceService {
 	@Value("${egov.user.create.endpoint}")
 	private String userCreateEndPoint;
 
-	@Value("${url.enrichment.enabled}")
-	private Boolean isUrlEnrichmentEnabled;
-
 	@Autowired
 	private ResponseInfoFactory factory;
 
@@ -466,7 +463,7 @@ public class GrievanceService {
 				.collect(Collectors.toList()));
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(PGRConstants.ROLE_CITIZEN)) {
 			serviceReqSearchCriteria.setAccountId(requestInfo.getUserInfo().getId().toString());
-		    serviceReqSearchCriteria.setTenantId(serviceReqSearchCriteria.getTenantId().split("[.]")[0]); //citizen can search his complaints across state.
+		   serviceReqSearchCriteria.setTenantId(null); //citizen can search his complaints across state.
 		} else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(PGRConstants.ROLE_EMPLOYEE)) {
 			/**
 			 * GRO can search complaints belonging to only his tenant.
@@ -507,7 +504,7 @@ public class GrievanceService {
 			 * CSR can search complaints across the state.
 			 */
 			else if (precedentRole.equalsIgnoreCase(PGRConstants.ROLE_CSR)) {
-				serviceReqSearchCriteria.setTenantId(serviceReqSearchCriteria.getTenantId().split("[.]")[0]); //csr can search his complaints across state.
+				//serviceReqSearchCriteria.setTenantId(serviceReqSearchCriteria.getTenantId().split("[.]")[0]); //csr can search his complaints across state.
 			}
 		}
 		if (!StringUtils.isEmpty(serviceReqSearchCriteria.getAssignedTo())) {
@@ -640,8 +637,7 @@ public class GrievanceService {
 				services.add(obj.getServices());
 			}
 		});
-		if(isUrlEnrichmentEnabled)
-			replaceIdsWithUrls(actionHistory);
+		replaceIdsWithUrls(actionHistory);
 
 		return ServiceResponse.builder().responseInfo(factory.createResponseInfoFromRequestInfo(requestInfo, true))
 				.services(services).actionHistory(actionHistory).build();

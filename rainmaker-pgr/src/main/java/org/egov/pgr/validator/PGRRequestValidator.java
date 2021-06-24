@@ -85,6 +85,8 @@ public class PGRRequestValidator {
 	 */
 	public void validateCreate(ServiceRequest serviceRequest) {
 		log.info("Validating create request");
+		if(serviceRequest.getServices().get(0).getCitizen() !=null && serviceRequest.getServices().get(0).getCitizen().getEmailId() !=null)
+			serviceRequest.getServices().get(0).getCitizen().setEmailId(serviceRequest.getServices().get(0).getCitizen().getEmailId().trim());
 		Map<String, String> errorMap = new HashMap<>();
 		validateDataSanity(serviceRequest, errorMap, true);
 		validateUserRBACProxy(errorMap, serviceRequest.getRequestInfo());
@@ -109,6 +111,8 @@ public class PGRRequestValidator {
 	 */
 	public void validateUpdate(ServiceRequest serviceRequest) {
 		log.info("Validating update request");
+		if(serviceRequest.getServices().get(0).getCitizen() !=null && serviceRequest.getServices().get(0).getCitizen().getEmailId() !=null)
+			serviceRequest.getServices().get(0).getCitizen().setEmailId(serviceRequest.getServices().get(0).getCitizen().getEmailId().trim());
 		Map<String, String> errorMap = new HashMap<>();
 		validateDataSanity(serviceRequest, errorMap, false);
 		validateIfArraysEqual(serviceRequest, errorMap);
@@ -270,7 +274,7 @@ public class PGRRequestValidator {
 			Pattern pattern = Pattern.compile(PGRConstants.SERVICE_REQID_REGEX);
 			for(String id: criteria.getServiceRequestId()) {
 				Matcher matcher = pattern.matcher(id);
-				if(!matcher.find() || id.length() >= 30) {
+				if(!matcher.find() || id.length() >= 20) {
 					errorMap.put(ErrorConstants.INVALID_EG_PGR_SERVICE_REQ_ID_CODE, ErrorConstants.INVALID_EG_PGR_SERVICE_REQ_ID_MSG + id);
 				}
 			}
@@ -414,7 +418,8 @@ public class PGRRequestValidator {
 			Service service = serviceRequest.getServices().get(index);
 			ActionHistory history = historyMap.get(service.getServiceRequestId());
 			ActionInfo actionInfo = serviceRequest.getActionInfo().get(index);
-			String currentStatus = pgrUtils.getCurrentStatus(history);
+			String currentStatus = service.getStatus().toString();
+			//String currentStatus = pgrUtils.getCurrentStatus(history);
 			List<String> validStatusList = actioncurrentStatusMap.get(actionInfo.getAction());
 			/**
 			 * if currenstatus isn't available in the validstatus list of that action, then the action is invalid.
