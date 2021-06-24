@@ -64,7 +64,8 @@ public class EnrichmentService {
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
-		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
+		if (config.getIsExternalWorkFlowEnabled())
+			sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
 			for (String constValue : SWConstants.ADDITIONAL_OBJECT) {
@@ -82,6 +83,16 @@ public class EnrichmentService {
 				reqType == SWConstants.CREATE_APPLICATION ? SWConstants.NEW_SEWERAGE_CONNECTION : SWConstants.MODIFY_SEWERAGE_CONNECTION);
 		setSewarageApplicationIdgenIds(sewerageConnectionRequest);
 		setStatusForCreate(sewerageConnectionRequest);
+
+		SewerageConnection connection = sewerageConnectionRequest.getSewerageConnection();
+
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				roadCuttingInfo.setId(UUID.randomUUID().toString());
+				roadCuttingInfo.setStatus(Status.ACTIVE);
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,12 +119,14 @@ public class EnrichmentService {
 			}
 			additionalDetail.put(SWConstants.LOCALITY,addDetail.get(SWConstants.LOCALITY).toString());
 
+			log.info("Additional details1:"+ additionalDetail);
 			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
 				if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
 					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 				}
 			}
 		}
+		log.info("Additional details2:"+ additionalDetail);
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 	}
 
@@ -390,13 +403,13 @@ public class EnrichmentService {
 			if (!StringUtils.isEmpty(criteria.getTenantId())) {
 				propertyCriteria.setTenantId(criteria.getTenantId());
 			}
-			propertyCriteria.setUuids(propertyIds);
+			propertyCriteria.setPropertyIds(propertyIds);
 			List<Property> propertyList = sewerageServicesUtil.getPropertyDetails(serviceRequestRepository.fetchResult(sewerageServicesUtil.getPropertyURL(propertyCriteria),
 					RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 
 			if(!CollectionUtils.isEmpty(propertyList)){
 				for(Property property: propertyList){
-					propertyToOwner.put(property.getId(),property.getOwners());
+					propertyToOwner.put(property.getPropertyId(),property.getOwners());
 				}
 			}
 

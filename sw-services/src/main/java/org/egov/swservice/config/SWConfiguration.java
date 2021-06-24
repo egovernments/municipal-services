@@ -24,6 +24,9 @@ public class SWConfiguration {
 	@Value("${egov.sewerageservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
+	@Value("${egov.sewerageservice.pagination.max.limit}")
+	private Integer maxLimit;
+	
 
     	@Value("${egov.idgen.scid.name}")
     	private String sewerageIdGenName;
@@ -183,4 +186,10 @@ public class SWConfiguration {
 
 	@Value("${egov.usr.events.pay.link}")
 	private String userEventApplicationPayLink;
+	
+	@Value("${egov.billing.service.host}")
+	private String businesserviceHost;
+	
+	@Value("${egov.bill.fetchbillendpoint}")
+	private String fetchBillEndPoint;
 }

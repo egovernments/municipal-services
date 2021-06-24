@@ -7,12 +7,18 @@ import org.egov.swservice.web.models.SearchCriteria;
 import org.egov.swservice.web.models.SewerageConnection;
 import org.egov.swservice.web.models.SewerageConnectionRequest;
 
+
 public interface SewerageService {
 
 	List<SewerageConnection> createSewerageConnection(SewerageConnectionRequest sewarageConnectionRequest);
 
 	List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo);
+	
+	List<SewerageConnection> searchSewerageConnectionPlainSearch(SearchCriteria criteria, RequestInfo requestInfo);
 
 	List<SewerageConnection> updateSewerageConnection(SewerageConnectionRequest sewarageConnectionRequest);
+	
+	void disConnectSewerageConnection(String connectionNo,RequestInfo requestInfo,String tenantId);
+
 
 }
