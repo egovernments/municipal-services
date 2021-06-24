@@ -112,7 +112,7 @@ public class AssessmentRepository {
 			params.put("locality", request.getLocality());
 		}
 		if (request.getPropertyType() != null) {
-			query.append(" and prop.usagecategory in (:propertytype) ");
+			query.append(" and SPLIT_PART(prop.usagecategory,'.',1) in (:propertytype) ");
 			params.put("propertytype", request.getPropertyType());
 		}
 		query.append(" and prop.tenantid=:tenantid");

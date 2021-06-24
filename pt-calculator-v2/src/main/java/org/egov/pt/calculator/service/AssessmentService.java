@@ -186,7 +186,7 @@ public class AssessmentService {
 			List<String> locality = (List<String>) configData.get(CalculatorConstants.LOCALITY_KEY);
 			List<String> propertyType = (List<String>) configData.get(CalculatorConstants.PROPERTYTYPE_KEY);
 			assessmentRequest.setTenantId(tenantConfig.getKey());
-			assessmentRequest.setAssessmentYear(tenantConfig.getValue().toString());
+			assessmentRequest.setAssessmentYear(configData.get(CalculatorConstants.FINANCIALYEAR_KEY).toString());
 			assessmentRequest.setLocality(locality);
 			assessmentRequest.setPropertyType(propertyType);
 			List<Property> properties = repository.fetchAllActiveProperties(assessmentRequest);
