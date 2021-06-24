@@ -241,8 +241,8 @@ public class WsQueryBuilder {
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList, SearchCriteria criteria) {
 		Integer limit = config.getDefaultLimit();
 		Integer offset = config.getDefaultOffset();
-//		if (criteria.getLimit() == null && criteria.getOffset() == null)
-//			limit = config.getMaxLimit();
+		if (criteria.getLimit() == null && criteria.getOffset() == null)
+			limit = config.getMaxLimit();
 //
 //		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
 //			limit = criteria.getLimit();
