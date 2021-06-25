@@ -78,6 +78,9 @@ public class InboxService {
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
 			moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", criteria.getLimit());
+			if(!CollectionUtils.isEmpty(processCriteria.getCreationReason())){
+				moduleSearchCriteria.put("creationReason", StringUtils.arrayToDelimitedString(processCriteria.getCreationReason().toArray(),","));
+			}
 			List<BusinessService> bussinessSrvs = new ArrayList<BusinessService>();
 			for(String businessSrv : businessServiceName) {
 				BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessSrv);
@@ -179,13 +182,6 @@ public class InboxService {
 			if(!param.equalsIgnoreCase("tenantId")) {
 				url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
 			}
-			/*else{
-			&& !(moduleSearchCriteria.get(param) instanceof Collection)
-				Collection<Object> clc = (Collection<Object>)moduleSearchCriteria.get(param);
-				for(Object obj : clc){
-					url.append("&").append(param).append("=").append(obj);
-				}
-			}*/
 		});
 //		url.append("&limit=10&offset=0");
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
