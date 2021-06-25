@@ -329,4 +329,15 @@ public class PropertyConfiguration {
     @Value("${elasticsearch.search.endpoint}")
     private String esSearchEndpoint;
 
+    @Value("${pt.search.name.fuziness}")
+    private String nameFuziness;
+
+    @Value("${pt.search.doorno.fuziness}")
+    private String doorNoFuziness;
+
+    @Value("${pt.search.oldpropertyid.fuziness}")
+    private String oldPropertyIdFuziness;
+
+
+
 }
