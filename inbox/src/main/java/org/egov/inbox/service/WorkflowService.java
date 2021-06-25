@@ -141,7 +141,7 @@ public class WorkflowService {
 			url.append("&moduleName=").append( criteria.getModuleName());
 		}
 		if(!StringUtils.isEmpty(criteria.getBusinessService())) {
-			url.append("&businessService=").append( criteria.getBusinessService());
+			url.append("&businessService=").append( StringUtils.arrayToDelimitedString(criteria.getBusinessService().toArray(),","));
 		}
 		if(!StringUtils.isEmpty(criteria.getLimit())) {
 			url.append("&limit=").append( criteria.getLimit());

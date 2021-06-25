@@ -66,21 +66,23 @@ public class InboxService {
 		processCriteria.setTenantId(criteria.getTenantId());
 		Integer totalCount = workflowService.getProcessCount(criteria.getTenantId(), requestInfo, processCriteria);
 		List<HashMap<String,Object>> statusCountMap = workflowService.getProcessStatusCount( requestInfo, processCriteria);
-		String businessServiceName = processCriteria.getBusinessService();
+		List<String> businessServiceName = processCriteria.getBusinessService();
 		List<Inbox> inboxes = new ArrayList<Inbox>();
 		InboxResponse response = new InboxResponse();
 		JSONArray businessObjects = null;
-		Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName);
-		if(StringUtils.isEmpty(businessServiceName)) {
+		Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName.get(0));
+		if(CollectionUtils.isEmpty(businessServiceName)) {
 			throw new CustomException(ErrorConstants.MODULE_SEARCH_INVLAID,"Bussiness Service is mandatory for module search");
 		}
 		if( !CollectionUtils.isEmpty(moduleSearchCriteria)) {
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
 			moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", criteria.getLimit());
-			BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessServiceName);
 			List<BusinessService> bussinessSrvs = new ArrayList<BusinessService>();
-			bussinessSrvs.add(businessService);
+			for(String businessSrv : businessServiceName) {
+				BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessSrv);
+				bussinessSrvs.add(businessService);
+			}
 			HashMap<String,String> StatusIdNameMap = workflowService.getActionableStatusesForRole(requestInfo, bussinessSrvs, processCriteria);
 			String applicationStatusParam = srvMap.get("applsStatusParam");
 			String businessIdParam = srvMap.get("businessIdProperty");
@@ -165,7 +167,7 @@ public class InboxService {
 		return response; 
 	}
 	
-	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, String businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
+	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
 		JSONArray resutls = null;
 		if(CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
 			throw new CustomException(ErrorConstants.INVALID_MODULE_SEARCH_PATH,"search path not configured for the businessService : " + businessServiceName );
@@ -177,6 +179,13 @@ public class InboxService {
 			if(!param.equalsIgnoreCase("tenantId")) {
 				url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
 			}
+			/*else{
+			&& !(moduleSearchCriteria.get(param) instanceof Collection)
+				Collection<Object> clc = (Collection<Object>)moduleSearchCriteria.get(param);
+				for(Object obj : clc){
+					url.append("&").append(param).append("=").append(obj);
+				}
+			}*/
 		});
 //		url.append("&limit=10&offset=0");
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();

@@ -205,10 +205,11 @@ public class PropertyQueryBuilder {
 			addToPreparedStatement(preparedStmtList, statusStringList);
 		}
 
-		if(!ObjectUtils.isEmpty(criteria.getCreationReason())){
+		Set<String> creationReasonsList = criteria.getCreationReason();
+		if(!CollectionUtils.isEmpty(creationReasonsList)){
 			addClauseIfRequired(preparedStmtList, builder);
-			builder.append("property.creationreason = ?");
-			preparedStmtList.add(criteria.getCreationReason());
+			builder.append("property.creationreason IN ( ").append(createQuery(creationReasonsList)).append(" )");
+			addToPreparedStatement(preparedStmtList, creationReasonsList);
 		}
 		
 		if (null != criteria.getLocality()) {

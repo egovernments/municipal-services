@@ -55,7 +55,7 @@ public class PropertyCriteria {
 
 	private String oldPropertyId;
 
-	private String creationReason;
+	private Set<String> creationReason;
 	
 	
 	
