@@ -49,7 +49,7 @@ public class FuzzySearchQueryBuilder {
             "          \"match\": {\n" +
             "            \"{{VAR}}\": {\n" +
             "              \"query\": \"{{PARAM}}\",\n" +
-            "              \"fuzziness\": \"7\"\n" +
+            "              \"fuzziness\": \"{{FUZZINESS}}\"\n" +
             "            }\n" +
             "          }\n" +
             "        }";
@@ -74,6 +74,7 @@ public class FuzzySearchQueryBuilder {
 
             if(criteria.getName() != null){
                 String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getName());
+                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getNameFuziness());
                 innerQuery = innerQuery.replace("{{VAR}}","Data.ownerNames");
                 JsonNode innerNode = mapper.readTree(innerQuery);
                 fuzzyClauses.add(innerNode);
@@ -81,6 +82,7 @@ public class FuzzySearchQueryBuilder {
 
             if(criteria.getDoorNo() != null){
                 String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getDoorNo());
+                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getDoorNoFuziness());
                 innerQuery = innerQuery.replace("{{VAR}}","Data.doorNo");
                 JsonNode innerNode = mapper.readTree(innerQuery);
                 fuzzyClauses.add(innerNode);
@@ -88,6 +90,7 @@ public class FuzzySearchQueryBuilder {
 
             if(criteria.getOldPropertyId() != null){
                 String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getOldPropertyId());
+                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getOldPropertyIdFuziness());
                 innerQuery = innerQuery.replace("{{VAR}}","Data.oldPropertyId");
                 JsonNode innerNode = mapper.readTree(innerQuery);
                 fuzzyClauses.add(innerNode);
