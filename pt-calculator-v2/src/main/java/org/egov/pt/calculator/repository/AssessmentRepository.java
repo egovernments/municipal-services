@@ -125,7 +125,7 @@ public class AssessmentRepository {
 		final Map<String, Object> params = new HashMap<>();
 		params.put("propertyid", propertyId);
 		params.put("financialyear", assessmentYear);
-		params.put("tenantId", tenantId);
+		params.put("tenantid", tenantId);
 		List<String> assessmentIds = new ArrayList<>();
 		try {
 			assessmentIds = namedParameterJdbcTemplate.queryForList(query.toString(), params, String.class);
