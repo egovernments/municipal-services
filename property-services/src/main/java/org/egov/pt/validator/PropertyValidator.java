@@ -580,7 +580,9 @@ public class PropertyValidator {
 				&& CollectionUtils.isEmpty(criteria.getOwnerIds()) 
 				&& CollectionUtils.isEmpty(criteria.getUuids())
 				&& null == criteria.getMobileNumber()
-				&& null == criteria.getName();
+				&& null == criteria.getName()
+				&& null == criteria.getDoorNo()
+				&& null == criteria.getOldPropertyId();
 		
 		if (isUserCitizen) {
 			
