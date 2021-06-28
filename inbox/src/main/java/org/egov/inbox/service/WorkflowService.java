@@ -23,6 +23,7 @@ import org.egov.inbox.web.model.workflow.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,6 +48,7 @@ public class WorkflowService {
 	public Integer getProcessCount(String tenantId, RequestInfo requestInfo, ProcessInstanceSearchCriteria criteria) {
 		StringBuilder url = new StringBuilder(config.getWorkflowHost());
 		url.append( config.getProcessCountPath());
+		criteria.setIsProcessCountCall(true);
 		url = this.buildWorkflowUrl( criteria, url, Boolean.TRUE);
 		
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
@@ -63,6 +65,7 @@ public class WorkflowService {
 	public List<HashMap<String, Object>> getProcessStatusCount( RequestInfo requestInfo, ProcessInstanceSearchCriteria criteria) {
 		StringBuilder url = new StringBuilder(config.getWorkflowHost());
 		url.append( config.getProcessStatusCountPath());
+		criteria.setIsProcessCountCall(true);
 		url = this.buildWorkflowUrl(criteria, url, Boolean.FALSE);
 		
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
@@ -140,7 +143,7 @@ public class WorkflowService {
 		if(!StringUtils.isEmpty(criteria.getModuleName())) {
 			url.append("&moduleName=").append( criteria.getModuleName());
 		}
-		if(!StringUtils.isEmpty(criteria.getBusinessService())) {
+		if(criteria.getIsProcessCountCall() || ObjectUtils.isEmpty(criteria.getModuleName()) && !StringUtils.isEmpty(criteria.getBusinessService())) {
 			url.append("&businessService=").append( StringUtils.arrayToDelimitedString(criteria.getBusinessService().toArray(),","));
 		}
 		if(!StringUtils.isEmpty(criteria.getLimit())) {

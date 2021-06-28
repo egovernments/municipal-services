@@ -117,6 +117,7 @@ public class InboxService {
 			processCriteria.setBusinessIds(businessIds);
 			processCriteria.setOffset(criteria.getOffset());
 			processCriteria.setLimit(criteria.getLimit());
+			processCriteria.setIsProcessCountCall(false);
 			
 			ProcessInstanceResponse processInstanceResponse = workflowService.getProcessInstance(processCriteria, requestInfo);
 			List<ProcessInstance> processInstances = processInstanceResponse.getProcessInstances();
