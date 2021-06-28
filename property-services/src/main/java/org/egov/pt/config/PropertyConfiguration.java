@@ -338,6 +338,9 @@ public class PropertyConfiguration {
     @Value("${pt.search.oldpropertyid.fuziness}")
     private String oldPropertyIdFuziness;
 
+    @Value("${pt.fuzzy.searh.is.wildcard}")
+    private Boolean isSearchWildcardBased;
+
 
 
 }
