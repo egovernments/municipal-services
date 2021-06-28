@@ -43,9 +43,6 @@ public class ProcessInstanceSearchCriteria {
     @JsonProperty("businessService")
     private List<String> businessService;
 
-    @JsonProperty("creationReason")
-    private List<String> creationReason;
-
     @JsonProperty("moduleName")
     private String moduleName;
 

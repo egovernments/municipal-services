@@ -78,9 +78,6 @@ public class InboxService {
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
 			moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", criteria.getLimit());
-			if(!CollectionUtils.isEmpty(processCriteria.getCreationReason())){
-				moduleSearchCriteria.put("creationReason", StringUtils.arrayToDelimitedString(processCriteria.getCreationReason().toArray(),","));
-			}
 			List<BusinessService> bussinessSrvs = new ArrayList<BusinessService>();
 			for(String businessSrv : businessServiceName) {
 				BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessSrv);
@@ -180,7 +177,12 @@ public class InboxService {
 		Set<String> searchParams = moduleSearchCriteria.keySet();
 		searchParams.forEach((param)->{
 			if(!param.equalsIgnoreCase("tenantId")) {
-				url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
+				if(moduleSearchCriteria.get(param) instanceof Collection){
+					url.append("&").append(param).append("=");
+					url.append(StringUtils.arrayToDelimitedString(((Collection<?>) moduleSearchCriteria.get(param)).toArray(), ","));
+				} else {
+					url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
+				}
 			}
 		});
 //		url.append("&limit=10&offset=0");
