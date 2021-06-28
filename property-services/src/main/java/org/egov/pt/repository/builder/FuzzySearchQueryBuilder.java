@@ -1,5 +1,7 @@
 package org.egov.pt.repository.builder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -45,12 +47,19 @@ public class FuzzySearchQueryBuilder {
             "  }\n" +
             "}";
 
-    private static final String innerQueryTemplate = "{\n" +
+    private static final String fuzzyQueryTemplate = "{\n" +
             "          \"match\": {\n" +
             "            \"{{VAR}}\": {\n" +
             "              \"query\": \"{{PARAM}}\",\n" +
             "              \"fuzziness\": \"{{FUZZINESS}}\"\n" +
             "            }\n" +
+            "          }\n" +
+            "        }";
+
+    private static final String wildCardQueryTemplate = "{\n" +
+            "          \"query_string\": {\n" +
+            "            \"default_field\": \"{{VAR}}\",\n" +
+            "            \"query\": \"*{{PARAM}}*\"\n" +
             "          }\n" +
             "        }";
 
@@ -73,27 +82,15 @@ public class FuzzySearchQueryBuilder {
             List<JsonNode> fuzzyClauses = new LinkedList<>();
 
             if(criteria.getName() != null){
-                String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getName());
-                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getNameFuziness());
-                innerQuery = innerQuery.replace("{{VAR}}","Data.ownerNames");
-                JsonNode innerNode = mapper.readTree(innerQuery);
-                fuzzyClauses.add(innerNode);
+                fuzzyClauses.add(getInnerNode(criteria.getName(),"Data.ownerNames",config.getNameFuziness()));
             }
 
             if(criteria.getDoorNo() != null){
-                String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getDoorNo());
-                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getDoorNoFuziness());
-                innerQuery = innerQuery.replace("{{VAR}}","Data.doorNo");
-                JsonNode innerNode = mapper.readTree(innerQuery);
-                fuzzyClauses.add(innerNode);
+                fuzzyClauses.add(getInnerNode(criteria.getDoorNo(),"Data.doorNo",config.getDoorNoFuziness()));
             }
 
             if(criteria.getOldPropertyId() != null){
-                String innerQuery = innerQueryTemplate.replace("{{PARAM}}",criteria.getOldPropertyId());
-                innerQuery = innerQuery.replace("{{FUZZINESS}}", config.getOldPropertyIdFuziness());
-                innerQuery = innerQuery.replace("{{VAR}}","Data.oldPropertyId");
-                JsonNode innerNode = mapper.readTree(innerQuery);
-                fuzzyClauses.add(innerNode);
+                fuzzyClauses.add(getInnerNode(criteria.getOldPropertyId(),"Data.oldPropertyId",config.getOldPropertyIdFuziness()));
             }
 
             JsonNode mustNode = mapper.convertValue(new HashMap<String, List<JsonNode>>(){{put("must",fuzzyClauses);}}, JsonNode.class);
@@ -110,7 +107,7 @@ public class FuzzySearchQueryBuilder {
             }
 
             finalQuery = mapper.writeValueAsString(node);
-
+            
         }
         catch (Exception e){
             throw new CustomException("JSONNODE_ERROR","Failed to build json query for fuzzy search");
@@ -119,6 +116,33 @@ public class FuzzySearchQueryBuilder {
         return finalQuery;
 
     }
+
+
+    /**
+     * Creates inner query using the query template
+     * @param param
+     * @param var
+     * @param fuziness
+     * @return
+     * @throws JsonProcessingException
+     */
+    private JsonNode getInnerNode(String param, String var, String fuziness) throws JsonProcessingException {
+
+        String template;
+        if(config.getIsSearchWildcardBased())
+            template = wildCardQueryTemplate;
+        else
+            template = fuzzyQueryTemplate;
+        String innerQuery = template.replace("{{PARAM}}",param);
+        innerQuery = innerQuery.replace("{{VAR}}",var);
+
+        if(!config.getIsSearchWildcardBased())
+            innerQuery = innerQuery.replace("{{FUZZINESS}}", fuziness);
+
+        JsonNode innerNode = mapper.readTree(innerQuery);
+        return innerNode;
+    }
+
 
     private String addPagination(PropertyCriteria criteria) {
 
