@@ -56,6 +56,8 @@ public class PropertyCriteria {
 	private String oldPropertyId;
 
 	private Set<String> creationReason;
+
+	private Boolean isInboxSearch;
 	
 	
 	

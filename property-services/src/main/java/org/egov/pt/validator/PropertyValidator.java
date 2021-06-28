@@ -562,6 +562,10 @@ public class PropertyValidator {
     public void validatePropertyCriteria(PropertyCriteria criteria,RequestInfo requestInfo) {
     	
 		List<String> allowedParams = null;
+
+		if(configs.getIsInboxSearchAllowed()){
+			return;
+		}
 		
 		User user = requestInfo.getUserInfo();
 		String userType = user.getType();
