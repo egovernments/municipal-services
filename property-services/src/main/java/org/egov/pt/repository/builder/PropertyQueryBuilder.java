@@ -141,7 +141,8 @@ public class PropertyQueryBuilder {
 					&& null == criteria.getMobileNumber()
 					&& null == criteria.getName()
 					&& null == criteria.getDoorNo()
-					&& null == criteria.getOldPropertyId();
+					&& null == criteria.getOldPropertyId()
+					&& CollectionUtils.isEmpty(criteria.getCreationReason());
 		
 		if(isEmpty)
 			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
