@@ -6,7 +6,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.2.6.RELEASE</version>
-    <relativePath></relativePath>
+    <relativePath/>
   </parent>
   <groupId>org.egov</groupId>
   <artifactId>rainmaker-pgr</artifactId>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
-      <version>2.2.0</version>
+      <version>2.6.0</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
