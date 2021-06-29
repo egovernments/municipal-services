@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,7 +71,8 @@ public class InboxService {
 		List<Inbox> inboxes = new ArrayList<Inbox>();
 		InboxResponse response = new InboxResponse();
 		JSONArray businessObjects = null;
-		Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName.get(0));
+		//Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName.get(0));
+		Map<String,String> srvMap = fetchAppropriateServiceMap(businessServiceName);
 		if(CollectionUtils.isEmpty(businessServiceName)) {
 			throw new CustomException(ErrorConstants.MODULE_SEARCH_INVLAID,"Bussiness Service is mandatory for module search");
 		}
@@ -167,7 +169,26 @@ public class InboxService {
 		response.setItems(inboxes);
 		return response; 
 	}
-	
+
+	private Map<String, String> fetchAppropriateServiceMap(List<String> businessServiceName) {
+		StringBuilder appropriateKey = new StringBuilder();
+		for(String businessServiceKeys : config.getServiceSearchMapping().keySet()){
+			if(businessServiceKeys.contains(businessServiceName.get(0))){
+				appropriateKey.append(businessServiceKeys);
+				break;
+			}
+		}
+		if(ObjectUtils.isEmpty(appropriateKey)){
+			throw new CustomException("EG_INBOX_SEARCH_ERROR", "Inbox service is not configured for the provided business services");
+		}
+		for(String inputBusinessService : businessServiceName){
+			if(!appropriateKey.toString().contains(inputBusinessService)){
+				throw new CustomException("EG_INBOX_SEARCH_ERROR", "Cross module search is NOT allowed.");
+			}
+		}
+		return config.getServiceSearchMapping().get(appropriateKey.toString());
+	}
+
 	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
 		JSONArray resutls = null;
 		if(CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
