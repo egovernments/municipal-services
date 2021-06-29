@@ -117,8 +117,8 @@ public class InboxService {
 			ArrayList businessIds = new ArrayList();
 			businessIds.addAll( businessMap.keySet());
 			processCriteria.setBusinessIds(businessIds);
-			processCriteria.setOffset(criteria.getOffset());
-			processCriteria.setLimit(criteria.getLimit());
+			//processCriteria.setOffset(criteria.getOffset());
+			//processCriteria.setLimit(criteria.getLimit());
 			processCriteria.setIsProcessCountCall(false);
 			
 			ProcessInstanceResponse processInstanceResponse = workflowService.getProcessInstance(processCriteria, requestInfo);
@@ -148,7 +148,7 @@ public class InboxService {
 			String businessIdParam = srvMap.get("businessIdProperty");
 			moduleSearchCriteria.put(srvMap.get("applNosParam"),StringUtils.arrayToDelimitedString( processInstanceMap.keySet().toArray(),","));
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
-			moduleSearchCriteria.put("offset", criteria.getOffset());
+			//moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", -1);
 			businessObjects = fetchModuleObjects(moduleSearchCriteria,businessServiceName,criteria.getTenantId(),requestInfo,srvMap);
 			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
