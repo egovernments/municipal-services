@@ -135,9 +135,10 @@ public class TLQueryBuilder {
             }
 
             if (criteria.getStatus() != null) {
+                List<String> status = Arrays.asList(criteria.getStatus().split(","));
                 addClauseIfRequired(preparedStmtList, builder);
-                builder.append("  tl.status = ? ");
-                preparedStmtList.add(criteria.getStatus());
+                builder.append(" tl.status IN (").append(createQuery(status)).append(")");
+                addToPreparedStatement(preparedStmtList, status);
             }
 
             if (criteria.getApplicationType() != null) {
