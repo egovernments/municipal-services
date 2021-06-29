@@ -44,6 +44,12 @@ public class WorkflowService {
 	 * @return BusinessService for the the given tenantId
 	 */
 	public BusinessService getBusinessService(FSM fsm, RequestInfo requestInfo, String businessServceName, String applicationNo) {
+		
+		if(fsm==null) {
+			fsm=new FSM();
+			fsm.setTenantId("pb");
+		}
+		
 		StringBuilder url = getSearchURLWithParams(fsm.getTenantId(), businessServceName, applicationNo);
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
