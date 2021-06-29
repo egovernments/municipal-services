@@ -92,19 +92,19 @@ public class DatamartRepository {
 
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
 			Map<String, List<LinkedHashMap>> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
-		//	for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
-				//query.append(" offset " + i + " limit 500 ;");
-				List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
-				for (DataMartModel dataMartModel : dataMartList) {
-					String locality = dataMartModel.getLocality();
-					Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
-							dataMartModel.getApplicationId(), requestInfo, tenantModel.getTenantId());
-					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel, businessService);
-					dataMartModel = enrichMasterData(boundaryObject, masterData, dataMartModel);
+			// for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
+			// query.append(" offset " + i + " limit 500 ;");
+			List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
+			for (DataMartModel dataMartModel : dataMartList) {
+				String locality = dataMartModel.getLocality();
+				Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
+						dataMartModel.getApplicationId(), requestInfo, tenantModel.getTenantId());
+				dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel, businessService);
+				dataMartModel = enrichMasterData(boundaryObject, masterData, dataMartModel);
 
-					datamartList.add(dataMartModel);
-				}
-			//}
+				datamartList.add(dataMartModel);
+			}
+			// }
 		}
 		return datamartList;
 
@@ -125,10 +125,13 @@ public class DatamartRepository {
 		if (dataMartModel.getSlumName() != null) {
 			List<LinkedHashMap> slumMasterData = masterData.get(FSMConstants.MDMS_SLUM_NAME);
 			String slumName = dataMartModel.getSlumName();
-			List<LinkedHashMap> slumCodeList = slumMasterData.stream()
-					.filter(map -> ((String) map.get("code")).equals(slumName)).collect(Collectors.toList());
-			if(slumCodeList.size()>0) {
-			dataMartModel.setSlumName(slumCodeList.get(0).get("name").toString());
+			if (slumMasterData != null) {
+				List<LinkedHashMap> slumCodeList = slumMasterData.stream()
+						.filter(map -> ((String) map.get("code")).equals(slumName)).collect(Collectors.toList());
+
+				if (slumCodeList.size() > 0) {
+					dataMartModel.setSlumName(slumCodeList.get(0).get("name").toString());
+				}
 			}
 		}
 
