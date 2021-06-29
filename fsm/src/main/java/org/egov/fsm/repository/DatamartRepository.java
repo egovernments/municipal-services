@@ -39,6 +39,7 @@ import org.egov.fsm.web.model.DataMartModel;
 import org.egov.fsm.web.model.DataMartTenantModel;
 import org.egov.fsm.web.model.RequestInfoWrapper;
 import org.egov.fsm.web.model.location.Boundary;
+import org.egov.fsm.web.model.workflow.BusinessService;
 import org.egov.fsm.web.model.workflow.ProcessInstance;
 import org.egov.fsm.web.model.workflow.ProcessInstanceResponse;
 import org.egov.fsm.web.model.workflow.State;
@@ -73,8 +74,6 @@ public class DatamartRepository {
 	@Autowired
 	MDMSValidator mdmsValidator;
 	
-	@Autowired
-	WorkflowService workflowService;
 
 	public List<DataMartModel> getData(RequestInfo requestInfo) {
 
@@ -101,7 +100,7 @@ public class DatamartRepository {
 					String locality = dataMartModel.getLocality();
 					Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
 							dataMartModel.getApplicationId(), requestInfo, totalrowsWithTenantId.get(i).getTenantId());
-					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel);
+					dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel,businessService);
 					dataMartModel = enrichMasterData(boundaryObject, masterData, dataMartModel);
 
 					datamartList.add(dataMartModel);
@@ -113,7 +112,7 @@ public class DatamartRepository {
 	}
 
 	private DataMartModel enrichMasterData(List<LinkedHashMap> boundaryObject,
-			Map<String, List<LinkedHashMap>> masterData, DataMartModel dataMartModel,) {
+			Map<String, List<LinkedHashMap>> masterData, DataMartModel dataMartModel) {
 		if (dataMartModel.getLocality() != null && boundaryObject != null) {
 
 			for (LinkedHashMap map : boundaryObject) {
@@ -162,10 +161,11 @@ public class DatamartRepository {
 				dataMartModel.setPropertySubType(propertySubTypeList.get(0).get("name").toString());
 			}
 		}
+		return dataMartModel;
 	}
 
 	private DataMartModel enrichWorkFlowData(Map<String, ProcessInstance> processInstanceData,
-			DataMartModel dataMartModel) {
+			DataMartModel dataMartModel,BusinessService businessService) {
 
 		for (Map.Entry<String, ProcessInstance> data : processInstanceData.entrySet()) {
 
@@ -240,6 +240,7 @@ public class DatamartRepository {
 				dataMartModel.setApplicationCompletedTime(dateTime);
 				Duration duration = Duration.between(dateTime, createdTime);
 				dataMartModel.setSlaDays(duration.toDays());
+				dataMartModel.setSlaPlanned((int)(businessService.getBusinessServiceSla()/(1000*60*60*24)));
 				break;
 
 			}
