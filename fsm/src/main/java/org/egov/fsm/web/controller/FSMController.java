@@ -1,10 +1,13 @@
 package org.egov.fsm.web.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.egov.fsm.service.DataMartService;
 import org.egov.fsm.service.FSMService;
 import org.egov.fsm.service.UserService;
@@ -19,6 +22,9 @@ import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
 import org.egov.fsm.web.model.RequestInfoWrapper;
+import org.json.CDL;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +34,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 /**
  * Home redirection to swagger api documentation 
@@ -112,13 +122,13 @@ public class FSMController {
 	
 	
 	@RequestMapping(value="/_datamart")
-	public ResponseEntity<List<DataMartModel>> getDataMart(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper){
+	public ResponseEntity<List<DataMartModel>> getDataMart(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) throws JSONException, IOException{
 		
 		
-		
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		List<DataMartModel> dataMartModel=dataMartService.getFsmDataMartData(requestInfoWrapper.getRequestInfo());
-		
-		return new ResponseEntity<>(dataMartModel,HttpStatus.OK);
-		
+				return new ResponseEntity<>(dataMartModel,HttpStatus.OK);
 	}
+	
+	 
 }

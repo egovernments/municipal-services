@@ -161,14 +161,18 @@ public class DatamartRepository {
 			List<LinkedHashMap> propertyTypeList = propertyTypeMasterData.stream()
 					.filter(map -> ((String) map.get("code")).equals(propertyType)).collect(Collectors.toList());
 			if (propertyTypeList.size() > 0) {
-				dataMartModel.setPropertySubType(propertyTypeList.get(0).get("name").toString());
+				dataMartModel.setPropertyType(propertyTypeList.get(0).get("name").toString());
 			}
 			if (dataMartModel.getPropertySubType() != null) {
-				String propertySubType = dataMartModel.getPropertyType() + "." + dataMartModel.getPropertySubType();
+				String propertySubType = dataMartModel.getPropertyType().toUpperCase() + "." + dataMartModel.getPropertySubType();
 				List<LinkedHashMap> propertySubTypeList = propertyTypeMasterData.stream()
 						.filter(map -> ((String) map.get("code")).equals(propertySubType)).collect(Collectors.toList());
 				if (propertySubTypeList.size() > 0) {
 					dataMartModel.setPropertySubType(propertySubTypeList.get(0).get("name").toString());
+				}else {
+					if(propertyType.toUpperCase()==propertySubType.toUpperCase()) {
+						dataMartModel.setPropertySubType(propertyType);
+					}
 				}
 			}
 		}
