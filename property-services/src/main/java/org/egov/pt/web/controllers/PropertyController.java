@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.validation.Valid;
 
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
 import org.egov.pt.models.oldProperty.OldPropertyCriteria;
@@ -26,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,6 +49,9 @@ public class PropertyController {
 
     @Autowired
     private PropertyValidator propertyValidator;
+
+    @Autowired
+    private PropertyConfiguration configs;
 
     @Autowired
     FuzzySearchService fuzzySearchService;
@@ -79,8 +84,8 @@ public class PropertyController {
     @PostMapping("/_search")
     public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                    @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
-
-        propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
+        if(!configs.getIsInboxSearchAllowed() && (ObjectUtils.isEmpty(propertyCriteria.getIsInboxSearch()) || !propertyCriteria.getIsInboxSearch()))
+            propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
         List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
         PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))

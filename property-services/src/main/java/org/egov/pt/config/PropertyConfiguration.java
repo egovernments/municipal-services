@@ -341,6 +341,9 @@ public class PropertyConfiguration {
     @Value("${pt.fuzzy.searh.is.wildcard}")
     private Boolean isSearchWildcardBased;
 
+    // Inbox service Config
 
+    @Value("${inbox.property.search.allowed}")
+    private Boolean isInboxSearchAllowed;
 
 }

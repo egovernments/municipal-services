@@ -1,6 +1,7 @@
 package org.egov.inbox.web.model.workflow;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -41,10 +42,13 @@ public class ProcessInstanceSearchCriteria {
     private Integer limit;
 
     @JsonProperty("businessService")
-    private String businessService;
+    private List<String> businessService;
 
     @JsonProperty("moduleName")
     private String moduleName;
+
+    @JsonIgnore
+    private Boolean isProcessCountCall;
 
 
     public Boolean isNull(){

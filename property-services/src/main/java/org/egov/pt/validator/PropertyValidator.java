@@ -562,7 +562,7 @@ public class PropertyValidator {
     public void validatePropertyCriteria(PropertyCriteria criteria,RequestInfo requestInfo) {
     	
 		List<String> allowedParams = null;
-		
+
 		User user = requestInfo.getUserInfo();
 		String userType = user.getType();
 		Boolean isUserCitizen = "CITIZEN".equalsIgnoreCase(userType);
