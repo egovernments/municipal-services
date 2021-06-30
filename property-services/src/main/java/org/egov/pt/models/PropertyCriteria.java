@@ -50,6 +50,14 @@ public class PropertyCriteria {
 	private Long toDate;
 	
 	private String locality;
+
+	private String doorNo;
+
+	private String oldPropertyId;
+
+	private Set<String> creationReason;
+
+	private Boolean isInboxSearch;
 	
 	
 	

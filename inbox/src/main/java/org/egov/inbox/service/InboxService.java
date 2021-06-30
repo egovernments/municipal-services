@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,21 +67,24 @@ public class InboxService {
 		processCriteria.setTenantId(criteria.getTenantId());
 		Integer totalCount = workflowService.getProcessCount(criteria.getTenantId(), requestInfo, processCriteria);
 		List<HashMap<String,Object>> statusCountMap = workflowService.getProcessStatusCount( requestInfo, processCriteria);
-		String businessServiceName = processCriteria.getBusinessService();
+		List<String> businessServiceName = processCriteria.getBusinessService();
 		List<Inbox> inboxes = new ArrayList<Inbox>();
 		InboxResponse response = new InboxResponse();
 		JSONArray businessObjects = null;
-		Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName);
-		if(StringUtils.isEmpty(businessServiceName)) {
+		//Map<String,String> srvMap = (Map<String, String>) config.getServiceSearchMapping().get(businessServiceName.get(0));
+		Map<String,String> srvMap = fetchAppropriateServiceMap(businessServiceName);
+		if(CollectionUtils.isEmpty(businessServiceName)) {
 			throw new CustomException(ErrorConstants.MODULE_SEARCH_INVLAID,"Bussiness Service is mandatory for module search");
 		}
 		if( !CollectionUtils.isEmpty(moduleSearchCriteria)) {
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
 			moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", criteria.getLimit());
-			BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessServiceName);
 			List<BusinessService> bussinessSrvs = new ArrayList<BusinessService>();
-			bussinessSrvs.add(businessService);
+			for(String businessSrv : businessServiceName) {
+				BusinessService businessService = workflowService.getBusinessService(criteria.getTenantId(), requestInfo, businessSrv);
+				bussinessSrvs.add(businessService);
+			}
 			HashMap<String,String> StatusIdNameMap = workflowService.getActionableStatusesForRole(requestInfo, bussinessSrvs, processCriteria);
 			String applicationStatusParam = srvMap.get("applsStatusParam");
 			String businessIdParam = srvMap.get("businessIdProperty");
@@ -113,8 +117,9 @@ public class InboxService {
 			ArrayList businessIds = new ArrayList();
 			businessIds.addAll( businessMap.keySet());
 			processCriteria.setBusinessIds(businessIds);
-			processCriteria.setOffset(criteria.getOffset());
-			processCriteria.setLimit(criteria.getLimit());
+			//processCriteria.setOffset(criteria.getOffset());
+			//processCriteria.setLimit(criteria.getLimit());
+			processCriteria.setIsProcessCountCall(false);
 			
 			ProcessInstanceResponse processInstanceResponse = workflowService.getProcessInstance(processCriteria, requestInfo);
 			List<ProcessInstance> processInstances = processInstanceResponse.getProcessInstances();
@@ -143,7 +148,7 @@ public class InboxService {
 			String businessIdParam = srvMap.get("businessIdProperty");
 			moduleSearchCriteria.put(srvMap.get("applNosParam"),StringUtils.arrayToDelimitedString( processInstanceMap.keySet().toArray(),","));
 			moduleSearchCriteria.put("tenantId", criteria.getTenantId());
-			moduleSearchCriteria.put("offset", criteria.getOffset());
+			//moduleSearchCriteria.put("offset", criteria.getOffset());
 			moduleSearchCriteria.put("limit", -1);
 			businessObjects = fetchModuleObjects(moduleSearchCriteria,businessServiceName,criteria.getTenantId(),requestInfo,srvMap);
 			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
@@ -164,8 +169,27 @@ public class InboxService {
 		response.setItems(inboxes);
 		return response; 
 	}
-	
-	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, String businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
+
+	private Map<String, String> fetchAppropriateServiceMap(List<String> businessServiceName) {
+		StringBuilder appropriateKey = new StringBuilder();
+		for(String businessServiceKeys : config.getServiceSearchMapping().keySet()){
+			if(businessServiceKeys.contains(businessServiceName.get(0))){
+				appropriateKey.append(businessServiceKeys);
+				break;
+			}
+		}
+		if(ObjectUtils.isEmpty(appropriateKey)){
+			throw new CustomException("EG_INBOX_SEARCH_ERROR", "Inbox service is not configured for the provided business services");
+		}
+		for(String inputBusinessService : businessServiceName){
+			if(!appropriateKey.toString().contains(inputBusinessService)){
+				throw new CustomException("EG_INBOX_SEARCH_ERROR", "Cross module search is NOT allowed.");
+			}
+		}
+		return config.getServiceSearchMapping().get(appropriateKey.toString());
+	}
+
+	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
 		JSONArray resutls = null;
 		if(CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
 			throw new CustomException(ErrorConstants.INVALID_MODULE_SEARCH_PATH,"search path not configured for the businessService : " + businessServiceName );
@@ -175,7 +199,12 @@ public class InboxService {
 		Set<String> searchParams = moduleSearchCriteria.keySet();
 		searchParams.forEach((param)->{
 			if(!param.equalsIgnoreCase("tenantId")) {
-				url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
+				if(moduleSearchCriteria.get(param) instanceof Collection){
+					url.append("&").append(param).append("=");
+					url.append(StringUtils.arrayToDelimitedString(((Collection<?>) moduleSearchCriteria.get(param)).toArray(), ","));
+				} else {
+					url.append("&").append(param).append("=").append(moduleSearchCriteria.get(param).toString());
+				}
 			}
 		});
 //		url.append("&limit=10&offset=0");

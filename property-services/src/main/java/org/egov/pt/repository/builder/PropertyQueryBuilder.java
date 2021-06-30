@@ -124,6 +124,9 @@ public class PropertyQueryBuilder {
 					&& CollectionUtils.isEmpty(criteria.getUuids())
 					&& null == criteria.getMobileNumber()
 					&& null == criteria.getName();
+					&& null == criteria.getDoorNo()
+					&& null == criteria.getOldPropertyId()
+					&& CollectionUtils.isEmpty(criteria.getCreationReason());
 		
 		if(isEmpty)
 			throw new CustomException("EG_PT_SEARCH_ERROR"," No criteria given for the property search");
@@ -176,6 +179,11 @@ public class PropertyQueryBuilder {
 			builder.append("property.status = ?");
 			preparedStmtList.add(criteria.getStatus());
 			appendAndQuery= true;
+		Set<String> creationReasonsList = criteria.getCreationReason();
+		if(!CollectionUtils.isEmpty(creationReasonsList)){
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append("property.creationreason IN ( ").append(createQuery(creationReasonsList)).append(" )");
+			addToPreparedStatement(preparedStmtList, creationReasonsList);
 		}
 		
 		if (null != criteria.getLocality()) {
