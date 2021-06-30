@@ -212,7 +212,7 @@ const calculateNOCFee = async (
       else  
       {
           let area;
-                if ( billingslabs[0].areauom.Equals("SQYD"))
+                if ( billingslabs[0].areauom === "SQYD")
                     area = AREA_SQYD;
                 else
                     area = AREA_ACRE;
@@ -221,7 +221,7 @@ const calculateNOCFee = async (
     
                     
     
-                    let fee = fullrate + ((Math.Ceiling(area*2)/2) * fee_per_unit); // if unit is above 0.5 then treat full unit otherwise half e.g. 3.4 ACRE will be treated as 3.5 unit and 3.6 ACRE will be treated as 4 unit multiplier
+                    let fee = fullrate + ((Math.round(area*2)/2) * fee_per_unit); // if unit is above 0.5 then treat full unit otherwise half e.g. 3.4 ACRE will be treated as 3.5 unit and 3.6 ACRE will be treated as 4 unit multiplier
                     let max_fee = Number(billingslabs[0].maxfee);
                     let min_fee =Number(billingslabs[0].minfee);
     
