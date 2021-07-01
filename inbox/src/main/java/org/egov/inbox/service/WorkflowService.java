@@ -46,33 +46,48 @@ public class WorkflowService {
 	}
 
 	public Integer getProcessCount(String tenantId, RequestInfo requestInfo, ProcessInstanceSearchCriteria criteria) {
-		StringBuilder url = new StringBuilder(config.getWorkflowHost());
-		url.append( config.getProcessCountPath());
-		criteria.setIsProcessCountCall(true);
-		url = this.buildWorkflowUrl( criteria, url, Boolean.TRUE);
-		
-		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		Object result = serviceRequestRepository.fetchIntResult(url, requestInfoWrapper);
-		Integer response = null;
-		try {
-			response = mapper.convertValue(result, Integer.class);
-		} catch (IllegalArgumentException e) {
-			throw new CustomException(ErrorConstants.PARSING_ERROR, "Failed to parse response of ProcessInstance Count");
+		List<String> listOfBusinessServices = new ArrayList<>(criteria.getBusinessService());
+		Integer processCount = 0;
+		for(String businessSrv : listOfBusinessServices) {
+			criteria.setBusinessService(Collections.singletonList(businessSrv));
+			StringBuilder url = new StringBuilder(config.getWorkflowHost());
+			url.append(config.getProcessCountPath());
+			criteria.setIsProcessCountCall(true);
+			url = this.buildWorkflowUrl(criteria, url, Boolean.TRUE);
+
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+			Object result = serviceRequestRepository.fetchIntResult(url, requestInfoWrapper);
+			Integer response = null;
+			try {
+				response = mapper.convertValue(result, Integer.class);
+			} catch (IllegalArgumentException e) {
+				throw new CustomException(ErrorConstants.PARSING_ERROR, "Failed to parse response of ProcessInstance Count");
+			}
+			processCount += response;
 		}
-		return response;
+		criteria.setBusinessService(listOfBusinessServices);
+		return processCount;
 	}
 	
 	public List<HashMap<String, Object>> getProcessStatusCount( RequestInfo requestInfo, ProcessInstanceSearchCriteria criteria) {
-		StringBuilder url = new StringBuilder(config.getWorkflowHost());
-		url.append( config.getProcessStatusCountPath());
-		criteria.setIsProcessCountCall(true);
-		url = this.buildWorkflowUrl(criteria, url, Boolean.FALSE);
-		
-		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-		List<HashMap<String, Object>> response = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper);
-		
-		
-		return response;
+		List<String> listOfBusinessServices = new ArrayList<>(criteria.getBusinessService());
+		List<HashMap<String, Object>> finalResponse = null;
+		for(String businessSrv : listOfBusinessServices) {
+			criteria.setBusinessService(Collections.singletonList(businessSrv));
+			StringBuilder url = new StringBuilder(config.getWorkflowHost());
+			url.append(config.getProcessStatusCountPath());
+			criteria.setIsProcessCountCall(true);
+			url = this.buildWorkflowUrl(criteria, url, Boolean.FALSE);
+
+			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+			if(finalResponse == null) {
+				finalResponse = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper);
+			}else{
+				finalResponse.addAll((List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper));
+			}
+		}
+		criteria.setBusinessService(listOfBusinessServices);
+		return finalResponse;
 	}
 	
 	public ProcessInstanceResponse getProcessInstance(ProcessInstanceSearchCriteria criteria, RequestInfo requestInfo) {
