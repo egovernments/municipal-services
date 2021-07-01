@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.sun.tools.sjavac.Log;
+
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -326,7 +326,7 @@ public class DatamartRepository {
 			return processInstanceMap;
 
 		} catch (Exception e) {
-			Log.error(e.getMessage());
+			log.error(e.getMessage());
 		}
 
 		return null;
