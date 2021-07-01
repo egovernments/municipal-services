@@ -566,6 +566,13 @@ public class PropertyValidator {
 		User user = requestInfo.getUserInfo();
 		String userType = user.getType();
 		Boolean isUserCitizen = "CITIZEN".equalsIgnoreCase(userType);
+
+		// Safeguards against the possibility of inbox search being performed when inbox search has been disabled at service level
+		if(!configs.getIsInboxSearchAllowed()){
+			if(!ObjectUtils.isEmpty(criteria.getIsInboxSearch()) && criteria.getIsInboxSearch()){
+				throw new CustomException("EG_PT_INVALID_SEARCH", "Inbox search has been disabled for property service");
+			}
+		}
 		
 		if(propertyUtil.isPropertySearchOpen(user)) {
 			
@@ -585,7 +592,7 @@ public class PropertyValidator {
 				&& null == criteria.getOldPropertyId();
 		
 		if (isUserCitizen) {
-			
+
 			if (isCriteriaEmpty)
 				criteria.setMobileNumber(user.getMobileNumber());
 			
