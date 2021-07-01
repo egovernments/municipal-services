@@ -89,13 +89,8 @@ public class PropertyController {
             propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
         }else{
             // If inbox search is allowed but the current search is NOT from inbox service to display property applications, validate the search criteria.
-            if(ObjectUtils.isEmpty(propertyCriteria.getIsInboxSearch())){
+            if(!propertyCriteria.getIsInboxSearch()){
                 propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-            }
-            else{
-                if(!propertyCriteria.getIsInboxSearch()){
-                    propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-                }
             }
         }
         List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
