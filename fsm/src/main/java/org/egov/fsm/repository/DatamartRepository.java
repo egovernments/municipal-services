@@ -34,6 +34,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.sun.tools.sjavac.Log;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.egov.fsm.web.model.DataMartModel;
 import org.egov.fsm.web.model.DataMartTenantModel;
@@ -48,6 +51,7 @@ import org.egov.tracer.model.CustomException;
 import org.json.JSONObject;
 
 @Repository
+@Slf4j
 public class DatamartRepository {
 
 	@Autowired
@@ -92,14 +96,14 @@ public class DatamartRepository {
 
 			Object mdmsData = dataMartUtil.mDMSCall(requestInfo, tenantModel.getTenantId());
 			Map<String, List<LinkedHashMap>> masterData = dataMartUtil.groupMdmsDataByMater(mdmsData);
-			// for (int i = 0; i < tenantModel.getCount() - 500; i += 500) {
-			// query.append(" offset " + i + " limit 500 ;");
 			List<DataMartModel> dataMartList = jdbcTemplate.query(query.toString(), dataMartRowMapper);
 			for (DataMartModel dataMartModel : dataMartList) {
 				String locality = dataMartModel.getLocality();
 				Map<String, ProcessInstance> processInstanceData = getProceessInstanceData(
 						dataMartModel.getApplicationId(), requestInfo, tenantModel.getTenantId());
+				if(processInstanceData!=null) {
 				dataMartModel = enrichWorkFlowData(processInstanceData, dataMartModel, businessService);
+				}
 				dataMartModel = enrichMasterData(boundaryObject, masterData, dataMartModel);
 
 				datamartList.add(dataMartModel);
@@ -164,13 +168,14 @@ public class DatamartRepository {
 				dataMartModel.setPropertyType(propertyTypeList.get(0).get("name").toString());
 			}
 			if (dataMartModel.getPropertySubType() != null) {
-				String propertySubType = dataMartModel.getPropertyType().toUpperCase() + "." + dataMartModel.getPropertySubType();
+				String propertySubType = dataMartModel.getPropertyType().toUpperCase() + "."
+						+ dataMartModel.getPropertySubType();
 				List<LinkedHashMap> propertySubTypeList = propertyTypeMasterData.stream()
 						.filter(map -> ((String) map.get("code")).equals(propertySubType)).collect(Collectors.toList());
 				if (propertySubTypeList.size() > 0) {
 					dataMartModel.setPropertySubType(propertySubTypeList.get(0).get("name").toString());
-				}else {
-					if(propertyType.toUpperCase()==propertySubType.toUpperCase()) {
+				} else {
+					if (propertyType.toUpperCase() == propertySubType.toUpperCase()) {
 						dataMartModel.setPropertySubType(propertyType);
 					}
 				}
@@ -304,22 +309,27 @@ public class DatamartRepository {
 	private Map<String, ProcessInstance> getProceessInstanceData(String applicationId, RequestInfo requestInfo,
 			String tenantId) {
 		// TODO Auto-generated method stub
+		try {
+			LinkedHashMap processInstanceResponse = (LinkedHashMap) serviceRequestRepository.fetchResult(
+					new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()
+							+ "?businessService=FSM&&businessIds=" + applicationId + "&&tenantId=" + tenantId),
+					requestInfo);
+			List<ProcessInstance> processInstances = (List<ProcessInstance>) processInstanceResponse
+					.get("ProcessInstances");
+			Map<State, List<ProcessInstance>> processInstanceListMap = processInstances.stream()
+					.collect(Collectors.groupingBy(ProcessInstance::getState));
+			Map<String, ProcessInstance> processInstanceMap = new HashMap<String, ProcessInstance>();
+			for (Map.Entry<State, List<ProcessInstance>> entry : processInstanceListMap.entrySet()) {
+				processInstanceMap.put(entry.getKey().getState(), entry.getValue().get(0));
+			}
 
-		LinkedHashMap processInstanceResponse = (LinkedHashMap) serviceRequestRepository.fetchResult(
-				new StringBuilder(fsmConfiguration.getWfHost() + fsmConfiguration.getWfProcessPath()
-						+ "?businessService=FSM&&businessIds=" + applicationId + "&&tenantId=" + tenantId),
-				requestInfo);
-		List<ProcessInstance> processInstances = (List<ProcessInstance>) processInstanceResponse
-				.get("ProcessInstances");
-		Map<State, List<ProcessInstance>> processInstanceListMap = processInstances.stream()
-				.collect(Collectors.groupingBy(ProcessInstance::getState));
-		Map<String, ProcessInstance> processInstanceMap = new HashMap<String, ProcessInstance>();
-		for (Map.Entry<State, List<ProcessInstance>> entry : processInstanceListMap.entrySet()) {
-			processInstanceMap.put(entry.getKey().getState(), entry.getValue().get(0));
+			return processInstanceMap;
+
+		} catch (Exception e) {
+			Log.error(e.getMessage());
 		}
 
-		return processInstanceMap;
-
+		return null;
 	}
 
 	private List<List<LinkedHashMap>> getBoundaryData(String tenantId, RequestInfo requestInfo) {
