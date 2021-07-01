@@ -84,14 +84,9 @@ public class PropertyController {
     @PostMapping("/_search")
     public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                    @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
-        // If inbox search has been disallowed at config level, validate the search criteria.
-        if(!configs.getIsInboxSearchAllowed()){
+        // If inbox search has been disallowed at config level or if inbox search is allowed but the current search is NOT, from inbox service validate the search criteria.
+        if(!configs.getIsInboxSearchAllowed() || !propertyCriteria.getIsInboxSearch()){
             propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-        }else{
-            // If inbox search is allowed but the current search is NOT from inbox service to display property applications, validate the search criteria.
-            if(!propertyCriteria.getIsInboxSearch()){
-                propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-            }
         }
         List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
         PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
