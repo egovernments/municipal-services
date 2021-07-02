@@ -545,7 +545,10 @@ public class CalculatorUtils {
 				amtPaid = amtPaid.add(detail.getAdjustedAmount());
 			}
 		}
-		return taxAmt.subtract(amtPaid);
+		if(actualTax.compareTo(taxAmt) > 0 )
+ 		return actualTax.subtract(amtPaid);
+		else
+			return taxAmt.subtract(amtPaid);
         }else {
         	return BigDecimal.ZERO;
         }

@@ -103,7 +103,11 @@ public class PayService {
 						.collect(Collectors.toList());
 				BigDecimal intersetAmount = interestList.stream().map(DemandDetail::getCollectionAmount)
 						.reduce(BigDecimal.ZERO, BigDecimal::add);
-				estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
+				if (taxAmt.compareTo(oldCollectedTaxAmount) >0) {
+					estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount.abs());
+				} 
+				else 
+					estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate);
 				if (taxAmt.compareTo(oldCollectedTaxAmount) == 0) {
 					estimates.put(CalculatorConstants.PT_TIME_PENALTY, penaltyAmount);
 				} else {
