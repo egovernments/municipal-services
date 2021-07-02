@@ -33,6 +33,7 @@ import lombok.Setter;
 @Setter
 public class FSM   {
   @JsonProperty("citizen")
+  @Valid
   private User citizen ;
 
   @JsonProperty("id")
