@@ -44,6 +44,7 @@ public class User {
 
     @Size(min=1,max=64)
     @SafeHtml
+    @Pattern(regexp = "^[^\\$\"'<>?\\\\~`!@#$%^()+={}\\[\\]*,:;“”‘’]*$", message = "Invalid name. Only alphabets and special characters -, ',`, .")
     @JsonProperty("name")
     private String name;
 
