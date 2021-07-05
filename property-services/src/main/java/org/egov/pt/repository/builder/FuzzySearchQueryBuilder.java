@@ -17,9 +17,10 @@ import org.springframework.util.CollectionUtils;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class FuzzySearchQueryBuilder {
 
 
@@ -107,7 +108,7 @@ public class FuzzySearchQueryBuilder {
             }
 
             finalQuery = mapper.writeValueAsString(node);
-            
+            log.info(finalQuery);
         }
         catch (Exception e){
             throw new CustomException("JSONNODE_ERROR","Failed to build json query for fuzzy search");
@@ -171,10 +172,10 @@ public class FuzzySearchQueryBuilder {
      * @return
      */
     private String getEscapedString(String inputString){
-        final String[] metaCharacters = {"\\","^","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
+        final String[] metaCharacters = {"\\","/","^","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
         for (int i = 0 ; i < metaCharacters.length ; i++) {
             if (inputString.contains(metaCharacters[i])) {
-                inputString = inputString.replace(metaCharacters[i], "\\" + metaCharacters[i]);
+                inputString = inputString.replace(metaCharacters[i], "\\\\" + metaCharacters[i]);
             }
         }
         return inputString;
