@@ -17,6 +17,7 @@ import org.egov.pt.repository.ElasticSearchRepository;
 import org.egov.pt.service.FuzzySearchService;
 import org.egov.pt.service.MigrationService;
 import org.egov.pt.service.PropertyService;
+import org.egov.pt.util.PrivacyFilter;
 import org.egov.pt.util.ResponseInfoFactory;
 import org.egov.pt.validator.PropertyValidator;
 import org.egov.pt.web.contracts.FuzzySearchCriteria;
@@ -54,7 +55,7 @@ public class PropertyController {
     private PropertyConfiguration configs;
 
     @Autowired
-    FuzzySearchService fuzzySearchService;
+    PrivacyFilter privacyFilter;
 
     @PostMapping("/_create")
     public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
@@ -131,14 +132,10 @@ public class PropertyController {
 
 
 
-    @PostMapping("/fuzzy/_search")
-    public ResponseEntity<PropertyResponse> fuzzySearch(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                      @Valid @ModelAttribute PropertyCriteria fuzzySearchCriteria) {
+    @PostMapping("/privacy/_search")
+    public ResponseEntity<PropertyResponse> fuzzySearch() {
 
-        List<Property> properties = fuzzySearchService.getProperties(requestInfoWrapper.getRequestInfo(), fuzzySearchCriteria);
-        PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
-                .build();
+        PropertyResponse response = privacyFilter.getMaskedProperty();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
