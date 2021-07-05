@@ -17,9 +17,10 @@ import org.springframework.util.CollectionUtils;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class FuzzySearchQueryBuilder {
 
 
@@ -86,7 +87,7 @@ public class FuzzySearchQueryBuilder {
             }
 
             if(criteria.getDoorNo() != null){
-                fuzzyClauses.add(getInnerNode(criteria.getDoorNo(),"Data.doorNo",config.getDoorNoFuziness()));
+                fuzzyClauses.add(getInnerNode(criteria.getDoorNo(),"Data.doorNo.keyword",config.getDoorNoFuziness()));
             }
 
             if(criteria.getOldPropertyId() != null){
@@ -107,9 +108,9 @@ public class FuzzySearchQueryBuilder {
             }
 
             finalQuery = mapper.writeValueAsString(node);
-            
         }
         catch (Exception e){
+            log.error("ES_ERROR",e);
             throw new CustomException("JSONNODE_ERROR","Failed to build json query for fuzzy search");
         }
 
@@ -133,7 +134,7 @@ public class FuzzySearchQueryBuilder {
             template = wildCardQueryTemplate;
         else
             template = fuzzyQueryTemplate;
-        String innerQuery = template.replace("{{PARAM}}",param);
+        String innerQuery = template.replace("{{PARAM}}",getEscapedString(param));
         innerQuery = innerQuery.replace("{{VAR}}",var);
 
         if(!config.getIsSearchWildcardBased())
@@ -163,6 +164,21 @@ public class FuzzySearchQueryBuilder {
         baseQuery = baseQuery.replace("{{LIMIT}}", limit.toString());
 
         return baseQuery;
+    }
+
+    /**
+     * Escapes special characters in given string
+     * @param inputString
+     * @return
+     */
+    private String getEscapedString(String inputString){
+        final String[] metaCharacters = {"\\","/","^","$","{","}","[","]","(",")",".","*","+","?","|","<",">","-","&","%"};
+        for (int i = 0 ; i < metaCharacters.length ; i++) {
+            if (inputString.contains(metaCharacters[i])) {
+                inputString = inputString.replace(metaCharacters[i], "\\\\" + metaCharacters[i]);
+            }
+        }
+        return inputString;
     }
 
 }

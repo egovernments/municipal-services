@@ -58,7 +58,7 @@ public class ElasticSearchRepository {
              response = restTemplate.postForEntity(url, requestEntity, Object.class);
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             throw new CustomException("ES_ERROR","Failed to fetch data from ES");
         }
 
@@ -80,6 +80,7 @@ public class ElasticSearchRepository {
 
         return builder.toString();
     }
+
 
 
 }
