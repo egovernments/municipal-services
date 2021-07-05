@@ -17,6 +17,7 @@ import java.util.*;
 
 import static org.egov.pt.util.PTConstants.ES_DATA_PATH;
 
+
 @Component
 public class FuzzySearchService {
 
@@ -44,8 +45,6 @@ public class FuzzySearchService {
         Object esResponse = elasticSearchRepository.fuzzySearchProperties(criteria, idsFromDB);
 
         Map<String, Set<String>> tenantIdToPropertyId = getTenantIdToPropertyIdMap(esResponse);
-
-        System.out.println(tenantIdToPropertyId);
 
         List<Property> properties = new LinkedList<>();
 
