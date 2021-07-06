@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.egov.pt.util.PTConstants.ES_DATA_PATH;
 
@@ -58,7 +60,42 @@ public class FuzzySearchService {
 
         }
 
-        return properties;
+        List<Property> orderedProperties = orderByESScore(properties, esResponse);
+
+        return orderedProperties;
+    }
+
+    private List<Property> orderByESScore(List<Property> properties, Object esResponse){
+
+        List<Property> orderedProperties = new LinkedList<>();
+
+        if(!CollectionUtils.isEmpty(properties)){
+
+            List<Map<String, Object>> data;
+            Map<String, Property> idToPropertyMap = properties.stream().collect(Collectors.toMap(Property::getPropertyId, Function.identity()));
+
+            try {
+                data = JsonPath.read(esResponse, ES_DATA_PATH);
+
+
+                if (!CollectionUtils.isEmpty(data)) {
+
+                    for (Map<String, Object> map : data) {
+
+                        String propertyId = JsonPath.read(map, "$.propertyId");
+
+                        orderedProperties.add(idToPropertyMap.get(propertyId));
+                    }
+
+                }
+
+            } catch (Exception e) {
+                throw new CustomException("PARSING_ERROR", "Failed to extract propertyIds from es response");
+            }
+
+        }
+
+        return orderedProperties;
     }
 
 
@@ -71,7 +108,7 @@ public class FuzzySearchService {
     private Map<String, Set<String>> getTenantIdToPropertyIdMap(Object esResponse) {
 
         List<Map<String, Object>> data;
-        Map<String, Set<String>> tenantIdToPropertyIds = new HashMap<>();
+        Map<String, Set<String>> tenantIdToPropertyIds = new LinkedHashMap<>();
 
 
         try {
