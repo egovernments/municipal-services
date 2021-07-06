@@ -91,7 +91,7 @@ public class FuzzySearchQueryBuilder {
             }
 
             if(criteria.getOldPropertyId() != null){
-                fuzzyClauses.add(getInnerNode(criteria.getOldPropertyId(),"Data.oldPropertyId",config.getOldPropertyIdFuziness()));
+                fuzzyClauses.add(getInnerNode(criteria.getOldPropertyId(),"Data.oldPropertyId.keyword",config.getOldPropertyIdFuziness()));
             }
 
             JsonNode mustNode = mapper.convertValue(new HashMap<String, List<JsonNode>>(){{put("must",fuzzyClauses);}}, JsonNode.class);
@@ -108,6 +108,7 @@ public class FuzzySearchQueryBuilder {
             }
 
             finalQuery = mapper.writeValueAsString(node);
+
         }
         catch (Exception e){
             log.error("ES_ERROR",e);
