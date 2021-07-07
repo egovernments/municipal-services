@@ -72,7 +72,12 @@ public class FuzzySearchService {
         if(!CollectionUtils.isEmpty(properties)){
 
             List<Map<String, Object>> data;
-            Map<String, Property> idToPropertyMap = properties.stream().collect(Collectors.toMap(Property::getPropertyId, Function.identity()));
+            Map<String, Property> idToPropertyMap = new LinkedHashMap<>();
+
+            properties.forEach(property -> {
+                idToPropertyMap.put(property.getPropertyId(),property);
+            });
+
 
             try {
                 data = JsonPath.read(esResponse, ES_DATA_PATH);
