@@ -5,8 +5,6 @@ import lombok.*;
 
 import javax.validation.Valid;
 
-import org.egov.rb.pgrmodels.Service;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
