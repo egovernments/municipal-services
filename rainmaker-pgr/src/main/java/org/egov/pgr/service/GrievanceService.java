@@ -504,7 +504,8 @@ public class GrievanceService {
 			 * CSR can search complaints across the state.
 			 */
 			else if (precedentRole.equalsIgnoreCase(PGRConstants.ROLE_CSR)) {
-				//serviceReqSearchCriteria.setTenantId(serviceReqSearchCriteria.getTenantId().split("[.]")[0]); //csr can search his complaints across state.
+				serviceReqSearchCriteria.setTenantId(serviceReqSearchCriteria.getTenantId().split("[.]")[0]); 
+				//csr can search his complaints across state.
 			}
 		}
 		if (!StringUtils.isEmpty(serviceReqSearchCriteria.getAssignedTo())) {
