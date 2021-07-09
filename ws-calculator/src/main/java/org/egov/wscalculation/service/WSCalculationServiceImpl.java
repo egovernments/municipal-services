@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -22,8 +24,8 @@ import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.web.models.AdhocTaxReq;
-import org.egov.wscalculation.web.models.BillGeneraterReq;
 import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
+import org.egov.wscalculation.web.models.BillGeneratorReq;
 import org.egov.wscalculation.web.models.BillScheduler;
 import org.egov.wscalculation.web.models.BillScheduler.StatusEnum;
 import org.egov.wscalculation.web.models.Calculation;
@@ -116,7 +118,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request, calculations, masterMap, true);
+		demandService.generateDemandForBillingCycleInBulk(request, calculations, masterMap, true);
 		return calculations;
 	}
 
@@ -223,17 +225,23 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
-				criteria.setFrom(request.getTaxPeriodFrom());
-				criteria.setTo(request.getTaxPeriodTo());
+			try {
+				if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
+					criteria.setFrom(request.getTaxPeriodFrom());
+					criteria.setTo(request.getTaxPeriodTo());
+				}
+				Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
+						masterMap);
+				ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+						.get(WSCalculationConstant.Billing_Period_Master);
+				masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+				Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
+				calculation.setFrom(criteria.getFrom());
+				calculation.setTo(criteria.getTo());
+				calculations.add(calculation);
+			}catch (Exception e) {
+				e.printStackTrace();
 			}
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
-					masterMap);
-			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-					.get(WSCalculationConstant.Billing_Period_Master);
-			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
-			Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
-			calculations.add(calculation);
 		}
 		return calculations;
 	}
@@ -338,32 +346,52 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		log.info("billSchedularList count : " + billSchedularList.size());
 		for (BillScheduler billSchedular : billSchedularList) {
 			try {
-				
-			requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
-			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 
-			//Enable it once UI screen is done, for passing actual locality
-			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
-//			List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, null);
-			if (connectionNos == null || connectionNos.isEmpty()) {
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.INPROGRESS);
+				log.info("Updated Bill Schedular Status To INPROGRESS");
+
+				requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+				List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+				//			connectionNos.add("0603000002");
+				//			connectionNos.add("0603009718");
+				//			connectionNos.add("0603000001");
+				if (connectionNos == null || connectionNos.isEmpty()) {
+					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+					continue;
+				}
+
+				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
+				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+				int threadSleepCount = 1;
+				int count = 1;
+				for (List<String>  conectionNoList : partitionConectionNoList) {
+
+					BillGeneratorReq billGeneraterReq = BillGeneratorReq
+							.builder()
+							.requestInfoWrapper(requestInfoWrapper)
+							.tenantId(billSchedular.getTenantId())
+							.consumerCodes(ImmutableSet.copyOf(conectionNoList))
+							.billSchedular(billSchedular)
+							.build();
+
+					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+					log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
+
+					if(threadSleepCount == 2) {
+						//Pausing the controller for 10 seconds after every two batches pushed to Kafka topic
+						Thread.sleep(10000);
+						threadSleepCount=1;
+					}
+					threadSleepCount++;
+
+				}
 				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
-				continue;
-			}
+				log.info("Updated Bill Schedular Status To COMPLETED");
 
-			log.info("Producer ConsumerCodes size : {}", connectionNos.size());
-
-			BillGeneraterReq billGeneraterReq = BillGeneraterReq
-					.builder()
-					.requestInfoWrapper(requestInfoWrapper)
-					.tenantId(billSchedular.getTenantId())
-					.consumerCodes(ImmutableSet.copyOf(connectionNos))
-					.billSchedular(billSchedular)
-					.build();
-
-			producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
-			
 			}catch (Exception e) {
-				 log.error("Execptio occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
+				log.error("Execption occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
 			}
 
 		}
@@ -411,4 +439,10 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 	
+	static <T> Collection<List<T>> partitionBasedOnSize(List<T> inputList, int size) {
+        final AtomicInteger counter = new AtomicInteger(0);
+        return inputList.stream()
+                    .collect(Collectors.groupingBy(s -> counter.getAndIncrement()/size))
+                    .values();
+	}
 }

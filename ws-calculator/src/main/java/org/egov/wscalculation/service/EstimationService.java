@@ -38,6 +38,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.CompletableToListenableFutureAdapter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
@@ -151,6 +152,12 @@ public class EstimationService {
 		BigDecimal waterCharge = BigDecimal.ZERO;
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		additionalDetail = mapper.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
+		try {
+			log.info("Water Connection Object in estimation service : " + mapper.writeValueAsString(waterConnection));
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		String billingType = (String) additionalDetail.getOrDefault(WSCalculationConstant.BILLINGTYPE, null);
 		if (waterConnection.getConnectionType().equalsIgnoreCase(WSCalculationConstant.nonMeterdConnection)
 				&& billingType.equalsIgnoreCase(WSCalculationConstant.CUSTOM)) {

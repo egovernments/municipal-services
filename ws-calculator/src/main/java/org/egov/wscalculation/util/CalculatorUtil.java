@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
@@ -133,10 +134,12 @@ public class CalculatorUtil {
 
 		WaterConnectionResponse response;
 		try {
+			log.info("WaterConnectionResponse result: " + mapper.writeValueAsString(result));
 			response = mapper.convertValue(result, WaterConnectionResponse.class);
-		} catch (IllegalArgumentException e) {
+			log.info("WaterConnectionResponse: " + mapper.writeValueAsString(response));
+		} catch (Exception e) {
 			throw new CustomException("PARSING_ERROR", "Error while parsing response of Water Connection Search");
-		}
+		} 
 
 		if (response == null || CollectionUtils.isEmpty(response.getWaterConnection()))
 			return null;
