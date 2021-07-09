@@ -83,14 +83,16 @@ public class TradeLicenseSearchCriteria {
     public boolean isEmpty() {
         return (this.tenantId == null && this.status == null && this.applicationType == null && this.ids == null && this.applicationNumber == null
                 && this.licenseNumbers == null && this.oldLicenseNumber == null && this.mobileNumber == null &&
-                this.fromDate == null && this.toDate == null && this.ownerIds == null
+                this.fromDate == null && this.toDate == null && this.ownerIds == null && this.locality == null && this.tradeName == null &&
+                this.ownerName == null && this.issuedFrom == null && this.issuedTo == null
         );
     }
 
     public boolean tenantIdOnly() {
         return (this.tenantId != null && this.status == null && this.applicationType == null && this.ids == null && this.applicationNumber == null
                 && this.licenseNumbers == null && this.oldLicenseNumber == null && this.mobileNumber == null &&
-                this.fromDate == null && this.toDate == null && this.ownerIds == null
+                this.fromDate == null && this.toDate == null && this.ownerIds == null && this.locality == null && this.tradeName == null &&
+                this.ownerName == null && this.issuedFrom == null && this.issuedTo == null
         );
     }
 
