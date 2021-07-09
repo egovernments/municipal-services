@@ -17,4 +17,5 @@ public class PTConstants {
     public static final String ACKNOWLEDGEMENT_IDS_PARAM = "acknowledgementIds";
     public static final String REQUESTINFO_PARAM = "RequestInfo";
     public static final String SEARCH_CRITERIA_PARAM = "searchCriteria";
+    public static final String USERID_PARAM = "userid";
 }

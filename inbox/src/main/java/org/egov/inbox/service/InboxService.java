@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.inbox.config.InboxConfiguration;
 import org.egov.inbox.repository.ServiceRequestRepository;
@@ -31,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -43,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.egov.inbox.util.PTConstants.*;
 
+@Slf4j
 @Service
 public class InboxService {
 
@@ -55,7 +58,7 @@ public class InboxService {
 	private WorkflowService workflowService;
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private PtInboxFilterService ptInboxFilterService;
 
 	@Autowired
 	public InboxService(InboxConfiguration config, ServiceRequestRepository serviceRequestRepository,
@@ -126,8 +129,33 @@ public class InboxService {
 //			}
 			// Redirect request to searcher in case of PT to fetch acknowledgement IDS
 			Boolean isSearchResultEmpty = false;
-			if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)){
-				if(!moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
+			if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)) {
+				List<String> acknowledgementNumbers = ptInboxFilterService.fetchAcknowledgementIdsFromSearcher(criteria, StatusIdNameMap, requestInfo);
+				if(!CollectionUtils.isEmpty(acknowledgementNumbers)) {
+					moduleSearchCriteria.put(ACKNOWLEDGEMENT_IDS_PARAM, acknowledgementNumbers);
+					moduleSearchCriteria.remove(OFFSET_PARAM);
+					moduleSearchCriteria.remove(LIMIT_PARAM);
+				}else{
+					isSearchResultEmpty = true;
+				}
+			}
+			/*if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)){
+				Boolean isMobileNumberPresent = false;
+				if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
+					isMobileNumberPresent = true;
+				}
+				Boolean isUserPresentForGivenMobileNumber = false;
+				if(isMobileNumberPresent) {
+					String tenantId = criteria.getTenantId();
+					String mobileNumber = (String) moduleSearchCriteria.get(MOBILE_NUMBER_PARAM);
+					String userUUID = fetchUserUUID(mobileNumber, requestInfo, tenantId);
+				 	isUserPresentForGivenMobileNumber = ObjectUtils.isEmpty(userUUID) ? true : false;
+				}
+				if(isMobileNumberPresent && isUserPresentForGivenMobileNumber){
+					isSearchResultEmpty = true;
+				}
+
+				if(!isSearchResultEmpty){
 					Object result = null;
 
 					Map<String, Object> searcherRequest = new HashMap<>();
@@ -136,6 +164,9 @@ public class InboxService {
 					searchCriteria.put(TENANT_ID_PARAM,criteria.getTenantId());
 
 					// Accomodating module search criteria in searcher request
+					if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
+						searchCriteria.put(MOBILE_NUMBER_PARAM, moduleSearchCriteria.get(MOBILE_NUMBER_PARAM));
+					}
 					if(moduleSearchCriteria.containsKey(LOCALITY_PARAM)){
 						searchCriteria.put(LOCALITY_PARAM, moduleSearchCriteria.get(LOCALITY_PARAM));
 					}
@@ -178,11 +209,9 @@ public class InboxService {
 					}else{
 						isSearchResultEmpty = true;
 					}
-
-				}else{
-					isSearchResultEmpty = false;
 				}
 			}
+			*/
 			businessObjects = new JSONArray();
 			if(!isSearchResultEmpty) {
 				businessObjects = fetchModuleObjects(moduleSearchCriteria, businessServiceName, criteria.getTenantId(), requestInfo, srvMap);
@@ -244,6 +273,30 @@ public class InboxService {
 		response.setItems(inboxes);
 		return response; 
 	}
+
+/*	private String fetchUserUUID(String mobileNumber, RequestInfo requestInfo, String tenantId) {
+		StringBuilder uri = new StringBuilder();
+		uri.append(userHost).append(userSearchEndpoint);
+		Map<String, Object> userSearchRequest = new HashMap<>();
+		userSearchRequest.put("RequestInfo", requestInfo);
+		userSearchRequest.put("tenantId", tenantId);
+		userSearchRequest.put("userType", "CITIZEN");
+		userSearchRequest.put("userName", mobileNumber);
+		String uuid = "";
+		try {
+			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+			if(null != user) {
+				uuid = JsonPath.read(user, "$.user[0].uuid");
+			}else {
+				log.error("Service returned null while fetching user for username - " + mobileNumber);
+			}
+		}catch(Exception e) {
+			log.error("Exception while fetching user for username - " + mobileNumber);
+			log.error("Exception trace: ", e);
+		}
+		return uuid;
+	}
+*/
 
 	private Map<String, String> fetchAppropriateServiceMap(List<String> businessServiceName) {
 		StringBuilder appropriateKey = new StringBuilder();
