@@ -25,6 +25,11 @@ public class SWCalculatorQueryBuilder {
 	private static final String BILL_SCHEDULER_STATUS_SEARCH_QUERY = "select status from eg_sw_scheduler ";
 	
 	private static final String LAST_DEMAND_GEN_FOR_CONN =" SELECT d.taxperiodfrom FROM egbs_demand_v1 d ";
+	
+	private static final String isConnectionDemandAvailableForBillingCycle ="select EXISTS (select 1 from egbs_demand_v1 d ";
+
+	public static final String EG_SW_BILL_SCHEDULER_CONNECTION_STATUS_INSERT = "INSERT INTO eg_sw_bill_scheduler_connection_status "
+			+ "(id, eg_sw_scheduler_id, locality, module, createdtime, lastupdatedtime, status, tenantid, reason, consumercode) VALUES (?,?,?,?,?,?,?,?,?,?);";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -52,6 +57,10 @@ public class SWCalculatorQueryBuilder {
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.tenantid = ? ");
 		preparedStatement.add(tenantId);
+		
+		//Added connection number for testing Anonymous User issue
+//		addClauseIfRequired(preparedStatement, query);
+//		query.append(" conn.connectionno ='0603001817' ");
 		
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
@@ -176,7 +185,7 @@ public class SWCalculatorQueryBuilder {
 		
 		//Getting only non exempted connection to generate bill
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" (conn.additionaldetails->>'isexempted')::boolean is false ");
+		query.append(" (conn.additionaldetails->>'isexempted')::boolean is not true ");
 
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
@@ -232,6 +241,36 @@ public class SWCalculatorQueryBuilder {
 		query.append(" d.status = 'ACTIVE' ");
 		
 		query.append(" ORDER BY d.taxperiodfrom desc limit 1 ");
+		
+		return query.toString();
+	}
+	
+	public String isConnectionDemandAvailableForBillingCycle(String tenantId, Long taxPeriodFrom, Long taxPeriodTo, String consumerCode, List<Object> preparedStatement) {
+		StringBuilder query = new StringBuilder(isConnectionDemandAvailableForBillingCycle);
+
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.tenantid = ? ");
+		preparedStatement.add(tenantId);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.consumercode = ? ");
+		preparedStatement.add(consumerCode);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.status = 'ACTIVE' ");
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodFrom = ? ");
+		preparedStatement.add(taxPeriodFrom);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.taxPeriodTo = ? ");
+		preparedStatement.add(taxPeriodTo);
+		
+		addClauseIfRequired(preparedStatement, query);
+		query.append(" d.businessservice = ? ) ");
+		preparedStatement.add(SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+
 		
 		return query.toString();
 	}

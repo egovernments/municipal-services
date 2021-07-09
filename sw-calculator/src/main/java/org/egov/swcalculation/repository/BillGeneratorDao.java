@@ -1,9 +1,13 @@
 package org.egov.swcalculation.repository;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
+import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.producer.SWCalculationProducer;
 import org.egov.swcalculation.repository.builder.SWCalculatorQueryBuilder;
 import org.egov.swcalculation.repository.rowMapper.BillGenerateSchedulerRowMapper;
@@ -14,6 +18,7 @@ import org.egov.swcalculation.web.models.BillScheduler.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Repository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -81,5 +86,41 @@ public class BillGeneratorDao {
 			log.error("Exception while reading bill scheduler status" + ex.getMessage());
 		}
 		return res;
+	}
+	
+	public void insertBillSchedulerConnectionStatus(List<String> consumerCodes, String scheduler_id, 
+			String locality, String Status, String tenantid, String reason, long createdTime) {
+		try {
+
+			log.info("Entered into insertBillSchedulerConnectionStatus");
+			if(consumerCodes ==null || consumerCodes.isEmpty())
+				return;
+			
+			consumerCodes.forEach(consumercode -> {
+				String id = UUID.randomUUID().toString();
+
+				jdbcTemplate.update(SWCalculatorQueryBuilder.EG_SW_BILL_SCHEDULER_CONNECTION_STATUS_INSERT, new PreparedStatementSetter() {
+
+					@Override
+					public void setValues(PreparedStatement ps) throws SQLException {
+
+						ps.setString(1, id);
+						ps.setString(2, scheduler_id);
+						ps.setString(3, locality);
+						ps.setString(4, SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+						ps.setObject(5, createdTime);
+						ps.setObject(6, createdTime);
+						ps.setString(7, Status);
+						ps.setString(8, tenantid);
+						ps.setString(9, reason+consumercode);
+						ps.setString(10, consumercode);
+
+					}
+				});
+			});
+		}catch (Exception e) {
+			log.error("Exception occurred in the insertBillSchedulerConnectionStatus: {}", e);
+			e.printStackTrace();
+		}
 	}
 }

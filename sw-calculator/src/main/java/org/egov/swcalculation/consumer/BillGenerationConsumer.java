@@ -1,10 +1,12 @@
 package org.egov.swcalculation.consumer;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.egov.swcalculation.constants.SWCalculationConstant;
 import org.egov.swcalculation.repository.BillGeneratorDao;
 import org.egov.swcalculation.service.DemandService;
-import org.egov.swcalculation.web.models.BillGeneraterReq;
+import org.egov.swcalculation.web.models.BillGeneratorReq;
 import org.egov.swcalculation.web.models.BillScheduler.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -38,28 +40,49 @@ public class BillGenerationConsumer {
 	"${egov.swcalculatorservice.billgenerate.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	public void listen(final List<Message<?>> records) {
 		try {
-			
-		log.info("bill generator consumer received records:  " + records.size());
+			log.info("bill generator consumer received records:  " + records.size());
 
-		BillGeneraterReq billGeneraterReq = mapper.convertValue(records.get(0).getPayload(), BillGeneraterReq.class);
-		billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.INPROGRESS);
-		
-		if(billGeneraterReq.getConsumerCodes() != null && !billGeneraterReq.getConsumerCodes().isEmpty() && billGeneraterReq.getTenantId() != null) {
-			Boolean bill = demandService.fetchBillScheduler(billGeneraterReq.getConsumerCodes(),billGeneraterReq.getTenantId() ,billGeneraterReq.getRequestInfoWrapper().getRequestInfo());
-			log.info("Is Bill generator completed: {}", bill);
-			if(bill) {
-				billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.COMPLETED);
-				log.info("Number of batch records:  " + billGeneraterReq.getConsumerCodes().size());
-			}else {
-				billGeneratorDao.updateBillSchedularStatus(billGeneraterReq.getBillSchedular().getId(), StatusEnum.INITIATED);
-				log.error("Bill scheduler fetch API failure for tenant: {}, locality: {} ", billGeneraterReq.getTenantId(), billGeneraterReq.getBillSchedular().getLocality());
+			BillGeneratorReq billGeneratorReq = mapper.convertValue(records.get(0).getPayload(), BillGeneratorReq.class);
+			log.info("Number of batch records:  " + billGeneratorReq.getConsumerCodes().size());
+
+			if(billGeneratorReq.getConsumerCodes() != null && !billGeneratorReq.getConsumerCodes().isEmpty() && billGeneratorReq.getTenantId() != null) {
+				log.info("Fetch Bill generator initiated for Consumers: {}", billGeneratorReq.getConsumerCodes());
+				
+				List<String> fetchBillSuccessConsumercodes = demandService.fetchBillSchedulerSingle(billGeneratorReq.getConsumerCodes(),billGeneratorReq.getTenantId() ,billGeneratorReq.getRequestInfoWrapper().getRequestInfo());
+				log.info("Fetch Bill generator completed fetchBillConsumers: {}", fetchBillSuccessConsumercodes);
+				long milliseconds = System.currentTimeMillis();
+				
+				if(fetchBillSuccessConsumercodes != null && !fetchBillSuccessConsumercodes.isEmpty()) {
+					
+					billGeneratorDao.insertBillSchedulerConnectionStatus(
+							fetchBillSuccessConsumercodes, 
+							billGeneratorReq.getBillSchedular().getId(), 
+							billGeneratorReq.getBillSchedular().getLocality(), 
+							SWCalculationConstant.SUCCESS, 
+							billGeneratorReq.getBillSchedular().getTenantId(), 
+							SWCalculationConstant.SUCCESS_MESSAGE, milliseconds);
+					
+				} 
+				//Removing the fetch bill success consumercodes from billGenerate
+				billGeneratorReq.getConsumerCodes().removeAll(fetchBillSuccessConsumercodes);
+				if(!billGeneratorReq.getConsumerCodes().isEmpty()) {
+					log.info("Bill generator failure consumercodes: {}", billGeneratorReq.getConsumerCodes());
+
+					billGeneratorDao.insertBillSchedulerConnectionStatus(
+							billGeneratorReq.getConsumerCodes().stream().collect(Collectors.toList()), 
+							billGeneratorReq.getBillSchedular().getId(), 
+							billGeneratorReq.getBillSchedular().getLocality(), 
+							SWCalculationConstant.FAILURE, 
+							billGeneratorReq.getBillSchedular().getTenantId(), 
+							SWCalculationConstant.FAILURE_MESSAGE, milliseconds);
+					
+				}
+				
 			}
-			
-		}
-		
 		}catch(Exception exception) {
 			log.error("Exception occurred while generating bills in the sw bill generator consumer");
 		}
+
 	}
 
 }

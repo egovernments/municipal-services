@@ -19,7 +19,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class BillGeneraterReq  {
+public class BillGeneratorReq  {
 	
 		@JsonProperty("requestInfoWrapper")
 		@NotNull

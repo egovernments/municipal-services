@@ -50,27 +50,26 @@ public class DemandGenerationConsumer {
 	 */
 	@KafkaListener(topics = {
 			"${egov.seweragecalculatorservice.createdemand.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
-	@SuppressWarnings("unchecked")
 	public void listen(final List<Message<?>> records) {
 		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
 		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
 				calculationReq.getCalculationCriteria().get(0).getTenantId());
-		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
-		records.forEach(record -> {
-			try {
-				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
-				calculationCriteria.addAll(calcReq.getCalculationCriteria());
-				log.info("Consuming record: " + record);
-			} catch (final Exception e) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(e);
-				log.error(builder.toString());
-			}
-		});
-		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(calculationReq.getRequestInfo()).taxPeriodFrom(calculationReq.getTaxPeriodFrom()).taxPeriodTo(calculationReq.getTaxPeriodTo()).isconnectionCalculation(true).build();
-		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
-		log.info("Number of batch records:  " + records.size());
+//		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
+//		records.forEach(record -> {
+//			try {
+//				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
+//				calculationCriteria.addAll(calcReq.getCalculationCriteria());
+//				log.info("Consuming record: " + record);
+//			} catch (final Exception e) {
+//				StringBuilder builder = new StringBuilder();
+//				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(e);
+//				log.error(builder.toString());
+//			}
+//		});
+//		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
+//				.requestInfo(calculationReq.getRequestInfo()).taxPeriodFrom(calculationReq.getTaxPeriodFrom()).taxPeriodTo(calculationReq.getTaxPeriodTo()).isconnectionCalculation(true).build();
+		generateDemandInBatch(calculationReq, masterMap, config.getDeadLetterTopicBatch());
+		log.info("Number of batch records in the consumer: " +  calculationReq.getCalculationCriteria().size());
 	}
 
 	
@@ -126,11 +125,11 @@ public class DemandGenerationConsumer {
 	 */
 	private void generateDemandInBatch(CalculationReq request, Map<String, Object> masterMap, String errorTopic) {
 		try {
-			for(CalculationCriteria criteria : request.getCalculationCriteria()){
-				Boolean genratedemand = true;
+//			for(CalculationCriteria criteria : request.getCalculationCriteria()){
+//				Boolean genratedemand = true;
 //				Application validation removing for migrated connection as of now 
 //				swCalculationWorkflowValidator.nonMeterconnectionValidation(request.getRequestInfo(),criteria.getTenantId(),criteria.getConnectionNo(),genratedemand);
-			}
+//			}
 			sWCalculationServiceImpl.bulkDemandGeneration(request, masterMap);
 			StringBuilder str = new StringBuilder("Demand generated Successfully. For records : ").append(request.getCalculationCriteria());
 			log.info(str.toString());
