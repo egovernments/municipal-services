@@ -39,11 +39,11 @@ public class ExpenseFileStoreConsumer {
         List<Expense> expenses = new ArrayList<>();
         jobMaps.forEach(job -> {
             if(job.get(KEY_NAME).toString().equalsIgnoreCase("mcollect-challan")) {
-            	Expense challan = new Expense();
-            	challan.setId((String) job.get(KEY_PDF_ENTITY_ID));
-            	challan.setFilestoreid(StringUtils.join((List<String>)job.get(KEY_PDF_FILESTOREID),','));
-            	expenses.add(challan);
-            	log.info("Updating filestorid for: "+expenses);
+            	Expense expense = new Expense();
+            	expense.setId((String) job.get(KEY_PDF_ENTITY_ID));
+            	expense.setFilestoreid(StringUtils.join((List<String>)job.get(KEY_PDF_FILESTOREID),','));
+            	expenses.add(expense);
+            	log.info("Updating filestorid for: ",expenses);
             }
         });
 

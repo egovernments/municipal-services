@@ -54,7 +54,8 @@ public class ExpenseUserService {
 
 		Expense expense = request.getExpense();
 		RequestInfo requestInfo = request.getRequestInfo();
-		expense.setCitizen(new UserInfo());
+		if(null == expense.getCitizen())
+			expense.setCitizen(new UserInfo());
 		UserInfo userInfo = expense.getCitizen();
 		if (expense.getAccountId() != null) {
 			UserDetailResponse userDetailResponse = userExists(expense, requestInfo);

@@ -45,8 +45,7 @@ public class ExpenseRepository {
     @Value("${egov.filestore.setinactivepath}")
 	private String fileStoreInactivePath;
 
-    @Autowired
-	private ObjectMapper mapper; 
+
     @Autowired
     public ExpenseRepository(ExpenseProducer producer, ChallanConfiguration	 config,ExpenseQueryBuilder queryBuilder,
     		JdbcTemplate jdbcTemplate,ExpenseRowMapper rowMapper,RestTemplate restTemplate) {
@@ -114,25 +113,5 @@ public class ExpenseRepository {
 			 
 		}
 
-
-
-	/*public void updateChallanOnCancelReceipt(HashMap<String, Object> record) {
-		// TODO Auto-generated method stub
-
-		PaymentRequest paymentRequest = mapper.convertValue(record, PaymentRequest.class);
-		RequestInfo requestInfo = paymentRequest.getRequestInfo();
-
-		List<PaymentDetail> paymentDetails = paymentRequest.getPayment().getPaymentDetails();
-		String tenantId = paymentRequest.getPayment().getTenantId();
-		List<Object[]> rows = new ArrayList<>();
-		for (PaymentDetail paymentDetail : paymentDetails) {
-			Bill bill = paymentDetail.getBill();
-			rows.add(new Object[] {bill.getConsumerCode(),
-        			bill.getBusinessService()}
-        	        );
-		}
-		jdbcTemplate.batchUpdate(CANCEL_RECEIPT_UPDATE_SQL,rows);
-		
-	}*/
     
 }

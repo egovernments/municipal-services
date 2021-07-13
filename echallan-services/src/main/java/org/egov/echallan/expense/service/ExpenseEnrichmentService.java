@@ -48,19 +48,22 @@ public class ExpenseEnrichmentService {
     }
 
     public void enrichCreateRequest(ExpenseRequest expenseRequest) {
-        RequestInfo requestInfo = expenseRequest.getRequestInfo();
-        String uuid = requestInfo.getUserInfo().getUuid();
-        AuditDetails auditDetails = commUtils.getAuditDetails(uuid, true);
-        Expense expense = expenseRequest.getExpense() ;
-        expense.setAuditDetails(auditDetails);
-        expense.setId(UUID.randomUUID().toString());
-        expense.setApplicationStatus(StatusEnum.ACTIVE);
-        if(expense.getAddress()!=null) {
-        	expense.getAddress().setId(UUID.randomUUID().toString());
-        	expense.getAddress().setTenantId(expense.getTenantId());
-        }
-        expense.setFilestoreid(null);
-        setIdgenIds(expenseRequest);
+		RequestInfo requestInfo = expenseRequest.getRequestInfo();
+		String uuid = requestInfo.getUserInfo().getUuid();
+		AuditDetails auditDetails = commUtils.getAuditDetails(uuid, true);
+		Expense expense = expenseRequest.getExpense();
+		expense.setAuditDetails(auditDetails);
+		expense.setId(UUID.randomUUID().toString());
+		if (expense.getIsBillPaid())
+			expense.setApplicationStatus(StatusEnum.PAID);
+		else
+			expense.setApplicationStatus(StatusEnum.ACTIVE);
+		if (expense.getAddress() != null) {
+			expense.getAddress().setId(UUID.randomUUID().toString());
+			expense.getAddress().setTenantId(expense.getTenantId());
+		}
+		expense.setFilestoreid(null);
+		setIdgenIds(expenseRequest);
     }
 
     private List<String> getIdList(RequestInfo requestInfo, String tenantId, String idKey,

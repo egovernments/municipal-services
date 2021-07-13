@@ -22,7 +22,6 @@ public class ExpenseService {
 
 	private ExpenseRepository repository;
 
-	private ExpenseCalculationService expenseCalculationService;
 
 	private ExpenseValidator validator;
 
@@ -30,12 +29,11 @@ public class ExpenseService {
 
 	@Autowired
 	public ExpenseService(ExpenseEnrichmentService enrichmentService, ExpenseUserService expenseUserService,
-			ExpenseRepository repository, ExpenseCalculationService expenseCalculationService,
+			ExpenseRepository repository, 
 			ExpenseValidator validator, ExpenseCommonUtils utils) {
 		this.enrichmentService = enrichmentService;
 		this.expenseUserService = expenseUserService;
 		this.repository = repository;
-		this.expenseCalculationService = expenseCalculationService;
 		this.validator = validator;
 		this.utils = utils;
 	}
@@ -51,68 +49,15 @@ public class ExpenseService {
 		Object mdmsData = utils.mDMSCall(request);
 		validator.validateFields(request, mdmsData);
 		enrichmentService.enrichCreateRequest(request);
-		expenseUserService.setAccountUser(request);   //TODO have to set challan account id as vendor userid?
+		expenseUserService.setAccountUser(request);
 		repository.save(request);
 		return request.getExpense();
 	}
 
 	public List<Expense> search(SearchCriteria criteria, RequestInfo requestInfo) {
 		List<Expense> expenses = null;
-		// enrichmentService.enrichSearchCriteriaWithAccountId(requestInfo,criteria);
-		/*
-		 * if(criteria.getMobileNumber()!=null){ challans =
-		 * getChallansFromMobileNumber(criteria,requestInfo); } else { challans
-		 * = getChallansWithOwnerInfo(criteria,requestInfo); }
-		 */
+
 		return expenses;
 	}
-
-	/*
-	 * public List<Challan> getChallansFromMobileNumber(SearchCriteria criteria,
-	 * RequestInfo requestInfo){ List<Challan> challans = new LinkedList<>();
-	 * UserDetailResponse userDetailResponse =
-	 * userService.getUser(criteria,requestInfo);
-	 * if(CollectionUtils.isEmpty(userDetailResponse.getUser())){ return
-	 * Collections.emptyList(); }
-	 * enrichmentService.enrichSearchCriteriaWithOwnerids(criteria,
-	 * userDetailResponse); challans = repository.getChallans(criteria);
-	 * 
-	 * if(CollectionUtils.isEmpty(challans)){ return Collections.emptyList(); }
-	 * 
-	 * criteria=enrichmentService.getChallanCriteriaFromIds(challans); challans
-	 * = getChallansWithOwnerInfo(criteria,requestInfo); return challans; }
-	 * 
-	 * public List<Challan> getChallansWithOwnerInfo(SearchCriteria
-	 * criteria,RequestInfo requestInfo){ List<Challan> challans =
-	 * repository.getChallans(criteria); if(challans.isEmpty()) return
-	 * Collections.emptyList(); challans =
-	 * enrichmentService.enrichChallanSearch(challans,criteria,requestInfo);
-	 * return challans; }
-	 */
-
-	/*
-	 * public List<Challan> searchChallans(ChallanRequest request){
-	 * SearchCriteria criteria = new SearchCriteria(); List<String> ids = new
-	 * LinkedList<>(); ids.add(request.getChallan().getId());
-	 * 
-	 * criteria.setTenantId(request.getChallan().getTenantId());
-	 * criteria.setIds(ids);
-	 * criteria.setBusinessService(request.getChallan().getBusinessService());
-	 * 
-	 * List<Challan> challans = repository.getChallans(criteria);
-	 * 
-	 * if(challans.isEmpty()) return Collections.emptyList(); challans =
-	 * enrichmentService.enrichChallanSearch(challans,criteria,request.
-	 * getRequestInfo()); return challans; }
-	 */
-	/*
-	 * public Challan update(ChallanRequest request) { Object mdmsData =
-	 * utils.mDMSCall(request); validator.validateFields(request, mdmsData);
-	 * List<Challan> searchResult = searchChallans(request);
-	 * validator.validateUpdateRequest(request,searchResult);
-	 * enrichmentService.enrichUpdateRequest(request);
-	 * calculationService.addCalculation(request); repository.update(request);
-	 * return request.getChallan(); }
-	 */
 
 }
