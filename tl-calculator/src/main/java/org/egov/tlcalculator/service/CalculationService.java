@@ -319,7 +319,7 @@ public class CalculationService {
               List<BillingSlab> billingSlabs = repository.getDataFromDB(query, preparedStmtList);
 
               if(billingSlabs.size()>1)
-                  throw new CustomException("BILLINGSLAB ERROR","Found multiple BillingSlabs for the given accessories ");
+                  //throw new CustomException("BILLINGSLAB ERROR","Found multiple BillingSlabs for the given accessories ");
               if(CollectionUtils.isEmpty(billingSlabs))
                   throw new CustomException("BILLINGSLAB ERROR","No BillingSlab Found for the given accessory");
              System.out.println("Accessory: "+accessory.getAccessoryCategory()+ " rate: "+billingSlabs.get(0).getRate());
