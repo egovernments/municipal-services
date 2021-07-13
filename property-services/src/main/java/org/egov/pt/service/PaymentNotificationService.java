@@ -130,14 +130,24 @@ public class PaymentNotificationService {
 
             Set<String> mobileNumbers = new HashSet<>();
             property.getOwners().forEach(owner -> {
-                mobileNumbers.add(owner.getMobileNumber());
+                //mobileNumbers.add(owner.getMobileNumber());
+				owner.getMobileNumber().forEach(alternateNumber -> {mobileNumbers.add(alternateNumber);});
             });
 
 			List<SMSRequest> smsRequests = getSMSRequests(mobileNumbers, customMessage, valMap);
-			String payerMobileNo = transaction.getUser().getMobileNumber();
+			
+			//need to change this , transaction
+			
+			//String payerMobileNo = transaction.getUser().getMobileNumber();
+			List <String> payerMobileNos = transaction.getUser().getMobileNumber();
+			
+			payerMobileNos.forEach(payerMobileNo ->{
+				
 			if (!mobileNumbers.contains(payerMobileNo)) {
 				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage, valMap));
 			}
+			});
+			
             
 
             util.sendSMS(smsRequests);
@@ -223,15 +233,33 @@ public class PaymentNotificationService {
             customMessage = getCustomizedMessage(valMap,messageTemplate,path);
 
             Set<String> mobileNumbers = new HashSet<>();
-            property.getOwners().forEach(owner -> {
-                mobileNumbers.add(owner.getMobileNumber());
+			
+			property.getOwners().forEach(owner -> {
+                //mobileNumbers.add(owner.getMobileNumber());
+				owner.getMobileNumber().forEach(alternateNumber -> {mobileNumbers.add(alternateNumber);});
             });
+			
+            //property.getOwners().forEach(owner -> {
+            //    mobileNumbers.add(owner.getMobileNumber());
+            //});
 
             smsRequests.addAll(getSMSRequests(mobileNumbers,customMessage, valMap));
-			String payerMobileNo = paymentRequest.getPayment().getMobileNumber();
+			
+			//String payerMobileNo = paymentRequest.getPayment().getMobileNumber();
+			
+			List <String> payerMobileNos = transaction.getUser().getMobileNumber();
+			
+			payerMobileNos.forEach(payerMobileNo ->{
+				
 			if (!mobileNumbers.contains(payerMobileNo)) {
 				smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage, valMap));
 			}
+			});
+			
+			
+			//if (!mobileNumbers.contains(payerMobileNo)) {
+			//	smsRequests.add(getSMSRequestsWithoutReceipt(payerMobileNo, customMessage, valMap));
+			//}
 
             if(null == propertyConfiguration.getIsUserEventsNotificationEnabled() || propertyConfiguration.getIsUserEventsNotificationEnabled()) {
                 if(paymentDetail.getTotalDue().compareTo(paymentDetail.getTotalAmountPaid())==0)
@@ -325,7 +353,12 @@ public class PaymentNotificationService {
             valMap.put("moduleId",transaction.getConsumerCode());
             valMap.put("propertyId",transaction.getConsumerCode());
 
-            valMap.put("mobileNumber",transaction.getUser().getMobileNumber());
+			
+			String mobileNumberList = "";
+			transaction.getUser().getMobileNumber().forEach(alternateNumber -> {mobileNumberList+=alternateNumber;mobileNumberList+=':'});
+			
+            //valMap.put("mobileNumber",transaction.getUser().getMobileNumber());
+			valMap.put("mobileNumber",mobileNumberList);
 
             valMap.put("module",transaction.getModule());
         }
@@ -349,9 +382,20 @@ public class PaymentNotificationService {
     private void addUserNumber(String topic,RequestInfo requestInfo,Map<String,String> valMap,List<String> mobileNumbers)
     {
       //  If the requestInfo is of citizen add citizen's MobileNumber
-        if((topic.equalsIgnoreCase(propertyConfiguration.getReceiptTopic())
-                || topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())) && !mobileNumbers.contains(valMap.get("mobileNumber")))
-            mobileNumbers.add(valMap.get("mobileNumber"));
+	  
+        //if((topic.equalsIgnoreCase(propertyConfiguration.getReceiptTopic())
+        //        || topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())) && !mobileNumbers.contains(valMap.get("mobileNumber")))
+        //    mobileNumbers.add(valMap.get("mobileNumber"));
+		
+		String mobileNumberList = valMap.get("mobileNumber");
+		String[] arrOfNumbers = mobileNumberList.split(":");
+		
+		for (String mobileNumber: arrOfNumbers){
+			if((topic.equalsIgnoreCase(propertyConfiguration.getReceiptTopic())
+                || topic.equalsIgnoreCase(propertyConfiguration.getPgTopic())) && !mobileNumbers.contains(mobileNumber))
+            mobileNumbers.add(mobileNumber);
+			
+		}
     }
 
 

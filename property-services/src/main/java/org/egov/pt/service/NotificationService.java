@@ -281,8 +281,11 @@ public class NotificationService {
 		Map<String, String> mobileNumberToOwner = new HashMap<>();
 
 		property.getOwners().forEach(owner -> {
-			if (owner.getMobileNumber() != null)
-				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+			//if (owner.getMobileNumber() != null)
+				//mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+			  if (!owner.getMobileNumber.isEmpty())
+				  owner.getMobileNumber.forEach(alternateNumber ->{mobileNumberToOwner.put(alternateNumber,owner.getName());});
+				
 		});
 
 		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);

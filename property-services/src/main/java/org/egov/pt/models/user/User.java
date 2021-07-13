@@ -68,11 +68,12 @@ public class User   {
         @JsonProperty("gender")
         private String gender;
 
-        @Pattern(regexp = "(^[6-9][0-9]{9}$)", message = "Inavlid mobile number, should start with 6-9 and contain ten digits of 0-9")
+        //@Pattern(regexp = "(^[6-9][0-9]{9}$)", message = "Inavlid mobile number, should start with 6-9 and contain ten digits of 0-9")
         @NotNull
         @SafeHtml
         @JsonProperty("mobileNumber")
-        private String mobileNumber;
+        //private String mobileNumber;
+        private List<String> mobileNumber;
 
         @Size(max=128)
         @SafeHtml

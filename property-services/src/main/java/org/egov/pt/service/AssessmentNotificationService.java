@@ -90,8 +90,10 @@ public class AssessmentNotificationService {
 
         Map<String,String > mobileNumberToOwner = new HashMap<>();
         property.getOwners().forEach(owner -> {
-            if(owner.getMobileNumber()!=null)
-                mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+            //if(owner.getMobileNumber()!=null)
+            //    mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+			if (!owner.getMobileNumber.isEmpty())
+				  owner.getMobileNumber.forEach(alternateNumber ->{mobileNumberToOwner.put(alternateNumber,owner.getName());});
         });
         return util.createSMSRequest(message,mobileNumberToOwner);
     }
