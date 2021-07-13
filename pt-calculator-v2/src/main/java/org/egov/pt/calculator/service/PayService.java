@@ -107,7 +107,7 @@ public class PayService {
 					estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount.abs());
 				} 
 				else 
-					estimates.put(CalculatorConstants.PT_TIME_REBATE, rebate);
+					estimates.put(CalculatorConstants.PT_TIME_REBATE, rebateamount);
 				if (taxAmt.compareTo(oldCollectedTaxAmount) == 0) {
 					estimates.put(CalculatorConstants.PT_TIME_PENALTY, penaltyAmount);
 				} else {
