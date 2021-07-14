@@ -46,9 +46,6 @@ public class ExpenseValidator {
 		Expense expense = request.getExpense();
 		Map<String, String> errorMap = new HashMap<>();
 
-		if (expense.getTotalAmount().compareTo(BigDecimal.ZERO) <= 0)
-			errorMap.put("Zero amount", "Expense amount can not be zero amount");
-
 		if (isBlank(expense.getTypeOfExpense()))
 			errorMap.put("BLANK_TypeOfExpense", "TypeOfExpense is manadatory");
 

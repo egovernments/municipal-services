@@ -12,7 +12,6 @@
 
 package org.egov.echallan.expense.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -164,7 +163,5 @@ public class Expense {
 	@JsonProperty("isBillPaid")
 	private Boolean isBillPaid;
 	
-    @JsonProperty("totalAmount")
-    private BigDecimal totalAmount;
 
 }

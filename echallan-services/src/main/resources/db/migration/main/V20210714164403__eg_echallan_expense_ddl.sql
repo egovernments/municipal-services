@@ -4,4 +4,3 @@ ALTER TABLE eg_echallan ADD COLUMN IF NOT EXISTS billDate bigint;
 ALTER TABLE eg_echallan ADD COLUMN IF NOT EXISTS billIssuedDate bigint;
 ALTER TABLE eg_echallan ADD COLUMN IF NOT EXISTS paidDate bigint;
 ALTER TABLE eg_echallan ADD COLUMN IF NOT EXISTS isBillPaid boolean;
-ALTER TABLE eg_echallan ADD COLUMN IF NOT EXISTS totalAmount numeric(12,2);
