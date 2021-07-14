@@ -12,7 +12,6 @@ public class PTConstants {
     public static final String STATUS_PARAM = "status";
     public static final String OFFSET_PARAM = "offset";
     public static final String NO_OF_RECORDS_PARAM = "noOfRecords";
-    public static final String PT_INBOX_SEARCHER_URL = "https://dev.digit.org/egov-searcher/property-services/inboxpropertysearch/_get";
     public static final String LIMIT_PARAM = "limit";
     public static final String ACKNOWLEDGEMENT_IDS_PARAM = "acknowledgementIds";
     public static final String REQUESTINFO_PARAM = "RequestInfo";
