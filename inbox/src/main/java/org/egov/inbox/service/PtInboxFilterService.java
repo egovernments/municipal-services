@@ -31,6 +31,12 @@ public class PtInboxFilterService {
     @Value("${egov.user.search.path}")
     private String userSearchEndpoint;
 
+    @Value("${egov.searcher.host}")
+    private String searcherHost;
+
+    @Value("${egov.searcher.pt.search.path}")
+    private String ptInboxSearcherEndpoint;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -101,7 +107,10 @@ public class PtInboxFilterService {
             searcherRequest.put(REQUESTINFO_PARAM, requestInfo);
             searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
 
-            result = restTemplate.postForObject(PT_INBOX_SEARCHER_URL, searcherRequest, Map.class);
+            StringBuilder uri = new StringBuilder();
+            uri.append(searcherHost).append(ptInboxSearcherEndpoint);
+
+            result = restTemplate.postForObject(uri.toString(), searcherRequest, Map.class);
 
             acknowledgementNumbers = JsonPath.read(result, "$.Properties.*.acknowldgementnumber");
 
