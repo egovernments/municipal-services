@@ -50,9 +50,8 @@ public class TransformService {
 		if (Boolean.valueOf(propertyConfiguration.getPgrv1enabled())) {
 			return processPgrV1Request(messageRequest);
 		} else {
-			processPgrV2Request(messageRequest);
+			return processPgrV2Request(messageRequest);
 		}
-		return null;
 
 	}
 
