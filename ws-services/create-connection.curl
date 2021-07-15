@@ -1,0 +1,28 @@
+curl --location --request POST 'https://mgramseva-dev.egov.org.in/ws-services/wc/_create' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "RequestInfo": {
+    "apiId": "Rainmaker",
+    "ver": ".01",
+    "action": "",
+    "did": "1",
+    "key": "",
+    "msgId": "20170310130900|en_IN",
+    "requesterId": "",
+    "authToken": "c13532b4-81df-4159-b7d8-5a65bbbea2c3"
+      },
+  "WaterConnection": {
+  	"propertyId":"PB-PT-2021-07-15-000010",
+	"tenantId":"pb.lodhipur",
+    "action": "INITIATE",
+    "documents": null,
+    "proposedTaps": "10",
+    "arrears": 10000,
+     "meterId": "1111",
+     "previousReadingDate" : 1626376528000,
+    "proposedPipeSize": 10,
+    "processInstance": {
+    	"action":"INITIATE"
+    }
+  }
+}'

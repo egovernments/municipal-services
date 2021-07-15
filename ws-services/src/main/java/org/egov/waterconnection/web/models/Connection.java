@@ -144,24 +144,13 @@ public class Connection {
 	@JsonProperty("oldApplication")
 	private Boolean oldApplication = false;
 	
-	@JsonProperty("meterNumber")
-	private String meterNumber =null;
-	
+	 
 	@JsonProperty("previousReadingDate")
 	private Long previousReadingDate = null;
 	
 	@JsonProperty("arrears")
 	private BigDecimal arrears = null;
 	
-	@Size(min = 3, max = 12)
-	public String getMeterNumber() {
-		return meterNumber;
-	}
-
-	
-	public void setMeterNumber(String meterNumber) {
-		this.meterNumber = meterNumber;
-	}
 
 	public Long getPreviousReadingDate() {
 		return previousReadingDate;

@@ -1,0 +1,117 @@
+curl --location --request POST 'https://mgramseva-dev.egov.org.in/property-services/property/_create' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+"RequestInfo":{
+  "apiId": "Rainmaker",
+  "authToken": "542dbe87-310e-4d0f-a06d-8ccdfa91ee65"
+ },
+"Property":
+{
+  "tenantId": "pb.lodhipur",
+  "address": {
+    "city": "lodhipur",
+    "locality": {
+      "code": "SUN20",
+      "area": "Aggarsain Chowk to Mal Godown - Both Sides - Area3"
+    },
+    "street": "333",
+    "doorNo": "3333",
+    "landmark": "dsfsfasd",
+    "documents": []
+  },
+  "ownershipCategory": "INSTITUTIONALPRIVATE",
+  "owners": [
+    {
+      "altContactNumber": "32423423423",
+      "correspondenceAddress": "3333, 333, dsfsfasd, Aggarsain Chowk to Mal Godown - Both Sides - Area3, Amritsar, ",
+      "designation": "sdfsfd",
+      "emailId": "ani@123.com",
+      "isCorrespondenceAddress": true,
+      "mobileNumber": "9980770587",
+      "name": "sdfsd",
+      "ownerType": "NONE",
+      "documents": [
+        {
+          "fileStoreId": "fd846189-3d48-4a2f-b0e4-3cfd32512449",
+          "documentType": "OWNER.IDENTITYPROOF.AADHAAR"
+        }
+      ]
+    }
+  ],
+  "institution": {
+    "designation": "sdfsfd",
+    "name": "dsfds",
+    "nameOfAuthorizedPerson": "sdfsd",
+    "tenantId": "pb.lodhipur",
+    "type": "PRIVATECOMPANY"
+  },
+  "documents": [
+    {
+      "fileStoreId": "28bb0c5f-4fd0-4727-81c4-cb9d7e37a4a1",
+      "documentType": "OWNER.ADDRESSPROOF.ELECTRICITYBILL"
+    },
+    {
+      "fileStoreId": "fd846189-3d48-4a2f-b0e4-3cfd32512449",
+      "documentType": "OWNER.IDENTITYPROOF.AADHAAR"
+    }
+  ],
+  "units": [
+    {
+      "occupancyType": "SELFOCCUPIED",
+      "floorNo": 0,
+      "constructionDetail": {
+        "builtUpArea": 800
+      },
+      "tenantId": "pb.lodhipur",
+      "usageCategory": "RESIDENTIAL"
+    }
+  ],
+  "landArea": "1000",
+  "propertyType": "BUILTUP.INDEPENDENTPROPERTY",
+  "noOfFloors": 1,
+  "superBuiltUpArea": null,
+  "usageCategory": "RESIDENTIAL",
+  "additionalDetails": {
+    "inflammable": false,
+    "heightAbove36Feet": false,
+    "isResdential": {
+      "i18nKey": "PT_COMMON_YES",
+      "code": "RESIDENTIAL"
+    },
+    "propertyType": {
+      "i18nKey": "COMMON_PROPTYPE_BUILTUP_INDEPENDENTPROPERTY",
+      "code": "BUILTUP.INDEPENDENTPROPERTY"
+    },
+    "Subusagetypeofrentedarea": null,
+    "subusagetype": null,
+    "IsAnyPartOfThisFloorUnOccupied": null,
+    "builtUpArea": null,
+    "noOfFloors": {
+      "i18nKey": "PT_GROUND_FLOOR_OPTION",
+      "code": 0
+    },
+    "noOofBasements": {
+      "i18nKey": "PT_NO_BASEMENT_OPTION"
+    },
+    "unit": [
+      {
+        "plotSize": "1000",
+        "builtUpArea": "800",
+        "selfOccupied": {
+          "i18nKey": "PT_YES_IT_IS_SELFOCCUPIED",
+          "code": "SELFOCCUPIED"
+        },
+        "IsAnyPartOfThisFloorUnOccupied": {
+          "i18nKey": "PT_COMMON_NO",
+          "code": "UNOCCUPIED"
+        }
+      }
+    ],
+    "basement1": null,
+    "basement2": null
+  },
+  "creationReason": "CREATE",
+  "source": "MUNICIPAL_RECORDS",
+  "channel": "CITIZEN"
+}
+}'
