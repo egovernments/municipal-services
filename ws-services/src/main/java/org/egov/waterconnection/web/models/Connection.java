@@ -1,21 +1,25 @@
 
 package org.egov.waterconnection.web.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.egov.waterconnection.web.models.workflow.ProcessInstance;
-import org.hibernate.validator.constraints.SafeHtml;
-import org.springframework.validation.annotation.Validated;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+
+import org.egov.waterconnection.web.models.workflow.ProcessInstance;
+import org.hibernate.validator.constraints.SafeHtml;
+import org.springframework.validation.annotation.Validated;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * This is lightweight property object that can be used as reference by
@@ -139,6 +143,45 @@ public class Connection {
 
 	@JsonProperty("oldApplication")
 	private Boolean oldApplication = false;
+	
+	@JsonProperty("meterNumber")
+	private String meterNumber =null;
+	
+	@JsonProperty("previousReadingDate")
+	private Long previousReadingDate = null;
+	
+	@JsonProperty("arrears")
+	private BigDecimal arrears = null;
+	
+	@Size(min = 3, max = 12)
+	public String getMeterNumber() {
+		return meterNumber;
+	}
+
+	
+	public void setMeterNumber(String meterNumber) {
+		this.meterNumber = meterNumber;
+	}
+
+	public Long getPreviousReadingDate() {
+		return previousReadingDate;
+	}
+
+	public void setPreviousReadingDate(Long previousReadingDate) {
+		this.previousReadingDate = previousReadingDate;
+	}
+
+	public BigDecimal getArrears() {
+		return arrears;
+	}
+
+	public void setArrears(BigDecimal arrears) {
+		this.arrears = arrears;
+	}
+
+	
+	
+	
 
 	public Connection id(String id) {
 		this.id = id;

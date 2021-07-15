@@ -104,7 +104,7 @@ public class WaterServiceImpl implements WaterService {
 		userService.createUser(waterConnectionRequest);
 		System.out.println("created user   "+config.getIsExternalWorkFlowEnabled()); 
 		// call work-flow
-		if (config.getIsExternalWorkFlowEnabled())
+		if (config.getIsExternalWorkFlowEnabled()!=null &&  config.getIsExternalWorkFlowEnabled())
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		System.out.println("calling save user   "); 
 		waterDao.saveWaterConnection(waterConnectionRequest);
