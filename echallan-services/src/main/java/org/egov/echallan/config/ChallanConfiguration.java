@@ -186,12 +186,6 @@ public class ChallanConfiguration {
     @Value("${egov.locality.search.endpoint}")
     private String fetchBoundaryEndpoint;
     
-    //expense number format
-    @Value("${egov.idgen.expenseNum.name}")
-    private String expenseNumberIdgenName;
-
-	@Value("${egov.idgen.expenseNum.format}")
-	private String expenseNumberIdgenFormat;
 
 	// Vendor  
 	@Value("${egov.vendor.host}")
@@ -203,10 +197,4 @@ public class ChallanConfiguration {
 	@Value("${egov.vendor.search.path}")
 	private String vendorSearchEndpoint;
 	
-    //Persister expense topic
-    @Value("${persister.save.expense.topic}")
-    private String saveExpenseTopic;
-    
-    @Value("${persister.update.expense.topic}")
-    private String updateExpenseTopic;
 }

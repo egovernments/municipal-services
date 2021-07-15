@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.echallan.expense.validator.ExpenseValidator;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.SearchCriteria;
@@ -30,18 +31,21 @@ public class ChallanService {
     private CalculationService calculationService;
     
     private ChallanValidator validator;
+    
+    private ExpenseValidator expenseValidator;
 
     private CommonUtils utils;
     
     @Autowired
     public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService,
-    		ChallanValidator validator, CommonUtils utils) {
+    		ChallanValidator validator, CommonUtils utils,ExpenseValidator expenseValidator) {
         this.enrichmentService = enrichmentService;
         this.userService = userService;
         this.repository = repository;
         this.calculationService = calculationService;
         this.validator = validator;
         this.utils = utils;
+        this.expenseValidator=expenseValidator;
     }
     
     
@@ -53,6 +57,7 @@ public class ChallanService {
 	 */
 	public Challan create(ChallanRequest request) {
 		Object mdmsData = utils.mDMSCall(request);
+		expenseValidator.validateFields(request, mdmsData);
 		validator.validateFields(request, mdmsData);
 		enrichmentService.enrichCreateRequest(request);
 		userService.createUser(request);

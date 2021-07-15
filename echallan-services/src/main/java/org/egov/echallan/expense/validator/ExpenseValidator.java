@@ -4,20 +4,17 @@ import static java.util.Objects.isNull;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
-import org.egov.echallan.expense.model.Expense;
-import org.egov.echallan.expense.model.Expense.StatusEnum;
-import org.egov.echallan.expense.model.ExpenseRequest;
-import org.egov.echallan.expense.repository.ExpenseServiceRequestRepository;
+import org.egov.echallan.model.Challan;
+import org.egov.echallan.model.ChallanRequest;
 import org.egov.echallan.model.RequestInfoWrapper;
+import org.egov.echallan.repository.ServiceRequestRepository;
 import org.egov.echallan.web.models.vendor.Vendor;
 import org.egov.echallan.web.models.vendor.VendorResponse;
 import org.egov.tracer.model.CustomException;
@@ -37,56 +34,54 @@ public class ExpenseValidator {
 	private ChallanConfiguration config;
 
 	@Autowired
-	private ExpenseServiceRequestRepository expenseServiceRequestRepository;
+	private ServiceRequestRepository serviceRequestRepository;
 
 	@Autowired
 	private ObjectMapper mapper;
 
-	public void validateFields(ExpenseRequest request, Object mdmsData) {
-		Expense expense = request.getExpense();
+	public void validateFields(ChallanRequest request, Object mdmsData) {
+		Challan challan = request.getChallan();
 		Map<String, String> errorMap = new HashMap<>();
 
-		if (isBlank(expense.getTypeOfExpense()))
+		if (isBlank(challan.getTypeOfExpense()))
 			errorMap.put("BLANK_TypeOfExpense", "TypeOfExpense is manadatory");
 
-		if (isBlank(expense.getVendor()))
+		if (isBlank(challan.getVendor()))
 			errorMap.put("BLANK_Vendor", "Vendor is mandatory");
 		else {
-			Vendor vendor = (Vendor) validateVendor(expense.getVendor(), expense.getTenantId(),
+			Vendor vendor = (Vendor) validateVendor(challan.getVendor(), challan.getTenantId(),
 					request.getRequestInfo());
 			if (isNull(vendor))
-				errorMap.put("INVALID_Vendor", "Vendor does not exists with id :" + expense.getVendor());
+				errorMap.put("INVALID_Vendor", "Vendor does not exists with id :" + challan.getVendor());
 			else {
-				expense.setAccountId(vendor.getOwnerId());
+				challan.setAccountId(vendor.getOwnerId());
 			}
 		}
 		Long currentTime = System.currentTimeMillis();
-		if (isNull(expense.getBillDate()))
+		if (isNull(challan.getBillDate()))
 			errorMap.put("NULL_BillDate", "Bill date is mandatory");
-		else if( expense.getBillDate()>currentTime)
+		else if( challan.getBillDate()>currentTime)
 			errorMap.put("BillDate_CurrentDate","Bill date should be before current date");
-		else if (isNull(expense.getBillIssuedDate()) &&  expense.getBillIssuedDate()> expense.getBillDate()) 
+		else if (isNull(challan.getBillIssuedDate()) &&  challan.getBillIssuedDate()> challan.getBillDate()) 
 				errorMap.put("BillIssuedDate_After_BillDate", " Party bill date should be before bill date.");
 	
-		if (expense.getIsBillPaid() && isNull(expense.getPaidDate()))
+		if (challan.getIsBillPaid() && isNull(challan.getPaidDate()))
 			errorMap.put("NULL_PaidDate","Paid date is mandatory");
 	
-		if (expense.getIsBillPaid() && (!isNull(expense.getPaidDate())) 
-				&& (!Objects.isNull(expense.getBillDate()))  && expense.getPaidDate() < expense.getBillDate()) 
+		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) 
+				&& (!Objects.isNull(challan.getBillDate()))  && challan.getPaidDate() < challan.getBillDate()) 
 			errorMap.put("PaidDate_Before_BillDate","Paid date should be after billdate");
 	
-		if (expense.getIsBillPaid() && (!isNull(expense.getPaidDate())) && expense.getPaidDate()  >currentTime)	
+		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) && challan.getPaidDate()  >currentTime)	
 			errorMap.put("PaidDate_CurrentDate"," Paid date should be before current date");
-				
-		
-		if (isBlank(expense.getBusinessService()))
-			errorMap.put("NULL_BusinessService", " Business Service cannot be null");
 
-		if (!expense.getTenantId().equalsIgnoreCase(request.getRequestInfo().getUserInfo().getTenantId()))
-			errorMap.put("Invalid Tenant", "Invalid tenant id");
 		
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
+		else {
+			challan.setTaxPeriodTo(challan.getBillIssuedDate());
+			challan.setTaxPeriodFrom(challan.getBillIssuedDate());
+		}
 
 	}
 
@@ -101,7 +96,7 @@ public class ExpenseValidator {
 		requestInfoWrpr.setRequestInfo(requestInfo);
 		try {
 
-			LinkedHashMap responseMap = (LinkedHashMap) expenseServiceRequestRepository.fetchResult(uri,
+			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
 					requestInfoWrpr);
 			VendorResponse vendorResponse = mapper.convertValue(responseMap, VendorResponse.class);
 			if (!CollectionUtils.isEmpty(vendorResponse.getVendor())) {
@@ -116,29 +111,4 @@ public class ExpenseValidator {
 
 	}
 
-
-	public void validateUpdateRequest(ExpenseRequest request, List<Expense> searchResult) {
-		Expense expense = request.getExpense();
-		Map<String, String> errorMap = new HashMap<>();
-		if (searchResult.size() == 0)
-			errorMap.put("INVALID_UPDATE_REQ_NOT_EXIST", "The Expense to be updated is not in database");
-		Expense searchExpense = searchResult.get(0);
-		if (!expense.getBusinessService().equalsIgnoreCase(searchExpense.getBusinessService()))
-			errorMap.put("INVALID_UPDATE_REQ_NOTMATCHED_BSERVICE",
-					"The business service is not matching with the Search result");
-		if (!expense.getChallanNo().equalsIgnoreCase(searchExpense.getChallanNo()))
-			errorMap.put("INVALID_UPDATE_REQ_NOTMATCHED_CHALLAN_NO",
-					"The Challan Number is not matching with the Search result");
-		if (!expense.getCitizen().getUuid().equalsIgnoreCase(searchExpense.getCitizen().getUuid()))
-			errorMap.put("INVALID_UPDATE_REQ_NOTMATCHED_ADDRESS", "User Details not matching with the Search result");
-		if (!expense.getCitizen().getName().equalsIgnoreCase(searchExpense.getCitizen().getName()))
-			errorMap.put("INVALID_UPDATE_REQ_NOTMATCHED_NAME", "User Details not matching with the Search result");
-		if (searchExpense.getApplicationStatus() != StatusEnum.ACTIVE)
-			errorMap.put("INVALID_UPDATE_REQ_CHALLAN_INACTIVE", "Challan cannot be updated/cancelled");
-		if (!expense.getTenantId().equalsIgnoreCase(request.getRequestInfo().getUserInfo().getTenantId()))
-			errorMap.put("INVALID_UPDATE_REQ_INVALID_TENANTID", "Invalid tenant id");
-		if (!errorMap.isEmpty())
-			throw new CustomException(errorMap);
-
-	}
 }

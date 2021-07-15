@@ -57,8 +57,8 @@ public class ChallanValidator {
 		if(totalAmt <= 0) {
 			errorMap.put("Zero amount","Challan cannot be generated for zero amount");
 		}
-		if (challan.getCitizen().getMobileNumber() == null)
-            errorMap.put("NULL_Mobile Number", " Mobile Number cannot be null");
+		/*if (challan.getCitizen().getMobileNumber() == null)
+            errorMap.put("NULL_Mobile Number", " Mobile Number cannot be null");*/
 		if (challan.getBusinessService() == null)
             errorMap.put("NULL_BusinessService", " Business Service cannot be null");
 		if (challan.getTaxPeriodFrom() == null)
@@ -68,7 +68,7 @@ public class ChallanValidator {
 		if(!challan.getTenantId().equalsIgnoreCase(request.getRequestInfo().getUserInfo().getTenantId()))
         	 errorMap.put("Invalid Tenant", "Invalid tenant id");
 
-		Boolean validFinancialYear = false;
+		/*	Boolean validFinancialYear = false;
 		if(challan.getTaxPeriodTo() != null && challan.getTaxPeriodFrom() != null){
 			for(Map<String,Object> financialYearProperties: taxPeriods){
 				Long startDate = (Long) financialYearProperties.get(MDMS_STARTDATE);
@@ -81,10 +81,10 @@ public class ChallanValidator {
 		if(!validFinancialYear)
 			errorMap.put("Invalid TaxPeriod", "Tax period details are invalid");
 
-        List<String> localityCodes = getLocalityCodes(challan.getTenantId(), request.getRequestInfo());
+		  List<String> localityCodes = getLocalityCodes(challan.getTenantId(), request.getRequestInfo());
 
         if(!localityCodes.contains(challan.getAddress().getLocality().getCode()))
-         	errorMap.put("Invalid Locality", "Locality details are invalid");
+         	errorMap.put("Invalid Locality", "Locality details are invalid");*/
 
         if(!currentTaxHeadCodes.isEmpty() && !requiredTaxHeadCodes.isEmpty()){
         	if(!currentTaxHeadCodes.containsAll(requiredTaxHeadCodes))

@@ -35,12 +35,12 @@ public class ChallanConsumer {
         ObjectMapper mapper = new ObjectMapper();
         ChallanRequest challanRequest = new ChallanRequest();
   
-            challanRequest = mapper.convertValue(record, ChallanRequest.class);
+         challanRequest = mapper.convertValue(record, ChallanRequest.class);
 
-        if(topic.equalsIgnoreCase(config.getSaveChallanTopic()))
+      /*  if(topic.equalsIgnoreCase(config.getSaveChallanTopic()))
         	notificationService.sendChallanNotification(challanRequest,true);
         else if(topic.equalsIgnoreCase(config.getUpdateChallanTopic()))
-            notificationService.sendChallanNotification(challanRequest,false);
+            notificationService.sendChallanNotification(challanRequest,false);*/
         } catch (final Exception e) {
         	e.printStackTrace();
             log.error("Error while listening to value: " + record + " on topic: " + topic + ": " + e);

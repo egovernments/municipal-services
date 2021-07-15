@@ -143,4 +143,25 @@ public class Challan {
 
   @JsonProperty("applicationStatus")
   private StatusEnum applicationStatus = null;
+  
+	// Expense fields
+	@JsonProperty("vendor")
+	@SafeHtml
+	private String vendor = null;
+
+	@JsonProperty("typeOfExpense")
+	@SafeHtml
+	private String typeOfExpense = null;
+
+	@JsonProperty("billDate")
+	private Long billDate = null;
+
+	@JsonProperty("billIssuedDate")
+	private Long billIssuedDate = null;
+
+	@JsonProperty("paidDate")
+	private Long paidDate = null;
+
+	@JsonProperty("isBillPaid")
+	private Boolean isBillPaid;
 }
