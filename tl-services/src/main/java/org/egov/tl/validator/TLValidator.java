@@ -238,7 +238,7 @@ public class TLValidator {
             }
         });
         criteria.setTenantId(request.getLicenses().get(0).getTenantId());
-        criteria.setStatus(TLConstants.STATUS_APPROVED);
+        criteria.setStatus(Collections.singletonList(TLConstants.STATUS_APPROVED));
         criteria.setBusinessService(request.getLicenses().get(0).getBusinessService());
         criteria.setLicenseNumbers(licenseNumbers);
         List<TradeLicense> searchResult = tlRepository.getLicenses(criteria);
