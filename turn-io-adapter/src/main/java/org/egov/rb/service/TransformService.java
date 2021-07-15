@@ -7,6 +7,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.rb.config.PropertyConfiguration;
 import org.egov.rb.contract.MessageRequest;
 import org.egov.rb.pgr.v2.models.Boundary;
+import org.egov.rb.pgr.v2.models.GeoLocation;
 import org.egov.rb.pgr.v2.models.ServiceRequestV2;
 import org.egov.rb.pgr.v2.models.ServiceResponseV2;
 import org.egov.rb.pgr.v2.models.User;
@@ -163,6 +164,8 @@ public class TransformService {
 		Boundary boundary = new Boundary();
 		boundary.setCode(messageRequest.getThreadContact().getContact().getLocality());
 		address.setLocality(boundary);
+		GeoLocation geoLocation=new GeoLocation();
+		address.setGeoLocation(geoLocation);
 		service.setTenantId(messageRequest.getThreadContact().getContact().getCity());
 		service.setAddress(address);
 		return service;
