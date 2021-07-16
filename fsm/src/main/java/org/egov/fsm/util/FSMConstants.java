@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import org.springframework.stereotype.Component;
 
+import com.jayway.jsonpath.Configuration;
+
 @Component
 public class FSMConstants {
 
@@ -145,6 +147,12 @@ public class FSMConstants {
 	public static final String RECEIPT_KEY = "fsm-receipt";
 	
 	public static final String MDMS_FSTP_PLANT_INFO = "FSTPPlantInfo";
+
+	public static final String PERIODIC_MASTER_NAME = "PeriodicService";
+
+	public static final String PERIODIC_SERVICE_PATH = "$.MdmsRes.PERIODICSERVICE.PERIODICSERVICE";
+
+	public static final String COMPLETED = "COMPLETED REQUEST";
 
 
 

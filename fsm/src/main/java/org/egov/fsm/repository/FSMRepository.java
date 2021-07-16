@@ -1,6 +1,7 @@
 package org.egov.fsm.repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -13,6 +14,8 @@ import org.egov.fsm.repository.querybuilder.FSMQueryBuilder;
 import org.egov.fsm.repository.rowmapper.FSMAuditRowMapper;
 import org.egov.fsm.repository.rowmapper.FSMRowMapper;
 import org.egov.fsm.util.FSMAuditUtil;
+import org.egov.fsm.util.FSMConstants;
+import org.egov.fsm.util.FSMUtil;
 import org.egov.fsm.web.model.FSM;
 import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
@@ -50,6 +53,9 @@ public class FSMRepository {
 
 	@Autowired
 	private FSMAuditRowMapper auditRowMapper;
+	
+	@Autowired
+	private  FSMUtil fsmUtil;
 
 	public void save(FSMRequest fsmRequest) {
 		producer.push(config.getSaveTopic(), fsmRequest);
@@ -121,4 +127,19 @@ public class FSMRepository {
 		log.info("PS: "+preparedStmtList);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), FSMrowMapper);
 	}
+	
+	@SuppressWarnings("deprecation")
+	public List<String> getPeriodicEligiableApplicationList(String tenantId,Long timeLimit) {
+		
+	StringBuilder baseQuery=new StringBuilder(FSMQueryBuilder.GET_PERIODIC_ELGIABLE_APPLICATIONS);
+	baseQuery.append("where tenantid=? and createdtime<? and applicationstatus=?");
+	List<Object> preparedStmtList=new ArrayList<>();
+	preparedStmtList.add(tenantId);
+	preparedStmtList.add(new Date().getTime()- timeLimit);
+	preparedStmtList.add(FSMConstants.COMPLETED);	
+	List<String> applicationNoList = jdbcTemplate.query(baseQuery.toString(),preparedStmtList.toArray(),new SingleColumnRowMapper<>(String.class));
+    return applicationNoList;
+    
+	}
+	
 }

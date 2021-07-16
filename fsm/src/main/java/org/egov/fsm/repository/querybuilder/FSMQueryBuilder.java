@@ -26,6 +26,8 @@ public class FSMQueryBuilder {
 			+ "	 LEFT OUTER JOIN  eg_fsm_pit_detail fsm_pit on fsm_pit.fsm_id = fsm.id";
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
+	
+	public static final String GET_PERIODIC_ELGIABLE_APPLICATIONS="select applicationno from eg_fsm_application where";
 
 	
 

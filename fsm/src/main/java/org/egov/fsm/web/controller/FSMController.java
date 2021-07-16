@@ -16,6 +16,7 @@ import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.PeriodicApplicationResponse;
 import org.egov.fsm.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -100,6 +102,17 @@ public class FSMController {
 			@Valid @ModelAttribute FSMSearchCriteria criteria) {
 		List<FSM> fsmList = fsmService.searchFSMPlainSearch(criteria,requestInfoWrapper.getRequestInfo());
 		FSMResponse response = FSMResponse.builder().fsm(fsmList)				
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/_getapplicationsforperiodic", method = RequestMethod.POST)
+	public ResponseEntity<PeriodicApplicationResponse> getFSMApplicationsForPeriodicServices(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,@RequestParam String tenantId){
+		
+	List<String> applicationList=fsmService.getFSMApplicationsForPeriodicServices(tenantId,requestInfoWrapper.getRequestInfo());
+		
+		PeriodicApplicationResponse response = PeriodicApplicationResponse.builder().applicationNoList(applicationList)				
 				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
 				.build();
 		return new ResponseEntity<>(response, HttpStatus.OK);
