@@ -1,6 +1,7 @@
 package org.egov.pt.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -33,6 +34,28 @@ public class TranslationService {
         this.mapper = mapper;
     }
 
+    public Map<String, Object> translateForDemand(AssessmentRequest assessmentRequest, Property property){
+    	 RequestInfo requestInfo = assessmentRequest.getRequestInfo();
+         Assessment assessment = assessmentRequest.getAssessment();
+         List<String> CC=new ArrayList<String>();  
+
+         CC.add(0, property.getPropertyId());
+         
+         Map<String, Object> getBillCriteria = new HashMap<>();
+         getBillCriteria.put("propertyId",property.getPropertyId());
+         getBillCriteria.put("tenantId", property.getTenantId());
+         getBillCriteria.put("assessmentNumber",assessment.getAssessmentNumber());
+         getBillCriteria.put("assessmentYear",assessment.getFinancialYear());
+         getBillCriteria.put("consumerCodes",CC);
+       
+         Map<String, Object> billCriteriaReq = new HashMap<>();
+         billCriteriaReq.put("RequestInfo", requestInfo);
+         billCriteriaReq.put("GetBillCriteria", Collections.singletonList(getBillCriteria));
+
+         return billCriteriaReq;
+  
+    	
+    }
 
     public Map<String, Object> translate(AssessmentRequest assessmentRequest, Property property){
 
