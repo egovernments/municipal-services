@@ -49,6 +49,10 @@ public class ChallanConstants {
     public static final String BOUNDARY_TYPE  = "Locality";
 
     public static final String LOCALITY_CODE_PATH = "$.TenantBoundary.[*].boundary[?(@.label==\"Locality\")].code";
+    
+    public static final String EXPENSE_MODULE_CODE = "Expense";
+    
+    public static final String EXPENSETYPE_MASTER = "ExpenseType";
 
 
     public ChallanConstants() {}

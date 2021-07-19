@@ -206,5 +206,31 @@ public class UserService {
 	        return  d.getTime();
 	    }
 	 
+		public void setAccountUser(ChallanRequest request) {
+
+			Challan challan = request.getChallan();
+			RequestInfo requestInfo = request.getRequestInfo();
+			if(null == challan.getCitizen())
+				challan.setCitizen(new UserInfo());
+			UserInfo userInfo = challan.getCitizen();
+			if (challan.getAccountId() != null) {
+				UserDetailResponse userDetailResponse = userExists(challan, requestInfo);
+				if (userDetailResponse.getUser().isEmpty())
+					throw new CustomException("INVALID Vendor", "The uuid " + challan.getAccountId() + " does not exists");
+				setOwnerFields(userInfo, userDetailResponse, requestInfo);
+			}
+
+		}
+		
+		private UserDetailResponse userExists(Challan expense,RequestInfo requestInfo){
+	        UserSearchRequest userSearchRequest =new UserSearchRequest();
+	        userSearchRequest.setTenantId(expense.getTenantId().split("\\.")[0]);
+	        userSearchRequest.setRequestInfo(requestInfo);
+	        userSearchRequest.setActive(true);
+	        userSearchRequest.setUuid(Arrays.asList(expense.getAccountId()));
+	        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+	        return userCall(userSearchRequest,uri);
+	    }
+		
 	   
 }

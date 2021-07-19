@@ -6,6 +6,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +47,11 @@ public class ExpenseValidator {
 
 		if (isBlank(challan.getTypeOfExpense()))
 			errorMap.put("BLANK_TypeOfExpense", "TypeOfExpense is manadatory");
+		else {
+			if (!((List<String>) JsonPath.read(mdmsData, "$.MdmsRes.Expense.ExpenseType"))
+					.contains(challan.getTypeOfExpense()))
+				errorMap.put("INVALID_TypeOfExpense", "TypeOfExpense is invalid");
+		}
 
 		if (isBlank(challan.getVendor()))
 			errorMap.put("BLANK_Vendor", "Vendor is mandatory");
@@ -60,26 +67,25 @@ public class ExpenseValidator {
 		Long currentTime = System.currentTimeMillis();
 		if (isNull(challan.getBillDate()))
 			errorMap.put("NULL_BillDate", "Bill date is mandatory");
-		else if( challan.getBillDate()>currentTime)
-			errorMap.put("BillDate_CurrentDate","Bill date should be before current date");
-		else if (isNull(challan.getBillIssuedDate()) &&  challan.getBillIssuedDate()> challan.getBillDate()) 
-				errorMap.put("BillIssuedDate_After_BillDate", " Party bill date should be before bill date.");
-	
-		if (challan.getIsBillPaid() && isNull(challan.getPaidDate()))
-			errorMap.put("NULL_PaidDate","Paid date is mandatory");
-	
-		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) 
-				&& (!Objects.isNull(challan.getBillDate()))  && challan.getPaidDate() < challan.getBillDate()) 
-			errorMap.put("PaidDate_Before_BillDate","Paid date should be after billdate");
-	
-		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) && challan.getPaidDate()  >currentTime)	
-			errorMap.put("PaidDate_CurrentDate"," Paid date should be before current date");
+		else if (challan.getBillDate() > currentTime)
+			errorMap.put("BillDate_CurrentDate", "Bill date should be before current date");
+		else if (isNull(challan.getBillIssuedDate()) && challan.getBillIssuedDate() > challan.getBillDate())
+			errorMap.put("BillIssuedDate_After_BillDate", " Party bill date should be before bill date.");
 
-		
+		if (challan.getIsBillPaid() && isNull(challan.getPaidDate()))
+			errorMap.put("NULL_PaidDate", "Paid date is mandatory");
+
+		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) && (!Objects.isNull(challan.getBillDate()))
+				&& challan.getPaidDate() < challan.getBillDate())
+			errorMap.put("PaidDate_Before_BillDate", "Paid date should be after billdate");
+
+		if (challan.getIsBillPaid() && (!isNull(challan.getPaidDate())) && challan.getPaidDate() > currentTime)
+			errorMap.put("PaidDate_CurrentDate", " Paid date should be before current date");
+
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 		else {
-			challan.setTaxPeriodTo(challan.getBillIssuedDate());
+			challan.setTaxPeriodTo(challan.getBillIssuedDate() + 1);
 			challan.setTaxPeriodFrom(challan.getBillIssuedDate());
 		}
 
@@ -96,8 +102,7 @@ public class ExpenseValidator {
 		requestInfoWrpr.setRequestInfo(requestInfo);
 		try {
 
-			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri,
-					requestInfoWrpr);
+			LinkedHashMap responseMap = (LinkedHashMap) serviceRequestRepository.fetchResult(uri, requestInfoWrpr);
 			VendorResponse vendorResponse = mapper.convertValue(responseMap, VendorResponse.class);
 			if (!CollectionUtils.isEmpty(vendorResponse.getVendor())) {
 				return vendorResponse.getVendor().get(0);

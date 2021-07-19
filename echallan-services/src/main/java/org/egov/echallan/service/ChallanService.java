@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.echallan.expense.service.PaymentService;
 import org.egov.echallan.expense.validator.ExpenseValidator;
 import org.egov.echallan.model.Challan;
 import org.egov.echallan.model.ChallanRequest;
@@ -12,6 +13,7 @@ import org.egov.echallan.model.SearchCriteria;
 import org.egov.echallan.repository.ChallanRepository;
 import org.egov.echallan.util.CommonUtils;
 import org.egov.echallan.validator.ChallanValidator;
+import org.egov.echallan.web.models.collection.PaymentResponse;
 import org.egov.echallan.web.models.user.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,18 +38,21 @@ public class ChallanService {
 
     private CommonUtils utils;
     
-    @Autowired
-    public ChallanService(EnrichmentService enrichmentService, UserService userService,ChallanRepository repository,CalculationService calculationService,
-    		ChallanValidator validator, CommonUtils utils,ExpenseValidator expenseValidator) {
-        this.enrichmentService = enrichmentService;
-        this.userService = userService;
-        this.repository = repository;
-        this.calculationService = calculationService;
-        this.validator = validator;
-        this.utils = utils;
-        this.expenseValidator=expenseValidator;
-    }
+    private PaymentService paymentService;
     
+	@Autowired
+	public ChallanService(EnrichmentService enrichmentService, UserService userService, ChallanRepository repository,
+			CalculationService calculationService, ChallanValidator validator, CommonUtils utils,
+			ExpenseValidator expenseValidator, PaymentService paymentService) {
+		this.enrichmentService = enrichmentService;
+		this.userService = userService;
+		this.repository = repository;
+		this.calculationService = calculationService;
+		this.validator = validator;
+		this.utils = utils;
+		this.expenseValidator = expenseValidator;
+		this.paymentService = paymentService;
+	}
     
 	/**
 	 * Enriches the Request and pushes to the Queue
@@ -60,8 +65,10 @@ public class ChallanService {
 		expenseValidator.validateFields(request, mdmsData);
 		validator.validateFields(request, mdmsData);
 		enrichmentService.enrichCreateRequest(request);
-		userService.createUser(request);
+	//	userService.createUser(request);
+		userService.setAccountUser(request);
 		calculationService.addCalculation(request);
+		paymentService.createPayment(request);  // If the Expense bill  is paid then post payment. 
 		repository.save(request);
 		return request.getChallan();
 	}

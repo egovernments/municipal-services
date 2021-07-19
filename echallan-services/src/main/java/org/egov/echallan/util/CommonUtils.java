@@ -1,6 +1,11 @@
 package org.egov.echallan.util;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.echallan.config.ChallanConfiguration;
 import org.egov.echallan.model.AuditDetails;
@@ -12,13 +17,10 @@ import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Getter;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 @Component
 @Getter
@@ -69,9 +71,9 @@ public class CommonUtils {
     }
 
     private MdmsCriteriaReq getMDMSRequest(RequestInfo requestInfo,String tenantId, String service){
-        ModuleDetail moduleDeatilRequest = getModuleDeatilRequest(service);
+    	List<ModuleDetail>  moduleDeatilRequest = getModuleDeatilsRequest(service);
         List<ModuleDetail> moduleDetails = new LinkedList<>();
-        moduleDetails.add(moduleDeatilRequest);
+        moduleDetails.addAll(moduleDeatilRequest);
 
         MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(moduleDetails).tenantId(tenantId)
                 .build();
@@ -94,6 +96,32 @@ public class CommonUtils {
                 .moduleName(constants.BILLING_SERVICE).build();
 
         return moduleDtls;
+    }
+    
+    private List<ModuleDetail> getModuleDeatilsRequest(String service) {
+        List<MasterDetail> masterDetails = new ArrayList<>();
+
+        // filter to only get code field from master data
+        final String filterCode = "$.[?(@.service=='"+service+"')]";
+
+        final String filterCodeExp = "$.[?(@.active==true)].code";
+        
+        masterDetails.add(MasterDetail.builder().name(constants.TAXPERIOD_MASTER).filter(filterCode).build());
+        masterDetails.add(MasterDetail.builder().name(constants.TAXPHEADCODE_MASTER).filter(filterCode).build());
+
+        ModuleDetail moduleDtls = ModuleDetail.builder().masterDetails(masterDetails)
+                .moduleName(constants.BILLING_SERVICE).build();
+        
+        
+
+		List<MasterDetail> expenseMasterDetails = new ArrayList<>();
+		expenseMasterDetails.add(MasterDetail.builder().name(constants.EXPENSETYPE_MASTER).filter(filterCodeExp).build());
+		ModuleDetail expenseModuleDetail = ModuleDetail.builder().masterDetails(expenseMasterDetails)
+				.moduleName(constants.EXPENSE_MODULE_CODE).build();
+
+        
+
+        return Arrays.asList(moduleDtls,expenseModuleDetail);
     }
 
  

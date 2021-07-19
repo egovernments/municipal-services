@@ -197,4 +197,14 @@ public class ChallanConfiguration {
 	@Value("${egov.vendor.search.path}")
 	private String vendorSearchEndpoint;
 	
+	@Value("${egov.collection.service.host}")
+	private String paymentContextPath;
+	
+	@Value("${egov.collection.service.search.endpoint}")
+	private String paymentCreateEndpoint;
+	
+    @Value("${egov.services.billing_service.search}")
+    private String searchBill;
+	
+	
 }
