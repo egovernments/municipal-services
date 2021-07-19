@@ -142,4 +142,16 @@ public class FSMRepository {
     
 	}
 	
+	/***
+	 * This method will return unique tenantid's
+	 * @return tenant list
+	 */
+
+	public List<String> getTenants() {
+		List<String> uniqueApplicationList = jdbcTemplate.query(FSMQueryBuilder.GET_UNIQUE_TENANTS,
+				new SingleColumnRowMapper<>(String.class));
+		return uniqueApplicationList;
+
+	}
+	
 }

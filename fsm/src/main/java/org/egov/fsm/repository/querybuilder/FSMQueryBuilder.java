@@ -29,7 +29,7 @@ public class FSMQueryBuilder {
 	
 	public static final String GET_PERIODIC_ELGIABLE_APPLICATIONS="select applicationno from eg_fsm_application where";
 
-	
+	public static final String GET_UNIQUE_TENANTS="select distinct(tenantid) from eg_fsm_application";
 
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
 

@@ -522,4 +522,37 @@ public class FSMService {
 
 	}
 
+	public void scheduleperiodicapplications(RequestInfo requestInfo) {
+	
+		try {
+			
+			List<String> tenantIdList=fsmRepository.getTenants();
+			
+			for(String tenantId:tenantIdList) {
+				
+				Object result = fsmUtil.getMasterData(FSMConstants.PERIODIC_MASTER_NAME, tenantId, requestInfo);	
+				
+				List<Map> periodicData = JsonPath.read(result, FSMConstants.PERIODIC_SERVICE_PATH);
+				
+				if (periodicData != null && periodicData.get(0) != null) {
+				
+					boolean isSchedular=Boolean.valueOf(periodicData.get(0).get("isSchedularConfiguration").toString());
+					
+					if(isSchedular) {
+						
+					List<String> applicationNoList=getFSMApplicationsForPeriodicServices(tenantId, requestInfo);
+							
+					}
+					
+				}
+			}
+			
+			
+		}
+		catch(Exception ex) {
+			
+			log.info("Exception occured while creataing application: "+ex.getMessage());
+		}
+	}
+
 }
