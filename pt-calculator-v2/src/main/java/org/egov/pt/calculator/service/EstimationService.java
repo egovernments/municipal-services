@@ -346,7 +346,7 @@ public class EstimationService {
 			Map<String, JSONArray> timeBasedExemeptionMasterMap,Map<String, Object> masterMap) {
 
 
-
+		taxAmt = taxAmt.divide(BigDecimal.valueOf(2));
 		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt;
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
