@@ -223,6 +223,7 @@ public class CalculatorConstants {
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
 
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME_PAYMENT = "consumerCodes=";
+	public static final String BUSINESS_SERVICE_SEARCH_FIELD_NAME = "businessService=";
 
 
 	public static final String DEMAND_ID_SEARCH_FIELD_NAME = "demandId=";
@@ -304,6 +305,9 @@ public class CalculatorConstants {
 	public static final String EG_PT_INVALID_DEMAND_ERROR = "EG_PT_INVALID_DEMAND_ERROR";
 	public static final String EG_PT_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 
+	
+	public static final String EG_PT_DEMAND_COLLECTED_ERROR = "EG_PT_DEMAND_COLLECTED_ERROR";
+	public static final String EG_PT_DEMAND_COLLECTED_ERROR_MSG = "Demand of this assessments is paid. Please cancel respective receipt first and then cancel Assessment ";
     public static final Long TIMEZONE_OFFSET = 19800000l;
 
     public static final String BILLINGSLAB_KEY = "calculationDescription";

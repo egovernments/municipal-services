@@ -69,6 +69,9 @@ public class Configurations {
 	@Value("${egov.demand.search.endpoint}")
 	private String demandSearchEndPoint;
 	
+	@Value("${egov.bill.search.endpoint}")
+	private String billSearchEndPoint;
+	
 	@Value("${egov.bill.gen.endpoint}")
 	private String billGenEndPoint;
 

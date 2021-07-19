@@ -14,6 +14,7 @@ import org.egov.pt.calculator.validator.CalculationValidator;
 import org.egov.pt.calculator.web.models.*;
 import org.egov.pt.calculator.web.models.collections.Payment;
 import org.egov.pt.calculator.web.models.demand.*;
+import org.egov.pt.calculator.web.models.demand.Demand.StatusEnum;
 import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyDetail;
@@ -296,7 +297,99 @@ public class DemandService {
 		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
 		repository.fetchResult(updateDemandUrl, request);
 		return res;
+	}  
+	
+	
+	
+public DemandResponse updateDemandsForAssessmentCancel(GetBillCriteria getBillCriteria, RequestInfoWrapper requestInfoWrapper) {
+		
+		if(getBillCriteria.getAmountExpected() == null) getBillCriteria.setAmountExpected(BigDecimal.ZERO);
+		validator.validateGetBillCriteria(getBillCriteria);
+		RequestInfo requestInfo = requestInfoWrapper.getRequestInfo();
+		Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap = new HashMap<>();
+		Map<String, JSONArray> timeBasedExmeptionMasterMap = new HashMap<>();
+		mstrDataService.setPropertyMasterValues(requestInfo, getBillCriteria.getTenantId(),
+				propertyBasedExemptionMasterMap, timeBasedExmeptionMasterMap);
+
+/*
+		if(CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
+			getBillCriteria.setConsumerCodes(Collections.singletonList(getBillCriteria.getPropertyId()+ CalculatorConstants.PT_CONSUMER_CODE_SEPARATOR +getBillCriteria.getAssessmentNumber()));
+*/
+
+		DemandResponse res = mapper.convertValue(
+				repository.fetchResult(utils.getDemandSearchUrl(getBillCriteria), requestInfoWrapper),
+				DemandResponse.class);
+		
+		BillResponse resBill = mapper.convertValue(
+				repository.fetchResult(utils.getBillSearchUrl(getBillCriteria), requestInfoWrapper),
+				BillResponse.class);
+		if (CollectionUtils.isEmpty(res.getDemands())) {
+			Map<String, String> map = new HashMap<>();
+			map.put(CalculatorConstants.EMPTY_DEMAND_ERROR_CODE, CalculatorConstants.EMPTY_DEMAND_ERROR_MESSAGE);
+			throw new CustomException(map);
+		}
+//if(!CollectionUtils.isEmpty(resBill.getDemands()))
+
+		/**
+		 * Loop through the consumerCodes and re-calculate the time based applicables
+		 */
+
+
+		Map<String,List<Demand>> consumerCodeToDemandMap = new HashMap<>();
+		res.getDemands().forEach(demand -> {
+			if(consumerCodeToDemandMap.containsKey(demand.getConsumerCode()))
+				consumerCodeToDemandMap.get(demand.getConsumerCode()).add(demand);
+			else {
+				List<Demand> demands = new LinkedList<>();
+				demands.add(demand);
+				consumerCodeToDemandMap.put(demand.getConsumerCode(),demands);
+			}
+		});
+		
+		if (CollectionUtils.isEmpty(consumerCodeToDemandMap))
+			throw new CustomException(CalculatorConstants.EMPTY_DEMAND_ERROR_CODE,
+					"No demands were found for the given consumerCodes : " + getBillCriteria.getConsumerCodes());
+
+		List<Demand> demandsToBeUpdated = new LinkedList<>();
+
+		String tenantId = getBillCriteria.getTenantId();
+
+		List<TaxPeriod> taxPeriods = mstrDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(), tenantId);
+
+		for (String consumerCode : getBillCriteria.getConsumerCodes()) {
+			List<Demand> demands = consumerCodeToDemandMap.get(consumerCode);
+			if (CollectionUtils.isEmpty(demands))
+			     continue;
+
+			for(Demand demand : demands){
+				if (demand.getStatus() != null
+						&& CalculatorConstants.DEMAND_CANCELLED_STATUS.equalsIgnoreCase(demand.getStatus().toString()))
+					throw new CustomException(CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR,
+							CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR_MSG);
+				
+				for(DemandDetail demanddetail : demand.getDemandDetails()){
+					if(demanddetail.getCollectionAmount().compareTo(BigDecimal.ZERO)>0)
+						throw new CustomException(CalculatorConstants.EG_PT_DEMAND_COLLECTED_ERROR,
+								CalculatorConstants.EG_PT_DEMAND_COLLECTED_ERROR_MSG);
+				}
+				//applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
+
+				//roundOffDecimalForDemand(demand, requestInfoWrapper);
+				demand.setStatus(StatusEnum.CANCELLED);
+				demandsToBeUpdated.add(demand);
+			}
+		}
+
+
+		/**
+		 * Call demand update in bulk to update the interest or penalty
+		 */
+		DemandRequest request = DemandRequest.builder().demands(demandsToBeUpdated).requestInfo(requestInfo).build();
+		StringBuilder updateDemandUrl = utils.getUpdateDemandUrl();
+		repository.fetchResult(updateDemandUrl, request);
+		return res;
 	}
+
 
 	/**
 	 * if any previous assessments and demands associated with it exists for the
