@@ -284,6 +284,12 @@ public class NotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 		});
+		
+		property.getAlternateMobileNumberDetails().forEach(entry ->{
+				log.info("Name : "+entry.getName()+" Mobile Number : "+entry.getMobileNumber());
+				mobileNumberToOwner.put(entry.getMobileNumber(), entry.getName());
+				
+		});
 
 		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);
 		notifUtil.sendSMS(smsRequests);
