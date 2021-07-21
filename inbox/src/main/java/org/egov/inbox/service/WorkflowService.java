@@ -294,5 +294,19 @@ public class WorkflowService {
         return stateToRolesMap;
     }
 
-	
+
+	public HashMap<String, String> getAllStatusesIdNameMap(List<BusinessService> businessServices, ProcessInstanceSearchCriteria criteria) {
+		Map<String,List<BusinessService>> tenantIdToBuisnessSevicesMap =  getTenantIdToBuisnessSevicesMap(businessServices);
+		HashMap<String,String> allStatuses = new HashMap<>();
+		List<BusinessService> businessServicesByTenantId = tenantIdToBuisnessSevicesMap.get(criteria.getTenantId());
+		if(!CollectionUtils.isEmpty(businessServicesByTenantId)) {
+			businessServicesByTenantId.forEach(service -> {
+				List<State> states = service.getStates();
+				states.forEach(state -> {
+						allStatuses.put(state.getUuid(), state.getApplicationStatus());
+				});
+			});
+		}
+		return allStatuses;
+	}
 }

@@ -103,6 +103,7 @@ public class InboxService {
 				bussinessSrvs.add(businessService);
 			}
 			HashMap<String,String> StatusIdNameMap = workflowService.getActionableStatusesForRole(requestInfo, bussinessSrvs, processCriteria);
+			HashMap<String, String> AllStatusesIdNameMap = workflowService.getAllStatusesIdNameMap(bussinessSrvs, processCriteria);
 			String applicationStatusParam = srvMap.get("applsStatusParam");
 			String businessIdParam = srvMap.get("businessIdProperty");
 			if(StringUtils.isEmpty(applicationStatusParam)) {
@@ -114,11 +115,20 @@ public class InboxService {
 //			}else {
 			if(StatusIdNameMap.values().size() >0) {
 				if(!CollectionUtils.isEmpty(processCriteria.getStatus())) {
-					List<String> statuses = new ArrayList<String>();
-					processCriteria.getStatus().forEach(status->{
-						statuses.add(StatusIdNameMap.get(status));
-					});
-					moduleSearchCriteria.put(applicationStatusParam, StringUtils.arrayToDelimitedString(statuses.toArray(),","));
+					if(moduleSearchCriteria.containsKey(NON_ACTIONABLE_APPLICATIONS_PARAM) && (Boolean) moduleSearchCriteria.get(NON_ACTIONABLE_APPLICATIONS_PARAM)){
+						List<String> statuses = new ArrayList<String>();
+						processCriteria.getStatus().forEach(status -> {
+							statuses.add(AllStatusesIdNameMap.get(status));
+						});
+						moduleSearchCriteria.put(applicationStatusParam, StringUtils.arrayToDelimitedString(statuses.toArray(), ","));
+						moduleSearchCriteria.remove(NON_ACTIONABLE_APPLICATIONS_PARAM);
+					}else {
+						List<String> statuses = new ArrayList<String>();
+						processCriteria.getStatus().forEach(status -> {
+							statuses.add(StatusIdNameMap.get(status));
+						});
+						moduleSearchCriteria.put(applicationStatusParam, StringUtils.arrayToDelimitedString(statuses.toArray(), ","));
+					}
 				}else {
 					moduleSearchCriteria.put(applicationStatusParam, StringUtils.arrayToDelimitedString( StatusIdNameMap.values().toArray(),","));
 				}
