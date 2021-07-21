@@ -115,13 +115,13 @@ public class InboxService {
 //			}else {
 			if(StatusIdNameMap.values().size() >0) {
 				if(!CollectionUtils.isEmpty(processCriteria.getStatus())) {
-					if(moduleSearchCriteria.containsKey("fetchNonActionableRecords") && (Boolean) moduleSearchCriteria.get("fetchNonActionableRecords")){
+					if(moduleSearchCriteria.containsKey(NON_ACTIONABLE_APPLICATIONS_PARAM) && (Boolean) moduleSearchCriteria.get(NON_ACTIONABLE_APPLICATIONS_PARAM)){
 						List<String> statuses = new ArrayList<String>();
 						processCriteria.getStatus().forEach(status -> {
 							statuses.add(AllStatusesIdNameMap.get(status));
 						});
 						moduleSearchCriteria.put(applicationStatusParam, StringUtils.arrayToDelimitedString(statuses.toArray(), ","));
-						moduleSearchCriteria.remove("fetchNonActionableRecords");
+						moduleSearchCriteria.remove(NON_ACTIONABLE_APPLICATIONS_PARAM);
 					}else {
 						List<String> statuses = new ArrayList<String>();
 						processCriteria.getStatus().forEach(status -> {
