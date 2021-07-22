@@ -85,7 +85,7 @@ public class UserService {
 
 				for (int i = 0; i < userDetailResponse.getUser().size(); i++) {
 
-					if (isRoleAvailale(userDetailResponse.getUser().get(i), VendorConstants.DSO_ROLE,
+					if (isRoleAvailale(userDetailResponse.getUser().get(i), config.getDsoRole(),
 							vendor.getTenantId()) == Boolean.TRUE) {
 						foundOwner = userDetailResponse.getUser().get(i);
 						//throw new CustomException(VendorErrorConstants.INVALID_OWNER_ERROR, "Vendor already exists with this mobile No");
@@ -95,7 +95,7 @@ public class UserService {
 
 				if (userDetailResponse.getUser().size() > 0 && foundOwner == null) {
 					foundOwner = userDetailResponse.getUser().get(0);
-					foundOwner.getRoles().add(getRolObj(VendorConstants.DSO_ROLE, VendorConstants.DSO_ROLE_NAME));
+					foundOwner.getRoles().add(getRolObj(config.getDsoRole(), config.getDsoRoleName()));
 					UserRequest userRequest = UserRequest.builder().user(foundOwner).requestInfo(requestInfo).build();
 					StringBuilder uri = new StringBuilder();
 					uri.append(config.getUserHost()).append(config.getUserContextPath())
@@ -161,7 +161,7 @@ public class UserService {
 
 					for (int i = 0; i < userDetailResponse.getUser().size(); i++) {
 
-						if (isRoleAvailale(userDetailResponse.getUser().get(i), VendorConstants.DSO_DRIVER,
+						if (isRoleAvailale(userDetailResponse.getUser().get(i), config.getDsoDriver(),
 								vendor.getTenantId()) == Boolean.TRUE) {
 							foundDriver = userDetailResponse.getUser().get(i);
 						}
@@ -170,7 +170,7 @@ public class UserService {
 					if (foundDriver == null) {
 						foundDriver = userDetailResponse.getUser().get(0);
 						foundDriver.getRoles()
-								.add(getRolObj(VendorConstants.DSO_DRIVER, VendorConstants.DSO_DRIVER_ROLE_NAME));
+								.add(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName()));
 						UserRequest userRequest = UserRequest.builder().user(foundDriver).requestInfo(requestInfo)
 								.build();
 						StringBuilder uri = new StringBuilder();
@@ -220,9 +220,9 @@ public class UserService {
 		}
 
 		if (owner.getRoles() != null) {
-			owner.getRoles().add(getRolObj(VendorConstants.DSO_ROLE, VendorConstants.DSO_ROLE_NAME));
+			owner.getRoles().add(getRolObj(config.getDsoRole(), config.getDsoRoleName()));
 		} else {
-			owner.setRoles(Arrays.asList(getRolObj(VendorConstants.DSO_ROLE, VendorConstants.DSO_ROLE_NAME)));
+			owner.setRoles(Arrays.asList(getRolObj(config.getDsoRole(), config.getDsoRoleName())));
 		}
 
 //		Role role = getCitizenRole();
@@ -320,9 +320,9 @@ public class UserService {
 		}
 
 		if (owner.getRoles() != null) {
-			owner.getRoles().add(getRolObj(VendorConstants.DSO_ROLE, VendorConstants.DSO_ROLE_NAME));
+			owner.getRoles().add(getRolObj(config.getDsoRole(), config.getDsoRoleName()));
 		} else {
-			owner.setRoles(Arrays.asList(getRolObj(VendorConstants.DSO_ROLE, VendorConstants.DSO_ROLE_NAME)));
+			owner.setRoles(Arrays.asList(getRolObj(config.getDsoRole(), config.getDsoRoleName())));
 		}
 		Jurisdiction juridiction = Jurisdiction.builder().hierarchy(VendorConstants.JURIDICTION_HIERARAHY)
 				.boundaryType(VendorConstants.JURIDICTION_BOUNDARYTYPE).boundary(owner.getTenantId())
@@ -368,9 +368,9 @@ public class UserService {
 					"Dob, relationShip, relation ship name and gender are mandaotry !");
 		}
 		if (driver.getRoles() != null) {
-			driver.getRoles().add(getRolObj(VendorConstants.DSO_DRIVER, VendorConstants.DSO_DRIVER_ROLE_NAME));
+			driver.getRoles().add(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName()));
 		} else {
-			driver.setRoles(Arrays.asList(getRolObj(VendorConstants.DSO_DRIVER, VendorConstants.DSO_DRIVER_ROLE_NAME)));
+			driver.setRoles(Arrays.asList(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName())));
 		}
 
 //		Role role = getCitizenRole();
@@ -398,9 +398,9 @@ public class UserService {
 					"Dob, relationShip, relation ship name and gender are mandaotry !");
 		}
 		if (driver.getRoles() != null) {
-			driver.getRoles().add(getRolObj(VendorConstants.DSO_DRIVER, VendorConstants.DSO_DRIVER_ROLE_NAME));
+			driver.getRoles().add(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName()));
 		} else {
-			driver.setRoles(Arrays.asList(getRolObj(VendorConstants.DSO_DRIVER, VendorConstants.DSO_DRIVER_ROLE_NAME)));
+			driver.setRoles(Arrays.asList(getRolObj(config.getDsoDriver(), config.getDsoDriverRoleName())));
 		}
 		Jurisdiction juridiction = Jurisdiction.builder().hierarchy(VendorConstants.JURIDICTION_HIERARAHY)
 				.boundaryType(VendorConstants.JURIDICTION_BOUNDARYTYPE).boundary(driver.getTenantId())
