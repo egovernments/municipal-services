@@ -60,6 +60,7 @@ public class FSMConstants {
 	public static final String MDMS_VEHICLE_MAKE_MODEL = "VehicleMakeModel";
 	public static final String MDMS_SLUM_NAME = "Slum";
 	public static final String MDMS_VEHICLE_TYPE = "VehicleType";
+	public static final String MDMS_APPLICATION_TYPE = "ApplicationType";
 
 
 	// FINANCIAL YEAR
@@ -153,6 +154,9 @@ public class FSMConstants {
 	public static final String PERIODIC_SERVICE_PATH = "$.MdmsRes.PERIODICSERVICE.PERIODICSERVICE";
 
 	public static final String COMPLETED = "COMPLETED REQUEST";
+
+	public static final String ADHOC_SERVICE = "Adhoc Service";
+
 
 
 

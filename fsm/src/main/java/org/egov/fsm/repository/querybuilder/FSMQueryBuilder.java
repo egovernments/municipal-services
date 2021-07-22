@@ -77,6 +77,21 @@ public class FSMQueryBuilder {
 			addToPreparedStatement(preparedStmtList, ids);
 
 		}
+		
+		if (criteria.getApplicationType()!=null) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm.applicationType=? ");
+			preparedStmtList.add(criteria.getApplicationType());
+
+		}
+		
+		List<String> oldApplicationNo = criteria.getOldApplicationNos();
+		if (!CollectionUtils.isEmpty(oldApplicationNo)) {
+			addClauseIfRequired(preparedStmtList, builder);
+			builder.append(" fsm.oldApplicationNo IN (").append(createQuery(oldApplicationNo)).append(")");
+			addToPreparedStatement(preparedStmtList, oldApplicationNo);
+
+		}
 
 		if (criteria.getFromDate() != null && criteria.getToDate() != null) {
 			
