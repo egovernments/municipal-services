@@ -43,6 +43,8 @@ public class TurnIoService {
 			+ "Complaint no. - {{complaintNumber}}\r\n" + "Complaint Status - {{status}}, \r\n"
 			+ "Please click on the following link to know more about the complaint status - {{link}}";
 
+	private static final String COUNTRY_CODE = "91";
+	
 	@Autowired
 	ServiceRequestRepository serviceRequestRepository;
 
@@ -141,6 +143,11 @@ public class TurnIoService {
 	}
 
 	public String prepareMessage(org.egov.rb.pgrmodels.Service service, String mobileNumber) throws Exception {
+		
+		if (mobileNumber.length() > 10 && mobileNumber.startsWith(COUNTRY_CODE)) {
+			mobileNumber = mobileNumber.substring(2, mobileNumber.length());
+		}
+		
 		String message = successMessage;
 		String complaintNumber = service.getServiceRequestId();
 		String encodedPath = URLEncoder.encode(complaintNumber, "UTF-8");
