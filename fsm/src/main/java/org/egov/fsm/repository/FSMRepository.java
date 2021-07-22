@@ -153,5 +153,15 @@ public class FSMRepository {
 		return uniqueApplicationList;
 
 	}
+
+	@SuppressWarnings("deprecation")
+	public List<String> getOldPeriodicApplications(String applicationNo) {
+		List<String> applicationNoList=new ArrayList<>();
+		StringBuilder baseQuery=new StringBuilder(FSMQueryBuilder.GET_APPLICATION_LIST);
+		List<Object> preparedStmtList=new ArrayList<>();
+		preparedStmtList.add(applicationNo);
+		applicationNoList=jdbcTemplate.query(baseQuery.toString(),preparedStmtList.toArray(),new SingleColumnRowMapper<>(String.class) );
+		return applicationNoList;	
+	}
 	
 }

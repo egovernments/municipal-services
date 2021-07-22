@@ -31,6 +31,8 @@ public class FSMQueryBuilder {
 
 	public static final String GET_UNIQUE_TENANTS="select distinct(tenantid) from eg_fsm_application";
 
+	public static final String GET_APPLICATION_LIST="select applicationno from eg_fsm_application where oldapplicationno=?";
+	
 	public String getFSMSearchQuery(FSMSearchCriteria criteria, String dsoId, List<Object> preparedStmtList) {
 
 		StringBuilder builder = new StringBuilder(Query);

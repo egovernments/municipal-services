@@ -16,6 +16,7 @@ import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.PeriodicApplicationRequest;
 import org.egov.fsm.web.model.PeriodicApplicationResponse;
 import org.egov.fsm.web.model.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +127,19 @@ public class FSMController {
 
 		fsmService.scheduleperiodicapplications(requestInfoWrapper.getRequestInfo());
 
+	}
+	
+	@RequestMapping(value = "/_createperiodicapplications", method = RequestMethod.POST)
+	public  ResponseEntity<PeriodicApplicationResponse> createperiodicapplications(@RequestBody PeriodicApplicationRequest periodicApplicationRequest) {
+		
+		List<String> applicationnoList=fsmService.createperiodicapplications(periodicApplicationRequest);
+		
+		PeriodicApplicationResponse response = PeriodicApplicationResponse.builder().applicationNoList(applicationnoList)
+				.responseInfo(responseInfoFactory.createResponseInfoFromRequestInfo(periodicApplicationRequest.getRequestInfo(),
+						true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+		
 	}
 
 }

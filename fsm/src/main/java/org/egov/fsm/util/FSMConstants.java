@@ -157,6 +157,8 @@ public class FSMConstants {
 
 	public static final String ADHOC_SERVICE = "Adhoc Service";
 
+	public static final String PERIODIC_SERVICE = "PERIODIC";
+
 
 
 

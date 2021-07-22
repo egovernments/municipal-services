@@ -31,6 +31,7 @@ import org.egov.fsm.web.model.FSMAuditSearchCriteria;
 import org.egov.fsm.web.model.FSMRequest;
 import org.egov.fsm.web.model.FSMResponse;
 import org.egov.fsm.web.model.FSMSearchCriteria;
+import org.egov.fsm.web.model.PeriodicApplicationRequest;
 import org.egov.fsm.web.model.Workflow;
 import org.egov.fsm.web.model.dso.Vendor;
 import org.egov.fsm.web.model.user.User;
@@ -501,7 +502,7 @@ public class FSMService {
 	 * limit for that tenantid
 	 * 
 	 * @param tenantId
-	 * @return 
+	 * @return
 	 */
 
 	public List<String> getFSMApplicationsForPeriodicServices(String tenantId, RequestInfo requestInfo) {
@@ -517,42 +518,86 @@ public class FSMService {
 			return applicationList;
 
 		}
-		
+
 		return new ArrayList<>();
 
 	}
 
 	public void scheduleperiodicapplications(RequestInfo requestInfo) {
-	
+
 		try {
-			
-			List<String> tenantIdList=fsmRepository.getTenants();
-			
-			for(String tenantId:tenantIdList) {
-				
-				Object result = fsmUtil.getMasterData(FSMConstants.PERIODIC_MASTER_NAME, tenantId, requestInfo);	
-				
+
+			List<String> tenantIdList = fsmRepository.getTenants();
+
+			for (String tenantId : tenantIdList) {
+
+				Object result = fsmUtil.getMasterData(FSMConstants.PERIODIC_MASTER_NAME, tenantId, requestInfo);
+
 				List<Map> periodicData = JsonPath.read(result, FSMConstants.PERIODIC_SERVICE_PATH);
-				
+
 				if (periodicData != null && periodicData.get(0) != null) {
-				
-					boolean isSchedular=Boolean.valueOf(periodicData.get(0).get("isSchedularConfiguration").toString());
-					
-					if(isSchedular) {
-						
-					List<String> applicationNoList=getFSMApplicationsForPeriodicServices(tenantId, requestInfo);
-							
+
+					boolean isSchedular = Boolean
+							.valueOf(periodicData.get(0).get("isSchedularConfiguration").toString());
+
+					if (isSchedular) {
+
+						List<String> applicationNoList = getFSMApplicationsForPeriodicServices(tenantId, requestInfo);
+						PeriodicApplicationRequest periodicApplicationRequest = new PeriodicApplicationRequest();
+						periodicApplicationRequest.setRequestInfo(requestInfo);
+						periodicApplicationRequest.setApplicationNoList(applicationNoList);
+						createperiodicapplications(periodicApplicationRequest);
+
 					}
-					
+
 				}
 			}
-			
-			
+
+		} catch (Exception ex) {
+
+			log.info("Exception occured while creataing application: " + ex.getMessage());
 		}
-		catch(Exception ex) {
-			
-			log.info("Exception occured while creataing application: "+ex.getMessage());
+	}
+
+	public List<String> createperiodicapplications(PeriodicApplicationRequest periodicApplicationRequest) {
+
+		List<String> applicationList = new ArrayList<>();
+
+		for (String applicationNo : periodicApplicationRequest.getApplicationNoList()) {
+
+			List<String> applicationNoList = fsmRepository.getOldPeriodicApplications(applicationNo);
+
+			if (applicationNoList.size() == 0 || applicationNoList.get(0) == applicationNo) {
+				String newApplicationNo = createPeriodicapplication(applicationNo,
+						periodicApplicationRequest.getRequestInfo());
+				applicationList.add(newApplicationNo);
+
+			}
+
 		}
+
+		return applicationList;
+		// TODO Auto-generated method stub
+
+	}
+
+	private String createPeriodicapplication(String applicationNo, RequestInfo requestInfo) {
+		// TODO Auto-generated method stub
+		FSMSearchCriteria fsmSearchCreCriteria = new FSMSearchCriteria();
+		List<String> applicationNoList = new ArrayList<String>();
+		applicationNoList.add(applicationNo);
+		fsmSearchCreCriteria.setApplicationNos(applicationNoList);
+		FSMResponse fsmResponse = FSMsearch(fsmSearchCreCriteria, requestInfo);
+		FSM fsm = fsmResponse.getFsm().get(0);
+		fsm.setApplicationType(FSMConstants.PERIODIC_SERVICE);
+		fsm.setOldApplicationNo(fsm.getApplicationNo());
+		fsm.setApplicationNo(null);
+		FSMRequest fsmRequest = new FSMRequest();
+		fsmRequest.setFsm(fsm);
+		fsmRequest.setRequestInfo(requestInfo);
+		FSM fsmData = create(fsmRequest);
+		return fsmData.getApplicationNo();
+
 	}
 
 }
