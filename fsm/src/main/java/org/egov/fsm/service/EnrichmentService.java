@@ -82,7 +82,7 @@ public class EnrichmentService {
 		
 		fsmRequest.getFsm().setAccountId(fsmRequest.getFsm().getCitizen().getUuid());
 		
-		if(fsmRequest.getFsm().getApplicationType().isEmpty() || fsmRequest.getFsm().getApplicationType() == null) {
+		if( fsmRequest.getFsm().getApplicationType() == null || fsmRequest.getFsm().getApplicationType().isEmpty()) {
 			fsmRequest.getFsm().setApplicationType(FSMConstants.ADHOC_SERVICE);
 		}
 		
