@@ -160,7 +160,7 @@ public class ChallanRepository {
         List<Object> preparedStmtList = new ArrayList<>();
 
         String query = queryBuilder.getChallanCountQuery(tenantId, preparedStmtList);
-        log.info("query; "+query);
+        
         try {
             response=jdbcTemplate.query(query, preparedStmtList.toArray(),countRowMapper);
         }catch(Exception e) {

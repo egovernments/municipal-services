@@ -142,11 +142,8 @@ public class ChallanService {
 		 response.put("ResponseInfo",responseInfo);
 		 results	= repository.fetchChallanCount(tenantId);
 
-		 if(CollectionUtils.isEmpty(results) || results.get("totalChallan").equalsIgnoreCase("0")){
-			 Map<String,String> error = new HashMap<>();
-			 error.put("NO_RECORDS","No records found for the tenantId: "+tenantId);
-			 throw new CustomException(error);
-		 }
+		 if(CollectionUtils.isEmpty(results) || results.get("totalChallan").equalsIgnoreCase("0"))
+			 throw new CustomException("NO_RECORDS","No records found for the tenantId: "+tenantId);
 
 		 response.put("ChallanCount",results);
 		 return  response;
