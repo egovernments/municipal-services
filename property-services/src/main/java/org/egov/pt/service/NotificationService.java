@@ -286,9 +286,7 @@ public class NotificationService {
 		});
 		
 		property.getAlternateMobileNumberDetails().forEach(entry ->{
-				log.info("Name : "+entry.getName()+" Mobile Number : "+entry.getMobileNumber());
-				mobileNumberToOwner.put(entry.getMobileNumber(), entry.getName());
-				
+				mobileNumberToOwner.put(entry.getMobileNumber(), entry.getName());				
 		});
 
 		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);
