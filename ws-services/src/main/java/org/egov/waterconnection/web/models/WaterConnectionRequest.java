@@ -29,7 +29,7 @@ import javax.validation.Valid;
 public class WaterConnectionRequest {
 	@JsonProperty("RequestInfo")
 	private RequestInfo requestInfo = null;
-
+	@Valid
 	@JsonProperty("WaterConnection")
 	private WaterConnection waterConnection = null;
 
