@@ -1,7 +1,26 @@
 package org.egov.pt.calculator.service;
 
+import static org.egov.pt.calculator.util.CalculatorConstants.BILLINGSLAB_KEY;
+import static org.egov.pt.calculator.util.CalculatorConstants.FINANCIALYEAR_MASTER_KEY;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ROUNDOFF;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_INTEREST;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_PENALTY;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_REBATE;
+
 import java.math.BigDecimal;
-import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -11,10 +30,22 @@ import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.validator.CalculationValidator;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.Calculation;
+import org.egov.pt.calculator.web.models.CalculationCriteria;
+import org.egov.pt.calculator.web.models.CalculationReq;
+import org.egov.pt.calculator.web.models.DemandDetailAndCollection;
+import org.egov.pt.calculator.web.models.GetBillCriteria;
+import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.collections.Payment;
-import org.egov.pt.calculator.web.models.demand.*;
+import org.egov.pt.calculator.web.models.demand.Bill;
+import org.egov.pt.calculator.web.models.demand.BillResponse;
+import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.demand.Demand.StatusEnum;
+import org.egov.pt.calculator.web.models.demand.DemandDetail;
+import org.egov.pt.calculator.web.models.demand.DemandRequest;
+import org.egov.pt.calculator.web.models.demand.DemandResponse;
+import org.egov.pt.calculator.web.models.demand.TaxHeadMaster;
+import org.egov.pt.calculator.web.models.demand.TaxPeriod;
 import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.Property;
 import org.egov.pt.calculator.web.models.property.PropertyDetail;
@@ -31,8 +62,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-
-import static org.egov.pt.calculator.util.CalculatorConstants.*;
 
 @Service
 @Slf4j
@@ -367,16 +396,31 @@ public DemandResponse updateDemandsForAssessmentCancel(GetBillCriteria getBillCr
 					throw new CustomException(CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR,
 							CalculatorConstants.EG_PT_INVALID_DEMAND_ERROR_MSG);
 				
+				String year=getBillCriteria.getAssessmentYear();
+				Date date = new Date(demand.getTaxPeriodFrom());
+		        DateFormat format = new SimpleDateFormat("yyyy");
+		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+		        String formattedFrom = format.format(date);
+		        date = new Date(demand.getTaxPeriodTo());
+		        format = new SimpleDateFormat("yyyy");
+		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+		        String formattedTo = format.format(date);
+		        String demandYear=formattedFrom+"-"+formattedTo.substring(2);
+		        if(year.equalsIgnoreCase(demandYear)) {
 				for(DemandDetail demanddetail : demand.getDemandDetails()){
 					if(demanddetail.getCollectionAmount().compareTo(BigDecimal.ZERO)>0)
 						throw new CustomException(CalculatorConstants.EG_PT_DEMAND_COLLECTED_ERROR,
 								CalculatorConstants.EG_PT_DEMAND_COLLECTED_ERROR_MSG);
 				}
+				demand.setStatus(StatusEnum.CANCELLED);
+				//demandsToBeUpdated.add(demand);
+		        }
 				//applytimeBasedApplicables(demand, requestInfoWrapper, timeBasedExmeptionMasterMap,taxPeriods);
 
 				//roundOffDecimalForDemand(demand, requestInfoWrapper);
-				demand.setStatus(StatusEnum.CANCELLED);
+				
 				demandsToBeUpdated.add(demand);
+
 			}
 		}
 
