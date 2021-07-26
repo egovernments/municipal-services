@@ -151,7 +151,7 @@ public class FSMConstants {
 
 	public static final String PERIODIC_MASTER_NAME = "PeriodicService";
 
-	public static final String PERIODIC_SERVICE_PATH = "$.MdmsRes.PERIODICSERVICE.PERIODICSERVICE";
+	public static final String PERIODIC_SERVICE_PATH = "$.MdmsRes.FSM.PeriodicService";
 
 	public static final String COMPLETED = "COMPLETED REQUEST";
 
