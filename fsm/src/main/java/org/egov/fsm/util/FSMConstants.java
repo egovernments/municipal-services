@@ -153,7 +153,7 @@ public class FSMConstants {
 
 	public static final String PERIODIC_SERVICE_PATH = "$.MdmsRes.FSM.PeriodicService";
 
-	public static final String COMPLETED = "COMPLETED REQUEST";
+	public static final String COMPLETED = "COMPLETED";
 
 	public static final String ADHOC_SERVICE = "Adhoc Service";
 
