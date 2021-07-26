@@ -3,6 +3,7 @@ All notable changes to this module will be documented in this file.
 
 ## 1.1.3 - 2021-07-23
 - Fixed HRMS multi-tenant department validation
+- Added RB Bot source to support Reap benfit system integration
 
 ## 1.1.2 - 2021-05-11
 - Fixed security issue of untrusted data pass as user input.
