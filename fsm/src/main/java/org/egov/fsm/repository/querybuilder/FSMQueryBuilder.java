@@ -27,7 +27,7 @@ public class FSMQueryBuilder {
 
 	private final String paginationWrapper = "{} {orderby} {pagination}";
 	
-	public static final String GET_PERIODIC_ELGIABLE_APPLICATIONS="select applicationno from eg_fsm_application where";
+	public static final String GET_PERIODIC_ELGIABLE_APPLICATIONS="select applicationno from eg_fsm_application ";
 
 	public static final String GET_UNIQUE_TENANTS="select distinct(tenantid) from eg_fsm_application";
 
