@@ -133,6 +133,7 @@ public class InboxService {
 				List<String> acknowledgementNumbers = ptInboxFilterService.fetchAcknowledgementIdsFromSearcher(criteria, StatusIdNameMap, requestInfo);
 				if(!CollectionUtils.isEmpty(acknowledgementNumbers)) {
 					moduleSearchCriteria.put(ACKNOWLEDGEMENT_IDS_PARAM, acknowledgementNumbers);
+					moduleSearchCriteria.remove(LOCALITY_PARAM);
 					moduleSearchCriteria.remove(OFFSET_PARAM);
 					moduleSearchCriteria.remove(LIMIT_PARAM);
 				}else{

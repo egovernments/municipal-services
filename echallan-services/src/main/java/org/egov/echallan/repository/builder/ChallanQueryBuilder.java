@@ -41,6 +41,8 @@ public class ChallanQueryBuilder {
       
       public static final String CANCEL_RECEIPT_UPDATE_SQL = "UPDATE eg_echallan SET applicationStatus='ACTIVE' WHERE challanNo=? and businessService=?";
 
+      public static final String CHALLAN_COUNT_QUERY = "SELECT applicationstatus, count(*)  FROM eg_echallan WHERE tenantid ";
+
 
 
     public String getChallanSearchQuery(SearchCriteria criteria, List<Object> preparedStmtList) {
@@ -156,6 +158,20 @@ public class ChallanQueryBuilder {
         else {
             queryString.append(" AND");
         }
+    }
+
+    public String getChallanCountQuery(String tenantId, List <Object> preparedStmtList ) {
+        StringBuilder builder = new StringBuilder(CHALLAN_COUNT_QUERY);
+        if(tenantId.equalsIgnoreCase(config.stateLevelTenantId)){
+            builder.append("LIKE ? ");
+            preparedStmtList.add(tenantId+"%");
+        }
+        else{
+            builder.append("= ? ");
+            preparedStmtList.add(tenantId);
+        }
+        builder.append("GROUP BY applicationstatus");
+        return builder.toString();
     }
 
 
