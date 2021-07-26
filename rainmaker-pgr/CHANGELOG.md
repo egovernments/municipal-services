@@ -2,6 +2,10 @@
 
 All notable changes to this module will be documented in this file.
 
+## 1.1.4 - 2021-07-26
+
+- Added new source RB Bot to support Reap benfit system integration
+
 ## 1.1.3 - 2021-02-26
 
 - Updated domain name in application.properties
