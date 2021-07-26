@@ -13,6 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.jayway.jsonpath.JsonPath;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.inbox.config.InboxConfiguration;
 import org.egov.inbox.repository.ServiceRequestRepository;
@@ -30,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -38,6 +41,11 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.JsonObject;
+import org.springframework.web.client.RestTemplate;
+
+import static org.egov.inbox.util.PTConstants.*;
+
+@Slf4j
 @Service
 public class InboxService {
 
@@ -48,6 +56,9 @@ public class InboxService {
 	private ObjectMapper mapper;
 	
 	private WorkflowService workflowService;
+
+	@Autowired
+	private PtInboxFilterService ptInboxFilterService;
 
 	@Autowired
 	public InboxService(InboxConfiguration config, ServiceRequestRepository serviceRequestRepository,
@@ -66,7 +77,13 @@ public class InboxService {
 		HashMap moduleSearchCriteria = criteria.getModuleSearchCriteria();
 		processCriteria.setTenantId(criteria.getTenantId());
 		Integer totalCount = workflowService.getProcessCount(criteria.getTenantId(), requestInfo, processCriteria);
+		List<String> inputStatuses = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(processCriteria.getStatus()))
+			inputStatuses = new ArrayList<>(processCriteria.getStatus());
+		// Since we want the whole status count map regardless of the status filter being passed
+		processCriteria.setStatus(null);
 		List<HashMap<String,Object>> statusCountMap = workflowService.getProcessStatusCount( requestInfo, processCriteria);
+		processCriteria.setStatus(inputStatuses);
 		List<String> businessServiceName = processCriteria.getBusinessService();
 		List<Inbox> inboxes = new ArrayList<Inbox>();
 		InboxResponse response = new InboxResponse();
@@ -110,8 +127,96 @@ public class InboxService {
 			}
 				
 //			}
-			
-			businessObjects = fetchModuleObjects(moduleSearchCriteria,businessServiceName,criteria.getTenantId(),requestInfo,srvMap);
+			// Redirect request to searcher in case of PT to fetch acknowledgement IDS
+			Boolean isSearchResultEmpty = false;
+			if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)) {
+				List<String> acknowledgementNumbers = ptInboxFilterService.fetchAcknowledgementIdsFromSearcher(criteria, StatusIdNameMap, requestInfo);
+				if(!CollectionUtils.isEmpty(acknowledgementNumbers)) {
+					moduleSearchCriteria.put(ACKNOWLEDGEMENT_IDS_PARAM, acknowledgementNumbers);
+					moduleSearchCriteria.remove(LOCALITY_PARAM);
+					moduleSearchCriteria.remove(OFFSET_PARAM);
+					moduleSearchCriteria.remove(LIMIT_PARAM);
+				}else{
+					isSearchResultEmpty = true;
+				}
+			}
+			/*if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)){
+				Boolean isMobileNumberPresent = false;
+				if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
+					isMobileNumberPresent = true;
+				}
+				Boolean isUserPresentForGivenMobileNumber = false;
+				if(isMobileNumberPresent) {
+					String tenantId = criteria.getTenantId();
+					String mobileNumber = (String) moduleSearchCriteria.get(MOBILE_NUMBER_PARAM);
+					String userUUID = fetchUserUUID(mobileNumber, requestInfo, tenantId);
+				 	isUserPresentForGivenMobileNumber = ObjectUtils.isEmpty(userUUID) ? true : false;
+				}
+				if(isMobileNumberPresent && isUserPresentForGivenMobileNumber){
+					isSearchResultEmpty = true;
+				}
+
+				if(!isSearchResultEmpty){
+					Object result = null;
+
+					Map<String, Object> searcherRequest = new HashMap<>();
+					Map<String, Object> searchCriteria = new HashMap<>();
+
+					searchCriteria.put(TENANT_ID_PARAM,criteria.getTenantId());
+
+					// Accomodating module search criteria in searcher request
+					if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
+						searchCriteria.put(MOBILE_NUMBER_PARAM, moduleSearchCriteria.get(MOBILE_NUMBER_PARAM));
+					}
+					if(moduleSearchCriteria.containsKey(LOCALITY_PARAM)){
+						searchCriteria.put(LOCALITY_PARAM, moduleSearchCriteria.get(LOCALITY_PARAM));
+					}
+					if(moduleSearchCriteria.containsKey(PROPERTY_ID_PARAM)){
+						searchCriteria.put(PROPERTY_ID_PARAM, moduleSearchCriteria.get(PROPERTY_ID_PARAM));
+					}
+					if(moduleSearchCriteria.containsKey(APPLICATION_NUMBER_PARAM)) {
+						searchCriteria.put(APPLICATION_NUMBER_PARAM, moduleSearchCriteria.get(APPLICATION_NUMBER_PARAM));
+					}
+
+					// Accomodating process search criteria in searcher request
+					if(!ObjectUtils.isEmpty(processCriteria.getAssignee())){
+						searchCriteria.put(ASSIGNEE_PARAM, processCriteria.getAssignee());
+					}
+					if(!ObjectUtils.isEmpty(processCriteria.getStatus())){
+						searchCriteria.put(STATUS_PARAM, processCriteria.getStatus());
+					}else{
+						if(StatusIdNameMap.values().size() > 0) {
+							if(CollectionUtils.isEmpty(processCriteria.getStatus())) {
+								searchCriteria.put(STATUS_PARAM, StatusIdNameMap.keySet());
+							}
+						}
+					}
+
+					// Paginating searcher results
+					searchCriteria.put(OFFSET_PARAM, criteria.getOffset());
+					searchCriteria.put(NO_OF_RECORDS_PARAM, criteria.getLimit());
+
+					searcherRequest.put(REQUESTINFO_PARAM, requestInfo);
+					searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
+
+					result = restTemplate.postForObject(PT_INBOX_SEARCHER_URL, searcherRequest, Map.class);
+
+					List<String> acknowledgementNumbers = JsonPath.read(result, "$.Properties.*.acknowldgementnumber");
+
+					if(!CollectionUtils.isEmpty(acknowledgementNumbers)) {
+						moduleSearchCriteria.put(ACKNOWLEDGEMENT_IDS_PARAM, acknowledgementNumbers);
+						moduleSearchCriteria.remove(OFFSET_PARAM);
+						moduleSearchCriteria.remove(LIMIT_PARAM);
+					}else{
+						isSearchResultEmpty = true;
+					}
+				}
+			}
+			*/
+			businessObjects = new JSONArray();
+			if(!isSearchResultEmpty) {
+				businessObjects = fetchModuleObjects(moduleSearchCriteria, businessServiceName, criteria.getTenantId(), requestInfo, srvMap);
+			}
 			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
                     s1 -> s1));
 			ArrayList businessIds = new ArrayList();
@@ -169,6 +274,30 @@ public class InboxService {
 		response.setItems(inboxes);
 		return response; 
 	}
+
+/*	private String fetchUserUUID(String mobileNumber, RequestInfo requestInfo, String tenantId) {
+		StringBuilder uri = new StringBuilder();
+		uri.append(userHost).append(userSearchEndpoint);
+		Map<String, Object> userSearchRequest = new HashMap<>();
+		userSearchRequest.put("RequestInfo", requestInfo);
+		userSearchRequest.put("tenantId", tenantId);
+		userSearchRequest.put("userType", "CITIZEN");
+		userSearchRequest.put("userName", mobileNumber);
+		String uuid = "";
+		try {
+			Object user = serviceRequestRepository.fetchResult(uri, userSearchRequest);
+			if(null != user) {
+				uuid = JsonPath.read(user, "$.user[0].uuid");
+			}else {
+				log.error("Service returned null while fetching user for username - " + mobileNumber);
+			}
+		}catch(Exception e) {
+			log.error("Exception while fetching user for username - " + mobileNumber);
+			log.error("Exception trace: ", e);
+		}
+		return uuid;
+	}
+*/
 
 	private Map<String, String> fetchAppropriateServiceMap(List<String> businessServiceName) {
 		StringBuilder appropriateKey = new StringBuilder();

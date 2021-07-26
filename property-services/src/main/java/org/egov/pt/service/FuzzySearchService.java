@@ -42,6 +42,9 @@ public class FuzzySearchService {
 
         List<String> idsFromDB = propertyRepository.getPropertyIds(criteria);
 
+        if(CollectionUtils.isEmpty(idsFromDB))
+            return new LinkedList<>();
+
         validateFuzzySearchCriteria(criteria);
 
         Object esResponse = elasticSearchRepository.fuzzySearchProperties(criteria, idsFromDB);
