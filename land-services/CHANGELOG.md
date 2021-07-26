@@ -3,7 +3,7 @@ All notable changes to this module will be documented in this file.
 
 ## 1.0.3
 
-- Fixed fix land search issue. For the citizen showing all applications which are created by other citizens when he has not submitted any application.
+- Fixed the land search issue. For a citizen, showing all applications which are created by other citizens when he has not submitted any application.
 
 ## 1.0.2
 
