@@ -1,0 +1,78 @@
+curl --location --request POST 'https://dev.digit.org/egov-workflow-v2/egov-wf/businessservice/_create' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "RequestInfo": {
+    "apiId": "Rainmaker",
+    "action": "",
+    "did": 1,
+    "key": "",
+    "msgId": "20170310130900|en_IN",
+    "requesterId": "",
+    "ts": 1513579888683,
+    "ver": ".01",
+    "authToken":  "{{Auth_Token}}"
+  },
+  "BusinessServices": [
+    {
+      "tenantId": "pb",
+      "businessService": "NewWS1",
+      "business": "ws-services",
+      "businessServiceSla": null,
+      "states": [
+        {
+          "sla": null,
+          "state": "INITIATED",
+          "applicationStatus": "INWORKFLOW",
+          "docUploadRequired": false,
+          "isStartState": true,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "action": "SUBMIT",
+              "nextState": "APPROVED",
+              "roles": [
+                "EMPLOYEE"
+              ]
+            },
+            {
+              "action": "BACK",
+              "nextState": "INWORKFLOW",
+              "roles": [
+                "EMPLOYEE"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "INWORKFLOW",
+          "applicationStatus": "INWORKFLOW",
+          "docUploadRequired": false,
+          "isStartState": true,
+          "isTerminateState": false,
+          "isStateUpdatable": true,
+          "actions": [
+            {
+              "action": "SUBMIT",
+              "nextState": "APPROVED",
+              "roles": [
+                "EMPLOYEE"
+              ]
+            }
+          ]
+        },
+        {
+          "sla": null,
+          "state": "APPROVED",
+          "applicationStatus": "ACTIVE",
+          "docUploadRequired": false,
+          "isStartState": false,
+          "isTerminateState": true,
+          "isStateUpdatable": false,
+          "actions": null
+        }
+      ]
+    }
+  ]
+}'
