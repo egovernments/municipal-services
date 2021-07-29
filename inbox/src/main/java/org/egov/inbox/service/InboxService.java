@@ -147,7 +147,6 @@ public class InboxService {
 					businessKeys.addAll(acknowledgementNumbers);
 					moduleSearchCriteria.remove(LOCALITY_PARAM);
 					moduleSearchCriteria.remove(OFFSET_PARAM);
-					moduleSearchCriteria.remove(LIMIT_PARAM);
 				}else{
 					isSearchResultEmpty = true;
 				}
@@ -159,7 +158,6 @@ public class InboxService {
 					businessKeys.addAll(applicationNumbers);
 					moduleSearchCriteria.remove(LOCALITY_PARAM);
 					moduleSearchCriteria.remove(OFFSET_PARAM);
-					moduleSearchCriteria.remove(LIMIT_PARAM);
 				}else{
 					isSearchResultEmpty = true;
 				}

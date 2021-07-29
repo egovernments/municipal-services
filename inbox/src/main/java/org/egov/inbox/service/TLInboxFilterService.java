@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.egov.inbox.util.PTConstants.LIMIT_PARAM;
 import static org.egov.inbox.util.TLConstants.*;
 
 @Slf4j
@@ -102,6 +103,7 @@ public class TLInboxFilterService {
             // Paginating searcher results
             searchCriteria.put(OFFSET_PARAM, criteria.getOffset());
             searchCriteria.put(NO_OF_RECORDS_PARAM, criteria.getLimit());
+            moduleSearchCriteria.put(LIMIT_PARAM, criteria.getLimit());
 
             searcherRequest.put(REQUESTINFO_PARAM, requestInfo);
             searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
