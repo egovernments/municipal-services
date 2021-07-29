@@ -121,7 +121,8 @@ public class TLRepository {
             license.getTradeLicenseDetail().getOwners().sort(Comparator.comparing(User::getUuid));}
             catch (Exception e){
                 e.printStackTrace();
-                System.out.println(license);
+                System.out.println(" Application Number of corrupt data: "+license.getApplicationNumber());
+                System.out.println("license: "+license.toString());
             }
             license.getTradeLicenseDetail().getTradeUnits().sort(Comparator.comparing(TradeUnit::getId));
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories()))
