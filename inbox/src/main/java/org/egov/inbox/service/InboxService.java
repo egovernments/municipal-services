@@ -333,6 +333,7 @@ public class InboxService {
 		return config.getServiceSearchMapping().get(appropriateKey.toString());
 	}
 
+	
 	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
 		JSONArray resutls = null;
 		if(CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
@@ -341,6 +342,8 @@ public class InboxService {
 		StringBuilder url = new StringBuilder(srvMap.get("searchPath"));
 		url.append("?tenantId=").append(tenantId);
 		Set<String> searchParams = moduleSearchCriteria.keySet();
+		if(searchParams!=null && searchParams.size()>0)
+		{
 		searchParams.forEach((param)->{
 			if(!param.equalsIgnoreCase("tenantId")) {
 				if(moduleSearchCriteria.get(param) instanceof Collection){
@@ -351,6 +354,8 @@ public class InboxService {
 				}
 			}
 		});
+		
+		}
 //		url.append("&limit=10&offset=0");
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
