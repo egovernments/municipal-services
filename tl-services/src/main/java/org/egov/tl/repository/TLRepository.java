@@ -1,5 +1,6 @@
 package org.egov.tl.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
@@ -35,17 +36,20 @@ public class TLRepository {
 
     private WorkflowService workflowService;
 
+    private ObjectMapper mapper;
 
     @Autowired
-    public TLRepository(JdbcTemplate jdbcTemplate, TLQueryBuilder queryBuilder, TLRowMapper rowMapper,
-                        Producer producer, TLConfiguration config, WorkflowService workflowService) {
+    public TLRepository(JdbcTemplate jdbcTemplate, TLQueryBuilder queryBuilder, TLRowMapper rowMapper, Producer producer, TLConfiguration config, WorkflowService workflowService, ObjectMapper mapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.queryBuilder = queryBuilder;
         this.rowMapper = rowMapper;
         this.producer = producer;
         this.config = config;
         this.workflowService = workflowService;
+        this.mapper = mapper;
     }
+
+
 
 
     /**
@@ -122,7 +126,10 @@ public class TLRepository {
             catch (Exception e){
                 e.printStackTrace();
                 System.out.println(" Application Number of corrupt data: "+license.getApplicationNumber());
-                System.out.println("license: "+license.toString());
+                try {
+                    System.out.println("license: "+mapper.writeValueAsString(license));
+                }
+                catch (Exception e1){e1.printStackTrace();}
             }
             license.getTradeLicenseDetail().getTradeUnits().sort(Comparator.comparing(TradeUnit::getId));
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories()))
