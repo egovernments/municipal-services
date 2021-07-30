@@ -35,6 +35,9 @@ public class TLQueryBuilder {
     @Value("${egov.receipt.businessserviceTL}")
     private String businessServiceTL;
 
+    @Value("${create.tl.workflow.name}")
+    private String businessServiceNewTL;
+
 
     @Value("${egov.receipt.businessserviceBPA}")
     private String businessServiceBPA;
@@ -221,8 +224,9 @@ public class TLQueryBuilder {
     private void addBusinessServiceClause(TradeLicenseSearchCriteria criteria,List<Object> preparedStmtList,StringBuilder builder){
         if ((criteria.getBusinessService() == null) || (businessServiceTL.equals(criteria.getBusinessService()))) {
             addClauseIfRequired(preparedStmtList, builder);
-            builder.append(" (tl.businessservice=? or tl.businessservice isnull) ");
+            builder.append(" (tl.businessservice=? or tl.businessservice=? or tl.businessservice isnull) ");
             preparedStmtList.add(businessServiceTL);
+            preparedStmtList.add(businessServiceNewTL);
         } else if (businessServiceBPA.equals(criteria.getBusinessService())) {
             addClauseIfRequired(preparedStmtList, builder);
             builder.append(" tl.businessservice=? ");
