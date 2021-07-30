@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.egov.inbox.util.PTConstants.LIMIT_PARAM;
 import static org.egov.inbox.util.TLConstants.*;
 
 @Slf4j
@@ -36,6 +35,9 @@ public class TLInboxFilterService {
 
     @Value("${egov.searcher.tl.search.path}")
     private String tlInboxSearcherEndpoint;
+
+    @Value("${egov.searcher.tl.search.desc.path}")
+    private String tlInboxSearcherDescEndpoint;
 
     @Value("${egov.searcher.tl.count.path}")
     private String tlInboxSearcherCountEndpoint;
@@ -112,7 +114,11 @@ public class TLInboxFilterService {
             searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
 
             StringBuilder uri = new StringBuilder();
-            uri.append(searcherHost).append(tlInboxSearcherEndpoint);
+            if(moduleSearchCriteria.containsKey(SORT_ORDER_PARAM) && moduleSearchCriteria.get(SORT_ORDER_PARAM).equals(DESC_PARAM)){
+                uri.append(searcherHost).append(tlInboxSearcherDescEndpoint);
+            }else {
+                uri.append(searcherHost).append(tlInboxSearcherEndpoint);
+            }
 
             result = restTemplate.postForObject(uri.toString(), searcherRequest, Map.class);
 
