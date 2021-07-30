@@ -37,6 +37,9 @@ public class PtInboxFilterService {
     @Value("${egov.searcher.pt.search.path}")
     private String ptInboxSearcherEndpoint;
 
+    @Value("${egov.searcher.pt.search.desc.path}")
+    private String ptInboxSearcherDescEndpoint;
+
     @Value("${egov.searcher.pt.count.path}")
     private String ptInboxSearcherCountEndpoint;
 
@@ -112,7 +115,11 @@ public class PtInboxFilterService {
             searcherRequest.put(SEARCH_CRITERIA_PARAM, searchCriteria);
 
             StringBuilder uri = new StringBuilder();
-            uri.append(searcherHost).append(ptInboxSearcherEndpoint);
+            if(moduleSearchCriteria.containsKey(SORT_ORDER_PARAM) && moduleSearchCriteria.get(SORT_ORDER_PARAM).equals(DESC_PARAM)){
+                uri.append(searcherHost).append(ptInboxSearcherDescEndpoint);
+            }else {
+                uri.append(searcherHost).append(ptInboxSearcherEndpoint);
+            }
 
             result = restTemplate.postForObject(uri.toString(), searcherRequest, Map.class);
 
