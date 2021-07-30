@@ -153,6 +153,7 @@ public class InboxService {
 				}
 			}
 			if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(TL)) {
+				totalCount = tlInboxFilterService.fetchApplicationCountFromSearcher(criteria, StatusIdNameMap, requestInfo);
 				List<String> applicationNumbers = tlInboxFilterService.fetchApplicationNumbersFromSearcher(criteria, StatusIdNameMap, requestInfo);
 				if(!CollectionUtils.isEmpty(applicationNumbers)) {
 					moduleSearchCriteria.put(APPLICATION_NUMBER_PARAM, applicationNumbers);
