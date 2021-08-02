@@ -35,6 +35,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.cedarsoftware.util.GraphComparator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -339,6 +341,13 @@ public class FSMValidator {
 		FSM fsm = fsmRequest.getFsm();
 
 		List<Map<String,Object>> tripAountAllowed = JsonPath.read(mdmsData, FSMConstants.FSM_TRIP_AMOUNT_OVERRIDE_ALLOWED);
+		
+		boolean isTextNode=fsm.getAdditionalDetails() instanceof TextNode? true:false;
+		
+		if(isTextNode) {
+			ObjectNode objectNode=(ObjectNode)fsm.getAdditionalDetails();
+			fsm.setAdditionalDetails(objectNode);
+		}
 		
 		
 		Map<String, String> additionalDetails = fsm.getAdditionalDetails() != null ? (Map<String,String>)fsm.getAdditionalDetails()
