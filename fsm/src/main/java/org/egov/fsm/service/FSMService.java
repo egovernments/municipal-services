@@ -598,6 +598,9 @@ public class FSMService {
 		fsm.setApplicationType(FSMConstants.PERIODIC_SERVICE);
 		fsm.setOldApplicationNo(fsm.getApplicationNo());
 		fsm.setApplicationNo(null);
+		fsm.getAddress().setId(null);
+		fsm.getAddress().getGeoLocation().setId(null);
+		fsm.setId(null);
 		FSMRequest fsmRequest = new FSMRequest();
 		fsmRequest.setFsm(fsm);
 		fsmRequest.setRequestInfo(requestInfo);
