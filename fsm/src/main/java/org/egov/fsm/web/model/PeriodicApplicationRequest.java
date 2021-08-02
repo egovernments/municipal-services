@@ -24,5 +24,7 @@ public class PeriodicApplicationRequest {
 	@JsonProperty("applicationNoList")
 	private List<String> applicationNoList;
 	
+	private String tenantId;
+	
 	
 }

@@ -155,11 +155,12 @@ public class FSMRepository {
 	}
 
 	@SuppressWarnings("deprecation")
-	public List<String> getOldPeriodicApplications(String applicationNo) {
+	public List<String> getOldPeriodicApplications(String applicationNo,String tenantId) {
 		List<String> applicationNoList=new ArrayList<>();
 		StringBuilder baseQuery=new StringBuilder(FSMQueryBuilder.GET_APPLICATION_LIST);
 		List<Object> preparedStmtList=new ArrayList<>();
 		preparedStmtList.add(applicationNo);
+		preparedStmtList.add(tenantId);
 		applicationNoList=jdbcTemplate.query(baseQuery.toString(),preparedStmtList.toArray(),new SingleColumnRowMapper<>(String.class) );
 		return applicationNoList;	
 	}

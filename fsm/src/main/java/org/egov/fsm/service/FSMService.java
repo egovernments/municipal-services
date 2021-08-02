@@ -525,15 +525,22 @@ public class FSMService {
 
 	public void scheduleperiodicapplications(RequestInfo requestInfo) {
 
-		try {
+	
 
 			List<String> tenantIdList = fsmRepository.getTenants();
 
 			for (String tenantId : tenantIdList) {
 
 				Object result = fsmUtil.getMasterData(FSMConstants.PERIODIC_MASTER_NAME, tenantId, requestInfo);
-
-				List<Map> periodicData = JsonPath.read(result, FSMConstants.PERIODIC_SERVICE_PATH);
+               
+				List<Map> periodicData=null;
+				
+				try {
+                	 periodicData = JsonPath.read(result, FSMConstants.PERIODIC_SERVICE_PATH);
+                }
+				catch (Exception e) {
+					log.info("Exception occured while creataing application: " + e.getMessage());
+				}
 
 				if (periodicData != null && periodicData.get(0) != null) {
 
@@ -546,6 +553,7 @@ public class FSMService {
 						PeriodicApplicationRequest periodicApplicationRequest = new PeriodicApplicationRequest();
 						periodicApplicationRequest.setRequestInfo(requestInfo);
 						periodicApplicationRequest.setApplicationNoList(applicationNoList);
+						periodicApplicationRequest.setTenantId(tenantId);
 						createperiodicapplications(periodicApplicationRequest);
 
 					}
@@ -553,10 +561,7 @@ public class FSMService {
 				}
 			}
 
-		} catch (Exception ex) {
-
-			log.info("Exception occured while creataing application: " + ex.getMessage());
-		}
+		
 	}
 
 	public List<String> createperiodicapplications(PeriodicApplicationRequest periodicApplicationRequest) {
@@ -565,7 +570,7 @@ public class FSMService {
 
 		for (String applicationNo : periodicApplicationRequest.getApplicationNoList()) {
 
-			List<String> applicationNoList = fsmRepository.getOldPeriodicApplications(applicationNo);
+			List<String> applicationNoList = fsmRepository.getOldPeriodicApplications(applicationNo,periodicApplicationRequest.getTenantId());
 
 			if (applicationNoList.size() == 0 || applicationNoList.get(0) == applicationNo) {
 				String newApplicationNo = createPeriodicapplication(applicationNo,
