@@ -573,7 +573,7 @@ public class FSMService {
 			List<String> applicationNoList = fsmRepository.getOldPeriodicApplications(applicationNo,periodicApplicationRequest.getTenantId());
 
 			if (applicationNoList.size() == 0 || applicationNoList.get(0) == applicationNo) {
-				String newApplicationNo = createPeriodicapplication(applicationNo,
+				String newApplicationNo = createPeriodicapplication(applicationNo,periodicApplicationRequest.getTenantId(),
 						periodicApplicationRequest.getRequestInfo());
 				applicationList.add(newApplicationNo);
 
@@ -586,12 +586,13 @@ public class FSMService {
 
 	}
 
-	private String createPeriodicapplication(String applicationNo, RequestInfo requestInfo) {
+	private String createPeriodicapplication(String applicationNo,String tenantId, RequestInfo requestInfo) {
 		// TODO Auto-generated method stub
 		FSMSearchCriteria fsmSearchCreCriteria = new FSMSearchCriteria();
 		List<String> applicationNoList = new ArrayList<String>();
 		applicationNoList.add(applicationNo);
 		fsmSearchCreCriteria.setApplicationNos(applicationNoList);
+		fsmSearchCreCriteria.setTenantId(tenantId);
 		FSMResponse fsmResponse = FSMsearch(fsmSearchCreCriteria, requestInfo);
 		FSM fsm = fsmResponse.getFsm().get(0);
 		fsm.setApplicationType(FSMConstants.PERIODIC_SERVICE);
