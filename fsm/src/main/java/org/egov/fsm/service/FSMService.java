@@ -601,6 +601,7 @@ public class FSMService {
 		fsm.getAddress().setId(null);
 		fsm.getAddress().getGeoLocation().setId(null);
 		fsm.setId(null);
+		fsm.getPitDetail().setId(null);
 		FSMRequest fsmRequest = new FSMRequest();
 		fsmRequest.setFsm(fsm);
 		fsmRequest.setRequestInfo(requestInfo);
