@@ -255,7 +255,6 @@ public class DemandService {
 			return res;
 		}
 
-
 		/**
 		 * Loop through the consumerCodes and re-calculate the time based applicables
 		 */
