@@ -182,13 +182,12 @@ public class EnrichmentService {
 			if (state.equalsIgnoreCase(NOCConstants.VOIDED_STATUS)) {
 				noc.setStatus(Status.INACTIVE);
 			}
-			if (noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)
-					|| noc.getWorkflow().getAction().equals(NOCConstants.ACTION_STATUS_CREATED)) {
-				Map<String, String> details = (Map<String, String>) noc.getAdditionalDetails();
-				details.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
-				noc.setAdditionalDetails(details);
-			}
-
+		}
+		
+		if (noc.getWorkflow() != null && noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
+			Map<String, String> details = (Map<String, String>) noc.getAdditionalDetails();
+			details.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
+			noc.setAdditionalDetails(details);
 		}
 	}
 
