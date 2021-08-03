@@ -148,34 +148,35 @@ public class EnrichmentService {
 
 		BusinessService businessService = workflowService.getBusinessService(noc, nocRequest.getRequestInfo(), businessServiceValue);
 		
-		State stateObj = workflowService.getCurrentState(noc.getApplicationStatus(), businessService);
-		String state = stateObj!=null ? stateObj.getState() : StringUtils.EMPTY;
+		if(businessService != null) {
 		
-		
-		if (state.equalsIgnoreCase(NOCConstants.APPROVED_STATE) || state.equalsIgnoreCase(NOCConstants.AUTOAPPROVED_STATE)) {
+			State stateObj = workflowService.getCurrentState(noc.getApplicationStatus(), businessService);
+			String state = stateObj!=null ? stateObj.getState() : StringUtils.EMPTY;
 			
-			Map<String, Object> additionalDetail = null;
-			if(noc.getAdditionalDetails() != null) {
-				additionalDetail = (Map) noc.getAdditionalDetails();
-			} else {
-				additionalDetail = new HashMap<String, Object>();
-				noc.setAdditionalDetails(additionalDetail);
+			if (state.equalsIgnoreCase(NOCConstants.APPROVED_STATE) || state.equalsIgnoreCase(NOCConstants.AUTOAPPROVED_STATE)) {
+				
+				Map<String, Object> additionalDetail = null;
+				if(noc.getAdditionalDetails() != null) {
+					additionalDetail = (Map) noc.getAdditionalDetails();
+				} else {
+					additionalDetail = new HashMap<String, Object>();
+					noc.setAdditionalDetails(additionalDetail);
+				}
+	
+				List<IdResponse> idResponses = idGenRepository.getId(nocRequest.getRequestInfo(), noc.getTenantId(),
+						config.getApplicationNoIdgenName(), 1).getIdResponses();
+				noc.setNocNo(idResponses.get(0).getId());
 			}
-
-			List<IdResponse> idResponses = idGenRepository.getId(nocRequest.getRequestInfo(), noc.getTenantId(),
-					config.getApplicationNoIdgenName(), 1).getIdResponses();
-			noc.setNocNo(idResponses.get(0).getId());
-		}
-		if (state.equalsIgnoreCase(NOCConstants.VOIDED_STATUS)) {
-			noc.setStatus(Status.INACTIVE);
-		}
-		if(noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
-			Map<String,String> details = (Map<String, String>) noc.getAdditionalDetails();
-			details.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
-			noc.setAdditionalDetails(details);			
-		}
+			if (state.equalsIgnoreCase(NOCConstants.VOIDED_STATUS)) {
+				noc.setStatus(Status.INACTIVE);
+			}
+			if(noc.getWorkflow().getAction().equals(NOCConstants.ACTION_INITIATE)) {
+				Map<String,String> details = (Map<String, String>) noc.getAdditionalDetails();
+				details.put(NOCConstants.INITIATED_TIME, Long.toString(System.currentTimeMillis()));
+				noc.setAdditionalDetails(details);			
+			}
 		
 	  }
-		
+	}
 
 }
