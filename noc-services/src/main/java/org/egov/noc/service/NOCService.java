@@ -86,7 +86,10 @@ public class NOCService {
 			BusinessService businessService = workflowService.getBusinessService(nocRequest.getNoc(), nocRequest.getRequestInfo(), additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		   wfIntegrator.callWorkFlow(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
 		   enrichmentService.postStatusEnrichment(nocRequest, additionalDetails.get(NOCConstants.WORKFLOWCODE));
-	       nocRepository.update(nocRequest, workflowService.isStateUpdatable(nocRequest.getNoc().getApplicationStatus(), businessService));
+		   if(businessService == null)
+			   nocRepository.update(nocRequest, true);
+		   else
+			   nocRepository.update(nocRequest, workflowService.isStateUpdatable(nocRequest.getNoc().getApplicationStatus(), businessService));
 		}else {
            nocRepository.update(nocRequest, Boolean.FALSE);
 		}
