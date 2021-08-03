@@ -89,6 +89,7 @@ public class NocService {
 		LinkedHashMap<String, Object> responseMap = null;
 		try {
 			log.debug("Creating NOC application with nocType : " + nocRequest.getNoc().getNocType());
+			log.info("nocRequest on creation" + uri.toString() +"---->>>" + nocRequest.toString());
 			responseMap = (LinkedHashMap<String, Object>) serviceRequestRepository.fetchResult(uri, nocRequest);
 			NocResponse nocResponse = mapper.convertValue(responseMap, NocResponse.class);
 			log.debug("NOC created with applicationNo : " + nocResponse.getNoc().get(0).getApplicationNo());
@@ -154,9 +155,9 @@ public class NocService {
 	 * @param mdmsData
 	 */
 	public void initiateNocWorkflow(BPARequest bpaRequest, Object mdmsData) {
-		log.debug("====> initiateNocWorkflow");
+		log.info("====> initiateNocWorkflow");
 		List<Noc> nocs = fetchNocRecords(bpaRequest);
-		log.debug("====> initiateNocWorkflow = no of noc "+ nocs.size());
+		log.info("====> initiateNocWorkflow = no of noc "+ nocs.size());
 		initiateNocWorkflow(bpaRequest, mdmsData, nocs);
 	}
 	
@@ -220,18 +221,19 @@ public class NocService {
 				.replace("{3}", (StringUtils.isEmpty(bpa.getRiskType()) || !bpa.getRiskType().equalsIgnoreCase("LOW"))
 						? "ALL" : bpa.getRiskType().toString());
 		List<Object> triggerActionStates = (List<Object>) JsonPath.read(mdmsData, nocPath);
-		log.debug("====> initiateNocWorkflow = triggerStates" + triggerActionStates.toString());
+		log.info("====> initiateNocWorkflow = triggerStates" + triggerActionStates.toString());
 		if (!CollectionUtils.isEmpty(triggerActionStates)
 				&& triggerActionStates.get(0).toString().equalsIgnoreCase(bpa.getStatus())) {
 			if (!CollectionUtils.isEmpty(nocs)) {
 				nocs.forEach(noc -> {
-					log.debug("====> noc application status " + noc.getApplicationStatus()  +" for noc appno "+ noc.getApplicationNo());
+					log.info("====> noc application status " + noc.getApplicationStatus()  +" for noc appno "+ noc.getApplicationNo());
 					if(!noc.getApplicationStatus().equalsIgnoreCase(BPAConstants.INPROGRESS_STATUS)){
 						noc.setWorkflow(Workflow.builder().action(config.getNocInitiateAction()).build());
 						NocRequest nocRequest = NocRequest.builder().noc(noc).requestInfo(bpaRequest.getRequestInfo())
 								.build();
+						log.info("nocRequest---->" + nocRequest.toString());
 						updateNoc(nocRequest);
-						log.debug("Noc Initiated with applicationNo : " + noc.getApplicationNo());
+						log.info("Noc Initiated with applicationNo : " + noc.getApplicationNo());
 					}
 				});
 			}
