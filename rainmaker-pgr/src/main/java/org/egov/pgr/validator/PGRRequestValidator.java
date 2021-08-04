@@ -86,7 +86,7 @@ public class PGRRequestValidator {
 	 */
 	public void validateCreate(ServiceRequest serviceRequest) {
 		log.info("Validating create request");
-		if(!ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen().getEmailId())) {
+		if(!ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen()) && !ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen().getEmailId())) {
 			String emailId = serviceRequest.getServices().get(0).getCitizen().getEmailId();
 			if (StringUtils.isNotBlank(emailId))
 				serviceRequest.getServices().get(0).getCitizen().setEmailId(emailId.trim());
@@ -115,7 +115,7 @@ public class PGRRequestValidator {
 	 */
 	public void validateUpdate(ServiceRequest serviceRequest) {
 		log.info("Validating update request");
-		if(ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen().getEmailId())) {
+		if(!ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen()) && !ObjectUtils.isEmpty(serviceRequest.getServices().get(0).getCitizen().getEmailId())) {
 			String emailId = serviceRequest.getServices().get(0).getCitizen().getEmailId();
 			if (StringUtils.isNotBlank(emailId))
 				serviceRequest.getServices().get(0).getCitizen().setEmailId(emailId);
