@@ -166,6 +166,10 @@ public class FSMValidator {
 			allowedParamStr = config.getAllowedCitizenSearchParameters();
 		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
+		
+		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.SYSTEM))
+			allowedParamStr = config.getAllowedEmployeeSearchParameters();
+		
 		else
 		{
 			if(!requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.SYSTEM))
