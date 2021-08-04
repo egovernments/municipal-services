@@ -159,6 +159,8 @@ public class FSMConstants {
 
 	public static final String PERIODIC_SERVICE = "PERIODIC";
 
+	public static final String SYSTEM ="SYSTEM";
+
 
 
 

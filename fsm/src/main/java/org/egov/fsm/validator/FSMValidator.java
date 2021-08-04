@@ -167,9 +167,11 @@ public class FSMValidator {
 		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.EMPLOYEE))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
 		else
+		{
+			if(!requestInfo.getUserInfo().getType().equalsIgnoreCase(FSMConstants.SYSTEM))
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH,
 					"The userType: " + requestInfo.getUserInfo().getType() + " does not have any search config");
-
+		}
 		if (StringUtils.isEmpty(allowedParamStr) && !criteria.isEmpty())
 			throw new CustomException(FSMErrorConstants.INVALID_SEARCH, "No search parameters are expected");
 		else {
