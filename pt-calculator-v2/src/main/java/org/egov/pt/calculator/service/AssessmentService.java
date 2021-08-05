@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pt.calculator.repository.AssessmentRepository;
 import org.egov.pt.calculator.repository.PTCalculatorRepository;
@@ -68,6 +69,9 @@ public class AssessmentService {
 	
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+	private UserService userService;
 
 	
 	/**
@@ -181,6 +185,11 @@ public class AssessmentService {
 	 @SuppressWarnings("unchecked")
 	public void createAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
 		Map<String, Map<String, Object>> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
+		
+		User user = userService.fetcPTAsseessmentUser();
+		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
+		requestInfo.setUserInfo(user);
+		
 		for (Entry<String, Map<String, Object>> tenantConfig : scheduledTenants.entrySet()) {
 			Map<String, Object> configData = tenantConfig.getValue();
 			List<String> locality = (List<String>) configData.get(CalculatorConstants.LOCALITY_KEY);
@@ -200,7 +209,7 @@ public class AssessmentService {
 							.channel(Channel.CFC_COUNTER).assessmentDate(System.currentTimeMillis())
 							.tenantId(assessmentRequest.getTenantId()).build();
 					AssessmentRequest assessmentReq = AssessmentRequest.builder().assessment(assessment)
-							.requestInfo(assessmentRequest.getRequestInfo()).build();
+							.requestInfo(requestInfo).build();
 					String url = new StringBuilder().append(configs.getAssessmentServiceHost())
 							.append(configs.getAssessmentCreateEndpoint()).toString();
 					AssessmentResponse response = null;
