@@ -1,15 +1,12 @@
-DROP TABLE IF EXISTS eg_pt_alternatenumbers;
-
---> Alternate number table
-
 CREATE TABLE eg_pt_alternatenumbers(
 
    id                   CHARACTER VARYING (128) NOT NULL,
-   propertyid           CHARACTER VARYING (256),
+   uuid                 CHARACTER VARYING (128) NOT NULL,
+   propertyid           CHARACTER VARYING (256) NOT NULL,
    tenantid             CHARACTER VARYING (256) NOT NULL,
-   name					CHARACTER VARYING (256) NOT NULL,
-   mobilenumber			CHARACTER VARYING (256) NOT NULL,
-   
-   CONSTRAINT fk_eg_pt_alternatenumbers FOREIGN KEY (id,propertyid,tenantid) REFERENCES eg_pt_property (id,propertyid,tenantid)
+   name                CHARACTER VARYING (256) NOT NULL,
+   mobilenumber          CHARACTER VARYING (256) NOT NULL,
 
+   CONSTRAINT pk_eg_pt_alternatenumbers PRIMARY KEY (id),
+   CONSTRAINT fk_eg_pt_alternatenumbers FOREIGN KEY (propertyid) REFERENCES eg_pt_property (id)
 );

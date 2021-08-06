@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+import org.apache.kafka.clients.admin.ConfigEntry.ConfigSource;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.models.OwnerInfo;
@@ -345,4 +347,22 @@ public class PropertyService {
 		util.enrichOwner(userDetailResponse, properties, false);
 		return properties;
 	}
+
+	public Property addAlternateNumber(PropertyRequest request) {
+		
+		Property propertyFromSearch = propertyValidator.validateAlternateMobileNumberInformation(request);
+		userService.createUserForAlternateNumber(request);
+		
+		//enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+		util.mergeAdditionalDetails(request, propertyFromSearch);
+		
+		producer.push(config.getUpdatePropertyTopic(), request);
+		
+		request.getProperty().setWorkflow(null);
+		
+		
+		return request.getProperty();
+	}
+	
+	
 }

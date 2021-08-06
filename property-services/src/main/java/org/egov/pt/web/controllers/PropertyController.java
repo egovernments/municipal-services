@@ -117,5 +117,16 @@ public class PropertyController {
 //				.build();
 //		return new ResponseEntity<>(response, HttpStatus.OK);
 //	}
+    
+    @PostMapping("/_addAlternateNumber")
+    public ResponseEntity<PropertyResponse> _addAlternateNumber(@Valid @RequestBody PropertyRequest propertyRequest) {    	
+        Property property = propertyService.addAlternateNumber(propertyRequest);
+        ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(), true);
+        PropertyResponse response = PropertyResponse.builder()
+                .properties(Arrays.asList(property))
+                .responseInfo(resInfo)
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

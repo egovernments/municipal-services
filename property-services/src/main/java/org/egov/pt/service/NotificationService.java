@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import jdk.internal.org.jline.utils.Log;
+
 import lombok.extern.slf4j.Slf4j;
 
 import static org.egov.pt.util.PTConstants.*;
@@ -293,6 +293,7 @@ public class NotificationService {
 		log.info("Logging the alternate numbers");
 		property.getAlternateMobileNumberDetails().forEach(entry ->{
 				log.info("Name : "+entry.getName()+" Mobile Number : "+entry.getMobileNumber());
+				mobileNumberToOwner.put(entry.getMobileNumber(), entry.getName());
 				
 		});
 		
