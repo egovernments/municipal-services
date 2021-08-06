@@ -420,10 +420,10 @@ public class PaymentNotificationService {
      * @return Customized message depending on values in valMap
      */
     private String getCustomizedOnlinePaymentMessage(String message,Map<String,String> valMap){
-        message = message.replace("< insert amount paid>",valMap.get("amountPaid"));
-        message = message.replace("< insert payment transaction id from PG>",valMap.get("transactionId"));
+        message = message.replace("<insert amount paid>",valMap.get("amountPaid"));
+        message = message.replace("<insert payment transaction id from PG>",valMap.get("transactionId"));
         message = message.replace("<insert Property Tax Assessment ID>",valMap.get("propertyId"));
-        message = message.replace("<pt due>.",valMap.get("amountDue"));
+        message = message.replace("<pt due>",valMap.get("amountDue"));
     //    message = message.replace("<FY>",valMap.get("financialYear"));
         return message;
     }
