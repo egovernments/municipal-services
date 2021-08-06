@@ -814,19 +814,27 @@ public class PropertyValidator {
 		if (!ifPropertyExists) {
 			throw new CustomException("EG_PT_PROPERTY_NOT_FOUND", "The property to be updated does not exist in the system");
 		}
-
+		
+		if (CollectionUtils.isEmpty(property.getAlternateMobileNumberDetails())) {
+			throw new CustomException("EG_PT_ALTERNATE_NUMBERS_NOT_FOUND", "The alternate mobile number details are null");
+		}
+		
 		Property propertyFromSearch = propertiesFromSearchResponse.get(0);	
 		
 		List <AlternateMobileNumber> existingAlternates = propertyFromSearch.getAlternateMobileNumberDetails();
 		List <AlternateMobileNumber> newAlternates = property.getAlternateMobileNumberDetails();
 		List <OwnerInfo> owners = propertyFromSearch.getOwners();
 		
-		for(AlternateMobileNumber existingEntry : existingAlternates) {
-			for(AlternateMobileNumber newEntry : newAlternates) {
-				if(existingEntry.getMobileNumber().equals(newEntry.getMobileNumber())) {
-					throw new CustomException("EG_PT_ALTERNATE_EXISTS", "The alternate mobile number already exists in the property");
+		
+		if (!CollectionUtils.isEmpty(existingAlternates)) {
+			
+			for(AlternateMobileNumber existingEntry : existingAlternates) {
+				for(AlternateMobileNumber newEntry : newAlternates) {
+					if(existingEntry.getMobileNumber().equals(newEntry.getMobileNumber())) {
+						throw new CustomException("EG_PT_ALTERNATE_EXISTS", "The alternate mobile number already exists in the property");
+						}
+					}
 				}
-			}
 		}
 		
 		for(OwnerInfo owner : owners) {
