@@ -90,9 +90,9 @@ public class WaterServiceImpl implements WaterService {
 	 * @return List of WaterConnection after create
 	 */
 	@Override
-	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest) {
+	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest, Boolean isMigration) {
 		int reqType = WCConstants.CREATE_APPLICATION;
-		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest) && config.getIsExternalWorkFlowEnabled()) {
+		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest) && (config.getIsExternalWorkFlowEnabled() || !isMigration)) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
 
 			// Validate any process Instance exists with WF
@@ -106,10 +106,10 @@ public class WaterServiceImpl implements WaterService {
 		Property property = validateProperty.getOrValidateProperty(waterConnectionRequest);
 		validateProperty.validatePropertyFields(property, waterConnectionRequest.getRequestInfo());
 		mDMSValidator.validateMasterForCreateRequest(waterConnectionRequest);
-		enrichmentService.enrichWaterConnection(waterConnectionRequest, reqType);
+		enrichmentService.enrichWaterConnection(waterConnectionRequest, reqType, isMigration);
 		userService.createUser(waterConnectionRequest);
 		// call work-flow
-		if (config.getIsExternalWorkFlowEnabled())
+		if (config.getIsExternalWorkFlowEnabled() || !isMigration)
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());

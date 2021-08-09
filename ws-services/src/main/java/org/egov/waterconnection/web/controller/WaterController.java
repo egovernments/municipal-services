@@ -46,8 +46,8 @@ public class WaterController {
 
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<WaterConnectionResponse> createWaterConnection(
-			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest) {
-		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest);
+			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest, @RequestParam(required = false) Boolean isMigration) {
+		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest,isMigration);
 		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnection)
 				.responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(waterConnectionRequest.getRequestInfo(), true))

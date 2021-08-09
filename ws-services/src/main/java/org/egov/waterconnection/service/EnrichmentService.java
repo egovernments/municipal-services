@@ -64,12 +64,12 @@ public class EnrichmentService {
 	 * @param waterConnectionRequest WaterConnection Object
 	 */
 	@SuppressWarnings("unchecked")
-	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType) {
+	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType, Boolean isMigration) {
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		if (config.getIsExternalWorkFlowEnabled())
+		if (config.getIsExternalWorkFlowEnabled() || !isMigration)
 			waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
