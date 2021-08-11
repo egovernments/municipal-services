@@ -46,8 +46,8 @@ public class SewarageController {
 
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<SewerageConnectionResponse> createWaterConnection(
-			@Valid @RequestBody SewerageConnectionRequest sewerageConnectionRequest) {
-		List<SewerageConnection> sewerageConnection = sewerageService.createSewerageConnection(sewerageConnectionRequest);
+			@Valid @RequestBody SewerageConnectionRequest sewerageConnectionRequest, @RequestParam(required = false) boolean isMigration) {
+		List<SewerageConnection> sewerageConnection = sewerageService.createSewerageConnection(sewerageConnectionRequest, isMigration);
 		SewerageConnectionResponse response = SewerageConnectionResponse.builder().sewerageConnections(sewerageConnection)
 				.responseInfo(responseInfoFactory
 						.createResponseInfoFromRequestInfo(sewerageConnectionRequest.getRequestInfo(), true))

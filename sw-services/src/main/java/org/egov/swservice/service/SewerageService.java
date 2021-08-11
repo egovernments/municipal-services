@@ -10,7 +10,7 @@ import org.egov.swservice.web.models.SewerageConnectionRequest;
 
 public interface SewerageService {
 
-	List<SewerageConnection> createSewerageConnection(SewerageConnectionRequest sewarageConnectionRequest);
+	List<SewerageConnection> createSewerageConnection(SewerageConnectionRequest sewarageConnectionRequest, Boolean isMigration);
 
 	List<SewerageConnection> search(SearchCriteria criteria, RequestInfo requestInfo);
 	
