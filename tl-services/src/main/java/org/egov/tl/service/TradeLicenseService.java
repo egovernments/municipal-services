@@ -117,36 +117,36 @@ public class TradeLicenseService {
 		
 		
 
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode json;
-		ObjectNode node;
-		if(roles.contains("TL_CEMP_FORLEGACY"))
-		{
-			
-			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-				
-				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
-				node = (ObjectNode) json;
-				node.put("islegacy", "true");	
-			}
-			else
-			{
-				node = mapper.createObjectNode().put("islegacy", "true");			}
-		}
-    	else
-    	{
-    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
-				
-				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
-				node = (ObjectNode) json;
-				node.put("islegacy", "false");	
-			}
-			else
-			{
-				node = mapper.createObjectNode().put("islegacy", "false");			}
-    	}
-		
-    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail((JsonNode)node);
+//		ObjectMapper mapper = new ObjectMapper();
+//		JsonNode json;
+//		ObjectNode node;
+//		if(roles.contains("TL_CEMP_FORLEGACY"))
+//		{
+//			
+//			if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+//				
+//				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+//				node = (ObjectNode) json;
+//				node.put("islegacy", "true");	
+//			}
+//			else
+//			{
+//				node = mapper.createObjectNode().put("islegacy", "true");			}
+//		}
+//    	else
+//    	{
+//    		if(!tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail().isNull()) {
+//				
+//				json =tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().getAdditionalDetail();
+//				node = (ObjectNode) json;
+//				node.put("islegacy", "false");	
+//			}
+//			else
+//			{
+//				node = mapper.createObjectNode().put("islegacy", "false");			}
+//    	}
+//		
+//    	tradeLicenseRequest.getLicenses().get(0).getTradeLicenseDetail().setAdditionalDetail((JsonNode)node);
 
         Object mdmsData = util.mDMSCall(tradeLicenseRequest);
         actionValidator.validateCreateRequest(tradeLicenseRequest);
