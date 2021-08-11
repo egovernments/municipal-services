@@ -176,8 +176,12 @@ public class CalculationService {
 
       if(totalTax.compareTo(BigDecimal.ZERO)==-1)
           throw new CustomException("INVALID AMOUNT","Tax amount is negative");
-
-      estimate.setEstimateAmount(totalTax);
+      if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==1)
+    	estimate.setEstimateAmount(totalTax);
+      else if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==2)
+    	estimate.setEstimateAmount(totalTax.multiply(BigDecimal.valueOf(2)));
+      else if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==2)
+      	estimate.setEstimateAmount(totalTax.multiply(BigDecimal.valueOf(3)));
       estimate.setCategory(Category.TAX);
       if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLCalculatorConstants.APPLICATION_TYPE_RENEWAL)){
           estimate.setTaxHeadCode(config.getRenewTaxHead());
