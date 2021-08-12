@@ -95,6 +95,28 @@ public class EnrichmentService {
         		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         		        String formattedFrom = format.format(date);
         		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
+        		        Integer validTillYear=(year+1);
+        		        String formattedTo=formattedFrom.split("/")[0]+"/"+formattedFrom.split("/")[1]+"/"+validTillYear.toString()+ " "+formattedFrom.split(" ")[1];
+        		        SimpleDateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        		        Date dateE;
+						try {
+							dateE = df.parse(formattedTo);
+							long epoch = dateE.getTime();
+	                    	tradeLicense.setValidTo(epoch);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					
+                    }
+                    if(tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==3)
+                    {
+                    	
+                    	Date date = new Date(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        		        String formattedFrom = format.format(date);
+        		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
         		        Integer validTillYear=(year+2);
         		        String formattedTo=formattedFrom.split("/")[0]+"/"+formattedFrom.split("/")[1]+"/"+validTillYear.toString()+ " "+formattedFrom.split(" ")[1];
         		        SimpleDateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
