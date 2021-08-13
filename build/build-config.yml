@@ -56,7 +56,7 @@ config:
       - work-dir: "tl-calculator/src/main/resources/db"
         image-name: "tl-calculator-db"
         
-  - name: "builds/municipal-services/tl-services"
+  - name: "builds/digit-impel-builds/municipal-services/tl-services"
     build:
       - work-dir: "tl-services"
         image-name: "tl-services"
@@ -64,21 +64,21 @@ config:
       - work-dir: "tl-services/src/main/resources/db"
         image-name: "tl-services-db"
 
-  - name: "builds/municipal-services/firenoc-services"
+  - name: "builds/digit-impel-builds/municipal-services/firenoc-services"
     build:
       - work-dir: "firenoc-services"
         image-name: "firenoc-services"
       - work-dir: "firenoc-services/migration"
         image-name: "firenoc-services-db"
 
-  - name: "builds/municipal-services/firenoc-calculator"
+  - name: "builds/digit-impel-builds/municipal-services/firenoc-calculator"
     build:
       - work-dir: "firenoc-calculator"
         image-name: "firenoc-calculator"
       - work-dir: "firenoc-calculator/migration"
         image-name: "firenoc-calculator-db"
 
-  - name: "builds/municipal-services/ws-services"
+  - name: "builds/digit-impel-builds/municipal-services/ws-services"
     build:
       - work-dir: "ws-services"
         image-name: "ws-services"
@@ -86,7 +86,7 @@ config:
       - work-dir: "ws-services/src/main/resources/db"
         image-name: "ws-services-db"
         
-  - name: "builds/municipal-services/property-services"
+  - name: "builds/digit-impel-builds/municipal-services/property-services"
     build:
       - work-dir: "property-services"
         image-name: "property-services"
