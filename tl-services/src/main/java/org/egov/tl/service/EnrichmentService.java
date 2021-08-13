@@ -97,7 +97,7 @@ public class EnrichmentService {
         		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
         		        Integer validTillYear=(year+1);
         		        String formattedTo=formattedFrom.split("/")[0]+"/"+formattedFrom.split("/")[1]+"/"+validTillYear.toString()+ " "+formattedFrom.split(" ")[1];
-        		        SimpleDateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        		        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         		        Date dateE;
 						try {
 							dateE = df.parse(formattedTo);
