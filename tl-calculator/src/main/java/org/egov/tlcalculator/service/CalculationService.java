@@ -180,7 +180,7 @@ public class CalculationService {
     	estimate.setEstimateAmount(totalTax);
       else if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==2)
     	estimate.setEstimateAmount(totalTax.multiply(BigDecimal.valueOf(2)));
-      else if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==2)
+      else if(license.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==3)
       	estimate.setEstimateAmount(totalTax.multiply(BigDecimal.valueOf(3)));
       estimate.setCategory(Category.TAX);
       if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLCalculatorConstants.APPLICATION_TYPE_RENEWAL)){
