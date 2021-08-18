@@ -63,9 +63,6 @@ public class WSConfiguration {
 	@Value("${workflow.process.search.path}")
 	private String wfProcessSearchPath;
 
-	@Value("${is.external.workflow.enabled}")
-	private Boolean isExternalWorkFlowEnabled;
-
 	@Value("${egov.waterservice.updatewaterconnection.workflow.topic}")
 	private String workFlowUpdateTopic;
 

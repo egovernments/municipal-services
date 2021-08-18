@@ -92,7 +92,7 @@ public class WaterServiceImpl implements WaterService {
 	@Override
 	public List<WaterConnection> createWaterConnection(WaterConnectionRequest waterConnectionRequest, Boolean isMigration) {
 		int reqType = WCConstants.CREATE_APPLICATION;
-		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest) && (config.getIsExternalWorkFlowEnabled() || !isMigration)) {
+		if (wsUtil.isModifyConnectionRequest(waterConnectionRequest) && !isMigration ) {
 			List<WaterConnection> previousConnectionsList = getAllWaterApplications(waterConnectionRequest);
 
 			// Validate any process Instance exists with WF
@@ -109,7 +109,7 @@ public class WaterServiceImpl implements WaterService {
 		enrichmentService.enrichWaterConnection(waterConnectionRequest, reqType, isMigration);
 		userService.createUser(waterConnectionRequest);
 		// call work-flow
-		if (config.getIsExternalWorkFlowEnabled() || !isMigration)
+		if (!isMigration)
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());

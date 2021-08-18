@@ -70,7 +70,7 @@ public class EnrichmentService {
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		if (config.getIsExternalWorkFlowEnabled() || !isMigration)
+		if (!isMigration)
 			waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
