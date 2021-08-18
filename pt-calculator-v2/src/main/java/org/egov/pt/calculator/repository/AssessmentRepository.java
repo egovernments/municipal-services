@@ -127,8 +127,8 @@ public class AssessmentRepository {
 		 */
 		
 		if (!request.getIsRented()) {
-			query.append(" and unit.active =true");
-			query.append(" and unit.occupancytype != :occupancytype ");
+			query.append(
+					" and prop.id not in (select propertyid from eg_pt_unit where tenantid=:tenantid and occupancytype = :occupancytype)");
 			params.put("occupancytype", OCUUPANCY_TYPE_RENTED);
 		}
 
