@@ -60,9 +60,6 @@ public class SWConfiguration {
     	@Value("${workflow.businessservice.search.path}")
     	private String wfBusinessServiceSearchPath;
 
-    	@Value("${is.external.workflow.enabled}")
-    	private Boolean isExternalWorkFlowEnabled;
-    
     	@Value("${egov.sewerageservice.updatesewerageconnection.workflow.topic}")
     	private String workFlowUpdateTopic;
     

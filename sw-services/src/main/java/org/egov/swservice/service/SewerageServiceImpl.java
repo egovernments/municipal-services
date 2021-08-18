@@ -89,7 +89,7 @@ public class SewerageServiceImpl implements SewerageService {
 	@Override
 	public List<SewerageConnection> createSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, Boolean isMigration) {
 		int reqType = SWConstants.CREATE_APPLICATION;
-		if (sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest) && (config.getIsExternalWorkFlowEnabled() || !isMigration) ) {
+		if (sewerageServicesUtil.isModifyConnectionRequest(sewerageConnectionRequest) && !isMigration) {
 			List<SewerageConnection> sewerageConnectionList = getAllSewerageApplications(sewerageConnectionRequest);
 			if (!CollectionUtils.isEmpty(sewerageConnectionList)) {
 				workflowService.validateInProgressWF(sewerageConnectionList, sewerageConnectionRequest.getRequestInfo(),
@@ -105,7 +105,7 @@ public class SewerageServiceImpl implements SewerageService {
 		userService.createUser(sewerageConnectionRequest);
 		sewerageDao.saveSewerageConnection(sewerageConnectionRequest);
 		// call work-flow
-		if (config.getIsExternalWorkFlowEnabled() || !isMigration)
+		if (!isMigration)
 			wfIntegrator.callWorkFlow(sewerageConnectionRequest, property);
 		return Arrays.asList(sewerageConnectionRequest.getSewerageConnection());
 	}
