@@ -198,6 +198,7 @@ public class AssessmentService {
 			assessmentRequest.setAssessmentYear(configData.get(CalculatorConstants.FINANCIALYEAR_KEY).toString());
 			assessmentRequest.setLocality(locality);
 			assessmentRequest.setPropertyType(propertyType);
+			assessmentRequest.setIsRented((Boolean) configData.get(CalculatorConstants.IS_RENTED));
 			List<Property> properties = repository.fetchAllActiveProperties(assessmentRequest);
 			for (Property property : properties) {
 				boolean isExists = repository.isAssessmentExists(property.getPropertyId(),
@@ -248,6 +249,7 @@ public class AssessmentService {
 						config.get(CalculatorConstants.PROPERTYTYPE_KEY));
 				tenantConfig.put(CalculatorConstants.FINANCIALYEAR_KEY,
 						config.get(CalculatorConstants.FINANCIALYEAR_KEY));
+				tenantConfig.put(CalculatorConstants.IS_RENTED, config.get(CalculatorConstants.IS_RENTED));
 				scheduledTenants.put(config.get(CalculatorConstants.TENANT_KEY).toString(), tenantConfig);
 			}
 			return scheduledTenants;

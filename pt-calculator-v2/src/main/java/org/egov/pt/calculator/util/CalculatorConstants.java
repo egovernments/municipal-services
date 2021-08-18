@@ -353,9 +353,11 @@ public class CalculatorConstants {
 	public static final String PROPERTYTYPE_KEY = "propertytype";
 
 	public static final String TENANT_KEY = "tenant";
+	
+	public static final String IS_RENTED = "isRented";
 
 	public static final String ASSESSMENT_JOB_MDMS_ERROR = "ASSESSMENT_JOB_MDMS_ERROR";
 
-	public static final String ASSESSMENT_JOB_MDMS_ERROR_MSG = "Exception while fetching aseesment configuration tenants.";
+	public static final String ASSESSMENT_JOB_MDMS_ERROR_MSG = "Exception while fetching configured tenants for assessment.";
 
 }

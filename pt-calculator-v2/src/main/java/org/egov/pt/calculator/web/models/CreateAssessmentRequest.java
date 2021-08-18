@@ -31,5 +31,7 @@ public class CreateAssessmentRequest {
 	private List<String> propertyType;
 
 	private String tenantId;
-	
+
+	private Boolean isRented = true;
+
 }

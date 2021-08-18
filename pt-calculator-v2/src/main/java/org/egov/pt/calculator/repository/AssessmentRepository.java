@@ -32,12 +32,14 @@ import org.egov.pt.calculator.web.models.property.Property;
 @Repository
 public class AssessmentRepository {
 	
-	private static final String PROPERTY_SEARCH_QUERY = "select prop.* from eg_pt_property prop ,eg_pt_address addr where addr.propertyid=prop.id and addr.tenantid=prop.tenantid and prop.status='ACTIVE' ";
+	private static final String PROPERTY_SEARCH_QUERY = "select distinct prop.id,prop.propertyid,prop.acknowldgementNumber,prop.propertytype,prop.status,prop.ownershipcategory,prop.oldPropertyId,prop.createdby,prop.createdTime,prop.lastmodifiedby,prop.lastmodifiedtime,prop.tenantid from eg_pt_property prop inner join eg_pt_address addr ON prop.id = addr.propertyid and prop.tenantid=addr.tenantid left join eg_pt_unit unit ON prop.id = unit.propertyid and prop.tenantid=addr.tenantid where prop.status='ACTIVE' ";
 
 	private static final String ASSESSMENT_SEARCH_QUERY = "select id from eg_pt_asmt_assessment where status='ACTIVE' and propertyid=:propertyid and financialyear=:financialyear and tenantid=:tenantid";
 
 	private static final String ASSESSMENT_JOB_DATA_INSERT_QUERY = "Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,tenantid) values(:id,:assessmentnumber,:propertyid,:financialyear,:createdtime,:status,:error,:tenantid)";;
 
+	private static final String OCUUPANCY_TYPE_RENTED = "RENTED";
+	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
@@ -111,10 +113,25 @@ public class AssessmentRepository {
 			query.append(" and addr.locality in (:locality) ");
 			params.put("locality", request.getLocality());
 		}
+		//currently this filter is disabled in MDMS config
 		if (request.getPropertyType() != null) {
 			query.append(" and SPLIT_PART(prop.usagecategory,'.',1) in (:propertytype) ");
 			params.put("propertytype", request.getPropertyType());
 		}
+		
+		/*
+		 * Include or exclude rented properties based on isRented flag in MDMS
+		 * config if true then include rented properties, else exclude rented
+		 * properties (If any one of the unit of the property is Rented then
+		 * total property will be considered as Rented)
+		 */
+		
+		if (!request.getIsRented()) {
+			query.append(" and unit.active =true");
+			query.append(" and unit.occupancytype != :occupancytype ");
+			params.put("occupancytype", OCUUPANCY_TYPE_RENTED);
+		}
+
 		query.append(" and prop.tenantid=:tenantid");
 		params.put("tenantid", request.getTenantId());
 		return namedParameterJdbcTemplate.query(query.toString(), params, propertyRowMapper);
