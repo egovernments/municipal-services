@@ -817,7 +817,7 @@ public class EstimationService {
 		BigDecimal userExemption = BigDecimal.ZERO;
 		final long userCount = owners.stream()
 				.filter(owner -> OWNER_STATUS_ACTIVE.equalsIgnoreCase(owner.getStatus().toString())).count();
-		BigDecimal share = taxAmt.divide(BigDecimal.valueOf(userCount), 2, 2);
+		BigDecimal share = taxAmt.divide(BigDecimal.valueOf(userCount));
 
 		for (OwnerInfo owner : owners) {
 
