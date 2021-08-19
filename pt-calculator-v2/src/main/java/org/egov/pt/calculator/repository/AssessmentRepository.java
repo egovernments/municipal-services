@@ -114,10 +114,10 @@ public class AssessmentRepository {
 			params.put("locality", request.getLocality());
 		}
 		//currently this filter is disabled in MDMS config
-		if (request.getPropertyType() != null) {
+		/*if (request.getPropertyType() != null) {
 			query.append(" and SPLIT_PART(prop.usagecategory,'.',1) in (:propertytype) ");
 			params.put("propertytype", request.getPropertyType());
-		}
+		}*/
 		
 		/*
 		 * Include or exclude rented properties based on isRented flag in MDMS
