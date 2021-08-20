@@ -820,7 +820,7 @@ public class EstimationService {
 
 		BigDecimal share;
 		
-		share= taxAmt.divide(BigDecimal.valueOf(userCount), 2, 2); // default equal ownership share (will be used when ownershippercentage is null)
+		share= taxAmt.divide(BigDecimal.valueOf(userCount)); // default equal ownership share (will be used when ownershippercentage is null)
 
 
 		for (OwnerInfo owner : owners) {
@@ -836,7 +836,7 @@ public class EstimationService {
 
 				BigDecimal currentExemption;
 				if(owner.getOwnerShipPercentage()!=null) // of ownershippercentage is not null then owner's share will be used 
-					 share=taxAmt.multiply(BigDecimal.valueOf(owner.getOwnerShipPercentage())).divide(BigDecimal.valueOf(100.0), 2, 2); // share=taxAmount*ownerpercentage/100
+					 share=taxAmt.multiply(BigDecimal.valueOf(owner.getOwnerShipPercentage())).divide(BigDecimal.valueOf(100.0)); // share=taxAmount*ownerpercentage/100
 				
 				currentExemption= mDataService.calculateApplicables(share,
 						applicableOwnerType.get(EXEMPTION_FIELD_NAME));
