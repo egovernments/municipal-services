@@ -212,13 +212,14 @@ public class MasterDataService {
 			Map<String, Object> objMap = (Map<String, Object>) object;
 			String objFinYear = ((String) objMap.get(CalculatorConstants.FROMFY_FIELD_NAME)).split("-")[0];
 			if(!objMap.containsKey(CalculatorConstants.STARTING_DATE_APPLICABLES)){
+				
 				if (objFinYear.compareTo(assessmentYear.split("-")[0]) == 0)
 					return  objMap;
 
-				/*else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+				else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
 					maxYearFromTheList = objFinYear;
 					objToBeReturned = objMap;
-				}*/
+				}
 			}
 			else{
 				String objStartDay = ((String) objMap.get(CalculatorConstants.STARTING_DATE_APPLICABLES));
