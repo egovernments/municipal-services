@@ -820,7 +820,7 @@ public class EstimationService {
 
 		BigDecimal share;
 		
-		share= taxAmt.divide(BigDecimal.valueOf(userCount)); // default equal ownership share (will be used when ownershippercentage is null)
+		share= taxAmt.divide(BigDecimal.valueOf(userCount),4,4); // default equal ownership share (will be used when ownershippercentage is null)
 
 
 		for (OwnerInfo owner : owners) {
