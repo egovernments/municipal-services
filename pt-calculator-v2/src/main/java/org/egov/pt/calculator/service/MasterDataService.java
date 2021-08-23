@@ -215,10 +215,10 @@ public class MasterDataService {
 				if (objFinYear.compareTo(assessmentYear.split("-")[0]) == 0)
 					return  objMap;
 
-				else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
+				/*else if (assessmentYear.split("-")[0].compareTo(objFinYear) > 0 && maxYearFromTheList.compareTo(objFinYear) <= 0) {
 					maxYearFromTheList = objFinYear;
 					objToBeReturned = objMap;
-				}
+				}*/
 			}
 			else{
 				String objStartDay = ((String) objMap.get(CalculatorConstants.STARTING_DATE_APPLICABLES));

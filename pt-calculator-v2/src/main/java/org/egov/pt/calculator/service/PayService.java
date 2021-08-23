@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 
 import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT;
@@ -34,6 +35,7 @@ import static org.egov.pt.calculator.util.CalculatorUtils.getEODEpoch;
  *
  */
 @Service
+@Slf4j
 public class PayService {
 
 	@Autowired
@@ -148,20 +150,22 @@ public class PayService {
 
 		BigDecimal rebateAmt = BigDecimal.ZERO;
 		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
-		System.out.println("Rebate Object---->" + rebate);
-		if (null == rebate)
+		log.info("Rebate Object---->" + rebate);
+		if (null == rebate){
+			log.info("Rebate config not found for the FY" + assessmentYear);
 			return rebateAmt;
+		}	
 
 		String[] time = ((String) rebate.get(CalculatorConstants.ENDING_DATE_APPLICABLES)).split("/");
 		Calendar cal = Calendar.getInstance();
 		setDateToCalendar(assessmentYear, time, cal);
 
-		System.out.println("cal.getTimeInMillis--->" + cal.getTimeInMillis());
-		System.out.println("System.currentTimeMillis--->" + System.currentTimeMillis());
+		log.info("cal.getTimeInMillis--->" + cal.getTimeInMillis());
+		log.info("System.currentTimeMillis--->" + System.currentTimeMillis());
 
 		if (cal.getTimeInMillis() > System.currentTimeMillis())
 			rebateAmt = mDService.calculateApplicables(taxAmt, rebate);
-		System.out.println("rebateAmt rate--->" + rebateAmt);
+		log.info("rebateAmt rate--->" + rebateAmt);
 		return rebateAmt;
 	}
 
