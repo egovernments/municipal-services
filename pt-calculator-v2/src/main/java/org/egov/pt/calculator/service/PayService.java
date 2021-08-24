@@ -151,10 +151,20 @@ public class PayService {
 		BigDecimal rebateAmt = BigDecimal.ZERO;
 		Map<String, Object> rebate = mDService.getApplicableMaster(assessmentYear, rebateMasterList);
 		log.info("Rebate Object---->" + rebate);
+		
 		if (null == rebate){
 			log.info("Rebate config not found for the FY" + assessmentYear);
 			return rebateAmt;
-		}	
+		} else {
+			String configYear = ((String) rebate.get(CalculatorConstants.FROMFY_FIELD_NAME)).split("-")[0];
+
+			if (configYear.compareTo(assessmentYear.split("-")[0]) != 0) {
+				log.info("FY from rebate config :" + configYear);
+				log.info("FY from request  :" + assessmentYear);
+				return rebateAmt;
+			}
+
+		}
 
 		String[] time = ((String) rebate.get(CalculatorConstants.ENDING_DATE_APPLICABLES)).split("/");
 		Calendar cal = Calendar.getInstance();
