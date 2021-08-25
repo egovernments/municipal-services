@@ -346,8 +346,16 @@ public class PropertyValidator {
 		}
 
 		String ownershipCategory = property.getOwnershipCategory();
+		String SplittedOwnerShip="";
+		if(ownershipCategory.contains(".")
+		{
 		String[] ownerSplit = ownershipCategory.split("\\.", 2);
-		if (ownershipCategory != null && !codes.get(PTConstants.MDMS_PT_OWNERSHIPCATEGORY).contains(ownerSplit[1])) {
+		SplittedOwnerShip=ownerSplit[1];
+		}
+		else
+		SplittedOwnerShip=ownershipCategory
+		
+		if (ownershipCategory != null && !codes.get(PTConstants.MDMS_PT_OWNERSHIPCATEGORY).contains(SplittedOwnerShip)) {
 			errorMap.put("Invalid OWNERSHIPCATEGORY", "The OwnershipCategory '" + ownershipCategory + "' does not exists");
 		}
 
