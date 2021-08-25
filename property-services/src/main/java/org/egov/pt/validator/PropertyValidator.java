@@ -353,7 +353,7 @@ public class PropertyValidator {
 		SplittedOwnerShip=ownerSplit[1];
 		}
 		else
-		SplittedOwnerShip=ownershipCategory
+		SplittedOwnerShip=ownershipCategory;
 		
 		if (ownershipCategory != null && !codes.get(PTConstants.MDMS_PT_OWNERSHIPCATEGORY).contains(SplittedOwnerShip)) {
 			errorMap.put("Invalid OWNERSHIPCATEGORY", "The OwnershipCategory '" + ownershipCategory + "' does not exists");
