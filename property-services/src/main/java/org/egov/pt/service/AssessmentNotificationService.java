@@ -143,8 +143,8 @@ public class AssessmentNotificationService {
 
         String messageTemplate = util.getMessageTemplate(msgCode, localizationMessages);
 
-        if(messageTemplate.contains(NOTIFICATION_ASSESSMENTNUMBER))
-            messageTemplate = messageTemplate.replace(NOTIFICATION_ASSESSMENTNUMBER, assessment.getAssessmentNumber());
+        if(messageTemplate.contains("NOTIFICATION_ASSESSMENTNUMBER"))
+            messageTemplate = messageTemplate.replace("NOTIFICATION_ASSESSMENTNUMBER", assessment.getAssessmentNumber());
 
         if(messageTemplate.contains(NOTIFICATION_STATUS)){
             String localizationCode = LOCALIZATION_ASMT_PREFIX + assessment.getWorkflow().getState().getState();
@@ -152,13 +152,13 @@ public class AssessmentNotificationService {
             messageTemplate = messageTemplate.replace(NOTIFICATION_STATUS, statusLocalization);
         }
 
-        if(messageTemplate.contains(NOTIFICATION_PROPERTYID))
-            messageTemplate = messageTemplate.replace(NOTIFICATION_PROPERTYID, property.getPropertyId());
+        if(messageTemplate.contains("NOTIFICATION_PROPERTYID"))
+            messageTemplate = messageTemplate.replace("NOTIFICATION_PROPERTYID", property.getPropertyId());
 
-        if(messageTemplate.contains(NOTIFICATION_FINANCIALYEAR))
-            messageTemplate = messageTemplate.replace(NOTIFICATION_FINANCIALYEAR, assessment.getFinancialYear());
+        if(messageTemplate.contains("NOTIFICATION_FINANCIALYEAR"))
+            messageTemplate = messageTemplate.replace("NOTIFICATION_FINANCIALYEAR", assessment.getFinancialYear());
 
-        if(messageTemplate.contains(NOTIFICATION_PAYMENT_LINK)){
+        if(messageTemplate.contains("NOTIFICATION_PAYMENT_LINK")){
 
             String UIHost = config.getUiAppHost();
             String paymentPath = config.getPayLinkSMS();
@@ -168,7 +168,7 @@ public class AssessmentNotificationService {
 
             String finalPath = UIHost + paymentPath;
 
-            messageTemplate = messageTemplate.replace(NOTIFICATION_PAYMENT_LINK,util.getShortenedUrl(finalPath));
+            messageTemplate = messageTemplate.replace("NOTIFICATION_PAYMENT_LINK",util.getShortenedUrl(finalPath));
         }
 
         return messageTemplate;
