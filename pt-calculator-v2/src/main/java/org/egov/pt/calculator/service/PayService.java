@@ -446,6 +446,8 @@ public class PayService {
 		if (month < 3)
 			year += 1;
 		cal.set(year, month, day);
+		cal.set(Calendar.HOUR_OF_DAY, 23);
+		cal.set(Calendar.MINUTE, 59);
 	}
 
 	/**
