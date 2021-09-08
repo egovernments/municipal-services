@@ -175,10 +175,10 @@ public class TLValidator {
 //                taxPeriods = tradeUtil.getTaxPeriods(license,mdmsData);
 //            }
             taxPeriods = tradeUtil.getTaxPeriods(license,mdmsData);
-//            if(license.getValidTo()!=null && license.getValidTo()>taxPeriods.get(TLConstants.MDMS_ENDDATE)){
-//                Date expiry = new Date(license.getValidTo());
-//                throw new CustomException("INVALID TO DATE"," Validto cannot be greater than: "+expiry);
-//            }
+            if(license.getValidTo()!=null && license.getValidTo()>taxPeriods.get(TLConstants.MDMS_ENDDATE)){
+                Date expiry = new Date(license.getValidTo());
+                throw new CustomException("INVALID TO DATE"," Validto cannot be greater than: "+expiry);
+            }
             if(license.getLicenseType().toString().equalsIgnoreCase(TradeLicense.LicenseTypeEnum.TEMPORARY.toString())) {
                 Long startOfDay = getStartOfDay();
                 if (!config.getIsPreviousTLAllowed() && license.getValidFrom() != null
