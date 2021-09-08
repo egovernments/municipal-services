@@ -1,10 +1,13 @@
 package org.egov.pt.calculator.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.pt.calculator.repository.DefaultersRepository;
@@ -39,15 +42,22 @@ public class DefaultersService {
 	@Autowired
 	private NotificationService notificationService;
 
-	public List<String> fetchAllDefaulterDetails(RequestInfo request) {
+	@Autowired
+	private MasterDataService mdmsService;
+
+	public List<String> fetchAllDefaulterDetails(RequestInfo requestInfo) {
 		List<DefaultersInfo> defaulterDetails = null;
 		List<String> notifiedTenants = new ArrayList<>();
-		Map<String, Object> config = fetchDefultersConfig(request);
+		Map<String, Long> finYearDates = new HashMap<>();
+		Map<String, Object> config = fetchDefultersConfig(requestInfo);
 		List<String> tenants = (List<String>) config.get("tenants");
+		if (StringUtils.isNotBlank(((String) config.get("financialyear")))) {
+			finYearDates = getFinancialYearDates(requestInfo, (String) config.get("financialyear"),
+					configs.getStateLevelTenantId());
+		}
 		for (String tenant : tenants) {
-
-			defaulterDetails = defaultersRepository.fetchAllDefaulterDetailsForFY((String) config.get("financialyear"),
-					tenant);
+			defaulterDetails = defaultersRepository.fetchAllDefaulterDetailsForFY(finYearDates.get("startingDate"),
+					finYearDates.get("endingDate"), tenant);
 			if (defaulterDetails.isEmpty()) {
 				log.info("No properties with due in the city " + tenant);
 			} else {
@@ -86,4 +96,13 @@ public class DefaultersService {
 		}
 	}
 
+	private Map<String, Long> getFinancialYearDates(RequestInfo requestInfo, String finYear, String tenantId) {
+		Map<String, Long> finDates = new HashMap<>();
+		Map<String, Map<String, Object>> finYearMap = mdmsService.getFinancialYear(tenantId, requestInfo,
+				new HashSet<>(Arrays.asList(finYear)));
+		finDates.put("startingDate", Long.valueOf(finYearMap.get(finYear).get("startingDate").toString()));
+		finDates.put("endingDate", Long.valueOf(finYearMap.get(finYear).get("endingDate").toString()));
+		return finDates;
+
+	}
 }
