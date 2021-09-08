@@ -25,7 +25,7 @@ public class NotificationService {
 
 	private static final String MESSAGE = "Dear {citizen} , Pay your Property tax before {rebatedate} and get a 10% rebate! Click on this link to pay: https://wa.me/+918750975975?text=mSeva";
 
-	private static final String DEFAULTER_SMS_INSERT_QUERY = "Insert into eg_pt_due_sms (propertyid,finyear,ownername,mobilenumber,due,createdtime,tenantid) values (:propertyid,:finyear,:ownername,:mobilenumber,:due,:createdtime,:tenantid)";
+	private static final String DEFAULTER_SMS_INSERT_QUERY = "Insert into eg_pt_due_sms (propertyid,finyear,ownername,mobilenumber,dueamount,status,error,createdtime,tenantid) values (:propertyid,:finyear,:ownername,:mobilenumber,:dueamount,:status,:error,:createdtime,:tenantid)";
 
 	@Autowired
 	private Producer producer;
@@ -81,11 +81,11 @@ public class NotificationService {
 	private void saveNotificationDetails(DefaultersInfo defaulter, String status, String error) {
 
 		StringBuilder query = new StringBuilder(DEFAULTER_SMS_INSERT_QUERY);
-		final Map<String, Object> params = new HashMap<>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("propertyid", defaulter.getPropertyId());
 		params.put("ownername", defaulter.getOwnerName());
 		params.put("mobilenumber", defaulter.getMobileNumber());
-		params.put("financialyear", defaulter.getFinYear());
+		params.put("finyear", defaulter.getFinYear());
 		params.put("createdtime", System.currentTimeMillis());
 		params.put("dueamount", defaulter.getDueAmount());
 		params.put("status", status);
@@ -95,6 +95,7 @@ public class NotificationService {
 			namedParameterJdbcTemplate.update(query.toString(), params);
 		} catch (Exception e) {
 			log.info("Due sms request pushed to kafka, but details not saved in the sms table.");
+			log.info("error: " +e);
 		}
 
 	}
