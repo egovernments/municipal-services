@@ -186,7 +186,7 @@ public class AssessmentService {
 	public void createAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
 		Map<String, Map<String, Object>> scheduledTenants = fetchScheduledTenants(assessmentRequest.getRequestInfo());
 		
-		User user = userService.fetcPTAsseessmentUser();
+		User user = userService.fetchPTAsseessmentUser();
 		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
 		requestInfo.setUserInfo(user);
 		

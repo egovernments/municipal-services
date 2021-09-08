@@ -360,4 +360,8 @@ public class CalculatorConstants {
 
 	public static final String ASSESSMENT_JOB_MDMS_ERROR_MSG = "Exception while fetching configured tenants for assessment.";
 
+	public static final String DEFAULTERS_CONFIG_MASTER = "defaultersmsconfig";
+	
+	public static final String MDMS_DEFAULTERS_CONFIG_PATH = "$.MdmsRes.tenant.defaultersmsconfig";
+
 }

@@ -841,4 +841,15 @@ public class CalculatorUtils {
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
+	
+	public MdmsCriteriaReq getDefaultersConfigRequest(RequestInfo requestInfo, String tenantId) {
+
+		MasterDetail mstrDetail = MasterDetail.builder().name(CalculatorConstants.DEFAULTERS_CONFIG_MASTER)
+				.build();
+		ModuleDetail moduleDetail = ModuleDetail.builder().moduleName("tenant")
+				.masterDetails(Arrays.asList(mstrDetail)).build();
+		MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+				.build();
+		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+	}
 }

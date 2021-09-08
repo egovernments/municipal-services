@@ -151,5 +151,14 @@ public class Configurations {
 	
 	@Value("${state.level.tenant.id}")
 	private String stateLevelTenantId;
-	
+
+	@Value("${kafka.topics.notification.sms}")
+	private String smsNotifTopic;
+
+	@Value("${egov.decypt.service.host}")
+	private String decryptServiceHost;
+
+	@Value("${egov.decypt.endpoint}")
+	private String decryptEndPoint;
+
 }

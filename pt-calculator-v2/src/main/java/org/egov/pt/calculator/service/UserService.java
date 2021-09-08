@@ -32,7 +32,7 @@ public class UserService {
 	@Value("${egov.pt.assessment.job.user.name}")
 	private String ptAsmtUserName;
 
-	public User fetcPTAsseessmentUser() {
+	public User fetchPTAsseessmentUser() {
 
 		UserSearchRequest userSearchRequest = new UserSearchRequest();
 		userSearchRequest.setUserType(USER_TYPE_EMPLOYEE);
