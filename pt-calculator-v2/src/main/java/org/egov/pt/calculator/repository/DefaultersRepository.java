@@ -43,7 +43,7 @@ public class DefaultersRepository {
 		final Map<String, Object> params = new HashMap<>();
 		List<DefaultersInfo> defaultersInfo = new ArrayList<>();
 		StringBuilder dueQuery = new StringBuilder(INNER_QUERY);
-		if (fromDate != null &&toDate != null) {
+		if (fromDate != null && toDate != null) {
 			dueQuery.append(" and d.taxperiodfrom >=:fromDate and d.taxperiodto <=:toDate ");
 			params.put("fromDate", fromDate);
 			params.put("toDate", toDate);

@@ -50,20 +50,21 @@ public class DefaultersService {
 		List<String> notifiedTenants = new ArrayList<>();
 		Map<String, Long> finYearDates = new HashMap<>();
 		Map<String, Object> config = fetchDefultersConfig(requestInfo);
-		List<String> tenants = (List<String>) config.get("tenants");
-		if (StringUtils.isNotBlank(((String) config.get("financialyear")))) {
-			finYearDates = getFinancialYearDates(requestInfo, (String) config.get("financialyear"),
-					configs.getStateLevelTenantId());
+		List<String> tenants = (List<String>) config.get(CalculatorConstants.TENANT_KEY);
+		if (StringUtils.isNotBlank(((String) config.get(CalculatorConstants.FINANCIALYEAR_KEY)))) {
+			finYearDates = getFinancialYearDates(requestInfo,
+					(String) config.get(CalculatorConstants.FINANCIALYEAR_KEY), configs.getStateLevelTenantId());
 		}
 		for (String tenant : tenants) {
-			defaulterDetails = defaultersRepository.fetchAllDefaulterDetailsForFY(finYearDates.get("startingDate"),
-					finYearDates.get("endingDate"), tenant);
+			defaulterDetails = defaultersRepository.fetchAllDefaulterDetailsForFY(
+					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE),
+					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE), tenant);
 			if (defaulterDetails.isEmpty()) {
 				log.info("No properties with due in the city " + tenant);
 			} else {
 				defaulterDetails.forEach(d -> {
 					d.setTenantId(tenant);
-					d.setRebateEndDate((String) config.get("rebateDate"));
+					d.setRebateEndDate((String) config.get(CalculatorConstants.REBATE_DATE_KEY));
 				});
 				notificationService.prepareAndSendSMS(defaulterDetails);
 				notifiedTenants.add(tenant);
@@ -85,10 +86,10 @@ public class DefaultersService {
 			Map<String, Object> tenantConfig = new HashMap<>();
 			for (Map<String, Object> config : jsonOutput) {
 
-				tenantConfig.put("rebateDate", config.get("rebatedate"));
+				tenantConfig.put(CalculatorConstants.REBATE_DATE_KEY, config.get(CalculatorConstants.REBATE_DATE_KEY));
 				tenantConfig.put(CalculatorConstants.FINANCIALYEAR_KEY,
 						config.get(CalculatorConstants.FINANCIALYEAR_KEY));
-				tenantConfig.put("tenants", config.get("tenant"));
+				tenantConfig.put(CalculatorConstants.TENANT_KEY, config.get(CalculatorConstants.TENANT_KEY));
 			}
 			return tenantConfig;
 		} catch (Exception e) {
@@ -100,8 +101,10 @@ public class DefaultersService {
 		Map<String, Long> finDates = new HashMap<>();
 		Map<String, Map<String, Object>> finYearMap = mdmsService.getFinancialYear(tenantId, requestInfo,
 				new HashSet<>(Arrays.asList(finYear)));
-		finDates.put("startingDate", Long.valueOf(finYearMap.get(finYear).get("startingDate").toString()));
-		finDates.put("endingDate", Long.valueOf(finYearMap.get(finYear).get("endingDate").toString()));
+		finDates.put(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE,
+				Long.valueOf(finYearMap.get(finYear).get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE).toString()));
+		finDates.put(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE,
+				Long.valueOf(finYearMap.get(finYear).get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE).toString()));
 		return finDates;
 
 	}
