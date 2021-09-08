@@ -1,10 +1,8 @@
 package org.egov.pt.calculator.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.egov.pt.calculator.producer.Producer;
 import org.egov.pt.calculator.util.Configurations;
@@ -12,7 +10,6 @@ import org.egov.pt.calculator.web.models.DefaultersInfo;
 import org.egov.pt.calculator.web.models.OwnerDetails;
 import org.egov.pt.calculator.web.models.SMSRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,8 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class NotificationService {
-
-	private static final String MESSAGE = "Dear {citizen} , Pay your Property tax before {rebatedate} and get a 10% rebate! Click on this link to pay: https://wa.me/+918750975975?text=mSeva";
 
 	private static final String DEFAULTER_SMS_INSERT_QUERY = "Insert into eg_pt_due_sms (propertyid,finyear,ownername,mobilenumber,dueamount,status,error,createdtime,tenantid) values (:propertyid,:finyear,:ownername,:mobilenumber,:dueamount,:status,:error,:createdtime,:tenantid)";
 
@@ -39,11 +34,11 @@ public class NotificationService {
 	@Autowired
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-	public void prepareAndSendSMS(List<DefaultersInfo> defaulterDetails) {
+	public void prepareAndSendSMS(List<DefaultersInfo> defaulterDetails, final String smsTemplate) {
 
 		for (DefaultersInfo defaulter : defaulterDetails) {
 
-			SMSRequest smsRequest = getSMSRequest(defaulter);
+			SMSRequest smsRequest = getSMSRequest(defaulter, smsTemplate);
 			producer.push(configs.getSmsNotifTopic(), smsRequest);
 			log.info("MobileNumber: " + smsRequest.getMobileNumber() + " Messages: " + smsRequest.getMessage());
 			saveNotificationDetails(defaulter, "SUCCESS", null);
@@ -51,12 +46,12 @@ public class NotificationService {
 
 	}
 
-	private SMSRequest getSMSRequest(DefaultersInfo defaulter) {
+	private SMSRequest getSMSRequest(DefaultersInfo defaulter, String smsTemplate) {
 
 		OwnerDetails owner = getDecryptedValues(defaulter);
-		String message = MESSAGE.replace("{citizen}", owner.getName());
+		String message = smsTemplate.replace("<citizen>", owner.getName());
 
-		message = message.replace("{rebatedate}", defaulter.getRebateEndDate());
+		message = message.replace("<rebatedate>", defaulter.getRebateEndDate());
 
 		return SMSRequest.builder().message(message).mobileNumber(owner.getMobileNumber()).build();
 
@@ -95,7 +90,7 @@ public class NotificationService {
 			namedParameterJdbcTemplate.update(query.toString(), params);
 		} catch (Exception e) {
 			log.info("Due sms request pushed to kafka, but details not saved in the sms table.");
-			log.info("error: " +e);
+			log.info("error: " + e);
 		}
 
 	}

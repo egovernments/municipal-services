@@ -366,4 +366,10 @@ public class CalculatorConstants {
 	
 	public static final String REBATE_DATE_KEY = "rebatedate";
 
+	public static final String NOTIFICATION_MODULENAME = "rainmaker-pt";
+
+	public static final String DUE_SMS_TEMPLATE_CODE = "PT_DUE_SMS";
+
+	public static final String DEFAULT_LOCALE_CODE = "en_IN";
+
 }

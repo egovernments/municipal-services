@@ -16,7 +16,9 @@ import org.egov.pt.calculator.util.CalculatorConstants;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.util.Configurations;
 import org.egov.pt.calculator.web.models.DefaultersInfo;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jayway.jsonpath.JsonPath;
@@ -45,6 +47,9 @@ public class DefaultersService {
 	@Autowired
 	private MasterDataService mdmsService;
 
+	@Value("${egov.pt.due.sms.default.template}")
+	private String defaultSMSTemplate;
+
 	public List<String> fetchAllDefaulterDetails(RequestInfo requestInfo) {
 		List<DefaultersInfo> defaulterDetails = null;
 		List<String> notifiedTenants = new ArrayList<>();
@@ -55,6 +60,8 @@ public class DefaultersService {
 			finYearDates = getFinancialYearDates(requestInfo,
 					(String) config.get(CalculatorConstants.FINANCIALYEAR_KEY), configs.getStateLevelTenantId());
 		}
+		String localizedSMSTemplate = getLocalizedDueSMSTemplate(requestInfo);
+
 		for (String tenant : tenants) {
 			defaulterDetails = defaultersRepository.fetchAllDefaulterDetailsForFY(
 					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE),
@@ -62,11 +69,12 @@ public class DefaultersService {
 			if (defaulterDetails.isEmpty()) {
 				log.info("No properties with due in the city " + tenant);
 			} else {
-				defaulterDetails.forEach(d -> {
-					d.setTenantId(tenant);
-					d.setRebateEndDate((String) config.get(CalculatorConstants.REBATE_DATE_KEY));
+				defaulterDetails.forEach(defaulter -> {
+					defaulter.setTenantId(tenant);
+					defaulter.setFinYear((String) config.get(CalculatorConstants.FINANCIALYEAR_KEY));
+					defaulter.setRebateEndDate((String) config.get(CalculatorConstants.REBATE_DATE_KEY));
 				});
-				notificationService.prepareAndSendSMS(defaulterDetails);
+				notificationService.prepareAndSendSMS(defaulterDetails, localizedSMSTemplate);
 				notifiedTenants.add(tenant);
 			}
 
@@ -107,5 +115,27 @@ public class DefaultersService {
 				Long.valueOf(finYearMap.get(finYear).get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE).toString()));
 		return finDates;
 
+	}
+
+	public String getLocalizedDueSMSTemplate(RequestInfo requestInfo) {
+		StringBuilder url = utils.getLocalizationUri(configs.getStateLevelTenantId(),
+				CalculatorConstants.DEFAULT_LOCALE_CODE, CalculatorConstants.DUE_SMS_TEMPLATE_CODE);
+
+		try {
+			Map<String, Object> responseMap = (Map<String, Object>) mdmsRepository.fetchResult(url, requestInfo);
+			String jsonString = new JSONObject(responseMap).toString();
+			String path = "$..messages[?(@.code==\"{}\")].message";
+			path = path.replace("{}", CalculatorConstants.DUE_SMS_TEMPLATE_CODE);
+			String message = "";
+
+			Object messageObj = JsonPath.parse(jsonString).read(path);
+			message = ((ArrayList<String>) messageObj).get(0);
+
+			return message;
+
+		} catch (Exception e) {
+			log.info("Exception while fetching localization message for due sms", e);
+		}
+		return defaultSMSTemplate;
 	}
 }

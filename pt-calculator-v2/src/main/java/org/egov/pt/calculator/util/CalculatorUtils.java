@@ -852,4 +852,15 @@ public class CalculatorUtils {
 				.build();
 		return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
 	}
+	
+	public StringBuilder getLocalizationUri(String tenantId, String locale, String code) {
+
+		StringBuilder uri = new StringBuilder();
+		uri.append(configurations.getLocalizationServiceHost()).append(configurations.getLocalizationContextPath())
+				.append(configurations.getLocalizationSearchEndpoint()).append("?").append("locale=").append(locale)
+				.append("&tenantId=").append(tenantId).append("&codes=").append(code).append("&module=")
+				.append(NOTIFICATION_MODULENAME);
+
+		return uri;
+	}
 }

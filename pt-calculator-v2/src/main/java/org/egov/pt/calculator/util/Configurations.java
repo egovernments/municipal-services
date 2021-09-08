@@ -161,4 +161,13 @@ public class Configurations {
 	@Value("${egov.decypt.endpoint}")
 	private String decryptEndPoint;
 
+	@Value("${egov.localization.host}")
+	private String localizationServiceHost;
+
+	@Value("${egov.localization.context.path}")
+	private String localizationContextPath;
+
+	@Value("${egov.localization.search.endpoint}")
+	private String localizationSearchEndpoint;
+
 }
