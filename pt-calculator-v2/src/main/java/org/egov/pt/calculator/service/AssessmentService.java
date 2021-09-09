@@ -198,7 +198,8 @@ public class AssessmentService {
 			assessmentRequest.setAssessmentYear(configData.get(CalculatorConstants.FINANCIALYEAR_KEY).toString());
 			assessmentRequest.setLocality(locality);
 			assessmentRequest.setPropertyType(propertyType);
-			assessmentRequest.setIsRented((Boolean) configData.get(CalculatorConstants.IS_RENTED));
+			assessmentRequest.setIsRented(configData.get(CalculatorConstants.IS_RENTED) == null ? true
+					: (Boolean) configData.get(CalculatorConstants.IS_RENTED));
 			List<Property> properties = repository.fetchAllActiveProperties(assessmentRequest);
 			for (Property property : properties) {
 				boolean isExists = repository.isAssessmentExists(property.getPropertyId(),
