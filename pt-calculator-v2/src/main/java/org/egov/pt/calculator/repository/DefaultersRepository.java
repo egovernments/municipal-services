@@ -48,6 +48,7 @@ public class DefaultersRepository {
 			params.put("fromDate", fromDate);
 			params.put("toDate", toDate);
 		}
+		dueQuery.append(" and pt.propertyid='PT-1012-1044546' ");
 		dueQuery.append(" and pt.tenantId=:tenantId");
 		params.put("tenantId", tenantId);
 		dueQuery.append(GROUP_BY_CLAUSE);
