@@ -144,8 +144,8 @@ public class CalculatorConstants {
 	public static final String ENDING_DATE_APPLICABLES = "endingDay";
 
 	public static final String STARTING_DATE_APPLICABLES = "startingDay";
-
-    public static final String RECEIPT_START_DATE_PARAM = "fromDate=";
+	
+	public static final String RECEIPT_START_DATE_PARAM = "fromDate=";
 
     public static final String RECEIPT_END_DATE_PARAM = "toDate=";
 

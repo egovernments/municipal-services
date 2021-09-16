@@ -222,12 +222,30 @@ public class PayService {
 			return interestAmt;
 
 		String[] time = getStartTime(assessmentYear, interestMap);
+		String[] endTime=getEndTime(assessmentYear, interestMap); // will return null if endingDay attribute is not present in mdms
 
 		Calendar cal = Calendar.getInstance();
 		setDateToCalendar(time, cal);
+		
+		Calendar calEnd=null;//will be used if endingDay for Interest is specified in mdms
+		Long interestEnd=null;
+		
+		
+		if(endTime != null)
+		{
+			calEnd=Calendar.getInstance();
+			setDateToCalendar(endTime,calEnd);
+		}
+		
 		long currentUTC = System.currentTimeMillis();
 		long currentIST = System.currentTimeMillis() + TIMEZONE_OFFSET;
 		long interestStart = cal.getTimeInMillis();
+		
+	   if(endTime != null)
+	   {
+		interestEnd= calEnd.getTimeInMillis();
+	   }
+		
 		List<Payment> filteredPaymentsAfterIntersetDate = null;
 		List<Payment> actualPayments = filterPaymentForAssessmentYear(payments, taxPeriod);
 
@@ -237,11 +255,11 @@ public class PayService {
 
 		}
 
-		if (interestStart < currentIST) {
+		if (endTime==null ? (interestStart < currentIST):(interestStart < interestEnd.longValue())) {
 
 			if (CollectionUtils.isEmpty(actualPayments)) {
 
-				long numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
+				long numberOfDaysInMillies = (endTime==null ? (getEODEpoch(currentUTC) - interestStart) : (Math.min(interestEnd.longValue(),getEODEpoch(currentUTC))-interestStart));
 				return calculateInterest(numberOfDaysInMillies, taxAmt, interestMap);
 			} else {
 
@@ -281,7 +299,7 @@ public class PayService {
 
 				if (CollectionUtils.isEmpty(filteredPaymentsAfterIntersetDate)) {
 					applicableAmount = firstApplicableAmount;
-					numberOfDaysInMillies = getEODEpoch(currentUTC) - interestStart;
+					numberOfDaysInMillies =  (endTime==null ? (getEODEpoch(currentUTC) - interestStart) : (Math.min(interestEnd.longValue(),getEODEpoch(currentUTC)) - interestStart)) ;
 					interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount, interestMap);
 					interestAmt = interestAmt.add(interestCalculated);
 				} else {
@@ -317,7 +335,8 @@ public class PayService {
 
 							applicableAmount = firstApplicableAmount;
 
-							numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
+							// use endTime CurrentDate or endingDay whichever is smaller
+							numberOfDaysInMillies = Math.min(getEODEpoch(payment.getTransactionDate()),interestEnd.longValue()) - interestStart;
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else if (i == numberOfPeriods - 1) {
@@ -333,7 +352,7 @@ public class PayService {
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else {
-
+							//TODO: check the impact of endingDay i.e. endTime i.e. interestEnd on this code snippet
 							Payment paymentPrev = filteredPaymentsAfterIntersetDate.get(i - 1);
 							applicableAmount = utils
 									.getTaxAmtFromPaymentForApplicablesGeneration(currentFinanicalPayment, taxPeriod,firstApplicableAmount);
@@ -548,6 +567,22 @@ public class PayService {
 		String[] time = startDay.split("/");
 		return time;
 	}
+	
+	private String[] getEndTime(String assessmentYear, Map<String, Object> interestMap) {
+		String financialYearOfApplicableEntry = ((String) interestMap.get(CalculatorConstants.FROMFY_FIELD_NAME))
+				.split("-")[0];
+		Integer diffInYear = Integer.valueOf(assessmentYear.split("-")[0])
+				- Integer.valueOf(financialYearOfApplicableEntry);
+		if(interestMap.containsKey(CalculatorConstants.ENDING_DATE_APPLICABLES)==false) // endingDay attribute is not present in mdms interest.json
+			return null;
+		String endDay = ((String) interestMap.get(CalculatorConstants.ENDING_DATE_APPLICABLES));
+		Integer yearOfStartDayInApplicableEntry = Integer.valueOf((endDay.split("/")[2]));
+		endDay = endDay.replace(String.valueOf(yearOfStartDayInApplicableEntry),
+				String.valueOf(yearOfStartDayInApplicableEntry + diffInYear));
+		String[] time = endDay.split("/");
+		return time;
+	}
+
 
 	/**
 	 * Calculates the interest based on the given parameters
