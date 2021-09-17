@@ -67,6 +67,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -109,6 +110,9 @@ import org.egov.pt.calculator.web.models.propertyV2.PropertyV2;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
@@ -359,7 +363,42 @@ public class EstimationService {
 		List<TaxHeadEstimate> taxHeadEstimates =  getEstimatesForTax(requestInfo,taxAmt, usageExemption, property, propertyBasedExemptionMasterMap,
 				timeBasedExemptionMasterMap,masterMap,demand);
 
-
+		
+		//Add Additional Rebate (if given in application.Properties for given FY)
+		
+				String additional_rebate=null;
+				String aditional_rebate_upto_fy=null;
+				try
+				{
+				Resource resource = new ClassPathResource("/application.properties");
+			    Properties props = PropertiesLoaderUtils.loadProperties(resource);
+			    additional_rebate= props.containsKey("ADDITIONAL_REBATE_PERCENT")?props.getProperty("ADDITIONAL_REBATE_PERCENT"):null;
+			    aditional_rebate_upto_fy= props.containsKey("ADDITIONAL_REBATE_UPTO_FY") ? props.getProperty("ADDITIONAL_REBATE_UPTO_FY"):null;
+				}
+				catch(Exception ex)
+				{
+					additional_rebate=null;
+					aditional_rebate_upto_fy=null;
+				}
+				
+				if(additional_rebate!=null && (aditional_rebate_upto_fy!=null?assessmentYear.compareTo(aditional_rebate_upto_fy)<=0:true) ) //if additionalRebate is to be given and (if additionaRebate to be given uptoFY and assessmentYear is less than uptoFY)  
+					{
+					// additional Rebate to be given on nettax payable (sum of all taxes)
+					   BigDecimal nettax=new BigDecimal(0);
+					   for (TaxHeadEstimate t : taxHeadEstimates)
+						   nettax=nettax.add(t.getEstimateAmount());
+					   
+					   BigDecimal AdditionalRebateAmount=nettax.multiply(new BigDecimal(additional_rebate).divide(new BigDecimal(100.0)));
+					   //updating TaxHeadCode with key "PT_TIME_REBATE" to add AdditionalRebate
+					   
+					   //List<TaxHeadEstimate>  c= taxHeadEstimates.stream().map(i -> (i.getTaxHeadCode()==""?i.setEstimateAmount(i.getEstimateAmount().add(AdditionalRebateAmount)):i.setEstimateAmount(i.getEstimateAmount()));
+					   for (TaxHeadEstimate t : taxHeadEstimates)
+						   if(t.getTaxHeadCode().equals("PT_TIME_REBATE"))
+							   t.setEstimateAmount(t.getEstimateAmount().subtract(AdditionalRebateAmount));
+						   		
+					   
+					}
+		
 		Map<String,List> estimatesAndBillingSlabs = new HashMap<>();
 		estimatesAndBillingSlabs.put("estimates",taxHeadEstimates);
 		estimatesAndBillingSlabs.put("billingSlabIds",billingSlabIds);
