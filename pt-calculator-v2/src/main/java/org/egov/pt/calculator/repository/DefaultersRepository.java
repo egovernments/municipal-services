@@ -36,7 +36,6 @@ public class DefaultersRepository {
 
 	private static final String GROUP_BY_CLAUSE = " group by pt.propertyid,usr.name,usr.mobilenumber";
 
-	private static final String LIMIT = " limit 10";
 
 	public List<DefaultersInfo> fetchAllDefaulterDetailsForFY(Long fromDate, Long toDate, String tenantId) {
 
@@ -48,11 +47,9 @@ public class DefaultersRepository {
 			params.put("fromDate", fromDate);
 			params.put("toDate", toDate);
 		}
-		dueQuery.append(" and pt.propertyid='PT-1012-1044546' ");
 		dueQuery.append(" and pt.tenantId=:tenantId");
 		params.put("tenantId", tenantId);
 		dueQuery.append(GROUP_BY_CLAUSE);
-		dueQuery.append(LIMIT);
 
 		log.info("Due query " + dueQuery.toString());
 		log.info("Params " + params);
