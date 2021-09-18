@@ -388,7 +388,7 @@ public class EstimationService {
 					   for (TaxHeadEstimate t : taxHeadEstimates)
 						   nettax=nettax.add(t.getEstimateAmount());
 					   
-					   BigDecimal AdditionalRebateAmount=nettax.multiply(new BigDecimal(additional_rebate).divide(new BigDecimal(100.0)));
+					   BigDecimal AdditionalRebateAmount=nettax.multiply(new BigDecimal(additional_rebate).divide(new BigDecimal(100.0))).setScale(2,BigDecimal.ROUND_UP);
 					   //updating TaxHeadCode with key "PT_TIME_REBATE" to add AdditionalRebate
 					   
 					   //List<TaxHeadEstimate>  c= taxHeadEstimates.stream().map(i -> (i.getTaxHeadCode()==""?i.setEstimateAmount(i.getEstimateAmount().add(AdditionalRebateAmount)):i.setEstimateAmount(i.getEstimateAmount()));
