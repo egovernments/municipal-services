@@ -383,9 +383,10 @@ public class EstimationService {
 				
 				if(additional_rebate!=null && (aditional_rebate_upto_fy!=null?assessmentYear.compareTo(aditional_rebate_upto_fy)<=0:true) ) //if additionalRebate is to be given and (if additionaRebate to be given uptoFY and assessmentYear is less than uptoFY)  
 					{
-					// additional Rebate to be given on nettax payable (sum of all taxes)
+					// additional Rebate to be given on nettax payable (sum of all taxes excluding FireCess and CancerCess)
 					   BigDecimal nettax=new BigDecimal(0);
 					   for (TaxHeadEstimate t : taxHeadEstimates)
+						if(!t.getTaxHeadCode().equals("PT_FIRE_CESS") && !t.getTaxHeadCode().equals("PT_CANCER_CESS"))
 						   nettax=nettax.add(t.getEstimateAmount());
 					   
 					   BigDecimal AdditionalRebateAmount=nettax.multiply(new BigDecimal(additional_rebate).divide(new BigDecimal(100.0))).setScale(2,BigDecimal.ROUND_UP);
