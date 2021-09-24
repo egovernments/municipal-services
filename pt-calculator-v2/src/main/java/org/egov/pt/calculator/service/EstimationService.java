@@ -566,7 +566,7 @@ public class EstimationService {
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_OWNER_EXEMPTION).estimateAmount(userExemption).build());
 		payableTax = payableTax.add(userExemption);
 
-		//-------------------------------TODO: FIRECESS on commercialTaxAmt with percentratio as commercialTaxAmtRatioPercent
+		//FIRECESS on commercialTaxAmt with percentratio (ratio for commercial share) as commercialTaxAmtRatioPercent
 		BigDecimal FireCessTaxableAmount=payableTax.multiply(commercialTaxAmtRatioPercent).divide(new BigDecimal(100.00)).setScale(2,BigDecimal.ROUND_HALF_UP);
 		
 		
@@ -577,12 +577,12 @@ public class EstimationService {
 		//FireCess should be calculated only on commercialTaxAmt (Tax payable for NonResidential units only)
 		if (usePBFirecessLogic) {
 			//fireCess = firecessUtils.getPBFireCess(payableTax, assessmentYear, fireCessMasterList, detail);
-			fireCess = firecessUtils.getPBFireCess(payableTax, assessmentYear, fireCessMasterList, detail);
+			fireCess = firecessUtils.getPBFireCess(FireCessTaxableAmount, assessmentYear, fireCessMasterList, detail);
 			estimates.add(
 					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
 		} else {
 			//fireCess = mDataService.getCess(payableTax, assessmentYear, fireCessMasterList);
-			fireCess = mDataService.getCess(payableTax, assessmentYear, fireCessMasterList);
+			fireCess = mDataService.getCess(FireCessTaxableAmount, assessmentYear, fireCessMasterList);
 			estimates.add(
 					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
 
