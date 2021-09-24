@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -260,6 +261,7 @@ public class EstimationService {
 	private Map<String,List> getEstimationMap(CalculationCriteria criteria, RequestInfo requestInfo, Map<String, Object> masterMap,Demand demand) {
 
 		BigDecimal taxAmt = BigDecimal.ZERO;
+		BigDecimal commercialTaxAmt=BigDecimal.ZERO;
 		BigDecimal usageExemption = BigDecimal.ZERO;
 		Property property = criteria.getProperty();
 		PropertyDetail detail = property.getPropertyDetails().get(0);
@@ -301,6 +303,7 @@ public class EstimationService {
 			for (Unit unit : activeUnits) {
 				BillingSlab slab = getSlabForCalc(filteredBillingSlabs, unit);
 				BigDecimal currentUnitTax = getTaxForUnit(slab, unit,assessmentYear);
+				
 				billingSlabIds.add(slab.getId()+"|"+i);
 				unitSlabMapping.put(unit, slab);
 				if((unit.getOccupancyType().equalsIgnoreCase("RENTED") || unit.getOccupancyType().equalsIgnoreCase("PG")) && unit.getAdditionalDetails() != null && unit.getAdditionalDetails().has("rentedformonths"))
@@ -330,6 +333,10 @@ public class EstimationService {
 						unBuiltRate += slab.getUnBuiltUnitRate();
 				}
 				taxAmt = taxAmt.add(currentUnitTax);
+				if(unit.getUsageCategoryMajor().startsWith("RESIDENTIAL")==false) // if unit is NONRESIDENTIAL
+					commercialTaxAmt=commercialTaxAmt.add(currentUnitTax);
+				
+				
 				usageExemption = usageExemption
 						.add(getExemption(unit, currentUnitTax, assessmentYear, propertyBasedExemptionMasterMap));
 				i++;
@@ -343,9 +350,25 @@ public class EstimationService {
 			/*
 			 * making call to get unbuilt area tax estimate
 			 */
-			
+			// all unbuilt area taxAmt
 			BigDecimal unBuiltTax=unBuiltRateCalc.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 			taxAmt = taxAmt.add(unBuiltTax);
+		
+			// unBuiltRateCalc contains map with unbuiltareas of units where as we are need commercial unbuilt unit tax also for FireCess
+			BigDecimal commercialUnbuiltTax=BigDecimal.ZERO;			
+			Iterator <Map.Entry<Unit, BigDecimal>> entries =unBuiltRateCalc.entrySet().iterator();
+			while (entries.hasNext()) {
+			    Map.Entry<Unit, BigDecimal> entry = entries.next();
+			    if(entry.getKey().getUsageCategoryMajor().startsWith("RESIDENTIAL")==false )
+			    	commercialUnbuiltTax=commercialUnbuiltTax.add(entry.getValue());
+			}
+			
+			
+			
+		//	->(((Unit)k.getUsageCategoryDetail().startsWith("RESIDENTIAL"))==false?(commercialUnbuiltTax= commercialUnbuiltTax.add(v)):"");
+			// Now commercial Unbuilt Tax is present in commercialUnbuiltTax 
+			
+			commercialTaxAmt=commercialTaxAmt.add(commercialUnbuiltTax).setScale(2,BigDecimal.ROUND_HALF_UP); // complete Commercial Tax Amount
 			
 			/*
 			 * special case to handle property with one unit
@@ -361,7 +384,7 @@ public class EstimationService {
 		}
 
 		List<TaxHeadEstimate> taxHeadEstimates =  getEstimatesForTax(requestInfo,taxAmt, usageExemption, property, propertyBasedExemptionMasterMap,
-				timeBasedExemptionMasterMap,masterMap,demand);
+				timeBasedExemptionMasterMap,masterMap,demand,commercialTaxAmt);
 
 		
 		//Add Additional Rebate (if given in application.Properties for given FY)
@@ -495,6 +518,7 @@ public class EstimationService {
 			if(assessmentYear.startsWith("2021-"))
 				currentUnitTax=currentUnitTax.multiply(new BigDecimal("1.05"));
 		}
+		
 		return currentUnitTax;
 	}
 
@@ -512,12 +536,16 @@ public class EstimationService {
 	 */
 	private List<TaxHeadEstimate> getEstimatesForTax(RequestInfo requestInfo,BigDecimal taxAmt, BigDecimal usageExemption, Property property,
 			Map<String, Map<String, List<Object>>> propertyBasedExemptionMasterMap,
-			Map<String, JSONArray> timeBasedExemeptionMasterMap,Map<String, Object> masterMap, Demand demand) {
+			Map<String, JSONArray> timeBasedExemeptionMasterMap,Map<String, Object> masterMap, Demand demand,BigDecimal commercialTaxAmt) {
 
 
 
 		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt.setScale(2, 2);
+		// To find Percentage Share of Commecial Tax ( to be used for firecess) after subtracting exemptions) = commercialTax/TaxPayable*100
+		BigDecimal commercialTaxAmtRatioPercent=commercialTaxAmt.divide(payableTax).multiply(new BigDecimal(100.00)).setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+		
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
 
 		//PropertyDetail detail = property.getPropertyDetails().get(0);
@@ -525,6 +553,7 @@ public class EstimationService {
 		// taxes
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_TAX).estimateAmount(taxAmt.setScale(2, 2)).build());
 
+		
 		// usage exemption
 		 usageExemption = usageExemption.setScale(2, 2).negate();
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_UNIT_USAGE_EXEMPTION).estimateAmount(
@@ -537,15 +566,22 @@ public class EstimationService {
 		estimates.add(TaxHeadEstimate.builder().taxHeadCode(PT_OWNER_EXEMPTION).estimateAmount(userExemption).build());
 		payableTax = payableTax.add(userExemption);
 
+		//-------------------------------TODO: FIRECESS on commercialTaxAmt with percentratio as commercialTaxAmtRatioPercent
+		BigDecimal FireCessTaxableAmount=payableTax.multiply(commercialTaxAmtRatioPercent).divide(new BigDecimal(100.00)).setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+		
 		// Fire cess
 		List<Object> fireCessMasterList = timeBasedExemeptionMasterMap.get(CalculatorConstants.FIRE_CESS_MASTER);
 		BigDecimal fireCess;
 
+		//FireCess should be calculated only on commercialTaxAmt (Tax payable for NonResidential units only)
 		if (usePBFirecessLogic) {
+			//fireCess = firecessUtils.getPBFireCess(payableTax, assessmentYear, fireCessMasterList, detail);
 			fireCess = firecessUtils.getPBFireCess(payableTax, assessmentYear, fireCessMasterList, detail);
 			estimates.add(
 					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
 		} else {
+			//fireCess = mDataService.getCess(payableTax, assessmentYear, fireCessMasterList);
 			fireCess = mDataService.getCess(payableTax, assessmentYear, fireCessMasterList);
 			estimates.add(
 					TaxHeadEstimate.builder().taxHeadCode(PT_FIRE_CESS).estimateAmount(fireCess.setScale(2, 2)).build());
