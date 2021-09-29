@@ -139,14 +139,15 @@ public class PropertyService {
 		List <OwnerInfo> ownersFromRequest = request.getProperty().getOwners();
 
 		Boolean isNumberDifferent = false;
-
+if(!request.getProperty().getCreationReason().equals(CreationReason.MUTATION))
+{
 		for(OwnerInfo owner : ownersFromRequest) {
 			if(!uuidToMobileNumber.get(owner.getUuid()).equals(owner.getMobileNumber())) {
 				isNumberDifferent = true;
 				break;
 			}
 		}
-
+}
 		return isNumberDifferent;
 	}
 
