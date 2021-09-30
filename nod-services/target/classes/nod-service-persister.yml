@@ -1,0 +1,34 @@
+serviceMaps:
+  serviceName: NoDuesApply
+  mappings:
+  - version: 1.0
+    name: nod-service
+    description: Persists transactions
+    fromTopic: save-nod-txns
+    isTransaction: true
+    queryMaps:
+    - query: INSERT INTO eg_nod_details (id, ptid, waterconnectionno, sewreageconnectionno, tenantId, createdDate, createdBy, reason, remarks, applicanttype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+      basePath: Transaction
+      jsonMaps:
+
+      - jsonPath: $.Transaction.id
+
+      - jsonPath: $.Transaction.ptid
+
+      - jsonPath: $.Transaction.waterconnectionno
+
+      - jsonPath: $.Transaction.sewreageconnectionno
+
+      - jsonPath: $.Transaction.tenantId
+
+      - jsonPath: $.Transaction.createdDate
+
+      - jsonPath: $.Transaction.createdBy
+
+      - jsonPath: $.Transaction.reason
+
+      - jsonPath: $.Transaction.remarks
+
+      - jsonPath: $.Transaction.applicanttype
+  
