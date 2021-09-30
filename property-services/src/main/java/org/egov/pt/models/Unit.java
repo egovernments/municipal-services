@@ -68,7 +68,7 @@ public class Unit {
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;
 
-	@Digits(integer = 10, fraction = 2)
+	@Digits(integer = 12, fraction = 2)
 	@JsonProperty("arv")
 	private BigDecimal arv;
 
