@@ -63,7 +63,7 @@ public class AssessmentRepository {
 	
 	private static final String INNER_QUERY = "select pt.propertyid,usr.name ownername,usr.mobilenumber,sum(dd.taxamount - dd.collectionamount) balance from eg_pt_property pt,eg_pt_owner ownr,eg_user usr,egbs_demanddetail_v1 dd, egbs_demand_v1 d "
 			+ " where ownr.propertyid = pt.id and ownr.tenantid=pt.tenantid and usr.uuid=ownr.userid and dd.demandid=d.id and d.consumercode = pt.propertyid and d.tenantid = pt.tenantid and pt.status='ACTIVE' and d.status = 'ACTIVE'";
-	private static final String OUTER_QUERY = "select result.propertyid,result.ownername,result.mobilenumber,result.balance from ({duequery}) as result where result.balance > 0 limit 10";
+	private static final String OUTER_QUERY = "select result.propertyid,result.ownername,result.mobilenumber,result.balance from ({duequery}) as result where result.balance > 0 ";
 
 	private static final String GROUP_BY_CLAUSE = " group by pt.propertyid,usr.name,usr.mobilenumber";
 
