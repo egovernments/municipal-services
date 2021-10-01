@@ -264,7 +264,7 @@ public class AssessmentService {
 
 			for (DefaultersInfo property : dueproperties) {
 				final List<Assessment> assessments = repository.fetchAssessments(property.getPropertyId(),
-						finYear, property.getTenantId());
+						finYear, tenant);
 				if (assessments.isEmpty()) {
 
                     log.info("No assessments");
