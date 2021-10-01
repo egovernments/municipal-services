@@ -199,16 +199,16 @@ public class AssessmentRepository {
 		StringBuilder query = new StringBuilder(ASSESSMENT_DETAIL_SEARCH_QUERY);
 		final Map<String, Object> params = new HashMap<>();
 		if (!StringUtils.isEmpty(propertyId)) {
-			query.append(" asmt.tenantid = :tenantid");
+			query.append(" and asmt.tenantid = :tenantid");
 			params.put("tenantid", tenantId);
 		}
 
 		if (!StringUtils.isEmpty(assessmentYear)) {
-			query.append(" asmt.financialyear = :financialyear");
+			query.append(" and asmt.financialyear = :financialyear");
 			params.put("financialyear", assessmentYear);
 		}
 		if (!StringUtils.isEmpty(tenantId)) {
-			query.append(" asmt.propertyId =:propertyid ");
+			query.append(" and asmt.propertyId =:propertyid ");
 			params.put("propertyid", propertyId);
 		}
 		query.append(" ORDER BY asmt.createdtime DESC");
