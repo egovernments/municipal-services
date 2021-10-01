@@ -238,7 +238,7 @@ public class AssessmentRepository {
 		try {
 			namedParameterJdbcTemplate.update(query.toString(), params);
 		} catch (final DataAccessException e) {
-
+           log.info("exception in saving assessment job details");
 		}
 	}
 
