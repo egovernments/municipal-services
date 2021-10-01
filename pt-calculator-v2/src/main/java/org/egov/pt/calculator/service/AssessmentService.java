@@ -275,6 +275,7 @@ public class AssessmentService {
 					String url = new StringBuilder().append(configs.getAssessmentServiceHost())
 							.append(configs.getAssessmentUpdateEndpoint()).toString();
 					AssessmentResponse response = null;
+					log.info("re-assess request:"+assessmentReq);
 					try {
 						response = restTemplate.postForObject(url, assessmentReq, AssessmentResponse.class);
 						log.info("re-assess response:"+response);
