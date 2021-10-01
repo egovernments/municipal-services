@@ -1,13 +1,16 @@
 package org.egov.pt.calculator.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
@@ -22,6 +25,7 @@ import org.egov.pt.calculator.web.models.AssessmentRequest;
 import org.egov.pt.calculator.web.models.AssessmentResponse;
 import org.egov.pt.calculator.web.models.CalculationReq;
 import org.egov.pt.calculator.web.models.CreateAssessmentRequest;
+import org.egov.pt.calculator.web.models.DefaultersInfo;
 import org.egov.pt.calculator.web.models.demand.Demand;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 import org.egov.pt.calculator.web.models.property.Channel;
@@ -72,6 +76,9 @@ public class AssessmentService {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private MasterDataService mdmsService;
 
 	
 	/**
@@ -218,11 +225,55 @@ public class AssessmentService {
 					try {
 						response = restTemplate.postForObject(url, assessmentReq, AssessmentResponse.class);
 						Assessment createdAsessment = response.getAssessments().get(0);
-						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS", null);
+						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS","Assessment", null);
 					} catch (HttpClientErrorException e) {
-						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.toString());
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED","Assessment", e.toString());
 					} catch (Exception e) {
-						repository.saveAssessmentGenerationDetails(assessment, "FAILED", e.toString());
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED","Assessment", e.toString());
+					}
+
+				}
+
+			}
+		}
+
+	}
+	 
+	public void createReAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
+
+		Map<String, Object> config = fetchReAssessmentConfig(assessmentRequest.getRequestInfo());
+		List<String> tenants = (List<String>) config.get(CalculatorConstants.TENANT_KEY);
+		User user = userService.fetchPTAsseessmentUser();
+		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
+		requestInfo.setUserInfo(user);
+		Map<String, Long> finYearDates = new HashMap<>();
+		if (StringUtils.isNotBlank(((String) config.get(CalculatorConstants.FINANCIALYEAR_KEY)))) {
+			finYearDates = getFinancialYearDates(requestInfo,
+					(String) config.get(CalculatorConstants.FINANCIALYEAR_KEY), configs.getStateLevelTenantId());
+		}
+		for (String tenant : tenants) {
+			List<DefaultersInfo> dueproperties = repository.fetchAllPropertiesForReAssess(
+					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE),
+					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE), tenant);
+			for (DefaultersInfo property : dueproperties) {
+				final List<Assessment> assessments = repository.fetchAssessments(property.getPropertyId(),
+						assessmentRequest.getAssessmentYear(), property.getTenantId());
+				if (!assessments.isEmpty()) {
+
+					Assessment assessment = assessments.get(0);
+					AssessmentRequest assessmentReq = AssessmentRequest.builder().assessment(assessment)
+							.requestInfo(requestInfo).build();
+					String url = new StringBuilder().append(configs.getAssessmentServiceHost())
+							.append(configs.getAssessmentUpdateEndpoint()).toString();
+					AssessmentResponse response = null;
+					try {
+						response = restTemplate.postForObject(url, assessmentReq, AssessmentResponse.class);
+						Assessment createdAsessment = response.getAssessments().get(0);
+						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS", "Re-Assess", null);
+					} catch (HttpClientErrorException e) {
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", "Re-Assess", e.toString());
+					} catch (Exception e) {
+						repository.saveAssessmentGenerationDetails(assessment, "FAILED", "Re-Assess", e.toString());
 					}
 
 				}
@@ -232,11 +283,22 @@ public class AssessmentService {
 
 	}
 
+	 private Map<String, Long> getFinancialYearDates(RequestInfo requestInfo, String finYear, String tenantId) {
+			Map<String, Long> finDates = new HashMap<>();
+			Map<String, Map<String, Object>> finYearMap = mdmsService.getFinancialYear(tenantId, requestInfo,
+					new HashSet<>(Arrays.asList(finYear)));
+			finDates.put(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE,
+					Long.valueOf(finYearMap.get(finYear).get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE).toString()));
+			finDates.put(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE,
+					Long.valueOf(finYearMap.get(finYear).get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE).toString()));
+			return finDates;
+
+		}
 	private Map<String, Map<String,Object>> fetchScheduledTenants(RequestInfo request) {
 
 		StringBuilder mdmsURL = utils.getMdmsSearchUrl();
-
 		MdmsCriteriaReq mdmsConfig = utils.getAssessmentConfigRequest(request, configs.getStateLevelTenantId());
+
 		try {
 			Object response = mdmsRepository.fetchResult(mdmsURL, mdmsConfig);
 			List<Map<String, Object>> jsonOutput = JsonPath.read(response,
@@ -257,6 +319,28 @@ public class AssessmentService {
 		} catch (Exception e) {
 			throw new CustomException(CalculatorConstants.ASSESSMENT_JOB_MDMS_ERROR,
 					CalculatorConstants.ASSESSMENT_JOB_MDMS_ERROR_MSG);
+		}
+	}
+	
+	private Map<String, Object> fetchReAssessmentConfig(RequestInfo request) {
+
+		StringBuilder mdmsURL = utils.getMdmsSearchUrl();
+
+		MdmsCriteriaReq mdmsConfig = utils.getReAssessmentConfigRequest(request, configs.getStateLevelTenantId());
+		try {
+			Object response = mdmsRepository.fetchResult(mdmsURL, mdmsConfig);
+			List<Map<String, Object>> jsonOutput = JsonPath.read(response,
+					CalculatorConstants.MDMS_RE_ASSESSMENT_JOB_CONFIG_PATH);
+			Map<String, Object> tenantConfig = new HashMap<>();
+			for (Map<String, Object> config : jsonOutput) {
+
+				tenantConfig.put(CalculatorConstants.FINANCIALYEAR_KEY,
+						config.get(CalculatorConstants.FINANCIALYEAR_KEY));
+				tenantConfig.put(CalculatorConstants.TENANT_KEY, config.get(CalculatorConstants.TENANT_KEY));
+			}
+			return tenantConfig;
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
 		}
 	}
 

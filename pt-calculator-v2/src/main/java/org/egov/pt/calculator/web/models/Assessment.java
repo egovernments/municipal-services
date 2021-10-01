@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Assessment {
+	
+	private String id;
 
 	private String uuid;
 	

@@ -339,12 +339,17 @@ public class CalculatorConstants {
 	public static final String MUTATION_PAYMENT_PERIOD_IN_MONTH = "mutationPaymentPeriodInMonth";
 
 	public static final String ASSESSMENT_CONFIG_MASTER = "assessmentconfig";
+	
+	public static final String RE_ASSESSMENT_CONFIG_MASTER = "reassessmentconfig";
 
 	public static final String MODULE_TENANT = "tenant";
 	
 	public static final String NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB = "No tenant is configured to create assessments";
 
 	public static final String MDMS_ASSESSMENT_JOB_CONFIG_PATH = "$.MdmsRes.tenant.assessmentconfig[?(@.enabled==true)]";
+	
+	public static final String MDMS_RE_ASSESSMENT_JOB_CONFIG_PATH = "$.MdmsRes.tenant.reassessmentconfig";
+
 
 	public static final String FINANCIALYEAR_KEY = "financialyear";
 

@@ -25,4 +25,12 @@ public class AssessmentController {
 		assessmentService.createAssessmentsForFY(assessmentRequest);
 		return new ResponseEntity<>("Assessments are generated for the configured tenants.", HttpStatus.CREATED);
 	}
+	
+	@PostMapping("/reassess/_job")
+	public ResponseEntity<Object> reAssessment(@Valid @RequestBody CreateAssessmentRequest assessmentRequest) {
+
+		assessmentService.createReAssessmentsForFY(assessmentRequest);
+		return new ResponseEntity<>("Re-Assessment done generated for the configured tenants.", HttpStatus.CREATED);
+	}
+	
 }
