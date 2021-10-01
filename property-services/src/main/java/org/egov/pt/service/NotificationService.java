@@ -390,4 +390,71 @@ public class NotificationService {
                     ErrorConstants.INVALID_TENANT_ID_MDMS_MSG);
         }
     }
+    public void sendNotificationForMobileNumberUpdate(PropertyRequest propertyRequest, Property propertyFromSearch) {
+		Property property = propertyRequest.getProperty();
+		ProcessInstance wf = property.getWorkflow();
+		String createOrUpdate = null;
+		String msg = null;
+
+		Boolean isCreate =  CreationReason.CREATE.equals(property.getCreationReason());
+		String state = getStateFromWf(wf, configs.getIsWorkflowEnabled());
+		String completeMsgs = notifUtil.getLocalizationMessages(property.getTenantId(), propertyRequest.getRequestInfo());
+		String localisedState = getLocalisedState(wf.getState().getState(), completeMsgs);
+		switch (state) {
+
+		case WF_NO_WORKFLOW:
+			createOrUpdate = isCreate ? CREATED_STRING : UPDATED_STRING;
+			msg = getMsgForUpdate(property, UPDATE_NO_WORKFLOW, completeMsgs, createOrUpdate);
+			break;
+
+		case WF_STATUS_OPEN:
+			createOrUpdate = isCreate ? CREATE_STRING : UPDATE_STRING;
+			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_OPEN_CODE, completeMsgs, createOrUpdate);
+			break;
+
+		case WF_STATUS_APPROVED:
+			createOrUpdate = isCreate ? CREATED_STRING : UPDATED_STRING;
+			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_APPROVED_CODE, completeMsgs, createOrUpdate);
+			break;
+
+		default:
+			createOrUpdate = isCreate ? CREATE_STRING : UPDATE_STRING;
+			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_CHANGE_CODE, completeMsgs, createOrUpdate);
+			break;
+		}
+
+
+		msg = replaceCommonValues(property, msg, localisedState);
+		prepareMsgAndSendToBothNumbers(propertyRequest, propertyFromSearch, msg,state);
+
+	}
+
+	private void prepareMsgAndSendToBothNumbers(PropertyRequest request, Property propertyFromSearch,
+			String msg, String state) {
+
+		Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+		Map<String, String> mobileNumberToOwner = new HashMap<>();
+
+		property.getOwners().forEach(owner -> {
+			if (owner.getMobileNumber() != null)
+				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+		});
+
+		propertyFromSearch.getOwners().forEach(owner -> {
+			if (owner.getMobileNumber() != null)
+				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+		});
+
+		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);
+		notifUtil.sendSMS(smsRequests);
+
+		Boolean isActionReq = false;
+		if(state.equalsIgnoreCase(PT_CORRECTION_PENDING))
+			isActionReq = true;
+
+		List<Event> events = notifUtil.enrichEvent(smsRequests, requestInfo, property.getTenantId(), property, isActionReq);
+		notifUtil.sendEventNotification(new EventRequest(requestInfo, events));
+
+	}
 }
