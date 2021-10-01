@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.calculator.repository.rowmapper.AssessmentRowMapper;
 import org.egov.pt.calculator.repository.rowmapper.DefaultersRowMapper;
@@ -43,8 +44,18 @@ public class AssessmentRepository {
 
 	private static final String ASSESSMENT_SEARCH_QUERY = "select id,assessmentnumber from eg_pt_asmt_assessment where status='ACTIVE' and propertyid=:propertyid and financialyear=:financialyear and tenantid=:tenantid";
 
-	private static final String ASSESSMENT_DETAIL_SEARCH_QUERY = "select id,assessmentnumber,financialyear as assessmentyear,assessmentdate,propertyId,source,channel,status,tenantId from eg_pt_asmt_assessment where status='ACTIVE' and propertyid=:propertyid and financialyear=:financialyear and tenantid=:tenantid";
-
+	private static final String ASSESSMENT_DETAIL_SEARCH_QUERY = "SELECT asmt.id as ass_assessmentid, asmt.financialyear as ass_financialyear, asmt.tenantId as ass_tenantid, asmt.assessmentNumber as ass_assessmentnumber, "
+			+ "asmt.status as ass_status, asmt.propertyId as ass_propertyid, asmt.source as ass_source, asmt.assessmentDate as ass_assessmentdate,  "
+			+ "asmt.additionalDetails as ass_additionaldetails, asmt.createdby as ass_createdby, asmt.createdtime as ass_createdtime, asmt.lastmodifiedby as ass_lastmodifiedby, "
+			+ "asmt.lastmodifiedtime as ass_lastmodifiedtime, us.tenantId as us_tenantid, us.unitId as us_unitid, us.id as us_id, us.assessmentId as us_assessmentid, "
+			+ "us.usageCategory as us_usagecategory, us.occupancyType as us_occupancytype, "
+			+ "us.occupancyDate as us_occupancydate, us.active as us_active, us.createdby as us_createdby, "
+			+ "us.createdtime as us_createdtime, us.lastmodifiedby as us_lastmodifiedby, us.lastmodifiedtime as us_lastmodifiedtime, "
+			+ "doc.id as doc_id, doc.entityid as doc_entityid, doc.documentType as doc_documenttype, doc.fileStoreId as doc_filestoreid, doc.documentuid as doc_documentuid, "
+			+ "doc.status as doc_status, doc.tenantid as doc_tenantid, "
+			+ "doc.createdby as doc_createdby, doc.createdtime as doc_createdtime, doc.lastmodifiedby as doc_lastmodifiedby, doc.lastmodifiedtime as doc_lastmodifiedtime " 
+			+ "FROM eg_pt_asmt_assessment asmt LEFT OUTER JOIN eg_pt_asmt_unitusage us ON asmt.id = us.assessmentId LEFT OUTER JOIN eg_pt_asmt_document doc ON asmt.id = doc.entityid ";
+	
 	
 	private static final String ASSESSMENT_JOB_DATA_INSERT_QUERY = "Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,additionaldetails,tenantid) values(:id,:assessmentnumber,:propertyid,:financialyear,:createdtime,:status,:error,:additionaldetails,:tenantid)";;
 
@@ -187,9 +198,20 @@ public class AssessmentRepository {
 	public List<Assessment> fetchAssessments(String propertyId, String assessmentYear, String tenantId) {
 		StringBuilder query = new StringBuilder(ASSESSMENT_DETAIL_SEARCH_QUERY);
 		final Map<String, Object> params = new HashMap<>();
-		params.put("propertyid", propertyId);
-		params.put("financialyear", assessmentYear);
-		params.put("tenantid", tenantId);
+		if (!StringUtils.isEmpty(propertyId)) {
+			query.append(" asmt.tenantid = :tenantid");
+			params.put("tenantid", tenantId);
+		}
+
+		if (!StringUtils.isEmpty(assessmentYear)) {
+			query.append(" asmt.financialyear = :financialyear");
+			params.put("financialyear", assessmentYear);
+		}
+		if (!StringUtils.isEmpty(tenantId)) {
+			query.append(" asmt.propertyId =:propertyid ");
+			params.put("propertyid", propertyId);
+		}
+		query.append(" ORDER BY asmt.createdtime DESC");
 		List<Assessment> assessments = new ArrayList<>();
 		try {
 			assessments = namedParameterJdbcTemplate.query(query.toString(), params, assessmentRowmapper);
