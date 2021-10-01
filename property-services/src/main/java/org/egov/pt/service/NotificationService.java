@@ -397,40 +397,29 @@ public class NotificationService {
 		String msg = null;
 
 		Boolean isCreate =  CreationReason.CREATE.equals(property.getCreationReason());
-		String state = getStateFromWf(wf, configs.getIsWorkflowEnabled());
+
 		String completeMsgs = notifUtil.getLocalizationMessages(property.getTenantId(), propertyRequest.getRequestInfo());
-		String localisedState = getLocalisedState(wf.getState().getState(), completeMsgs);
-		switch (state) {
+		String localisedState = getLocalisedState(WF_STATUS_FIELDVERIFIED_LOCALE, completeMsgs);
 
-		case WF_NO_WORKFLOW:
-			createOrUpdate = isCreate ? CREATED_STRING : UPDATED_STRING;
-			msg = getMsgForUpdate(property, UPDATE_NO_WORKFLOW, completeMsgs, createOrUpdate);
-			break;
-
-		case WF_STATUS_OPEN:
-			createOrUpdate = isCreate ? CREATE_STRING : UPDATE_STRING;
-			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_OPEN_CODE, completeMsgs, createOrUpdate);
-			break;
-
-		case WF_STATUS_APPROVED:
-			createOrUpdate = isCreate ? CREATED_STRING : UPDATED_STRING;
-			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_APPROVED_CODE, completeMsgs, createOrUpdate);
-			break;
-
-		default:
-			createOrUpdate = isCreate ? CREATE_STRING : UPDATE_STRING;
-			msg = getMsgForUpdate(property, WF_UPDATE_STATUS_CHANGE_CODE, completeMsgs, createOrUpdate);
-			break;
-		}
-
+		createOrUpdate = isCreate ? CREATE_STRING : UPDATE_STRING;
+		msg = getMsgForMobileNumberUpdate(property, WF_UPDATE_STATUS_CHANGE_CODE, completeMsgs, createOrUpdate);
 
 		msg = replaceCommonValues(property, msg, localisedState);
-		prepareMsgAndSendToBothNumbers(propertyRequest, propertyFromSearch, msg,state);
+		prepareMsgAndSendToBothNumbers(propertyRequest, propertyFromSearch, msg);
 
 	}
 
+	private String getMsgForMobileNumberUpdate(Property property, String msgCode, String completeMsgs, String createUpdateReplaceString) {
+
+		String url = configs.getUiAppHost().concat(configs.getViewPropertyLink().replace(NOTIFICATION_PROPERTYID, property.getPropertyId()).replace(NOTIFICATION_TENANTID, property.getTenantId()));
+
+		return notifUtil.getMessageTemplate(msgCode, completeMsgs)
+				.replace(NOTIFICATION_PROPERTY_LINK, url)
+				.replace(NOTIFICATION_UPDATED_CREATED_REPLACE, createUpdateReplaceString);
+	}
+
 	private void prepareMsgAndSendToBothNumbers(PropertyRequest request, Property propertyFromSearch,
-			String msg, String state) {
+			String msg) {
 
 		Property property = request.getProperty();
 		RequestInfo requestInfo = request.getRequestInfo();
@@ -450,8 +439,6 @@ public class NotificationService {
 		notifUtil.sendSMS(smsRequests);
 
 		Boolean isActionReq = false;
-		if(state.equalsIgnoreCase(PT_CORRECTION_PENDING))
-			isActionReq = true;
 
 		List<Event> events = notifUtil.enrichEvent(smsRequests, requestInfo, property.getTenantId(), property, isActionReq);
 		notifUtil.sendEventNotification(new EventRequest(requestInfo, events));
