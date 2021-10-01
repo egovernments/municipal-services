@@ -46,7 +46,7 @@ public class AssessmentRepository {
 	private static final String ASSESSMENT_DETAIL_SEARCH_QUERY = "select id,assessmentnumber,financialyear as assessmentyear,assessmentdate,propertyId,source,channel,tenantId from eg_pt_asmt_assessment where status='ACTIVE' and propertyid=:propertyid and financialyear=:financialyear and tenantid=:tenantid";
 
 	
-	private static final String ASSESSMENT_JOB_DATA_INSERT_QUERY = "Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,additionaldetails,tenantid) values(:id,:assessmentnumber,:propertyid,:financialyear,:createdtime,:status,:error,:additionalDetails,:tenantid)";;
+	private static final String ASSESSMENT_JOB_DATA_INSERT_QUERY = "Insert into eg_pt_assessment_job (id,assessmentnumber,propertyid,financialyear,createdtime,status,error,additionaldetails,tenantid) values(:id,:assessmentnumber,:propertyid,:financialyear,:createdtime,:status,:error,:additionaldetails,:tenantid)";;
 
 	private static final String OCUUPANCY_TYPE_RENTED = "RENTED";
 	
