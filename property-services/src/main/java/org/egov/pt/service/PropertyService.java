@@ -126,6 +126,40 @@ public class PropertyService {
 		boolean isRequestForOwnerMutation = CreationReason.MUTATION.equals(request.getProperty().getCreationReason());
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
 
+		boolean isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
+
+		// Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
+		// List <OwnerInfo> owners = propertyFromSearch.getOwners();
+
+		// for(OwnerInfo owner : owners) {
+		// 	uuidToMobileNumber.put(owner.getUuid(), owner.getMobileNumber());
+		// }
+
+		// List <OwnerInfo> ownersFromRequest = request.getProperty().getOwners();
+
+		// Boolean isNumberDifferent = false;
+
+		// for(OwnerInfo owner : ownersFromRequest) {
+		// 	if(!uuidToMobileNumber.get(owner.getUuid()).equals(owner.getMobileNumber())) {
+		// 		isNumberDifferent = true;
+		// 		break;
+		// 	}
+		// }
+		
+		if (isRequestForOwnerMutation)
+			processOwnerMutation(request, propertyFromSearch);
+		else if(isNumberDifferent)
+			processMobileNumberUpdate(request, propertyFromSearch);
+		else
+			processPropertyUpdate(request, propertyFromSearch);
+
+		request.getProperty().setWorkflow(null);
+		return request.getProperty();
+	}
+	/*
+		Method to check if the update request is for updating owner mobile numbers
+	*/
+	private boolean checkIsRequestForMobileNumberUpdate(PropertyRequest request, Property propertyFromSearch) {
 		Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
 		List <OwnerInfo> owners = propertyFromSearch.getOwners();
 
@@ -143,18 +177,12 @@ public class PropertyService {
 				break;
 			}
 		}
-		
-		if (isRequestForOwnerMutation)
-			processOwnerMutation(request, propertyFromSearch);
-		else if(isNumberDifferent)
-			processMobileNumberUpdate(request, propertyFromSearch);
-		else
-			processPropertyUpdate(request, propertyFromSearch);
 
-		request.getProperty().setWorkflow(null);
-		return request.getProperty();
+		return isNumberDifferent;
 	}
-
+	/*
+		Method to process owner mobile number update
+	*/
 	private void processMobileNumberUpdate(PropertyRequest request, Property propertyFromSearch) {
 
 				if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {
@@ -242,7 +270,9 @@ public class PropertyService {
 			producer.push(config.getUpdatePropertyTopic(), request);
 		}
 	}
-
+	/*
+		Method to update owners mobile number
+	*/
 	private void updateOwnerMobileNumbers(PropertyRequest request, Property propertyFromSearch) {
 
 
