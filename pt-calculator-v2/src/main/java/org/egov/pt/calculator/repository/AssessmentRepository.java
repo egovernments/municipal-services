@@ -198,10 +198,9 @@ public class AssessmentRepository {
 	public List<Assessment> fetchAssessments(String propertyId, String assessmentYear, String tenantId) {
 		StringBuilder query = new StringBuilder(ASSESSMENT_DETAIL_SEARCH_QUERY);
 		final Map<String, Object> params = new HashMap<>();
-		if (!StringUtils.isEmpty(propertyId)) {
-			query.append(" and asmt.tenantid = :tenantid");
+		
+			query.append(" where asmt.tenantid = :tenantid");
 			params.put("tenantid", tenantId);
-		}
 
 		if (!StringUtils.isEmpty(assessmentYear)) {
 			query.append(" and asmt.financialyear = :financialyear");
