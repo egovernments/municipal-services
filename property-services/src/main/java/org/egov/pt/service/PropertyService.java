@@ -125,14 +125,47 @@ public class PropertyService {
 		
 		boolean isRequestForOwnerMutation = CreationReason.MUTATION.equals(request.getProperty().getCreationReason());
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
+
+		Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
+		List <OwnerInfo> owners = propertyFromSearch.getOwners();
+
+		for(OwnerInfo owner : owners) {
+			uuidToMobileNumber.put(owner.getUuid(), owner.getMobileNumber());
+		}
+
+		List <OwnerInfo> ownersFromRequest = request.getProperty().getOwners();
+
+		Boolean isNumberDifferent = false;
+
+		for(OwnerInfo owner : ownersFromRequest) {
+			if(!uuidToMobileNumber.get(owner.getUuid()).equals(owner.getMobileNumber())) {
+				isNumberDifferent = true;
+				break;
+			}
+		}
 		
 		if (isRequestForOwnerMutation)
 			processOwnerMutation(request, propertyFromSearch);
+		else if(isNumberDifferent)
+			processMobileNumberUpdate(request, propertyFromSearch);
 		else
 			processPropertyUpdate(request, propertyFromSearch);
 
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
+	}
+
+	private void processMobileNumberUpdate(PropertyRequest request, Property propertyFromSearch) {
+
+				if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {
+					userService.createUser(request);
+				} else {			
+					updateOwnerMobileNumbers(request,propertyFromSearch);
+				}
+
+				enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
+				util.mergeAdditionalDetails(request, propertyFromSearch);
+				producer.push(config.getUpdatePropertyTopic(), request);		
 	}
 
 	/**
@@ -143,7 +176,7 @@ public class PropertyService {
 	 */
 	private void processPropertyUpdate(PropertyRequest request, Property propertyFromSearch) {
 		
-		// propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
+		propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
 		if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {	
 			userService.createUser(request);	
 		} else {
@@ -164,7 +197,7 @@ public class PropertyService {
 
 				request.getProperty().setOwners(util.getCopyOfOwners(collectedOwners));
 			} else{
-				updateOwnerMobileNumbers(request, propertyFromSearch);
+				request.getProperty().setOwners(util.getCopyOfOwners(propertyFromSearch.getOwners()));
 			}
 		}
 		enrichmentService.enrichAssignes(request.getProperty());
@@ -212,6 +245,7 @@ public class PropertyService {
 
 	private void updateOwnerMobileNumbers(PropertyRequest request, Property propertyFromSearch) {
 
+
 		Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
 		List <OwnerInfo> owners = propertyFromSearch.getOwners();
 
@@ -219,26 +253,8 @@ public class PropertyService {
 			uuidToMobileNumber.put(owner.getUuid(), owner.getMobileNumber());
 		}
 
-		List <OwnerInfo> ownersFromRequest = request.getProperty().getOwners();
-
-		Boolean isNumberDifferent = false;
-
-		for(OwnerInfo owner : ownersFromRequest) {
-			if(!uuidToMobileNumber.get(owner.getUuid()).equals(owner.getMobileNumber())) {
-				isNumberDifferent = true;
-				break;
-			}
-		}
-
-		if(isNumberDifferent) {
-			userService.updateUserMobileNumber(request, uuidToMobileNumber);
-			notifService.sendNotificationForMobileNumberUpdate(request, propertyFromSearch);
-		}
-		else {
-			request.getProperty().setOwners(util.getCopyOfOwners(propertyFromSearch.getOwners()));
-		}
-
-
+		userService.updateUserMobileNumber(request, uuidToMobileNumber);
+		notifService.sendNotificationForMobileNumberUpdate(request, propertyFromSearch);						
 	}
 
 	/**
