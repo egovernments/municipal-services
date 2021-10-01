@@ -31,6 +31,8 @@ public class Assessment {
 	
 	private String demandId;
 	
+	private String status;
+	
 	private String tenantId;
 	
 	@JsonProperty("source")

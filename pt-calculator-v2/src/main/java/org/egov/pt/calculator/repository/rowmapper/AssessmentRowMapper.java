@@ -17,6 +17,8 @@ public class AssessmentRowMapper implements RowMapper<Assessment> {
 
 		return Assessment.builder().propertyId(rs.getString("propertyId"))
 				.assessmentYear(rs.getString("assessmentyear")).id(rs.getString("id"))
+				.financialYear(rs.getString("assessmentyear"))
+				.status(rs.getString("status"))
 				.assessmentNumber(rs.getString("assessmentNumber")).assessmentDate(rs.getLong("assessmentDate"))
 				.source(Source.fromValue(rs.getString("source"))).channel(Channel.fromValue(rs.getString("channel")))
 				.tenantId(rs.getString("tenantId")).build();
