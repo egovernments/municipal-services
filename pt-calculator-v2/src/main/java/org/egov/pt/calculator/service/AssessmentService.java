@@ -277,7 +277,9 @@ public class AssessmentService {
 					AssessmentResponse response = null;
 					try {
 						response = restTemplate.postForObject(url, assessmentReq, AssessmentResponse.class);
+						log.info("re-assess response:"+response);
 						Assessment createdAsessment = response.getAssessments().get(0);
+						
 						repository.saveAssessmentGenerationDetails(createdAsessment, "SUCCESS", "Re-Assess", null);
 					} catch (HttpClientErrorException e) {
 						repository.saveAssessmentGenerationDetails(assessment, "FAILED", "Re-Assess", e.toString());
