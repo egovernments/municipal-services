@@ -251,9 +251,10 @@ public class AssessmentService {
 		RequestInfo requestInfo = assessmentRequest.getRequestInfo();
 		requestInfo.setUserInfo(user);
 		Map<String, Long> finYearDates = new HashMap<>();
+		String finYear =null;
 		if (StringUtils.isNotBlank(((String) config.get(CalculatorConstants.FINANCIALYEAR_KEY)))) {
-			finYearDates = getFinancialYearDates(requestInfo,
-					(String) config.get(CalculatorConstants.FINANCIALYEAR_KEY), configs.getStateLevelTenantId());
+			finYear= (String) config.get(CalculatorConstants.FINANCIALYEAR_KEY);
+			finYearDates = getFinancialYearDates(requestInfo,finYear, configs.getStateLevelTenantId());
 		}
 		for (String tenant : tenants) {
 			List<DefaultersInfo> dueproperties = repository.fetchAllPropertiesForReAssess(
@@ -263,7 +264,7 @@ public class AssessmentService {
 
 			for (DefaultersInfo property : dueproperties) {
 				final List<Assessment> assessments = repository.fetchAssessments(property.getPropertyId(),
-						assessmentRequest.getAssessmentYear(), property.getTenantId());
+						finYear, property.getTenantId());
 				if (assessments.isEmpty()) {
 
                     log.info("No assessments");
