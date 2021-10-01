@@ -212,11 +212,14 @@ public class AssessmentRepository {
 			params.put("propertyid", propertyId);
 		}
 		query.append(" ORDER BY asmt.createdtime DESC");
+		
+		log.info("Assessment search query" + query);
+		log.info("Parmas "+ params);
 		List<Assessment> assessments = new ArrayList<>();
 		try {
 			assessments = namedParameterJdbcTemplate.query(query.toString(), params, assessmentRowmapper);
 		} catch (final DataAccessException e) {
-
+           log.info("exception in assessment search" );
 		}
 
 		if (assessments.isEmpty())
