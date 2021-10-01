@@ -175,6 +175,7 @@ public class AssessmentRepository {
 
 	
 		String mainQuery = OUTER_QUERY.replace("{duequery}", dueQuery);
+		log.info("re-assess query" + mainQuery);
 		try {
 			defaultersInfo = namedParameterJdbcTemplate.query(mainQuery, params, defaultersRowMapper);
 		} catch (Exception ex) {

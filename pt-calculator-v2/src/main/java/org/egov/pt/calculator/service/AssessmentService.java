@@ -42,6 +42,8 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * AssesmentService
  * 
@@ -50,6 +52,7 @@ import com.jayway.jsonpath.JsonPath;
  * @author kavi elrey
  */
 @Service
+@Slf4j
 public class AssessmentService {
 
 	@Autowired
@@ -239,6 +242,7 @@ public class AssessmentService {
 
 	}
 	 
+	@SuppressWarnings("unchecked")
 	public void createReAssessmentsForFY(CreateAssessmentRequest assessmentRequest) {
 
 		Map<String, Object> config = fetchReAssessmentConfig(assessmentRequest.getRequestInfo());
@@ -255,11 +259,15 @@ public class AssessmentService {
 			List<DefaultersInfo> dueproperties = repository.fetchAllPropertiesForReAssess(
 					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_STARTING_DATE),
 					finYearDates.get(CalculatorConstants.FINANCIAL_YEAR_ENDING_DATE), tenant);
+			log.info("Total properites with due: " + dueproperties.size());
+
 			for (DefaultersInfo property : dueproperties) {
 				final List<Assessment> assessments = repository.fetchAssessments(property.getPropertyId(),
 						assessmentRequest.getAssessmentYear(), property.getTenantId());
-				if (!assessments.isEmpty()) {
+				if (assessments.isEmpty()) {
 
+                    log.info("No assessments");
+				}else{
 					Assessment assessment = assessments.get(0);
 					AssessmentRequest assessmentReq = AssessmentRequest.builder().assessment(assessment)
 							.requestInfo(requestInfo).build();
@@ -275,7 +283,7 @@ public class AssessmentService {
 					} catch (Exception e) {
 						repository.saveAssessmentGenerationDetails(assessment, "FAILED", "Re-Assess", e.toString());
 					}
-
+					
 				}
 
 			}
