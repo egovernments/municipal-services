@@ -426,6 +426,39 @@ public class UserService {
 				.build();
     }
 
+    public void updateUserMobileNumber(PropertyRequest request,Map <String, String> uuidToMobileNumber) {
 
+		Property property = request.getProperty();
+		RequestInfo requestInfo = request.getRequestInfo();
+
+		property.getOwners().forEach(owner -> {
+
+			UserDetailResponse userDetailResponse = searchedUserExists(owner, requestInfo, uuidToMobileNumber);
+			StringBuilder uri = new StringBuilder(userHost);
+
+				owner.setId(userDetailResponse.getUser().get(0).getId());
+				uri = uri.append(userContextPath).append(userUpdateEndpoint);
+
+			userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
+			setOwnerFields(owner, userDetailResponse, requestInfo);
+		});
+
+
+	}
+
+
+	private UserDetailResponse searchedUserExists(OwnerInfo owner, RequestInfo requestInfo,
+			Map<String, String> uuidToMobileNumber) {
+
+		UserSearchRequest userSearchRequest = getBaseUserSearchRequest(owner.getTenantId(), requestInfo);
+		userSearchRequest.setMobileNumber(uuidToMobileNumber.get(owner.getUuid()));
+		userSearchRequest.setUserType(owner.getType());
+		userSearchRequest.setName(owner.getName());
+
+        StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
+        return userCall(userSearchRequest,uri);
+
+
+	}
 
 }
