@@ -136,7 +136,7 @@ public class PropertyValidator {
     	Map<String, String> errorMap = new HashMap<>();
     	
         if(request.getRequestInfo().getUserInfo().getType().equalsIgnoreCase("CITIZEN"))
-            validateAssessees(request,propertyFromSearch, errorMap);
+//             validateAssessees(request,propertyFromSearch, errorMap);
 
 		if (configs.getIsWorkflowEnabled() && request.getProperty().getWorkflow() == null && !"LEGACY_RECORD".equals(request.getProperty().getSource().toString()))
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for update process");
