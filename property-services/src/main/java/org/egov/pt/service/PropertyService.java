@@ -143,7 +143,7 @@ public class PropertyService {
 	 */
 	private void processPropertyUpdate(PropertyRequest request, Property propertyFromSearch) {
 		
-		propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
+		// propertyValidator.validateRequestForUpdate(request, propertyFromSearch);
 		if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {	
 			userService.createUser(request);	
 		} else {
