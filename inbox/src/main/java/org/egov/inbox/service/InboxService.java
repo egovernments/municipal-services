@@ -18,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.inbox.config.InboxConfiguration;
 import org.egov.inbox.repository.ServiceRequestRepository;
+
 import org.egov.inbox.util.ErrorConstants;
+import org.egov.inbox.util.FSMConstants;
+import org.egov.inbox.util.TLConstants;
 import org.egov.inbox.web.model.Inbox;
 import org.egov.inbox.web.model.InboxResponse;
 import org.egov.inbox.web.model.InboxSearchCriteria;
@@ -44,7 +47,11 @@ import com.google.gson.JsonObject;
 import org.springframework.web.client.RestTemplate;
 
 import static org.egov.inbox.util.PTConstants.*;
+import static org.egov.inbox.util.TLConstants.REQUESTINFO_PARAM;
+import static org.egov.inbox.util.TLConstants.SEARCH_CRITERIA_PARAM;
+import static org.egov.inbox.util.TLConstants.TENANT_ID_PARAM;
 import static org.egov.inbox.util.TLConstants.TL;
+
 
 @Slf4j
 @Service
@@ -63,6 +70,16 @@ public class InboxService {
 
 	@Autowired
 	private TLInboxFilterService tlInboxFilterService;
+	
+	
+	@Autowired
+	
+	private FSMInboxFilterService fsmInboxFilter;
+	
+	@Autowired
+	private RestTemplate restTemplate;
+	
+	 
 
 	@Autowired
 	public InboxService(InboxConfiguration config, ServiceRequestRepository serviceRequestRepository,
@@ -85,6 +102,23 @@ public class InboxService {
 		if(!CollectionUtils.isEmpty(processCriteria.getStatus()))
 			inputStatuses = new ArrayList<>(processCriteria.getStatus());
 		StringBuilder assigneeUuid = new StringBuilder();
+		 String dsoId=null;
+		 if(requestInfo.getUserInfo().getRoles().get(0).getCode().equals(FSMConstants.FSM_DSO)) {
+        	 Map<String, Object> searcherRequestForDSO = new HashMap<>();
+        	 Map<String, Object> searchCriteriaForDSO = new HashMap<>();
+        	 searchCriteriaForDSO.put(TENANT_ID_PARAM, criteria.getTenantId());
+        	 searchCriteriaForDSO.put(FSMConstants.OWNER_ID, requestInfo.getUserInfo().getUuid());
+        	 searcherRequestForDSO.put(REQUESTINFO_PARAM, requestInfo);
+        	 searcherRequestForDSO.put(SEARCH_CRITERIA_PARAM, searchCriteriaForDSO);
+        	  StringBuilder uri = new StringBuilder();
+              uri.append(config.getSearcherHost()).append(config.getFsmInboxDSoIDEndpoint());
+
+            
+           Object   resultForDsoId = restTemplate.postForObject(uri.toString(), searcherRequestForDSO, Map.class);
+
+           dsoId = JsonPath.read(resultForDsoId, "$.vendor[0].id");     
+              
+		}
 		if(!ObjectUtils.isEmpty(processCriteria.getAssignee())){
 			assigneeUuid = assigneeUuid.append(processCriteria.getAssignee());
 		}
@@ -158,12 +192,19 @@ public class InboxService {
 				if(!CollectionUtils.isEmpty(applicationNumbers)) {
 					moduleSearchCriteria.put(APPLICATION_NUMBER_PARAM, applicationNumbers);
 					businessKeys.addAll(applicationNumbers);
+					moduleSearchCriteria.remove(TLConstants.STATUS_PARAM);
 					moduleSearchCriteria.remove(LOCALITY_PARAM);
 					moduleSearchCriteria.remove(OFFSET_PARAM);
 				}else{
 					isSearchResultEmpty = true;
 				}
 			}
+			
+			if(!ObjectUtils.isEmpty(processCriteria.getBusinessService()) && processCriteria.getBusinessService().get(0).equals(FSMConstants.FSM_MODULE)) {
+					
+				totalCount = fsmInboxFilter.fetchApplicationCountFromSearcher(criteria, StatusIdNameMap, requestInfo,dsoId);
+			  }
+		
 			/*if(!ObjectUtils.isEmpty(processCriteria.getModuleName()) && processCriteria.getModuleName().equals(PT)){
 				Boolean isMobileNumberPresent = false;
 				if(moduleSearchCriteria.containsKey(MOBILE_NUMBER_PARAM)){
@@ -241,8 +282,8 @@ public class InboxService {
 			if(!isSearchResultEmpty) {
 				businessObjects = fetchModuleObjects(moduleSearchCriteria, businessServiceName, criteria.getTenantId(), requestInfo, srvMap);
 			}
-			Map<String, Object> businessMap = StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
-                    s1 -> s1));
+			Map<String, Object> businessMap =StreamSupport.stream(businessObjects.spliterator(), false).collect(Collectors.toMap(s1 -> ((JSONObject) s1).get(businessIdParam).toString(),
+                    s1 -> s1, (e1,e2)->e1, LinkedHashMap::new));
 			ArrayList businessIds = new ArrayList();
 			businessIds.addAll( businessMap.keySet());
 			processCriteria.setBusinessIds(businessIds);
@@ -350,7 +391,6 @@ public class InboxService {
 		return config.getServiceSearchMapping().get(appropriateKey.toString());
 	}
 
-	
 	private JSONArray fetchModuleObjects(HashMap moduleSearchCriteria, List<String> businessServiceName,String tenantId,RequestInfo requestInfo,Map<String,String> srvMap) {
 		JSONArray resutls = null;
 		if(CollectionUtils.isEmpty(srvMap) || StringUtils.isEmpty(srvMap.get("searchPath"))) {
@@ -359,8 +399,6 @@ public class InboxService {
 		StringBuilder url = new StringBuilder(srvMap.get("searchPath"));
 		url.append("?tenantId=").append(tenantId);
 		Set<String> searchParams = moduleSearchCriteria.keySet();
-		if(searchParams!=null && searchParams.size()>0)
-		{
 		searchParams.forEach((param)->{
 			if(!param.equalsIgnoreCase("tenantId")) {
 				if(moduleSearchCriteria.get(param) instanceof Collection){
@@ -371,8 +409,6 @@ public class InboxService {
 				}
 			}
 		});
-		
-		}
 //		url.append("&limit=10&offset=0");
 		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
 		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
