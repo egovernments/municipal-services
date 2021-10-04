@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.calculator.repository.rowmapper.AssessmentRowMapper;
-import org.egov.pt.calculator.repository.rowmapper.DefaultersRowMapper;
+import org.egov.pt.calculator.repository.rowmapper.DuePropertyRowMapper;
 import org.egov.pt.calculator.repository.rowmapper.PropertyRowMapper;
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.Assessment;
@@ -61,11 +61,11 @@ public class AssessmentRepository {
 
 	private static final String OCUUPANCY_TYPE_RENTED = "RENTED";
 	
-	private static final String INNER_QUERY = "select pt.propertyid,usr.name ownername,usr.mobilenumber,sum(dd.taxamount - dd.collectionamount) balance from eg_pt_property pt,eg_pt_owner ownr,eg_user usr,egbs_demanddetail_v1 dd, egbs_demand_v1 d "
-			+ " where ownr.propertyid = pt.id and ownr.tenantid=pt.tenantid and usr.uuid=ownr.userid and dd.demandid=d.id and d.consumercode = pt.propertyid and d.tenantid = pt.tenantid and pt.status='ACTIVE' and d.status = 'ACTIVE'";
-	private static final String OUTER_QUERY = "select result.propertyid,result.ownername,result.mobilenumber,result.balance from ({duequery}) as result where result.balance > 0 ";
+	private static final String INNER_QUERY = "select pt.propertyid,sum(dd.taxamount - dd.collectionamount) balance,pt.tenantid from eg_pt_property pt, egbs_demand_v1 d,egbs_demanddetail_v1 dd where dd.demandid=d.id and dd.tenantid=d.tenantid and d.consumercode = pt.propertyid and d.tenantid = pt.tenantid and pt.status='ACTIVE' and d.status = 'ACTIVE' ";
+	
+	private static final String OUTER_QUERY = "select result.propertyid,result.tenantid,result.balance from ({duequery}) as result where result.balance > 0 ";
 
-	private static final String GROUP_BY_CLAUSE = " group by pt.propertyid,usr.name,usr.mobilenumber";
+	private static final String GROUP_BY_CLAUSE = " group by pt.propertyid,pt.tenantid";
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
@@ -86,7 +86,7 @@ public class AssessmentRepository {
 	private AssessmentRowMapper assessmentRowmapper;
 	
 	@Autowired
-	private DefaultersRowMapper defaultersRowMapper;
+	private DuePropertyRowMapper duePropertyRowMapper;
 	
 	/**
 	 * Retrieves assessments for the given query
@@ -188,7 +188,7 @@ public class AssessmentRepository {
 		String mainQuery = OUTER_QUERY.replace("{duequery}", dueQuery);
 		log.info("re-assess query" + mainQuery);
 		try {
-			defaultersInfo = namedParameterJdbcTemplate.query(mainQuery, params, defaultersRowMapper);
+			defaultersInfo = namedParameterJdbcTemplate.query(mainQuery, params, duePropertyRowMapper);
 		} catch (Exception ex) {
 			log.info("exception while fetching PT details for reassess " + ex.getMessage());
 		}
@@ -210,6 +210,7 @@ public class AssessmentRepository {
 			query.append(" and asmt.propertyId =:propertyid ");
 			params.put("propertyid", propertyId);
 		}
+		query.append(" asmt.status='ACTIVE' ");
 		query.append(" ORDER BY asmt.createdtime DESC");
 		
 		log.info("Assessment search query" + query);
