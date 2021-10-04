@@ -210,7 +210,7 @@ public class AssessmentRepository {
 			query.append(" and asmt.propertyId =:propertyid ");
 			params.put("propertyid", propertyId);
 		}
-		query.append(" asmt.status='ACTIVE' ");
+		query.append(" and asmt.status='ACTIVE' ");
 		query.append(" ORDER BY asmt.createdtime DESC");
 		
 		log.info("Assessment search query" + query);
