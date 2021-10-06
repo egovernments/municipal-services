@@ -185,7 +185,7 @@ public class FSMUtil {
         if(CollectionUtils.isEmpty(userRoles))
             return false;
 
-       userRoles.contains(role);
+       flag = userRoles.contains(role);
         return flag;
     }
     
