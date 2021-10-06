@@ -78,6 +78,11 @@
 		  <version>2.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.16.Final</version>
+		</dependency>
+		<dependency>
 			<groupId>org.egov.services</groupId>
 			<artifactId>services-common</artifactId>
 			<version>1.0.1-SNAPSHOT</version>
