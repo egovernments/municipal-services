@@ -162,7 +162,7 @@ config:
         image-name: "echallan-calculator"
         dockerfile: "build/maven/Dockerfile"  
         
-  - name: "builds/municipal-services/fsm"
+  - name: "builds/digit-impel-builds/municipal-services/fsm"
     build:
       - work-dir: "fsm"
         image-name: "fsm"
@@ -171,7 +171,7 @@ config:
         image-name: "fsm-db"
 
 
-  - name: "builds/municipal-services/vehicle"
+  - name: "builds/digit-impel-builds/municipal-services/vehicle"
     build:
       - work-dir: "vehicle"
         image-name: "vehicle"
@@ -179,7 +179,7 @@ config:
       - work-dir: "vehicle/src/main/resources/db"
         image-name: "vehicle-db"
 
-  - name: "builds/municipal-services/vendor"
+  - name: "builds/digit-impel-builds/municipal-services/vendor"
     build:
       - work-dir: "vendor"
         image-name: "vendor"
@@ -187,7 +187,7 @@ config:
       - work-dir: "vendor/src/main/resources/db"
         image-name: "vendor-db"
 
-  - name: "builds/municipal-services/fsm-calculator"
+  - name: "builds/digit-impel-builds/municipal-services/fsm-calculator"
     build:
       - work-dir: "fsm-calculator"
         image-name: "fsm-calculator"
@@ -202,7 +202,7 @@ config:
         dockerfile: "build/maven/Dockerfile"
 
         
-  - name: "builds/municipal-services/inbox"
+  - name: "builds/digit-impel-builds/municipal-services/inbox"
     build:
       - work-dir: "inbox"
         image-name: "inbox"
