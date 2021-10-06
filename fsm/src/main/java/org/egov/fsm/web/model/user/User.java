@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 import org.egov.common.contract.request.Role;
 import org.springframework.validation.annotation.Validated;
-
+import org.hibernate.validator.constraints.SafeHtml;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
