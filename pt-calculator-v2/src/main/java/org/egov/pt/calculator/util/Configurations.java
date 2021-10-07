@@ -172,5 +172,9 @@ public class Configurations {
 
 	@Value("${egov.localization.search.endpoint}")
 	private String localizationSearchEndpoint;
+	
+	 @Value("${kafka.whatsapp.adoption.data.topic}")
+	 private String kafkaWhatsappAdoptionDataTopic;
+
 
 }
