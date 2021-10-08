@@ -336,7 +336,12 @@ public class PayService {
 							applicableAmount = firstApplicableAmount;
 
 							// use endTime CurrentDate or endingDay whichever is smaller
-							numberOfDaysInMillies = Math.min(getEODEpoch(payment.getTransactionDate()),interestEnd.longValue()) - interestStart;
+							
+							if(interestEnd==null)
+								numberOfDaysInMillies = getEODEpoch(payment.getTransactionDate()) - interestStart;
+							else
+								numberOfDaysInMillies = Math.min(getEODEpoch(payment.getTransactionDate()),interestEnd.longValue()) - interestStart;
+							
 							interestCalculated = calculateInterest(numberOfDaysInMillies, applicableAmount,
 									interestMap);
 						} else if (i == numberOfPeriods - 1) {
