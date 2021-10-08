@@ -543,7 +543,12 @@ public class EstimationService {
 		PropertyDetail detail = property.getPropertyDetails().get(0);
 		BigDecimal payableTax = taxAmt.setScale(2, 2);
 		// To find Percentage Share of Commecial Tax ( to be used for firecess) after subtracting exemptions) = commercialTax/TaxPayable*100
-		BigDecimal commercialTaxAmtRatioPercent=commercialTaxAmt.divide(payableTax,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100.00)).setScale(2,BigDecimal.ROUND_HALF_UP);
+		
+		BigDecimal commercialTaxAmtRatioPercent;
+		if(payableTax.compareTo(BigDecimal.ZERO)==0)
+			commercialTaxAmtRatioPercent=BigDecimal.ZERO;
+		else
+		    commercialTaxAmtRatioPercent=commercialTaxAmt.divide(payableTax,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100.00)).setScale(2,BigDecimal.ROUND_HALF_UP);
 		
 		
 		List<TaxHeadEstimate> estimates = new ArrayList<>();
