@@ -126,7 +126,12 @@ public class PropertyService {
 		boolean isRequestForOwnerMutation = CreationReason.MUTATION.equals(request.getProperty().getCreationReason());
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
 
-		boolean isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
+		boolean isRequestForUpdateMobileNumber = request.getProperty().getIsMobileNumberUpdate();
+		
+		boolean isNumberDifferent=false;
+		
+		if(isRequestForUpdateMobileNumber)
+			isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
 
 		// Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
 		// List <OwnerInfo> owners = propertyFromSearch.getOwners();
