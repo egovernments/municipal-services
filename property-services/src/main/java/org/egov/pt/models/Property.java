@@ -95,6 +95,9 @@ public class Property extends PropertyInfo {
 
 	@JsonProperty("workflow")
 	private ProcessInstance workflow;
+
+	@JsonProperty("isMobileNumberUpdate")
+	private boolean isMobileNumberUpdate;
 	
 	@Builder
 	public Property(String id, String propertyId, String surveyId, List<String> linkedProperties, String tenantId,
@@ -102,7 +105,7 @@ public class Property extends PropertyInfo {
 			String propertyType, String ownershipCategory, List<OwnerInfo> owners, Institution institution,
 			CreationReason creationReason, String usageCategory, Long noOfFloors, Double landArea,
 			BigDecimal superBuiltUpArea, Source source, Channel channel, List<Document> documents, List<Unit> units,
-			JsonNode additionalDetails, AuditDetails auditDetails, ProcessInstance workflow) {
+			JsonNode additionalDetails, AuditDetails auditDetails, ProcessInstance workflow, boolean isMobileNumberUpdate) {
 		super(id, propertyId, surveyId, linkedProperties, tenantId, accountId, oldPropertyId, status, address);
 		this.acknowldgementNumber = acknowldgementNumber;
 		this.propertyType = propertyType;
@@ -121,6 +124,7 @@ public class Property extends PropertyInfo {
 		this.additionalDetails = additionalDetails;
 		this.auditDetails = auditDetails;
 		this.workflow = workflow;
+		this.isMobileNumberUpdate = isMobileNumberUpdate;
 	}
 
 	public Property addOwnersItem(OwnerInfo ownersItem) {

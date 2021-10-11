@@ -130,8 +130,10 @@ public class PropertyService {
 		
 		boolean isNumberDifferent=false;
 		
-		if(isRequestForUpdateMobileNumber)
+		if(isRequestForUpdateMobileNumber){
 			isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
+		}
+
 
 		// Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
 		// List <OwnerInfo> owners = propertyFromSearch.getOwners();
