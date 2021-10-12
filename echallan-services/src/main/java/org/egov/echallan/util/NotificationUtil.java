@@ -97,6 +97,10 @@ public class NotificationUtil {
 		
 		Calendar tocal = Calendar.getInstance();
 		tocal.setTimeInMillis((long) challan.getTaxPeriodTo());
+		log.info("message:" + message );
+		log.info("challan:" + challan );
+		log.info("challan.getCitizen():" + challan.getCitizen() );
+		
         message = message.replace("<citizen>",challan.getCitizen().getName());
         message = message.replace("<challanno>", challan.getChallanNo());
         message = message.replace("<service>", businessMsg.get(MSG_KEY));
