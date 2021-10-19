@@ -47,7 +47,7 @@ public class Amount {
   private String taxHeadCode = null;
 
   @JsonProperty("amount")
- // @Min(value = 0L, message = "The amount must be positive")
+  @Min(value = 0L, message = "The amount must be positive")
   private BigDecimal amount = null;
   public Amount taxHeadCode(String taxHeadCode) {
     this.taxHeadCode = taxHeadCode;

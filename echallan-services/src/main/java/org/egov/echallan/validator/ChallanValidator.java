@@ -53,8 +53,8 @@ public class ChallanValidator {
 				errorMap.put("Negative Amount", "Amount cannot be negative");
 		}
 
-		if (totalAmt <= 0) {
-			errorMap.put("Zero amount", "Challan cannot be generated for zero amount");
+		if (totalAmt < 0) {
+			errorMap.put("Invalid amount", "Challan cannot be generated for zero amount");
 		}
 		if (challan.getCitizen().getMobileNumber() == null)
 			errorMap.put("NULL_Mobile Number", " Mobile Number cannot be null");
