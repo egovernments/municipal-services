@@ -217,13 +217,13 @@ public class DemandService {
 
 		//Save the bulk demands for metered connections
 		if (!createDemands.isEmpty()) {
-			log.info("Creating Non metered Demands list size: {} and Demand Object" + createDemands.size(), createDemands.toString());
+			log.info("Creating Non metered Demands list size: {} and Demand Object: {}" , createDemands.size(), mapper.writeValueAsString(createDemands));
 			demandRes.addAll(demandRepository.saveDemand(request.getRequestInfo(), createDemands));
 
 		}
 		//Save the bulk demands for non metered connections
 		if(!updateDemands.isEmpty()) {
-			log.info("Updating Non metered Demands list size: {} and Demand Object" + updateDemands.size(), updateDemands.toString());
+			log.info("Updating Non metered Demands list size: {} and Demand Object: {}" , updateDemands.size(), mapper.writeValueAsString(updateDemands));
 			demandRes.addAll(demandRepository.updateDemand(request.getRequestInfo(), updateDemands));
 
 		}
