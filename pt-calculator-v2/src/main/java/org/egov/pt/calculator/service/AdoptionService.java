@@ -46,7 +46,8 @@ public class AdoptionService {
 		Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(totalProperties, limit);
 
 		for (List<String> propertiesList : partitionConectionNoList) {
-			pushTotalDataTokafka(propertiesList);
+			pushAssessmentDataTokafka(propertiesList);
+			pushPaymentDataTokafka(propertiesList);
 
 		}
 
@@ -59,13 +60,30 @@ public class AdoptionService {
 		Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(propertiesData, limit);
 
 		for (List<String> propertiesList : partitionConectionNoList) {
-			pushTotalDataTokafka(propertiesList);
+			pushAssessmentDataTokafka(propertiesList);
+			pushPaymentDataTokafka(propertiesList);
 
 		}
 	}
 
-	public void pushTotalDataTokafka(List<String> propertiesList) {
-		List<String> adoptionData = adoptionRepository.generateTotalReport(propertiesList);
+	public void pushAssessmentDataTokafka(List<String> propertiesList) {
+		List<String> adoptionData = adoptionRepository.generateAssessmentReport(propertiesList);
+
+		List<Map> mapData = new LinkedList<Map>();
+
+		adoptionData.stream().forEach(data -> {
+			try {
+				mapData.add(objectMapper.readValue(data, Map.class));
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		});
+
+		producer.push(configurations.getKafkaWhatsappAdoptionDataTopic(), mapData);
+	}
+	
+	public void pushPaymentDataTokafka(List<String> propertiesList) {
+		List<String> adoptionData = adoptionRepository.generatePaymentReport(propertiesList);
 
 		List<Map> mapData = new LinkedList<Map>();
 

@@ -27,9 +27,21 @@ public class AdoptionRepository {
 
 		return properties;
 	}
-	public List<String> generateTotalReport(List<String> propertiesList) {
-		String query = AdoptionQueryBuilder.WHATSAAP_ADOPTION_REPORT_QUERY;
-		log.info("generateTotalReport: " + query);
+	public List<String> generateAssessmentReport(List<String> propertiesList) {
+		String query = AdoptionQueryBuilder.PT_ASSESSMENT_DATA_QUERY;
+//		log.info("generateTotalReport: " + query);
+		Map<String, Object> preparedStatementValues = new HashMap<>();
+		preparedStatementValues.put("propertyid", propertiesList);
+
+		List<String> result = namedParameterJdbcTemplate.queryForList(query, preparedStatementValues, String.class);
+		log.info("Result of whatsapp chatbot adoption data: " + result.size());
+		return result;
+
+	}
+	
+	public List<String> generatePaymentReport(List<String> propertiesList) {
+		String query = AdoptionQueryBuilder.PT_PAYMENT_DATA_QUERY;
+//		log.info("generateTotalReport: " + query);
 		Map<String, Object> preparedStatementValues = new HashMap<>();
 		preparedStatementValues.put("propertyid", propertiesList);
 
