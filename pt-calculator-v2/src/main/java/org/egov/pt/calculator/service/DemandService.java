@@ -349,9 +349,9 @@ public DemandResponse updateDemandsForAssessmentCancel(GetBillCriteria getBillCr
 				repository.fetchResult(utils.getDemandSearchUrl(getBillCriteria), requestInfoWrapper),
 				DemandResponse.class);
 		
-		BillResponse resBill = mapper.convertValue(
-				repository.fetchResult(utils.getBillSearchUrl(getBillCriteria), requestInfoWrapper),
-				BillResponse.class);
+		//BillResponse resBill = mapper.convertValue(
+		//		repository.fetchResult(utils.getBillSearchUrl(getBillCriteria), requestInfoWrapper),
+		//		BillResponse.class);
 		if (CollectionUtils.isEmpty(res.getDemands())) {
 			Map<String, String> map = new HashMap<>();
 			map.put(CalculatorConstants.EMPTY_DEMAND_ERROR_CODE, CalculatorConstants.EMPTY_DEMAND_ERROR_MESSAGE);
