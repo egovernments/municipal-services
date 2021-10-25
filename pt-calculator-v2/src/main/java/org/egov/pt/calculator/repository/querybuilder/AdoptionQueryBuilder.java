@@ -17,7 +17,7 @@ public class AdoptionQueryBuilder {
 			+ "'userdetails',(SELECT json_agg(userdetails) FROM (SELECT usr.uuid \"user\", (SELECT CASE WHEN usr.gender = 1 THEN 'FEMALE' WHEN usr.gender = 2 THEN 'MALE' ELSE 'OTHERS' END ) \"gender\" FROM eg_pt_owner ptowner "
 			+ " INNER JOIN eg_user usr ON ptowner.propertyid=pt.id and ptowner.status='ACTIVE' AND ptowner.userid=usr.uuid ) userdetails),"
 			+ "'assessmentnumber',job.assessmentnumber,'sms_sentdate',(To_timestamp(job.createdtime/1000) at time Zone 'Asia/Kolkata')::date,"  
-			+ "'isValidsms',(SELECT CASE WHEN (select isvalid from decrypted_user u where u.uuid=(select userid from eg_pt_owner owner where owner.propertyid=pt.id and owner.status='ACTIVE' limit 1 )) is null then false else true end)) " + 
+			+ "'isValidsms',(SELECT CASE WHEN (select isvalid from decrypted_user u where u.uuid=(select userid from eg_pt_owner owner where owner.propertyid=pt.id and owner.status='ACTIVE' limit 1 ) limit 1) is null then false else true end)) " + 
 			"from eg_pt_property pt,eg_pt_assessment_job job WHERE job.propertyid=pt.propertyid and pt.status='ACTIVE' and job.status!='FAILED' and pt.propertyid IN (:propertyid);";
 	
 	public static final String PT_PAYMENT_DATA_QUERY="select json_build_object ('isWhatsappPayment',(SELECT CASE WHEN (p.additionaldetails->>'isWhatsapp')::boolean is true then true else false END),"
