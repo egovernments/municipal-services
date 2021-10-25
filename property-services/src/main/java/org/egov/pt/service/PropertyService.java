@@ -127,7 +127,7 @@ public class PropertyService {
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
 
 		boolean isRequestForUpdateMobileNumber = false;
-		if(request.getProperty().getAdditionalDetails()!=null) {
+		if(null != request.getProperty().getAdditionalDetails()) {
 			HashMap<String, Boolean> additionalDetails = mapper.convertValue(request.getProperty().getAdditionalDetails(),HashMap.class);
 			isRequestForUpdateMobileNumber = additionalDetails.getOrDefault("isMobileNumberUpdate", false);
 		}
