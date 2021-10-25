@@ -34,9 +34,9 @@ public class AdoptionQueryBuilder {
 
 	public static final String ASSESS_JOB_PROPERTIES_IDS_QUERY ="SELECT distinct propertyid FROM ( SELECT distinct propertyid FROM eg_pt_assessment_job "
 			+ "where status !='FAILED' and (To_timestamp(createdtime/1000) at time Zone 'Asia/Kolkata')::date "
-			+ "between ((now() - INTERVAL '1 DAY')::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp "
+			+ "between ((now() - INTERVAL ':days DAY')::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp "
 			+ "UNION SELECT distinct bill.consumercode as propertyid FROM egcl_bill bill INNER JOIN egcl_paymentdetail pd ON pd.businessservice='PT' "
 			+ "and pd.billid = bill.id INNER JOIN egcl_payment p ON p.paymentstatus!='CANCELLED' and p.id=pd.paymentid "
-			+ "and (To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata')::date between ((now() - INTERVAL '1 DAY')::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp) as properties";
+			+ "and (To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata')::date between ((now() - INTERVAL ':days DAY')::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp) as properties";
 
 }
