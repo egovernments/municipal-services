@@ -18,7 +18,7 @@ public class AdoptionQueryBuilder {
 			+ " INNER JOIN eg_user usr ON ptowner.propertyid=pt.id and ptowner.status='ACTIVE' AND ptowner.userid=usr.uuid ) userdetails),"
 			+ "'assessmentnumber',job.assessmentnumber,'sms_sentdate',(To_timestamp(job.createdtime/1000) at time Zone 'Asia/Kolkata')::date,"  
 			+ "'isValidsms',(SELECT CASE WHEN (select isvalid from decrypted_user u where u.uuid=(select userid from eg_pt_owner owner where owner.propertyid=pt.id and owner.status='ACTIVE' limit 1 ) limit 1) is null then false else true end)) " + 
-			"from eg_pt_property pt,eg_pt_assessment_job job WHERE job.propertyid=pt.propertyid and pt.status='ACTIVE' and job.status!='FAILED' and pt.propertyid IN (:propertyid);";
+			"from eg_pt_property pt,eg_pt_assessment_job job WHERE job.propertyid=pt.propertyid and pt.status='ACTIVE' and job.status!='FAILED' and pt.propertyid IN (:propertyid) ";
 	
 	public static final String PT_ASSESSMENT_DATE_FILTER =" and (To_timestamp(job.createdtime/1000) at time Zone 'Asia/Kolkata')::date between ((now() - INTERVAL :days)::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp";
 
