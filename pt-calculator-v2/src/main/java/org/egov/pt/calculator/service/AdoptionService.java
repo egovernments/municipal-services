@@ -46,8 +46,8 @@ public class AdoptionService {
 		Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(totalProperties, limit);
 
 		for (List<String> propertiesList : partitionConectionNoList) {
-			pushAssessmentDataTokafka(propertiesList);
-			pushPaymentDataTokafka(propertiesList);
+			pushAssessmentDataTokafka(propertiesList, 0);
+			pushPaymentDataTokafka(propertiesList, 0);
 
 		}
 
@@ -55,19 +55,21 @@ public class AdoptionService {
 
 	@Transactional(readOnly = true)
 	public void generateTodaysReport(int daysForIncrement) {
+		
+		daysForIncrement = daysForIncrement < 1 ? 1 : daysForIncrement;
+
 		List<String> propertiesData = adoptionRepository.getPropertiesFromAssessmentJob(daysForIncrement);
 		int limit = 500;
 		Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(propertiesData, limit);
 
 		for (List<String> propertiesList : partitionConectionNoList) {
-			pushAssessmentDataTokafka(propertiesList);
-			pushPaymentDataTokafka(propertiesList);
+			pushAssessmentDataTokafka(propertiesList, daysForIncrement);
+			pushPaymentDataTokafka(propertiesList, daysForIncrement);
 
 		}
 	}
-
-	public void pushAssessmentDataTokafka(List<String> propertiesList) {
-		List<String> adoptionData = adoptionRepository.generateAssessmentReport(propertiesList);
+	public void pushAssessmentDataTokafka(List<String> propertiesList, int daysForIncrement) {
+		List<String> adoptionData = adoptionRepository.generateAssessmentReport(propertiesList, daysForIncrement);
 
 		List<Map> mapData = new LinkedList<Map>();
 
@@ -82,8 +84,9 @@ public class AdoptionService {
 		producer.push(configurations.getKafkaWhatsappAdoptionDataTopic(), mapData);
 	}
 	
-	public void pushPaymentDataTokafka(List<String> propertiesList) {
-		List<String> adoptionData = adoptionRepository.generatePaymentReport(propertiesList);
+	public void pushPaymentDataTokafka(List<String> propertiesList, int daysForIncrement) {
+
+		List<String> adoptionData = adoptionRepository.generatePaymentReport(propertiesList, daysForIncrement);
 
 		List<Map> mapData = new LinkedList<Map>();
 

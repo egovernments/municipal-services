@@ -27,8 +27,15 @@ public class AdoptionRepository {
 
 		return properties;
 	}
-	public List<String> generateAssessmentReport(List<String> propertiesList) {
+	public List<String> generateAssessmentReport(List<String> propertiesList, int daysForIncrement) {
 		String query = AdoptionQueryBuilder.PT_ASSESSMENT_DATA_QUERY;
+		
+		//If the daysForIncrement >= 1 then, it's days report
+		if(daysForIncrement >= 1) {
+			query = query +  AdoptionQueryBuilder.PT_ASSESSMENT_DATE_FILTER;
+			query = query.replaceAll(":days", "'"+ daysForIncrement +" DAY'");
+
+		}
 //		log.info("generateTotalReport: " + query);
 		Map<String, Object> preparedStatementValues = new HashMap<>();
 		preparedStatementValues.put("propertyid", propertiesList);
@@ -39,8 +46,19 @@ public class AdoptionRepository {
 
 	}
 	
-	public List<String> generatePaymentReport(List<String> propertiesList) {
+	public List<String> generatePaymentReport(List<String> propertiesList, int daysForIncrement) {
+		
 		String query = AdoptionQueryBuilder.PT_PAYMENT_DATA_QUERY;
+		
+		//If the daysForIncrement < 1 then, it's total report
+		if(daysForIncrement < 1) {
+			query = query+AdoptionQueryBuilder.PT_PAYMENT_TOTAL_DATE_FILTER;
+			
+		} else {
+			query = query+AdoptionQueryBuilder.PT_PAYMENT_DATE_FILTER;
+			query = query.replaceAll(":days", "'"+ daysForIncrement +" DAY'");
+
+		}
 //		log.info("generateTotalReport: " + query);
 		Map<String, Object> preparedStatementValues = new HashMap<>();
 		preparedStatementValues.put("propertyid", propertiesList);
@@ -52,8 +70,6 @@ public class AdoptionRepository {
 	}
 
 	public List<String> getPropertiesFromAssessmentJob(int daysForIncrement) {
-		
-		daysForIncrement = daysForIncrement < 1 ? 1 : daysForIncrement;
 		
 		String query =  AdoptionQueryBuilder.ASSESS_JOB_PROPERTIES_IDS_QUERY;
 		
