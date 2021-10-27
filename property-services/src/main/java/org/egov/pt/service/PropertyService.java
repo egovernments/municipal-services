@@ -128,10 +128,10 @@ public class PropertyService {
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
 
 		boolean isRequestForUpdateMobileNumber = false;
-		JsonNode additionalDetails = request.getProperty().getAdditionalDetails();
-		System.out.println("additional details------------- "+ additionalDetails);
+		JsonNode additionalDetailsJson = request.getProperty().getAdditionalDetails();
+		System.out.println("additional details------------- "+ additionalDetailsJson);
 		
-		if( null != additionalDetails && !additionalDetails.isNull() ) {
+		if( null != additionalDetailsJson && !additionalDetailsJson.isNull() ) {
 			System.out.println("inside additional details condition------------- ");
 			HashMap<String, Boolean> additionalDetails = mapper.convertValue(request.getProperty().getAdditionalDetails(),HashMap.class);
 			isRequestForUpdateMobileNumber = additionalDetails.getOrDefault("isMobileNumberUpdate", false);
