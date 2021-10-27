@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -127,15 +128,16 @@ public class PropertyService {
 		System.out.println("isRequestForOwnerMutation -------- "+isRequestForOwnerMutation);
 
 		boolean isRequestForUpdateMobileNumber = false;
-		System.out.println("additional details------------- "+ request.getProperty().getAdditionalDetails());
-		if(null != request.getProperty().getAdditionalDetails()) {
+		JsonNode additionalDetails = request.getProperty().getAdditionalDetails();
+		System.out.println("additional details------------- "+ additionalDetails);
+		
+		if( null != additionalDetails && !additionalDetails.isNull() ) {
 			System.out.println("inside additional details condition------------- ");
 			HashMap<String, Boolean> additionalDetails = mapper.convertValue(request.getProperty().getAdditionalDetails(),HashMap.class);
 			isRequestForUpdateMobileNumber = additionalDetails.getOrDefault("isMobileNumberUpdate", false);
 		}
 		
 		boolean isNumberDifferent=false;
-		
 		if(isRequestForUpdateMobileNumber)
 			isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
 		// Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
