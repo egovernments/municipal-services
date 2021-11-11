@@ -16,7 +16,7 @@ config:
       - work-dir: "egov-user-event/src/main/resources/db"
         image-name: "egov-user-event-db"
 
-  - name: "builds/municipal-services/pt-calculator-v2"
+  - name: "builds/digit-impel-builds/municipal-services/pt-calculator-v2"
     build:
       - work-dir: "pt-calculator-v2"
         image-name: "pt-calculator-v2"
@@ -78,7 +78,7 @@ config:
       - work-dir: "firenoc-calculator/migration"
         image-name: "firenoc-calculator-db"
 
-  - name: "builds/municipal-services/ws-services"
+  - name: "builds/digit-impel-builds/municipal-services/ws-services"
     build:
       - work-dir: "ws-services"
         image-name: "ws-services"
@@ -86,7 +86,7 @@ config:
       - work-dir: "ws-services/src/main/resources/db"
         image-name: "ws-services-db"
         
-  - name: "builds/municipal-services/property-services"
+  - name: "builds/digit-impel-builds/municipal-services/property-services"
     build:
       - work-dir: "property-services"
         image-name: "property-services"
@@ -94,7 +94,7 @@ config:
       - work-dir: "property-services/src/main/resources/db"
         image-name: "property-services-db"
 
-  - name: "builds/municipal-services/ws-calculator"
+  - name: "builds/digit-impel-builds/municipal-services/ws-calculator"
     build:
       - work-dir: "ws-calculator"
         image-name: "ws-calculator"
@@ -102,7 +102,7 @@ config:
       - work-dir: "ws-calculator/src/main/resources/db"
         image-name: "ws-calculator-db"
 
-  - name: "builds/municipal-services/sw-services"
+  - name: "builds/digit-impel-builds/municipal-services/sw-services"
     build:
       - work-dir: "sw-services"
         image-name: "sw-services"
@@ -110,7 +110,7 @@ config:
       - work-dir: "sw-services/src/main/resources/db"
         image-name: "sw-services-db"
 
-  - name: "builds/municipal-services/sw-calculator"
+  - name: "builds/digit-impel-builds/municipal-services/sw-calculator"
     build:
       - work-dir: "sw-calculator"
         image-name: "sw-calculator"
