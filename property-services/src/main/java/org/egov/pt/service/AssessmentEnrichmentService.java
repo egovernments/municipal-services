@@ -198,6 +198,8 @@ public class AssessmentEnrichmentService {
 
         List<Unit> units  = property.getUnits();
 
+	if(!CollectionUtils.isEmpty(units))
+	{
         for(Unit unit : units){
 
             if(unitIdToUnitUsage.containsKey(unit.getId())){
@@ -212,7 +214,7 @@ public class AssessmentEnrichmentService {
                  unit.setUsageCategory(unitUsage.getUsageCategory());
             }
         }
-
+	}
     }
 
 
