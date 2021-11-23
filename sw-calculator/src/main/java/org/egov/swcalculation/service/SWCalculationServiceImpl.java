@@ -208,6 +208,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 				demandService.generateDemandForTenantId(tenantId, requestInfo);
 			} catch (Exception e) {
 				log.error("Exception occurred while generating demand for tenant: {} : " , tenantId);
+				log.error("Exception: {} : " , e);
 				e.printStackTrace();
 				continue;
 
