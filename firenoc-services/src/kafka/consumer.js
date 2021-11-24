@@ -148,8 +148,7 @@ consumerGroup.on("message", function(message) {
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} document verifier.|1301157492438182299|1407161407329037630`;
+          ] = `Dear ${ownerName}, Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been ${actionType} for document verifier.PMIDC|1301157492438182299|1407163652442445553`;
            break;
         case "PENDINGAPPROVAL":
           smsRequest[
