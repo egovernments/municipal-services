@@ -92,7 +92,8 @@ public class Validator {
 
 		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(Constants.CITIZEN))
 			allowedParamStr = config.getAllowedCitizenSearchParameters();
-		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(Constants.EMPLOYEE))
+		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(Constants.EMPLOYEE) ||
+				requestInfo.getUserInfo().getType().equalsIgnoreCase(Constants.SYSTEM))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
 		else
 			throw new CustomException(VehicleErrorConstants.INVALID_SEARCH,

@@ -35,6 +35,8 @@ public class Constants {
 
 	public static final String VEHICLE_SUCTION_TYPE = "SuctionType";
 
+	public static final String SYSTEM ="SYSTEM";
+
 	
 
 }

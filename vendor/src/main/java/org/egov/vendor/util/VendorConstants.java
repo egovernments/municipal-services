@@ -29,7 +29,9 @@ public class VendorConstants {
 
 	public static final String COULD_NOT_CREATE_VEHICLE = "COULD_NOT_CREATE_VEHICLE";
 
-	public static final String CITIZEN = "CITIZEN";	
+	public static final String CITIZEN = "CITIZEN";
+
+	public static final String SYSTEM = "SYSTEM";
 	
 	
 	

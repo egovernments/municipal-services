@@ -60,7 +60,8 @@ public class VendorValidator {
 		String allowedParamStr = null;
 
 		// I am in doute
-		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.EMPLOYEE))
+		if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.EMPLOYEE) || 
+				requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.SYSTEM))
 			allowedParamStr = config.getAllowedEmployeeSearchParameters();
 		else if (requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.CITIZEN))
 			allowedParamStr = config.getAllowedCitizenSearchParameters();
