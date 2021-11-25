@@ -127,34 +127,28 @@ consumerGroup.on("message", function(message) {
 /*case "INITIATED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.|1301157492438182299|1407161407309889909`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is${applicationNumber}.|1301157492438182299|1407161407309889909`;
           break;*/
 
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate has been submitted, the application no. is ${applicationNumber}. 
-          You can download your application form by clicking on the below link: 
-           ${downLoadLink}.
-          Kindly pay your NOC Fees online or at your applicable fire office.|1301157492438182299|1407161492659630233`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC Certificate has been submitted, the application no. is ${applicationNumber}.You can download your application form by clicking on the below link:${downLoadLink}.Kindly pay your NOC Fees online or at your applicable fire office.|1301157492438182299|1407161492659630233`;
           break;
         case "FIELDINSPECTION":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} field inspection.|1301157492438182299|1407161492704744715`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been ${actionType} field inspection.|1301157492438182299|1407161492704744715`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been ${actionType} for document verifier.PMIDC|1301157492438182299|1407163652442445553`;
+          ] = `Dear ${ownerName}, Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been ${actionType} for document verifier.PMIDC|1301157492438182299|1407163782241169942`;
            break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} approver.|1301157492438182299|1407161407332754584`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC Certificate with application no.${applicationNumber} has been ${actionType} approver.|1301157492438182299|1407161407332754584`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
@@ -171,24 +165,17 @@ consumerGroup.on("message", function(message) {
 
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and  ${messageForcertificate}
-          Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.
-          You can download your Fire NOC Certificate by clicking on the below link:
-          ${downLoadLink}|1301157492438182299|1407161494277225601`;
+          ] = `Dear ${ownerName}, Your Application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and ${messageForcertificate} Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.You can download your Fire NOC Certificate by clicking on the below link: ${downLoadLink}|1301157492438182299|1407161494277225601`;
           break;
         case "SENDBACKTOCITIZEN":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.|1301157492438182299|1407161407355219072`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.|1301157492438182299|1407161407355219072`;
           break;
         case "REJECTED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.|1301157492438182299|1407161407368404178
-          `;
+          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.|1301157492438182299|1407161407368404178`;
           break;
         // case "CANCELLED":
         //   break;
