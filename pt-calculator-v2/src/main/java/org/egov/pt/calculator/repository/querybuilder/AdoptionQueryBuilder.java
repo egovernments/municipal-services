@@ -33,7 +33,7 @@ public class AdoptionQueryBuilder {
 			+ " between ";
 	
 			
-	public static final String PT_PAYMENT_TOTAL_DATE_FILTER=" (To_timestamp((select min(ast_job.createdtime) from eg_pt_assessment_job ast_job where ast_job.propertyid=pt.propertyid and ast_job.status!='FAILED')/1000) at time Zone 'Asia/Kolkata') and ((now())::date || ' 23:59:59')::timestamp order by pd.receiptdate;";
+	public static final String PT_PAYMENT_TOTAL_DATE_FILTER=" (To_timestamp((select min(ast_job.createdtime) from eg_pt_assessment_job ast_job where ast_job.status!='FAILED')/1000) at time Zone 'Asia/Kolkata') and ((now())::date || ' 23:59:59')::timestamp order by pd.receiptdate;";
 	
 	public static final String PT_PAYMENT_DATE_FILTER=" ((now() - INTERVAL :days )::date || ' 00:00:00')::timestamp and ((now() - INTERVAL '1 DAY')::date || ' 23:59:59')::timestamp";
 	
