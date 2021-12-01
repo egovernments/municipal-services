@@ -1,9 +1,12 @@
 package org.egov.vendor.validator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.tracer.model.CustomException;
 import org.egov.vendor.config.VendorConfiguration;
 import org.egov.vendor.service.BoundaryService;
@@ -15,6 +18,7 @@ import org.egov.vendor.util.VendorUtil;
 import org.egov.vendor.web.model.Vendor;
 import org.egov.vendor.web.model.VendorRequest;
 import org.egov.vendor.web.model.VendorSearchCriteria;
+import org.egov.vendor.web.model.user.User;
 import org.egov.vendor.web.model.vehicle.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -44,6 +48,19 @@ public class VendorValidator {
 	public void validateSearch(RequestInfo requestInfo, VendorSearchCriteria criteria) {
 
 		// Coz hear employee will be logged in to create vendor so..
+		org.egov.common.contract.request.User  userInfo ;
+		if(requestInfo.getUserInfo()==null) {
+			ArrayList<Role> userrole=new ArrayList();
+			userrole.add(Role.builder().code("FSM_ADMIN").build());
+		 userInfo = org.egov.common.contract.request.User.builder()
+                .uuid("FSM_VENDOR_SEARCH")
+                .type("SYSTEM")
+                .roles(userrole).id(0L).build();
+		requestInfo.setUserInfo(userInfo);
+		}
+
+        
+		
 		if (!requestInfo.getUserInfo().getType().equalsIgnoreCase(VendorConstants.EMPLOYEE) && criteria.isEmpty())
 			throw new CustomException(VendorErrorConstants.INVALID_SEARCH,
 					"Search without any paramters is not allowed");
