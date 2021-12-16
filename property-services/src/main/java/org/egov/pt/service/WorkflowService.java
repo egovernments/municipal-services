@@ -114,6 +114,8 @@ public class WorkflowService {
 		
 		ProcessInstanceRequest workflowReq = utils.getWfForPropertyRegistry(request, creationReasonForWorkflow);
 		State state = callWorkFlow(workflowReq);
+		System.out.println("workflowReq ~~~~~~~~~~~~~~~~~~~~"+workflowReq);
+		System.out.println("state ~~~~~~~~~~~~~~~~~~~~"+state);
 		
 		if (state.getApplicationStatus().equalsIgnoreCase(configs.getWfStatusActive()) && property.getPropertyId() == null) {
 			
