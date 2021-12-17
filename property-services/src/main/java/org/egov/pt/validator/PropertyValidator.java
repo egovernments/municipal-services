@@ -90,6 +90,10 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 		if(CollectionUtils.isEmpty(request.getProperty().getOwners()))
 			throw new CustomException("OWNER INFO ERROR","Owners cannot be empty, please provide at least one owner information");
 		
+		if(!CollectionUtils.isEmpty(request.getProperty().getOwners())) {
+			//write code for checking mobilenumber
+		}
+		
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
 
