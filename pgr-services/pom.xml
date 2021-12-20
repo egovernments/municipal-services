@@ -14,6 +14,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.5.9.RELEASE</version>
+		<log4j2.version>2.16.0</log4j2.version>
     </parent>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>

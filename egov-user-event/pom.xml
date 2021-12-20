@@ -24,6 +24,7 @@
 		<commons-lang-version>2.6</commons-lang-version>
 		<joda-time-version>2.9.6</joda-time-version>
 		<maven.version>3.3.9</maven.version>
+		<log4j2.version>2.16.0</log4j2.version>
 	</properties>
 
 	<dependencies>
