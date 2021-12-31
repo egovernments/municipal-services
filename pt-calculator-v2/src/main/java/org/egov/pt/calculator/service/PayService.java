@@ -198,7 +198,10 @@ public class PayService {
 		Calendar cal = Calendar.getInstance();
 		setDateToCalendar(time, cal);
 		Long currentIST = System.currentTimeMillis() + TIMEZONE_OFFSET;
-
+                log.info("penalty object:" + penalty);
+		log.info("Penalty effective time: " + cal.getTimeInMillis());
+		log.info("System time: " + currentIST);
+		
 		if (cal.getTimeInMillis() < currentIST)
 			penaltyAmt = mDService.calculateApplicables(taxAmt, penalty);
 
@@ -240,6 +243,8 @@ public class PayService {
 		long currentUTC = System.currentTimeMillis();
 		long currentIST = System.currentTimeMillis() + TIMEZONE_OFFSET;
 		long interestStart = cal.getTimeInMillis();
+		
+		log.info("System time: " + currentIST);
 		
 	   if(endTime != null)
 	   {
