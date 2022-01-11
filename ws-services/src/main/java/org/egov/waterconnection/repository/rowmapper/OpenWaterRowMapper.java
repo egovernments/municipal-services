@@ -1,15 +1,22 @@
 package org.egov.waterconnection.repository.rowmapper;
 
 import org.apache.commons.lang3.StringUtils;
+import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.web.models.*;
 import org.egov.waterconnection.web.models.Connection.StatusEnum;
 import org.egov.waterconnection.web.models.workflow.ProcessInstance;
+import org.postgresql.util.PGobject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,6 +26,9 @@ import java.util.Map;
 
 @Component
 public class OpenWaterRowMapper implements ResultSetExtractor<List<WaterConnection>> {
+	@Autowired
+	private ObjectMapper mapper;
+	
 	@Override
     public List<WaterConnection> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<String, WaterConnection> connectionListMap = new HashMap<>();
@@ -40,11 +50,41 @@ public class OpenWaterRowMapper implements ResultSetExtractor<List<WaterConnecti
                 currentWaterConnection.setConnectionNo(rs.getString("connectionNo"));
                 currentWaterConnection.setOldConnectionNo(rs.getString("oldConnectionNo"));
                 currentWaterConnection.setOldApplication(rs.getBoolean("isoldapplication"));
-                HashMap<String, Object> additionalDetails = new HashMap<>();
-                additionalDetails.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
-                additionalDetails.put(WCConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
-                additionalDetails.put(WCConstants.LOCALITY, rs.getString("locality"));
-                currentWaterConnection.setAdditionalDetails(additionalDetails);
+//                HashMap<String, Object> additionalDetails = new HashMap<>();
+//                additionalDetails.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
+//                additionalDetails.put(WCConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
+//                additionalDetails.put(WCConstants.LOCALITY, rs.getString("locality"));
+//                currentWaterConnection.setAdditionalDetails(additionalDetails);
+                PGobject pgObj = (PGobject) rs.getObject("additionaldetails");
+				ObjectNode additionalDetails = null;
+				if (pgObj != null) {
+
+					try {
+						additionalDetails = mapper.readValue(pgObj.getValue(), ObjectNode.class);
+					} catch (IOException ex) {
+						// TODO Auto-generated catch block
+						throw new CustomException("PARSING ERROR", "The additionalDetail json cannot be parsed");
+					}
+				} else {
+					additionalDetails = mapper.createObjectNode();
+				}
+				// HashMap<String, Object> additionalDetails = new HashMap<>();
+				additionalDetails.put(WCConstants.ADHOC_PENALTY, rs.getBigDecimal("adhocpenalty"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE, rs.getBigDecimal("adhocrebate"));
+				additionalDetails.put(WCConstants.ADHOC_PENALTY_REASON, rs.getString("adhocpenaltyreason"));
+				additionalDetails.put(WCConstants.ADHOC_PENALTY_COMMENT, rs.getString("adhocpenaltycomment"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE_REASON, rs.getString("adhocrebatereason"));
+				additionalDetails.put(WCConstants.ADHOC_REBATE_COMMENT, rs.getString("adhocrebatecomment"));
+				additionalDetails.put(WCConstants.INITIAL_METER_READING_CONST, rs.getBigDecimal("initialmeterreading"));
+				additionalDetails.put(WCConstants.APP_CREATED_DATE, rs.getBigDecimal("appCreatedDate"));
+				additionalDetails.put(WCConstants.DETAILS_PROVIDED_BY, rs.getString("detailsprovidedby"));
+				additionalDetails.put(WCConstants.ESTIMATION_FILESTORE_ID, rs.getString("estimationfileStoreId"));
+				additionalDetails.put(WCConstants.SANCTION_LETTER_FILESTORE_ID, rs.getString("sanctionfileStoreId"));
+				additionalDetails.put(WCConstants.ESTIMATION_DATE_CONST, rs.getBigDecimal("estimationLetterDate"));
+				additionalDetails.put(WCConstants.LOCALITY, rs.getString("locality"));
+
+				currentWaterConnection.setAdditionalDetails(additionalDetails);
+
                 currentWaterConnection
                         .processInstance(ProcessInstance.builder().action((rs.getString("action"))).build());
                 currentWaterConnection.setPropertyId(rs.getString("property_id"));

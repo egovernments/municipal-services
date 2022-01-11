@@ -1,6 +1,7 @@
 package org.egov.waterconnection.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,6 +11,7 @@ import org.egov.tracer.model.CustomException;
 import org.egov.waterconnection.config.WSConfiguration;
 import org.egov.waterconnection.constants.WCConstants;
 import org.egov.waterconnection.repository.IdGenRepository;
+import org.egov.waterconnection.repository.ServiceRequestRepository;
 import org.egov.waterconnection.repository.WaterDaoImpl;
 import org.egov.waterconnection.util.WaterServicesUtil;
 import org.egov.waterconnection.web.models.*;
@@ -53,18 +55,23 @@ public class EnrichmentService {
 	@Autowired
 	private WaterServiceImpl waterService;
 
+	@Autowired
+	private ServiceRequestRepository serviceRequestRepository;
+
+
 	/**
 	 * Enrich water connection
 	 * 
 	 * @param waterConnectionRequest WaterConnection Object
 	 */
 	@SuppressWarnings("unchecked")
-	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType) {
+	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType, Boolean isMigration) {
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
+		if (!isMigration)
+			waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
@@ -82,6 +89,16 @@ public class EnrichmentService {
 	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION :  WCConstants.NEW_WATER_CONNECTION);
 		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+
+		WaterConnection connection = waterConnectionRequest.getWaterConnection();
+
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				roadCuttingInfo.setId(UUID.randomUUID().toString());
+				roadCuttingInfo.setStatus(Status.ACTIVE);
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 		
 	}
 	@SuppressWarnings("unchecked")
@@ -97,12 +114,12 @@ public class EnrichmentService {
 			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY, WCConstants.ADHOC_REBATE,
 					WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE,
 					WCConstants.ESTIMATION_DATE_CONST);
-			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
-				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
-					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
-					additionalDetail.put(constKey, big);
+			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
+				if (addDetail.getOrDefault(entry.getKey(), null) != null && numberConstants.contains(entry.getKey())) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(entry.getKey())));
+					additionalDetail.put(entry.getKey(), big);
 				} else {
-					additionalDetail.put(constKey, addDetail.get(constKey));
+					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 				}
 			}
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
@@ -111,6 +128,11 @@ public class EnrichmentService {
 			}
 			additionalDetail.put(WCConstants.LOCALITY,addDetail.get(WCConstants.LOCALITY).toString());
 
+			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
+				if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
+					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
+				}
+			}
 		}
 		waterConnectionRequest.getWaterConnection().setAdditionalDetails(additionalDetail);
 	}
@@ -173,6 +195,15 @@ public class EnrichmentService {
 					plumberInfo.setId(UUID.randomUUID().toString());
 				}
 				plumberInfo.setAuditDetails(auditDetails);
+			});
+		}
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				if (roadCuttingInfo.getId() == null) {
+					roadCuttingInfo.setId(UUID.randomUUID().toString());
+					roadCuttingInfo.setStatus(Status.ACTIVE);
+				}
+				roadCuttingInfo.setAuditDetails(auditDetails);
 			});
 		}
 		enrichingAdditionalDetails(waterConnectionRequest);
@@ -374,6 +405,55 @@ public class EnrichmentService {
 			}
 		});
 		return new ArrayList(connectionHashMap.values());
+	}
+
+	public List<WaterConnection> enrichPropertyDetails(List<WaterConnection> waterConnectionList, SearchCriteria criteria, RequestInfo requestInfo){
+		List<WaterConnection> finalConnectionList = new ArrayList<>();
+		if (CollectionUtils.isEmpty(waterConnectionList))
+			return finalConnectionList;
+
+		Set<String> propertyIds = new HashSet<>();
+		Map<String,List<OwnerInfo>> propertyToOwner = new HashMap<>();
+		for(WaterConnection waterConnection : waterConnectionList){
+			if(!StringUtils.isEmpty(waterConnection.getPropertyId()))
+				propertyIds.add(waterConnection.getPropertyId());
+		}
+		if(!CollectionUtils.isEmpty(propertyIds)){
+			PropertyCriteria propertyCriteria = new PropertyCriteria();
+			if (!StringUtils.isEmpty(criteria.getTenantId())) {
+				propertyCriteria.setTenantId(criteria.getTenantId());
+			}
+			propertyCriteria.setPropertyIds(propertyIds);
+			List<Property> propertyList = waterServicesUtil.getPropertyDetails(serviceRequestRepository.fetchResult(waterServicesUtil.getPropertyURL(propertyCriteria),
+					RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
+
+			if(!CollectionUtils.isEmpty(propertyList)){
+				for(Property property: propertyList){
+					propertyToOwner.put(property.getPropertyId(),property.getOwners());
+				}
+			}
+
+			for(WaterConnection waterConnection : waterConnectionList){
+				HashMap<String, Object> additionalDetail = new HashMap<>();
+				HashMap<String, Object> addDetail = mapper
+						.convertValue(waterConnection.getAdditionalDetails(), HashMap.class);
+
+				for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
+					if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
+						additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
+					}
+				}
+				List<OwnerInfo> ownerInfoList = propertyToOwner.get(waterConnection.getPropertyId());
+				if(!CollectionUtils.isEmpty(ownerInfoList)){
+					additionalDetail.put("ownerName",ownerInfoList.get(0).getName());
+				}
+				waterConnection.setAdditionalDetails(additionalDetail);
+				finalConnectionList.add(waterConnection);
+			}
+
+
+		}
+		return finalConnectionList;
 	}
 
 }

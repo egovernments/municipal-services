@@ -75,6 +75,9 @@ public class SearchCriteria {
 	@JsonProperty("locality")
 	private String locality;
 
+	@JsonProperty("isPropertyDetailsRequired")
+	private Boolean isPropertyDetailsRequired = false;
+
 
 	@JsonIgnore
 	private List<String> ownerIds;
