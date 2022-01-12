@@ -654,18 +654,32 @@ public class DemandService {
 	@SuppressWarnings("unchecked")
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
 		log.info("Billing master data values for non metered connection:: {}", master);
+		Integer batchsize = configs.getBatchSize();
+		Integer batchOffset = configs.getBatchOffset();
 		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
 			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
 					SWCalculationConstant.nonMeterdConnection);
+			int connectionCount = connectionNos.size();
+			if(batchsize<connectionCount)
+				batchsize = connectionCount;
+			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+
 			for (String connectionNo : connectionNos) {
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
-				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
-				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).isconnectionCalculation(true).build();
-				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+
+				if(batchOffset==batchsize-1){
+					CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+							.requestInfo(requestInfo).isconnectionCalculation(true).build();
+					kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+					batchOffset = 0;
+					calculationCriteriaList.clear();
+				}
+				else{
+					batchOffset++;
+				}
 			}
 		}
 	}
