@@ -2,14 +2,7 @@ package org.egov.wscalculation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -678,19 +671,32 @@ public class DemandService {
 	 */
 	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
 		log.info("Billing master data values for non metered connection:: {}", master);
+		Integer batchsize = configs.getBatchSize();
+		Integer batchOffset = configs.getBatchOffset();
+
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if(isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection);
 			String assessmentYear = estimationService.getAssessmentYear();
+			int connectionCount = connectionNos.size();
+			if(batchsize<connectionCount)
+				batchsize = connectionCount;
+			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 			for (String connectionNo : connectionNos) {
 				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
 						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
-				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 				calculationCriteriaList.add(calculationCriteria);
-				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).isconnectionCalculation(true).build();
-				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+				if(batchOffset==batchsize-1){
+					CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+							.requestInfo(requestInfo).isconnectionCalculation(true).build();
+					wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+					batchOffset = 0;
+					calculationCriteriaList.clear();
+				}
+				else{
+					batchOffset++;
+				}
 				// log.info("Prepared Statement" + calculationRes.toString());
 
 			}
