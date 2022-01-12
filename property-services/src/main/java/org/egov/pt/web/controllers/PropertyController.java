@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
@@ -29,8 +30,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+
 @Controller
+@Slf4j
 @RequestMapping("/property")
+
 public class PropertyController {
 
     @Autowired
@@ -46,7 +53,10 @@ public class PropertyController {
     private PropertyValidator propertyValidator;
 
     @PostMapping("/_create")
-    public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
+    public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest,@RequestBody RequestInfo requestInfo,
+    		@ModelAttribute @Valid PropertyCriteria propertycriteria) {
+log.info("Property is created:"+propertycriteria.getMobileNumber());
+log.info("Property name:"+propertycriteria.getName());
 
         Property property = propertyService.createProperty(propertyRequest);
         ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(), true);
@@ -59,8 +69,9 @@ public class PropertyController {
 
 
     @PostMapping("/_update")
-    public ResponseEntity<PropertyResponse> update(@Valid @RequestBody PropertyRequest propertyRequest) {
-
+    public ResponseEntity<PropertyResponse> update(@Valid @RequestBody PropertyRequest propertyRequest,
+    		@ModelAttribute @Valid PropertyCriteria propertycriteria) {
+log.info("Property is updated:"+propertycriteria.getMobileNumber());
         Property property = propertyService.updateProperty(propertyRequest);
         ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(), true);
         PropertyResponse response = PropertyResponse.builder()
@@ -73,6 +84,7 @@ public class PropertyController {
     @PostMapping("/_search")
     public ResponseEntity<PropertyResponse> search(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                    @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
+		log.info("Update your number: "+propertyCriteria.getMobileNumber());
 
         propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
         List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
@@ -107,6 +119,8 @@ public class PropertyController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    
+    
 //	@RequestMapping(value = "/_cancel", method = RequestMethod.POST)
 //	public ResponseEntity<PropertyResponse> cancel(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
 //												   @Valid @ModelAttribute PropertyCancelCriteria propertyCancelCriteria) {
