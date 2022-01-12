@@ -2,10 +2,18 @@ package org.egov.pt.models;
 
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import org.egov.pt.models.enums.Status;
+import org.egov.pt.service.MigrationService;
+import org.egov.pt.service.PropertyService;
+import org.egov.pt.util.ResponseInfoFactory;
+import org.egov.pt.validator.PropertyValidator;
+import org.egov.pt.web.controllers.PropertyController;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +25,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class PropertyCriteria {
 
 	private String tenantId;
@@ -32,7 +41,7 @@ public class PropertyCriteria {
 	private Set<String> oldpropertyids;
 	
 	private Status status;
-
+    
 	private String mobileNumber;
 
 	private String name;
