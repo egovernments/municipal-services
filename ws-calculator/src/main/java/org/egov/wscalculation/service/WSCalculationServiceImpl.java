@@ -14,16 +14,7 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.web.models.AdhocTaxReq;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationCriteria;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.TaxHeadCategory;
-import org.egov.wscalculation.web.models.Property;
-import org.egov.wscalculation.web.models.TaxHeadEstimate;
-import org.egov.wscalculation.web.models.TaxHeadMaster;
-import org.egov.wscalculation.web.models.WaterConnection;
-import org.egov.wscalculation.web.models.WaterConnectionRequest;
+import org.egov.wscalculation.web.models.*;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
@@ -34,6 +25,7 @@ import org.springframework.stereotype.Service;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -272,16 +264,23 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	/**
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
-	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo) {
+	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo, BulkBillCriteria bulkBillCriteria) {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
-		List<String> tenantIds = wSCalculationDao.getTenantId();
+		List<String> tenantIds = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(bulkBillCriteria.getTenantIds())){
+			tenantIds = bulkBillCriteria.getTenantIds();
+		}
+		else
+			tenantIds = wSCalculationDao.getTenantId();
+
 		if (tenantIds.isEmpty())
 			return;
+
 		log.info("Tenant Ids : " + tenantIds.toString());
 		tenantIds.forEach(tenantId -> {
-			demandService.generateDemandForTenantId(tenantId, requestInfo);
+			demandService.generateDemandForTenantId(tenantId, requestInfo, bulkBillCriteria);
 		});
 	}
 	

@@ -19,22 +19,8 @@ import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
 import org.egov.wscalculation.validator.WSCalculationWorkflowValidator;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationCriteria;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.Demand;
+import org.egov.wscalculation.web.models.*;
 import org.egov.wscalculation.web.models.Demand.StatusEnum;
-import org.egov.wscalculation.web.models.DemandDetail;
-import org.egov.wscalculation.web.models.DemandDetailAndCollection;
-import org.egov.wscalculation.web.models.DemandRequest;
-import org.egov.wscalculation.web.models.DemandResponse;
-import org.egov.wscalculation.web.models.GetBillCriteria;
-import org.egov.wscalculation.web.models.Property;
-import org.egov.wscalculation.web.models.RequestInfoWrapper;
-import org.egov.wscalculation.web.models.TaxHeadEstimate;
-import org.egov.wscalculation.web.models.TaxPeriod;
-import org.egov.wscalculation.web.models.WaterConnection;
-import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -657,10 +643,10 @@ public class DemandService {
 	 * @param tenantId
 	 *            TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo, BulkBillCriteria bulkBillCriteria) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
-		generateDemandForULB(billingMasterData, requestInfo, tenantId);
+		generateDemandForULB(billingMasterData, requestInfo, tenantId, bulkBillCriteria);
 	}
 
 	/**
@@ -669,37 +655,43 @@ public class DemandService {
 	 * @param requestInfo Request Info
 	 * @param tenantId Tenant Id
 	 */
-	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
+	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId, BulkBillCriteria bulkBillCriteria) {
 		log.info("Billing master data values for non metered connection:: {}", master);
-		Integer batchsize = configs.getBatchSize();
-		Integer batchOffset = configs.getBatchOffset();
 
 		long startDay = (((int) master.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if(isCurrentDateIsMatching((String) master.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
-			List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
-					WSCalculationConstant.nonMeterdConnection);
-			String assessmentYear = estimationService.getAssessmentYear();
-			int connectionCount = connectionNos.size();
-			if(batchsize<connectionCount)
-				batchsize = connectionCount;
-			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-			for (String connectionNo : connectionNos) {
-				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-						.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
-				calculationCriteriaList.add(calculationCriteria);
-				if(batchOffset==batchsize-1){
-					CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-							.requestInfo(requestInfo).isconnectionCalculation(true).build();
-					wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
-					batchOffset = 0;
-					calculationCriteriaList.clear();
+			long count = waterCalculatorDao.getConnectionCount(tenantId);
+			Integer batchsize = configs.getBatchSize();
+			Integer batchOffset = configs.getBatchOffset();
+
+			if(bulkBillCriteria.getLimit() != null)
+				batchsize = Math.toIntExact(bulkBillCriteria.getLimit());
+
+			if(bulkBillCriteria.getOffset() != null)
+				batchOffset = Math.toIntExact(bulkBillCriteria.getOffset());
+
+			log.info("Count: "+count);
+
+			while(batchOffset<count){
+				List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
+						WSCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+				String assessmentYear = estimationService.getAssessmentYear();
+
+				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+				for (String connectionNo : connectionNos) {
+					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+							.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
+					calculationCriteriaList.add(calculationCriteria);
 				}
-				else{
-					batchOffset++;
-				}
-				// log.info("Prepared Statement" + calculationRes.toString());
+				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+						.requestInfo(requestInfo).isconnectionCalculation(true).build();
+				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
+				calculationCriteriaList.clear();
+				batchOffset = batchOffset + batchsize;
 
 			}
+
+
 		}
 	}
 

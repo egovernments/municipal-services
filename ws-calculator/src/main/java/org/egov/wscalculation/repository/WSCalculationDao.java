@@ -21,10 +21,12 @@ public interface WSCalculationDao {
 	
 	int isMeterReadingConnectionExist(List<String> ids);
 	
-	List<String> getConnectionsNoList(String tenantId, String connectionType);
+	List<String> getConnectionsNoList(String tenantId, String connectionType, Integer batchOffset, Integer batchsize);
 	
 	List<String> getTenantId();
 	
 	int isBillingPeriodExists(String connectionNo, String billingPeriod);
+
+	long getConnectionCount(String tenantid);
 
 }

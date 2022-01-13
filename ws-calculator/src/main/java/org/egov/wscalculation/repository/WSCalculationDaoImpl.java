@@ -125,9 +125,9 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 	}
 	
 	@Override
-	public List<String> getConnectionsNoList(String tenantId, String connectionType) {
+	public List<String> getConnectionsNoList(String tenantId, String connectionType, Integer batchOffset, Integer batchsize) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement);
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType, preparedStatement, batchOffset, batchsize);
 		log.info("water " + connectionType + " connection list : " + query);
 		return jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 	}
@@ -145,5 +145,13 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		String query = queryBuilder.isBillingPeriodExists(connectionNo, billingPeriod, preparedStatement);
 		log.info("Is BillingPeriod Exits Query: " + query);
 		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
+	}
+
+	@Override
+	public long getConnectionCount(String tenantid){
+		String query = queryBuilder.getCountQuery();
+		query =	query.replace("{}",tenantid);
+		long count = jdbcTemplate.queryForObject(query, Integer.class);
+		return count;
 	}
 }

@@ -5,14 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.egov.wscalculation.web.models.AdhocTaxReq;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.CalculationRes;
-import org.egov.wscalculation.web.models.Demand;
-import org.egov.wscalculation.web.models.DemandResponse;
-import org.egov.wscalculation.web.models.GetBillCriteria;
-import org.egov.wscalculation.web.models.RequestInfoWrapper;
+import org.egov.wscalculation.web.models.*;
 import org.egov.wscalculation.service.DemandService;
 import org.egov.wscalculation.service.WSCalculationService;
 import org.egov.wscalculation.service.WSCalculationServiceImpl;
@@ -83,8 +76,8 @@ public class CalculatorController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
-		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo());
+	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, @ModelAttribute @Valid BulkBillCriteria bulkBillCriteria) {
+		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo(), bulkBillCriteria);
 	}
 	
 	@PostMapping("/_applyAdhocTax")
