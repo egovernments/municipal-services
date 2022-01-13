@@ -640,8 +640,6 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 			return false;
 		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 4)
 			return false;
-		else if (mobileNumber == "999999999")
-			return false;
 		else
 			return true;
 	}
