@@ -332,11 +332,11 @@ public class PropertyMigrationValidator {
 			return false;
 		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 5)
 			return false;
+		
 		else if(mobileNumber == "9999999999")
 			return false;
 		else
 			return true;
-		
 	}
 
 
