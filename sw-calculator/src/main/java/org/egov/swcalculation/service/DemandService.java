@@ -25,22 +25,8 @@ import org.egov.swcalculation.repository.SewerageCalculatorDao;
 import org.egov.swcalculation.util.CalculatorUtils;
 import org.egov.swcalculation.util.SWCalculationUtil;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
-import org.egov.swcalculation.web.models.Calculation;
-import org.egov.swcalculation.web.models.CalculationCriteria;
-import org.egov.swcalculation.web.models.CalculationReq;
-import org.egov.swcalculation.web.models.Demand;
+import org.egov.swcalculation.web.models.*;
 import org.egov.swcalculation.web.models.Demand.StatusEnum;
-import org.egov.swcalculation.web.models.DemandDetail;
-import org.egov.swcalculation.web.models.DemandDetailAndCollection;
-import org.egov.swcalculation.web.models.DemandRequest;
-import org.egov.swcalculation.web.models.DemandResponse;
-import org.egov.swcalculation.web.models.GetBillCriteria;
-import org.egov.swcalculation.web.models.Property;
-import org.egov.swcalculation.web.models.RequestInfoWrapper;
-import org.egov.swcalculation.web.models.SewerageConnection;
-import org.egov.swcalculation.web.models.SewerageConnectionRequest;
-import org.egov.swcalculation.web.models.TaxHeadEstimate;
-import org.egov.swcalculation.web.models.TaxPeriod;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -638,11 +624,11 @@ public class DemandService {
 	 * 
 	 * @param tenantId TenantId for getting master data.
 	 */
-	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo) {
+	public void generateDemandForTenantId(String tenantId, RequestInfo requestInfo, BulkBillCriteria bulkBillCriteria) {
 		requestInfo.getUserInfo().setTenantId(tenantId);
 		Map<String, Object> billingMasterData = calculatorUtils.loadBillingFrequencyMasterData(requestInfo, tenantId);
 		generateDemandForULB(billingMasterData, requestInfo,
-				tenantId);
+				tenantId, bulkBillCriteria);
 	}
 	
 	/**
@@ -652,38 +638,42 @@ public class DemandService {
 	 * @param tenantId - Tenant Id
 	 */
 	@SuppressWarnings("unchecked")
-	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId) {
+	public void generateDemandForULB(Map<String, Object> master, RequestInfo requestInfo, String tenantId, BulkBillCriteria bulkBillCriteria) {
 		log.info("Billing master data values for non metered connection:: {}", master);
-		Integer batchsize = configs.getBatchSize();
-		Integer batchOffset = configs.getBatchOffset();
 		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
-			List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-					SWCalculationConstant.nonMeterdConnection);
-			int connectionCount = connectionNos.size();
-			if(batchsize<connectionCount)
-				batchsize = connectionCount;
-			List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+			long count = sewerageCalculatorDao.getConnectionCount(tenantId);
+			Integer batchsize = configs.getBatchSize();
+			Integer batchOffset = configs.getBatchOffset();
 
-			for (String connectionNo : connectionNos) {
-				CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-						.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
-				calculationCriteriaList.add(calculationCriteria);
+			if(bulkBillCriteria.getLimit() != null)
+				batchsize = Math.toIntExact(bulkBillCriteria.getLimit());
 
-				if(batchOffset==batchsize-1){
-					CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-							.requestInfo(requestInfo).isconnectionCalculation(true).build();
-					kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
-					batchOffset = 0;
-					calculationCriteriaList.clear();
+			if(bulkBillCriteria.getOffset() != null)
+				batchOffset = Math.toIntExact(bulkBillCriteria.getOffset());
+
+			log.info("Count: "+count);
+
+			while(batchOffset<count){
+				List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
+						SWCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+
+				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+
+				for (String connectionNo : connectionNos) {
+					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+							.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
+					calculationCriteriaList.add(calculationCriteria);
 				}
-				else{
-					batchOffset++;
-				}
+				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+						.requestInfo(requestInfo).isconnectionCalculation(true).build();
+				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+				calculationCriteriaList.clear();
+				batchOffset = batchOffset + batchsize;
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param billingFrequency - Billing Frequency period

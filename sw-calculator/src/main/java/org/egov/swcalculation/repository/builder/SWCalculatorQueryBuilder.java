@@ -11,11 +11,17 @@ public class SWCalculatorQueryBuilder {
 	
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
+	private  static final String countQuery = "select count(*) from eg_sw_connection where tenantid = '{}';";
+
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
 	}
 
-	public String getConnectionNumberList(String tenantId, String connectionType, List<Object> preparedStatement) {
+	public String getCountQuery() {
+		return countQuery;
+	}
+
+	public String getConnectionNumberList(String tenantId, String connectionType, List<Object> preparedStatement, Integer batchOffset, Integer batchsize) {
 		StringBuilder query = new StringBuilder(connectionNoListQuery);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
@@ -30,6 +36,12 @@ public class SWCalculatorQueryBuilder {
 		//Add not null condition
 		addClauseIfRequired(preparedStatement, query);
 		query.append(" conn.connectionno is not null");
+
+		String orderbyClause = " ORDER BY conn.connectionno OFFSET ? LIMIT ?";
+		preparedStatement.add(batchOffset);
+		preparedStatement.add(batchsize);
+		query.append(orderbyClause);
+
 		return query.toString();
 	}
 
