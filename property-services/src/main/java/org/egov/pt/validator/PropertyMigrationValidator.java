@@ -324,21 +324,15 @@ public class PropertyMigrationValidator {
 	 */
 	private Boolean isMobileNumberValid(String mobileNumber) {
 
-		log.info("Mobile number is:" + mobileNumber);
-		
 		if (mobileNumber == null)
 			return false;
 		else if (mobileNumber.length() != 10)
 			return false;
 		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 5)
 			return false;
-		
-		else if(mobileNumber == "9999999999")
-			return false;
 		else
 			return true;
 	}
-
 
 
 
