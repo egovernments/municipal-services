@@ -47,6 +47,8 @@ public class WSCalculationConstant {
 	 */
 
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
+	
+	public static final String PAYMENT_COMPLETED_SEARCH_FIELD_NAME = "isPaymentCompleted=";
 
 	public static final String DEMAND_CANCELLED_STATUS = DemandStatus.CANCELLED.toString();
 
@@ -248,6 +250,8 @@ public class WSCalculationConstant {
 	public static final String WS_TIME_ADHOC_PENALTY = "WS_TIME_ADHOC_PENALTY";
 	
 	public static final String WS_TIME_ADHOC_REBATE = "WS_TIME_ADHOC_REBATE";
+
+	public static final String MDMS_CACHE_KEY = "WSMasterData";
 
 
 	

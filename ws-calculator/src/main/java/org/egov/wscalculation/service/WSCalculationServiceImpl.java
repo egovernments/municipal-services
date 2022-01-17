@@ -14,18 +14,26 @@ import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.web.models.*;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.web.models.AdhocTaxReq;
+import org.egov.wscalculation.web.models.BulkBillCriteria;
+import org.egov.wscalculation.web.models.Calculation;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
+import org.egov.wscalculation.web.models.TaxHeadCategory;
+import org.egov.wscalculation.web.models.TaxHeadEstimate;
+import org.egov.wscalculation.web.models.TaxHeadMaster;
+import org.egov.wscalculation.web.models.WaterConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 
 @Service
 @Slf4j
@@ -81,18 +89,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	/**
 	 * 
-	 * 
-	 * @param request - Calculation Request Object
-	 * @return List of calculation.
-	 */
-	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
-		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, true);
-		return calculations;
-	}
-
-	/**
-	 * 
 	 * @param request - Calculation Request Object
 	 * @return list of calculation based on request
 	 */
@@ -120,10 +116,6 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 		WaterConnection waterConnection = criteria.getWaterConnection();
-		Property property = wSCalculationUtil.getProperty(
-				WaterConnectionRequest.builder().waterConnection(waterConnection).requestInfo(requestInfo).build());
-		
-		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
 
 		@SuppressWarnings("unchecked")
 		Map<String, TaxHeadCategory> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
@@ -180,7 +172,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(waterCharge).add(fee);
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
-				.charge(waterCharge).fee(fee).waterConnection(waterConnection).rebate(rebate).tenantId(tenantId)
+				.charge(waterCharge).fee(fee).waterConnection(waterConnection).rebate(rebate).tenantId(criteria.getTenantId())
 				.taxHeadEstimates(estimates).billingSlabIds(billingSlabIds).connectionNo(criteria.getConnectionNo()).applicationNO(criteria.getApplicationNo())
 				.build();
 	}
@@ -191,9 +183,11 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * @param masterMap master data
 	 * @return all calculations including water charge and taxhead on that
 	 */
-	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
+	public List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
+		
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
+			
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo(),
 					masterMap);
 			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
@@ -265,9 +259,11 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 * Generate Demand Based on Time (Monthly, Quarterly, Yearly)
 	 */
 	public void generateDemandBasedOnTimePeriod(RequestInfo requestInfo, BulkBillCriteria bulkBillCriteria) {
+		
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
+		
 		List<String> tenantIds = new ArrayList<>();
 		if(!CollectionUtils.isEmpty(bulkBillCriteria.getTenantIds())){
 			tenantIds = bulkBillCriteria.getTenantIds();
@@ -278,7 +274,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		if (tenantIds.isEmpty())
 			return;
 
-		log.info("Tenant Ids : " + tenantIds.toString());
+		log.info("Tenant Ids : " + tenantIds);
 		tenantIds.forEach(tenantId -> {
 			demandService.generateDemandForTenantId(tenantId, requestInfo, bulkBillCriteria);
 		});
