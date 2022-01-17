@@ -1,6 +1,7 @@
 package org.egov.wscalculation.consumer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -42,9 +43,9 @@ public class DemandGenerationConsumer {
 	 */
 	@KafkaListener(topics = {
 			"${egov.watercalculatorservice.createdemand.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
-	public void listen(final List<Message<?>> records) {
-		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
-		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
+	public void listen(final HashMap<String, Object> records) {
+
+		/*List<CalculationCriteria> calculationCriteria = new ArrayList<>();
 		records.forEach(record -> {
 			try {
 				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
@@ -61,8 +62,14 @@ public class DemandGenerationConsumer {
 			}
 		});
 		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
-		generateDemandInBatch(request);
+				.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();*/
+
+		try{
+			CalculationReq calculationReq = mapper.convertValue(records, CalculationReq.class);
+			generateDemandInBatch(calculationReq);
+		}catch (final Exception e){
+			log.error("KAFKA_PROCESS_ERROR", e);
+		}
 		log.info("Number of batch records:  " + records.size());
 	}
 
@@ -70,8 +77,7 @@ public class DemandGenerationConsumer {
 	 * Generate demand in bulk on given criteria
 	 * 
 	 * @param request    Calculation request
-	 * @param masterMap  master data
-	 * @param errorTopic error topic
+	 *
 	 */
 	private void generateDemandInBatch(CalculationReq request) {
 		

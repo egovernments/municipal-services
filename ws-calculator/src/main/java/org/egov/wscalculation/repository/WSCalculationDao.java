@@ -6,6 +6,7 @@ import java.util.List;
 import org.egov.wscalculation.web.models.MeterConnectionRequest;
 import org.egov.wscalculation.web.models.MeterReading;
 import org.egov.wscalculation.web.models.MeterReadingSearchCriteria;
+import org.egov.wscalculation.web.models.WaterConnection;
 
 public interface WSCalculationDao {
 
@@ -20,8 +21,8 @@ public interface WSCalculationDao {
 	List<MeterReading> searchCurrentMeterReadings(MeterReadingSearchCriteria criteria);
 	
 	int isMeterReadingConnectionExist(List<String> ids);
-	
-	List<String> getConnectionsNoList(String tenantId, String connectionType, Integer batchOffset, Integer batchsize);
+
+	List<WaterConnection> getConnectionsNoList(String tenantId, String connectionType, Integer batchOffset, Integer batchsize, Long fromDate, Long toDate);
 	
 	List<String> getTenantId();
 	

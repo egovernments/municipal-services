@@ -2,14 +2,7 @@ package org.egov.wscalculation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,23 +18,8 @@ import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
-import org.egov.wscalculation.web.models.BulkBillCriteria;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationCriteria;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.Demand;
+import org.egov.wscalculation.web.models.*;
 import org.egov.wscalculation.web.models.Demand.StatusEnum;
-import org.egov.wscalculation.web.models.DemandDetail;
-import org.egov.wscalculation.web.models.DemandDetailAndCollection;
-import org.egov.wscalculation.web.models.DemandRequest;
-import org.egov.wscalculation.web.models.DemandResponse;
-import org.egov.wscalculation.web.models.GetBillCriteria;
-import org.egov.wscalculation.web.models.Property;
-import org.egov.wscalculation.web.models.RequestInfoWrapper;
-import org.egov.wscalculation.web.models.TaxHeadEstimate;
-import org.egov.wscalculation.web.models.TaxPeriod;
-import org.egov.wscalculation.web.models.WaterConnection;
-import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -693,20 +671,30 @@ public class DemandService {
 				batchOffset = Math.toIntExact(bulkBillCriteria.getOffset());
 
 			log.info("Count: "+count);
+			Map<String, Object> masterMap = mstrDataService.loadMasterData(requestInfo, tenantId);
+
+			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
+					.get(WSCalculationConstant.BILLING_PERIOD);
+			Long fromDate = (Long) financialYearMaster.get(WSCalculationConstant.STARTING_DATE_APPLICABLES);
+			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 
 			while(batchOffset<count){
-				List<String> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
-						WSCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+				List<WaterConnection> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
+						WSCalculationConstant.nonMeterdConnection, batchOffset, batchsize, fromDate, toDate);
 				String assessmentYear = estimationService.getAssessmentYear();
 
 				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
-				for (String connectionNo : connectionNos) {
+				for (WaterConnection connectionNo : connectionNos) {
 					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-							.assessmentYear(assessmentYear).connectionNo(connectionNo).build();
+							.assessmentYear(assessmentYear).connectionNo(connectionNo.getConnectionNo()).build();
 					calculationCriteriaList.add(calculationCriteria);
 				}
+				MigrationCount migrationCount = MigrationCount.builder().id(UUID.randomUUID().toString()).offset(Long.valueOf(batchOffset)).limit(Long.valueOf(batchsize)).recordCount(Long.valueOf(connectionNos.size()))
+						.tenantid(tenantId).createdTime(System.currentTimeMillis()).businessService("WS").build();
+
 				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).isconnectionCalculation(true).build();
+						.requestInfo(requestInfo).isconnectionCalculation(true).migrationCount(migrationCount).build();
+				
 				wsCalculationProducer.push(configs.getCreateDemand(), calculationReq);
 				calculationCriteriaList.clear();
 				batchOffset = batchOffset + batchsize;

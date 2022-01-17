@@ -58,6 +58,7 @@ public class WSCalculationConstant {
 	public static final String EG_WS_FINANCIAL_MASTER_NOT_FOUND_MSG = "No Financial Year data is available for the given year value of : ";
 
 	public static final String BUSINESSSERVICE_FIELD_FOR_SEARCH_URL = "businessService=";
+	
 	public static final String WATER_TAX_SERVICE_CODE = "WS";
 
 	public static final String EMPTY_DEMAND_ERROR_CODE = "EMPTY_DEMANDS";
@@ -253,6 +254,31 @@ public class WSCalculationConstant {
 
 	public static final String MDMS_CACHE_KEY = "WSMasterData";
 
+	public static final String ADHOC_PENALTY_REASON = "adhocPenaltyReason";
 
-	
+	public static final String ADHOC_PENALTY_COMMENT = "adhocPenaltyComment";
+
+	public static final String ADHOC_REBATE_REASON = "adhocRebateReason";
+
+	public static final String ADHOC_REBATE_COMMENT = "adhocRebateComment";
+
+	public static final String INITIAL_METER_READING_CONST = "initialMeterReading";
+
+	public static final String SUBMIT_APPLICATION_CONST = "SUBMIT_APPLICATION";
+
+	public static final String DETAILS_PROVIDED_BY = "detailsProvidedBy";
+
+	public static final String APP_CREATED_DATE = "appCreatedDate";
+
+	public static final String ESTIMATION_FILESTORE_ID = "estimationFileStoreId";
+
+	public static final String SANCTION_LETTER_FILESTORE_ID = "sanctionFileStoreId";
+
+	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
+
+	public static final String LOCALITY = "locality";
+
+
+
+
 }
