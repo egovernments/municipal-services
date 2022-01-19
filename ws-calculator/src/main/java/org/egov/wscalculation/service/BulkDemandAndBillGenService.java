@@ -1,13 +1,11 @@
 package org.egov.wscalculation.service;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.kafka.CustomKafkaTemplate;
@@ -29,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class BulkDemandAndBillGenService {
 
 	
@@ -117,7 +116,11 @@ public class BulkDemandAndBillGenService {
 		
 		List<Demand> demands = new LinkedList<>();
 		String tenantId = calculations.get(0).getTenantId();
-		Set<String> propertyIds = calculations.stream().map(Calculation::getConnectionNo).collect(Collectors.toSet());
+		Set<String> propertyIds = new HashSet<String>();
+		for (Calculation calculation: calculations){
+			WaterConnection connection = calculation.getWaterConnection();
+			propertyIds.add(connection.getPropertyId());
+		}
 		List<Property> properties = wsCalculationUtil.propertySearch(requestInfo, propertyIds, tenantId);
 		Map<String, Property> propertyUuidMap = properties.stream().collect(Collectors.toMap(Property::getId, Function.identity()));
 		
