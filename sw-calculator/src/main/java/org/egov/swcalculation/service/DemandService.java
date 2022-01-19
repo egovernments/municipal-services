@@ -2,14 +2,7 @@ package org.egov.swcalculation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -654,22 +647,29 @@ public class DemandService {
 
 			log.info("Count: "+count);
 
-			while(batchOffset<count){
-				List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-						SWCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+			if(count > 0) {
+				while (batchOffset < count) {
+					List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
+							SWCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+					if(connectionNos.size()>0){
+						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 
-				List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
+						for (String connectionNo : connectionNos) {
+							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
+									.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
+							calculationCriteriaList.add(calculationCriteria);
+						}
 
-				for (String connectionNo : connectionNos) {
-					CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-							.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
-					calculationCriteriaList.add(calculationCriteria);
+						/*MigrationCount migrationCount = MigrationCount.builder().id(UUID.randomUUID().toString()).offset(Long.valueOf(batchOffset)).limit(Long.valueOf(batchsize)).recordCount(Long.valueOf(connectionNos.size()))
+								.tenantid(tenantId).createdTime(System.currentTimeMillis()).businessService("SW").build();*/
+
+						CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
+								.requestInfo(requestInfo).isconnectionCalculation(true).build();
+						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
+						calculationCriteriaList.clear();
+					}
+					batchOffset = batchOffset + batchsize;
 				}
-				CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-						.requestInfo(requestInfo).isconnectionCalculation(true).build();
-				kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
-				calculationCriteriaList.clear();
-				batchOffset = batchOffset + batchsize;
 			}
 		}
 	}

@@ -1,9 +1,6 @@
 package org.egov.swcalculation.consumer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
@@ -51,26 +48,16 @@ public class DemandGenerationConsumer {
 	@KafkaListener(topics = {
 			"${egov.seweragecalculatorservice.createdemand.topic}" }, containerFactory = "kafkaListenerContainerFactoryBatch")
 	@SuppressWarnings("unchecked")
-	public void listen(final List<Message<?>> records) {
-		CalculationReq calculationReq = mapper.convertValue(records.get(0).getPayload(), CalculationReq.class);
-		Map<String, Object> masterMap = mDataService.loadMasterData(calculationReq.getRequestInfo(),
-				calculationReq.getCalculationCriteria().get(0).getTenantId());
-		List<CalculationCriteria> calculationCriteria = new ArrayList<>();
-		records.forEach(record -> {
-			try {
-				CalculationReq calcReq = mapper.convertValue(record.getPayload(), CalculationReq.class);
-				calculationCriteria.addAll(calcReq.getCalculationCriteria());
-				log.info("Consuming record: " + record);
-			} catch (final Exception e) {
-				StringBuilder builder = new StringBuilder();
-				builder.append("Error while listening to value: ").append(record).append(" on topic: ").append(e);
-				log.error(builder.toString());
-			}
-		});
-		CalculationReq request = CalculationReq.builder().calculationCriteria(calculationCriteria)
-				.requestInfo(calculationReq.getRequestInfo()).isconnectionCalculation(true).build();
-		generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
-		log.info("Number of batch records:  " + records.size());
+	public void listen(final HashMap<String, Object> records) {
+		try{
+			CalculationReq request = mapper.convertValue(records, CalculationReq.class);
+			Map<String, Object> masterMap = mDataService.loadMasterData(request.getRequestInfo(),
+					request.getCalculationCriteria().get(0).getTenantId());
+			generateDemandInBatch(request, masterMap, config.getDeadLetterTopicBatch());
+			log.info("Number of batch records:  " + records.size());
+		}catch (final Exception e){
+			log.error("KAFKA_PROCESS_ERROR", e);
+		}
 	}
 
 	

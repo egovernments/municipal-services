@@ -8,10 +8,11 @@ import org.springframework.stereotype.Controller;
 public class SWCalculatorQueryBuilder {
 	
 	private static final String connectionNoListQuery = "SELECT distinct(conn.connectionno) FROM eg_sw_connection conn INNER JOIN eg_sw_service sw ON conn.id = sw.connection_id";
-	
+ 
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
-	private  static final String countQuery = "select count(*) from eg_sw_connection where tenantid = '{}';";
+	private  static final String countQuery = "select count(distinct(conn.connectionno)) from eg_sw_connection conn inner join eg_sw_service sw ON sw.connection_id = conn.id where conn.tenantid = '{}' and sw.connectiontype ='Non Metered' and conn.connectionno is not null";
+
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
