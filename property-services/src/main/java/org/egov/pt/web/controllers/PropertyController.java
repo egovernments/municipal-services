@@ -53,9 +53,7 @@ public class PropertyController {
     private PropertyValidator propertyValidator;
 
     @PostMapping("/_create")
-    public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest,@RequestBody RequestInfo requestInfo,
-    		@ModelAttribute @Valid PropertyCriteria propertycriteria) {
-log.info("Property is created:"+propertycriteria.getMobileNumber());
+    public ResponseEntity<PropertyResponse> create(@Valid @RequestBody PropertyRequest propertyRequest) {
         Property property = propertyService.createProperty(propertyRequest);
         ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(), true);
         PropertyResponse response = PropertyResponse.builder()
@@ -67,9 +65,7 @@ log.info("Property is created:"+propertycriteria.getMobileNumber());
 
 
     @PostMapping("/_update")
-    public ResponseEntity<PropertyResponse> update(@Valid @RequestBody PropertyRequest propertyRequest,
-    		@ModelAttribute @Valid PropertyCriteria propertycriteria) {
-log.info("Property is updated:"+propertycriteria.getMobileNumber());
+    public ResponseEntity<PropertyResponse> update(@Valid @RequestBody PropertyRequest propertyRequest) {
         Property property = propertyService.updateProperty(propertyRequest);
         ResponseInfo resInfo = responseInfoFactory.createResponseInfoFromRequestInfo(propertyRequest.getRequestInfo(), true);
         PropertyResponse response = PropertyResponse.builder()
@@ -90,17 +86,7 @@ log.info("Property is updated:"+propertycriteria.getMobileNumber());
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    @PostMapping("/get")
-    public ResponseEntity<PropertyResponse> get(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
-                                                   @Valid @ModelAttribute PropertyCriteria propertyCriteria) {
-		log.info("Update your number: "+propertyCriteria.getMobileNumber());
-        propertyValidator.validatePropertyCriteria(propertyCriteria, requestInfoWrapper.getRequestInfo());
-        List<Property> properties = propertyService.searchProperty(propertyCriteria,requestInfoWrapper.getRequestInfo());
-        PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
-                responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
-                .build();
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+   
     @PostMapping("/_migration")
     public ResponseEntity<?> propertyMigration(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper,
                                                @Valid @ModelAttribute OldPropertyCriteria propertyCriteria) {
