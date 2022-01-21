@@ -194,7 +194,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 					masterMap);
 			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
 					.get(SWCalculationConstant.Billing_Period_Master);
-			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+			mDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap, criteria.getSewerageConnection().getConnectionType());
 			Calculation calculation = getCalculation(request.getRequestInfo(), criteria, estimationMap, masterMap,
 					true);
 			calculations.add(calculation);

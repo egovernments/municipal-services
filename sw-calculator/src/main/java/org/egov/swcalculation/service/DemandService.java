@@ -635,7 +635,7 @@ public class DemandService {
 		log.info("Billing master data values for non metered connection:: {}", master);
 		long startDay = (((int) master.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if (isCurrentDateIsMatching((String) master.get(SWCalculationConstant.BILLING_CYCLE_CONST), startDay)) {
-			long count = sewerageCalculatorDao.getConnectionCount(tenantId);
+
 			Integer batchsize = configs.getBatchSize();
 			Integer batchOffset = configs.getBatchOffset();
 
@@ -645,18 +645,32 @@ public class DemandService {
 			if(bulkBillCriteria.getOffset() != null)
 				batchOffset = Math.toIntExact(bulkBillCriteria.getOffset());
 
+			Map<String, Object> masterMap = masterDataService.loadMasterData(requestInfo, tenantId);
+
+			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+					.get(SWCalculationConstant.Billing_Period_Master);
+			masterDataService.enrichBillingPeriod(null, billingFrequencyMap, masterMap, SWCalculationConstant.nonMeterdConnection);
+
+			Map<String, Object> financialYearMaster =  (Map<String, Object>) masterMap
+					.get(SWCalculationConstant.BILLING_PERIOD);
+
+			Long fromDate = (Long) financialYearMaster.get(SWCalculationConstant.STARTING_DATE_APPLICABLES);
+			Long toDate = (Long) financialYearMaster.get(SWCalculationConstant.ENDING_DATE_APPLICABLES);
+
+			long count = sewerageCalculatorDao.getConnectionCount(tenantId, fromDate, toDate);
 			log.info("Count: "+count);
 
 			if(count > 0) {
 				while (batchOffset < count) {
-					List<String> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
-							SWCalculationConstant.nonMeterdConnection, batchOffset, batchsize);
+					List<SewerageConnection> connectionNos = sewerageCalculatorDao.getConnectionsNoList(tenantId,
+							SWCalculationConstant.nonMeterdConnection, batchOffset, batchsize, fromDate, toDate);
 					if(connectionNos.size()>0){
 						List<CalculationCriteria> calculationCriteriaList = new ArrayList<>();
 
-						for (String connectionNo : connectionNos) {
+						for (SewerageConnection connectionNo : connectionNos) {
 							CalculationCriteria calculationCriteria = CalculationCriteria.builder().tenantId(tenantId)
-									.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo).build();
+									.assessmentYear(estimationService.getAssessmentYear()).connectionNo(connectionNo.getConnectionNo())
+									.sewerageConnection(connectionNo).build();
 							calculationCriteriaList.add(calculationCriteria);
 						}
 

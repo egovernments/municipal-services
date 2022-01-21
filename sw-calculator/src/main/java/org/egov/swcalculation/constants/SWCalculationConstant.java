@@ -288,4 +288,24 @@ public class SWCalculationConstant {
 
 	public static final String PROPERTY_MASTER_MODULE = "PropertyTax";
 
+	public static final String ADHOC_PENALTY_REASON = "adhocPenaltyReason";
+
+	public static final String ADHOC_PENALTY_COMMENT = "adhocPenaltyComment";
+
+	public static final String ADHOC_REBATE_REASON = "adhocRebateReason";
+
+	public static final String ADHOC_REBATE_COMMENT = "adhocRebateComment";
+
+	public static final String DETAILS_PROVIDED_BY = "detailsProvidedBy";
+
+	public static final String APP_CREATED_DATE = "appCreatedDate";
+
+	public static final String ESTIMATION_FILESTORE_ID = "estimationFileStoreId";
+
+	public static final String SANCTION_LETTER_FILESTORE_ID = "sanctionFileStoreId";
+
+	public static final String ESTIMATION_DATE_CONST = "estimationLetterDate";
+
+	public static final String LOCALITY = "locality";
+
 }
