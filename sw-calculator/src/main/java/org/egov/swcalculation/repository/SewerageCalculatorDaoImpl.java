@@ -53,6 +53,7 @@ public class SewerageCalculatorDaoImpl implements SewerageCalculatorDao {
 		preparedStatement.add(tenantid);
 		preparedStatement.add(fromDate);
 		preparedStatement.add(toDate);
+		preparedStatement.add(tenantid);
 
 		long count = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return count;

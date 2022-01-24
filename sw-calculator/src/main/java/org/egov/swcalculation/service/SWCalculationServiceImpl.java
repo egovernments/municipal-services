@@ -88,12 +88,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		@SuppressWarnings("unchecked")
 		List<String> billingSlabIds = estimatesAndBillingSlabs.get("billingSlabIds");
 		SewerageConnection sewerageConnection = criteria.getSewerageConnection();
-		
-		Property property = sWCalculationUtil.getProperty(SewerageConnectionRequest.builder()
-				.sewerageConnection(sewerageConnection).requestInfo(requestInfo).build());
-
-		String tenantId = null != property.getTenantId() ? property.getTenantId() : criteria.getTenantId();
-
+  
 		@SuppressWarnings("unchecked")
 		Map<String, TaxHeadCategory> taxHeadCategoryMap = ((List<TaxHeadMaster>) masterMap
 				.get(SWCalculationConstant.TAXHEADMASTER_MASTER_KEY)).stream()
@@ -154,7 +149,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		BigDecimal totalAmount = taxAmt.add(penalty).add(rebate).add(exemption).add(sewerageCharge).add(fee);
 		return Calculation.builder().totalAmount(totalAmount).taxAmount(taxAmt).penalty(penalty).exemption(exemption)
 				.charge(sewerageCharge).fee(fee).sewerageConnection(sewerageConnection).rebate(rebate)
-				.tenantId(tenantId).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds)
+				.tenantId(criteria.getTenantId()).taxHeadEstimates(estimates).billingSlabIds(billingSlabIds)
 				.connectionNo(criteria.getConnectionNo()).applicationNO(criteria.getApplicationNo()).build();
 	}
 
@@ -175,7 +170,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 
 		if (tenantIds.isEmpty())
 			return;
-		log.info("Tenant Ids : " + tenantIds.toString());
+		log.info("Tenant Ids : " + tenantIds);
 		tenantIds.forEach(tenantId -> demandService.generateDemandForTenantId(tenantId, requestInfo, bulkBillCriteria));
 	}
 
@@ -187,7 +182,7 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 	 *            master data
 	 * @return all calculations including sewerage charge and taxhead on that
 	 */
-	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
+	public List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
 			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request.getRequestInfo(),
@@ -202,17 +197,6 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		return calculations;
 	}
 
-	/**
-	 * 
-	 * 
-	 * @param request - Calculation Request
-	 * @return List of calculation.
-	 */
-	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
-		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request.getRequestInfo(), calculations, masterMap, true);
-		return calculations;
-	}
 
 	/**
 	 * 

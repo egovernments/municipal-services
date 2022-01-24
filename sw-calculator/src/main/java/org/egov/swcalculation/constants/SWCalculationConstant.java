@@ -308,4 +308,10 @@ public class SWCalculationConstant {
 
 	public static final String LOCALITY = "locality";
 
+	public static final String PAYMENT_COMPLETED_SEARCH_FIELD_NAME = "isPaymentCompleted=";
+
+	public static final String MDMS_CACHE_KEY = "WSMasterData";
+
+	public static final String Billing_Cycle_String = "billingCycle";
+
 }

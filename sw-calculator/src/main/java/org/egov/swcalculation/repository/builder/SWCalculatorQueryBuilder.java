@@ -11,7 +11,7 @@ public class SWCalculatorQueryBuilder {
  
 	private static final String distinctTenantIdsCriteria = "SELECT distinct(tenantid) FROM eg_sw_connection sw";
 
-	private  static final String countQuery = "select count(distinct(conn.connectionno)) from eg_sw_connection conn inner join eg_sw_service sw ON sw.connection_id = conn.id where conn.tenantid = ? and sw.connectiontype ='Non Metered' and conn.connectionno is not null and conn.connectionno in (select distinct(consumercode) from egbs_demand_v1 dmd where NOT (dmd.taxperiodfrom >= ? and dmd.taxperiodto <= ?) and businessservice = 'SW')";
+	private  static final String countQuery = "select count(distinct(conn.connectionno)) from eg_sw_connection conn inner join eg_sw_service sw ON sw.connection_id = conn.id where conn.tenantid = ? and sw.connectiontype ='Non Metered' and conn.connectionno is not null and conn.connectionno not in (select distinct(consumercode) from egbs_demand_v1 dmd where (dmd.taxperiodfrom >= ? and dmd.taxperiodto <= ?) and businessservice = 'SW' and tenantid=?)";
 
 	private static final String INNER_JOIN_STRING = "INNER JOIN";
 
@@ -39,9 +39,7 @@ public class SWCalculatorQueryBuilder {
 			+ LEFT_OUTER_JOIN_STRING
 			+ "eg_sw_connectionholder connectionholder ON connectionholder.connectionid = conn.id"
 			+ LEFT_OUTER_JOIN_STRING
-			+ "eg_sw_roadcuttinginfo roadcuttingInfo ON roadcuttingInfo.swid = conn.id "
-			+ INNER_JOIN_STRING
-			+ " egbs_demand_v1 as dmd on dmd.consumercode = conn.connectionno";;
+			+ "eg_sw_roadcuttinginfo roadcuttingInfo ON roadcuttingInfo.swid = conn.id ";
 
 	public String getDistinctTenantIds() {
 		return distinctTenantIdsCriteria;
@@ -55,7 +53,7 @@ public class SWCalculatorQueryBuilder {
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		// Add connection type
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" sw.connectiontype = ? ");
+		query.append(" sc.connectiontype = ? ");
 		preparedStatement.add(connectionType);
 
 		// add tenantid
@@ -68,11 +66,14 @@ public class SWCalculatorQueryBuilder {
 		query.append(" conn.connectionno is not null");
 
 		addClauseIfRequired(preparedStatement, query);
-		query.append(" NOT (dmd.taxperiodfrom >= ? and dmd.taxperiodto <= ?)");
+		query.append(" conn.connectionno NOT IN (select distinct(consumercode) from egbs_demand_v1 dmd where (dmd.taxperiodfrom >= ? and dmd.taxperiodto <= ?) and businessservice = 'SW' and tenantid=?)");
 		preparedStatement.add(fromDate);
 		preparedStatement.add(toDate);
+		preparedStatement.add(tenantId);
 
-		String orderbyClause = " ORDER BY conn.connectionno OFFSET ? LIMIT ?";
+		addClauseIfRequired(preparedStatement, query);
+		String orderbyClause = " conn.connectionno IN (select connectionno FROM eg_sw_connection where tenantid=? and connectionno is not null ORDER BY connectionno OFFSET ? LIMIT ?)";
+		preparedStatement.add(tenantId);
 		preparedStatement.add(batchOffset);
 		preparedStatement.add(batchsize);
 		query.append(orderbyClause);

@@ -66,7 +66,12 @@ public class SWCalculationController {
 	@PostMapping("/_updateDemand")
 	public ResponseEntity<DemandResponse> updateDemands(@RequestBody @Valid RequestInfoWrapper requestInfoWrapper,
 			@ModelAttribute @Valid GetBillCriteria getBillCriteria) {
-		return new ResponseEntity<>(demandService.updateDemands(getBillCriteria, requestInfoWrapper), HttpStatus.OK);
+		List<Demand> demands = demandService.updateDemands(getBillCriteria, requestInfoWrapper, false);
+		DemandResponse response = DemandResponse.builder().demands(demands)
+				.responseInfo(
+						responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
+				.build();
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	@PostMapping("/_jobscheduler")

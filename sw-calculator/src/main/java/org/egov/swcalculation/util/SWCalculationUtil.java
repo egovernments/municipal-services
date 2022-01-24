@@ -1,11 +1,7 @@
 package org.egov.swcalculation.util;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -112,8 +108,10 @@ public class SWCalculationUtil {
 	 */
 	public StringBuilder getDemandSearchUrl(GetBillCriteria getBillCriteria) {
 
+		StringBuilder url;
+
 		if (CollectionUtils.isEmpty(getBillCriteria.getConsumerCodes()))
-			return new StringBuilder().append(configurations.getBillingServiceHost())
+			url = new StringBuilder().append(configurations.getBillingServiceHost())
 					.append(configurations.getDemandSearchEndPoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(SWCalculationConstant.SEPARATER)
@@ -121,14 +119,39 @@ public class SWCalculationUtil {
 					.append(getBillCriteria.getConnectionId()).append(SWCalculationConstant.SW_CONSUMER_CODE_SEPARATOR)
 					.append(getBillCriteria.getConnectionNumber());
 
-		else
-			return new StringBuilder().append(configurations.getBillingServiceHost())
+		else{
+			url = new StringBuilder().append(configurations.getBillingServiceHost())
 					.append(configurations.getDemandSearchEndPoint()).append(SWCalculationConstant.URL_PARAMS_SEPARATER)
 					.append(SWCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(SWCalculationConstant.SEPARATER)
 					.append(SWCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
 					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
 
+			if(getBillCriteria.getIsPaymentCompleted() != null)
+				url.append(SWCalculationConstant.SEPARATER)
+						.append(SWCalculationConstant.PAYMENT_COMPLETED_SEARCH_FIELD_NAME)
+						.append(getBillCriteria.getIsPaymentCompleted());
+		}
+
+		return url;
+	}
+
+
+	public List<Property> propertySearch(RequestInfo requestInfo, Set<String> propertyUuids, String tenantId) {
+
+		PropertyCriteria propertyCriteria = PropertyCriteria.builder()
+				.uuids(propertyUuids)
+				.tenantId(tenantId)
+				.build();
+
+		StringBuilder url = getPropertyURL(propertyCriteria);
+		RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder()
+				.requestInfo(requestInfo)
+				.build();
+
+		Object result = serviceRequestRepository.fetchResult(url, requestInfoWrapper);
+		List<Property> propertyList = getPropertyDetails(result);
+		return propertyList;
 	}
 
 	/**
