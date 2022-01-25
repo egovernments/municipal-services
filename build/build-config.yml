@@ -102,7 +102,7 @@ config:
       - work-dir: "ws-calculator/src/main/resources/db"
         image-name: "ws-calculator-db"
 
-  - name: "builds/municipal-services/sw-services"
+  - name: "builds/digit-impel-builds/municipal-services/sw-services"
     build:
       - work-dir: "sw-services"
         image-name: "sw-services"
@@ -110,7 +110,7 @@ config:
       - work-dir: "sw-services/src/main/resources/db"
         image-name: "sw-services-db"
 
-  - name: "builds/municipal-services/sw-calculator"
+  - name: "builds/digit-impel-builds/municipal-services/sw-calculator"
     build:
       - work-dir: "sw-calculator"
         image-name: "sw-calculator"
