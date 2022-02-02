@@ -684,7 +684,7 @@ public class DemandService {
 		long startDay = (((int) billingMasterData.get(WSCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if(isCurrentDateIsMatching((String) billingMasterData.get(WSCalculationConstant.Billing_Cycle_String), startDay)) {
 
-			Integer batchsize = configs.getBatchSize();
+			Integer batchsize = configs.getBulkbatchSize();
 			Integer batchOffset = configs.getBatchOffset();
 
 			if(bulkBillCriteria.getLimit() != null)
@@ -707,11 +707,13 @@ public class DemandService {
 			Long toDate = (Long) financialYearMaster.get(WSCalculationConstant.ENDING_DATE_APPLICABLES);
 
 			long count = waterCalculatorDao.getConnectionCount(tenantId, fromDate, toDate);
+			log.info("batchsize: "+batchsize+ " batchOffset :"+batchOffset);
 			log.info("Connection Count: "+count);
 			log.info("fromDate: "+fromDate+ " toDate :"+toDate);
 
 			if(count>0) {
 				while (batchOffset < count) {
+					log.info("batchOffset: "+batchOffset);
 					List<WaterConnection> connections = waterCalculatorDao.getConnectionsNoList(tenantId,
 							WSCalculationConstant.nonMeterdConnection, batchOffset, batchsize, fromDate, toDate);
 					String assessmentYear = estimationService.getAssessmentYear();
