@@ -42,5 +42,14 @@ public class MigrationCount   {
     
     @JsonProperty("businessService")
     private String businessService;
+
+    @JsonProperty("message")
+    private String message;
+
+    @JsonProperty("auditTopic")
+    private String auditTopic;
+
+    @JsonProperty("auditTime")
+    private Long auditTime;
 }
 

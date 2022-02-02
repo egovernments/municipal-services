@@ -76,8 +76,8 @@ public class CalculatorController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, @ModelAttribute @Valid BulkBillCriteria bulkBillCriteria) {
-		wSCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo(), bulkBillCriteria);
+	public void jobscheduler(@Valid @RequestBody BulkBillReq bulkBillReq) {
+		wSCalculationService.generateDemandBasedOnTimePeriod(bulkBillReq.getRequestInfo(), bulkBillReq.getBulkBillCriteria());
 	}
 	
 	@PostMapping("/_applyAdhocTax")

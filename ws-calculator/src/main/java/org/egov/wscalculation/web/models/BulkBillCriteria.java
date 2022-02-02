@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 
 @Validated
-
+@Data
 @Getter
 @Setter
 @AllArgsConstructor
