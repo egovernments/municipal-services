@@ -641,7 +641,7 @@ public class DemandService {
 		long startDay = (((int) billingMasterData.get(SWCalculationConstant.Demand_Generate_Date_String)) / 86400000);
 		if(isCurrentDateIsMatching((String) billingMasterData.get(SWCalculationConstant.Billing_Cycle_String), startDay)) {
 
-			Integer batchsize = configs.getBatchSize();
+			Integer batchsize = configs.getBulkbatchSize();
 			Integer batchOffset = configs.getBatchOffset();
 
 			if(bulkBillCriteria.getLimit() != null)
@@ -682,11 +682,22 @@ public class DemandService {
 							calculationCriteriaList.add(calculationCriteria);
 						}
 
-						MigrationCount migrationCount = MigrationCount.builder().id(UUID.randomUUID().toString()).offset(Long.valueOf(batchOffset)).limit(Long.valueOf(batchsize)).recordCount(Long.valueOf(connections.size()))
-								.tenantid(tenantId).createdTime(System.currentTimeMillis()).businessService("SW").build();
+						MigrationCount migrationCount = MigrationCount.builder()
+								.tenantid(tenantId)
+								.businessService("SW")
+								.limit(Long.valueOf(batchsize))
+								.id(UUID.randomUUID().toString())
+								.offset(Long.valueOf(batchOffset))
+								.createdTime(System.currentTimeMillis())
+								.recordCount(Long.valueOf(connections.size()))
+								.build();
 
-						CalculationReq calculationReq = CalculationReq.builder().calculationCriteria(calculationCriteriaList)
-								.requestInfo(requestInfo).isconnectionCalculation(true).migrationCount(migrationCount).build();
+						CalculationReq calculationReq = CalculationReq.builder()
+								.calculationCriteria(calculationCriteriaList)
+								.requestInfo(requestInfo)
+								.isconnectionCalculation(true)
+								.migrationCount(migrationCount).build();
+
 						kafkaTemplate.send(configs.getCreateDemand(), calculationReq);
 						log.info("Bulk bill Gen batch info : " + migrationCount);
 						calculationCriteriaList.clear();

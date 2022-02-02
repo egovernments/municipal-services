@@ -2,7 +2,6 @@ package org.egov.swcalculation.consumer;
 
 import java.util.*;
 
-import org.egov.swcalculation.config.SWCalculationConfiguration;
 import org.egov.swcalculation.service.BulkDemandAndBillGenService;
 import org.egov.swcalculation.validator.SWCalculationWorkflowValidator;
 import org.egov.swcalculation.web.models.CalculationCriteria;
@@ -16,6 +15,7 @@ import org.springframework.messaging.Message;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,9 +29,6 @@ public class DemandGenerationConsumer {
 	private ObjectMapper mapper;
 
 	@Autowired
-	private SWCalculationConfiguration config;
-
-	@Autowired
 	private BulkDemandAndBillGenService bulkDemandAndBillGenService;
 
 	@Autowired
@@ -42,6 +39,10 @@ public class DemandGenerationConsumer {
 
 	@Autowired
 	private SWCalculationWorkflowValidator swCalculationWorkflowValidator;
+
+	@Value("${kafka.topics.bulk.bill.generation.audit}")
+	private String bulkBillGenAuditTopic;
+
 	/**
 	 * Listen the topic for processing the batch records.
 	 * 
@@ -68,13 +69,18 @@ public class DemandGenerationConsumer {
 	 *            Calculation request
 	 */
 	private void generateDemandInBatch(CalculationReq request) {
+		/*
+		 * this topic will be used by billing service to post message
+		 */
+		request.getMigrationCount().setAuditTopic(bulkBillGenAuditTopic);
 		try {
 			bulkDemandAndBillGenService.bulkDemandGeneration(request);
 		} catch (Exception ex) {
-			log.error("Demand generation error: ", ex);
-			log.info(" Bulk bill Errorbatch records log for batch :  " + request.getMigrationCount().getOffset()
-					+ "Count is : " + request.getMigrationCount().getLimit());
-			producer.push(config.getDeadLetterTopicBatch(), request);
+			/*
+			 * Error with message goes to audit topic
+			 */
+			request.getMigrationCount().setMessage("Failed in DemandGenerationConsumer with error : " + ex.getMessage());
+			producer.push(bulkBillGenAuditTopic, request.getMigrationCount());
 		}
 
 	}

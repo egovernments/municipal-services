@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import org.egov.swcalculation.web.BulkBillReq;
 import org.egov.swcalculation.web.models.*;
 import org.egov.swcalculation.service.DemandService;
 import org.egov.swcalculation.service.SWCalculationService;
@@ -75,8 +76,8 @@ public class SWCalculationController {
 	}
 	
 	@PostMapping("/_jobscheduler")
-	public void jobscheduler(@Valid @RequestBody RequestInfoWrapper requestInfoWrapper, @ModelAttribute @Valid BulkBillCriteria bulkBillCriteria) {
-		sWCalculationService.generateDemandBasedOnTimePeriod(requestInfoWrapper.getRequestInfo(), bulkBillCriteria);
+	public void jobscheduler(@Valid @RequestBody BulkBillReq bulkBillReq) {
+		sWCalculationService.generateDemandBasedOnTimePeriod(bulkBillReq.getRequestInfo(), bulkBillReq.getBulkBillCriteria());
 	}
 
 	@PostMapping("/_applyAdhocTax")

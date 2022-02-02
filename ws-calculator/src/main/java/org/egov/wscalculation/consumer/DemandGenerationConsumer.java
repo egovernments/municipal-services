@@ -43,7 +43,7 @@ public class DemandGenerationConsumer {
 		try{
 			CalculationReq calculationReq = mapper.convertValue(consumerRecord, CalculationReq.class);
 			log.info(" Bulk bill Consumerbatch records log for batch :  "
-					+ calculationReq.getMigrationCount().getOffset() + "Count is : "
+					+ calculationReq.getMigrationCount().getOffset() + " Count is : "
 					+ calculationReq.getMigrationCount().getLimit());
 			generateDemandInBatch(calculationReq);
 		}catch (final Exception e){
