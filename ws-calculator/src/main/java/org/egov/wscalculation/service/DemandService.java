@@ -708,7 +708,7 @@ public class DemandService {
 
 			long count = waterCalculatorDao.getConnectionCount(tenantId, fromDate, toDate);
 			log.info("Connection Count: "+count);
-			log.info("fromDate: "+fromDate+ "toDate :"+toDate);
+			log.info("fromDate: "+fromDate+ " toDate :"+toDate);
 
 			if(count>0) {
 				while (batchOffset < count) {

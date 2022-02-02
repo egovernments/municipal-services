@@ -157,9 +157,9 @@ public class WSCalculationDaoImpl implements WSCalculationDao {
 		List<Object> preparedStatement = new ArrayList<>();
 		String query = queryBuilder.getCountQuery();
 		preparedStatement.add(tenantid);
-		preparedStatement.add(fromDate);
+		/*preparedStatement.add(fromDate);
 		preparedStatement.add(toDate);
-		preparedStatement.add(tenantid);
+		preparedStatement.add(tenantid);*/
 
 		long count = jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
 		return count;
