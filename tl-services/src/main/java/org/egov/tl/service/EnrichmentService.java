@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import static org.egov.tl.util.TLConstants.*;
@@ -66,23 +65,37 @@ public class EnrichmentService {
             switch (businessService) {
                 case businessService_TL:
                     //TLR Changes
-                    if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
+                       if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                         tradeLicense.setLicenseNumber(tradeLicenseRequest.getLicenses().get(0).getLicenseNumber());
                         Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                         tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                         tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
                     }else{
                         Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+
                         if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
-                            tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                        	tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                             tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
                     }
-                    if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories()))
+                    
+                    if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories())) {
                         tradeLicense.getTradeLicenseDetail().getAccessories().forEach(accessory -> {
                             accessory.setTenantId(tradeLicense.getTenantId());
                             accessory.setId(UUID.randomUUID().toString());
                             accessory.setActive(true);
-                        });
+                        });}
+                    else {
+                    	Accessory accessory=new Accessory();
+                    	List<Accessory> list=new ArrayList<>();
+                    	 accessory.setTenantId(tradeLicense.getTenantId());
+                         accessory.setId(UUID.randomUUID().toString());
+                         accessory.setCount(null);
+                         accessory.setAccessoryCategory("ACC-NULL");
+                         accessory.setActive(true);
+                         list.add(accessory);
+                         tradeLicense.getTradeLicenseDetail().setAccessories(list);
+                    }
                     break;
             }
             tradeLicense.getTradeLicenseDetail().getAddress().setTenantId(tradeLicense.getTenantId());
@@ -102,22 +115,38 @@ public class EnrichmentService {
             
             if(tradeLicense.getApplicationType() !=null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                 if(tradeLicense.getAction().equalsIgnoreCase(ACTION_APPLY) || tradeLicense.getAction().equalsIgnoreCase(TLConstants.TL_ACTION_INITIATE)){
+                	if(tradeLicense.getTradeLicenseDetail().getApplicationDocuments()!=null){
                     tradeLicense.getTradeLicenseDetail().getApplicationDocuments().forEach(document -> {
                         document.setId(UUID.randomUUID().toString());
                         document.setActive(true);
                     });
+                	}
                 }
                                
             }
 
+           if(tradeLicense.getApplicationType().toString().equalsIgnoreCase("RENEWAL") && tradeLicense.getWorkflowCode().toString().equalsIgnoreCase("EDITRENEWAL")) {
             tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner -> {
-                owner.setUserActive(true);
+                //owner.setUserActive(true);
                 if (!CollectionUtils.isEmpty(owner.getDocuments()))
                     owner.getDocuments().forEach(document -> {
                         document.setId(UUID.randomUUID().toString());
                         document.setActive(true);
                     });
-            });
+            });}
+
+            else 
+            { 
+                tradeLicense.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                owner.setUserActive(true);
+                    if (!CollectionUtils.isEmpty(owner.getDocuments()))
+                         owner.getDocuments().forEach(document -> {
+                         document.setId(UUID.randomUUID().toString());
+                         document.setActive(true);
+                        });
+                });
+            }
+
 
             if (tradeLicense.getTradeLicenseDetail().getSubOwnerShipCategory().contains(config.getInstitutional())) {
                 tradeLicense.getTradeLicenseDetail().getInstitution().setId(UUID.randomUUID().toString());
@@ -593,8 +622,4 @@ public class EnrichmentService {
                     license.setAssignee(new LinkedList<>(assignes));
             }
     }
-
-
-
-
 }

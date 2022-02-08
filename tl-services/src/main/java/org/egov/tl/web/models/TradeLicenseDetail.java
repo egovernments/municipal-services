@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Builder;
+import javax.validation.constraints.Pattern;
 
 /**
  * A Object holds the basic data for a Trade License
@@ -89,7 +90,11 @@ public class TradeLicenseDetail   {
     
     CITIZEN("CITIZEN"),
     
-    DATAENTRY("DATAENTRY");
+    DATAENTRY("DATAENTRY"),
+	  
+    EODB("EODB"),	
+	  
+    RENEWAL("RENEWAL");
 
     private String value;
 
@@ -129,7 +134,7 @@ public class TradeLicenseDetail   {
 
         @JsonProperty("accessories")
         @Valid
-        private List<Accessory> accessories = null;
+        private List<Accessory> accessories = new ArrayList<>();
 
         @JsonProperty("applicationDocuments")
         @Valid
