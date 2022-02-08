@@ -1,7 +1,6 @@
 package org.egov.waterconnection.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,13 +64,12 @@ public class EnrichmentService {
 	 * @param waterConnectionRequest WaterConnection Object
 	 */
 	@SuppressWarnings("unchecked")
-	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType, Boolean isMigration) {
+	public void enrichWaterConnection(WaterConnectionRequest waterConnectionRequest, int reqType) {
 		AuditDetails auditDetails = waterServicesUtil
 				.getAuditDetails(waterConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		waterConnectionRequest.getWaterConnection().setAuditDetails(auditDetails);
 		waterConnectionRequest.getWaterConnection().setId(UUID.randomUUID().toString());
-		if (!isMigration)
-			waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
+		waterConnectionRequest.getWaterConnection().setStatus(StatusEnum.ACTIVE);
 		//Application creation date
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (waterConnectionRequest.getWaterConnection().getAdditionalDetails() == null) {
@@ -89,16 +87,6 @@ public class EnrichmentService {
 	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION :  WCConstants.NEW_WATER_CONNECTION);
 		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
-
-		WaterConnection connection = waterConnectionRequest.getWaterConnection();
-
-		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
-			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
-				roadCuttingInfo.setId(UUID.randomUUID().toString());
-				roadCuttingInfo.setStatus(Status.ACTIVE);
-				roadCuttingInfo.setAuditDetails(auditDetails);
-			});
-		}
 		
 	}
 	@SuppressWarnings("unchecked")
@@ -114,12 +102,12 @@ public class EnrichmentService {
 			List<String> numberConstants = Arrays.asList(WCConstants.ADHOC_PENALTY, WCConstants.ADHOC_REBATE,
 					WCConstants.INITIAL_METER_READING_CONST, WCConstants.APP_CREATED_DATE,
 					WCConstants.ESTIMATION_DATE_CONST);
-			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
-				if (addDetail.getOrDefault(entry.getKey(), null) != null && numberConstants.contains(entry.getKey())) {
-					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(entry.getKey())));
-					additionalDetail.put(entry.getKey(), big);
+			for (String constKey : WCConstants.ADDITIONAL_OBJ_CONSTANT) {
+				if (addDetail.getOrDefault(constKey, null) != null && numberConstants.contains(constKey)) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+					additionalDetail.put(constKey, big);
 				} else {
-					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
+					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
 			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
@@ -423,13 +411,13 @@ public class EnrichmentService {
 			if (!StringUtils.isEmpty(criteria.getTenantId())) {
 				propertyCriteria.setTenantId(criteria.getTenantId());
 			}
-			propertyCriteria.setPropertyIds(propertyIds);
+			propertyCriteria.setUuids(propertyIds);
 			List<Property> propertyList = waterServicesUtil.getPropertyDetails(serviceRequestRepository.fetchResult(waterServicesUtil.getPropertyURL(propertyCriteria),
 					RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 
 			if(!CollectionUtils.isEmpty(propertyList)){
 				for(Property property: propertyList){
-					propertyToOwner.put(property.getPropertyId(),property.getOwners());
+					propertyToOwner.put(property.getId(),property.getOwners());
 				}
 			}
 

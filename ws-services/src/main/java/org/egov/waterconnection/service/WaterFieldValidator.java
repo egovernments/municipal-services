@@ -48,8 +48,7 @@ public class WaterFieldValidator implements WaterActionValidator {
 					}
 				}
 			}
-			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
-					|| waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() == WCConstants.INVALID_CONEECTION_EXECUTION_DATE) {
+			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
 
@@ -83,8 +82,7 @@ public class WaterFieldValidator implements WaterActionValidator {
 			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getWaterSource())) {
 				errorMap.put("INVALID_WATER_SOURCE", "WaterConnection cannot be created  without water source");
 			}
-			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())
-					|| waterConnectionRequest.getWaterConnection().getConnectionExecutionDate() == WCConstants.INVALID_CONEECTION_EXECUTION_DATE) {
+			if (StringUtils.isEmpty(waterConnectionRequest.getWaterConnection().getConnectionExecutionDate())) {
 				errorMap.put("INVALID_CONNECTION_EXECUTION_DATE", "Connection execution date should not be empty");
 			}
 		}
