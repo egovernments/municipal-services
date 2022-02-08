@@ -2,7 +2,6 @@ package org.egov.tlcalculator.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tlcalculator.config.TLCalculatorConfigs;
 import org.egov.tlcalculator.kafka.broker.TLCalculatorProducer;
@@ -177,8 +176,7 @@ public class CalculationService {
 
       if(totalTax.compareTo(BigDecimal.ZERO)==-1)
           throw new CustomException("INVALID AMOUNT","Tax amount is negative");
-
-      estimate.setEstimateAmount(totalTax);
+     estimate.setEstimateAmount(totalTax);
       estimate.setCategory(Category.TAX);
       if(license.getApplicationType() != null && license.getApplicationType().toString().equals(TLCalculatorConstants.APPLICATION_TYPE_RENEWAL)){
           estimate.setTaxHeadCode(config.getRenewTaxHead());
@@ -187,6 +185,7 @@ public class CalculationService {
       }else{
           estimate.setTaxHeadCode(config.getBaseTaxHead());
           estimateList.add(estimate);
+          estimateList.addAll(tlRenewal.tlRenewalCalculation(requestInfo,calulationCriteria,mdmsData,totalTax));
       }
 
       estimatesAndSlabs.setEstimates(estimateList);
@@ -243,7 +242,6 @@ public class CalculationService {
               BillingSlabSearchCriteria searchCriteria = new BillingSlabSearchCriteria();
               searchCriteria.setTenantId(license.getTenantId());
               searchCriteria.setStructureType(license.getTradeLicenseDetail().getStructureType());
-              searchCriteria.setApplicationType(license.getApplicationType().toString());
               searchCriteria.setLicenseType(license.getLicenseType().toString());
               searchCriteria.setTradeType(tradeUnit.getTradeType());
               if(tradeUnit.getUomValue()!=null)
@@ -308,7 +306,6 @@ public class CalculationService {
                BillingSlabSearchCriteria searchCriteria = new BillingSlabSearchCriteria();
                searchCriteria.setTenantId(license.getTenantId());
                searchCriteria.setAccessoryCategory(accessory.getAccessoryCategory());
-               searchCriteria.setApplicationType(license.getApplicationType().toString());
               if(accessory.getUomValue()!=null)
               {
                   searchCriteria.setUomValue(Double.parseDouble(accessory.getUomValue()));
