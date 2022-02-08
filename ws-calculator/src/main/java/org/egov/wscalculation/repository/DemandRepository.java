@@ -1,14 +1,19 @@
 package org.egov.wscalculation.repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
+import org.egov.wscalculation.repository.builder.DemandQueryBuilder;
+import org.egov.wscalculation.repository.rowmapper.DemandRowMapper;
 import org.egov.wscalculation.web.models.Demand;
 import org.egov.wscalculation.web.models.DemandRequest;
 import org.egov.wscalculation.web.models.DemandResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,6 +31,15 @@ public class DemandRepository {
 
     @Autowired
     private ObjectMapper mapper;
+    
+    @Autowired
+    private DemandQueryBuilder demandQueryBuilder;
+    
+    @Autowired
+    private DemandRowMapper demandRowMapper;
+    
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 
     /**
@@ -65,6 +79,22 @@ public class DemandRepository {
             throw new CustomException("PARSING_ERROR","Failed to parse response of update demand");
         }
     }
+    
+	
+	/**
+	 * Fetches demand from DB based on a map of business code and set of consumer codes
+	 * 
+	 * @param businessConsumercodeMap
+	 * @param tenantId
+	 * @return
+	 */
+	public List<Demand> getDemandsForConsumerCodes(Set<String> businessConsumercodes, String tenantId) {
+
+		List<Object> presparedStmtList = new ArrayList<>();
+		String sql = demandQueryBuilder.getDemandQueryForConsumerCodes(businessConsumercodes, presparedStmtList,
+				tenantId);
+		return jdbcTemplate.query(sql, presparedStmtList.toArray(), demandRowMapper);
+	}
 
 
 }

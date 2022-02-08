@@ -209,8 +209,8 @@ public class MasterDataService {
 			}
 		}
 		Map<String, Object> billingPeriod = new HashMap<>();
-		if (master.get(WSCalculationConstant.ConnectionType).toString()
-				.equalsIgnoreCase(WSCalculationConstant.meteredConnectionType)) {
+		if (WSCalculationConstant.meteredConnectionType
+				.equalsIgnoreCase(criteria.getWaterConnection().getConnectionType())) {
 			billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
 			billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 		} else {
@@ -219,7 +219,9 @@ public class MasterDataService {
 				estimationService.getMonthStartAndEndDate(billingPeriod);
 			} else if (WSCalculationConstant.Quaterly_Billing_Period
 					.equalsIgnoreCase(master.get(WSCalculationConstant.Billing_Cycle_String).toString())) {
-				estimationService.getQuarterStartAndEndDate(billingPeriod);
+//				estimationService.getQuarterStartAndEndDate(billingPeriod);
+				billingPeriod.put(WSCalculationConstant.STARTING_DATE_APPLICABLES, criteria.getFrom());
+				billingPeriod.put(WSCalculationConstant.ENDING_DATE_APPLICABLES, criteria.getTo());
 			} else {
 				LocalDateTime demandEndDate = LocalDateTime.now();
 				demandEndDate = setCurrentDateValueToStartingOfDay(demandEndDate);

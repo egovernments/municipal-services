@@ -128,10 +128,10 @@ List<WaterDetails> waterDetails=jdbcTemplate.query(query,preparedStatement.toArr
 	}
 	
 	@Override
-	public List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType) {
+	public List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType, Long taxPeriodFrom, Long taxPeriodTo) {
 		List<Object> preparedStatement = new ArrayList<>();
-		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,WSCalculationConstant.ACTIVE_CONNECTION, preparedStatement);
-		log.info("water " + connectionType + " connection list : " + query);
+		String query = queryBuilder.getConnectionNumberList(tenantId, connectionType,WSCalculationConstant.ACTIVE_CONNECTION, taxPeriodFrom, taxPeriodTo, preparedStatement);
+		log.info("preparedStatement: "+ preparedStatement +" connection type: " + connectionType + " connection list : " + query);
 		return jdbcTemplate.query(query, preparedStatement.toArray(), demandSchedulerRowMapper);
 	}
 
@@ -148,5 +148,33 @@ List<WaterDetails> waterDetails=jdbcTemplate.query(query,preparedStatement.toArr
 		String query = queryBuilder.isBillingPeriodExists(connectionNo, billingPeriod, preparedStatement);
 		log.info("Is BillingPeriod Exits Query: " + query);
 		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Integer.class);
+	}
+	
+	@Override
+	public List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality) {
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.getConnectionsNoByLocality(tenantId, connectionType,WSCalculationConstant.ACTIVE_CONNECTION, locality, preparedStatement);
+		log.info("preparedStatement: " + preparedStatement + " query : " + query);
+		return jdbcTemplate.queryForList(query, preparedStatement.toArray(), String.class);
+	}
+	@Override
+	public Long searchLastDemandGenFromDate(String consumerCode, String tenantId) {
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.searchLastDemandGenFromDate(consumerCode, tenantId, preparedStatement);
+		log.info("preparedStatement: "+ preparedStatement + " searchLastDemandGenFromDate Query : " + query);
+		List<Long> fromDate = jdbcTemplate.queryForList(query, preparedStatement.toArray(), Long.class);
+		if(fromDate != null && !fromDate.isEmpty())
+			return  fromDate.get(0);
+		
+		return null;
+	}
+	@Override
+	public Boolean isConnectionDemandAvailableForBillingCycle(String tenantId, Long taxPeriodFrom, Long taxPeriodTo,
+			String consumerCode) {
+		List<Object> preparedStatement = new ArrayList<>();
+		String query = queryBuilder.isConnectionDemandAvailableForBillingCycle(tenantId, taxPeriodFrom, taxPeriodTo, consumerCode, preparedStatement);
+		log.info("isConnectionDemandAvailableForBillingCycle Query: " + query + " preparedStatement: "+ preparedStatement);
+		
+		return jdbcTemplate.queryForObject(query, preparedStatement.toArray(), Boolean.class);
 	}
 }

@@ -197,4 +197,17 @@ public class WSCalculationConfiguration {
 
 	@Value("${workflow.process.search.path}")
 	private String searchWorkflowProcessEndPoint;
+	
+	@Value("${egov.watercalculatorservice.billgenerate.topic}")
+	private String billGenerateSchedulerTopic;
+	
+	@Value("${kafka.topics.save.demand}")
+	private String saveDemand;
+	
+	@Value("${egov.bulk.save.demand.count}")
+	private Integer bulkSaveDemandCount;
+	
+	@Value("${egov.bulk.bill.generate.count}")
+	private Integer bulkBillGenerateCount;
+	
 }

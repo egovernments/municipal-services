@@ -4,33 +4,44 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.tracer.model.CustomException;
+import org.egov.wscalculation.config.WSCalculationConfiguration;
 import org.egov.wscalculation.constants.WSCalculationConstant;
-import org.egov.wscalculation.web.models.AdhocTaxReq;
-import org.egov.wscalculation.web.models.Calculation;
-import org.egov.wscalculation.web.models.CalculationCriteria;
-import org.egov.wscalculation.web.models.CalculationReq;
-import org.egov.wscalculation.web.models.TaxHeadCategory;
-import org.egov.wscalculation.web.models.Property;
-import org.egov.wscalculation.web.models.TaxHeadEstimate;
-import org.egov.wscalculation.web.models.TaxHeadMaster;
-import org.egov.wscalculation.web.models.WaterConnection;
-import org.egov.wscalculation.web.models.WaterConnectionRequest;
+import org.egov.wscalculation.producer.WSCalculationProducer;
+import org.egov.wscalculation.repository.BillGeneratorDao;
 import org.egov.wscalculation.repository.ServiceRequestRepository;
 import org.egov.wscalculation.repository.WSCalculationDao;
 import org.egov.wscalculation.util.CalculatorUtil;
 import org.egov.wscalculation.util.WSCalculationUtil;
+import org.egov.wscalculation.web.models.AdhocTaxReq;
+import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
+import org.egov.wscalculation.web.models.BillGeneratorReq;
+import org.egov.wscalculation.web.models.BillScheduler;
+import org.egov.wscalculation.web.models.BillScheduler.StatusEnum;
+import org.egov.wscalculation.web.models.Calculation;
+import org.egov.wscalculation.web.models.CalculationCriteria;
+import org.egov.wscalculation.web.models.CalculationReq;
+import org.egov.wscalculation.web.models.Property;
+import org.egov.wscalculation.web.models.RequestInfoWrapper;
+import org.egov.wscalculation.web.models.TaxHeadCategory;
+import org.egov.wscalculation.web.models.TaxHeadEstimate;
+import org.egov.wscalculation.web.models.TaxHeadMaster;
+import org.egov.wscalculation.web.models.WaterConnection;
+import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.ImmutableSet;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +73,18 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	
 	@Autowired
 	private WSCalculationUtil wSCalculationUtil;
+	
+	@Autowired
+	private BillGeneratorService billGeneratorService;
+	
+	@Autowired
+	private WSCalculationProducer producer;
+	
+	@Autowired
+	private WSCalculationConfiguration configs;
+	
+	@Autowired
+	private BillGeneratorDao billGeneratorDao;
 
 	/**
 	 * Get CalculationReq and Calculate the Tax Head on Water Charge And Estimation Charge
@@ -95,7 +118,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	 */
 	public List<Calculation> bulkDemandGeneration(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = getCalculations(request, masterMap);
-		demandService.generateDemand(request, calculations, masterMap, true);
+		demandService.generateDemandForBillingCycleInBulk(request, calculations, masterMap, true);
 		return calculations;
 	}
 
@@ -202,13 +225,23 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 	List<Calculation> getCalculations(CalculationReq request, Map<String, Object> masterMap) {
 		List<Calculation> calculations = new ArrayList<>(request.getCalculationCriteria().size());
 		for (CalculationCriteria criteria : request.getCalculationCriteria()) {
-			Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
-					masterMap);
-			ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
-					.get(WSCalculationConstant.Billing_Period_Master);
-			masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
-			Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
-			calculations.add(calculation);
+			try {
+				if(criteria.getFrom() == null || criteria.getTo() ==null || criteria.getFrom() <= 0 || criteria.getTo() <= 0){
+					criteria.setFrom(request.getTaxPeriodFrom());
+					criteria.setTo(request.getTaxPeriodTo());
+				}
+				Map<String, List> estimationMap = estimationService.getEstimationMap(criteria, request,
+						masterMap);
+				ArrayList<?> billingFrequencyMap = (ArrayList<?>) masterMap
+						.get(WSCalculationConstant.Billing_Period_Master);
+				masterDataService.enrichBillingPeriod(criteria, billingFrequencyMap, masterMap);
+				Calculation calculation = getCalculation(request, criteria, estimationMap, masterMap, true);
+				calculation.setFrom(criteria.getFrom());
+				calculation.setTo(criteria.getTo());
+				calculations.add(calculation);
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return calculations;
 	}
@@ -276,13 +309,92 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime date = LocalDateTime.now();
 		log.info("Time schedule start for water demand generation on : " + date.format(dateTimeFormatter));
-		List<String> tenantIds = wSCalculationDao.getTenantId();
-		if (tenantIds.isEmpty())
+//		List<String> tenantIds = wSCalculationDao.getTenantId();
+		List<String> tenantIds = new ArrayList<>();
+		tenantIds.add("pb.fazilka");
+		if (tenantIds.isEmpty()) {
+			log.info("No tenants are found for generating demand");
 			return;
+		}
 		log.info("Tenant Ids : " + tenantIds.toString());
 		tenantIds.forEach(tenantId -> {
-			demandService.generateDemandForTenantId(tenantId, requestInfo);
+			try {
+				
+				demandService.generateDemandForTenantId(tenantId, requestInfo);
+				
+			} catch (Exception e) {
+				log.error("Exception occured while generating demand for tenant: " + tenantId);
+				e.printStackTrace();
+			}
 		});
+	}
+	
+	/**
+	 * Generate bill Based on Time (Monthly, Quarterly, Yearly)
+	 */
+	public void generateBillBasedLocality(RequestInfo requestInfo) {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime date = LocalDateTime.now();
+		log.info("Time schedule start for water bill generation on : " + date.format(dateTimeFormatter));
+
+		BillGenerationSearchCriteria criteria = new BillGenerationSearchCriteria();
+		criteria.setStatus(WSCalculationConstant.INITIATED_CONST);
+
+		List<BillScheduler> billSchedularList = billGeneratorService.getBillGenerationDetails(criteria);
+		if (billSchedularList.isEmpty())
+			return;
+		log.info("billSchedularList count : " + billSchedularList.size());
+		for (BillScheduler billSchedular : billSchedularList) {
+			try {
+
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.INPROGRESS);
+				log.info("Updated Bill Schedular Status To INPROGRESS");
+
+				requestInfo.getUserInfo().setTenantId(billSchedular.getTenantId() != null ? billSchedular.getTenantId() : requestInfo.getUserInfo().getTenantId());
+				RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+
+				List<String> connectionNos = wSCalculationDao.getConnectionsNoByLocality( billSchedular.getTenantId(), WSCalculationConstant.nonMeterdConnection, billSchedular.getLocality());
+				//			connectionNos.add("0603000002");
+				//			connectionNos.add("0603009718");
+				//			connectionNos.add("0603000001");
+				if (connectionNos == null || connectionNos.isEmpty()) {
+					billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+					continue;
+				}
+
+				Collection<List<String>> partitionConectionNoList = partitionBasedOnSize(connectionNos, configs.getBulkBillGenerateCount());
+				log.info("partitionConectionNoList size: {}, Producer ConsumerCodes size : {} and BulkBillGenerateCount: {}",partitionConectionNoList.size(), connectionNos.size(), configs.getBulkBillGenerateCount());
+				int threadSleepCount = 1;
+				int count = 1;
+				for (List<String>  conectionNoList : partitionConectionNoList) {
+
+					BillGeneratorReq billGeneraterReq = BillGeneratorReq
+							.builder()
+							.requestInfoWrapper(requestInfoWrapper)
+							.tenantId(billSchedular.getTenantId())
+							.consumerCodes(ImmutableSet.copyOf(conectionNoList))
+							.billSchedular(billSchedular)
+							.build();
+
+					producer.push(configs.getBillGenerateSchedulerTopic(), billGeneraterReq);
+					log.info("Bill Scheduler pushed connections size:{} to kafka topic of batch no: ", conectionNoList.size(), count++);
+
+					if(threadSleepCount == 2) {
+						//Pausing the controller for 10 seconds after every two batches pushed to Kafka topic
+						Thread.sleep(10000);
+						threadSleepCount=1;
+					}
+					threadSleepCount++;
+
+				}
+				billGeneratorDao.updateBillSchedularStatus(billSchedular.getId(), StatusEnum.COMPLETED);
+				log.info("Updated Bill Schedular Status To COMPLETED");
+
+			}catch (Exception e) {
+				log.error("Execption occured while generating bills for tenant"+billSchedular.getTenantId()+" and locality: "+billSchedular.getLocality());
+			}
+
+		}
 	}
 	
 	/**
@@ -322,9 +434,15 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 					.estimateAmount(adhocTaxReq.getAdhocrebate().setScale(2, 2).negate()).build());
 		Calculation calculation = Calculation.builder()
 				.tenantId(adhocTaxReq.getRequestInfo().getUserInfo().getTenantId())
-				.applicationNO(adhocTaxReq.getDemandId()).taxHeadEstimates(estimates).build();
+				.connectionNo(adhocTaxReq.getConsumerCode()).taxHeadEstimates(estimates).build();
 		List<Calculation> calculations = Collections.singletonList(calculation);
 		return demandService.updateDemandForAdhocTax(adhocTaxReq.getRequestInfo(), calculations);
 	}
 	
+	static <T> Collection<List<T>> partitionBasedOnSize(List<T> inputList, int size) {
+        final AtomicInteger counter = new AtomicInteger(0);
+        return inputList.stream()
+                    .collect(Collectors.groupingBy(s -> counter.getAndIncrement()/size))
+                    .values();
+	}
 }

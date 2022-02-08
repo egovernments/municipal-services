@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.egov.wscalculation.service.BillGeneratorService;
 import org.egov.wscalculation.util.ResponseInfoFactory;
+import org.egov.wscalculation.validator.BillGenerationValidator;
 import org.egov.wscalculation.web.models.BillGenerationReq;
 import org.egov.wscalculation.web.models.BillGenerationSearchCriteria;
 import org.egov.wscalculation.web.models.BillScheduler;
@@ -36,10 +37,15 @@ public class BillGeneratorController {
 
 	@Autowired
 	private BillGeneratorService billGeneratorService;
+	
+	@Autowired
+	private BillGenerationValidator billGenerationValidator;
 
 	@PostMapping("/scheduler/_create")
 	public ResponseEntity<BillSchedulerResponse> billSchedulerCreate(
 			@Valid @RequestBody BillGenerationReq billGenerationReq) {
+
+		billGenerationValidator.validateBillingCycleDates(billGenerationReq, billGenerationReq.getRequestInfo());
 		List<BillScheduler> billDetails = billGeneratorService.saveBillGenerationDetails(billGenerationReq);
 		BillSchedulerResponse response = BillSchedulerResponse.builder().billSchedulers(billDetails)
 				.responseInfo(

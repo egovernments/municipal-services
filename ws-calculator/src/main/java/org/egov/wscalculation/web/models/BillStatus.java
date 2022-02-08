@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum BillStatus {
 
-	INITATED("INITATED"), INPROGRESS("INPROGRESS"), COMPLETED("COMPLETED");
+	INITIATED("INITIATED"), INPROGRESS("INPROGRESS"), COMPLETED("COMPLETED");
 
 	private String value;
 

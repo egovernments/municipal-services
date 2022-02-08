@@ -94,6 +94,8 @@ public class WSCalculationUtil {
 					.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
 					.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
 					.append(WSCalculationConstant.SEPARATER)
+					.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getBusinessService())
+					.append(WSCalculationConstant.SEPARATER)
 					.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
 					.append(getBillCriteria.getConnectionId())
 					.append(WSCalculationConstant.WS_CONSUMER_CODE_SEPARATOR)
@@ -103,6 +105,8 @@ public class WSCalculationUtil {
 			return new StringBuilder().append(configurations.getBillingServiceHost())
 					.append(configurations.getDemandSearchEndPoint()).append(WSCalculationConstant.URL_PARAMS_SEPARATER)
 					.append(WSCalculationConstant.TENANT_ID_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getTenantId())
+					.append(WSCalculationConstant.SEPARATER)
+					.append(WSCalculationConstant.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL).append(getBillCriteria.getBusinessService())
 					.append(WSCalculationConstant.SEPARATER)
 					.append(WSCalculationConstant.CONSUMER_CODE_SEARCH_FIELD_NAME)
 					.append(StringUtils.join(getBillCriteria.getConsumerCodes(), ","));
@@ -155,9 +159,9 @@ public class WSCalculationUtil {
 	 */
 	public List<Property> propertySearch(WaterConnectionRequest waterConnectionRequest) {
 		PropertyCriteria propertyCriteria = new PropertyCriteria();
-		HashSet<String> propertyUUID = new HashSet<>();
-		propertyUUID.add(waterConnectionRequest.getWaterConnection().getPropertyId());
-		propertyCriteria.setUuids(propertyUUID);
+		HashSet<String> propertyIds = new HashSet<>();
+		propertyIds.add(waterConnectionRequest.getWaterConnection().getPropertyId());
+		propertyCriteria.setPropertyIds(propertyIds);
 		propertyCriteria.setTenantId(waterConnectionRequest.getWaterConnection().getTenantId());
 		Object result = serviceRequestRepository.fetchResult(getPropertyURL(propertyCriteria),
 				RequestInfoWrapper.builder().requestInfo(waterConnectionRequest.getRequestInfo()).build());

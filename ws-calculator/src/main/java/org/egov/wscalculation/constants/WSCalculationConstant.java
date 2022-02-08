@@ -290,7 +290,47 @@ public class WSCalculationConstant {
 
 	public static final String WATER_SUBUSAGE_TYPE = "waterSubUsageType";
 	
+	public static final String INITIATED_CONST = "INITIATED";
+	
+	public static final String INPROGRESS_CONST = "INPROGRESS";
+	
+	public static final String COMPLETED_CONST = "COMPLETED";
+	
+	public static final String ACTIVE = "ACTIVE";
+	
+    public static final String EG_WS_CAL_JSON_EXCEPTION_KEY = "EG_WS_CAL_JSON_EXCEPTION";
+    
+    public static final String EG_WS_CAL_JSON_EXCEPTION_MSG = "Exception occured while parsing additional details";
+    
+	public static final String WS_BILL_SCHEDULER_TRANSACTION = "Bill Generation";
 
+	public static final String PROPERTY_TYPE_MIXED = "MIXED";
+	
+	public static final String UNIT_USAGE_TYPE_KEY = "unitUsageType";
+	
+	public static final String CONNECTION_ACTIVATED = "CONNECTION_ACTIVATED";
+	
+	public static final String WS_NO_BILLING_PERIOD = "WS_NO_BILLING_PERIOD";
+	
+	public static final String WS_NO_BILLING_PERIOD_MSG = "No billin period is active or not defined";
+	
+    public static final String WS_DUPLICATE_BILL_SCHEDULER = "WS_DUPLICATE_BILL_SCHEDULER";
+	
+	public static final String WS_DUPLICATE_BILL_SCHEDULER_MSG = "Bills are already scheduled for the locality ";
+	
+	public static final String MODULE_NAME_BILLINGSERVICE = "BillingService";
+	
+	public static final String TAXPERIOD_MASTERNAME = "TaxPeriod";
 
+	public static final String MDMS_NO_FILTER_TAXPERIOD = "$.MdmsRes.BillingService.TaxPeriod.*";
+
+	public static final String SUCCESS = "Success";
+
+	public static final String FAILURE = "Failure";
+	
+	public static final String SUCCESS_MESSAGE = "Bill is generated successfully for consumercode: ";
+	
+	public static final String FAILURE_MESSAGE = "Bill already paid or Error in bill generation for consumercode: ";
+	
 	
 }

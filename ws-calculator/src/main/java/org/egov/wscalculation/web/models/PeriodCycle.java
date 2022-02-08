@@ -7,7 +7,7 @@ public enum PeriodCycle {
 
 	MONTH("MONTH"),
 
-	QUARTER("QUARTER"),
+	QUATERLY("QUATERLY"),
 
 	HALFYEAR("HALFYEAR"),
 

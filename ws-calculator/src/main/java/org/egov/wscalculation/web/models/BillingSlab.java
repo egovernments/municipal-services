@@ -73,4 +73,14 @@ public class BillingSlab {
 	private String calculationAttribute = null;
 	private double minimumCharge;
 	private List<Slab> slabs = new ArrayList<>();
+
+	@Override
+	public String toString() {
+		return "BillingSlab [id=" + id + ", buildingType=" + buildingType + ", connectionType=" + connectionType
+				+ ", waterSubUsageType=" + waterSubUsageType + ", calculationAttribute=" + calculationAttribute
+				+ ", minimumCharge=" + minimumCharge + ", slabs=" + slabs.toString() + "]";
+	}
+	
+	
+	
 }

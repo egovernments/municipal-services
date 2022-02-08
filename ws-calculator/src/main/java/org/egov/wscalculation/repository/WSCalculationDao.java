@@ -22,10 +22,17 @@ public interface WSCalculationDao {
 	
 	int isMeterReadingConnectionExist(List<String> ids);
 	
-	List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType);
+	List<WaterDetails> getConnectionsNoList(String tenantId, String connectionType, Long taxPeriodFrom, Long taxPeriodTo);
 	
 	List<String> getTenantId();
 	
 	int isBillingPeriodExists(String connectionNo, String billingPeriod);
+	
+	List<String> getConnectionsNoByLocality(String tenantId, String connectionType, String locality);
+	
+	Long searchLastDemandGenFromDate(String consumerCode, String tenantId);
+	
+	Boolean isConnectionDemandAvailableForBillingCycle(String tenantId, Long taxPeriodFrom, Long taxPeriodTo, String consumerCode); 
+
 
 }
