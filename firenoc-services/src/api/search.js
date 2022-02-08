@@ -42,7 +42,7 @@ export const searchApiResponse = async (request, next = {}) => {
   }
   // console.log(queryObj);
   let text =
-    "SELECT FN.uuid as FID,FN.tenantid,FN.fireNOCNumber,FN.provisionfirenocnumber,FN.oldfirenocnumber,FN.dateofapplied,FN.createdBy,FN.createdTime,FN.lastModifiedBy,FN.lastModifiedTime,FD.uuid as firenocdetailsid,FD.action,FD.applicationnumber,FD.fireNOCType,FD.applicationdate,FD.financialYear,FD.firestationid,FD.issuedDate,FD.validFrom,FD.validTo,FD.action,FD.status,FD.channel,FD.propertyid,FD.noofbuildings,FD.additionaldetail,FBA.uuid as puuid,FBA.doorno as pdoorno,FBA.latitude as platitude,FBA.longitude as plongitude,FBA.buildingName as pbuildingname,FBA.addressnumber as paddressnumber,FBA.pincode as ppincode,FBA.locality as plocality,FBA.city as pcity,FBA.street as pstreet,FB.uuid as buildingid ,FB.name as buildingname,FB.usagetype,FO.uuid as ownerid,FO.ownertype,FO.useruuid,FO.relationship,FUOM.uuid as uomuuid,FUOM.code,FUOM.value,FUOM.activeuom,FBD.uuid as documentuuid,FUOM.active,FBD.documentType,FBD.filestoreid,FBD.documentuid,FBD.createdby as documentCreatedBy,FBD.lastmodifiedby as documentLastModifiedBy,FBD.createdtime as documentCreatedTime,FBD.lastmodifiedtime as documentLastModifiedTime FROM eg_fn_firenoc FN JOIN eg_fn_firenocdetail FD ON (FN.uuid = FD.firenocuuid) JOIN eg_fn_address FBA ON (FD.uuid = FBA.firenocdetailsuuid) JOIN eg_fn_owner FO ON (FD.uuid = FO.firenocdetailsuuid) JOIN eg_fn_buidlings FB ON (FD.uuid = FB.firenocdetailsuuid) JOIN eg_fn_buildinguoms FUOM ON (FB.uuid = FUOM.buildinguuid) LEFT OUTER JOIN eg_fn_buildingdocuments FBD on(FB.uuid = FBD.buildinguuid)";
+    "SELECT FN.uuid as FID,FN.tenantid,FN.fireNOCNumber,FN.islegacy,FN.provisionfirenocnumber,FN.oldfirenocnumber,FN.dateofapplied,FN.createdBy,FN.createdTime,FN.lastModifiedBy,FN.lastModifiedTime,FD.uuid as firenocdetailsid,FD.action,FD.applicationnumber,FD.fireNOCType,FD.applicationdate,FD.financialYear,FD.firestationid,FD.issuedDate,FD.validFrom,FD.validTo,FD.action,FD.status,FD.channel,FD.propertyid,FD.noofbuildings,FD.additionaldetail,FBA.uuid as puuid,FBA.doorno as pdoorno,FBA.latitude as platitude,FBA.longitude as plongitude,FBA.buildingName as pbuildingname,FBA.addressnumber as paddressnumber,FBA.pincode as ppincode,FBA.locality as plocality,FBA.landmark as landmark, FBA.addressline2,FBA.city as pcity, FBA.areatype as pareatype, FBA.subdistrict as psubdistrict, FBA.street as pstreet,FB.uuid as buildingid ,FB.name as buildingname,FB.usagetype,FB.usagesubtype,FB.leftsurrounding,FB.rightsurrounding,FB.frontsurrounding,FB.backsurrounding,FB.landarea,FB.totalcoveredarea,FB.parkingarea,FO.uuid as ownerid,FO.ownertype,FO.useruuid,FO.relationship,FUOM.uuid as uomuuid,FUOM.code,FUOM.value,FUOM.activeuom,FBD.uuid as documentuuid,FUOM.active,FBD.documentType,FBD.filestoreid,FBD.documentuid,FBD.createdby as documentCreatedBy,FBD.lastmodifiedby as documentLastModifiedBy,FBD.createdtime as documentCreatedTime,FBD.lastmodifiedtime as documentLastModifiedTime FROM eg_fn_firenoc FN JOIN eg_fn_firenocdetail FD ON (FN.uuid = FD.firenocuuid) JOIN eg_fn_address FBA ON (FD.uuid = FBA.firenocdetailsuuid) JOIN eg_fn_owner FO ON (FD.uuid = FO.firenocdetailsuuid) JOIN eg_fn_buidlings FB ON (FD.uuid = FB.firenocdetailsuuid) JOIN eg_fn_buildinguoms FUOM ON (FB.uuid = FUOM.buildinguuid) LEFT OUTER JOIN eg_fn_buildingdocuments FBD on(FB.uuid = FBD.buildinguuid)";
   // FBD.active=true AND FO.active=true AND FUOM.active=true AND";
   //if citizen
   const roles = get(request.body, "RequestInfo.userInfo.roles");
@@ -50,19 +50,15 @@ export const searchApiResponse = async (request, next = {}) => {
   const isUser = some(roles, { code: "CITIZEN" }) && userUUID;
   if (isUser) {
     const mobileNumber = get(request.body, "RequestInfo.userInfo.mobileNumber");
-    const tenantId = get(request.body, "RequestInfo.userInfo.permanentCity");
-    
-    
-    //text = `${text} where (FN.createdby = '${userUUID}' OR`;    
+    const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
+    console.log("mobileNumber", mobileNumber);
+    console.log("tenedrIDD", tenantId);
+    text = `${text} where (FN.createdby = '${userUUID}' OR`;
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
       ? queryObj.mobileNumber
       : mobileNumber;
     queryObj.tenantId = queryObj.tenantId ? queryObj.tenantId : tenantId;
-    console.log("mobileNumber", mobileNumber);
-    console.log("tenedrIDD", tenantId);
-
-    text = `${text} where FN.tenantid = '${queryObj.tenantId}' AND`;
   } else {
     if (!isEmpty(queryObj)) {
       text = text + " where ";
@@ -83,49 +79,34 @@ export const searchApiResponse = async (request, next = {}) => {
       envVariables.EGOV_DEFAULT_STATE_ID
     );
     // console.log(userSearchResponse);
-    let searchUserUUID = get(userSearchResponse, "user.0.uuid");
+    let users= get(userSearchResponse, "user");
+
+    let searchUserUUID='';
+    
+    if(users.length>1){
+      users.forEach((user,i)=>{
+        if(i!=users.length-1){
+          searchUserUUID=searchUserUUID+`'${user.uuid}',`
+        }else{
+          searchUserUUID=searchUserUUID+`'${user.uuid}'`
+        }   
+      })
+
+    }else{
+      searchUserUUID=`'${users[0].uuid}'`;
+    }
     // if (searchUserUUID) {
     //   // console.log(searchUserUUID);
-    var userSearchResponseJson = JSON.parse(JSON.stringify(userSearchResponse));  
-    var userUUIDArray =[];
-    for(var i =0;i<userSearchResponseJson.user.length;i++){
-      userUUIDArray.push(userSearchResponseJson.user[i].uuid);
-    }
-    /*
-    if (isUser) {
-      sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
-        queryObj.mobileNumber}') AND`;
-    } else {
-        sqlQuery = `${sqlQuery} FO.useruuid in (`;
-        if(userUUIDArray.length > 0){
-          for(var j =0;j<userUUIDArray.length;j++){
-            if(j==0)
-              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
-
-            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
-          }      
-        }
-        else
-          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
-
-        sqlQuery = `${sqlQuery}) AND`;  
-    }*/
-
-    sqlQuery = `${sqlQuery} FO.useruuid in (`;
-        if(userUUIDArray.length > 0){
-          for(var j =0;j<userUUIDArray.length;j++){
-            if(j==0)
-              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
-
-            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
-          }      
-        }
-        else
-          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
-
-        sqlQuery = `${sqlQuery}) AND`;  
-
-
+   
+      sqlQuery = `${sqlQuery} FO.useruuid='${queryObj.mobileNumber}' or FO.useruuid in (${searchUserUUID})`;
+      
+      if(isUser){
+        sqlQuery=sqlQuery+`) AND`;
+      }else{
+        sqlQuery=sqlQuery+` AND`;
+      }
+     
+   
     // }
   }
   if (queryObj.hasOwnProperty("ids")) {
@@ -150,12 +131,43 @@ export const searchApiResponse = async (request, next = {}) => {
           item != "ids" &&
           item != "mobileNumber"
         ) {
-          queryObj[item]=queryObj[item].toUpperCase();
           sqlQuery = `${sqlQuery} ${item}='${queryObj[item]}' AND`;
         }
       }
     });
   }
+
+  if(queryObj.hasOwnProperty("city"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.city='${queryObj.city}' AND`;
+
+}
+
+
+if(queryObj.hasOwnProperty("fireNOCType"))
+{     
+
+  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.fireNOCType}' AND`;
+
+}
+
+
+if(queryObj.hasOwnProperty("areaType"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.areatype='${queryObj.areaType}' AND`;
+
+}
+
+if(queryObj.hasOwnProperty("subDistrict"))
+{     
+
+  sqlQuery=`${sqlQuery}  FBA.subdistrict='${queryObj.subDistrict}' AND`;
+
+}
+
+
   if (
     queryObj.hasOwnProperty("fromDate") &&
     queryObj.hasOwnProperty("toDate")
@@ -169,7 +181,7 @@ export const searchApiResponse = async (request, next = {}) => {
   } else if (!isEmpty(queryObj)) {
     sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
   }
-  console.log("SQL QUery:" +sqlQuery);
+  console.log("SQL Query:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
   //console.log("dbResponse"+JSON.stringify(dbResponse));
   if (dbResponse.err) {

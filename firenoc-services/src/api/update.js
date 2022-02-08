@@ -30,7 +30,7 @@ export default ({ config }) => {
   return api;
 };
 export const updateApiResponse = async ({ body }, next = {}) => {
-  //console.log("Update Body: "+JSON.stringify(body));
+  console.log("Update Body: "+JSON.stringify(body));
   let payloads = [];
   let mdms = await mdmsData(body.RequestInfo, body.FireNOCs[0].tenantId);
   //model validator
@@ -75,7 +75,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
   }
 
   body.FireNOCs = updateStatus(FireNOCs, workflowResponse);
-  //console.log("Fire NoC body"+JSON.stringify(body.FireNOCs));
+  console.log("Fire NoC body"+JSON.stringify(body.FireNOCs));
 
   payloads.push({
     topic: envVariables.KAFKA_TOPICS_FIRENOC_UPDATE,
@@ -94,7 +94,7 @@ export const updateApiResponse = async ({ body }, next = {}) => {
       messages: JSON.stringify({ RequestInfo, FireNOCs: approvedList })
     });
   }
-  // console.log(JSON.stringify(body));
+  console.log(JSON.stringify(body));
   let response = {
     ResponseInfo: requestInfoToResponseInfo(body.RequestInfo, true),
     FireNOCs: body.FireNOCs

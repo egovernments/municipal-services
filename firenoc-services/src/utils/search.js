@@ -21,6 +21,7 @@ const fireNOCRowMapper = async (row, mapper = {}) => {
   fireNoc.provisionFireNOCNumber = row.provisionfirenocnumber;
   fireNoc.oldFireNOCNumber = row.oldfirenocnumber;
   fireNoc.dateOfApplied = intConversion(row.dateofapplied);
+  fireNoc.IsLegacy=row.islegacy;
   let auditDetails = {
     createdBy: row.createdby,
     lastModifiedBy: row.lastmodifiedby,
@@ -60,6 +61,10 @@ const fireNOCRowMapper = async (row, mapper = {}) => {
         addressNumber: row.paddressNumber,
         buildingName: row.pbuildingname,
         city: row.pcity,
+        areaType:row.pareatype,
+        subDistrict:row.psubdistrict,
+        addressLine2:row.addressline2,
+        landmark:row.landmark,
         locality: {
           code: row.plocality
         },
@@ -122,8 +127,16 @@ const fireNocBuildingsRowMapper = (row, mapper = []) => {
     tenantId: row.tenantid,
     name: row.buildingname,
     usageType: row.usagetype,
+    usageSubType:row.usagesubtype,
     uoms: fireNocUomsRowMapper(row),
-    applicationDocuments: fireNocApplicationDocumentsRowMapper(row)
+    applicationDocuments: fireNocApplicationDocumentsRowMapper(row),
+    landArea: intConversion(row.landarea),
+    totalCoveredArea:intConversion(row.totalcoveredarea),
+    parkingArea:intConversion(row.parkingarea),
+    leftSurrounding:row.leftsurrounding,
+    rightSurrounding:row.rightsurrounding,
+    frontSurrounding:row.frontsurrounding,
+    backSurrounding:row.backsurrounding
   };
   if (buildingIndex != -1) {
     buildingObject.uoms = fireNocUomsRowMapper(

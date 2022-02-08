@@ -48,7 +48,7 @@ const envVariables = {
     process.env.EGOV_DEMAND_SEARCH_ENDPOINT ||
     "/billing-service/demand/_search",
   EGOV_BILL_GEN_ENDPOINT:
-    process.env.EGOV_BILL_GEN_ENDPOINT || "/billing-service/bill/_generate",
+    process.env.EGOV_BILL_GEN_ENDPOINT || "/billing-service/bill/v2/_fetchbill",
   TAXABLE_TAXHEADS: process.env.TAXABLE_TAXHEADS || ["FIRENOC_FEES"],
   DEBIT_TAXHEADS: process.env.DEBIT_TAXHEADS || ["FIRENOC_ADHOC_REBATE"],
 
