@@ -54,8 +54,12 @@ public class Service   {
   private String serviceRequestId;
 
   @JsonProperty("description")
+<<<<<<< HEAD
   @Pattern(regexp = "^[a-zA-Z0-9!@#.,/: ()&']*$")
   @Size(max=256)
+=======
+  @Size(max=2000)
+>>>>>>> 1fd46c68152d930995eec20f5e37d65a21d93b75
   private String description;
 
   @JsonProperty("lat")
@@ -169,7 +173,9 @@ public class Service   {
     
     CSC("csc"),
     
-    WEB("web");
+    WEB("web"),
+	  
+    RBBOT("RB Bot");
 
     private String value;
 
