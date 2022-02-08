@@ -41,6 +41,12 @@ public class CalculationReq  {
 		 * 
 		 */
         private Boolean isconnectionCalculation;
+		
+		
+		private long taxPeriodFrom;
+		
+		
+		private long taxPeriodTo;
 
         @Valid
         @NotNull

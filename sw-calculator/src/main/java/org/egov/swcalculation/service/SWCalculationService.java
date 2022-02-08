@@ -13,4 +13,7 @@ public interface SWCalculationService {
 	void generateDemandBasedOnTimePeriod(RequestInfo requestInfo);
 	
 	List<Calculation> getEstimation(CalculationReq request);
+	
+	void generateBillBasedLocality(RequestInfo requestInfo);
+
 }

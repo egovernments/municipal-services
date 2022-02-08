@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -23,6 +24,7 @@ import org.egov.swcalculation.web.models.RequestInfoWrapper;
 import org.egov.swcalculation.web.models.SearchCriteria;
 import org.egov.swcalculation.web.models.SewerageConnection;
 import org.egov.swcalculation.web.models.SewerageConnectionResponse;
+import org.egov.swcalculation.web.models.TaxPeriod;
 import org.egov.swcalculation.web.models.workflow.ProcessInstance;
 import org.egov.swcalculation.web.models.workflow.ProcessInstanceResponse;
 import org.egov.tracer.model.CustomException;
@@ -30,13 +32,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Getter
+@Slf4j
 public class CalculatorUtils {
 
 	@Autowired
@@ -338,7 +344,7 @@ public class CalculatorUtils {
 		StringBuilder url = new StringBuilder(configurations.getPropertyHost());
 		url.append(configurations.getSearchPropertyEndPoint()).append("?");
 		url.append("tenantId=").append(tenantId).append("&");
-		url.append("uuids=").append(propertyId);
+		url.append("propertyIds=").append(propertyId);
 		return url.toString();
 	}
 
@@ -370,4 +376,54 @@ public class CalculatorUtils {
 		url.append("businessIds=").append(businessIds);
 		return url.toString();
 	}
+	
+	/**
+	 * Prepare the MDMS tax period
+	 * @param requestInfo
+	 * @param serviceName
+	 * @param tenantId
+	 * @return
+	 */
+	public MdmsCriteriaReq prepareWSTaxPeriodMdmsRequest(RequestInfo requestInfo, String serviceName, String tenantId) {
+		
+			MasterDetail masterDetail = MasterDetail.builder().name(SWCalculationConstant.TAXPERIOD_MASTERNAME)
+					.filter("[?(@.periodCycle=='QUATERLY' && @.service== '"+serviceName+"')]")
+					.build();
+			ModuleDetail moduleDetail = ModuleDetail.builder().moduleName(SWCalculationConstant.MODULE_NAME_BILLINGSERVICE)
+					.masterDetails(Arrays.asList(masterDetail)).build();
+			MdmsCriteria mdmsCriteria = MdmsCriteria.builder().moduleDetails(Arrays.asList(moduleDetail)).tenantId(tenantId)
+					.build();
+			return MdmsCriteriaReq.builder().requestInfo(requestInfo).mdmsCriteria(mdmsCriteria).build();
+
+	}
+	
+	/**
+	 * Fetches the MDMS tax periods based on the MdmsCriteriaRequest
+	 *
+	 * @param tenantId    tenantId of properties in PropertyRequest
+	 * @param names       List of String containing the names of all master-data
+	 *                    whose code has to be extracted
+	 * @param requestInfo RequestInfo of the received PropertyRequest
+	 * @return Map of MasterData name to the list of code in the MasterData
+	 *
+	 */
+	public List<TaxPeriod> getTaxPeriodsFromMDMS(RequestInfo requestInfo, String tenantId) {
+
+		try {
+			MdmsCriteriaReq mdmsReq = prepareWSTaxPeriodMdmsRequest(requestInfo, SWCalculationConstant.SERVICE_FIELD_VALUE_SW, tenantId);
+			DocumentContext documentContext = JsonPath.parse(serviceRequestRepository.fetchResult(getMdmsSearchUrl(), mdmsReq));
+
+			List<TaxPeriod> taxPeriods =  mapper.convertValue(documentContext.read(SWCalculationConstant.MDMS_NO_FILTER_TAXPERIOD), new TypeReference<List<TaxPeriod>>() {});
+			//Sorting the tax periods based on tax from date in ascending order
+			taxPeriods = taxPeriods.stream()
+					     .sorted(Comparator.comparing(TaxPeriod::getFromDate))
+					     .collect(Collectors.toList());
+			return taxPeriods;
+			
+		} catch (Exception e) {
+			log.error("Error while fetching MDMS data", e);
+			throw new CustomException("NO_TAXPERIOD_FOUND", "Exception while getting the tax periods from the MDMS service");
+		}
+	}
+
 }
