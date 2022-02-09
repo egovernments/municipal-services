@@ -107,6 +107,9 @@ public class TranslationService {
         propertyDetail.put("usageCategoryMinor", usageCategoryMinor);
         propertyDetail.put("ownershipCategory", ownershipCategory);
         propertyDetail.put("subOwnershipCategory", subOwnershipCategory);
+        if(property.getAdditionalDetails()!=null) {
+        	propertyDetail.put("additionalDetails", property.getAdditionalDetails());
+        }
 
         // propertyDetail.put("adhocExemption", );
         // propertyDetail.put("adhocPenalty",);
@@ -128,6 +131,7 @@ public class TranslationService {
                 unitMap.put("unitArea", unit.getConstructionDetail().getBuiltUpArea());
                 unitMap.put("arv", unit.getArv());
                 unitMap.put("occupancyType", unit.getOccupancyType());
+                unitMap.put("active", unit.getActive());
 
                 String[] masterData = unit.getUsageCategory().split("\\.");
 
@@ -143,7 +147,11 @@ public class TranslationService {
                 if(masterData.length >= 4)
                     unitMap.put("usageCategoryDetail",masterData[3]);
 
-                unitMap.put("additionalDetails", unit.getAdditionalDetails());
+                if(!unit.getAdditionalDetails().isNull())
+                	unitMap.put("additionalDetails", unit.getAdditionalDetails());
+                else
+                	unitMap.put("additionalDetails", null);
+
                 units.add(unitMap);
 
             });
@@ -151,7 +159,7 @@ public class TranslationService {
         if(assessment.getAdditionalDetails()!=null){
             // propertyDetail.put("adhocPenalty",);
             try{
-                if(assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY)!=null && !assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY).isNull()){
+                if(assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY)!=null){
                     BigDecimal adhocExemption = new BigDecimal(assessment.getAdditionalDetails().get(ADHOC_REBATE_KEY).doubleValue());
                     propertyDetail.put("adhocExemption",adhocExemption);
                 }
@@ -160,7 +168,7 @@ public class TranslationService {
                     propertyDetail.put("adhocExemptionReason",assessment.getAdditionalDetails().get(ADHOC_REBATE_REASON_KEY).asText());
 
 
-                if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY)!=null && !assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY).isNull()){
+                if(assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY)!=null){
                     BigDecimal adhocPenalty = new BigDecimal(assessment.getAdditionalDetails().get(ADHOC_PENALTY_KEY).doubleValue());
                     propertyDetail.put("adhocPenalty",adhocPenalty);
                 }

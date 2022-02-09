@@ -48,7 +48,7 @@ public class User   {
 
         @NotNull
         @Size(max=100)
-        @Pattern(regexp = "^[^\\$\"'<>?\\\\~`!@#$%^()+={}\\[\\]*,:;“”‘’]*$", message = "Invalid name. Only alphabets and special characters -, ',`, .")
+        @Pattern(regexp = "^[^\\$\"'<>?\\\\~`!@#$%^()+={}\\[\\]*,.:;“”‘’]*$", message = "Invalid name. Only alphabets and special characters -, ',`, .")
         @JsonProperty("name")
         private String name;
 
@@ -188,4 +188,3 @@ public class User   {
                 return Objects.hash(uuid, name, mobileNumber);
         }
 }
-

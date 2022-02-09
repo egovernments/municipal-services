@@ -5,12 +5,13 @@ import java.math.BigDecimal;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -71,5 +72,11 @@ public class Unit   {
 
         @JsonProperty("arv")
         private BigDecimal arv;
-}
+        
+        @JsonProperty("active")
+    	private Boolean active;
+       
+    	@JsonProperty("additionalDetails")
+    	private JsonNode additionalDetails;
 
+}

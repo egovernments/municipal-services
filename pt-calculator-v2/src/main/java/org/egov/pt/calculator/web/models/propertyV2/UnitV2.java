@@ -1,6 +1,9 @@
 package org.egov.pt.calculator.web.models.propertyV2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.JsonObject;
+
 import lombok.*;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
 
@@ -55,7 +58,7 @@ public class UnitV2 {
 	private ConstructionDetail constructionDetail;
 
 	@JsonProperty("additionalDetails")
-	private Object additionalDetails;
+	private JsonNode additionalDetails;
 
 	@JsonProperty("auditDetails")
 	private AuditDetails auditDetails;

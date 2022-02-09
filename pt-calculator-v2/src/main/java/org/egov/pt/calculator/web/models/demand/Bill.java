@@ -49,7 +49,7 @@ public class Bill {
 	private String payerId = null;
 
 	@JsonProperty("status")
-	private BillStatusEnum status = null;
+	private StatusEnum status = null;
 
 	@JsonProperty("reasonForCancellation")
 	private String reasonForCancellation = null;
@@ -102,7 +102,7 @@ public class Bill {
 
 
 
-	public enum BillStatusEnum {
+	public enum StatusEnum {
 		ACTIVE("ACTIVE"),
 
 		CANCELLED("CANCELLED"),
@@ -113,7 +113,7 @@ public class Bill {
 
 		private String value;
 
-		BillStatusEnum(String value) {
+		StatusEnum(String value) {
 			this.value = value;
 		}
 
@@ -125,7 +125,7 @@ public class Bill {
 		}
 
 		public static boolean contains(String test) {
-			for (BillStatusEnum val : BillStatusEnum.values()) {
+			for (StatusEnum val : StatusEnum.values()) {
 				if (val.name().equalsIgnoreCase(test)) {
 					return true;
 				}
@@ -134,8 +134,8 @@ public class Bill {
 		}
 
 		@JsonCreator
-		public static BillStatusEnum fromValue(String text) {
-			for (BillStatusEnum b : BillStatusEnum.values()) {
+		public static StatusEnum fromValue(String text) {
+			for (StatusEnum b : StatusEnum.values()) {
 				if (String.valueOf(b.value).equals(text)) {
 					return b;
 				}

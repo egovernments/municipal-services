@@ -37,6 +37,7 @@ public class PBFirecessUtils {
             firecess_category_major =new BigDecimal ((Integer) ((HashMap)applicableMaster.get("dynamicRates")).get("firecess_category_major"));
         }
 
+
         if (propertyAttributes!=null &&
                 propertyAttributes.get("heightAbove36Feet")!=null &&
                 (Boolean) propertyAttributes.get("heightAbove36Feet")) {
@@ -50,7 +51,6 @@ public class PBFirecessUtils {
             // height is above 36 feet
             firecess_inflammable = new BigDecimal ((Integer) ((HashMap)applicableMaster.get("dynamicRates")).get("firecess_inflammable"));
         }
-
         return firecess_category_major.add(firecess_building_height).add(firecess_inflammable);
     }
 

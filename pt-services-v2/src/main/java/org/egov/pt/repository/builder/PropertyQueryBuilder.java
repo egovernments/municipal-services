@@ -1,14 +1,13 @@
 package org.egov.pt.repository.builder;
 
+import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 import org.egov.pt.config.PropertyConfiguration;
 import org.egov.pt.web.models.PropertyCriteria;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class PropertyQueryBuilder {
@@ -51,8 +50,9 @@ public class PropertyQueryBuilder {
 			+ "insti.name as institutionname,insti.type as institutiontype,insti.tenantid as institenantId,"
 			+ "ownerdoc.userid as docuserid,ownerdoc.propertydetail as docassessmentnumber,"
 			+ "unit.usagecategorymajor as unitusagecategorymajor,unit.usagecategoryminor as unitusagecategoryminor,"
-			+ "pt.lastModifiedTime as propertylastModifiedTime,pt.createdby as propertyCreatedby,"
-			+ "pt.lastModifiedBy as propertyModifiedBy,pt.createdTime as propertyCreatedTime "
+			+ "unit.additionalDetails as unit_additionalDetails,owner.additionalDetails as ownerInfo_additionalDetails,"
+			+ "insti.additionalDetails as insti_additionalDetails,address.additionalDetails as add_additionalDetails,"
+			+ "pt.lastModifiedTime as propertylastModifiedTime "
 			+ " FROM eg_pt_property_v2 pt " + INNER_JOIN_STRING
 			+ " eg_pt_propertydetail_v2 ptdl ON pt.propertyid =ptdl.property " + INNER_JOIN_STRING
 			+ " eg_pt_owner_v2 owner ON ptdl.assessmentnumber=owner.propertydetail " + INNER_JOIN_STRING
@@ -107,43 +107,23 @@ public class PropertyQueryBuilder {
 	
 
 	public String getPropertyLikeQuery(PropertyCriteria criteria, List<Object> preparedStmtList) {
-		StringBuilder builder = new StringBuilder(LIKE_QUERY);
-
-		Set<String> ids = criteria.getIds();
-		if (!CollectionUtils.isEmpty(ids)) {
-
-			builder.append(" pt.propertyid IN (").append(createQuery(ids)).append(")");
-			addToPreparedStatement(preparedStmtList, ids);
+		StringBuilder builder = new StringBuilder(LIKE_QUERY);	
+		
+		if(!StringUtils.isEmpty(criteria.getTenantId())) {
+			if(criteria.getTenantId().equals("pb")) {
+				builder.append("pt.tenantid LIKE ? ");
+				preparedStmtList.add("pb%");
+			}else {
+				builder.append("pt.tenantid = ? ");
+				preparedStmtList.add(criteria.getTenantId());
+			}
+		}else {
+			builder.append("pt.tenantid LIKE ? ");
+			preparedStmtList.add("pb%");
 		}
+		
+        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
 
-
-		/*builder.append("AND pt.propertyid LIKE ?");
-		System.out.println("\n\ncriteria.getPropertyId()-->"+criteria.getPropertyId()+"\n\n");
-		preparedStmtList.add(criteria.getPropertyId());*/
-
-		//return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
-		return addPaginationClause(builder, preparedStmtList, criteria);
-
-	}
-
-	private static String addPaginationClause(StringBuilder selectQuery, List<Object> preparedStmtList,
-											  PropertyCriteria criteria) {
-
-		if (criteria.getLimit()!=null && criteria.getLimit() != 0) {
-			selectQuery.append("and pt.propertyid in (select propertyid from eg_pt_property_v2 where tenantid= ? order by propertyid offset ? limit ?)");
-			preparedStmtList.add(criteria.getTenantId());
-			preparedStmtList.add(criteria.getOffset());
-			preparedStmtList.add(criteria.getLimit());
-
-			return addOrderByClause(selectQuery, criteria);
-
-		} else
-			return addOrderByClause(selectQuery, criteria);
-	}
-
-	private static String addOrderByClause(StringBuilder selectQuery,
-										   PropertyCriteria criteria) {
-		return selectQuery.append(" ORDER BY pt.propertyid DESC ").toString();
 	}
 
 	private String addPaginationWrapper(String query, List<Object> preparedStmtList,
