@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,9 @@ public class NotificationService {
 	private NotificationUtil util;
 	
 	private Producer producer;
+	
+	@Autowired
+	private ObjectMapper mapper;
 	
 	 private ServiceRequestRepository serviceRequestRepository;
 	
@@ -98,6 +103,12 @@ public class NotificationService {
 										message(msgDetail.get(NotificationUtil.MSG_KEY)).
 										templateId(msgDetail.get(NotificationUtil.TEMPLATE_KEY)).
 										users(users).build();
+								try {
+									log.info("smsRequest: {} ", mapper.writeValueAsString(smsRequest));
+								} catch (JsonProcessingException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								producer.push(config.getSmsNotifTopic(), smsRequest);
 							} else {
 								log.error("No message configured! Notification will not be sent.");
