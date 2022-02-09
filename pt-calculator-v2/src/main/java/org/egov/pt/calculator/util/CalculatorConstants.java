@@ -61,7 +61,7 @@ public class CalculatorConstants {
 
 	public static final String ADHOC_REBATE_REASON_KEY = "adhocExemptionReason";
 	
-	public static final String ALLOWED_RECEIPT_STATUS = "DEPOSITED,NEW";
+	public static final String ALLOWED_RECEIPT_STATUS = "APPROVED,REMITTED";
 
 	public static final List<String> TAXES_TO_BE_CONSIDERD_WHEN_CALUCLATING_REBATE_AND_PENALTY = Collections.unmodifiableList(Arrays
 			.asList(PT_TAX));
@@ -144,8 +144,8 @@ public class CalculatorConstants {
 	public static final String ENDING_DATE_APPLICABLES = "endingDay";
 
 	public static final String STARTING_DATE_APPLICABLES = "startingDay";
-	
-	public static final String RECEIPT_START_DATE_PARAM = "fromDate=";
+
+    public static final String RECEIPT_START_DATE_PARAM = "fromDate=";
 
     public static final String RECEIPT_END_DATE_PARAM = "toDate=";
 
@@ -223,7 +223,6 @@ public class CalculatorConstants {
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME = "consumerCode=";
 
 	public static final String CONSUMER_CODE_SEARCH_FIELD_NAME_PAYMENT = "consumerCodes=";
-	public static final String BUSINESS_SERVICE_SEARCH_FIELD_NAME = "businessService=";
 
 
 	public static final String DEMAND_ID_SEARCH_FIELD_NAME = "demandId=";
@@ -305,9 +304,6 @@ public class CalculatorConstants {
 	public static final String EG_PT_INVALID_DEMAND_ERROR = "EG_PT_INVALID_DEMAND_ERROR";
 	public static final String EG_PT_INVALID_DEMAND_ERROR_MSG = " Bill cannot be generated for previous assessments in a year, please use the latest assesmment to pay";
 
-	
-	public static final String EG_PT_DEMAND_COLLECTED_ERROR = "EG_PT_DEMAND_COLLECTED_ERROR";
-	public static final String EG_PT_DEMAND_COLLECTED_ERROR_MSG = "Demand of this assessments is paid. Please cancel respective receipt first and then cancel Assessment ";
     public static final Long TIMEZONE_OFFSET = 19800000l;
 
     public static final String BILLINGSLAB_KEY = "calculationDescription";
@@ -338,43 +334,6 @@ public class CalculatorConstants {
 
 	public static final String MUTATION_PAYMENT_PERIOD_IN_MONTH = "mutationPaymentPeriodInMonth";
 
-	public static final String ASSESSMENT_CONFIG_MASTER = "assessmentconfig";
-	
-	public static final String RE_ASSESSMENT_CONFIG_MASTER = "reassessmentconfig";
-
-	public static final String MODULE_TENANT = "tenant";
-	
-	public static final String NO_TENANT_CONFIGURED_FOR_ASSESSMENT_JOB = "No tenant is configured to create assessments";
-
-	public static final String MDMS_ASSESSMENT_JOB_CONFIG_PATH = "$.MdmsRes.tenant.assessmentconfig[?(@.enabled==true)]";
-	
-	public static final String MDMS_RE_ASSESSMENT_JOB_CONFIG_PATH = "$.MdmsRes.tenant.reassessmentconfig";
-
-
-	public static final String FINANCIALYEAR_KEY = "financialyear";
-
-	public static final String LOCALITY_KEY = "locality";
-
-	public static final String PROPERTYTYPE_KEY = "propertytype";
-
-	public static final String TENANT_KEY = "tenant";
-	
-	public static final String IS_RENTED = "isRented";
-
-	public static final String ASSESSMENT_JOB_MDMS_ERROR = "ASSESSMENT_JOB_MDMS_ERROR";
-
-	public static final String ASSESSMENT_JOB_MDMS_ERROR_MSG = "Exception while fetching configured tenants for assessment.";
-
-	public static final String DEFAULTERS_CONFIG_MASTER = "defaultersmsconfig";
-	
-	public static final String MDMS_DEFAULTERS_CONFIG_PATH = "$.MdmsRes.tenant.defaultersmsconfig";
-	
-	public static final String REBATE_DATE_KEY = "rebatedate";
-
-	public static final String NOTIFICATION_MODULENAME = "rainmaker-pt";
-
-	public static final String DUE_SMS_TEMPLATE_CODE = "PT_DUE_SMS";
-
-	public static final String DEFAULT_LOCALE_CODE = "en_IN";
-
+	public static final String TAX_PERIOD_SEARCH_FAILED = "EGPT_CALCULATOR_TAX_PERIOD_SEARCH_ERROR";
+	public static final String TAX_PERIOD_SEARCH_FAILED_MSG = "Tax period for current financial year is not present. Please add the tax period details";
 }

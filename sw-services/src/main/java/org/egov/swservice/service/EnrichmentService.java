@@ -59,13 +59,12 @@ public class EnrichmentService {
 	 *            - Sewerage Connection Requst Object
 	 */
 	@SuppressWarnings("unchecked")
-	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, int reqType, Boolean isMigration) {
+	public void enrichSewerageConnection(SewerageConnectionRequest sewerageConnectionRequest, int reqType) {
 		AuditDetails auditDetails = sewerageServicesUtil
 				.getAuditDetails(sewerageConnectionRequest.getRequestInfo().getUserInfo().getUuid(), true);
 		sewerageConnectionRequest.getSewerageConnection().setAuditDetails(auditDetails);
 		sewerageConnectionRequest.getSewerageConnection().setId(UUID.randomUUID().toString());
-		if (!isMigration)
-			sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
+		sewerageConnectionRequest.getSewerageConnection().setStatus(StatusEnum.ACTIVE);
 		HashMap<String, Object> additionalDetail = new HashMap<>();
 		if (sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails() == null) {
 			for (String constValue : SWConstants.ADDITIONAL_OBJECT) {
@@ -105,12 +104,12 @@ public class EnrichmentService {
 					sewerageConnectionRequest.getSewerageConnection().getAdditionalDetails(), HashMap.class);
 			List<String> adhocPenalityAndRebateConst = Arrays.asList(SWConstants.ADHOC_PENALTY,
 					SWConstants.ADHOC_REBATE, SWConstants.APP_CREATED_DATE, SWConstants.ESTIMATION_DATE_CONST);
-			for (Map.Entry<String, Object> entrySet: addDetail.entrySet()) {
-				if (addDetail.getOrDefault(entrySet.getKey(), null) != null && adhocPenalityAndRebateConst.contains(entrySet.getKey())) {
-					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(entrySet.getKey())));
-					additionalDetail.put(entrySet.getKey(), big);
+			for (String constKey : SWConstants.ADDITIONAL_OBJECT) {
+				if (addDetail.getOrDefault(constKey, null) != null && adhocPenalityAndRebateConst.contains(constKey)) {
+					BigDecimal big = new BigDecimal(String.valueOf(addDetail.get(constKey)));
+					additionalDetail.put(constKey, big);
 				} else {
-					additionalDetail.put(entrySet.getKey(), addDetail.get(entrySet.getKey()));
+					additionalDetail.put(constKey, addDetail.get(constKey));
 				}
 			}
 			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
@@ -119,14 +118,12 @@ public class EnrichmentService {
 			}
 			additionalDetail.put(SWConstants.LOCALITY,addDetail.get(SWConstants.LOCALITY).toString());
 
-			log.info("Additional details1:"+ additionalDetail);
 			for (Map.Entry<String, Object> entry: addDetail.entrySet()) {
 				if (additionalDetail.getOrDefault(entry.getKey(), null) == null) {
 					additionalDetail.put(entry.getKey(), addDetail.get(entry.getKey()));
 				}
 			}
 		}
-		log.info("Additional details2:"+ additionalDetail);
 		sewerageConnectionRequest.getSewerageConnection().setAdditionalDetails(additionalDetail);
 	}
 
@@ -260,8 +257,10 @@ public class EnrichmentService {
 	 */
 	public void enrichFileStoreIds(SewerageConnectionRequest sewerageConnectionRequest) {
 		try {
-			if (sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(SWConstants.APPROVE_CONNECTION_CONST)
+			log.info("ACTION "+sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction());
+			log.info("ApplicationStatus "+sewerageConnectionRequest.getSewerageConnection().getApplicationStatus());
+			if (sewerageConnectionRequest.getSewerageConnection().getApplicationStatus()
+					.equalsIgnoreCase(SWConstants.PENDING_APPROVAL_FOR_CONNECTION_CODE)
 					|| sewerageConnectionRequest.getSewerageConnection().getProcessInstance().getAction()
 							.equalsIgnoreCase(SWConstants.ACTION_PAY)) {
 				sewerageDao.enrichFileStoreIds(sewerageConnectionRequest);

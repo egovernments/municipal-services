@@ -71,16 +71,16 @@ consumerGroup.on("message", function(message) {
     // );
   };
 
-  const sendFireNOCSMSRequest = (FireNOCs,RequestInfo) => {
-    
+  const sendFireNOCSMSRequest = FireNOCs => {
     for (let i = 0; i < FireNOCs.length; i++) {
       smsRequest["mobileNumber"] = get(
         FireNOCs[i],
         "fireNOCDetails.applicantDetails.owners.0.mobileNumber"
       );
-      let firenocType = get(FireNOCs[i], "fireNOCDetails.fireNOCType")
-	  
-	  firenocType=firenocType.toLowerCase();
+      let firenocType =
+        get(FireNOCs[i], "fireNOCDetails.fireNOCType") === "NEW"
+          ? "new"
+          : "provision";
 
       let ownerName = get(
         FireNOCs[i],
@@ -94,68 +94,34 @@ consumerGroup.on("message", function(message) {
         FireNOCs[i],
         "fireNOCDetails.applicationNumber"
       );
-      let fireNOCNumber = get(FireNOCs[i], "fireNOCNumber");
+      let fireNOCNumber = get(FireNOCs[i], "fireNOCDetails.validTo");
       let validTo = get(FireNOCs[i], "fireNOCDetails.validTo");
       let tenantId = get(FireNOCs[i], "tenantId");
-      let actionType="forwarded for";
-      let action=get(FireNOCs[i],"fireNOCDetails.action");
-      if(action==envVariables.SENDBACK){
-        actionType="send back to";
-      }
-	  
-	  let messageForcertificate;
-	    
-		if(firenocType=='renewal'){
-		messageForcertificate=	'your renewed Fire NOC Certificate has been generated.'
-		}else{
-			messageForcertificate=	'your Fire NOC Certificate has been generated.'
-		}
-	  
-      let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenantId}`;
-	    
-     console.log("download link "+ downLoadLink);	    
-     
-      let ownerInfo="";
-      ownerInfo= get(RequestInfo,"userInfo.roles");
-      console.log("ownerInfo is", ownerInfo);
-      if(ownerInfo!=null  && ownerInfo.length>0){
-       ownerInfo=ownerInfo[0].name;
-      }
-     console.log("ownerInfo is",ownerInfo);
-     console.log("firenoc status is",FireNOCs[i].fireNOCDetails.status);
       switch (FireNOCs[i].fireNOCDetails.status) {
-/*case "INITIATED":
+        case "INITIATED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName},Your application for ${firenocType} Fire NOC has been generated. Your application no. is ${applicationNumber}.|1301157492438182299|1407161407309889909`;
-          break;*/
-
+          ] = `Dear ${ownerName},Your application for ${firenocType} has been generated. Your application no. is ${applicationNumber}.\n\nEGOVS`;
+          break;
         case "PENDINGPAYMENT":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate has been submitted, the application no. is ${applicationNumber}. 
-          You can download your application form by clicking on the below link: 
-           ${downLoadLink}.
-          Kindly pay your NOC Fees online or at your applicable fire office.|1301157492438182299|1407161492659630233`;
-          break;
-        case "FIELDINSPECTION":
-          smsRequest[
-            "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} field inspection.|1301157492438182299|1407161492704744715`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} has been submitted. Your application no. is ${applicationNumber}. Please pay your NoC Fees online or at your applicable fire office\n\nEGOVS`;
           break;
         case "DOCUMENTVERIFY":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} document verifier.|1301157492438182299|1407161407329037630`;
-           break;
+          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for field inpsection.\n\nEGOVS`;
+          break;
+        case "FIELDINSPECTION":
+          smsRequest[
+            "message"
+          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for document verifier.\n\nEGOVS`;
+          break;
         case "PENDINGAPPROVAL":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber}  has been ${actionType} approver.|1301157492438182299|1407161407332754584`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been forwarded for approver.\n\nEGOVS`;
           break;
         case "APPROVED":
           var currentDate = new Date(validTo);
@@ -172,24 +138,18 @@ consumerGroup.on("message", function(message) {
 
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your Application for  ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is approved and  ${messageForcertificate}
-          Your Fire NOC Certificate No. is ${fireNOCNumber} and it is valid till ${dateString}.
-          You can download your Fire NOC Certificate by clicking on the below link:
-          ${downLoadLink}|1301157492438182299|1407161494277225601`;
+          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} is approved.And your fire NoC has been generated.Your Fire NoC No. is ${fireNOCNumber}. It is valid till ${dateString}\n\nEGOVS`;
           break;
         case "SENDBACKTOCITIZEN":
           smsRequest[
             "message"
           ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.|1301157492438182299|1407161407355219072`;
+          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} is send back to you for further actions.Please check the comments and Re-submit application through mSeva App or by ULB counter.\n\nEGOVS`;
           break;
         case "REJECTED":
           smsRequest[
             "message"
-          ] = `Dear ${ownerName}, 
-          Your application for ${firenocType} Fire NOC Certificate with application no. ${applicationNumber} has been rejected by ${ownerInfo} .To know more details please contact your respective fire office.|1301157492438182299|1407161407368404178
-          `;
+          ] = `Dear ${ownerName},Your application for ${firenocType} with application no. is ${applicationNumber} has been rejected.To know more details please contact your applicable fire office\n\nEGOVS`;
           break;
         // case "CANCELLED":
         //   break;
@@ -199,7 +159,7 @@ consumerGroup.on("message", function(message) {
         topic,
         messages: JSON.stringify(smsRequest)
       });
-       console.log("smsRequest is",smsRequest);
+      // console.log("smsRequest",smsRequest);
       if (smsRequest.message) {
         events.push({
           tenantId: tenantId,
@@ -218,46 +178,9 @@ consumerGroup.on("message", function(message) {
       sendEventNotificaiton();
     }
   };
-
-  const sendPaymentMessage=value=>{
-    
-    const { Payment, RequestInfo } = value;
-    smsRequest["mobileNumber"] = get(
-      Payment.paymentDetails[0],
-      "Bill[0].mobileNumber"
-    );
-
-    let businessService=get(Payment.paymentDetails[0],"Bill[0].businessService")
-    if (businessService === envVariables.BUSINESS_SERVICE) {
-    let paymentAmount=get(Payment.paymentDetails[0],"Bill[0].amountPaid");
-    console.log("paid amount is",paymentAmount);
-
-    let applicantName=get(Payment.paymentDetails[0],"Bill[0].payerName");
-    console.log("applicantName is",applicantName);
-
-    let receiptNumber=get(Payment.paymentDetails[0],"Bill[0].billDetails[0].receiptNumber");
-
-    let applicationNumber=get(Payment.paymentDetails[0],"Bill[0].billDetails[0].consumerCode");
-    let tenant=get(Payment,"tenantId");
-
-    let downLoadLink=`${envVariables.EGOV_HOST_BASE_URL}${envVariables.EGOV_RECEIPT_URL}?applicationNumber=${applicationNumber}&tenantId=${tenant}`;
-
-    smsRequest[
-      "message"
-    ] = `Dear ${applicantName}, 
-    A Payment of ${paymentAmount} has been collected successfully for your Fire NOC Certificate.
-    The payment receipt no. is  ${receiptNumber} and you can download your receipt by clicking on the below link:
-    ${downLoadLink}|1301157492438182299|1407161407392327147`;
-
-    payloads.push({
-      topic,
-      messages: JSON.stringify(smsRequest)
-    });
-  } 
-  }
   const FireNOCPaymentStatus = async value => {
     try {
-      console.log("Consumer Payment data"+JSON.stringify(value));
+      //console.log("Consumer Payment data"+JSON.stringify(value));
       const { Payment, RequestInfo } = value;
       let tenantId = get(Payment, "tenantId");
       const { paymentDetails } = Payment;
@@ -276,7 +199,7 @@ consumerGroup.on("message", function(message) {
             const body = { RequestInfo };
             const searchRequest = { body, query };
             const searchResponse = await searchApiResponse(searchRequest);
-            console.log("search response: "+JSON.stringify(searchResponse));
+            //console.log("search response: "+JSON.stringify(searchResponse));
             const { FireNOCs } = searchResponse;
             if (!FireNOCs.length) {
               throw "FIRENOC Search error";
@@ -296,14 +219,14 @@ consumerGroup.on("message", function(message) {
             for(var index =0; index < RequestInfo.userInfo.roles.length;index++){
               let tenantId = get(RequestInfo.userInfo,"tenantId");
               set(RequestInfo.userInfo.roles[index],"tenantId",tenantId);
-              console.log("Workflow TenantId",get(body.RequestInfo.userInfo.roles[index],"tenantId"));
+              //console.log("Workflow TenantId",get(body.RequestInfo.userInfo.roles[index],"tenantId"));
             }
 
             const updateBody = { RequestInfo, FireNOCs };
             const updateRequest = { body: updateBody };
-            console.log("update Request: "+JSON.stringify(updateRequest));
-            const updateResponse = await updateApiResponse(updateRequest);
-            console.log("update Response: "+JSON.stringify(updateResponse));
+            //console.log("update Request: "+JSON.stringify(updateRequest));
+            const updateResponse = await updateApiResponse(updateRequest, false);
+            //console.log("update Response: "+JSON.stringify(updateResponse));
           }
         }
       }
@@ -315,38 +238,40 @@ consumerGroup.on("message", function(message) {
   switch (message.topic) {
     case envVariables.KAFKA_TOPICS_FIRENOC_CREATE:
       {
-        const { FireNOCs,RequestInfo } = value;
-        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
+        const { FireNOCs } = value;
+        sendFireNOCSMSRequest(FireNOCs);
       }
       break;
     case envVariables.KAFKA_TOPICS_FIRENOC_UPDATE:
       {
         const { FireNOCs } = value;
-        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
+        sendFireNOCSMSRequest(FireNOCs);
       }
       break;
     case envVariables.KAFKA_TOPICS_FIRENOC_WORKFLOW:
       {
         const { FireNOCs } = value;
-        sendFireNOCSMSRequest(FireNOCs,RequestInfo);
+        sendFireNOCSMSRequest(FireNOCs);
       }
       break;
 
+    // case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
+    //   {
+    //     console.log("reciept hit");
+    //   }
+    //   break;
     case envVariables.KAFKA_TOPICS_RECEIPT_CREATE:
       {
-        sendPaymentMessage(value);
         FireNOCPaymentStatus(value);
       }
       break;
   }
 
-	console.log("payloads is",payloads);
   producer.send(payloads, function(err, data) {
-	 
     if (!err) {
-      console.log("sucessfully pushed" + data);
+      console.log(data);
     } else {
-      console.log("failed to push " + err);
+      console.log(err);
     }
   });
 });

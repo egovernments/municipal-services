@@ -27,12 +27,16 @@ public class SearchCriteria {
 	@JsonProperty("tenantId")
 	private String tenantId;
 	
+	private Set<String> propertyIds;
+	
+	private Set<String> userIds;
+
 	@JsonProperty("status")
 	private String status;
 
 	@JsonProperty("ids")
 	private Set<String> ids;
-	
+
 	@JsonProperty("applicationNumber")
 	private String applicationNumber;
 		
@@ -80,8 +84,6 @@ public class SearchCriteria {
 
 	@JsonIgnore
 	private List<String> ownerIds;
-	
-	private Set<String> uuids;
 
 	public boolean isEmpty() {
 		return (StringUtils.isEmpty(this.tenantId) && StringUtils.isEmpty(this.mobileNumber)

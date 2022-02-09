@@ -187,7 +187,8 @@ public class WCConstants {
 
 	public static final List<String> ADDITIONAL_OBJ_CONSTANT = Collections
 			.unmodifiableList(Arrays.asList(ADHOC_PENALTY, ADHOC_REBATE, ADHOC_PENALTY_REASON, ADHOC_PENALTY_COMMENT,
-					ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST, DETAILS_PROVIDED_BY,APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID, ESTIMATION_DATE_CONST));
+					ADHOC_REBATE_REASON, ADHOC_REBATE_COMMENT, INITIAL_METER_READING_CONST, DETAILS_PROVIDED_BY,
+					APP_CREATED_DATE, ESTIMATION_FILESTORE_ID, SANCTION_LETTER_FILESTORE_ID, ESTIMATION_DATE_CONST));
 
 	public static final List<String> EDIT_NOTIFICATION_STATE = Collections
 			.unmodifiableList(Arrays.asList(ACTION_INITIATE, SUBMIT_APPLICATION_CONST, ACTION_PAY));
@@ -242,22 +243,9 @@ public class WCConstants {
 			.unmodifiableList(Arrays.asList(MODIFIED_FINAL_STATE, STATUS_APPROVED));
 	
 	public static final String SEARCH_TYPE_CONNECTION = "CONNECTION";
-	
+
 	public static final long INVALID_CONEECTION_EXECUTION_DATE = 0L;
-	
-	public static final String BILL_NO_DEMAND_ERROR_CODE = "EG_BS_BILL_NO_DEMANDS_FOUND";
-	
-	public static final String BILL_NO_PAYABLE_DEMAND_ERROR_CODE = "EG_BS_BILL_ZERO_TAX";
-	
-	public static final String BILL_AMOUNT_PATH = "/Bill/0/totalAmount";
-	
-	public static final String DUES_ERROR_MESSAGE="Please collect pending dues before proceeding to disconnect the connection";
 
-	public static final String ACTIVE_STATUS="Active";
-	
-	public static final String ACTIVE_ERROR_MESSAGE="Action can not be performed as the consumer is already inactive";
+	public static final String PENDING_APPROVAL_FOR_CONNECTION_CODE ="PENDING_APPROVAL_FOR_CONNECTION";
 
-	public static final String INACTIVE_STATUS = "Inactive";
-
-	public static final String SUCCESS_DISCONNECT_MSG = "Successfully disconnected water connection";
 }

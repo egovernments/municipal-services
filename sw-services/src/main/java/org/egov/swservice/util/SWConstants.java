@@ -237,4 +237,8 @@ public static final String BILL_NO_DEMAND_ERROR_CODE = "EG_BS_BILL_NO_DEMANDS_FO
 
 	public static final String SUCCESS_DISCONNECT_MSG = "Successfully disconnected sewerage connection";
 
+	public static final long INVALID_CONEECTION_EXECUTION_DATE = 0L;
+
+	public static final String PENDING_APPROVAL_FOR_CONNECTION_CODE ="PENDING_APPROVAL_FOR_CONNECTION";
+
 }

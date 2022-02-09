@@ -5,20 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.egov.tl.web.models.Boundary;
+import lombok.*;
+import org.egov.tl.web.models.AuditDetails;
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Builder;
 
 /**
- * Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. 
+ * A Object holds the basic data for a Trade License
  */
-@ApiModel(description = "Representation of a address. Indiavidual APIs may choose to extend from this using allOf if more details needed to be added in their case. ")
+@ApiModel(description = "A Object holds the basic data for a Trade License")
 @Validated
 @javax.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2018-09-18T17:06:11.263+05:30")
 
@@ -27,73 +24,43 @@ import lombok.Builder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Address   {
+@EqualsAndHashCode
+public class Accessory   {
 
         @Size(max=64)
+        @SafeHtml
         @JsonProperty("id")
         private String id;
 
         @Size(max=64)
+        @SafeHtml
         @JsonProperty("tenantId")
         private String tenantId = null;
 
-        @Size(max=64)
-        @JsonProperty("doorNo")
-        private String doorNo = null;
-
-        @JsonProperty("latitude")
-        private Double latitude = null;
-
-        @JsonProperty("longitude")
-        private Double longitude = null;
+        @JsonProperty("active")
+        private Boolean active;
 
         @Size(max=64)
-        @JsonProperty("addressId")
-        private String addressId = null;
+        @SafeHtml
+        @JsonProperty("accessoryCategory")
+        private String accessoryCategory = null;
 
         @Size(max=64)
-        @JsonProperty("addressNumber")
-        private String addressNumber = null;
+        @SafeHtml
+        @JsonProperty("uom")
+        private String uom = null;
 
         @Size(max=64)
-        @JsonProperty("type")
-        private String type = null;
+        @SafeHtml
+        @JsonProperty("uomValue")
+        private String uomValue = null;
 
-        @JsonProperty("addressLine1")
-        private String addressLine1 = null;
+        @Min(value = 1)
+        @JsonProperty("count")
+        private Integer count;
 
-        @Size(max=256)
-        @JsonProperty("addressLine2")
-        private String addressLine2 = null;
-
-        @Size(max=255)
-        @JsonProperty("landmark")
-        private String landmark = null;
-
-        @Size(max=64)
-        @JsonProperty("city")
-        private String city = null;
-
-        @Size(max=64)
-        @JsonProperty("pincode")
-        private String pincode = null;
-
-        @Size(max=64)
-        @JsonProperty("detail")
-        private String detail = null;
-
-        @Size(max=255)
-        @JsonProperty("buildingName")
-        private String buildingName = null;
-
-        @Size(max=255)
-        @JsonProperty("street")
-        private String street = null;
-
-        @Valid
-        @JsonProperty("locality")
-        private Boundary locality = null;
+        @JsonProperty("auditDetails")
+        private AuditDetails auditDetails = null;
 
 
 }
-

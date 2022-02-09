@@ -76,12 +76,17 @@ public class SWQueryBuilder {
 			RequestInfo requestInfo) {
 		if(criteria.isEmpty())
 			return null;
+		Set<String> propertyIds = new HashSet<>();
 		StringBuilder query = new StringBuilder(SEWERAGE_SEARCH_QUERY);
 		boolean propertyIdsPresent = false;
+		
 		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
-			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = sewerageServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
+<<<<<<< HEAD
+=======
+			criteria.setPropertyIds(propertyIds);
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(" (conn.property_id in (").append(createQuery(propertyIds)).append(" )");
@@ -92,6 +97,7 @@ public class SWQueryBuilder {
 		if(!StringUtils.isEmpty(criteria.getMobileNumber())) {
 			Set<String> uuids = userService.getUUIDForUsers(criteria.getMobileNumber(), criteria.getTenantId(), requestInfo);
 			boolean userIdsPresent = false;
+			criteria.setUserIds(uuids);
 			if (!CollectionUtils.isEmpty(uuids)) {
 				addORClauseIfRequired(preparedStatement, query);
 				if(!propertyIdsPresent)
@@ -104,10 +110,27 @@ public class SWQueryBuilder {
 				query.append(")");
 			}
 		}
+		
+		/*
+		 * to return empty result for mobilenumber empty result
+		 */
+		if (!StringUtils.isEmpty(criteria.getMobileNumber()) && 
+				CollectionUtils.isEmpty(criteria.getPropertyIds()) && CollectionUtils.isEmpty(criteria.getUserIds())
+				&& StringUtils.isEmpty(criteria.getApplicationNumber()) && StringUtils.isEmpty(criteria.getPropertyId())
+				&& StringUtils.isEmpty(criteria.getConnectionNumber()) && CollectionUtils.isEmpty(criteria.getIds())) {
+			return null;
+		}
+		
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.tenantid = ? ");
-			preparedStatement.add(criteria.getTenantId());
+			if(criteria.getTenantId().equalsIgnoreCase(config.getStateLevelTenantId())){
+				query.append(" conn.tenantid LIKE ? ");
+				preparedStatement.add(criteria.getTenantId() + '%');
+			}
+			else{
+				query.append(" conn.tenantid = ? ");
+				preparedStatement.add(criteria.getTenantId());
+			}
 		}
 
 		if (!StringUtils.isEmpty(criteria.getPropertyId()) && StringUtils.isEmpty(criteria.getMobileNumber())) {

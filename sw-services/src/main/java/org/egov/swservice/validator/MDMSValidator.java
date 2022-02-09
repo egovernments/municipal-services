@@ -92,11 +92,9 @@ public class MDMSValidator {
 			errorMap.put("INVALID SEWERAGE CONNECTION TYPE", messageBuilder.toString());
 		}
 		
-		/*
-		 * if(sewerageConnection.getRoadCuttingInfo() == null){
-		 * errorMap.put("INVALID_ROAD_INFO",
-		 * "Road Cutting Information should not be empty"); }
-		 */
+		if(sewerageConnection.getRoadCuttingInfo() == null){
+			errorMap.put("INVALID_ROAD_INFO", "Road Cutting Information should not be empty");
+		}
 
 		if(sewerageConnection.getRoadCuttingInfo() != null){
 			for(RoadCuttingInfo roadCuttingInfo : sewerageConnection.getRoadCuttingInfo()){

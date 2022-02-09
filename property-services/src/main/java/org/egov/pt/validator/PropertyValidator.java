@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -43,14 +42,11 @@ import com.google.common.collect.Sets;
 import com.jayway.jsonpath.PathNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 @Component
 public class PropertyValidator {
 
-public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class);
 
     @Autowired
     private PropertyUtil propertyUtil;
@@ -89,10 +85,6 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 
 		if(CollectionUtils.isEmpty(request.getProperty().getOwners()))
 			throw new CustomException("OWNER INFO ERROR","Owners cannot be empty, please provide at least one owner information");
-		
-		if(!CollectionUtils.isEmpty(request.getProperty().getOwners())) {
-			//write code for checking mobilenumber
-		}
 		
 		if (!errorMap.isEmpty())
 			throw new CustomException(errorMap);
@@ -195,11 +187,10 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 		List<String> objectsAdded = diffService.getObjectsAdded(property, propertyFromSearch, "");
 		objectsAdded.removeAll(Arrays.asList("TextNode", "Role", "NullNode", "LongNode", "JsonNodeFactory", "IntNode",
 				"ProcessInstance"));
-	        log.info("the following fields are updated "+fieldsUpdated);
 
-		/*if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
+		if (!isstateUpdatable && (!CollectionUtils.isEmpty(objectsAdded) || !CollectionUtils.isEmpty(fieldsUpdated)))
 			throw new CustomException("EG_PT_WF_UPDATE_ERROR",
-					"The current state of workflow does not allow chnages to property");*/
+					"The current state of workflow does not allow changes to property");
 		
 	    
         /*
@@ -638,7 +629,7 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 			return false;
 		else if (mobileNumber.length() != 10)
 			return false;
-		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 4)
+		else if (Character.getNumericValue(mobileNumber.charAt(0)) < 5)
 			return false;
 		else
 			return true;
@@ -663,9 +654,9 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 		
 		if (!propertyFromSearch.getStatus().equals(Status.INWORKFLOW)) {
 
-//			Boolean isBillUnpaid = propertyUtil.isBillUnpaid(propertyFromSearch.getPropertyId(), propertyFromSearch.getTenantId(), request.getRequestInfo());
-//			if (isBillUnpaid)
-//				throw new CustomException("EG_PT_MUTATION_UNPAID_ERROR", "Property has to be completely paid for before initiating the mutation process");
+			Boolean isBillUnpaid = propertyUtil.isBillUnpaid(propertyFromSearch.getPropertyId(), propertyFromSearch.getTenantId(), request.getRequestInfo());
+			if (isBillUnpaid)
+				throw new CustomException("EG_PT_MUTATION_UNPAID_ERROR", "Property has to be completely paid for before initiating the mutation process");
 		}
 		
 		if (configs.getIsMutationWorkflowEnabled() && request.getProperty().getWorkflow() == null)
@@ -684,9 +675,9 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 //				.getCurrentState(request.getRequestInfo(), property.getTenantId(), property.getAcknowldgementNumber())
 //				.getIsStateUpdatable();
 
-		//if (!CollectionUtils.isEmpty(fieldsUpdated))
-		//	throw new CustomException("EG_PT_MUTATION_ERROR",
-		//			"The property mutation doesnt allow change of these fields " + fieldsUpdated);
+		if (!CollectionUtils.isEmpty(fieldsUpdated))
+			throw new CustomException("EG_PT_MUTATION_ERROR",
+					"The property mutation doesnt allow change of these fields " + fieldsUpdated);
 
 		@SuppressWarnings("unchecked")
 		Map<String, Object> additionalDetails = mapper.convertValue(property.getAdditionalDetails(), Map.class);
@@ -798,8 +789,8 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 
 		if (isDocsEmpty || !isTransferDocPresent) {
 
-//			errorMap.put("EG_PT_MT_DOCS_ERROR",
-//					"Mandatory documents mising for the muation reason : " + reasonForTransfer);
+			errorMap.put("EG_PT_MT_DOCS_ERROR",
+					"Mandatory documents mising for the muation reason : " + reasonForTransfer);
 		}
 
 		if (propertyFromSearch.getStatus().equals(Status.INWORKFLOW)
@@ -808,33 +799,6 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
 
 		if (!CollectionUtils.isEmpty(errorMap))
 			throw new CustomException(errorMap);
-	}
-
-	/**
-	 * Verfies if atleast one owner in mutation request is modified
-	 * 
-	 * @param propertyFromSearch
-	 * @param errorMap
-	 * @param property
-	 * @return
-	 */
-	private Boolean isAtleastOneOwnerModified(Property propertyFromSearch, Map<String, String> errorMap, Property property) {
-		
-		Map<String, OwnerInfo> ownerIdMapFromSearch = propertyFromSearch.getOwners().stream().collect(Collectors.toMap(OwnerInfo::getOwnerInfoUuid, Function.identity()));
-
-		for (OwnerInfo ownerFromRequest : property.getOwners()) {
-
-			OwnerInfo OwnerFromSearch = ownerIdMapFromSearch.get(ownerFromRequest.getOwnerInfoUuid());
-
-			if (OwnerFromSearch == null) {
-
-				errorMap.put("EG_PT_MUTATION_OWNER_ERROR", "Owner with invalid id found in the property request object : " + ownerFromRequest.getOwnerInfoUuid());
-			}
-			if (!ownerFromRequest.mutationEquals(OwnerFromSearch))
-				return true;
-		}
-
-		return false;
 	}
 
 }

@@ -39,7 +39,7 @@ public class WsQueryBuilder {
 	private static final String WATER_SEARCH_QUERY = "SELECT conn.*, wc.*, document.*, plumber.*, wc.connectionCategory, wc.connectionType, wc.waterSource,"
 			+ " wc.meterId, wc.meterInstallationDate, wc.pipeSize, wc.noOfTaps, wc.proposedPipeSize, wc.proposedTaps, wc.connection_id as connection_Id, wc.connectionExecutionDate, wc.initialmeterreading, wc.appCreatedDate,"
 			+ " wc.detailsprovidedby, wc.estimationfileStoreId , wc.sanctionfileStoreId , wc.estimationLetterDate,"
-			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo,conn.isoldapplication, conn.property_id, conn.roadcuttingarea,"
+			+ " conn.id as conn_id, conn.tenantid, conn.applicationNo, conn.applicationStatus, conn.status, conn.connectionNo, conn.oldConnectionNo, conn.property_id, conn.roadcuttingarea,"
 			+ " conn.action, conn.adhocpenalty, conn.adhocrebate, conn.adhocpenaltyreason, conn.applicationType, conn.dateEffectiveFrom,"
 			+ " conn.adhocpenaltycomment, conn.adhocrebatereason, conn.adhocrebatecomment, conn.createdBy as ws_createdBy, conn.lastModifiedBy as ws_lastModifiedBy,"
 			+ " conn.createdTime as ws_createdTime, conn.lastModifiedTime as ws_lastModifiedTime,conn.additionaldetails, "
@@ -66,10 +66,6 @@ public class WsQueryBuilder {
             "WHERE offset_ > ? AND offset_ <= ?";
 	
 	private static final String ORDER_BY_CLAUSE= " ORDER BY wc.appCreatedDate DESC";
-	
-	
-	public static final String UPDATE_DISCONNECT_STATUS="update eg_ws_connection set status=? where id=?";
-	
 	/**
 	 * 
 	 * @param criteria
@@ -86,13 +82,14 @@ public class WsQueryBuilder {
 				return null;
 		StringBuilder query = new StringBuilder(WATER_SEARCH_QUERY);
 		boolean propertyIdsPresent = false;
-		
+
+		Set<String> propertyIds = new HashSet<>();
 		String propertyIdQuery = " (conn.property_id in (";
 
 		if (!StringUtils.isEmpty(criteria.getMobileNumber()) || !StringUtils.isEmpty(criteria.getPropertyId())) {
-			Set<String> propertyIds = new HashSet<>();
 			List<Property> propertyList = waterServicesUtil.propertySearchOnCriteria(criteria, requestInfo);
 			propertyList.forEach(property -> propertyIds.add(property.getPropertyId()));
+			criteria.setPropertyIds(propertyIds);
 			if (!propertyIds.isEmpty()) {
 				addClauseIfRequired(preparedStatement, query);
 				query.append(propertyIdQuery).append(createQuery(propertyIds)).append(" )");
@@ -100,9 +97,12 @@ public class WsQueryBuilder {
 				propertyIdsPresent = true;
 			}
 		}
+		
+		Set<String> uuids = null;
 		if(!StringUtils.isEmpty(criteria.getMobileNumber())) {
-			Set<String> uuids = userService.getUUIDForUsers(criteria.getMobileNumber(), criteria.getTenantId(), requestInfo);
+			uuids = userService.getUUIDForUsers(criteria.getMobileNumber(), criteria.getTenantId(), requestInfo);
 			boolean userIdsPresent = false;
+			criteria.setUserIds(uuids);
 			if (!CollectionUtils.isEmpty(uuids)) {
 				addORClauseIfRequired(preparedStatement, query);
 				if(!propertyIdsPresent)
@@ -115,10 +115,27 @@ public class WsQueryBuilder {
 				query.append(")");
 			}
 		}
+
+		/*
+		 * to return empty result for mobilenumber empty result
+		 */
+		if (!StringUtils.isEmpty(criteria.getMobileNumber()) 
+				&& CollectionUtils.isEmpty(criteria.getPropertyIds()) && CollectionUtils.isEmpty(criteria.getUserIds())
+				&& StringUtils.isEmpty(criteria.getApplicationNumber()) && StringUtils.isEmpty(criteria.getPropertyId())
+				&& StringUtils.isEmpty(criteria.getConnectionNumber()) && CollectionUtils.isEmpty(criteria.getIds())) {
+			return null;
+		}
+
 		if (!StringUtils.isEmpty(criteria.getTenantId())) {
 			addClauseIfRequired(preparedStatement, query);
-			query.append(" conn.tenantid = ? ");
-			preparedStatement.add(criteria.getTenantId());
+			if(criteria.getTenantId().equalsIgnoreCase(config.getStateLevelTenantId())){
+				query.append(" conn.tenantid LIKE ? ");
+				preparedStatement.add(criteria.getTenantId() + '%');
+			}
+			else{
+				query.append(" conn.tenantid = ? ");
+				preparedStatement.add(criteria.getTenantId());
+			}
 		}
 		if (!StringUtils.isEmpty(criteria.getPropertyId()) && StringUtils.isEmpty(criteria.getMobileNumber())) {
 			if(propertyIdsPresent)
@@ -208,26 +225,11 @@ public class WsQueryBuilder {
 		}
 		return builder.toString();
 	}
-	
-	private String createQuery(List<String> ids) {
-        StringBuilder builder = new StringBuilder();
-        int length = ids.size();
-        for( int i = 0; i< length; i++){
-            builder.append(" LOWER(?)");
-            if(i != length -1) builder.append(",");
-        }
-        return builder.toString();
-    }
 
 	private void addToPreparedStatement(List<Object> preparedStatement, Set<String> ids) {
 		preparedStatement.addAll(ids);
 	}
-	
-	
-	private void addToPreparedStatement(List<Object> preparedStmtList,List<String> ids)
-    {
-        ids.forEach(id ->{ preparedStmtList.add(id);});
-    }
+
 
 	/**
 	 * 
@@ -243,19 +245,13 @@ public class WsQueryBuilder {
 		Integer offset = config.getDefaultOffset();
 		if (criteria.getLimit() == null && criteria.getOffset() == null)
 			limit = config.getMaxLimit();
-//
-//		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
-//			limit = criteria.getLimit();
-//
-//		if (criteria.getLimit() != null && criteria.getLimit() > config.getDefaultOffset())
-//			limit = config.getDefaultLimit();
-		
-		if (criteria.getLimit() != null && criteria.getLimit() <= config.getMaxLimit())
+
+		if (criteria.getLimit() != null && criteria.getLimit() <= config.getDefaultLimit())
 			limit = criteria.getLimit();
 
-		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxLimit())
-			limit = config.getMaxLimit();
-		
+		if (criteria.getLimit() != null && criteria.getLimit() > config.getDefaultOffset())
+			limit = config.getDefaultLimit();
+
 		if (criteria.getOffset() != null)
 			offset = criteria.getOffset();
 
@@ -271,18 +267,4 @@ public class WsQueryBuilder {
 			queryString.append(" OR");
 		}
 	}
-	
-	public String getWCPlainSearchQuery(SearchCriteria criteria, List<Object> preparedStmtList) {
-        StringBuilder builder = new StringBuilder(WATER_SEARCH_QUERY);
-
-        Set<String> ids = criteria.getIds();
-        if (!CollectionUtils.isEmpty(ids)) {
-            addClauseIfRequired(preparedStmtList,builder);
-            builder.append(" conn.id IN (").append(createQuery(ids)).append(")");
-            addToPreparedStatement(preparedStmtList, ids);
-        }
-
-        return addPaginationWrapper(builder.toString(), preparedStmtList, criteria);
-
-    }
 }

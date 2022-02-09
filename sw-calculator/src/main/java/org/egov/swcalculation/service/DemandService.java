@@ -2,6 +2,7 @@ package org.egov.swcalculation.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,6 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+=======
+import java.util.*;
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -670,6 +674,7 @@ public class DemandService {
 				}
 			}
 
+<<<<<<< HEAD
 			if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
 				demand.getDemandDetails()
 						.add(DemandDetail.builder().taxAmount(penalty.setScale(2, 2))
@@ -680,6 +685,43 @@ public class DemandService {
 						.add(DemandDetail.builder().taxAmount(interest.setScale(2, 2))
 								.taxHeadMasterCode(SWCalculationConstant.SW_TIME_INTEREST).demandId(demand.getId())
 								.tenantId(demand.getTenantId()).build());
+=======
+		BigDecimal penalty = interestPenaltyEstimates.get(SWCalculationConstant.SW_TIME_PENALTY);
+		BigDecimal interest = interestPenaltyEstimates.get(SWCalculationConstant.SW_TIME_INTEREST);
+		if(penalty == null)
+			penalty = BigDecimal.ZERO;
+		if(interest == null)
+			interest = BigDecimal.ZERO;
+
+		DemandDetailAndCollection latestPenaltyDemandDetail, latestInterestDemandDetail;
+
+		if (interest.compareTo(BigDecimal.ZERO) != 0) {
+			latestInterestDemandDetail = utils.getLatestDemandDetailByTaxHead(SWCalculationConstant.SW_TIME_INTEREST,
+					demand.getDemandDetails());
+			if (latestInterestDemandDetail != null) {
+				updateTaxAmount(interest, latestInterestDemandDetail);
+				isInterestUpdated = true;
+			}
+		}
+
+		if (penalty.compareTo(BigDecimal.ZERO) != 0) {
+			latestPenaltyDemandDetail = utils.getLatestDemandDetailByTaxHead(SWCalculationConstant.SW_TIME_PENALTY,
+					demand.getDemandDetails());
+			if (latestPenaltyDemandDetail != null) {
+				updateTaxAmount(penalty, latestPenaltyDemandDetail);
+				isPenaltyUpdated = true;
+			}
+		}
+
+		if (!isPenaltyUpdated && penalty.compareTo(BigDecimal.ZERO) > 0)
+			demand.getDemandDetails().add(
+					DemandDetail.builder().taxAmount(penalty.setScale(2, 2)).taxHeadMasterCode(SWCalculationConstant.SW_TIME_PENALTY)
+							.demandId(demand.getId()).tenantId(demand.getTenantId()).build());
+		if (!isInterestUpdated && interest.compareTo(BigDecimal.ZERO) > 0)
+			demand.getDemandDetails().add(
+					DemandDetail.builder().taxAmount(interest.setScale(2, 2)).taxHeadMasterCode(SWCalculationConstant.SW_TIME_INTEREST)
+							.demandId(demand.getId()).tenantId(demand.getTenantId()).build());
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 		}
 
 		return isCurrentDemand;
@@ -913,12 +955,21 @@ public class DemandService {
 
 	/**
 	 * 
+<<<<<<< HEAD
 	 * @param tenantId    - Tenant ID
+=======
+	 * @param tenantId - Tenant ID
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 	 * @param consumerCode - Connection number
 	 * @param requestInfo - Request Info Object
 	 * @return List of Demand
 	 */
+<<<<<<< HEAD
 	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, String consumerCode,RequestInfo requestInfo) {
+=======
+	private List<Demand> searchDemandBasedOnConsumerCode(String tenantId, String consumerCode,
+			RequestInfo requestInfo) {
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 		String uri = getDemandSearchURLForDemandId().toString();
 		uri = uri.replace("{1}", tenantId);
 		uri = uri.replace("{2}", configs.getBusinessService());
@@ -1008,6 +1059,7 @@ public class DemandService {
 			demands.add(demand);
 		}
 
+<<<<<<< HEAD
 		log.info("Updated Demand Details " + demands.toString());
 		demandRepository.updateDemand(requestInfo, demands);
 		return calculations;
@@ -1025,6 +1077,35 @@ public class DemandService {
 			List<BillV2> bills = billResponse.getBill();
 			if(bills != null && !bills.isEmpty()) {
 				consumercodesFromRes = bills.stream().map(BillV2::getConsumerCode).collect(Collectors.toList());
+=======
+		/**
+		 * Search demand based on demand id and updated the tax heads with new adhoc tax heads
+		 * 
+		 * @param requestInfo - Request Info Object
+		 * @param calculations - List of Calculations
+		 * @return List of calculation
+		 */
+		public List<Calculation> updateDemandForAdhocTax(RequestInfo requestInfo, List<Calculation> calculations) {
+			List<Demand> demands = new LinkedList<>();
+			for (Calculation calculation : calculations) {
+				String consumerCode = calculation.getConnectionNo();
+				List<Demand> searchResult = searchDemandBasedOnConsumerCode(calculation.getTenantId(), consumerCode,
+						requestInfo);
+				if (CollectionUtils.isEmpty(searchResult))
+					throw new CustomException("INVALID_DEMAND_UPDATE",
+							"No demand exists for Number: " + consumerCode);
+
+				Collections.sort(searchResult, new Comparator<Demand>() {
+					@Override
+					public int compare(Demand d1, Demand d2) {
+						return d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom());
+					}
+				});
+
+				Demand demand = searchResult.get(0);
+				demand.setDemandDetails(getUpdatedAdhocTax(calculation, demand.getDemandDetails()));
+				demands.add(demand);
+>>>>>>> 04194f0e171d514a8bef87e53d193d3837d933c3
 			}
 
 		} catch (Exception ex) {

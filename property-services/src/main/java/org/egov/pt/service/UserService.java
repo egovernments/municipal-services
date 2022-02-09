@@ -20,6 +20,7 @@ import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.enums.Status;
 import org.egov.pt.models.user.CreateUserRequest;
+import org.egov.pt.models.user.User;
 import org.egov.pt.models.user.UserDetailResponse;
 import org.egov.pt.models.user.UserSearchRequest;
 import org.egov.pt.repository.ServiceRequestRepository;
@@ -122,7 +123,7 @@ public class UserService {
     /**
      * creating multiple usersfor mutation request 
      * 
-     * @param PropertyRequest
+     * @param request
      */
     public void createUserForMutation (PropertyRequest request, Boolean isWorkflowStarting){
     	
@@ -277,8 +278,7 @@ public class UserService {
 
     /**
      * Returns user using user search based on propertyCriteria(owner name,mobileNumber,userName)
-     * @param criteria
-     * @param requestInfo
+     * @param userSearchRequest
      * @return serDetailResponse containing the user if present and the responseInfo
      */
 	public UserDetailResponse getUser(UserSearchRequest userSearchRequest) {
@@ -291,7 +291,7 @@ public class UserService {
     /**
      * Returns UserDetailResponse by calling user service with given uri and object
      * @param userRequest Request object for user service
-     * @param uri The address of the endpoint
+     * @param url The address of the endpoint
      * @return Response from user service as parsed as userDetailResponse
      */
     @SuppressWarnings("unchecked")
@@ -426,42 +426,44 @@ public class UserService {
 				.build();
     }
 
-	
-    /*
-	Method to update user mobile number
-*/
-public void updateUserMobileNumber(PropertyRequest request,Map <String, String> uuidToMobileNumber) {
-		
-		Property property = request.getProperty();
-		RequestInfo requestInfo = request.getRequestInfo();
 
-		property.getOwners().forEach(owner -> {
+	public Set<User>  getUUidFromUserName(Property property){
 
-			UserDetailResponse userDetailResponse = searchedSingleUserExists(owner, requestInfo);
-			StringBuilder uri = new StringBuilder(userHost);
-			 
-				owner.setId(userDetailResponse.getUser().get(0).getId());
-				uri = uri.append(userContextPath).append(userUpdateEndpoint);
-			
-			userDetailResponse = userCall(new CreateUserRequest(requestInfo, owner), uri);
-			setOwnerFields(owner, userDetailResponse, requestInfo);
+		String tenantId = property.getTenantId();
+		List<OwnerInfo> ownerInfos = property.getOwners();
+
+		Set<String> mobileNumbers = new HashSet<>();
+
+		// Get all unique mobileNumbers in the license
+		ownerInfos.forEach(owner -> {
+			mobileNumbers.add(owner.getMobileNumber());
 		});
-				
-	}
-    
-	/*
-	 * Method to check if the searched user exists
-	 */
-	private UserDetailResponse searchedSingleUserExists(OwnerInfo owner, RequestInfo requestInfo) {
 
-		UserSearchRequest userSearchRequest = getBaseUserSearchRequest(owner.getTenantId(), requestInfo);
-		userSearchRequest.setUserType(owner.getType());
-		Set<String> uuids = new HashSet<String>();
-		uuids.add(owner.getUuid());
-		userSearchRequest.setUuid(uuids);
+		Set<User>  userSet = new HashSet<>();
 
-		StringBuilder uri = new StringBuilder(userHost).append(userSearchEndpoint);
-		return userCall(userSearchRequest, uri);
+		// For every unique mobilenumber search the use with mobilenumber as username and get uuid
+		mobileNumbers.forEach(mobileNumber -> {
+			UserDetailResponse userDetailResponse = searchByUserName(mobileNumber, getStateLevelTenant(tenantId));
+			if(!CollectionUtils.isEmpty(userDetailResponse.getUser())){
+				userSet.add(userDetailResponse.getUser().get(0));
+			}
+		});
+
+		return userSet;
 	}
+
+	private UserDetailResponse searchByUserName(String userName,String tenantId){
+		UserSearchRequest userSearchRequest = new UserSearchRequest();
+		userSearchRequest.setUserType("CITIZEN");
+		userSearchRequest.setUserName(userName);
+		userSearchRequest.setTenantId(tenantId);
+		return getUser(userSearchRequest);
+	}
+
+	private String getStateLevelTenant(String tenantId){
+		return tenantId.split("\\.")[0];
+	}
+
+
 
 }

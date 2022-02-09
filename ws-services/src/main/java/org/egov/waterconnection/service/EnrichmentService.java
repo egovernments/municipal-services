@@ -87,6 +87,16 @@ public class EnrichmentService {
 	  			reqType == WCConstants.MODIFY_CONNECTION ? WCConstants.MODIFY_WATER_CONNECTION :  WCConstants.NEW_WATER_CONNECTION);
 		setApplicationIdGenIds(waterConnectionRequest);
 		setStatusForCreate(waterConnectionRequest);
+
+		WaterConnection connection = waterConnectionRequest.getWaterConnection();
+
+		if (!CollectionUtils.isEmpty(connection.getRoadCuttingInfo())) {
+			connection.getRoadCuttingInfo().forEach(roadCuttingInfo -> {
+				roadCuttingInfo.setId(UUID.randomUUID().toString());
+				roadCuttingInfo.setStatus(Status.ACTIVE);
+				roadCuttingInfo.setAuditDetails(auditDetails);
+			});
+		}
 		
 	}
 	@SuppressWarnings("unchecked")
@@ -258,8 +268,10 @@ public class EnrichmentService {
 	 */
 	public void enrichFileStoreIds(WaterConnectionRequest waterConnectionRequest) {
 		try {
-			if (waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
-					.equalsIgnoreCase(WCConstants.APPROVE_CONNECTION_CONST)
+			log.info("ACTION "+waterConnectionRequest.getWaterConnection().getProcessInstance().getAction());
+			log.info("ApplicationStatus "+waterConnectionRequest.getWaterConnection().getApplicationStatus());
+			if (waterConnectionRequest.getWaterConnection().getApplicationStatus()
+					.equalsIgnoreCase(WCConstants.PENDING_APPROVAL_FOR_CONNECTION_CODE)
 					|| waterConnectionRequest.getWaterConnection().getProcessInstance().getAction()
 							.equalsIgnoreCase(WCConstants.ACTION_PAY)) {
 				waterDao.enrichFileStoreIds(waterConnectionRequest);
@@ -411,13 +423,13 @@ public class EnrichmentService {
 			if (!StringUtils.isEmpty(criteria.getTenantId())) {
 				propertyCriteria.setTenantId(criteria.getTenantId());
 			}
-			propertyCriteria.setUuids(propertyIds);
+			propertyCriteria.setPropertyIds(propertyIds);
 			List<Property> propertyList = waterServicesUtil.getPropertyDetails(serviceRequestRepository.fetchResult(waterServicesUtil.getPropertyURL(propertyCriteria),
 					RequestInfoWrapper.builder().requestInfo(requestInfo).build()));
 
 			if(!CollectionUtils.isEmpty(propertyList)){
 				for(Property property: propertyList){
-					propertyToOwner.put(property.getId(),property.getOwners());
+					propertyToOwner.put(property.getPropertyId(),property.getOwners());
 				}
 			}
 

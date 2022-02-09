@@ -14,7 +14,7 @@ This module created to manage the Bill calculation for the registered water serv
 
 ### Swagger API Contract
 
-- Please refer to the [Swagger API contarct](https://app.swaggerhub.com/apis/egov-foundation/Water-Sewerage-1.0/1.0.0#/free) to understand the structure of APIs and to have visualization of all internal APIs.
+- Please refer to the [Swagger API contarct](https://github.com/egovernments/municipal-services/blob/master/docs/water-sewerage-services.yaml) to understand the structure of APIs and to have visualization of all internal APIs.
 
 ## Service Details
 
@@ -41,7 +41,7 @@ c) `/waterCalculator/_estimate`
    - To Activate the Water Service application, the user needs to pay the ONE_TIME_FEE for the connection. To calculate the ONE_TIME_FEE ws-calculator/waterCalculator/_estimate API used.
 
 d) `/waterCalculator/_calculate`
-   - This API used to generate /home/rohit/Desktop/Workspace/municipal-services/property-servicesthe demand for metered or non-metered water connection.
+   - This API used to generate the demand for metered or non-metered water connection.
 
 e) `/waterCalculator/_updateDemand`
    - User can pay partial / full / advance amount for the Metered or Non-Metered connection bill. In these cases, Billing service would call back ws-calculator/waterCalculator/_updateDemand API to update the details of the demand generated.

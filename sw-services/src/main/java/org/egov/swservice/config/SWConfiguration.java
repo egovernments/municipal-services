@@ -24,9 +24,6 @@ public class SWConfiguration {
 	@Value("${egov.sewerageservice.pagination.default.offset}")
 	private Integer defaultOffset;
 	
-	@Value("${egov.sewerageservice.pagination.max.limit}")
-	private Integer maxLimit;
-	
 
     	@Value("${egov.idgen.scid.name}")
     	private String sewerageIdGenName;
@@ -60,6 +57,9 @@ public class SWConfiguration {
     	@Value("${workflow.businessservice.search.path}")
     	private String wfBusinessServiceSearchPath;
 
+    	@Value("${is.external.workflow.enabled}")
+    	private Boolean isExternalWorkFlowEnabled;
+    
     	@Value("${egov.sewerageservice.updatesewerageconnection.workflow.topic}")
     	private String workFlowUpdateTopic;
     
@@ -183,10 +183,7 @@ public class SWConfiguration {
 
 	@Value("${egov.usr.events.pay.link}")
 	private String userEventApplicationPayLink;
-	
-	@Value("${egov.billing.service.host}")
-	private String businesserviceHost;
-	
-	@Value("${egov.bill.fetchbillendpoint}")
-	private String fetchBillEndPoint;
+
+	@Value("${state.level.tenant.id}")
+	private String stateLevelTenantId;
 }

@@ -3,6 +3,7 @@ package org.egov.tl.service;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tl.config.TLConfiguration;
+import org.egov.tl.producer.Producer;
 import org.egov.tl.repository.TLRepository;
 import org.egov.tl.util.NotificationUtil;
 import org.egov.tl.web.models.SMSRequest;
@@ -13,6 +14,7 @@ import org.egov.tl.workflow.WorkflowIntegrator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,16 +40,21 @@ public class TLBatchService {
 
     private WorkflowIntegrator workflowIntegrator;
 
+    private Producer producer;
 
     @Autowired
     public TLBatchService(NotificationUtil util, TLConfiguration config, TLRepository repository,
-                          EnrichmentService enrichmentService, WorkflowIntegrator workflowIntegrator) {
+                          EnrichmentService enrichmentService, WorkflowIntegrator workflowIntegrator,
+                          Producer producer) {
         this.util = util;
         this.config = config;
         this.repository = repository;
         this.enrichmentService = enrichmentService;
         this.workflowIntegrator = workflowIntegrator;
+        this.producer = producer;
     }
+
+
 
 
 
@@ -57,10 +64,16 @@ public class TLBatchService {
      * Searches trade licenses which are expiring and sends reminder sms to
      *  owner's of the licenses
      * @param serviceName
-     * @param validTill
      * @param requestInfo
      */
-    public void getLicensesAndPerformAction(String serviceName, String jobName, Long validTill, RequestInfo requestInfo){
+    public void getLicensesAndPerformAction(String serviceName, String jobName, RequestInfo requestInfo){
+
+
+        Long validTill = System.currentTimeMillis();
+
+        if(jobName.equalsIgnoreCase(JOB_SMS_REMINDER))
+            validTill = validTill + config.getReminderPeriod();
+
 
         TradeLicenseSearchCriteria criteria = TradeLicenseSearchCriteria.builder()
                 .businessService(serviceName)
@@ -109,15 +122,20 @@ public class TLBatchService {
         List<SMSRequest> smsRequests = new LinkedList<>();
 
         for(TradeLicense license : licenses){
+            try{
 
-            String message = util.getReminderMsg(license, localizationMessages);
-            Map<String,String > mobileNumberToOwner = new HashMap<>();
+                String message = util.getReminderMsg(license, localizationMessages);
+                Map<String,String > mobileNumberToOwner = new HashMap<>();
 
-            license.getTradeLicenseDetail().getOwners().forEach(owner -> {
-                if(owner.getMobileNumber()!=null)
-                    mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
-            });
-            smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
+                license.getTradeLicenseDetail().getOwners().forEach(owner -> {
+                    if(owner.getMobileNumber()!=null)
+                        mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+                });
+                smsRequests.addAll(util.createSMSRequest(message,mobileNumberToOwner));
+            }
+            catch (Exception e){
+                producer.push(config.getReminderErrorTopic(), license);
+            }
         }
 
         util.sendSMS(smsRequests, config.getIsReminderEnabled());
@@ -132,11 +150,22 @@ public class TLBatchService {
      */
     private void expireLicenses(RequestInfo requestInfo, List<TradeLicense> licenses){
 
-        licenses.forEach(license -> {
-            license.setAction(ACTION_EXPIRE);
-        });
+        try {
+            licenses.forEach(license -> {
+                license.setAction(ACTION_EXPIRE);
+                if(StringUtils.isEmpty(license.getWorkflowCode()))
+                    license.setWorkflowCode(DEFAULT_WORKFLOW);
+            });
 
-        workflowIntegrator.callWorkFlow(new TradeLicenseRequest(requestInfo, licenses));
+            workflowIntegrator.callWorkFlow(new TradeLicenseRequest(requestInfo, licenses));
+
+            producer.push(config.getUpdateWorkflowTopic(), new TradeLicenseRequest(requestInfo, licenses));
+        }
+        catch (Exception e){
+            producer.push(config.getExpiryErrorTopic(), licenses);
+        }
+
+
 
     }
 

@@ -52,14 +52,14 @@ public class PropertyRepository {
     @Autowired
     private UserService userService;
     
-	public List<String> getPropertyIds(Set<String> ownerIds,String tenantId) {
+	public List<String> getPropertyIds(Set<String> ownerIds, String tenantId) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
-		String query = queryBuilder.getPropertyIdsQuery(ownerIds,tenantId, preparedStmtList);
+		String query = queryBuilder.getPropertyIdsQuery(ownerIds, tenantId, preparedStmtList);
 		return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 	}
 
-	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen,Boolean isPlainSearch) {
+	public List<Property> getProperties(PropertyCriteria criteria, Boolean isApiOpen, Boolean isPlainSearch) {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch);
@@ -69,7 +69,7 @@ public class PropertyRepository {
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 	}
 
-	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria,Boolean isPlainSearch) {
+	public List<Property> getPropertiesForBulkSearch(PropertyCriteria criteria, Boolean isPlainSearch) {
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertyQueryForBulkSearch(criteria, preparedStmtList, isPlainSearch);
 		return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
@@ -86,7 +86,8 @@ public class PropertyRepository {
 		return builder.toString();
 	}
 
-	public List<String> fetchIds(PropertyCriteria criteria,Boolean isPlainSearch) {
+	public List<String> fetchIds(PropertyCriteria criteria, Boolean isPlainSearch) {
+		
 		List<Object> preparedStmtList = new ArrayList<>();
 		String basequery = "select id from eg_pt_property";
 		StringBuilder builder = new StringBuilder(basequery);
@@ -131,7 +132,7 @@ public class PropertyRepository {
 			properties = getPropertyAudit(criteria);
 		} else {
 
-			properties = getProperties(criteria, isOpenSearch,false);
+			properties = getProperties(criteria, isOpenSearch, false);
 		}
 		if (CollectionUtils.isEmpty(properties))
 			return Collections.emptyList();
@@ -191,7 +192,7 @@ public class PropertyRepository {
 
 		// fetching property id from owner table and enriching criteria
 		ownerIds.addAll(userDetailResponse.getUser().stream().map(User::getUuid).collect(Collectors.toSet()));
-		List<String> propertyIds = getPropertyIds(ownerIds,userTenant);
+		List<String> propertyIds = getPropertyIds(ownerIds, userTenant);
 
 		// returning empty list if no property id found for user criteria
 		if (CollectionUtils.isEmpty(propertyIds)) {

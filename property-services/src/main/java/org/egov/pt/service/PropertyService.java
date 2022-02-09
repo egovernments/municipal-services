@@ -1,7 +1,6 @@
 package org.egov.pt.service;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +64,6 @@ public class PropertyService {
 
 	@Autowired
 	private CalculationService calculatorService;
-	
-	@Autowired
-	private NotificationService notifService;
 
 
 
@@ -113,56 +109,16 @@ public class PropertyService {
 		Property propertyFromSearch = propertyValidator.validateCommonUpdateInformation(request);
 
 		boolean isRequestForOwnerMutation = CreationReason.MUTATION.equals(request.getProperty().getCreationReason());
-		
-		boolean isNumberDifferent = checkIsRequestForMobileNumberUpdate(request, propertyFromSearch);
-		
+
 		if (isRequestForOwnerMutation)
 			processOwnerMutation(request, propertyFromSearch);
-		else if(isNumberDifferent)
-			processMobileNumberUpdate(request, propertyFromSearch);
 		else
 			processPropertyUpdate(request, propertyFromSearch);
 
 		request.getProperty().setWorkflow(null);
 		return request.getProperty();
 	}
-	
-	
-	private boolean checkIsRequestForMobileNumberUpdate(PropertyRequest request, Property propertyFromSearch) {
-		Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
-		List <OwnerInfo> owners = propertyFromSearch.getOwners();
 
-		for(OwnerInfo owner : owners) {
-			uuidToMobileNumber.put(owner.getUuid(), owner.getMobileNumber());
-		}
-
-		List <OwnerInfo> ownersFromRequest = request.getProperty().getOwners();
-
-		Boolean isNumberDifferent = false;
-if(!request.getProperty().getCreationReason().equals(CreationReason.MUTATION))
-{
-		for(OwnerInfo owner : ownersFromRequest) {
-			if(!uuidToMobileNumber.get(owner.getUuid()).equals(owner.getMobileNumber())) {
-				isNumberDifferent = true;
-				break;
-			}
-		}
-}
-		return isNumberDifferent;
-	}
-
-	private void processMobileNumberUpdate(PropertyRequest request, Property propertyFromSearch) {
-
-		if (CreationReason.CREATE.equals(request.getProperty().getCreationReason())) {
-			userService.createUser(request);
-		} else {			
-			updateOwnerMobileNumbers(request,propertyFromSearch);
-		}
-
-		enrichmentService.enrichUpdateRequest(request, propertyFromSearch);
-		util.mergeAdditionalDetails(request, propertyFromSearch);
-		producer.push(config.getUpdatePropertyTopic(), request);		
-}
 	/**
 	 * Method to process Property update 
 	 *
@@ -222,19 +178,6 @@ if(!request.getProperty().getCreationReason().equals(CreationReason.MUTATION))
 		}
 	}
 
-private void updateOwnerMobileNumbers(PropertyRequest request, Property propertyFromSearch) {
-		
-		
-		Map <String, String> uuidToMobileNumber = new HashMap <String, String>();
-		List <OwnerInfo> owners = propertyFromSearch.getOwners();
-		
-		for(OwnerInfo owner : owners) {
-			uuidToMobileNumber.put(owner.getUuid(), owner.getMobileNumber());
-		}
-		
-		userService.updateUserMobileNumber(request, uuidToMobileNumber);
-		notifService.sendNotificationForMobileNumberUpdate(request, propertyFromSearch,uuidToMobileNumber);		
-	}
 	/**
 	 * method to process owner mutation
 	 *
@@ -247,7 +190,7 @@ private void updateOwnerMobileNumbers(PropertyRequest request, Property property
 		userService.createUserForMutation(request, !propertyFromSearch.getStatus().equals(Status.INWORKFLOW));
 		enrichmentService.enrichAssignes(request.getProperty());
 		enrichmentService.enrichMutationRequest(request, propertyFromSearch);
-		//calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
+		calculatorService.calculateMutationFee(request.getRequestInfo(), request.getProperty());
 
 		// TODO FIX ME block property changes FIXME
 		util.mergeAdditionalDetails(request, propertyFromSearch);
@@ -330,8 +273,6 @@ private void updateOwnerMobileNumbers(PropertyRequest request, Property property
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
-		
-		propertyValidator.validatePropertyCriteria(criteria, requestInfo);
 
 		/*
 		 * throw error if audit request is with no proeprty id or multiple propertyids
@@ -371,6 +312,7 @@ private void updateOwnerMobileNumbers(PropertyRequest request, Property property
 
 
 	List<Property> getPropertiesPlainSearch(PropertyCriteria criteria, RequestInfo requestInfo) {
+		
 		if (criteria.getLimit() != null && criteria.getLimit() > config.getMaxSearchLimit())
 			criteria.setLimit(config.getMaxSearchLimit());
 		if(criteria.getLimit()==null)
@@ -385,13 +327,13 @@ private void updateOwnerMobileNumbers(PropertyRequest request, Property property
 				propertyCriteria.setPropertyIds(criteria.getPropertyIds());
 
 		} else {
-			List<String> uuids = repository.fetchIds(criteria,true);
+			List<String> uuids = repository.fetchIds(criteria, true);
 			if (uuids.isEmpty())
 				return Collections.emptyList();
 			propertyCriteria.setUuids(new HashSet<>(uuids));
 		}
 		propertyCriteria.setLimit(criteria.getLimit());
-		List<Property> properties = repository.getPropertiesForBulkSearch(propertyCriteria,true);
+		List<Property> properties = repository.getPropertiesForBulkSearch(propertyCriteria, true);
 		if(properties.isEmpty())
 			return Collections.emptyList();
 		Set<String> ownerIds = properties.stream().map(Property::getOwners).flatMap(List::stream)

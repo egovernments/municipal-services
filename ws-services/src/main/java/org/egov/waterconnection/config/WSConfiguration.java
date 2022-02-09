@@ -63,6 +63,9 @@ public class WSConfiguration {
 	@Value("${workflow.process.search.path}")
 	private String wfProcessSearchPath;
 
+	@Value("${is.external.workflow.enabled}")
+	private Boolean isExternalWorkFlowEnabled;
+
 	@Value("${egov.waterservice.updatewaterconnection.workflow.topic}")
 	private String workFlowUpdateTopic;
 
@@ -193,11 +196,7 @@ public class WSConfiguration {
 
 	@Value("${egov.collection.host}")
 	private String collectionHost;
-	
-	@Value("${egov.billing.service.host}")
-	private String businesserviceHost;
-	
-	@Value("${egov.bill.fetchbillendpoint}")
-	private String fetchBillEndPoint;
-	
+
+	@Value("${state.level.tenant.id}")
+	private String stateLevelTenantId;
 }
