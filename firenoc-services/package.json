@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@godaddy/terminus": "^4.1.0",
-    "ajv": "^6.10.0",
+    "ajv": "^6.12.3",
     "axios": "^0.18.0",
     "body-parser": "^1.13.3",
     "compression": "^1.5.2",
