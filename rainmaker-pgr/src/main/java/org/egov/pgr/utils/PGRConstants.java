@@ -19,9 +19,7 @@ public class PGRConstants {
 	
 	
 	public static final String SEARCHER_PGR_MOD_NAME = "rainmaker-pgr-V2";
-	public static final String SEARCHER_SRSEARCH_DEF_NAME = "serviceSearchWithDetails";	
-	public static final String SEARCHER_SRSEARCHCITIZEN_DEF_NAME = "serviceSearchWithDetailsCitizen";
-
+	public static final String SEARCHER_SRSEARCH_DEF_NAME = "serviceSearchWithDetails";
 	public static final String SEARCHER_PLAINSEARCH_DEF_NAME = "plainSearch";
 	public static final String SEARCHER_COUNT_DEF_NAME = "count";
 	public static final String PG_JSONPATH_COUNT = "$.count[0].count";
@@ -133,7 +131,7 @@ public class PGRConstants {
 	public static final String ROLE_NAME_GRO = "Grievance Routing Officer";
 	public static final String ROLE_NAME_DGRO = "Department Grievance Routing Officer";
 	public static final String ROLE_NAME_CSR = "Customer Support Representative";
-	public static final String ROLE_NAME_ANONYMOUS = "ANONYMOUS";
+	public static final String  ROLE_NAME_ANONYMOUS = "ANONYMOUS";
 	
 	
 	private static Map<String, String> statusNotifKeyMap = prepareStatusNotifKeyMap();
