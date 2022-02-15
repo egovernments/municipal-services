@@ -361,7 +361,7 @@ public class NotificationService {
 			if (owner.getMobileNumber() != null)
 				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
 		});
-
+		System.out.println("here owner+number map--------------------------------------------------------------"+mobileNumberToOwner);
 		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);
 		notifUtil.sendSMS(smsRequests);
 
