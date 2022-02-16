@@ -1,45 +1,7 @@
 package org.egov.pt.service;
 
-import static org.egov.pt.util.PTConstants.ACTION_PAY;
-import static org.egov.pt.util.PTConstants.CREATED_STRING;
-import static org.egov.pt.util.PTConstants.CREATE_PROCESS_CONSTANT;
-import static org.egov.pt.util.PTConstants.CREATE_STRING;
-import static org.egov.pt.util.PTConstants.MT_NO_WORKFLOW;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_AMOUNT;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_APPID;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_CONSUMERCODE;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_MUTATION_LINK;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_OWNERNAME;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_PAY_LINK;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_PROPERTYID;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_PROPERTY_LINK;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_STATUS;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_TENANTID;
-import static org.egov.pt.util.PTConstants.NOTIFICATION_UPDATED_CREATED_REPLACE;
-import static org.egov.pt.util.PTConstants.UPDATED_STRING;
-import static org.egov.pt.util.PTConstants.UPDATE_NO_WORKFLOW;
-import static org.egov.pt.util.PTConstants.UPDATE_STRING;
-import static org.egov.pt.util.PTConstants.WF_MT_STATUS_APPROVED_CODE;
-import static org.egov.pt.util.PTConstants.WF_MT_STATUS_CHANGE_CODE;
-import static org.egov.pt.util.PTConstants.WF_MT_STATUS_OPEN_CODE;
-import static org.egov.pt.util.PTConstants.WF_MT_STATUS_PAID_CODE;
-import static org.egov.pt.util.PTConstants.WF_MT_STATUS_PAYMENT_PENDING_CODE;
-import static org.egov.pt.util.PTConstants.WF_NO_WORKFLOW;
-import static org.egov.pt.util.PTConstants.WF_STATUS_APPROVED;
-import static org.egov.pt.util.PTConstants.WF_STATUS_DOCVERIFIED;
-import static org.egov.pt.util.PTConstants.WF_STATUS_DOCVERIFIED_LOCALE;
-import static org.egov.pt.util.PTConstants.WF_STATUS_FIELDVERIFIED;
-import static org.egov.pt.util.PTConstants.WF_STATUS_FIELDVERIFIED_LOCALE;
-import static org.egov.pt.util.PTConstants.WF_STATUS_OPEN;
-import static org.egov.pt.util.PTConstants.WF_STATUS_OPEN_LOCALE;
-import static org.egov.pt.util.PTConstants.WF_STATUS_PAID;
-import static org.egov.pt.util.PTConstants.WF_STATUS_PAYMENT_PENDING;
-import static org.egov.pt.util.PTConstants.WF_STATUS_REJECTED;
-import static org.egov.pt.util.PTConstants.WF_STATUS_REJECTED_LOCALE;
-import static org.egov.pt.util.PTConstants.WF_UPDATE_STATUS_APPROVED_CODE;
-import static org.egov.pt.util.PTConstants.WF_UPDATE_STATUS_CHANGE_CODE;
-import static org.egov.pt.util.PTConstants.WF_UPDATE_STATUS_OPEN_CODE;
-import static org.egov.pt.util.PTConstants.PT_CORRECTION_PENDING;
+
+import static org.egov.pt.util.PTConstants.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
