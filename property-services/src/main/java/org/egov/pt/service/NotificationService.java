@@ -397,7 +397,7 @@ public class NotificationService {
 
 		Property property = request.getProperty();
 		RequestInfo requestInfo = request.getRequestInfo();
-		Map<String, String> mobileNumberToOwner = new HashMap<>();
+	
 
 		property.getOwners().forEach(owner -> {
 			
