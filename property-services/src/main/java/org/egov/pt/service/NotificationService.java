@@ -394,7 +394,7 @@ public class NotificationService {
    	 /*
 	 Method to send notification while updating owner mobile number	 
 	*/
-    public void sendNotificationForMobileNumberUpdate(PropertyRequest propertyRequest, Property propertyFromSearch) {
+    public void sendNotificationForMobileNumberUpdate(PropertyRequest propertyRequest, Property propertyFromSearch,Map<String, String> uuidToMobileNumber) {
 		Property property = propertyRequest.getProperty();
 		ProcessInstance wf = property.getWorkflow();
 		String createOrUpdate = null;
@@ -409,7 +409,7 @@ public class NotificationService {
 		msg = getMsgForMobileNumberUpdate(property, WF_UPDATE_STATUS_CHANGE_CODE, completeMsgs, createOrUpdate);
 
 		msg = replaceCommonValues(property, msg, localisedState);
-		prepareMsgAndSendToBothNumbers(propertyRequest, propertyFromSearch, msg);
+		prepareMsgAndSendToBothNumbers(propertyRequest, propertyFromSearch, msg,uuidToMobileNumber);
 
 	}
 
@@ -431,29 +431,32 @@ public class NotificationService {
 	*/
 
 	private void prepareMsgAndSendToBothNumbers(PropertyRequest request, Property propertyFromSearch,
-			String msg) {
+			String msg, Map<String, String> uuidToMobileNumber) {
 
 		Property property = request.getProperty();
 		RequestInfo requestInfo = request.getRequestInfo();
 		Map<String, String> mobileNumberToOwner = new HashMap<>();
 
 		property.getOwners().forEach(owner -> {
-			if (owner.getMobileNumber() != null)
-				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
+			
+			if(uuidToMobileNumber.containsKey(owner.getUuid()) && uuidToMobileNumber.get(owner.getUuid())!=owner.getMobileNumber()) {
+				
+				String customizedMsg = msg.replace(PT_OWNER_NAME,owner.getName()).replace(PT_OLD_MOBILENUMBER, uuidToMobileNumber.get(owner.getUuid())).replace(PT_NEW_MOBILENUMBER, owner.getMobileNumber());
+				Map<String, String> mobileNumberToOwner = new HashMap<>();
+				
+				mobileNumberToOwner.put(uuidToMobileNumber.get(owner.getUuid()), owner.getName());
+				mobileNumberToOwner.put(owner.getMobileNumber(),owner.getName());
+				
+				List<SMSRequest> smsRequests = notifUtil.createSMSRequest(customizedMsg, mobileNumberToOwner);
+				notifUtil.sendSMS(smsRequests);
+
+				Boolean isActionReq = false;		
+
+				List<Event> events = notifUtil.enrichEvent(smsRequests, requestInfo, property.getTenantId(), property, isActionReq);
+				notifUtil.sendEventNotification(new EventRequest(requestInfo, events));
+				
+			}
 		});
-
-		propertyFromSearch.getOwners().forEach(owner -> {
-			if (owner.getMobileNumber() != null)
-				mobileNumberToOwner.put(owner.getMobileNumber(), owner.getName());
-		});
-
-		List<SMSRequest> smsRequests = notifUtil.createSMSRequest(msg, mobileNumberToOwner);
-		notifUtil.sendSMS(smsRequests);
-
-		Boolean isActionReq = false;
-
-		List<Event> events = notifUtil.enrichEvent(smsRequests, requestInfo, property.getTenantId(), property, isActionReq);
-		notifUtil.sendEventNotification(new EventRequest(requestInfo, events));
 
 	}
 }
