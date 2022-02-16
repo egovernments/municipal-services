@@ -75,7 +75,7 @@ public class PTConstants {
 
     public static final String NOTIFICATION_OLDPROPERTYID_ABSENT = "pt.oldpropertyid.absent";
     public static final String PT_OLD_MOBILENUMBER = "{oldmobilenumber}";
-    
+    public static final String PT_OWNER_NAME = "{ownername}";
     public static final String PT_NEW_MOBILENUMBER = "{newmobilenumber}";
 
     public static final List<String> ASSESSSMENT_NOTIFICATION_CODES = Collections.unmodifiableList(Arrays.asList(NOTIFICATION_PAYMENT_ONLINE,
