@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -140,7 +141,14 @@ public class PropertyValidator {
 
 		if (configs.getIsWorkflowEnabled() && request.getProperty().getWorkflow() == null && !"LEGACY_RECORD".equals(request.getProperty().getSource().toString()))
 			throw new CustomException("EG_PT_UPDATE_WF_ERROR", "Workflow information is mandatory for update process");
-
+		if(property.getPropertyType().equalsIgnoreCase("VACANT"))
+		{
+			if (!CollectionUtils.isEmpty(property.getUnits()))
+				property.getUnits().forEach(unit -> {
+					unit.setActive(false);
+				});
+	
+		}
 		// third variable is needed only for mutation
 		List<String> fieldsUpdated = diffService.getUpdatedFields(property, propertyFromSearch, "");
 		
