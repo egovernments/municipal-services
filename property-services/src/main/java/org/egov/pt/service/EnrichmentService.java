@@ -105,6 +105,7 @@ public class EnrichmentService {
     public void enrichUpdateRequest(PropertyRequest request,Property propertyFromDb) {
     	
     	Property property = request.getProperty();
+    	
         RequestInfo requestInfo = request.getRequestInfo();
 		AuditDetails auditDetailsForUpdate = propertyutil.getAuditDetails(requestInfo.getUserInfo().getUuid().toString(), false);
 		propertyFromDb.setAuditDetails(auditDetailsForUpdate); 
@@ -130,8 +131,15 @@ public class EnrichmentService {
 					doc.setStatus(Status.ACTIVE);
 				}
 			});
-				
-	    	if (!CollectionUtils.isEmpty(property.getUnits()))
+		if(property.getPropertyType().equalsIgnoreCase("VACANT"))
+		{
+			if (!CollectionUtils.isEmpty(propertyFromDb.getUnits()))
+				propertyFromDb.getUnits().forEach(unit -> {
+					unit.setActive(false);
+				});
+	
+		}	
+		else if (!CollectionUtils.isEmpty(property.getUnits()))
 			property.getUnits().forEach(unit -> {
 
 				if (unit.getId() == null) {
@@ -139,6 +147,7 @@ public class EnrichmentService {
 					unit.setActive(true);
 				}
 			});
+	    	
 				
 		Institution institute = property.getInstitution();
 		if (!ObjectUtils.isEmpty(institute) && null == institute.getId())
