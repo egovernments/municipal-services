@@ -513,13 +513,21 @@ public class DemandService {
 			map.put(SWCalculationConstant.EMPTY_DEMAND_ERROR_CODE, SWCalculationConstant.EMPTY_DEMAND_ERROR_MESSAGE);
 			throw new CustomException(map);
 		}
-
+List<Demand> demands=res.getDemands();
+		demands=demands
+				  .stream()
+				  .filter(i-> !SWCalculationConstant.DEMAND_CANCELLED_STATUS
+							.equalsIgnoreCase(i.getStatus().toString()))
+				  .collect(Collectors.toList());
+		
 		// Loop through the consumerCodes and re-calculate the time based applicable
-		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
+		Map<String, Demand> consumerCodeToDemandMap = demands.stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
+		demands.sort((d1, d2) -> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
 		List<TaxPeriod> taxPeriods = masterDataService.getTaxPeriodList(requestInfoWrapper.getRequestInfo(),
 				getBillCriteria.getTenantId(), SWCalculationConstant.SERVICE_FIELD_VALUE_SW);
+		Demand oldDemand = demands.get(0);
 		consumerCodeToDemandMap.forEach((id, demand) -> {
 			BigDecimal totalTax = demand.getDemandDetails().stream().map(DemandDetail::getTaxAmount)
 					.reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -532,9 +540,7 @@ public class DemandService {
 			boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConsumerCodes().get(0),
 					getBillCriteria.getTenantId());
 
-			List<Demand> demands = res.getDemands();
-			demands.sort((d1, d2) -> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
-			Demand oldDemand = demands.get(0);
+			
 			if (!(isMigratedCon && oldDemand.getId().equalsIgnoreCase(demand.getId()))) {
 			if(!demand.getIsPaymentCompleted() && 
 					totalTax.compareTo(totalCollection) > 0 && 
