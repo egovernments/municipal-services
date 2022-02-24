@@ -3,6 +3,7 @@ package org.egov.wscalculation.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
@@ -618,14 +620,20 @@ public class DemandService {
 			map.put(WSCalculationConstant.EMPTY_DEMAND_ERROR_CODE, WSCalculationConstant.EMPTY_DEMAND_ERROR_MESSAGE);
 			throw new CustomException(map);
 		}
-
+		List<Demand> demands = res.getDemands();
+		demands=demands
+				  .stream()
+				  .filter(i-> !WSCalculationConstant.DEMAND_CANCELLED_STATUS
+							.equalsIgnoreCase(i.getStatus().toString()))
+				  .collect(Collectors.toList());
+		
 		// Loop through the consumerCodes and re-calculate the time base applicable
-		Map<String, Demand> consumerCodeToDemandMap = res.getDemands().stream()
+		Map<String, Demand> consumerCodeToDemandMap =  demands.stream()
 				.collect(Collectors.toMap(Demand::getId, Function.identity()));
 		List<Demand> demandsToBeUpdated = new LinkedList<>();
 		boolean isMigratedCon = isMigratedConnection(getBillCriteria.getConsumerCodes().get(0),getBillCriteria.getTenantId());
 		log.info("-------updateDemands------------isMigratedCon--------"+isMigratedCon);
-		List<Demand> demands = res.getDemands();
+		
 		demands.sort( (d1,d2)-> d1.getTaxPeriodFrom().compareTo(d2.getTaxPeriodFrom()));
 		log.info("-------updateDemands------------demands--------"+demands);
 		Demand oldDemand = demands.get(0);
