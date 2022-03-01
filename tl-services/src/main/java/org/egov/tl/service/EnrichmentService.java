@@ -622,8 +622,4 @@ public class EnrichmentService {
                     license.setAssignee(new LinkedList<>(assignes));
             }
     }
-
-
-
-
 }
