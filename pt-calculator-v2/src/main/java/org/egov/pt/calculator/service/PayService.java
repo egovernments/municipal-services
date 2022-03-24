@@ -74,11 +74,6 @@ public class PayService {
 					timeBasedExmeptionMasterMap.get(CalculatorConstants.PENANLTY_MASTER));
 			interestCalculated = getInterest(taxAmt, assessmentYear,
 					timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER), payments, taxPeriod);
-			
-			if(assessmentYear.startsWith("202")==false && assessmentYear.startsWith("2019")==false )
-			interestCalculated = interestCalculated.add(getInterest(taxAmt, assessmentYear.replaceFirst("20","50").replace("-", "-50"),
-					timeBasedExmeptionMasterMap.get(CalculatorConstants.INTEREST_MASTER), payments, taxPeriod));
-			
 		}
 
 		if (demand != null) {

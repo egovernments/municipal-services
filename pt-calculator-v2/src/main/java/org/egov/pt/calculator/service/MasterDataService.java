@@ -227,7 +227,7 @@ public class MasterDataService {
 					maxYearFromTheList = objFinYear;
 					Long startTime = getStartDayInMillis(objStartDay);
 					Long currentTime = System.currentTimeMillis();
-					if(startTime < currentTime && (assessmentYear.startsWith("50")==true || maxStartTime < startTime)){
+					if(startTime < currentTime &&  maxStartTime < startTime){
 						objToBeReturned = objMap;
 						maxStartTime = startTime;
 					}
