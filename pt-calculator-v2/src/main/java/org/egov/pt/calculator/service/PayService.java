@@ -93,7 +93,7 @@ public class PayService {
 				rebate = getRebate(demand, jsonMasterMap.get(REBATE_MASTER), payments);
 				estimates.put(PT_TIME_REBATE, rebate.setScale(2, 2).negate());
 			}
-			promotionalRebate = getRebate(demand, jsonMasterMap.get(PROMOTIONAL_REBATE_MASTER), payments);
+			promotionalRebate = getPromotionalRebate(demand,rebate, jsonMasterMap.get(PROMOTIONAL_REBATE_MASTER), payments);
 			estimates.put(PT_PROMOTIONAL_REBATE, promotionalRebate.setScale(2, 2).negate());
 
 			Object additionalDetails = demand.getAdditionalDetails();
@@ -191,6 +191,51 @@ public class PayService {
 				}
 			}
 		}
+		return rebateAmt;
+	}
+	public BigDecimal getPromotionalRebate(Demand demand,BigDecimal rebate2, List<Object> rebateMasterList, List<Payment> payments) {
+
+		BigDecimal rebateAmt = BigDecimal.ZERO;
+		BigDecimal taxAmt = BigDecimal.ZERO;
+		//BigDecimal taxAmt = getTaxAmountToCalculateRebateOnApplicables(demand, payments);
+		//Assumtion: Partial payment is not allowed 
+		for (DemandDetail demandDetail : demand.getDemandDetails()) {
+			if (demandDetail.getTaxHeadMasterCode().equalsIgnoreCase("PT_TAX")) {
+					taxAmt = demandDetail.getTaxAmount();
+			}
+		}
+		if(taxAmt.compareTo(BigDecimal.ZERO)>0 && rebate2.compareTo(BigDecimal.ZERO)>0 )
+		{
+			taxAmt=taxAmt.subtract(rebate2);
+		}
+		long currentTime = Calendar.getInstance().getTimeInMillis();
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+		String currentFinancialYear = currentMonth < 4 ? (currentYear - 1) + "-" + currentYear
+				: currentYear + "-" + (currentYear + 1);
+
+		Calendar fromCalendar = Calendar.getInstance();
+		fromCalendar.setTimeInMillis(demand.getTaxPeriodFrom());
+		int fromYear = fromCalendar.get(Calendar.YEAR);
+		Calendar toCalendar = Calendar.getInstance();
+		toCalendar.setTimeInMillis(demand.getTaxPeriodTo());
+		int toYear = toCalendar.get(Calendar.YEAR);
+		String demandFinancialYear = fromYear + "-" + toYear;
+		
+		if (currentFinancialYear.equals(demandFinancialYear)) {
+
+			for (Object rebate : rebateMasterList) {
+				Map<String, Object> rebateMap = (Map<String, Object>) rebate;
+				if ((long) rebateMap.get("startingDay") < currentTime && currentTime < (long) rebateMap.get("endingDay")
+						&& rebateMap.get("rate") != null) {
+					rebateAmt = taxAmt.multiply(BigDecimal.valueOf(Double.valueOf(rebateMap.get("rate").toString())))
+							.divide(HUNDRED);
+				}
+			}
+		}
+		
+		
+		
 		return rebateAmt;
 	}
 
