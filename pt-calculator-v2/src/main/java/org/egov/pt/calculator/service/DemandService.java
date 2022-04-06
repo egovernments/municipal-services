@@ -2,6 +2,7 @@ package org.egov.pt.calculator.service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
@@ -45,8 +46,8 @@ public class DemandService {
 	@Autowired
 	private Configurations configs;
 
-	// @Autowired
-	// private AssessmentService assessmentService;
+	@Autowired
+	private AssessmentService assessmentService;
 
 	@Autowired
 	private CalculatorUtils utils;
@@ -82,7 +83,7 @@ public class DemandService {
 	 * @param request
 	 * @return
 	 */
-	public Map<String, Calculation> generateDemands(CalculationReq request) {
+	public Map<String, Calculation> calculateAndGenerateDemands(CalculationReq request, boolean generateDemand) {
 
 		List<CalculationCriteria> criterias = request.getCalculationCriteria();
 		List<Demand> demands = new ArrayList<>();
@@ -92,6 +93,8 @@ public class DemandService {
 
 
 		Map<String, Calculation> propertyCalculationMap = estimationService.getEstimationPropertyMap(request,masterMap);
+		
+		if(generateDemand)
 		for (CalculationCriteria criteria : criterias) {
 
 			Property property = criteria.getProperty();
@@ -99,9 +102,14 @@ public class DemandService {
 			PropertyDetail detail = property.getPropertyDetails().get(0);
 
 			Calculation calculation = propertyCalculationMap.get(property.getPropertyDetails().get(0).getAssessmentNumber());
-
+			
 			String assessmentNumber = detail.getAssessmentNumber();
-
+			Map<String, Object> finyearMap = (Map<String, Object>) masterMap.get(FINANCIALYEAR_MASTER_KEY);
+			Map<String, Object> finYear = (Map<String, Object>) finyearMap.get(detail.getFinancialYear());
+			Long startingDate = (Long) finYear.get("startingDate");
+			Long endingDate = (Long) finYear.get("endingDate");
+			criteria.setFromDate(startingDate);
+			criteria.setToDate(endingDate);
 			// pt_tax for the new assessment
 			BigDecimal newTax =  BigDecimal.ZERO;
 			Optional<TaxHeadEstimate> advanceCarryforwardEstimate = propertyCalculationMap.get(assessmentNumber).getTaxHeadEstimates()
@@ -135,20 +143,19 @@ public class DemandService {
 			throw new CustomException(CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR,
 					CalculatorConstants.EG_PT_DEPRECIATING_ASSESSMENT_ERROR_MSG + lesserAssessments);
 		}
-		
-		DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
-		String url = new StringBuilder().append(configs.getBillingServiceHost())
-				.append(configs.getDemandCreateEndPoint()).toString();
-		DemandResponse res = new DemandResponse();
-
-		try {
-			res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
-
-		} catch (HttpClientErrorException e) {
-			throw new ServiceCallException(e.getResponseBodyAsString());
+		if (generateDemand) {
+			DemandRequest dmReq = DemandRequest.builder().demands(demands).requestInfo(request.getRequestInfo()).build();
+			String url = new StringBuilder().append(configs.getBillingServiceHost())
+					.append(configs.getDemandCreateEndPoint()).toString();
+			DemandResponse res = new DemandResponse();
+			
+			try {
+				res = restTemplate.postForObject(url, dmReq, DemandResponse.class);
+			} catch (HttpClientErrorException e) {
+				throw new ServiceCallException(e.getResponseBodyAsString());
+			}
+			log.info(" The demand Response is : " + res);
 		}
-		log.info(" The demand Response is : " + res);
-	//	assessmentService.saveAssessments(res.getDemands(), consumerCodeFinYearMap, request.getRequestInfo());
 		return propertyCalculationMap;
 	}
 
@@ -288,7 +295,7 @@ public class DemandService {
 	 * @return
 	 */
 	protected BigDecimal getCarryForwardAndCancelOldDemand(BigDecimal newTax, CalculationCriteria criteria, RequestInfo requestInfo
-			,Demand demand, boolean cancelDemand) {
+			, Demand demand,boolean cancelDemand) {
 
 		Property property = criteria.getProperty();
 
@@ -297,7 +304,7 @@ public class DemandService {
 
 		if(null == property.getPropertyId()) return carryForward;
 
-	//	Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
+	    // Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
 		
 		if(null == demand) return carryForward;
 
@@ -327,6 +334,36 @@ public class DemandService {
 		return carryForward;
 	}
 
+	public Demand getLatestDemandForCurrentFinancialYear(RequestInfo requestInfo, Property property) {
+
+		Assessment assessment = Assessment.builder().propertyId(property.getPropertyId())
+				.tenantId(property.getTenantId())
+				.assessmentYear(property.getPropertyDetails().get(0).getFinancialYear()).build();
+
+		List<Assessment> assessments = assessmentService.getMaxAssessment(assessment);
+
+		if (CollectionUtils.isEmpty(assessments))
+			return null;
+
+		Assessment latestAssessment = assessments.get(0);
+		log.debug(" the latest assessment : " + latestAssessment);
+
+		DemandResponse res = mapper.convertValue(
+				repository.fetchResult(utils.getDemandSearchUrl(latestAssessment), new RequestInfoWrapper(requestInfo)),
+				DemandResponse.class);
+		BigDecimal totalCollectedAmount = res.getDemands().get(0).getDemandDetails().stream()
+				.map(d -> d.getCollectionAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		if (totalCollectedAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) != 0) {
+			// The total collected amount is fractional most probably because of
+			// previous
+			// round off dropping prior to BS/CS 1.1 release
+			throw new CustomException("INVALID_COLLECT_AMOUNT",
+					"The collected amount is fractional, please contact support for data correction");
+		}
+
+		return res.getDemands().get(0);
+	}
 	/**
 	 * Prepares Demand object based on the incoming calculation object and property
 	 * 
@@ -346,7 +383,7 @@ public class DemandService {
 		else
 			owner = detail.getOwners().iterator().next();
 		
-	//	Demand demand = getLatestDemandForCurrentFinancialYear(requestInfo, property);
+	   // Demand demand = utils.getLatestDemandForCurrentFinancialYear(requestInfo, property);
 
 		List<DemandDetail> details = new ArrayList<>();
 
@@ -385,7 +422,7 @@ public class DemandService {
 
 		/**
 		 * Commenting the below as Partial payment is disabled and sending null to
-		 * applyPenaltyRebateAndInterest get the payments done agianst this demand
+		 * applyPenaltyRebateAndInterest get the payments done against this demand
 		 * List<Payment> payments = paymentService.getPaymentsFromDemand(demand,
 		 * requestInfoWrapper);
 		 */
@@ -464,18 +501,25 @@ public class DemandService {
 
 		for (DemandDetail detail : demand.getDemandDetails()) {
 
+			log.info("Tax Amount of " + detail.getTaxHeadMasterCode() + " is : " + detail.getTaxAmount() );
+			log.info("Collection Amount of " + detail.getTaxHeadMasterCode() + " is : " + detail.getCollectionAmount() );
 			if (!detail.getTaxHeadMasterCode().equalsIgnoreCase(PT_ROUNDOFF)) {
-				taxAmount = taxAmount.add(detail.getTaxAmount());
+				taxAmount = taxAmount.add(detail.getTaxAmount().subtract(detail.getCollectionAmount()));
 			} else {
-				currentRoundOff = detail.getTaxAmount();
+				currentRoundOff = detail.getTaxAmount().subtract(detail.getCollectionAmount());
 			}
 		}
-
+		log.info("Tax Amount of Demand : " + taxAmount );
+		log.info("Current RoundOff Amount of Demand : " + currentRoundOff );
 		/*
 		 * An estimate object will be returned incase if there is a decimal value If no
 		 * decimal value found null object will be returned
+		 * 
+		 * 
 		 */
+		if(taxAmount.compareTo(BigDecimal.ZERO) != 0){
 		TaxHeadEstimate roundOffEstimate = payService.roundOffDecimals(taxAmount, currentRoundOff);
+		log.info("Tax Head Estimate of Demand : " + roundOffEstimate );
 
 		if (roundOffEstimate != null) {
 			if (currentRoundOff == null) {
@@ -486,6 +530,11 @@ public class DemandService {
 				utils.getLatestDemandDetailByTaxHead(PT_ROUNDOFF, details).getLatestDemandDetail()
 						.setTaxAmount(roundOffEstimate.getEstimateAmount());
 			}
+		}
+		}else if (currentRoundOff != null && currentRoundOff.compareTo(BigDecimal.ZERO) != 0 && !CollectionUtils.isEmpty(details.stream().filter(dtl -> dtl.getTaxHeadMasterCode().equals(PT_ROUNDOFF)).collect(Collectors.toList())))
+		{
+				utils.getLatestDemandDetailByTaxHead(PT_ROUNDOFF, details).getLatestDemandDetail()
+						.setTaxAmount(BigDecimal.ZERO);
 		}
 
 	}
@@ -571,6 +620,37 @@ public class DemandService {
 		BigDecimal diff = newAmount.subtract(latestDetailInfo.getTaxAmountForTaxHead());
 		BigDecimal newTaxAmountForLatestDemandDetail = latestDetailInfo.getLatestDemandDetail().getTaxAmount().add(diff);
 		latestDetailInfo.getLatestDemandDetail().setTaxAmount(newTaxAmountForLatestDemandDetail);
+	}
+	
+	public DemandResponse createPTDemands(List<Demand> demands, RequestInfo requestInfo) {
+
+		DemandRequest demandReq = DemandRequest.builder().demands(demands).requestInfo(requestInfo).build();
+		String url = new StringBuilder().append(configs.getBillingServiceHost())
+				.append(configs.getDemandCreateEndPoint()).toString();
+		DemandResponse res = new DemandResponse();
+
+		try {
+			res = restTemplate.postForObject(url, demandReq, DemandResponse.class);
+
+		} catch (HttpClientErrorException e) {
+			throw new ServiceCallException(e.getResponseBodyAsString());
+		}
+		return res;
+	}
+
+	public DemandResponse updatePTDemands(List<Demand> demands, RequestInfo requestInfo) {
+		DemandRequest demandReq = DemandRequest.builder().demands(demands).requestInfo(requestInfo).build();
+		String url = new StringBuilder().append(configs.getBillingServiceHost())
+				.append(configs.getDemandUpdateEndPoint()).toString();
+		DemandResponse res = new DemandResponse();
+
+		try {
+			res = restTemplate.postForObject(url, demandReq, DemandResponse.class);
+
+		} catch (HttpClientErrorException e) {
+			throw new ServiceCallException(e.getResponseBodyAsString());
+		}
+		return res;
 	}
 
 }

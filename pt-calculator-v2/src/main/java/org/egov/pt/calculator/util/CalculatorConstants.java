@@ -10,6 +10,14 @@ import org.egov.pt.calculator.web.models.demand.DemandStatus;
 
 public class CalculatorConstants {
 
+	
+	
+
+	
+	
+
+	
+
 	private CalculatorConstants() {
 
 	}
@@ -58,6 +66,8 @@ public class CalculatorConstants {
 	public static final String PT_ADHOC_PENALTY = "PT_ADHOC_PENALTY";
 
 	public static final String PT_ADHOC_REBATE = "PT_ADHOC_REBATE";
+	
+	public static final String SWATCHATHA_TAX = "SWATCHATHA_TAX";
 
 //	public static final String PT_DECIMAL_CEILING_CREDIT = "PT_DECIMAL_CEILING_CREDIT";
 	
@@ -302,7 +312,7 @@ public class CalculatorConstants {
 
 	
 	public static final String PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANCT = "PT_ESTIMATE_BILLINGSLABS_UNMATCH";
-	public static final String PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG = "Incorrect count of {count} billing slabs has been found for the given VACANT LAND property detail";
+	public static final String PT_ESTIMATE_BILLINGSLABS_UNMATCH_VACANT_MSG = "Incorrect count of {0} billing slabs has been found for the given VACANT LAND property detail";
 
 	public static final String PT_ESTIMATE_BILLINGSLABS_UNMATCH = "PT_ESTIMATE_BILLINGSLABS_UNMATCH";
 	public static final String PT_ESTIMATE_BILLINGSLABS_UNMATCH_MSG = "more than one billing slab with ids : {ids} has been found for the given unit : ";
@@ -331,8 +341,138 @@ public class CalculatorConstants {
 
 	public static final String NONRESIDENTIAL = "NONRESIDENTIAL";
 	
+	public static final String MIXED = "MIXED";
+	
 	public static final String BUILTUP = "BUILTUP";
 
 	public static final String RENTED = "RENTED";
+	
+	public static final String SERVICE_FIELD_VALUE_PT_MUTATION = "PT.MUTATION";
+	
+	public static final String DOCUMENT_DATE = "documentDate";
+	public static final String DOCUMENT_NUMBER = "documentNumber";
 
+	public static final String MUTATION_PAYMENT_PERIOD_IN_MONTH = "mutationPaymentPeriodInMonth";
+	
+	public static final String PT_ADDITIONALNDETAILS_NULL = "PT_ADDITIONALNDETAILS_NULL";
+	public static final String PT_ADDITIONALNDETAILS_NULL_MSG = "Additional Details should not be null. Please add field like marketValue, documentDate, adhocRebate and adhocPenalty with their proper value in additionalDetails object";
+
+	public static final String MARKET_VALUE = "marketValue";
+	public static final String PT_MARKETVALUE_NULL = "PT_MARKETVALUE_NULL";
+	public static final String PT_MARKETVALUE_NULL_MSG = "Market Value is not present in additional details or set as null or not in numeric format ";
+	public static final String PT_DOCUMENT_NUMBER_NULL="Document Number is Null";
+	public static final String PT_DOCUMENT_NUMBER_NULL_MSG="Document Number is not present in additional details or set as null or not in numeric format ";
+	public static final String PT_DOCDATE_NULL = "PT_DOCDATE_NULL";
+	public static final String PT_DOCDATE_NULL_MSG = "Document date is not present in additional details or set as null";
+
+	public static final String NUMERIC_REGEX = "-?\\d+(\\.\\d+)?";
+	
+	public static final String DEMAND_CREATE_FAILED = "DEMAND_CREATE_FAILED";
+	public static final String DEMAND_CREATE_FAILED_MSG = "Demand Creation Failed";
+	
+	public static final String OWNER_STATUS_ACTIVE = "ACTIVE";
+	
+	public static final String DEMAND_UPDATE_FAILED = "DEMAND_UPDATE_FAILED";
+	public static final String DEMAND_UPDATE_FAILED_MSG = "Demand Updation Failed";
+	
+	public static final String MDMS_CITYWISE_CONFIG_KEY = "citywiseconfig";
+	public static final String MODULE_TENANT = "tenant";
+
+	public static final String MDMS_INTEREST_CINFIG_PATH = "$.MdmsRes.tenant.citywiseconfig[?(@.config=='ptCalculateInterest')].disabledCities";
+	public static final String MDMS_REBATE_CINFIG_PATH = "$.MdmsRes.tenant.citywiseconfig[?(@.config=='ptCalculateRebate')].disabledCities";
+
+	public static final String INTEREST_DISABLED_CITIES = "INTEREST_DISABLED_CITIES";
+	public static final String REBATE_DISABLED_CITIES = "REBATE_DISABLED_CITIES";
+
+	public static final String INVALID_TENANT_ID_MDMS_KEY = "INVALID TENANTID";
+	public static final String INVALID_TENANT_ID_MDMS_MSG = "No data found for this tenentID";
+	
+	public static final String GROUND_FLOOR_NUMBER = "0";
+	
+	public static final String MDMS_MASTER_MUTATIONFEE = "MutationFee";
+	public static final String MDMS_MASTER_SWACHHATA_TAX = "SwachhataTax";
+
+	public static final String REASON_FOR_TRANSFER = "reasonForTransfer";
+
+	public static final String PT_REASON_FOR_TRANSFER_NULL = "Reason for trasfer can't be null";
+
+	public static final String PT_REASON_FOR_TRANSFER_NULL_MSG = "Reason for trasfer can't be null";
+	public static final String ATTORNEY_REG_NO ="powerOfAttorneyRegNo";
+
+	public static final String PT_ATTORNEY_REG_NO_NULL = "Power of attorney is null";
+
+	public static final String PT_ATTORNEY_REG_NO_MSG ="Power of attorney can't be null";
+
+	public static final String DATE_OF_WRITING_WILL = "DateOfWritingWill";
+
+	public static final String PT_DATE_OF_WRITING_WILL_NULL = "Date of writing will is null";
+
+	public static final String PT_DATE_OF_WRITING_WILL_MSG = "Date of writing will is null";
+	public static final String POWER_OF_ATTORNEY_REG_NO="powerOfAttorneyRegNo";
+	public static final String PT_POWER_OF_ATTORNEY_REG_NO_NULL="Power of attorney reg. no. is null";
+
+	public static final String PT_POWER_OF_ATTORNEY_REG_NO_MSG = "Power of attorney reg. no. is null";
+
+	public static final String DOCUMENT_ISSUE_DATE = "documentIssueDateField";
+	public static final String PT_DOCUMENT_ISSUE_DATE_NULL = "documentIssueDateField is null";
+	public static final String PT_DOCUMENT_ISSUE_DATE_MSG = "Document Issue Date Field cannot be null";
+
+	public static final String POWER_OF_ATTORNEY_REG_DATE = "PowerOfAttorneyRegDate";
+	public static final String PT_POWER_OF_ATTORNEY_REG_DATE_NULL = "PowerOfAttorneyRegDate is null";
+	public static final String PT_POWER_OF_ATTORNEY_REG_DATE_MSG= "Power Of Attorney Reg Date cannot be null";
+
+	public static final String NAME_AND_ADDRESS_OF_WITNESS = "NameAndAddressOfWitnesses";
+	public static final String PT_NAME_AND_ADDRESS_OF_WITNESS_NULL = "NameAndAddressOfWitnesses is null";
+	public static final String PT_NAME_AND_ADDRESS_OF_WITNESS_MSG = "NameAndAddressOfWitnesses cannot be null";
+
+	public static final String DECREE_NO = "DecreeNo";
+	public static final String PT_DECREE_NO_NULL = "DecreeNo is null";
+	public static final String PT_DECREE_NO_MSG = "DecreeNo cannot be null";
+	
+	public static final String DECREE_DATE = "DecreeDate";
+	public static final String PT_DECREE_DATE_NULL = "DecreeDate is null";
+	public static final String PT_DECREE_DATE_MSG = "DecreeDate cannot be null";
+	
+	public static final String SERIAL_NO = "SerialNumber";
+	public static final String PT_SERIAL_NO_NULL = "SerialNumber is null";
+	public static final String PT_SERIAL_NO_MSG = "SerialNumber cannot be null";
+
+	public static final String COURT_NAME = "CourtName";
+	public static final String PT_COURT_NAME_NULL = "CourtName is null";
+	public static final String PT_COURT_NAME_MSG = "CourtName cannot be null";
+
+	public static final String DETAILS_OF_UPPER_STAY_ORDER = "DetailsOfUpperCourtStayOrder";
+	public static final String PT_DETAILS_OF_UPPER_STAY_ORDER_NULL = "DetailsOfUpperCourtStayOrder is null";
+	public static final String PT_DETAILS_OF_UPPER_STAY_ORDER_MSG = "DetailsOfUpperCourtStayOrder cannot be null";
+	
+	public static final String DETAILS_OF_UPPER_STAY_ORDER_YES_NO = "IsThereAnyStayOrderOnCourtDecreeByUpperCourt";
+	public static final String PT_DETAILS_OF_UPPER_STAY_ORDER_YES_NO_NULL = "IsThereAnyStayOrderOnCourtDecreeByUpperCourt is null";
+	public static final String PT_DETAILS_OF_UPPER_STAY_ORDER_YES_NO_MSG = "IsThereAnyStayOrderOnCourtDecreeByUpperCourt cannot be null";
+
+	public static final String AUCTION_REG_NO = "AuctionRegistrationnumber";
+	public static final String PT_AUCTION_REG_NO_NULL = "AuctionRegistrationnumber is null";
+	public static final String PT_AUCTION_REG_NO_MSG = "AuctionRegistrationnumber cannot be null";
+	
+	public static final String AUCTION_REG_DATE = "AuctionRegistrationDate";
+	public static final String PT_AUCTION_REG_DATE_NULL = "AuctionRegistrationDate is null";
+	public static final String PT_AUCTION_REG_DATE_MSG = "AuctionRegistrationDate cannot be null";
+	
+	public static final String AUCTION_DATE = "AuctionDate";
+	public static final String PT_AUCTION_DATE_NULL = "AuctionDate is null";
+	public static final String PT_AUCTION_DATE_MSG = "AuctionDate cannot be null";
+
+	public static final String NAME_OF_AUCTION_AUTHORITY = "NameOfAuctionAuthority";
+	public static final String PT_NAME_OF_AUCTION_AUTHORITY_NULL = "NameOfAuctionAuthority is null";
+	public static final String PT_NAME_OF_AUCTION_AUTHORITY_MSG= "NameOfAuctionAuthority cannot be null";
+	
+	public static final String NAME_OF_ISSUING_AUTHORITY = "IssuingAuthority";
+	public static final String PT_NAME_OF_ISSUING_AUTHORITY_NULL = "IssuingAuthority is null";
+	public static final String PT_NAME_OF_ISSUING_AUTHORITY_MSG= "IssuingAuthority cannot be null";
+
+	public static final String DATE_OF_ISSUING = "IssuingDate";
+	public static final String PT_DATE_OF_ISSUING_NULL = "IssuingDate is null";
+	public static final String PT_DATE_OF_ISSUING_MSG = "IssuingDate cannot be null";
+	
+	
+	
 }

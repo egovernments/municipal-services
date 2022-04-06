@@ -1,34 +1,83 @@
 package org.egov.pt.calculator.util;
 
+import static java.util.Objects.isNull;
+import static org.egov.pt.calculator.util.CalculatorConstants.ALLOWED_RECEIPT_STATUS;
+import static org.egov.pt.calculator.util.CalculatorConstants.ASSESSMENTNUMBER_FIELD_SEARCH;
+import static org.egov.pt.calculator.util.CalculatorConstants.BUSINESSSERVICE_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME;
+import static org.egov.pt.calculator.util.CalculatorConstants.CONSUMER_CODE_SEARCH_FIELD_NAME_PAYMENT;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_END_DATE_PARAM;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_ID_SEARCH_FIELD_NAME;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_START_DATE_PARAM;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_STATUS_ACTIVE;
+import static org.egov.pt.calculator.util.CalculatorConstants.DEMAND_STATUS_PARAM;
+import static org.egov.pt.calculator.util.CalculatorConstants.PROPERTY_TAX_SERVICE_CODE;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ADVANCE_CARRYFORWARD;
+import static org.egov.pt.calculator.util.CalculatorConstants.RECEIPT_END_DATE_PARAM;
+import static org.egov.pt.calculator.util.CalculatorConstants.RECEIPT_START_DATE_PARAM;
+import static org.egov.pt.calculator.util.CalculatorConstants.SEPARATER;
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT;
+import static org.egov.pt.calculator.util.CalculatorConstants.STATUS_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.TAXES_TO_BE_CONSIDERD;
+import static org.egov.pt.calculator.util.CalculatorConstants.TENANT_ID_FIELD_FOR_SEARCH_URL;
+import static org.egov.pt.calculator.util.CalculatorConstants.URL_PARAMS_SEPARATER;
+
 import java.math.BigDecimal;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
+import org.egov.common.contract.request.User;
 import org.egov.mdms.model.MasterDetail;
 import org.egov.mdms.model.MdmsCriteria;
 import org.egov.mdms.model.MdmsCriteriaReq;
 import org.egov.mdms.model.ModuleDetail;
 import org.egov.pt.calculator.repository.Repository;
 import org.egov.pt.calculator.service.PaymentService;
-import org.egov.pt.calculator.web.models.*;
+import org.egov.pt.calculator.web.models.Assessment;
+import org.egov.pt.calculator.web.models.CalculationCriteria;
+import org.egov.pt.calculator.web.models.CalculationReq;
+import org.egov.pt.calculator.web.models.DemandDetailAndCollection;
+import org.egov.pt.calculator.web.models.DemandSearchCriteria;
+import org.egov.pt.calculator.web.models.GetBillCriteria;
+import org.egov.pt.calculator.web.models.ReceiptSearchCriteria;
 import org.egov.pt.calculator.web.models.collections.Payment;
 import org.egov.pt.calculator.web.models.collections.PaymentSearchCriteria;
-import org.egov.pt.calculator.web.models.demand.*;
+import org.egov.pt.calculator.web.models.demand.BillAccountDetail;
+import org.egov.pt.calculator.web.models.demand.Demand;
+import org.egov.pt.calculator.web.models.demand.DemandDetail;
+import org.egov.pt.calculator.web.models.demand.DemandResponse;
+import org.egov.pt.calculator.web.models.demand.TaxPeriod;
 import org.egov.pt.calculator.web.models.property.AuditDetails;
+import org.egov.pt.calculator.web.models.property.OwnerInfo;
 import org.egov.pt.calculator.web.models.property.PropertyRequest;
 import org.egov.pt.calculator.web.models.property.RequestInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import lombok.Getter;
 import org.springframework.util.CollectionUtils;
 
-import static org.egov.pt.calculator.util.CalculatorConstants.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import lombok.Getter;
 
 @Component
 @Getter
@@ -618,8 +667,8 @@ public class CalculatorUtils {
     public Demand getLatestDemandForCurrentFinancialYear(RequestInfo requestInfo, CalculationCriteria calculationCriteria) {
 
         DemandSearchCriteria criteria = new DemandSearchCriteria();
-        criteria.setFromDate(calculationCriteria.getFromDate());
-        criteria.setToDate(calculationCriteria.getToDate());
+        criteria.setFromDate(calculationCriteria.getFromDate() == null ? 0 : calculationCriteria.getFromDate());
+        criteria.setToDate(calculationCriteria.getToDate()== null ? 0 : calculationCriteria.getToDate());
         criteria.setTenantId(calculationCriteria.getTenantId());
         criteria.setPropertyId(calculationCriteria.getProperty().getPropertyId());
 
@@ -693,5 +742,60 @@ public class CalculatorUtils {
 
 		return null;
 	}
+	
+	 public User getCommonContractUser(OwnerInfo owner){
+	        org.egov.common.contract.request.User user = new org.egov.common.contract.request.User();
+	        user.setTenantId(owner.getTenantId());
+	        user.setId(owner.getId());
+	        user.setName(owner.getName());
+	        user.setType(owner.getType());
+	        user.setMobileNumber(owner.getMobileNumber());
+	        user.setEmailId(owner.getEmailId());
+	        user.setRoles(addRoles(owner.getRoles()));
+	        user.setUuid(owner.getUuid());
 
+	        return user;
+	    }
+
+	  private List<Role> addRoles(List<org.egov.common.contract.request.Role> Roles){
+	        LinkedList<Role> addroles = new LinkedList<>();
+	        Roles.forEach(role -> {
+	            Role addrole = new Role();
+	            addrole.setId(role.getId());
+	            addrole.setName(role.getName());
+	            addrole.setCode(role.getCode());
+	            addroles.add(addrole);
+	        });
+	        return addroles;
+	    }
+
+
+	    public static JsonNode jsonMerge(JsonNode mainNode, JsonNode updateNode) {
+
+	        if(isNull(mainNode) || mainNode.isNull())
+	            return updateNode;
+	        if (isNull(updateNode) || updateNode.isNull())
+	            return mainNode;
+
+	        Iterator<String> fieldNames = updateNode.fieldNames();
+	        while (fieldNames.hasNext()) {
+
+	            String fieldName = fieldNames.next();
+	            JsonNode jsonNode = mainNode.get(fieldName);
+	            // if field exists and is an embedded object
+	            if (jsonNode != null && jsonNode.isObject()) {
+	                jsonMerge(jsonNode, updateNode.get(fieldName));
+	            }
+	            else {
+	                if (mainNode instanceof ObjectNode) {
+	                    // Overwrite field
+	                    JsonNode value = updateNode.get(fieldName);
+	                    ((ObjectNode) mainNode).put(fieldName, value);
+	                }
+	            }
+
+	        }
+
+	        return mainNode;
+	    }
 }

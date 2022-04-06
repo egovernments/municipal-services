@@ -1,16 +1,40 @@
 package org.egov.pt.calculator.service;
 
-import java.math.BigDecimal;
-import java.util.*;
+import static org.egov.pt.calculator.util.CalculatorConstants.HUNDRED;
+import static org.egov.pt.calculator.util.CalculatorConstants.INTEREST_DISABLED_CITIES;
+import static org.egov.pt.calculator.util.CalculatorConstants.INTEREST_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.PROMOTIONAL_REBATE_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_PROMOTIONAL_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_ROUNDOFF;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_INTEREST;
+import static org.egov.pt.calculator.util.CalculatorConstants.PT_TIME_REBATE;
+import static org.egov.pt.calculator.util.CalculatorConstants.REBATE_DISABLED_CITIES;
+import static org.egov.pt.calculator.util.CalculatorConstants.REBATE_MASTER;
+import static org.egov.pt.calculator.util.CalculatorConstants.SERVICE_FIELD_VALUE_PT;
+import static org.egov.pt.calculator.util.CalculatorConstants.TAXES_TO_BE_CONSIDERD;
 
-import static org.egov.pt.calculator.util.CalculatorConstants.*;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.egov.pt.calculator.util.CalculatorUtils;
 import org.egov.pt.calculator.web.models.TaxHeadEstimate;
 import org.egov.pt.calculator.web.models.collections.Payment;
-import org.egov.pt.calculator.web.models.demand.*;
+import org.egov.pt.calculator.web.models.demand.BillAccountDetail;
+import org.egov.pt.calculator.web.models.demand.Demand;
+import org.egov.pt.calculator.web.models.demand.DemandDetail;
+import org.egov.pt.calculator.web.models.demand.TaxPeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.minidev.json.JSONArray;
 
@@ -29,6 +53,9 @@ public class PayService {
 
 	@Autowired
 	private CalculatorUtils utils;
+	
+	@Autowired
+	private MasterDataService mDataService;
 
 	/**
 	 * Updates the incoming demand with latest rebate, penalty and interest values if applicable
@@ -56,19 +83,64 @@ public class PayService {
 			}
 		}
 
+		Map<String, List<String>> cityConfig = mDataService.getRebateAndInterestDisabledCities(demand.getTenantId());
+		List<String> rebateDisabledCities = cityConfig.get(REBATE_DISABLED_CITIES);
+		List<String> interestDisabledCities = cityConfig.get(INTEREST_DISABLED_CITIES);
 		//Rebate Calculation
 		if (demandNotCollected) {
-			rebate = getRebate(demand, jsonMasterMap.get(REBATE_MASTER), payments);
-			promotionalRebate = getRebate(demand, jsonMasterMap.get(PROMOTIONAL_REBATE_MASTER), payments);
 
-			estimates.put(PT_TIME_REBATE, rebate.setScale(2, 2).negate());
+			if (rebateDisabledCities != null && !rebateDisabledCities.contains(demand.getTenantId())) {
+				rebate = getRebate(demand, jsonMasterMap.get(REBATE_MASTER), payments);
+				estimates.put(PT_TIME_REBATE, rebate.setScale(2, 2).negate());
+			}
+			promotionalRebate = getPromotionalRebate(demand,rebate, jsonMasterMap.get(PROMOTIONAL_REBATE_MASTER), payments);
 			estimates.put(PT_PROMOTIONAL_REBATE, promotionalRebate.setScale(2, 2).negate());
+
+			Object additionalDetails = demand.getAdditionalDetails();
+
+			String rebateAutocalculateValue = "{\"rebateAutoCalculate\" : \"true\"}";
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			JsonNode rebateAutocalculateNode = null;
+			try {
+				rebateAutocalculateNode = objectMapper.readTree(rebateAutocalculateValue);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			JsonNode additionalDetailsNode = objectMapper.convertValue(additionalDetails, JsonNode.class);
+
+			demand.setAdditionalDetails(CalculatorUtils.jsonMerge(additionalDetailsNode, rebateAutocalculateNode));
 		}
 
 		//Interest Calculation
 		if (demandNotCollected) {
-			interest = getInterestCurrent(demand, payments, taxPeriods, jsonMasterMap.get(INTEREST_MASTER));
-			estimates.put(PT_TIME_INTEREST, interest.setScale(2, 2));
+			if (interestDisabledCities != null && !interestDisabledCities.contains(demand.getTenantId())) {
+				interest = getInterestCurrent(demand, payments, taxPeriods, jsonMasterMap.get(INTEREST_MASTER));
+				estimates.put(PT_TIME_INTEREST, interest.setScale(2, 2));
+			}
+
+			Object additionalDetails = demand.getAdditionalDetails();
+
+			String interestAutocalculate = "{\"interestAutoCalculate\" : \"true\"}";
+			ObjectMapper objectMapper = new ObjectMapper();
+
+			JsonNode interestAutocalculateNode = null;
+			try {
+				interestAutocalculateNode = objectMapper.readTree(interestAutocalculate);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			JsonNode additionalDetailsNode = objectMapper.convertValue(additionalDetails, JsonNode.class);
+
+			demand.setAdditionalDetails(CalculatorUtils.jsonMerge(additionalDetailsNode, interestAutocalculateNode));
 		}
 		
 		return estimates;
@@ -112,12 +184,58 @@ public class PayService {
 
 			for (Object rebate : rebateMasterList) {
 				Map<String, Object> rebateMap = (Map<String, Object>) rebate;
-				if ( (long)rebateMap.get("startingDay") < currentTime
-						&& currentTime < (long)rebateMap.get("endingDay")) {
-					rebateAmt = taxAmt.multiply(BigDecimal.valueOf((int) rebateMap.get("rate"))).divide(HUNDRED);
+				if ((long) rebateMap.get("startingDay") < currentTime && currentTime < (long) rebateMap.get("endingDay")
+						&& rebateMap.get("rate") != null) {
+					rebateAmt = taxAmt.multiply(BigDecimal.valueOf(Double.valueOf(rebateMap.get("rate").toString())))
+							.divide(HUNDRED);
 				}
 			}
 		}
+		return rebateAmt;
+	}
+	public BigDecimal getPromotionalRebate(Demand demand,BigDecimal rebate2, List<Object> rebateMasterList, List<Payment> payments) {
+
+		BigDecimal rebateAmt = BigDecimal.ZERO;
+		BigDecimal taxAmt = BigDecimal.ZERO;
+		//BigDecimal taxAmt = getTaxAmountToCalculateRebateOnApplicables(demand, payments);
+		//Assumtion: Partial payment is not allowed 
+		for (DemandDetail demandDetail : demand.getDemandDetails()) {
+			if (demandDetail.getTaxHeadMasterCode().equalsIgnoreCase("PT_TAX")) {
+					taxAmt = demandDetail.getTaxAmount();
+			}
+		}
+		if(taxAmt.compareTo(BigDecimal.ZERO)>0 && rebate2.compareTo(BigDecimal.ZERO)>0 )
+		{
+			taxAmt=taxAmt.subtract(rebate2);
+		}
+		long currentTime = Calendar.getInstance().getTimeInMillis();
+		int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+		int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+		String currentFinancialYear = currentMonth < 4 ? (currentYear - 1) + "-" + currentYear
+				: currentYear + "-" + (currentYear + 1);
+
+		Calendar fromCalendar = Calendar.getInstance();
+		fromCalendar.setTimeInMillis(demand.getTaxPeriodFrom());
+		int fromYear = fromCalendar.get(Calendar.YEAR);
+		Calendar toCalendar = Calendar.getInstance();
+		toCalendar.setTimeInMillis(demand.getTaxPeriodTo());
+		int toYear = toCalendar.get(Calendar.YEAR);
+		String demandFinancialYear = fromYear + "-" + toYear;
+		
+		if (currentFinancialYear.equals(demandFinancialYear)) {
+
+			for (Object rebate : rebateMasterList) {
+				Map<String, Object> rebateMap = (Map<String, Object>) rebate;
+				if ((long) rebateMap.get("startingDay") < currentTime && currentTime < (long) rebateMap.get("endingDay")
+						&& rebateMap.get("rate") != null) {
+					rebateAmt = taxAmt.multiply(BigDecimal.valueOf(Double.valueOf(rebateMap.get("rate").toString())))
+							.divide(HUNDRED);
+				}
+			}
+		}
+		
+		
+		
 		return rebateAmt;
 	}
 
