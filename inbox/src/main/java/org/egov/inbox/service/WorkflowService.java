@@ -8,10 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.request.Role;
 import org.egov.inbox.config.InboxConfiguration;
 import org.egov.inbox.repository.ServiceRequestRepository;
+import org.egov.inbox.util.BpaConstants;
 import org.egov.inbox.util.ErrorConstants;
 import org.egov.inbox.util.FSMConstants;
 import org.egov.inbox.web.model.RequestInfoWrapper;
@@ -70,28 +73,48 @@ public class WorkflowService {
 		return processCount;
 	}
 	
-	public List<HashMap<String, Object>> getProcessStatusCount( RequestInfo requestInfo, ProcessInstanceSearchCriteria criteria) {
-		List<String> listOfBusinessServices = new ArrayList<>(criteria.getBusinessService());
-		List<HashMap<String, Object>> finalResponse = null;
-		for(String businessSrv : listOfBusinessServices) {
-			criteria.setBusinessService(Collections.singletonList(businessSrv));
-			StringBuilder url = new StringBuilder(config.getWorkflowHost());
-			url.append(config.getProcessStatusCountPath());
-			criteria.setIsProcessCountCall(true);
-			url = this.buildWorkflowUrl(criteria, url, Boolean.FALSE);
-            if(requestInfo.getUserInfo().getRoles().get(0).getCode().equals(FSMConstants.FSM_DSO)) {
-            	url.append("&assignee=").append( requestInfo.getUserInfo().getUuid());
+        public List<HashMap<String, Object>> getProcessStatusCount(RequestInfo requestInfo,
+                ProcessInstanceSearchCriteria criteria) {
+            List<String> listOfBusinessServices = new ArrayList<>(criteria.getBusinessService());
+            List<HashMap<String, Object>> finalResponse = null;
+            for (String businessSrv : listOfBusinessServices) {
+                criteria.setBusinessService(Collections.singletonList(businessSrv));
+                StringBuilder url = new StringBuilder(config.getWorkflowHost());
+                url.append(config.getProcessStatusCountPath());
+                criteria.setIsProcessCountCall(true);
+                // For BPA having large request, so that it was sending from the body
+                List<String> roles = requestInfo.getUserInfo().getRoles().stream().map(Role::getCode).collect(Collectors.toList());
+                if ((!ObjectUtils.isEmpty(criteria.getModuleName()) && !criteria.getModuleName().equalsIgnoreCase(BpaConstants.BPA)) 
+                        || (!ObjectUtils.isEmpty(criteria.getModuleName()) && 
+                        		criteria.getModuleName().equalsIgnoreCase(BpaConstants.BPA) && !roles.contains(BpaConstants.CITIZEN)))
+                    url = this.buildWorkflowUrl(criteria, url, Boolean.FALSE);
+                if (requestInfo.getUserInfo().getRoles().get(0).getCode().equals(FSMConstants.FSM_DSO)) {
+                    url.append("&assignee=").append(requestInfo.getUserInfo().getUuid());
+                }
+                
+                if (criteria != null && !ObjectUtils.isEmpty(criteria.getModuleName()) && criteria.getModuleName().equalsIgnoreCase(BpaConstants.BPA)
+                        && roles.contains(BpaConstants.CITIZEN)) {
+                    List<String> inputBusinessSrvs = new ArrayList<>(criteria.getBusinessService());
+                    criteria.setBusinessService(null);
+                    Map<String, Object> statusRequest = new HashMap<>();
+                    statusRequest.put("RequestInfo", requestInfo);
+                    statusRequest.put("ProcessInstanceSearchCriteria", criteria);
+                    finalResponse = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, statusRequest);
+                    criteria.setBusinessService(inputBusinessSrvs);
+                } else {
+                    RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
+                    if (finalResponse == null) {
+                        finalResponse = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url,
+                                requestInfoWrapper);
+                    } else {
+                        finalResponse.addAll(
+                                (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper));
+                    }
+                }
             }
-			RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-			if(finalResponse == null) {
-				finalResponse = (List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper);
-			}else{
-				finalResponse.addAll((List<HashMap<String, Object>>) serviceRequestRepository.fetchListResult(url, requestInfoWrapper));
-			}
-		}
-		criteria.setBusinessService(listOfBusinessServices);
-		return finalResponse;
-	}
+            criteria.setBusinessService(listOfBusinessServices);
+            return finalResponse;
+        }
 	
 	public ProcessInstanceResponse getProcessInstance(ProcessInstanceSearchCriteria criteria, RequestInfo requestInfo) {
 		StringBuilder url = new StringBuilder(config.getWorkflowHost());

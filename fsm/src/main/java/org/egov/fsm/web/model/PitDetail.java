@@ -1,5 +1,8 @@
 package org.egov.fsm.web.model;
 
+import javax.validation.constraints.DecimalMax;
+
+import org.hibernate.validator.constraints.SafeHtml;
 import org.springframework.validation.annotation.Validated;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,9 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.Max;
 
 /**
  * cature the pit details 
@@ -29,13 +29,16 @@ import javax.validation.constraints.Max;
 @Getter
 @Setter
 public class PitDetail   {
-	
+ 
+  @SafeHtml
   @JsonProperty("type")
   private String type = null;
 
+  @SafeHtml
   @JsonProperty("id")
   private String id = null;
 
+  @SafeHtml
   @JsonProperty("tenantId")
   private String tenantId = null;
   
@@ -60,4 +63,8 @@ public class PitDetail   {
 
   @JsonProperty("auditDetails")
   private AuditDetails auditDetails = null;
+  
+  @JsonProperty("additionalDetails")
+  private Object additionalDetails ;
+  
 }

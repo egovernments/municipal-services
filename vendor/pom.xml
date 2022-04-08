@@ -11,11 +11,12 @@
 	</parent>
 	<groupId>org.egov.vendor</groupId>
 	<artifactId>vendor</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<name>vendor</name>
 	<description>vendor services</description>
 
 	<properties>
+		<log4j2.version>2.17.1</log4j2.version>
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -26,6 +27,16 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.10.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.16.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

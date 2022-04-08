@@ -284,7 +284,6 @@ public class UserService {
 		
 		if (!StringUtils.isEmpty(owner.getMobileNumber())) {
 			ownerSearchRequest.setMobileNumber(owner.getMobileNumber());
-			ownerSearchRequest.setUserName(owner.getMobileNumber());
 		}
 		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
 		UserDetailResponse vendorDetailResponse = ownerCall(ownerSearchRequest, uri);
@@ -430,4 +429,18 @@ public class UserService {
 		
 		return Boolean.TRUE;
 	}
+	
+	public UserDetailResponse  searchUsersByCriteria(UserSearchRequest userSearchRequest) {
+		
+		StringBuilder uri = new StringBuilder(config.getUserHost()).append(config.getUserSearchEndpoint());
+		UserDetailResponse ownerDetailResponse = ownerCall(userSearchRequest, uri);
+		
+		if (ownerDetailResponse != null && ownerDetailResponse.getUser() != null
+				&& ownerDetailResponse.getUser().size() > 0) {
+			return ownerDetailResponse;
+		}else {
+			return null;
+		}
+	}
+
 }

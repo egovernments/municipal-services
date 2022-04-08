@@ -30,25 +30,28 @@ import lombok.ToString;
 @Builder
 public class Vehicle {
 
+    @SafeHtml
     @JsonProperty("id")
     private String id = null;
 
 	@Size(max=64)
+    @SafeHtml
     @JsonProperty("tenantId")
     private String tenantId = null;
 
     @NonNull
+    @SafeHtml
 	@Size(max=64)
     @JsonProperty("registrationNumber")
     private String registrationNumber  = null;
 
-    @NonNull
     @SafeHtml
 	@Size(max=64)
     @JsonProperty("model")
     private String model = null;
 
     @NonNull
+    @SafeHtml
 	@Size(max=64)
     @JsonProperty("type")
     private String type = null;
@@ -57,8 +60,13 @@ public class Vehicle {
     @JsonProperty("tankCapacity")
     private Double tankCapacity;
     
+    @SafeHtml
     @JsonProperty("suctionType")
     private String suctionType = null;
+    
+    @SafeHtml
+    @JsonProperty("vehicleOwner")
+    private String vehicleOwner = null;
 
     @JsonProperty("pollutionCertiValidTill")
     private Long pollutionCertiValidTill;
@@ -78,11 +86,13 @@ public class Vehicle {
     @JsonProperty("additionalDetails")
     private Object additionalDetails = null;
 
+    @SafeHtml
     @JsonProperty("source")
     private String source = null;
-    
+
+    @SafeHtml
     @JsonProperty("ownerId")
-    private String ownerId = null;
+    private String ownerId = null; 
 
     public enum StatusEnum {
         ACTIVE("ACTIVE"),
