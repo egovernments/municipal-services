@@ -515,8 +515,10 @@ public class EstimationService {
 		 else {
 	
 			currentUnitTax = BigDecimal.valueOf(unit.getUnitArea() * slab.getUnitRate());
-			if(assessmentYear.startsWith("2021-") || assessmentYear.startsWith("2022-"))
+			if(assessmentYear.startsWith("2021-") )
 				currentUnitTax=currentUnitTax.multiply(new BigDecimal("1.05"));
+			else if (assessmentYear.startsWith("2022-"))
+				currentUnitTax=currentUnitTax.multiply(new BigDecimal("1.1025"));
 		}
 		
 		return currentUnitTax;
@@ -1473,17 +1475,20 @@ public class EstimationService {
 					unBuiltRateCalc.put(unit, BigDecimal.ZERO);
 				} else {
 					if (unBuiltAreaProrated) {
-						if(assessmentYear.startsWith("2021-") || assessmentYear.startsWith("2022-")) {
-						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)*1.05));
-					} else
-						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)));
+						if(assessmentYear.startsWith("2021-") ) 
+						   unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)*1.05));
+						else if( assessmentYear.startsWith("2022-"))
+						   unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)*1.1025));
+						else
+						   unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() * unit.getUnitArea() / groundUnitsArea) * (diffArea)));
 					}
 						else {  
-						if(assessmentYear.startsWith("2021-") || assessmentYear.startsWith("2022-")) {
+						if(assessmentYear.startsWith("2021-") ) 
 							unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)*1.05));
-						}  
+						else if(assessmentYear.startsWith("2022-"))
+							unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)*1.1025));
 						else
-						unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)));
+						    unBuiltRateCalc.put(unit, BigDecimal.valueOf((slab.getUnBuiltUnitRate() / groundUnits.size()) * (diffArea)));
 					}
 				}
 			}
