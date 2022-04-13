@@ -4,6 +4,7 @@ import { mergeSearchResults, searchByMobileNumber } from "../utils/search";
 import isEmpty from "lodash/isEmpty";
 import get from "lodash/get";
 import some from "lodash/some";
+import keys from "lodash/keys";
 import { actions } from "../utils/search";
 import { validateFireNOCSearchModel } from "../utils/modelValidation";
 import envVariables from "../envVariables";
@@ -27,8 +28,8 @@ export const searchApiResponse = async (request, next = {}) => {
     FireNOCs: []
   };
   const queryObj = JSON.parse(JSON.stringify(request.query));
-  console.log("request", request.query);
-  console.log("Query object:"+JSON.stringify(queryObj));
+  //console.log("request", request.query);
+  //console.log("Query object:"+JSON.stringify(queryObj));
   let errors = validateFireNOCSearchModel(queryObj);
   if (errors.length > 0) {
     next({
@@ -40,9 +41,9 @@ export const searchApiResponse = async (request, next = {}) => {
     });
     return;
   }
-  // console.log(queryObj);
+  console.log(queryObj);
   let text =
-    "SELECT FN.uuid as FID,FN.tenantid,FN.fireNOCNumber,FN.islegacy,FN.provisionfirenocnumber,FN.oldfirenocnumber,FN.dateofapplied,FN.createdBy,FN.createdTime,FN.lastModifiedBy,FN.lastModifiedTime,FD.uuid as firenocdetailsid,FD.action,FD.applicationnumber,FD.fireNOCType,FD.applicationdate,FD.financialYear,FD.firestationid,FD.issuedDate,FD.validFrom,FD.validTo,FD.action,FD.status,FD.channel,FD.propertyid,FD.noofbuildings,FD.additionaldetail,FBA.uuid as puuid,FBA.doorno as pdoorno,FBA.latitude as platitude,FBA.longitude as plongitude,FBA.buildingName as pbuildingname,FBA.addressnumber as paddressnumber,FBA.pincode as ppincode,FBA.locality as plocality,FBA.landmark as landmark, FBA.addressline2,FBA.city as pcity, FBA.areatype as pareatype, FBA.subdistrict as psubdistrict, FBA.street as pstreet,FB.uuid as buildingid ,FB.name as buildingname,FB.usagetype,FB.usagesubtype,FB.leftsurrounding,FB.rightsurrounding,FB.frontsurrounding,FB.backsurrounding,FB.landarea,FB.totalcoveredarea,FB.parkingarea,FO.uuid as ownerid,FO.ownertype,FO.useruuid,FO.relationship,FUOM.uuid as uomuuid,FUOM.code,FUOM.value,FUOM.activeuom,FBD.uuid as documentuuid,FUOM.active,FBD.documentType,FBD.filestoreid,FBD.documentuid,FBD.createdby as documentCreatedBy,FBD.lastmodifiedby as documentLastModifiedBy,FBD.createdtime as documentCreatedTime,FBD.lastmodifiedtime as documentLastModifiedTime FROM eg_fn_firenoc FN JOIN eg_fn_firenocdetail FD ON (FN.uuid = FD.firenocuuid) JOIN eg_fn_address FBA ON (FD.uuid = FBA.firenocdetailsuuid) JOIN eg_fn_owner FO ON (FD.uuid = FO.firenocdetailsuuid) JOIN eg_fn_buidlings FB ON (FD.uuid = FB.firenocdetailsuuid) JOIN eg_fn_buildinguoms FUOM ON (FB.uuid = FUOM.buildinguuid) LEFT OUTER JOIN eg_fn_buildingdocuments FBD on(FB.uuid = FBD.buildinguuid)";
+    " SELECT * FROM (SELECT FN.uuid as FID,FN.tenantid,FN.fireNOCNumber,FN.provisionfirenocnumber,FN.oldfirenocnumber,FN.dateofapplied,FN.createdBy,FN.createdTime,FN.lastModifiedBy,FN.lastModifiedTime,FD.uuid as firenocdetailsid,FD.action,FD.applicationnumber,FD.fireNOCType,FD.applicationdate,FD.financialYear,FD.firestationid,FD.issuedDate,FD.validFrom,FD.validTo,FD.action,FD.status,FD.channel,FD.propertyid,FD.noofbuildings,FD.additionaldetail,FBA.uuid as puuid,FBA.doorno as pdoorno,FBA.latitude as platitude,FBA.longitude as plongitude,FBA.buildingName as pbuildingname,FBA.addressnumber as paddressnumber,FBA.pincode as ppincode,FBA.locality as plocality,FBA.city as pcity,FBA.street as pstreet,FB.uuid as buildingid ,FB.name as buildingname,FB.usagetype,FO.uuid as ownerid,FO.ownertype,FO.applicantcategory,FO.useruuid,FO.relationship,FUOM.uuid as uomuuid,FUOM.code,FUOM.value,FUOM.activeuom,FBD.uuid as documentuuid,FUOM.active,FBD.documentType,FBD.filestoreid,FBD.documentuid,FBD.createdby as documentCreatedBy,FBD.lastmodifiedby as documentLastModifiedBy,FBD.createdtime as documentCreatedTime,FBD.lastmodifiedtime as documentLastModifiedTime,DENSE_RANK () OVER(ORDER BY FN.uuid) rn FROM eg_fn_firenoc FN JOIN eg_fn_firenocdetail FD ON (FN.uuid = FD.firenocuuid) JOIN eg_fn_address FBA ON (FD.uuid = FBA.firenocdetailsuuid) JOIN eg_fn_owner FO ON (FD.uuid = FO.firenocdetailsuuid) JOIN eg_fn_buidlings FB ON (FD.uuid = FB.firenocdetailsuuid) JOIN eg_fn_buildinguoms FUOM ON (FB.uuid = FUOM.buildinguuid) LEFT OUTER JOIN eg_fn_buildingdocuments FBD on(FB.uuid = FBD.buildinguuid) ";
   // FBD.active=true AND FO.active=true AND FUOM.active=true AND";
   //if citizen
   const roles = get(request.body, "RequestInfo.userInfo.roles");
@@ -50,21 +51,32 @@ export const searchApiResponse = async (request, next = {}) => {
   const isUser = some(roles, { code: "CITIZEN" }) && userUUID;
   if (isUser) {
     const mobileNumber = get(request.body, "RequestInfo.userInfo.mobileNumber");
-    const tenantId = get(request.body, "RequestInfo.userInfo.tenantId");
-    console.log("mobileNumber", mobileNumber);
-    console.log("tenedrIDD", tenantId);
-    text = `${text} where (FN.createdby = '${userUUID}' OR`;
+    const tenantId = envVariables.EGOV_DEFAULT_STATE_ID;
+    
+    
+    //text = `${text} where (FN.createdby = '${userUUID}' OR`;    
     // text = `${text} where FN.createdby = '${userUUID}' OR`;
     queryObj.mobileNumber = queryObj.mobileNumber
       ? queryObj.mobileNumber
       : mobileNumber;
     queryObj.tenantId = queryObj.tenantId ? queryObj.tenantId : tenantId;
+    //console.log("mobileNumber", mobileNumber);
+    //console.log("tenedrIDD", tenantId);
+
+    if(queryObj.tenantId == envVariables.EGOV_DEFAULT_STATE_ID)
+      text = `${text} where FN.tenantid LIKE '${queryObj.tenantId}%' AND`;
+    else
+      text = `${text} where FN.tenantid = '${queryObj.tenantId}' AND`;
   } else {
-    if (!isEmpty(queryObj)) {
+    if (!isEmpty(queryObj) && !(keys(queryObj).length==2 && 
+    queryObj.hasOwnProperty("offset") && queryObj.hasOwnProperty("limit"))) {
       text = text + " where ";
     }
     if (queryObj.tenantId) {
-      text = `${text} FN.tenantid = '${queryObj.tenantId}' AND`;
+      if(queryObj.tenantId == envVariables.EGOV_DEFAULT_STATE_ID)
+        text = `${text} FN.tenantid LIKE '${queryObj.tenantId}%' AND`;
+      else
+        text = `${text} FN.tenantid = '${queryObj.tenantId}' AND`;
     }
   }
   // if (queryObj.status) {
@@ -79,34 +91,49 @@ export const searchApiResponse = async (request, next = {}) => {
       envVariables.EGOV_DEFAULT_STATE_ID
     );
     // console.log(userSearchResponse);
-    let users= get(userSearchResponse, "user");
-
-    let searchUserUUID='';
-    
-    if(users.length>1){
-      users.forEach((user,i)=>{
-        if(i!=users.length-1){
-          searchUserUUID=searchUserUUID+`'${user.uuid}',`
-        }else{
-          searchUserUUID=searchUserUUID+`'${user.uuid}'`
-        }   
-      })
-
-    }else{
-      searchUserUUID=`'${users[0].uuid}'`;
-    }
+    let searchUserUUID = get(userSearchResponse, "user.0.uuid");
     // if (searchUserUUID) {
     //   // console.log(searchUserUUID);
-   
-      sqlQuery = `${sqlQuery} FO.useruuid='${queryObj.mobileNumber}' or FO.useruuid in (${searchUserUUID})`;
-      
-      if(isUser){
-        sqlQuery=sqlQuery+`) AND`;
-      }else{
-        sqlQuery=sqlQuery+` AND`;
-      }
-     
-   
+    var userSearchResponseJson = JSON.parse(JSON.stringify(userSearchResponse));  
+    var userUUIDArray =[];
+    for(var i =0;i<userSearchResponseJson.user.length;i++){
+      userUUIDArray.push(userSearchResponseJson.user[i].uuid);
+    }
+    /*
+    if (isUser) {
+      sqlQuery = `${sqlQuery} FO.useruuid='${searchUserUUID ||
+        queryObj.mobileNumber}') AND`;
+    } else {
+        sqlQuery = `${sqlQuery} FO.useruuid in (`;
+        if(userUUIDArray.length > 0){
+          for(var j =0;j<userUUIDArray.length;j++){
+            if(j==0)
+              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
+
+            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
+          }      
+        }
+        else
+          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
+
+        sqlQuery = `${sqlQuery}) AND`;  
+    }*/
+
+    sqlQuery = `${sqlQuery} FO.useruuid in (`;
+        if(userUUIDArray.length > 0){
+          for(var j =0;j<userUUIDArray.length;j++){
+            if(j==0)
+              sqlQuery = `${sqlQuery}'${userUUIDArray[j]}'`;
+
+            sqlQuery = `${sqlQuery}, '${userUUIDArray[j]}'`;
+          }      
+        }
+        else
+          sqlQuery = `${sqlQuery}'${queryObj.mobileNumber}'`;
+
+        sqlQuery = `${sqlQuery}) AND`;  
+
+
     // }
   }
   if (queryObj.hasOwnProperty("ids")) {
@@ -129,59 +156,58 @@ export const searchApiResponse = async (request, next = {}) => {
           item != "tenantId" &&
           // item != "status" &&
           item != "ids" &&
-          item != "mobileNumber"
+          item != "mobileNumber" &&
+          item != "offset" &&
+          item != "limit"
         ) {
+          queryObj[item]=queryObj[item].toUpperCase();
           sqlQuery = `${sqlQuery} ${item}='${queryObj[item]}' AND`;
         }
       }
     });
   }
 
-  if(queryObj.hasOwnProperty("city"))
-{     
-
-  sqlQuery=`${sqlQuery}  FBA.city='${queryObj.city}' AND`;
-
-}
-
-
-if(queryObj.hasOwnProperty("fireNOCType"))
-{     
-
-  sqlQuery=`${sqlQuery}  FD.firenoctype='${queryObj.fireNOCType}' AND`;
-
-}
-
-
-if(queryObj.hasOwnProperty("areaType"))
-{     
-
-  sqlQuery=`${sqlQuery}  FBA.areatype='${queryObj.areaType}' AND`;
-
-}
-
-if(queryObj.hasOwnProperty("subDistrict"))
-{     
-
-  sqlQuery=`${sqlQuery}  FBA.subdistrict='${queryObj.subDistrict}' AND`;
-
-}
-
-
   if (
     queryObj.hasOwnProperty("fromDate") &&
     queryObj.hasOwnProperty("toDate")
   ) {
-    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} AND FN.createdtime <= ${queryObj.toDate} ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} AND FN.createdtime <= ${queryObj.toDate} `;
   } else if (
     queryObj.hasOwnProperty("fromDate") &&
     !queryObj.hasOwnProperty("toDate")
   ) {
-    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} ORDER BY FN.uuid`;
-  } else if (!isEmpty(queryObj)) {
-    sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} `;
   }
-  console.log("SQL Query:" +sqlQuery);
+
+  
+  
+
+  if (!isEmpty(queryObj) && ( queryObj.hasOwnProperty("limit" || queryObj.hasOwnProperty("offset")))) {
+    let offset =0;
+    let limit =10;
+    if( queryObj.hasOwnProperty("offset") ){
+      offset = queryObj.offset*1;
+      
+   }
+  if( queryObj.hasOwnProperty("limit") ){
+    limit = (queryObj.limit*1)+offset;
+ }
+ if( offset !=0){
+  offset = offset+1;
+}
+ if(keys(queryObj).length!=2){
+  sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ) s WHERE s.rn  BETWEEN ${offset} AND ${limit+offset}   `;
+ }else{
+  sqlQuery = `${sqlQuery}  ) s WHERE s.rn  BETWEEN ${offset} AND ${limit} ORDER BY fid `;
+ }
+  
+}else if(isEmpty(queryObj)){
+  sqlQuery = `${sqlQuery}  ) s`;
+}else if(!isEmpty(queryObj)){
+  sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)}  ) s ORDER BY fid `;
+}
+
+  console.log("SQL QUery:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
   //console.log("dbResponse"+JSON.stringify(dbResponse));
   if (dbResponse.err) {
