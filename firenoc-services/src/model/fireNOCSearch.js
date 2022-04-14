@@ -32,14 +32,15 @@ const FireNOCSearchRequest = {
     fireNOCType: {
       type: "string"
     },
-    offset: {
-      type: "string",
-      pattern: "[0-9]"
+    city:{
+      type:"string"
     },
-    limit: {
-      type: "string",
-      pattern: "[0-9]"
-    }
+subDistrict:{
+  type:"string"
+},
+areaType:{
+  type:"string"
+}
   },
   // required: ["tenantId"]
 };
