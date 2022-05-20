@@ -496,7 +496,7 @@ public class PGRUtils {
 			if (roles.contains(currentValue))
 				return currentValue;
 		}
-		return null;
+		return  PGRConstants.ROLE_GRO;
 	}
 
 	/**
