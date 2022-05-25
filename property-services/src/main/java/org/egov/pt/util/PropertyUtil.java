@@ -138,9 +138,9 @@ public class PropertyUtil extends CommonUtils {
 			case CREATE :
 				if(property.getSource().equals(Source.WATER_CHARGES)){
 					JSONObject response=getWnsPTworkflowConfig(request);
-//					wf.setBusinessService(response.get("businessService").toString());
+					wf.setBusinessService(response.get("businessService").toString());
 					wf.setModuleName(configs.getPropertyModuleName());
-//					wf.setAction(response.get("initialAction").toString());
+					wf.setAction(response.get("initialAction").toString());
 				}
 				else{
 					wf.setBusinessService(configs.getCreatePTWfName());
@@ -271,12 +271,12 @@ public class PropertyUtil extends CommonUtils {
 		List<String> masterName = Arrays.asList( "PTWorkflow");
 		Map<String, List<String>> codes = getAttributeValues(configs.getStateLevelTenantId(), PTConstants.MDMS_PT_MOD_NAME,masterName , "$.*",PTConstants.JSONPATH_CODES, request.getRequestInfo());
 		JSONObject obj = new JSONObject(codes);
-//		JSONArray configArray = obj.getJSONArray("PTWorkflow");
+		JSONArray configArray = obj.getJSONArray("PTWorkflow");
 		JSONObject response = new JSONObject();
-//		for(int i=0;i<configArray.length();i++){
-//			if(configArray.getJSONObject(i).getBoolean("enable"))
-//				response=configArray.getJSONObject(i);
-//		}
+		for(int i=0;i<configArray.length();i++){
+			if(configArray.getJSONObject(i).getBoolean("enable"))
+				response=configArray.getJSONObject(i);
+		}
 		return response;
 	}
 
