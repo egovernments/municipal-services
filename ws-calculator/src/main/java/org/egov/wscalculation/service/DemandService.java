@@ -1,5 +1,6 @@
 package org.egov.wscalculation.service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,10 +51,14 @@ import org.egov.wscalculation.web.models.TaxPeriod;
 import org.egov.wscalculation.web.models.WaterConnection;
 import org.egov.wscalculation.web.models.WaterConnectionRequest;
 import org.egov.wscalculation.web.models.WaterDetails;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -113,9 +118,11 @@ public class DemandService {
 	 * @param requestInfo  The RequestInfo of the calculation request
 	 * @param calculations The Calculation Objects for which demand has to be
 	 *                     generated or updated
+	 * @throws IOException 
+	 * @throws JsonMappingException 
 	 */
 	public List<Demand> generateDemand(CalculationReq request, List<Calculation> calculations,
-			Map<String, Object> masterMap, boolean isForConnectionNo) {
+			Map<String, Object> masterMap, boolean isForConnectionNo)  {
 //		@SuppressWarnings("unchecked")
 //		Map<String, Object> financialYearMaster = (Map<String, Object>) masterMap
 //				.get(WSCalculationConstant.BILLING_PERIOD);
@@ -135,8 +142,8 @@ public class DemandService {
 			Long toDateSearch = null;
 			Set<String> consumerCodes;
 			if (isForConnectionNo) {
-				fromDateSearch = request.getTaxPeriodFrom();
-				toDateSearch = request.getTaxPeriodTo();
+				fromDateSearch = request.getCalculationCriteria().get(0).getFrom();
+				toDateSearch = request.getCalculationCriteria().get(0).getTo();
 				consumerCodes = calculations.stream().map(calculation -> calculation.getConnectionNo())
 						.collect(Collectors.toSet());
 			} else {
@@ -164,7 +171,7 @@ public class DemandService {
 		List<Demand> createdDemands = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(createCalculations))
 			createdDemands = createDemand(request.getRequestInfo(), createCalculations, masterMap, isForConnectionNo,
-					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
+					request.getCalculationCriteria().get(0).getFrom(),request.getCalculationCriteria().get(0).getTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations)) {
 			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
@@ -242,6 +249,8 @@ public class DemandService {
 	 * @param calculations List of Calculation
 	 * @param masterMap    Master MDMS Data
 	 * @return Returns list of demands
+	 * @throws IOException 
+	 * @throws JsonMappingException 
 	 */
 	private List<Demand> createDemand(RequestInfo requestInfo, List<Calculation> calculations,
 			Map<String, Object> masterMap, boolean isForConnectionNO, long taxPeriodFrom, long taxPeriodTo) {
@@ -290,12 +299,25 @@ public class DemandService {
 			BigDecimal minimumPayableAmount = calculation.getTotalAmount();
 			String businessService = isForConnectionNO ? configs.getBusinessService()
 					: WSCalculationConstant.ONE_TIME_FEE_SERVICE_FIELD;
-
+			ObjectMapper  obj=new ObjectMapper ();	
+			
+			String json = "{ \"connectionType\" : \""+ connection.getConnectionType()+"\"}";
+			JsonNode additionalDetail = null;
+			try {
+				additionalDetail = obj.readTree(json);
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			addRoundOffTaxHead(calculation.getTenantId(), demandDetails);
 			Demand demand = Demand.builder().consumerCode(consumerCode).demandDetails(demandDetails).payer(owner)
 						.minimumAmountPayable(minimumPayableAmount).tenantId(tenantId).taxPeriodFrom(taxPeriodFrom)
 						.taxPeriodTo(taxPeriodTo).consumerType("waterConnection").businessService(businessService)
-						.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).build();
+						.status(StatusEnum.valueOf("ACTIVE")).billExpiryTime(expiryDaysInmillies).additionalDetails(additionalDetail).build();
 						
 			// For the metered connections demand has to create one by one
 			if (WSCalculationConstant.meteredConnectionType.equalsIgnoreCase(connection.getConnectionType())) {
