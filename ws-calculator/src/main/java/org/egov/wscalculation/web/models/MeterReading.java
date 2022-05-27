@@ -98,6 +98,7 @@ public class MeterReading {
 	@JsonProperty("consumption")
 	private Double consumption = null;
 
+	@Builder.Default
 	@JsonProperty("generateDemand")
 	private Boolean generateDemand = Boolean.TRUE;
 

@@ -174,7 +174,7 @@ public class DemandService {
 					request.getCalculationCriteria().get(0).getFrom(),request.getCalculationCriteria().get(0).getTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations)) {
-			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getTaxPeriodFrom(), request.getTaxPeriodTo(),
+			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getCalculationCriteria().get(0).getFrom(),request.getCalculationCriteria().get(0).getTo(),
 					isForConnectionNo);
 		}
 		return createdDemands;
@@ -758,6 +758,20 @@ public class DemandService {
 					if (!(demand.getPayer().getUuid().equalsIgnoreCase(owner.getUuid())))
 						demand.setPayer(owner);
 				}
+				ObjectMapper  obj=new ObjectMapper ();	
+				
+				String json = "{ \"connectionType\" : \""+ connection.getConnectionType()+"\"}";
+				JsonNode additionalDetail = null;
+				try {
+					additionalDetail = obj.readTree(json);
+				} catch (JsonMappingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				demand.setAdditionalDetails(additionalDetail);
 
 			}
 
