@@ -68,6 +68,8 @@ public class PropertyRepository {
 
 		List<Object> preparedStmtList = new ArrayList<>();
 		String query = queryBuilder.getPropertySearchQuery(criteria, preparedStmtList, isPlainSearch, false);
+		log.info("isPlainSearch::"+isPlainSearch+" isApiOpen:: "+isApiOpen+" :: Property search query::"+query);
+		log.info("preparedStmtList::"+preparedStmtList.toArray().toString());
 		if (isApiOpen)
 			return jdbcTemplate.query(query, preparedStmtList.toArray(), openRowMapper);
 		else

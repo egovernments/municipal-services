@@ -1,6 +1,7 @@
 package org.egov.pt.service;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +15,6 @@ import java.util.stream.Collectors;
 
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.pt.config.PropertyConfiguration;
-import org.egov.pt.models.Owner;
 import org.egov.pt.models.OwnerInfo;
 import org.egov.pt.models.Property;
 import org.egov.pt.models.PropertyCriteria;
@@ -36,12 +36,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import com.fasterxml.jackson.databind.JsonNode;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class PropertyService {
 
     @Autowired
@@ -408,7 +411,7 @@ public class PropertyService {
 	public List<Property> searchProperty(PropertyCriteria criteria, RequestInfo requestInfo) {
 
 		List<Property> properties;
-
+		log.info("PropertyCriteria::"+criteria);
 		/*
 		 * throw error if audit request is with no proeprty id or multiple propertyids
 		 */
@@ -420,6 +423,7 @@ public class PropertyService {
 
 
 		if(criteria.getDoorNo()!=null || criteria.getName()!=null || criteria.getOldPropertyId()!=null){
+			log.info("*******Fuzzy search call**********");
 			return fuzzySearchService.getProperties(requestInfo, criteria);
 		}
 
