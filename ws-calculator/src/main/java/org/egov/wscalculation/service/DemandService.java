@@ -919,7 +919,8 @@ public class DemandService {
 			log.info("Billing master data values for non metered connection:: {}", master);
 			List<WaterDetails> connectionNos = waterCalculatorDao.getConnectionsNoList(tenantId,
 					WSCalculationConstant.nonMeterdConnection, taxPeriodFrom, taxPeriodTo);
-
+			connectionNos.addAll(waterCalculatorDao.getConnectionsNoList(tenantId,
+					WSCalculationConstant.meteredConnectionType, taxPeriodFrom, taxPeriodTo));
 			//Generate bulk demands for connections in below count
 			int bulkSaveDemandCount = configs.getBulkSaveDemandCount() != null ? configs.getBulkSaveDemandCount() : 1;
 			log.info("Total Connections: {} and batch count: {}", connectionNos.size(), bulkSaveDemandCount);
