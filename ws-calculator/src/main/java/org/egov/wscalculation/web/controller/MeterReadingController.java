@@ -39,6 +39,8 @@ public class MeterReadingController {
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<MeterReadingResponse> createMeterReading(
 			@Valid @RequestBody MeterConnectionRequest meterConnectionRequest) {
+				meterConnectionRequest.getMeterReading().setGenerateDemand(Boolean.TRUE);
+
 		List<MeterReading> meterReadings = meterService.createMeterReading(meterConnectionRequest);
 		MeterReadingResponse response = MeterReadingResponse.builder().meterReadings(meterReadings).responseInfo(
 				responseInfoFactory.createResponseInfoFromRequestInfo(meterConnectionRequest.getRequestInfo(), true))
