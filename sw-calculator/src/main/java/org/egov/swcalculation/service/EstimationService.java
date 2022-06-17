@@ -166,6 +166,8 @@ public class EstimationService {
 		SewerageConnectionRequest sewerageConnectionRequest = SewerageConnectionRequest.builder()
 				.sewerageConnection(sewerageConnection).requestInfo(request.getRequestInfo()).build();
 		Property property = sWCalculationUtil.getProperty(sewerageConnectionRequest);
+		log.info("billingSlabMaster: "+billingSlabMaster);
+		log.info("mappingBillingSlab:"+mappingBillingSlab+"calculationAttribute: "+calculationAttribute+" calculationAttributeMaster {}:",calculationAttributeMaster);
 		List<BillingSlab> billingSlabs = getSlabsFiltered(sewerageConnectionRequest, mappingBillingSlab, calculationAttribute,
 				request.getRequestInfo(),property);
 
@@ -312,6 +314,12 @@ public class EstimationService {
 			boolean isConnectionTypeMatching = slab.getConnectionType().equalsIgnoreCase(connectionType);
 			boolean isCalculationAttributeMatching = slab.getCalculationAttribute()
 					.equalsIgnoreCase(calculationAttribute);
+			
+			log.info("BuildingTypeMatching: " + slab.getBuildingType() + "buildingType: " + buildingType +
+					"connectionType: " + connectionType + "calculationAttribute: " + calculationAttribute);
+
+			log.info("isBuildingTypeMatching: " +isBuildingTypeMatching+" isConnectionTypeMatching: "
+					+isConnectionTypeMatching+" isCalculationAttributeMatching: "+isCalculationAttributeMatching);
 			return isBuildingTypeMatching && isConnectionTypeMatching && isCalculationAttributeMatching;
 		}).collect(Collectors.toList());
 	}
