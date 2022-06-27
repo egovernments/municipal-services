@@ -27,11 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
 @Builder
 @RestController
+@Slf4j
 @RequestMapping("/wc")
 public class WaterController {
 
@@ -47,6 +49,9 @@ public class WaterController {
 	@RequestMapping(value = "/_create", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<WaterConnectionResponse> createWaterConnection(
 			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest, @RequestParam(required = false) boolean isMigration) {
+		
+				log.info("isMigration::::",isMigration);
+
 		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest,isMigration);
 		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnection)
 				.responseInfo(responseInfoFactory
