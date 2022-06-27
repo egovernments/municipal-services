@@ -35,10 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.egov.waterconnection.constants.WCConstants.APPROVE_CONNECTION;
 
 @Component
+@Slf4j
 public class WaterServiceImpl implements WaterService {
 
 	@Autowired
@@ -110,7 +112,10 @@ public class WaterServiceImpl implements WaterService {
 		userService.createUser(waterConnectionRequest);
 		// call work-flow
 		if (!isMigration)
+		{
+			log.info("Inside Workflow initiation Loop!!!!!");
 			wfIntegrator.callWorkFlow(waterConnectionRequest, property);
+		}		
 		waterDao.saveWaterConnection(waterConnectionRequest);
 		return Arrays.asList(waterConnectionRequest.getWaterConnection());
 	}
