@@ -50,7 +50,7 @@ public class WaterController {
 	public ResponseEntity<WaterConnectionResponse> createWaterConnection(
 			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest, @RequestParam(required = false) boolean isMigration) {
 		
-				log.info("isMigration::::",isMigration);
+				log.info("isMigration::::"+isMigration);
 
 		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest,isMigration);
 		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnection)
