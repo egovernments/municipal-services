@@ -51,6 +51,14 @@ public class WaterController {
 			@Valid @RequestBody WaterConnectionRequest waterConnectionRequest, @RequestParam(required = false) boolean isMigration) {
 		log.info("isMigration::::"+isMigration);
 		log.info("++++++++++++++++++==waterConnectionRequest++++++++++++++"+waterConnectionRequest);
+		if(waterConnectionRequest.getWaterConnection().getAdditionalDetails().toString().contains("isMigrated"))
+		{
+		 Object obj = waterConnectionRequest.getWaterConnection().getAdditionalDetails();
+		 JSONObject jo = (JSONObject) obj;
+		 isMigration=(boolean)jo.get("isMigrated");
+		log.info("updated isMigration::::"+isMigration);
+
+		}
 		List<WaterConnection> waterConnection = waterService.createWaterConnection(waterConnectionRequest,isMigration);
 		WaterConnectionResponse response = WaterConnectionResponse.builder().waterConnection(waterConnection)
 				.responseInfo(responseInfoFactory
