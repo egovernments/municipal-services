@@ -84,6 +84,8 @@ public class PropertyController {
         PropertyResponse response = PropertyResponse.builder().properties(properties).responseInfo(
                 responseInfoFactory.createResponseInfoFromRequestInfo(requestInfoWrapper.getRequestInfo(), true))
                 .build();
+	log.info("property found is==== "+response.getProperties().size());
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
    
