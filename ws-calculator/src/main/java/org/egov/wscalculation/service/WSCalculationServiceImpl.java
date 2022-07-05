@@ -313,7 +313,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		List<String> tenantIds = new ArrayList<>();
 		tenantIds.add("pb.fazilka");
 		tenantIds.add("pb.amritsar");
-
+tenantIds.add("pb.itpatiala");
 		if (tenantIds.isEmpty()) {
 			log.info("No tenants are found for generating demand");
 			return;
