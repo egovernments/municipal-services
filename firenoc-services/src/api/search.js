@@ -122,23 +122,23 @@ export const searchApiResponse = async (request, next = {}) => {
       }
     }
   }
-  if (queryKeys) {
-    queryKeys.forEach(item => {
-      if (queryObj[item]) {
-        if (
-          item != "fromDate" &&
-          item != "toDate" &&
-          item != "tenantId" &&
-          // item != "status" &&
-          item != "ids" &&
-          item != "mobileNumber"
-        ) {
-          sqlQuery = `${sqlQuery} ${item}='${queryObj[item]}' AND`;
-        }
-      }
-    });
-  }
-
+  // if (queryKeys) {
+  //   queryKeys.forEach(item => {
+  //     if (queryObj[item]) {
+  //       if (
+  //         item != "fromDate" &&
+  //         item != "toDate" &&
+  //         item != "tenantId" &&
+  //         // item != "status" &&
+  //         item != "ids" &&
+  //         item != "mobileNumber"
+  //       ) {
+  //         sqlQuery = `${sqlQuery} ${item} '${queryObj[item]}' AND`;
+  //       }
+  //     }
+  //   });
+  // }
+  
   if(queryObj.hasOwnProperty("city"))
 {     
 
