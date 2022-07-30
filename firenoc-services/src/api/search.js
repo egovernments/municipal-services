@@ -64,8 +64,16 @@ export const searchApiResponse = async (request, next = {}) => {
       text = text + " where ";
     }
     if (queryObj.tenantId) {
-      text = `${text} FN.tenantid  like '%${queryObj.tenantId}%' AND`;
-    }
+
+      if(queryObj.tenantId=="pb"){
+      
+        text = `${text} FN.tenantid  like '${queryObj.tenantId}%' AND`;
+      
+      }else{
+        text = `${text} FN.tenantid = '${queryObj.tenantId}' AND`;
+
+      }
+     }
   }
   console.log("sql update 0",sqlQuery);
 
@@ -126,19 +134,24 @@ export const searchApiResponse = async (request, next = {}) => {
   //   queryKeys.forEach(item => {
   //     if (queryObj[item]) {
   //       if (
-  //         item != "fromDate" &&
-  //         item != "toDate" &&
-  //         item != "tenantId" &&
-  //         // item != "status" &&
-  //         item != "ids" &&
-  //         item != "mobileNumber"
+  //       item != "fromDate" &&
+  //           item != "toDate" &&
+  //           item != "tenantId" &&
+  //           item != "status" &&
+  //          item != "ids" &&
+  //          item != "mobileNumber"
   //       ) {
-  //         sqlQuery = `${sqlQuery} ${item} '${queryObj[item]}' AND`;
-  //       }
+  //      sqlQuery = `${sqlQuery} ${item}= '${queryObj[item]}' AND`;
+  //      }
   //     }
-  //   });
+  //    });
   // }
-  
+
+  const offset= queryObj["offset"];
+  const limit = queryObj["limit"];
+  console.log('offset',offset);
+  console.log('limit',limit);
+
   if(queryObj.hasOwnProperty("city"))
 {     
 
@@ -183,7 +196,7 @@ console.log("sql update 1",sqlQuery);
   } else if (!isEmpty(queryObj)) {
     console.log("sql update 2",sqlQuery);
 
-    sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
+    sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid offset ${Number(offset)} limit ${Number(limit)}`;
     
   }
 
