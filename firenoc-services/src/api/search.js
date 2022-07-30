@@ -64,9 +64,11 @@ export const searchApiResponse = async (request, next = {}) => {
       text = text + " where ";
     }
     if (queryObj.tenantId) {
-      text = `${text} FN.tenantid = '${queryObj.tenantId}' AND`;
+      text = `${text} FN.tenantid  like '%${queryObj.tenantId}%' AND`;
     }
   }
+  console.log("sql update 0",sqlQuery);
+
   // if (queryObj.status) {
   //   queryObj.action = actions[queryObj.status];
   // }
@@ -167,7 +169,7 @@ if(queryObj.hasOwnProperty("subDistrict"))
 
 }
 
-
+console.log("sql update 1",sqlQuery);
   if (
     queryObj.hasOwnProperty("fromDate") &&
     queryObj.hasOwnProperty("toDate")
@@ -179,8 +181,12 @@ if(queryObj.hasOwnProperty("subDistrict"))
   ) {
     sqlQuery = `${sqlQuery} FN.createdtime >= ${queryObj.fromDate} ORDER BY FN.uuid`;
   } else if (!isEmpty(queryObj)) {
+    console.log("sql update 2",sqlQuery);
+
     sqlQuery = `${sqlQuery.substring(0, sqlQuery.length - 3)} ORDER BY FN.uuid`;
+    
   }
+
   console.log("SQL Query:" +sqlQuery);
   const dbResponse = await db.query(sqlQuery);
   //console.log("dbResponse"+JSON.stringify(dbResponse));
@@ -188,8 +194,7 @@ if(queryObj.hasOwnProperty("subDistrict"))
     console.log(err.stack);
   } else {
      //console.log(JSON.stringify(dbResponse.rows));
-    response.FireNOCs =
-      dbResponse.rows && !isEmpty(dbResponse.rows)
+    response.FireNOCs = dbResponse.rows && !isEmpty(dbResponse.rows)
         ? await mergeSearchResults(
             dbResponse.rows,
             request.query,
