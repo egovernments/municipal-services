@@ -201,7 +201,8 @@ public class SWCalculationServiceImpl implements SWCalculationService {
 		List<String> tenantIds = new ArrayList<>();
 		tenantIds.add("pb.fazilka");
 		tenantIds.add("pb.testing");
-
+		tenantIds.add("pb.amritsar");
+		tenantIds.add("pb.itpatiala");
 		if (tenantIds.isEmpty())
 			return;
 		log.info("Tenant Ids : " + tenantIds.toString());
