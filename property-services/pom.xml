@@ -121,9 +121,11 @@
 			<url>https://nexus-repo.egovernments.org/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
-	<headers>
+	<http>    
+    <headers>
         <frame-options policy="SAMEORIGIN"/>
     </headers>
+</http>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
