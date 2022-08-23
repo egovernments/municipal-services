@@ -152,20 +152,20 @@ public class TLRepository {
 	 */
     public List<String> fetchTradeLicenseIds(TradeLicenseSearchCriteria criteria){
 
-    	String query ="SELECT id from eg_tl_tradelicense";
+    	String query ="SELECT id from eg_tl_tradelicense ";
         List<Object> preparedStmtList = new ArrayList<>();
         preparedStmtList.add(criteria.getOffset());
         preparedStmtList.add(criteria.getLimit());
         
         if(!StringUtils.isEmpty(criteria.getTenantId())) {
         	System.out.println(criteria.getTenantId());
-        	query=query+"where tenantid="+criteria.getTenantId();
+        	query=query+" where tenantid="+criteria.getTenantId();
         }
         
         query=query+" ORDER BY createdtime offset " +
                 " ? " +
-                "limit ? ";
-	 System.out.println(query);
+                " limit ? ";
+	 System.out.println("SQL : "+query);
       /*  "SELECT id from eg_tl_tradelicense ORDER BY createdtime offset " +
         " ? " +
         "limit ? "*/
