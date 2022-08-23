@@ -157,14 +157,15 @@ public class TLRepository {
         preparedStmtList.add(criteria.getOffset());
         preparedStmtList.add(criteria.getLimit());
         
-        if(StringUtils.isEmpty(criteria.getTenantId())) {
+        if(!StringUtils.isEmpty(criteria.getTenantId())) {
         	System.out.println(criteria.getTenantId());
         	query=query+"where tenantid="+criteria.getTenantId();
         }
         
-        query=query+"ORDER BY createdtime offset " +
+        query=query+" ORDER BY createdtime offset " +
                 " ? " +
                 "limit ? ";
+	 System.out.println(query);
       /*  "SELECT id from eg_tl_tradelicense ORDER BY createdtime offset " +
         " ? " +
         "limit ? "*/
