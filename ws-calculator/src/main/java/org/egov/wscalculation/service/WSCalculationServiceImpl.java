@@ -314,6 +314,7 @@ public class WSCalculationServiceImpl implements WSCalculationService {
 		tenantIds.add("pb.fazilka");
 		tenantIds.add("pb.amritsar");
 		tenantIds.add("pb.itpatiala");
+		tenantIds.add("pb.testing");
 		if (tenantIds.isEmpty()) {
 			log.info("No tenants are found for generating demand");
 			return;
