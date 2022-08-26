@@ -138,6 +138,7 @@ public class TLRepository {
         String query = queryBuilder.getTLPlainSearchQuery(criteria, preparedStmtList);
         log.info("Query: " + query);
         List<TradeLicense> licenses =  jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
+        System.out.println("PlainLicenseSearch 111:: "+licenses.size());
         sortChildObjectsById(licenses);
         return licenses;
     }
