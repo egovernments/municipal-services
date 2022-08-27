@@ -15,6 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import com.jayway.jsonpath.JsonPath;
+
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import static org.egov.tl.util.TLConstants.*;
@@ -65,18 +70,67 @@ public class EnrichmentService {
             switch (businessService) {
                 case businessService_TL:
                     //TLR Changes
-                       if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
+                    Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
+
+                    if(tradeLicense.getApplicationType() != null && tradeLicense.getApplicationType().toString().equals(TLConstants.APPLICATION_TYPE_RENEWAL)){
                         tradeLicense.setLicenseNumber(tradeLicenseRequest.getLicenses().get(0).getLicenseNumber());
-                        Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
-                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
-                        tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                       // tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                         tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
                     }else{
-                        Map<String, Long> taxPeriods = tradeUtil.getTaxPeriods(tradeLicense, mdmsData);
-
                         if (tradeLicense.getLicenseType().equals(TradeLicense.LicenseTypeEnum.PERMANENT) || tradeLicense.getValidTo() == null)
-                        	tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                         //   tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                             tradeLicense.setValidFrom(taxPeriods.get(TLConstants.MDMS_STARTDATE));
+                    }
+                    if(tradeLicense.getTradeLicenseDetail().getAdditionalDetail() !=null && tradeLicense.getTradeLicenseDetail().getAdditionalDetail().has("validityYears")){
+                    	
+                    if(tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==1)
+                    {
+                    	tradeLicense.setValidTo(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                    }
+                    if(tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==2)
+                    {
+                    	
+                    	Date date = new Date(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        		        String formattedFrom = format.format(date);
+        		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
+        		        Integer validTillYear=(year+1);
+        		        String formattedTo=formattedFrom.split("/")[0]+"/"+formattedFrom.split("/")[1]+"/"+validTillYear.toString()+ " "+formattedFrom.split(" ")[1];
+        		        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        		        Date dateE;
+						try {
+							dateE = df.parse(formattedTo);
+							long epoch = dateE.getTime();
+	                    	tradeLicense.setValidTo(epoch);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					
+                    }
+                    if(tradeLicense.getTradeLicenseDetail().getAdditionalDetail().get("validityYears").asInt()==3)
+                    {
+                    	
+                    	Date date = new Date(taxPeriods.get(TLConstants.MDMS_ENDDATE));
+                        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        		        String formattedFrom = format.format(date);
+        		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
+        		        Integer validTillYear=(year+2);
+        		        String formattedTo=formattedFrom.split("/")[0]+"/"+formattedFrom.split("/")[1]+"/"+validTillYear.toString()+ " "+formattedFrom.split(" ")[1];
+        		        SimpleDateFormat df = new SimpleDateFormat("dd/mm/yyyy HH:mm:ss");
+        		        Date dateE;
+						try {
+							dateE = df.parse(formattedTo);
+							long epoch = dateE.getTime();
+	                    	tradeLicense.setValidTo(epoch);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					
+                    }
                     }
                     
                     if (!CollectionUtils.isEmpty(tradeLicense.getTradeLicenseDetail().getAccessories())) {
@@ -622,4 +676,5 @@ public class EnrichmentService {
                     license.setAssignee(new LinkedList<>(assignes));
             }
     }
+
 }
