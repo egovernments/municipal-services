@@ -452,8 +452,10 @@ public class TradeLicenseService {
         List<String> ids = repository.fetchTradeLicenseIds(criteria);
         if (ids.isEmpty())
             return Collections.emptyList();
-
+        System.out.println("plainSearch ids :: "+ids.size() );
         TradeLicenseSearchCriteria newCriteria = TradeLicenseSearchCriteria.builder().ids(ids).build();
+        System.out.println("plainSearch newCriteria :: "+ newCriteria.toString() );
+        
         List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
         licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
         return licenses;

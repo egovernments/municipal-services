@@ -238,6 +238,7 @@ public class TLQueryBuilder {
         preparedStmtList.add(offset);
         preparedStmtList.add(limit+offset);
 
+        System.out.println("finalQuery :: "+finalQuery);
        return finalQuery;
     }
 
