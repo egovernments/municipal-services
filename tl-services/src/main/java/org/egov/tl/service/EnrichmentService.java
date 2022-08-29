@@ -92,7 +92,7 @@ public class EnrichmentService {
                     	
                     	Date date = new Date(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                         DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        		        format.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
         		        String formattedFrom = format.format(date);
         		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
         		        Integer validTillYear=(year+1);
@@ -114,7 +114,7 @@ public class EnrichmentService {
                     	
                     	Date date = new Date(taxPeriods.get(TLConstants.MDMS_ENDDATE));
                         DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        		        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        		        format.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
         		        String formattedFrom = format.format(date);
         		        Integer year=Integer.valueOf(formattedFrom.split(" ")[0].split("/")[2]);
         		        Integer validTillYear=(year+2);
