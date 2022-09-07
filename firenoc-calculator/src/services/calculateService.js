@@ -157,6 +157,8 @@ const calculateNOCFee = async (
     searchReqParam.areaSQYD=AREA_SQYD; searchReqParam.areaACRE=AREA_ACRE;
 
     const billingslabs = await searchService(searchReqParam, {}, pool);
+      console.log("billingslabs",billingslabs);
+
     //   let billingslabs = [];
     // const billingSlab = {};
 
