@@ -171,7 +171,7 @@ public class DemandService {
 		List<Demand> createdDemands = new ArrayList<>();
 		if (!CollectionUtils.isEmpty(createCalculations))
 			createdDemands = createDemand(request.getRequestInfo(), createCalculations, masterMap, isForConnectionNo,
-					request.getCalculationCriteria().get(0).getFrom(),request.getCalculationCriteria().get(0).getTo());
+					request.getTaxPeriodFrom(), request.getTaxPeriodTo());
 
 		if (!CollectionUtils.isEmpty(updateCalculations)) {
 			createdDemands = updateDemandForCalculation(request.getRequestInfo(), updateCalculations, request.getCalculationCriteria().get(0).getFrom(),request.getCalculationCriteria().get(0).getTo(),
