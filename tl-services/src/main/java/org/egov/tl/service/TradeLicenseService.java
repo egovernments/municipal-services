@@ -457,7 +457,9 @@ public class TradeLicenseService {
         System.out.println("plainSearch newCriteria :: "+ newCriteria.toString() );
         
         List<TradeLicense> licenses = repository.getPlainLicenseSearch(newCriteria);
+	     System.out.println("plainSearch TradeLicense count ***********  :: "+ licenses.size() );
         licenses = enrichmentService.enrichTradeLicenseSearch(licenses,newCriteria,requestInfo);
+	     System.out.println("plainSearch enrichmentService licenses count ***********  :: "+ licenses.size() );
         return licenses;
     }
 
