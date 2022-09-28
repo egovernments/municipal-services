@@ -119,6 +119,7 @@ public class TLRepository {
         if(CollectionUtils.isEmpty(tradeLicenses))
             return;
         tradeLicenses.forEach(license -> {
+	try{
             license.getTradeLicenseDetail().getOwners().sort(Comparator.comparing(User::getUuid));
             license.getTradeLicenseDetail().getTradeUnits().sort(Comparator.comparing(TradeUnit::getId));
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getAccessories())) {
@@ -130,6 +131,10 @@ public class TLRepository {
                 license.getTradeLicenseDetail().getApplicationDocuments().sort(Comparator.comparing(Document::getId));
             if(!CollectionUtils.isEmpty(license.getTradeLicenseDetail().getVerificationDocuments()))
                 license.getTradeLicenseDetail().getVerificationDocuments().sort(Comparator.comparing(Document::getId));
+	} catch (Exception e) {
+		log.info("sortChildObjectsById: " + license.toString());
+		e.printStackTrace();
+	}
         });
     }
 
