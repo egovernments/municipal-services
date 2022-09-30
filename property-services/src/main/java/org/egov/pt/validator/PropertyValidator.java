@@ -479,7 +479,7 @@ public static final Logger log = LoggerFactory.getLogger(PropertyValidator.class
      * @return
      */
 	public boolean PropertyExists(List<Property> responseProperties) {
-		return (!CollectionUtils.isEmpty(responseProperties) && responseProperties.size() == 1);
+		return (!CollectionUtils.isEmpty(responseProperties));
 	}
 
     /**
