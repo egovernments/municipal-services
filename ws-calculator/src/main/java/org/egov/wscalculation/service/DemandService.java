@@ -1100,8 +1100,10 @@ public class DemandService {
 		return true;
 	}
 
-	public boolean fetchBill(List<Demand> demandResponse, RequestInfo requestInfo) {
+	public boolean fetchBill(List<Demand> demandResponse, RequestInfo requestInfo,Map<String, Object> masterMap) {
 		boolean notificationSent = false;
+		List<Demand> errorMap = new ArrayList<>();
+		int successCount=0;
 		for (Demand demand : demandResponse) {
 			try {
 				Object result = serviceRequestRepository.fetchResult(
@@ -1110,11 +1112,26 @@ public class DemandService {
 				HashMap<String, Object> billResponse = new HashMap<>();
 				billResponse.put("requestInfo", requestInfo);
 				billResponse.put("billResponse", result);
+//				log.info("Result"+result.toString());
 				wsCalculationProducer.push(configs.getPayTriggers(), billResponse);
 				notificationSent = true;
+				successCount++;
 			} catch (Exception ex) {
 				log.error("Fetch Bill Error", ex);
+                errorMap.add(demand);
 			}
+		}
+		String uuid = demandResponse.get(0).getAuditDetails().getCreatedBy();
+		if(errorMap.size() == demandResponse.size())
+		{
+			paymentNotificationService.sendBillNotification(requestInfo,uuid,demandResponse.get(0).getTenantId(),masterMap,false);
+		}
+		else
+		{if(!errorMap.isEmpty())
+			{
+				paymentNotificationService.sendBillNotification(requestInfo,uuid, demandResponse.get(0).getTenantId(), masterMap,false);
+			}
+			paymentNotificationService.sendBillNotification(requestInfo,uuid,demandResponse.get(0).getTenantId(),masterMap,true);
 		}
 		return notificationSent;
 	}
