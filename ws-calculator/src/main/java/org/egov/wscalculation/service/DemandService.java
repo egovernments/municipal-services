@@ -109,6 +109,9 @@ public class DemandService {
 
 	@Autowired
 	private WSCalculationWorkflowValidator wsCalulationWorkflowValidator;
+	
+	@Autowired
+	private PaymentNotificationService paymentNotificationService;
 
 	@Autowired
 	private WaterConnectionRepository waterConnectionRepository;
