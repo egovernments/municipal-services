@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import static org.egov.wscalculation.constants.WSCalculationConstant.CHANNEL_NAME_EVENT;
+import static org.egov.wscalculation.constants.WSCalculationConstant.CHANNEL_NAME_SMS;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.wscalculation.config.WSCalculationConfiguration;
@@ -90,35 +93,43 @@ public class PaymentNotificationService {
 			List<WaterConnection> waterConnectionList = calculatorUtil.getWaterConnection(requestInfo,
 					mappedRecord.get(consumerCode), mappedRecord.get(tenantId));
 			int size = waterConnectionList.size();
-			WaterConnection waterConnection = waterConnectionList.get(size-1);
+			WaterConnection waterConnection = waterConnectionList.get(size - 1);
 			WaterConnectionRequest waterConnectionRequest = WaterConnectionRequest.builder()
 					.waterConnection(waterConnection).requestInfo(requestInfo).build();
 			Property property = wSCalculationUtil.getProperty(waterConnectionRequest);
-			if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
-				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
-					if (waterConnection == null) {
-						throw new CustomException("WATER_CONNECTION_NOT_FOUND",
-								"Water Connection are not present for " + mappedRecord.get(consumerCode)
-										+ " connection no");
-					}
-					EventRequest eventRequest = getEventRequest(mappedRecord, waterConnectionRequest, topic, property);
-					if (eventRequest != null) {
-						log.info("In App Notification :: -> " + mapper.writeValueAsString(eventRequest));
-						notificationUtil.sendEventNotification(eventRequest);
+
+			List<String> configuredChannelNames = notificationUtil.fetchChannelList(waterConnectionRequest.getRequestInfo(), waterConnectionRequest.getWaterConnection().getTenantId(), "WS", waterConnectionRequest.getWaterConnection().getProcessInstance().getAction());
+
+			if (configuredChannelNames.contains(CHANNEL_NAME_EVENT)) {
+				if (config.getIsUserEventsNotificationEnabled() != null && config.getIsUserEventsNotificationEnabled()) {
+					if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
+						if (waterConnection == null) {
+							throw new CustomException("EG_WS_WATER_CONNECTION_NOT_FOUND",
+									"Water Connection are not present for " + mappedRecord.get(consumerCode)
+											+ " connection no");
+						}
+						EventRequest eventRequest = getEventRequest(mappedRecord, waterConnectionRequest, topic, property);
+						if (eventRequest != null) {
+							log.info("In App Notification :: -> " + mapper.writeValueAsString(eventRequest));
+							notificationUtil.sendEventNotification(eventRequest);
+						}
 					}
 				}
 			}
-			if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
-				if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
-					if (waterConnection == null) {
-						throw new CustomException("WATER_CONNECTION_NOT_FOUND",
-								"Water Connection are not present for " + mappedRecord.get(consumerCode)
-										+ " connection no");
-					}
-					List<SMSRequest> smsRequests = getSmsRequest(mappedRecord, waterConnectionRequest, topic, property);
-					if (!CollectionUtils.isEmpty(smsRequests)) {
-						log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
-						notificationUtil.sendSMS(smsRequests);
+
+			if (configuredChannelNames.contains(CHANNEL_NAME_SMS)) {
+				if (config.getIsSMSEnabled() != null && config.getIsSMSEnabled()) {
+					if (mappedRecord.get(serviceName).equalsIgnoreCase(WSCalculationConstant.SERVICE_FIELD_VALUE_WS)) {
+						if (waterConnection == null) {
+							throw new CustomException("EG_WS_WATER_CONNECTION_NOT_FOUND",
+									"Water Connection are not present for " + mappedRecord.get(consumerCode)
+											+ " connection no");
+						}
+						List<SMSRequest> smsRequests = getSmsRequest(mappedRecord, waterConnectionRequest, topic, property);
+						if (!CollectionUtils.isEmpty(smsRequests)) {
+							log.info("SMS Notification :: -> " + mapper.writeValueAsString(smsRequests));
+							notificationUtil.sendSMS(smsRequests);
+						}
 					}
 				}
 			}
