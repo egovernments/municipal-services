@@ -101,6 +101,19 @@ public class WSCalculationConstant {
 
 	public static final String DAYA_APPLICABLE_NAME = "applicableAfterDays";
 
+	//Notification
+		public static final String MODULECONSTANT = "module";
+		
+		public static final String ACTION = "action";
+		
+		public static final String CHANNEL_LIST = "channelList";
+		
+		public static final String CHANNEL = "Channel";
+		
+		public static final String CHANNEL_NAME_EVENT = "EVENT";
+		
+		public static final String CHANNEL_NAME_SMS = "SMS";
+	
 	/*
 	 * bigdecimal values
 	 */
